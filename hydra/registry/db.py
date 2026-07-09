@@ -18,6 +18,8 @@ ALLOWED_STATUSES = {
     "TOPSTEP_PAYOUT_SURVIVED", "TOPSTEP_REJECTED_SPIKE_DAY_DEPENDENCY",
     "TOPSTEP_REJECTED_LOW_MLL_BUFFER", "TOPSTEP_REJECTED_BAD_PAYOUT_PROFILE",
     "TOPSTEP_RESEARCH_CANDIDATE", "TOPSTEP_PORTFOLIO_CANDIDATE",
+    "DEAD_STRATEGY", "PROMISING_NEEDS_MUTATION", "TOPSTEP_NEAR_MISS",
+    "ECONOMICALLY_VIABLE", "TOPSTEP_VIABLE", "TRADING_READY_CANDIDATE",
 }
 
 
@@ -45,6 +47,20 @@ TOPSTEP_COLUMNS = {
     "max_consecutive_losing_days": "INTEGER NOT NULL DEFAULT 0",
     "winning_days_150_count": "INTEGER NOT NULL DEFAULT 0",
     "topstep_split_scores_json": "TEXT NOT NULL DEFAULT '{}'",
+    "strategy_fingerprint": "TEXT NOT NULL DEFAULT ''",
+    "parameter_zone": "TEXT NOT NULL DEFAULT ''",
+    "research_lane": "TEXT NOT NULL DEFAULT ''",
+    "promotion_stage": "TEXT NOT NULL DEFAULT 'GENERATED'",
+    "promotion_classification": "TEXT NOT NULL DEFAULT ''",
+    "promotion_score": "REAL NOT NULL DEFAULT 0",
+    "economic_score": "REAL NOT NULL DEFAULT 0",
+    "execution_readiness_score": "REAL NOT NULL DEFAULT 0",
+    "gate_history_json": "TEXT NOT NULL DEFAULT '[]'",
+    "recommended_action": "TEXT NOT NULL DEFAULT ''",
+    "config_export_path": "TEXT",
+    "risk_export_path": "TEXT",
+    "branch_action": "TEXT NOT NULL DEFAULT ''",
+    "lineage_json": "TEXT NOT NULL DEFAULT '{}'",
 }
 
 

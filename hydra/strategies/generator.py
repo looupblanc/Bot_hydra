@@ -4,6 +4,8 @@ import uuid
 
 import numpy as np
 
+from hydra.factory.topstep_sizing_optimizer import SIZING_MODES, candidate_sizing_plan
+from hydra.strategies.exit_policies import EXIT_POLICIES
 from hydra.strategies.dsl import StrategyCandidate
 from hydra.strategies.families import FAMILIES, TOPSTEP_FAMILIES
 
@@ -115,12 +117,18 @@ def _topstep_symbol_pool(symbols: list[str], family: str) -> list[str]:
 
 def _topstep_risk(symbol: str, rng: np.random.Generator) -> dict[str, float | int]:
     is_micro = symbol.startswith("M")
+    stop_distance_ticks = int(rng.choice([8, 12, 16, 20, 28, 36]))
+    risk_per_trade = float(rng.choice([150, 250, 350, 500, 750, 1000]))
+    sizing_mode = str(rng.choice(SIZING_MODES))
+    plan = candidate_sizing_plan(symbol, sizing_mode, risk_per_trade, stop_distance_ticks)
     return {
         "holding_period": int(rng.integers(3, 14)),
-        "risk_scale": float(rng.uniform(0.35, 1.10) if is_micro else rng.uniform(0.15, 0.55)),
-        "max_position": int(rng.integers(1, 4) if is_micro else 1),
-        "risk_per_trade": float(rng.choice([150, 250, 350, 500, 750])),
-        "stop_distance_ticks": int(rng.choice([8, 12, 16, 20, 28, 36])),
+        "risk_scale": float(plan.risk_scale * (rng.uniform(0.50, 1.15) if is_micro else rng.uniform(0.20, 0.65))),
+        "max_position": int(plan.max_position),
+        "sizing_mode": sizing_mode,
+        "risk_per_trade": float(plan.risk_per_trade),
+        "stop_distance_ticks": int(plan.stop_distance_ticks),
         "internal_daily_stop": float(rng.choice([500, 750, 1000, 1500, 2000])),
         "daily_profit_lock": float(rng.choice([750, 1000, 1500, 2000, 3000])),
+        "exit_policy": str(rng.choice(EXIT_POLICIES)),
     }

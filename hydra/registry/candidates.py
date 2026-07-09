@@ -110,3 +110,52 @@ def load_candidates(conn: sqlite3.Connection, status: str | None = None) -> list
     if status:
         return list(conn.execute("SELECT * FROM candidates WHERE validation_status = ? ORDER BY net_profit DESC", (status,)))
     return list(conn.execute("SELECT * FROM candidates ORDER BY created_at DESC"))
+
+
+def update_promotion_metadata(conn: sqlite3.Connection, candidate_id: str, promotion: dict) -> None:
+    conn.execute(
+        """
+        UPDATE candidates SET
+            validation_status=?,
+            rejection_reason=?,
+            strategy_fingerprint=?,
+            parameter_zone=?,
+            research_lane=?,
+            promotion_stage=?,
+            promotion_classification=?,
+            promotion_score=?,
+            economic_score=?,
+            execution_readiness_score=?,
+            gate_history_json=?,
+            recommended_action=?,
+            config_export_path=?,
+            risk_export_path=?,
+            branch_action=?,
+            lineage_json=?
+        WHERE candidate_id=?
+        """,
+        (
+            promotion.get("status"),
+            promotion.get("rejection_reason"),
+            promotion.get("strategy_fingerprint", ""),
+            promotion.get("parameter_zone", ""),
+            promotion.get("research_lane", ""),
+            promotion.get("promotion_stage", "GENERATED"),
+            promotion.get("classification", ""),
+            promotion.get("promotion_score", 0.0),
+            promotion.get("economic_score", 0.0),
+            promotion.get("execution_readiness_score", 0.0),
+            json.dumps(promotion.get("gate_history", []), sort_keys=True),
+            promotion.get("recommended_action", ""),
+            promotion.get("config_export_path"),
+            promotion.get("risk_export_path"),
+            promotion.get("branch_action", ""),
+            json.dumps(promotion.get("lineage", {}), sort_keys=True),
+            candidate_id,
+        ),
+    )
+    conn.commit()
+
+
+def load_strategy_fingerprints(conn: sqlite3.Connection) -> set[str]:
+    return {row["strategy_fingerprint"] for row in conn.execute("SELECT strategy_fingerprint FROM candidates WHERE strategy_fingerprint != ''")}

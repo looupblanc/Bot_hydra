@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import pandas as pd
 
 from hydra.backtest.costs import round_turn_cost
+from hydra.backtest.exits import evaluate_exit_policy
 from hydra.backtest.metrics import max_drawdown, profit_factor, sharpe_approx
 from hydra.markets.instruments import instrument_spec
 from hydra.strategies.dsl import StrategyCandidate
@@ -25,6 +26,10 @@ def run_backtest(candidate: StrategyCandidate, df: pd.DataFrame, seed: int = 42)
     risk_scale = float(candidate.risk_parameters.get("risk_scale", 1.0))
     hold = int(candidate.risk_parameters.get("holding_period", 8))
     max_position = int(candidate.risk_parameters.get("max_position", 1))
+    exit_policy = str(candidate.risk_parameters.get("exit_policy", "time_stop"))
+    risk_dollars = float(candidate.risk_parameters.get("risk_per_trade", 500.0))
+    daily_stop = float(candidate.risk_parameters.get("internal_daily_stop", 1000.0))
+    daily_profit_lock = float(candidate.risk_parameters.get("daily_profit_lock", 1500.0))
     equity = 0.0
     curve: list[float] = []
     trades: list[dict] = []
@@ -36,9 +41,13 @@ def run_backtest(candidate: StrategyCandidate, df: pd.DataFrame, seed: int = 42)
     cost = round_turn_cost(candidate.symbol)
     closes = df["close"].to_numpy(dtype=float)
     signal_values = signals.to_numpy(dtype=float)
+    sessions = df["session_id"].astype(str).to_numpy() if "session_id" in df.columns else ["all"] * len(df)
     slippage_bps = 0.5
+    daily_pnl: dict[str, float] = {}
 
     for i, close in enumerate(closes):
+        session_id = str(sessions[i])
+        day_pnl = daily_pnl.get(session_id, 0.0)
         signal = int(signal_values[i])
         execution_side = signal if signal else (pos or 1)
         price = float(close + execution_side * close * slippage_bps / 10_000)
@@ -46,16 +55,32 @@ def run_backtest(candidate: StrategyCandidate, df: pd.DataFrame, seed: int = 42)
             open_pnl = (close - entry_price) * pos * point_value * risk_scale
             mfe = max(mfe, open_pnl)
             mae = min(mae, open_pnl)
-            should_exit = (i - entry_i >= hold) or (signal == -pos)
+            exit_decision = evaluate_exit_policy(
+                exit_policy,
+                open_pnl=open_pnl,
+                mfe=mfe,
+                mae=mae,
+                bars_held=i - entry_i,
+                holding_period=hold,
+                risk_dollars=risk_dollars,
+                daily_pnl=day_pnl,
+                daily_stop=daily_stop,
+                daily_profit_lock=daily_profit_lock,
+                mll_buffer=4500.0 + equity,
+            )
+            should_exit = exit_decision.should_exit or (signal == -pos)
             if should_exit:
                 pnl = (price - entry_price) * pos * point_value * risk_scale - cost * risk_scale
                 equity += pnl
-                trades.append({"entry_i": entry_i, "exit_i": i, "side": pos, "pnl": float(pnl), "mfe": float(mfe), "mae": float(mae)})
+                daily_pnl[session_id] = daily_pnl.get(session_id, 0.0) + float(pnl)
+                trades.append({"entry_i": entry_i, "exit_i": i, "side": pos, "pnl": float(pnl), "mfe": float(mfe), "mae": float(mae), "exit_reason": exit_decision.reason})
                 pos = 0
                 entry_price = 0.0
                 mfe = 0.0
                 mae = 0.0
-        if pos == 0 and signal != 0:
+        day_pnl = daily_pnl.get(session_id, 0.0)
+        can_trade_today = day_pnl > -daily_stop and day_pnl < daily_profit_lock
+        if pos == 0 and signal != 0 and can_trade_today:
             pos = max(-max_position, min(max_position, signal))
             entry_price = price
             entry_i = i
