@@ -11,3 +11,4 @@ ta
 SQLAlchemy
 python-dotenv
 joblib
+databento

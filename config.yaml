@@ -13,6 +13,21 @@ markets:
   symbols: [ES, MES, NQ, MNQ]
   timeframes: [intraday, daily, 2d, 3d, 5d]
 
+data:
+  provider: synthetic
+  cache_folder: data/cache
+  databento:
+    provider: databento
+    dataset: GLBX.MDP3
+    schema: ohlcv-1m
+    symbols: [ES, MES, NQ, MNQ]
+    start_date: "2024-01-01"
+    end_date: "2024-01-05"
+    timeframe: 1m
+    stype_in: raw_symbol
+    stype_out: instrument_id
+    cache_folder: data/cache/databento
+
 strategy_factory:
   enabled: true
   target_qualified_strategies: 10

@@ -11,6 +11,8 @@ data/raw/
 *.parquet
 *.csv
 *.zip
+*.dbn
+*.dbn.zst
 registry/*.db
 registry/archive/*.db
 reports/*.json
