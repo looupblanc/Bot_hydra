@@ -6,5 +6,15 @@ __pycache__/
 .env
 logs/
 *.log
+data/cache/
+data/raw/
+*.parquet
+*.csv
+*.zip
+registry/*.db
+registry/archive/*.db
+reports/*.json
+!reports/
+!reports/*.md
 .DS_Store
 .cache/

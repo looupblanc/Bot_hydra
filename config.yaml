@@ -34,6 +34,7 @@ strategy_factory:
 validation:
   min_trades: 100
   min_profit_factor: 1.2
+  min_robustness_score: 0.45
   min_sharpe: 0.5
   max_drawdown_pct: 10.0
   require_walk_forward: true
@@ -54,6 +55,14 @@ risk_compression:
   max_strategies: 10
   objective: [reduce_drawdown, improve_mll_buffer, preserve_net_profit, reduce_correlation]
   max_risk_reduction_steps: 20
+
+diagnostics:
+  synthetic_relaxed:
+    bars: 3000
+    min_trades: 25
+    min_profit_factor: 1.01
+    min_robustness_score: 0.15
+    reject_if_mll_buffer_below: 100
 
 continuous:
   enabled: true

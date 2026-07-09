@@ -5,7 +5,6 @@ from dataclasses import dataclass
 import pandas as pd
 
 from hydra.backtest.costs import round_turn_cost
-from hydra.backtest.fills import execution_price
 from hydra.backtest.metrics import max_drawdown, profit_factor, sharpe_approx
 from hydra.strategies.dsl import StrategyCandidate
 from hydra.strategies.families import signal_for_candidate
@@ -34,12 +33,16 @@ def run_backtest(candidate: StrategyCandidate, df: pd.DataFrame, seed: int = 42)
     mfe = 0.0
     mae = 0.0
     cost = round_turn_cost(candidate.symbol)
+    closes = df["close"].to_numpy(dtype=float)
+    signal_values = signals.to_numpy(dtype=float)
+    slippage_bps = 0.5
 
-    for i, row in df.iterrows():
-        signal = int(signals.iloc[i])
-        price = execution_price(row, signal if signal else (pos or 1))
+    for i, close in enumerate(closes):
+        signal = int(signal_values[i])
+        execution_side = signal if signal else (pos or 1)
+        price = float(close + execution_side * close * slippage_bps / 10_000)
         if pos:
-            open_pnl = (float(row["close"]) - entry_price) * pos * point_value * risk_scale
+            open_pnl = (close - entry_price) * pos * point_value * risk_scale
             mfe = max(mfe, open_pnl)
             mae = min(mae, open_pnl)
             should_exit = (i - entry_i >= hold) or (signal == -pos)

@@ -10,9 +10,22 @@ from hydra.validation.no_leak import audit_no_lookahead
 from hydra.validation.robustness import robustness_score
 
 
-def evaluate_and_log(conn, candidate, config: dict, synthetic: bool, seed: int, existing_curves: dict) -> str:
-    raw = load_market_data(candidate.symbol, candidate.timeframe, synthetic, seed)
+def evaluate_and_log(
+    conn,
+    candidate,
+    config: dict,
+    synthetic: bool,
+    seed: int,
+    existing_curves: dict,
+    diagnostic_relaxed: bool = False,
+    bars: int = 1500,
+) -> str:
+    raw = load_market_data(candidate.symbol, candidate.timeframe, synthetic, seed, bars=bars, diagnostic_relaxed=diagnostic_relaxed)
     df = build_market_state(raw)
+    return evaluate_candidate_on_frame(conn, candidate, df, config, seed, existing_curves)
+
+
+def evaluate_candidate_on_frame(conn, candidate, df, config: dict, seed: int, existing_curves: dict) -> str:
     leak_ok, leak_reason = audit_no_lookahead(df)
     result = run_backtest(candidate, df, seed)
     prop = evaluate_topstep_style(result.equity_curve, config["propfirm"])
@@ -33,7 +46,7 @@ def evaluate_and_log(conn, candidate, config: dict, synthetic: bool, seed: int, 
         status, reason = "REJECTED_MLL_BUFFER_TOO_LOW", "mll_buffer_below_absolute_floor"
     elif correlated:
         status, reason = "REJECTED_CORRELATED", "equity_curve_correlation_too_high"
-    elif robust < 0.45:
+    elif robust < config["validation"].get("min_robustness_score", 0.45):
         status, reason = "REJECTED_NOT_ROBUST", "robustness_score_below_threshold"
     elif metrics["max_drawdown"] > config["propfirm"]["max_loss_limit"]:
         status, reason = "REJECTED_TOO_MUCH_DRAWDOWN", "drawdown_above_prop_limit"
