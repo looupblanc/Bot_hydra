@@ -1,0 +1,75 @@
+project:
+  name: hydra
+  mode: research
+  live_trading_allowed: false
+
+runtime:
+  timezone: Australia/Perth
+  loop_interval_seconds: 60
+  max_workers: 4
+  random_seed: 42
+
+markets:
+  symbols: [ES, MES, NQ, MNQ]
+  timeframes: [intraday, daily, 2d, 3d, 5d]
+
+strategy_factory:
+  enabled: true
+  target_qualified_strategies: 10
+  max_candidates_per_run: 12000
+  candidate_batch_size: 500
+  families:
+    - multi_session_momentum_exhaustion
+    - volatility_regime_expansion
+    - regime_compression_breakout
+    - session_exhaustion_reversal
+    - volatility_shift_continuation
+  forbidden_families:
+    - simple_rsi
+    - simple_ema_cross
+    - simple_bollinger
+    - naive_breakout
+    - naive_mean_reversion
+
+validation:
+  min_trades: 100
+  min_profit_factor: 1.2
+  min_sharpe: 0.5
+  max_drawdown_pct: 10.0
+  require_walk_forward: true
+  require_no_lookahead_audit: true
+  require_monte_carlo: true
+  require_correlation_check: true
+
+propfirm:
+  account_size: 150000
+  max_loss_limit: 4500
+  trailing_mll_enabled: true
+  min_mll_buffer: 500
+  target_mll_buffer: 2500
+  reject_if_mll_buffer_below: 250
+
+risk_compression:
+  enabled: true
+  max_strategies: 10
+  objective: [reduce_drawdown, improve_mll_buffer, preserve_net_profit, reduce_correlation]
+  max_risk_reduction_steps: 20
+
+continuous:
+  enabled: true
+  cycle_sleep_seconds: 300
+  target_qualified_strategies: 10
+  report_every_cycles: 10
+
+registry:
+  path: registry/hydra_registry.db
+  log_all_candidates: true
+  log_rejections: true
+  log_mutations: true
+
+logging:
+  level: INFO
+  folder: logs
+
+reports:
+  folder: reports

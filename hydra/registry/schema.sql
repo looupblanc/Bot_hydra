@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS candidates (
+    candidate_id TEXT PRIMARY KEY,
+    family TEXT NOT NULL,
+    symbol TEXT NOT NULL,
+    timeframe TEXT NOT NULL,
+    parameters_json TEXT NOT NULL,
+    risk_json TEXT NOT NULL DEFAULT '{}',
+    net_profit REAL NOT NULL DEFAULT 0,
+    max_drawdown REAL NOT NULL DEFAULT 0,
+    profit_factor REAL NOT NULL DEFAULT 0,
+    sharpe REAL NOT NULL DEFAULT 0,
+    trade_count INTEGER NOT NULL DEFAULT 0,
+    win_rate REAL NOT NULL DEFAULT 0,
+    mll_breached INTEGER NOT NULL DEFAULT 0,
+    mll_buffer REAL NOT NULL DEFAULT 0,
+    correlation_cluster TEXT,
+    validation_status TEXT NOT NULL,
+    rejection_reason TEXT,
+    robustness_score REAL NOT NULL DEFAULT 0,
+    parent_candidate_id TEXT,
+    mutation_type TEXT,
+    created_at TEXT NOT NULL
+);
