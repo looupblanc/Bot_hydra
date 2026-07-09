@@ -1,0 +1,13 @@
+pandas
+numpy
+scipy
+scikit-learn
+pyyaml
+requests
+tqdm
+rich
+matplotlib
+ta
+SQLAlchemy
+python-dotenv
+joblib
