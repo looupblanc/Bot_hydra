@@ -40,6 +40,8 @@ def evaluate_candidate_on_frame(conn, candidate, df, config: dict, seed: int, ex
         status, reason = "REJECTED_TOO_FEW_TRADES", "below_min_trade_count"
     elif metrics["profit_factor"] < config["validation"]["min_profit_factor"] or metrics["net_profit"] <= 0:
         status, reason = "REJECTED_NO_EDGE", "profit_factor_or_net_profit_below_threshold"
+    elif metrics["sharpe"] < config["validation"].get("min_sharpe", 0.5):
+        status, reason = "REJECTED_NO_EDGE", "sharpe_below_threshold"
     elif prop["mll_breached"]:
         status, reason = "REJECTED_MLL_BREACH", "trailing_mll_breached"
     elif prop["mll_buffer"] < config["propfirm"]["reject_if_mll_buffer_below"]:
@@ -50,6 +52,8 @@ def evaluate_candidate_on_frame(conn, candidate, df, config: dict, seed: int, ex
         status, reason = "REJECTED_NOT_ROBUST", "robustness_score_below_threshold"
     elif metrics["max_drawdown"] > config["propfirm"]["max_loss_limit"]:
         status, reason = "REJECTED_TOO_MUCH_DRAWDOWN", "drawdown_above_prop_limit"
+    elif metrics["max_drawdown"] > config["propfirm"]["account_size"] * config["validation"].get("max_drawdown_pct", 10.0) / 100.0:
+        status, reason = "REJECTED_TOO_MUCH_DRAWDOWN", "drawdown_above_validation_pct"
     upsert_candidate(conn, candidate, metrics, prop, status, reason, robust, cluster)
     if status == "QUALIFIED":
         existing_curves[candidate.candidate_id] = result.equity_curve
