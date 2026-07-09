@@ -6,6 +6,7 @@ import pandas as pd
 
 from hydra.backtest.costs import round_turn_cost
 from hydra.backtest.metrics import max_drawdown, profit_factor, sharpe_approx
+from hydra.markets.instruments import instrument_spec
 from hydra.strategies.dsl import StrategyCandidate
 from hydra.strategies.families import signal_for_candidate
 
@@ -20,7 +21,7 @@ class BacktestResult:
 
 def run_backtest(candidate: StrategyCandidate, df: pd.DataFrame, seed: int = 42) -> BacktestResult:
     signals = signal_for_candidate(candidate, df)
-    point_value = 5.0 if candidate.symbol.startswith("M") else 50.0
+    point_value = instrument_spec(candidate.symbol).point_value
     risk_scale = float(candidate.risk_parameters.get("risk_scale", 1.0))
     hold = int(candidate.risk_parameters.get("holding_period", 8))
     max_position = int(candidate.risk_parameters.get("max_position", 1))
