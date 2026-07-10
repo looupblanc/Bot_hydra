@@ -1,0 +1,262 @@
+{
+  "candidate_count": 12,
+  "candidates": [
+    {
+      "candidate_id": "intraday_range_migration_path_asymmetry_06_00",
+      "components": [
+        "accepted_center_migration",
+        "time_at_extremes"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "intraday_range_migration_path_asymmetry",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "RAW_POSITIVE_NET",
+        "RAW_ECONOMIC_SCREEN_PASS",
+        "MATCHED_NULL_BEATEN",
+        "REPRESENTATION_EVIDENCE_PASS",
+        "TOPSTEP_PATH_CANDIDATE",
+        "TOPSTEP_COMPATIBLE"
+      ],
+      "replay_role": "REPRESENTATION_EVIDENCE_CANDIDATE",
+      "sizing": "fixed_one_contract",
+      "structural_id": "intraday_range_migration_path_asymmetry_struct_06",
+      "symbol": "NQ",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "overnight_inventory_rth_resolution_09_00",
+      "components": [
+        "opening_response",
+        "acceptance_rejection"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "overnight_inventory_rth_resolution",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "RAW_POSITIVE_NET",
+        "RAW_ECONOMIC_SCREEN_PASS",
+        "MATCHED_NULL_BEATEN",
+        "REPRESENTATION_EVIDENCE_PASS"
+      ],
+      "replay_role": "REPRESENTATION_EVIDENCE_CANDIDATE",
+      "sizing": "fixed_one_contract",
+      "structural_id": "overnight_inventory_rth_resolution_struct_09",
+      "symbol": "MES",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "overnight_inventory_rth_resolution_05_00",
+      "components": [
+        "regime_context"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "overnight_inventory_rth_resolution",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "RAW_POSITIVE_NET",
+        "MATCHED_NULL_BEATEN",
+        "REPRESENTATION_EVIDENCE_PASS"
+      ],
+      "replay_role": "REPRESENTATION_EVIDENCE_CANDIDATE",
+      "sizing": "fixed_one_contract",
+      "structural_id": "overnight_inventory_rth_resolution_struct_05",
+      "symbol": "MES",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "intraday_range_migration_path_asymmetry_03_00",
+      "components": [
+        "path_asymmetry"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "intraday_range_migration_path_asymmetry",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "MATCHED_NULL_BEATEN",
+        "REPRESENTATION_EVIDENCE_PASS"
+      ],
+      "replay_role": "REPRESENTATION_EVIDENCE_CANDIDATE",
+      "sizing": "fixed_one_contract",
+      "structural_id": "intraday_range_migration_path_asymmetry_struct_03",
+      "symbol": "MNQ",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "intraday_range_migration_path_asymmetry_02_00",
+      "components": [
+        "effort_vs_progress"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "intraday_range_migration_path_asymmetry",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "RAW_POSITIVE_NET",
+        "RAW_ECONOMIC_SCREEN_PASS",
+        "MATCHED_NULL_BEATEN"
+      ],
+      "replay_role": "MATCHED_NULL_POSITIVE_CONTROL",
+      "sizing": "fixed_one_contract",
+      "structural_id": "intraday_range_migration_path_asymmetry_struct_02",
+      "symbol": "NQ",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "overnight_inventory_rth_resolution_01_00",
+      "components": [
+        "overnight_participation"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "overnight_inventory_rth_resolution",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "MATCHED_NULL_BEATEN"
+      ],
+      "replay_role": "MATCHED_NULL_POSITIVE_CONTROL",
+      "sizing": "fixed_one_contract",
+      "structural_id": "overnight_inventory_rth_resolution_struct_01",
+      "symbol": "MES",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "intraday_range_migration_path_asymmetry_00_00",
+      "components": [
+        "accepted_center_migration"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "intraday_range_migration_path_asymmetry",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "MATCHED_NULL_BEATEN"
+      ],
+      "replay_role": "MATCHED_NULL_POSITIVE_CONTROL",
+      "sizing": "fixed_one_contract",
+      "structural_id": "intraday_range_migration_path_asymmetry_struct_00",
+      "symbol": "ES",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "intraday_range_migration_path_asymmetry_09_00",
+      "components": [
+        "path_asymmetry",
+        "range_relocation"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "intraday_range_migration_path_asymmetry",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "MATCHED_NULL_BEATEN"
+      ],
+      "replay_role": "MATCHED_NULL_POSITIVE_CONTROL",
+      "sizing": "fixed_one_contract",
+      "structural_id": "intraday_range_migration_path_asymmetry_struct_09",
+      "symbol": "MES",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "overnight_inventory_rth_resolution_00_00",
+      "components": [
+        "overnight_displacement"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "overnight_inventory_rth_resolution",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "MATCHED_NULL_BEATEN"
+      ],
+      "replay_role": "MATCHED_NULL_POSITIVE_CONTROL",
+      "sizing": "fixed_one_contract",
+      "structural_id": "overnight_inventory_rth_resolution_struct_00",
+      "symbol": "ES",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "intraday_range_migration_path_asymmetry_01_00",
+      "components": [
+        "time_at_extremes"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "intraday_range_migration_path_asymmetry",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "FALSIFIED"
+      ],
+      "replay_role": "MATCHED_NULL_NEGATIVE_CONTROL",
+      "sizing": "fixed_one_contract",
+      "structural_id": "intraday_range_migration_path_asymmetry_struct_01",
+      "symbol": "MES",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "intraday_range_migration_path_asymmetry_04_00",
+      "components": [
+        "range_relocation"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "intraday_range_migration_path_asymmetry",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "FALSIFIED"
+      ],
+      "replay_role": "MATCHED_NULL_NEGATIVE_CONTROL",
+      "sizing": "fixed_one_contract",
+      "structural_id": "intraday_range_migration_path_asymmetry_struct_04",
+      "symbol": "ES",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    },
+    {
+      "candidate_id": "intraday_range_migration_path_asymmetry_05_00",
+      "components": [
+        "session_phase"
+      ],
+      "cost_model": "round_turn_cost_v1",
+      "horizon": 20,
+      "lane": "intraday_range_migration_path_asymmetry",
+      "max_trades_per_period": 80,
+      "previous_statuses": [
+        "FALSIFIED"
+      ],
+      "replay_role": "MATCHED_NULL_NEGATIVE_CONTROL",
+      "sizing": "fixed_one_contract",
+      "structural_id": "intraday_range_migration_path_asymmetry_struct_05",
+      "symbol": "MES",
+      "threshold_rank": 0,
+      "variant_id": "variant_00"
+    }
+  ],
+  "data_fingerprints": {
+    "q1": "212b69f59eb0ec68238bce022691759a49f40c655b57f2cabd3030d26de7fdac",
+    "q2": "cc1c3dbacb6ce94c6960b7bed5c65c2d4bff068a4af49a89273590a269845332",
+    "q3": "d946a85eb563c53d86b15a8534bd228c80f102905a2a008610a33ee6c05ba1a5"
+  },
+  "decision_policy_version": "candidate_null_policy_v1",
+  "manifest_hash": "97a40215f1454fe31b5b7ddce858f90f7caa1598d09d0f935b0eefcd25870e60",
+  "manifest_type": "strict_unsampled_temporal_transfer_replay",
+  "parameter_mutation_allowed": false,
+  "q4_access_allowed": false,
+  "sizing_optimization_allowed": false,
+  "source_commit": "7a05294ff2d2fd2154ec7e4e470b80a7cac4fdac",
+  "source_report": "reports/targeted_representation_pilot/targeted_representation_repair_20260710T083333+0000_targeted_ablation_and_cost_forensics_v2.md"
+}
