@@ -58,6 +58,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
     "post_calibration_retest_research_design",
+    "validator_integrity_repair_pilot",
 }
 
 
@@ -346,6 +347,11 @@ class AutonomousMissionController:
                 "post_calibration_retest_research_design",
                 "post_retest_research_design_completed",
             ),
+            (
+                POST_RETEST_PILOT_EXPERIMENT_ID,
+                "validator_integrity_repair_pilot",
+                "validator_integrity_repair_pilot_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -364,15 +370,12 @@ class AutonomousMissionController:
                 "report_path": result.get("report_path") or (result.get("paths") or {}).get("report"),
             }
             set_kv(conn, completion_flag, True)
-            result_key = (
-                "calibration_retest_design_result"
-                if experiment_type == "calibration_affected_atom_retest_design"
-                else (
-                    "calibration_retest_execution_result"
-                    if experiment_type == "calibration_affected_atom_retest_execution"
-                    else "post_retest_research_design_result"
-                )
-            )
+            result_key = {
+                "calibration_affected_atom_retest_design": "calibration_retest_design_result",
+                "calibration_affected_atom_retest_execution": "calibration_retest_execution_result",
+                "post_calibration_retest_research_design": "post_retest_research_design_result",
+                "validator_integrity_repair_pilot": "validator_integrity_repair_pilot_result",
+            }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
             set_kv(conn, "latest_scientific_finding", finding)
@@ -384,6 +387,15 @@ class AutonomousMissionController:
                     set_kv(conn, "milestone", "M2_FIRST_VALIDATED_MECHANISM")
             elif experiment_type == "post_calibration_retest_research_design":
                 self._queue_post_retest_pilot(conn, result)
+            elif experiment_type == "validator_integrity_repair_pilot":
+                disposition = str(result.get("integrity_disposition") or "INTEGRITY_AUDIT_INCONCLUSIVE")
+                set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+                set_kv(conn, "current_blocker", disposition)
+                set_kv(
+                    conn,
+                    "last_error",
+                    f"Validator-integrity pilot requires controlled resolution: {disposition}",
+                )
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,

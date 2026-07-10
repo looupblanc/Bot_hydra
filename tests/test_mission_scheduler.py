@@ -382,6 +382,7 @@ def test_missing_handler_is_blocked_before_claim_and_auto_clears_after_install(
 
     conn, paths = _connection(tmp_path)
     controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr("hydra.mission.controller.check_action_allowed", lambda *args, **kwargs: None)
     governance = SimpleNamespace(
         manifest_hash="test-hash",
         manifest_path="test-manifest",
@@ -694,6 +695,57 @@ def test_completed_experiment_reconciliation_retries_publication_after_crash(
             if line.strip()
         ]
         assert len([row for row in reconciliation_rows if row.get("reconciliation_id")]) == 1
+    finally:
+        conn.close()
+
+
+def test_completed_validator_integrity_pilot_is_reconciled_and_blocks_for_map_repair(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        set_kv(conn, "mission_id", "test")
+        enqueue_experiment(
+            conn,
+            POST_RETEST_PILOT_EXPERIMENT_ID,
+            {"experiment_type": "validator_integrity_repair_pilot"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            POST_RETEST_PILOT_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": "CONTRACT_MAP_DATE_FLATTENING_INTEGRITY_DEFECT_CONFIRMED_NO_CANDIDATE_RERUN",
+                "integrity_disposition": "CONTRACT_MAP_REBUILD_REQUIRED",
+                "result_hash": "diagnostic-result",
+                "report_path": "integrity.md",
+                "fully_validated_edge_atoms": 0,
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+        controller._reconcile_completed_experiments(conn)
+        controller._reconcile_completed_experiments(conn)
+        assert json.loads(
+            conn.execute(
+                "SELECT value FROM kv WHERE key='validator_integrity_repair_pilot_completed'"
+            ).fetchone()[0]
+        ) is True
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]) == (
+            "INTEGRITY_BLOCKED"
+        )
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_blocker'").fetchone()[0]) == (
+            "CONTRACT_MAP_REBUILD_REQUIRED"
+        )
+        evidence = [
+            json.loads(line)
+            for line in paths.evidence_ledger.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        assert len(
+            [row for row in evidence if row.get("experiment_id") == POST_RETEST_PILOT_EXPERIMENT_ID]
+        ) == 1
     finally:
         conn.close()
 

@@ -96,4 +96,19 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             source_execution_specification_hash=str(experiment["source_execution_specification_hash"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "validator_integrity_repair_pilot":
+        from hydra.validation.retest_integrity_repair import run_validator_integrity_repair_pilot
+
+        return run_validator_integrity_repair_pilot(
+            output_dir,
+            source_execution_result_path=Path(str(experiment["source_execution_result_path"])),
+            source_execution_result_hash=str(experiment["source_execution_result_hash"]),
+            source_execution_experiment_id=str(experiment["source_execution_experiment_id"]),
+            source_execution_specification_hash=str(experiment["source_execution_specification_hash"]),
+            post_retest_design_path=Path(str(experiment["post_retest_design_path"])),
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_hash=str(experiment["engineering_task_hash"]),
+            selected_post_retest_branch=str(experiment["selected_post_retest_branch"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")
