@@ -1,0 +1,41 @@
+{
+  "created_at_utc": "2026-07-10T00:00:00+00:00",
+  "source_report": "reports/market_representation_lab/market_representation_decision_20260710T070809+0000_bounded_market_representation_pilot_v1.md",
+  "disposition": "FALSIFIED_FORMULATIONS",
+  "q4_accessed": false,
+  "falsified_formulations": [
+    {
+      "representation_id": "roll_aware_beta_neutral_nq_es_residual_divergence",
+      "allowed_this_phase": "execution_cost_forensics_only",
+      "reason": "Failed matched/null evidence and economic transfer in bounded pilot."
+    },
+    {
+      "representation_id": "opening_auction_displacement_failed_continuation",
+      "allowed_this_phase": "frozen",
+      "reason": "Failed matched/null evidence in bounded pilot."
+    },
+    {
+      "representation_id": "volatility_shape_transition",
+      "allowed_this_phase": "frozen",
+      "reason": "Failed matched/null evidence and costs erased pilot effect."
+    },
+    {
+      "representation_id": "overnight_inventory_rth_resolution",
+      "allowed_this_phase": "targeted_reformulation_only",
+      "reason": "Raw economics existed but null evidence failed; ablation required before any child."
+    },
+    {
+      "representation_id": "intraday_range_migration_path_asymmetry",
+      "allowed_this_phase": "targeted_reformulation_only",
+      "reason": "Raw economics existed but null evidence failed; ablation required before any child."
+    }
+  ],
+  "child_requirements": [
+    "new representation ID",
+    "structural failure diagnosed by ablation",
+    "materially different economic mechanism",
+    "rewritten hypothesis and falsification criteria",
+    "no inherited validation status",
+    "matched-null evidence required before Topstep evaluation"
+  ]
+}

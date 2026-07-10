@@ -7,6 +7,7 @@ from typing import Any
 import pandas as pd
 
 from hydra.backtest.costs import round_turn_cost
+from hydra.execution.cost_units import leg_cost_breakdown
 from hydra.markets.instruments import instrument_spec
 
 
@@ -26,6 +27,8 @@ class PairLeg:
     point_value: float
     commission: float
     slippage: float
+    spread_cost: float = 0.0
+    forced_liquidation_cost: float = 0.0
 
     @property
     def gross_pnl(self) -> float:
@@ -33,10 +36,24 @@ class PairLeg:
 
     @property
     def net_pnl(self) -> float:
-        return self.gross_pnl - self.commission - self.slippage
+        return self.gross_pnl - self.execution_cost_usd
+
+    @property
+    def execution_cost_usd(self) -> float:
+        return self.commission + self.slippage + self.spread_cost + self.forced_liquidation_cost
+
+    @property
+    def notional_exposure_usd(self) -> float:
+        return self.entry_price * self.point_value * self.quantity
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self) | {"gross_pnl": self.gross_pnl, "net_pnl": self.net_pnl}
+        return asdict(self) | {
+            "gross_pnl": self.gross_pnl,
+            "net_pnl": self.net_pnl,
+            "execution_cost_usd": self.execution_cost_usd,
+            "notional_exposure_usd": self.notional_exposure_usd,
+            "mark_to_market_movement_usd": self.gross_pnl,
+        }
 
 
 @dataclass(frozen=True)
@@ -57,6 +74,10 @@ class TwoLegTrade:
     def net_pnl(self) -> float:
         return self.left.net_pnl + self.right.net_pnl + self.legging_risk_pnl
 
+    @property
+    def execution_cost_usd(self) -> float:
+        return self.left.execution_cost_usd + self.right.execution_cost_usd
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "entry_timestamp": self.entry_timestamp,
@@ -68,6 +89,9 @@ class TwoLegTrade:
             "failed_second_leg": self.failed_second_leg,
             "gross_pnl": self.gross_pnl,
             "net_pnl": self.net_pnl,
+            "execution_cost_usd": self.execution_cost_usd,
+            "notional_exposure_usd": self.left.notional_exposure_usd + self.right.notional_exposure_usd,
+            "mark_to_market_movement_usd": self.gross_pnl,
         }
 
 
@@ -85,20 +109,25 @@ def build_two_leg_trade(
     left_exit: float,
     right_exit: float,
     mode: ExecutionMode = ExecutionMode.ATOMIC_CONSERVATIVE,
-    slippage_bps: float = 0.5,
+    slippage_ticks: float = 1.0,
+    spread_ticks: float = 0.0,
+    forced_liquidation_ticks: float = 0.0,
     legging_delay_bars: int = 1,
+    slippage_bps: float | None = None,
 ) -> TwoLegTrade:
     left_side = int(direction)
     right_side = -int(direction)
-    left = _leg(left_symbol, left_quantity, left_side, left_entry, left_exit, slippage_bps)
-    right = _leg(right_symbol, right_quantity, right_side, right_entry, right_exit, slippage_bps)
+    if slippage_bps is not None:
+        slippage_ticks = float(slippage_bps)
+    left = _leg(left_symbol, left_quantity, left_side, left_entry, left_exit, slippage_ticks, spread_ticks, forced_liquidation_ticks)
+    right = _leg(right_symbol, right_quantity, right_side, right_entry, right_exit, slippage_ticks, spread_ticks, forced_liquidation_ticks)
     legging_risk = 0.0
     failed_second_leg = False
     if mode == ExecutionMode.LEG_SEQUENTIAL_STRESS:
-        legging_risk = -abs(left_entry) * slippage_bps * max(1, legging_delay_bars) / 10_000.0 * instrument_spec(left_symbol).point_value * left_quantity
+        legging_risk = -float(legging_delay_bars) * instrument_spec(left_symbol).tick_value * float(slippage_ticks) * int(left_quantity)
     elif mode == ExecutionMode.MIDPOINT_RESEARCH_ONLY:
-        left = _leg(left_symbol, left_quantity, left_side, left_entry, left_exit, 0.0)
-        right = _leg(right_symbol, right_quantity, right_side, right_entry, right_exit, 0.0)
+        left = _leg(left_symbol, left_quantity, left_side, left_entry, left_exit, 0.0, 0.0, 0.0)
+        right = _leg(right_symbol, right_quantity, right_side, right_entry, right_exit, 0.0, 0.0, 0.0)
     return TwoLegTrade(
         entry_timestamp=_as_utc_iso(entry_timestamp),
         exit_timestamp=_as_utc_iso(exit_timestamp),
@@ -110,21 +139,37 @@ def build_two_leg_trade(
     )
 
 
-def _leg(symbol: str, quantity: int, side: int, entry: float, exit_: float, slippage_bps: float) -> PairLeg:
+def _leg(
+    symbol: str,
+    quantity: int,
+    side: int,
+    entry: float,
+    exit_: float,
+    slippage_ticks: float,
+    spread_ticks: float,
+    forced_liquidation_ticks: float,
+) -> PairLeg:
     spec = instrument_spec(symbol)
-    adverse_entry = entry + side * entry * slippage_bps / 10_000.0
-    adverse_exit = exit_ - side * exit_ * slippage_bps / 10_000.0
-    slippage = (abs(adverse_entry - entry) + abs(adverse_exit - exit_)) * spec.point_value * quantity
-    commission = round_turn_cost(symbol) * quantity
+    costs = leg_cost_breakdown(
+        symbol=symbol,
+        quantity=quantity,
+        reference_price=entry,
+        entry_slippage_ticks=slippage_ticks,
+        exit_slippage_ticks=slippage_ticks,
+        spread_ticks=spread_ticks,
+        forced_liquidation_ticks=forced_liquidation_ticks,
+    )
     return PairLeg(
         symbol=symbol,
         quantity=int(quantity),
         side=int(side),
-        entry_price=float(adverse_entry),
-        exit_price=float(adverse_exit),
+        entry_price=float(entry),
+        exit_price=float(exit_),
         point_value=float(spec.point_value),
-        commission=float(commission),
-        slippage=float(slippage),
+        commission=float(costs.round_turn_commission_usd),
+        slippage=float(costs.slippage_cost_usd),
+        spread_cost=float(costs.spread_cost_usd),
+        forced_liquidation_cost=float(costs.forced_liquidation_cost_usd),
     )
 
 
