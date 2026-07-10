@@ -61,6 +61,12 @@ TOPSTEP_COLUMNS = {
     "risk_export_path": "TEXT",
     "branch_action": "TEXT NOT NULL DEFAULT ''",
     "lineage_json": "TEXT NOT NULL DEFAULT '{}'",
+    "validation_provenance_json": "TEXT NOT NULL DEFAULT '{}'",
+    "validation_version": "TEXT NOT NULL DEFAULT ''",
+    "input_fingerprint": "TEXT NOT NULL DEFAULT ''",
+    "validation_computed_at": "TEXT NOT NULL DEFAULT ''",
+    "computation_mode": "TEXT NOT NULL DEFAULT ''",
+    "evidence_strength": "TEXT NOT NULL DEFAULT ''",
 }
 
 

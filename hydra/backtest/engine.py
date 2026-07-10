@@ -40,8 +40,10 @@ def run_backtest(candidate: StrategyCandidate, df: pd.DataFrame, seed: int = 42)
     mae = 0.0
     cost = round_turn_cost(candidate.symbol)
     closes = df["close"].to_numpy(dtype=float)
+    timestamps = df["timestamp"].astype(str).to_numpy() if "timestamp" in df.columns else df.index.astype(str).to_numpy()
     signal_values = signals.to_numpy(dtype=float)
     sessions = df["session_id"].astype(str).to_numpy() if "session_id" in df.columns else ["all"] * len(df)
+    regimes = df["state"].astype(str).to_numpy() if "state" in df.columns else ["unknown"] * len(df)
     slippage_bps = 0.5
     daily_pnl: dict[str, float] = {}
 
@@ -70,19 +72,35 @@ def run_backtest(candidate: StrategyCandidate, df: pd.DataFrame, seed: int = 42)
             )
             should_exit = exit_decision.should_exit or (signal == -pos)
             if should_exit:
-                pnl = (price - entry_price) * pos * point_value * risk_scale - cost * risk_scale
+                gross_pnl = (price - entry_price) * pos * point_value * risk_scale
+                commissions = cost * risk_scale
+                pnl = gross_pnl - commissions
                 equity += pnl
                 daily_pnl[session_id] = daily_pnl.get(session_id, 0.0) + float(pnl)
                 trades.append(
                     {
                         "entry_i": entry_i,
                         "exit_i": i,
+                        "entry_timestamp": str(timestamps[entry_i]),
+                        "exit_timestamp": str(timestamps[i]),
                         "side": pos,
+                        "direction": pos,
+                        "quantity": int(max_position),
+                        "entry_price": float(entry_price),
+                        "exit_price": float(price),
+                        "gross_pnl": float(gross_pnl),
+                        "net_pnl": float(pnl),
                         "pnl": float(pnl),
+                        "commissions": float(commissions),
+                        "slippage": float(abs(price - close)),
+                        "slippage_bps": float(slippage_bps),
                         "mfe": float(mfe),
                         "mae": float(mae),
                         "exit_reason": exit_decision.reason,
+                        "entry_reason": "signal",
                         "symbol": candidate.symbol,
+                        "session": str(sessions[entry_i]),
+                        "regime": str(regimes[entry_i]),
                         "point_value": float(point_value),
                         "risk_scale": float(risk_scale),
                         "max_position": int(max_position),

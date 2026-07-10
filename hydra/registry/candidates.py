@@ -131,7 +131,13 @@ def update_promotion_metadata(conn: sqlite3.Connection, candidate_id: str, promo
             config_export_path=?,
             risk_export_path=?,
             branch_action=?,
-            lineage_json=?
+            lineage_json=?,
+            validation_provenance_json=?,
+            validation_version=?,
+            input_fingerprint=?,
+            validation_computed_at=?,
+            computation_mode=?,
+            evidence_strength=?
         WHERE candidate_id=?
         """,
         (
@@ -151,6 +157,12 @@ def update_promotion_metadata(conn: sqlite3.Connection, candidate_id: str, promo
             promotion.get("risk_export_path"),
             promotion.get("branch_action", ""),
             json.dumps(promotion.get("lineage", {}), sort_keys=True),
+            json.dumps(promotion.get("validation_provenance", {}), sort_keys=True),
+            promotion.get("validation_version", ""),
+            promotion.get("input_fingerprint", ""),
+            promotion.get("validation_computed_at", ""),
+            promotion.get("computation_mode", ""),
+            promotion.get("evidence_strength", ""),
             candidate_id,
         ),
     )
