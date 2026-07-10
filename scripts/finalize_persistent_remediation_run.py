@@ -328,7 +328,7 @@ def write_markdown(path: Path, data: dict[str, Any]) -> None:
         lines.append(f"- {key}: `{json.dumps(value, sort_keys=True, default=str)[:6000]}`")
     lines += ["", "## Candidate Selection"]
     for key, value in data["candidate_selection"].items():
-        lines.append(f"- {key}: `{json.dumps(value, sort_keys=True, default=str)[:12000]}`")
+        lines.append(f"- {key}: `{json.dumps(value, sort_keys=True, default=str)[:60000]}`")
     lines += ["", "## Equivalence And Clustering"]
     for key, value in data["equivalence"].items():
         lines.append(f"- {key}: {value}")
