@@ -55,6 +55,42 @@ def generate_actions(state: dict[str, Any]) -> list[MissionAction]:
                 "Retest only atom structures whose old decision was calibration-affected, with new IDs and preregistration.",
             )
         )
+    if state.get("calibration_retest_design_completed") and not state.get("calibration_retest_execution_plan_written"):
+        actions.append(
+            MissionAction(
+                "execute_calibration_affected_atom_retests",
+                "PLAN_CALIBRATION_RETEST_EXECUTION",
+                0.92,
+                0.78,
+                0.82,
+                0.28,
+                0.0,
+                0.0,
+                0.08,
+                0.08,
+                "The bounded preregistration now exists; recomputing only its discriminative atom versions resolves whether calibration changed any decision.",
+            )
+        )
+    if state.get("calibration_retest_execution_completed") and not state.get("post_retest_research_plan_written"):
+        actions.append(
+            MissionAction(
+                "plan_post_calibration_retest_research",
+                "PLAN_POST_RETEST_RESEARCH",
+                0.98,
+                0.92,
+                0.88,
+                0.08,
+                0.0,
+                0.0,
+                0.04,
+                0.04,
+                (
+                    "The frozen corrected retest result must choose exactly one preregistered next branch: survivor "
+                    "replication, zero-survival geometry pivot, insufficient-evidence power resolution, or "
+                    "validator/integrity repair."
+                ),
+            )
+        )
     return actions
 
 

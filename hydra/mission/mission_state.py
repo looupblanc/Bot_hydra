@@ -59,6 +59,15 @@ def connect_state(paths: MissionPaths) -> sqlite3.Connection:
     return conn
 
 
+def connect_state_readonly(paths: MissionPaths) -> sqlite3.Connection:
+    """Open existing mission state without DDL, WAL changes, or commits."""
+    if not paths.db_path.exists():
+        raise FileNotFoundError(paths.db_path)
+    conn = sqlite3.connect(f"file:{paths.db_path}?mode=ro", uri=True)
+    conn.execute("PRAGMA query_only=ON")
+    return conn
+
+
 def set_kv(conn: sqlite3.Connection, key: str, value: Any) -> None:
     conn.execute(
         "INSERT OR REPLACE INTO kv(key, value, updated_at) VALUES (?, ?, ?)",
@@ -89,7 +98,9 @@ def append_jsonl(path: Path, payload: dict[str, Any]) -> None:
 def write_heartbeat(paths: MissionPaths, payload: dict[str, Any]) -> None:
     payload = {"heartbeat_at_utc": utc_now_iso(), "pid": os.getpid(), **payload}
     paths.heartbeat_path.parent.mkdir(parents=True, exist_ok=True)
-    paths.heartbeat_path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str), encoding="utf-8")
+    temporary = paths.heartbeat_path.with_name(f".{paths.heartbeat_path.name}.{os.getpid()}.tmp")
+    temporary.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str), encoding="utf-8")
+    os.replace(temporary, paths.heartbeat_path)
 
 
 def request_stop(paths: MissionPaths, reason: str = "manual_stop") -> None:
@@ -109,11 +120,13 @@ def stop_requested(paths: MissionPaths) -> bool:
 @contextmanager
 def mission_lock(paths: MissionPaths) -> Iterator[None]:
     paths.state_dir.mkdir(parents=True, exist_ok=True)
-    with paths.lock_path.open("w", encoding="utf-8") as handle:
+    with paths.lock_path.open("a+", encoding="utf-8") as handle:
         try:
             fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as exc:
             raise RuntimeError("Another HYDRA autonomous mission instance already holds the lock.") from exc
+        handle.seek(0)
+        handle.truncate()
         handle.write(str(os.getpid()))
         handle.flush()
         try:
@@ -133,4 +146,3 @@ def event_payload(event_type: str, payload: dict[str, Any]) -> dict[str, Any]:
 
 def dataclass_payload(item: Any) -> dict[str, Any]:
     return asdict(item) if hasattr(item, "__dataclass_fields__") else dict(item)
-

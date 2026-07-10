@@ -7,8 +7,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hydra.governance.kernel import check_governance_kernel
-from hydra.mission.mission_state import connect_state, mission_paths, state_snapshot
-from hydra.mission.watchdog import heartbeat_status
+from hydra.mission.experiment_queue import experiment_counts
+from hydra.mission.mission_state import connect_state_readonly, mission_paths, state_snapshot
+from hydra.mission.watchdog import heartbeat_status, scheduler_health
 
 
 def parse_args() -> argparse.Namespace:
@@ -29,13 +30,22 @@ def main() -> int:
     )
     heartbeat = heartbeat_status(paths)
     snapshot = {}
+    counts = {"TOTAL": 0, "QUEUED": 0, "RUNNING": 0, "COMPLETED": 0, "FAILED": 0, "BLOCKED": 0}
     if paths.db_path.exists():
-        conn = connect_state(paths)
+        conn = connect_state_readonly(paths)
         try:
             snapshot = state_snapshot(conn)
+            counts = experiment_counts(conn)
         finally:
             conn.close()
-    result = {"governance": governance.to_dict(), "heartbeat": heartbeat.to_dict(), "state": snapshot}
+    scheduler = scheduler_health(heartbeat, snapshot, counts)
+    result = {
+        "governance": governance.to_dict(),
+        "heartbeat": heartbeat.to_dict(),
+        "state": snapshot,
+        "experiments": counts,
+        "scheduler": scheduler,
+    }
     if args.json:
         print(json.dumps(result, indent=2, sort_keys=True, default=str))
     else:
@@ -45,7 +55,8 @@ def main() -> int:
         print(f"heartbeat_fresh: {heartbeat.fresh}")
         print(f"heartbeat_age_seconds: {heartbeat.age_seconds}")
         print(f"current_phase: {snapshot.get('current_phase')}")
-    return 0 if governance.passed else 2
+        print(f"scheduler_classification: {scheduler.get('classification')}")
+    return 0 if governance.passed and scheduler.get("healthy") else 2
 
 
 if __name__ == "__main__":

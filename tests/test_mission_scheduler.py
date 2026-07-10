@@ -1,0 +1,803 @@
+from __future__ import annotations
+
+import json
+import signal
+import sqlite3
+import threading
+import time
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+
+from hydra.mission.controller import (
+    AutonomousMissionController,
+    CleanWorkerInterruption,
+    DESIGN_EXPERIMENT_ID,
+    EXECUTION_EXPERIMENT_ID,
+    MissionControllerConfig,
+    POST_RETEST_DESIGN_EXPERIMENT_ID,
+    POST_RETEST_PILOT_EXPERIMENT_ID,
+)
+from hydra.mission.experiment_queue import (
+    ExperimentSpecificationConflict,
+    block_experiment,
+    claim_next_experiment,
+    complete_experiment,
+    enqueue_experiment,
+    experiment_counts,
+    experiment_record,
+    ensure_experiment_schema,
+    fail_experiment,
+    recover_running_experiments,
+)
+from hydra.mission.mission_state import connect_state, connect_state_readonly, mission_paths, set_kv
+from hydra.mission.watchdog import HeartbeatStatus, scheduler_health
+
+
+def _blocking_spawn_worker(_experiment: dict[str, object], _result_path: str) -> None:
+    time.sleep(60.0)
+
+
+def _connection(tmp_path: Path) -> tuple[sqlite3.Connection, object]:
+    paths = mission_paths(str(tmp_path / "state"))
+    return connect_state(paths), paths
+
+
+def _config(state_dir: str) -> MissionControllerConfig:
+    return MissionControllerConfig(
+        mission_id="test_mission",
+        baseline_commit="test",
+        objective_config="test",
+        remaining_databento_budget_usd=77.0,
+        persistent=False,
+        state_dir=state_dir,
+        sleep_seconds=0.0,
+    )
+
+
+def test_enqueue_is_idempotent_and_specification_is_immutable(tmp_path: Path) -> None:
+    conn, _paths = _connection(tmp_path)
+    try:
+        spec = {"experiment_type": "control", "priority": 1.0, "value": 7}
+        assert enqueue_experiment(conn, "exp-1", spec)
+        assert not enqueue_experiment(conn, "exp-1", dict(spec))
+        with pytest.raises(ExperimentSpecificationConflict):
+            enqueue_experiment(conn, "exp-1", {**spec, "value": 8})
+        assert experiment_counts(conn)["TOTAL"] == 1
+    finally:
+        conn.close()
+
+
+def test_claim_complete_preserves_specification_and_result(tmp_path: Path) -> None:
+    conn, _paths = _connection(tmp_path)
+    try:
+        spec = {"experiment_type": "control", "priority": 2.0, "immutable": True}
+        enqueue_experiment(conn, "exp-1", spec)
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        assert claimed["experiment_id"] == "exp-1"
+        assert claimed["attempt_count"] == 1
+        with pytest.raises(RuntimeError):
+            complete_experiment(conn, "exp-1", {"passed": True}, claim_token="stale")
+        complete_experiment(
+            conn,
+            "exp-1",
+            {"passed": False, "reason": "null"},
+            claim_token=str(claimed["claim_token"]),
+        )
+        row = experiment_record(conn, "exp-1")
+        assert row is not None
+        assert row["specification"] == spec
+        assert row["result"] == {"passed": False, "reason": "null"}
+        assert row["status"] == "COMPLETED"
+        with pytest.raises(RuntimeError):
+            complete_experiment(conn, "exp-1", {"passed": True}, claim_token=str(claimed["claim_token"]))
+        assert row["claim_token"] is None
+        assert row["claimed_by"] is None
+        assert row["lease_expires_at"] is None
+    finally:
+        conn.close()
+
+
+def test_failure_allows_two_retries_then_terminates(tmp_path: Path) -> None:
+    conn, _paths = _connection(tmp_path)
+    try:
+        enqueue_experiment(conn, "exp-1", {"experiment_type": "control", "max_attempts": 3})
+        expected = ["QUEUED", "QUEUED", "FAILED"]
+        for status in expected:
+            claimed = claim_next_experiment(conn)
+            assert claimed is not None
+            assert (
+                fail_experiment(
+                    conn,
+                    "exp-1",
+                    "controlled failure",
+                    claim_token=str(claimed["claim_token"]),
+                )
+                == status
+            )
+        row = experiment_record(conn, "exp-1")
+        assert row is not None
+        assert row["attempt_count"] == 3
+        assert row["status"] == "FAILED"
+    finally:
+        conn.close()
+
+
+def test_restart_requeues_running_once_and_respects_attempt_limit(tmp_path: Path) -> None:
+    conn, _paths = _connection(tmp_path)
+    try:
+        enqueue_experiment(conn, "retry", {"experiment_type": "control", "max_attempts": 3})
+        enqueue_experiment(conn, "exhausted", {"experiment_type": "control", "max_attempts": 1})
+        first = claim_next_experiment(conn)
+        second = claim_next_experiment(conn)
+        assert {first["experiment_id"], second["experiment_id"]} == {"retry", "exhausted"}
+        recovered = recover_running_experiments(conn)
+        assert recovered == {"requeued": 1, "failed": 1}
+        assert recover_running_experiments(conn) == {"requeued": 0, "failed": 0}
+    finally:
+        conn.close()
+
+
+def test_v1_experiment_row_is_additively_backfilled(tmp_path: Path) -> None:
+    conn, _paths = _connection(tmp_path)
+    try:
+        payload = {"experiment_type": "legacy_control", "immutable": 1}
+        conn.execute(
+            "INSERT INTO experiments(experiment_id,status,payload,updated_at) VALUES (?,?,?,?)",
+            ("legacy", "QUEUED", json.dumps(payload), "2026-01-01T00:00:00+00:00"),
+        )
+        conn.commit()
+        ensure_experiment_schema(conn)
+        row = experiment_record(conn, "legacy")
+        assert row is not None
+        assert row["specification"] == payload
+        assert row["experiment_type"] == "legacy_control"
+        assert row["created_at"] == "2026-01-01T00:00:00+00:00"
+        assert conn.execute("PRAGMA user_version").fetchone()[0] == 2
+    finally:
+        conn.close()
+
+
+def test_legacy_plan_is_reconciled_exactly_once(tmp_path: Path) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        set_kv(conn, "bounded_retest_plan_written", True)
+        set_kv(
+            conn,
+            "first_autonomous_experiment_selected",
+            {"experiment": "calibration_affected_atom_retest_design", "status": "QUEUED_FOR_NEXT_IMPLEMENTATION_CYCLE"},
+        )
+        controller._reconcile_legacy_plan(conn)
+        controller._reconcile_legacy_plan(conn)
+        assert experiment_counts(conn)["QUEUED"] == 1
+        row = experiment_record(conn, DESIGN_EXPERIMENT_ID)
+        assert row is not None
+        assert row["specification"]["q4_access_allowed"] is False
+        assert row["specification"]["paid_data_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_empty_mission_becomes_stalled_without_wait_ledger_spam(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("hydra.mission.controller.check_action_allowed", lambda *args, **kwargs: None)
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        set_kv(conn, "mission_id", "test")
+        set_kv(conn, "validator_calibration_passed", True)
+        set_kv(conn, "zero_pass_audited", True)
+        set_kv(conn, "bounded_retest_plan_written", True)
+        set_kv(conn, "calibration_retest_design_completed", True)
+        set_kv(conn, "calibration_retest_execution_plan_written", True)
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        first, first_progress = controller.step(conn)
+        second, second_progress = controller.step(conn)
+        assert not first_progress and not second_progress
+        assert first["action_type"] == second["action_type"] == "WAIT"
+        assert conn.execute("SELECT COUNT(*) FROM events WHERE event_type='scheduler_stalled'").fetchone()[0] == 1
+        assert not paths.decision_ledger.exists()
+    finally:
+        conn.close()
+
+
+def test_readonly_connection_cannot_mutate_state(tmp_path: Path) -> None:
+    conn, paths = _connection(tmp_path)
+    set_kv(conn, "proof", "unchanged")
+    conn.close()
+    readonly = connect_state_readonly(paths)
+    try:
+        assert readonly.execute("SELECT value FROM kv WHERE key='proof'").fetchone() == ('"unchanged"',)
+        with pytest.raises(sqlite3.OperationalError):
+            readonly.execute("INSERT INTO kv VALUES ('x','1','now')")
+    finally:
+        readonly.close()
+
+
+def test_scheduler_health_distinguishes_progress_wait_and_stall() -> None:
+    now = datetime.now(timezone.utc)
+    heartbeat = HeartbeatStatus("heartbeat", True, True, 1.0, {"current_phase": "RUNNING_EXPERIMENT"})
+    progressing = scheduler_health(
+        heartbeat,
+        {
+            "governance_passed": True,
+            "current_phase": "RUNNING_EXPERIMENT",
+            "current_experiment": {"lease_expires_at": (now + timedelta(minutes=3)).isoformat()},
+        },
+        {"RUNNING": 1, "QUEUED": 0},
+        now=now,
+    )
+    assert progressing["classification"] == "HEALTHY_AND_PROGRESSING"
+
+    waiting = scheduler_health(
+        heartbeat,
+        {
+            "governance_passed": True,
+            "current_phase": "IDLE_SCHEDULED",
+            "next_wake_at_utc": (now + timedelta(minutes=5)).isoformat(),
+            "planned_action_id": "future_control",
+        },
+        {"RUNNING": 0, "QUEUED": 0},
+        now=now,
+    )
+    assert waiting["classification"] == "HEALTHY_BUT_WAITING_NORMALLY"
+
+    stalled = scheduler_health(
+        heartbeat,
+        {"governance_passed": True, "current_phase": "SCHEDULER_STALLED"},
+        {"RUNNING": 0, "QUEUED": 0},
+        now=now,
+    )
+    assert stalled["classification"] == "ALIVE_BUT_SCHEDULER_STALLED"
+
+    recent_queue = scheduler_health(
+        heartbeat,
+        {
+            "governance_passed": True,
+            "service_state": "RUNNING",
+            "current_phase": "PLANNING_NEXT_ACTION",
+            "last_progress_at_utc": (now - timedelta(seconds=89)).isoformat(),
+        },
+        {"RUNNING": 0, "QUEUED": 1},
+        now=now,
+    )
+    stale_queue = scheduler_health(
+        heartbeat,
+        {
+            "governance_passed": True,
+            "service_state": "RUNNING",
+            "current_phase": "PLANNING_NEXT_ACTION",
+            "last_progress_at_utc": (now - timedelta(seconds=91)).isoformat(),
+        },
+        {"RUNNING": 0, "QUEUED": 1},
+        now=now,
+    )
+    assert recent_queue["classification"] == "HEALTHY_AND_PROGRESSING"
+    assert stale_queue["classification"] == "ALIVE_BUT_SCHEDULER_STALLED"
+
+
+def test_queued_experiment_cannot_bypass_governance_guard(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    ran = {"value": False}
+    monkeypatch.setattr(
+        "hydra.mission.controller.check_action_allowed",
+        lambda *args, **kwargs: (_ for _ in ()).throw(RuntimeError("guard rejected")),
+    )
+    monkeypatch.setattr(
+        controller,
+        "_run_experiment_with_heartbeat",
+        lambda *_args, **_kwargs: ran.__setitem__("value", True),
+    )
+    try:
+        enqueue_experiment(
+            conn,
+            "guarded",
+            {"experiment_type": "future_unknown_pilot", "q4_access_allowed": False},
+        )
+        controller.step(conn)
+        assert not ran["value"]
+        assert experiment_record(conn, "guarded")["status"] == "QUEUED"
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]) == "INTEGRITY_BLOCKED"
+    finally:
+        conn.close()
+
+
+def test_blocked_state_is_absorbing_and_retry_clears_current_experiment(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+        action, progressed = controller.step(conn)
+        assert not progressed
+        assert action["action_type"] == "INTEGRITY_BLOCKED"
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]) == "INTEGRITY_BLOCKED"
+
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        monkeypatch.setattr("hydra.mission.controller.check_action_allowed", lambda *args, **kwargs: None)
+        monkeypatch.setattr(
+            controller,
+            "_run_experiment_with_heartbeat",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("retry me")),
+        )
+        enqueue_experiment(
+            conn,
+            "retry-clear",
+            {"experiment_type": "calibration_affected_atom_retest_design", "max_attempts": 3},
+        )
+        controller.step(conn)
+        assert experiment_record(conn, "retry-clear")["status"] == "QUEUED"
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_experiment'").fetchone()[0]) is None
+    finally:
+        conn.close()
+
+
+def test_blocked_state_is_preserved_across_controller_restart(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    governance = SimpleNamespace(
+        manifest_hash="test-hash",
+        manifest_path="test-manifest",
+        result=SimpleNamespace(
+            passed=True,
+            details={"cumulative_actual_databento_spend_usd": 0.0, "q4_access_count": 0},
+        ),
+    )
+    monkeypatch.setattr("hydra.mission.controller.initialize_governance_kernel", lambda **_kwargs: governance)
+    monkeypatch.setattr(
+        "hydra.mission.controller.detect_engineering_capability",
+        lambda: SimpleNamespace(to_dict=lambda: {}),
+    )
+    monkeypatch.setattr("hydra.mission.controller.record_engineering", lambda *_args, **_kwargs: None)
+    try:
+        set_kv(conn, "mission_id", "test_mission")
+        set_kv(conn, "service_state", "RUNNING")
+        set_kv(conn, "last_shutdown", "clean")
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", "MISSING_EXPERIMENT_HANDLER:future_type")
+        set_kv(conn, "last_error", "missing handler")
+        controller._initialize(conn)
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]) == "ENGINEERING_BLOCKED"
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_blocker'").fetchone()[0]) == (
+            "MISSING_EXPERIMENT_HANDLER:future_type"
+        )
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='last_error'").fetchone()[0]) == "missing handler"
+    finally:
+        conn.close()
+
+
+def test_missing_handler_is_blocked_before_claim_and_auto_clears_after_install(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import hydra.mission.controller as controller_module
+
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    governance = SimpleNamespace(
+        manifest_hash="test-hash",
+        manifest_path="test-manifest",
+        result=SimpleNamespace(
+            passed=True,
+            details={"cumulative_actual_databento_spend_usd": 0.0, "q4_access_count": 0},
+        ),
+    )
+    try:
+        set_kv(conn, "mission_id", "test_mission")
+        set_kv(conn, "service_state", "RUNNING")
+        set_kv(conn, "last_shutdown", "clean")
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        enqueue_experiment(conn, "future", {"experiment_type": "future_pilot", "max_attempts": 3})
+        action, progressed = controller.step(conn)
+        row = experiment_record(conn, "future")
+        assert not progressed
+        assert action["action_type"] == "ENGINEERING_BLOCKED"
+        assert row is not None and row["status"] == "QUEUED"
+        assert row["attempt_count"] == 0
+
+        monkeypatch.setattr(
+            controller_module,
+            "SUPPORTED_EXPERIMENT_TYPES",
+            {*controller_module.SUPPORTED_EXPERIMENT_TYPES, "future_pilot"},
+        )
+        monkeypatch.setattr("hydra.mission.controller.initialize_governance_kernel", lambda **_kwargs: governance)
+        monkeypatch.setattr(
+            "hydra.mission.controller.detect_engineering_capability",
+            lambda: SimpleNamespace(to_dict=lambda: {}),
+        )
+        monkeypatch.setattr("hydra.mission.controller.record_engineering", lambda *_args, **_kwargs: None)
+        controller._initialize(conn)
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]) == (
+            "PLANNING_NEXT_ACTION"
+        )
+        assert experiment_record(conn, "future")["status"] == "QUEUED"
+    finally:
+        conn.close()
+
+
+def test_legacy_missing_handler_block_is_safely_requeued_after_install(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import hydra.mission.controller as controller_module
+
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    governance = SimpleNamespace(
+        manifest_hash="test-hash",
+        manifest_path="test-manifest",
+        result=SimpleNamespace(
+            passed=True,
+            details={"cumulative_actual_databento_spend_usd": 0.0, "q4_access_count": 0},
+        ),
+    )
+    try:
+        set_kv(conn, "mission_id", "test_mission")
+        set_kv(conn, "service_state", "RUNNING")
+        set_kv(conn, "last_shutdown", "clean")
+        enqueue_experiment(conn, "legacy-future", {"experiment_type": "future_pilot", "max_attempts": 3})
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        block_experiment(
+            conn,
+            "legacy-future",
+            "No approved handler for experiment type 'future_pilot'.",
+            claim_token=str(claimed["claim_token"]),
+        )
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", "MISSING_EXPERIMENT_HANDLER:future_pilot")
+        set_kv(conn, "last_error", "missing")
+        monkeypatch.setattr(
+            controller_module,
+            "SUPPORTED_EXPERIMENT_TYPES",
+            {*controller_module.SUPPORTED_EXPERIMENT_TYPES, "future_pilot"},
+        )
+        monkeypatch.setattr("hydra.mission.controller.initialize_governance_kernel", lambda **_kwargs: governance)
+        monkeypatch.setattr(
+            "hydra.mission.controller.detect_engineering_capability",
+            lambda: SimpleNamespace(to_dict=lambda: {}),
+        )
+        monkeypatch.setattr("hydra.mission.controller.record_engineering", lambda *_args, **_kwargs: None)
+        controller._initialize(conn)
+        row = experiment_record(conn, "legacy-future")
+        assert row is not None and row["status"] == "QUEUED"
+        assert row["attempt_count"] == 0
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]) == (
+            "PLANNING_NEXT_ACTION"
+        )
+    finally:
+        conn.close()
+
+
+def test_restart_reconciles_enqueue_before_plan_flag_crash_window(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    governance = SimpleNamespace(
+        manifest_hash="test-hash",
+        manifest_path="test-manifest",
+        result=SimpleNamespace(
+            passed=True,
+            details={"cumulative_actual_databento_spend_usd": 0.0, "q4_access_count": 0},
+        ),
+    )
+    monkeypatch.setattr("hydra.mission.controller.initialize_governance_kernel", lambda **_kwargs: governance)
+    monkeypatch.setattr(
+        "hydra.mission.controller.detect_engineering_capability",
+        lambda: SimpleNamespace(to_dict=lambda: {}),
+    )
+    monkeypatch.setattr("hydra.mission.controller.record_engineering", lambda *_args, **_kwargs: None)
+    try:
+        set_kv(conn, "mission_id", "test_mission")
+        set_kv(conn, "service_state", "RUNNING")
+        set_kv(conn, "last_shutdown", "clean")
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        enqueue_experiment(
+            conn,
+            DESIGN_EXPERIMENT_ID,
+            {"experiment_type": "calibration_affected_atom_retest_design"},
+        )
+        enqueue_experiment(
+            conn,
+            EXECUTION_EXPERIMENT_ID,
+            {"experiment_type": "calibration_affected_atom_retest_execution"},
+        )
+        enqueue_experiment(
+            conn,
+            POST_RETEST_DESIGN_EXPERIMENT_ID,
+            {"experiment_type": "post_calibration_retest_research_design"},
+        )
+        controller._initialize(conn)
+        for flag in (
+            "bounded_retest_plan_written",
+            "calibration_retest_execution_plan_written",
+            "post_retest_research_plan_written",
+        ):
+            assert json.loads(conn.execute("SELECT value FROM kv WHERE key=?", (flag,)).fetchone()[0]) is True
+        assert experiment_counts(conn)["TOTAL"] == 3
+    finally:
+        conn.close()
+
+
+def test_post_retest_trace_selects_design_then_explicit_engineering_block(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr("hydra.mission.controller.check_action_allowed", lambda *args, **kwargs: None)
+    try:
+        set_kv(conn, "mission_id", "test")
+        set_kv(conn, "validator_calibration_passed", True)
+        set_kv(conn, "zero_pass_audited", True)
+        set_kv(conn, "bounded_retest_plan_written", True)
+        set_kv(conn, "calibration_retest_design_completed", True)
+        set_kv(conn, "calibration_retest_execution_plan_written", True)
+        set_kv(conn, "calibration_retest_execution_completed", True)
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        enqueue_experiment(
+            conn,
+            EXECUTION_EXPERIMENT_ID,
+            {"experiment_type": "calibration_affected_atom_retest_execution"},
+        )
+        execution_claim = claim_next_experiment(conn)
+        assert execution_claim is not None
+        complete_experiment(
+            conn,
+            EXECUTION_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": "ZERO_SURVIVAL_PERSISTS_UNDER_CORRECTED_RETEST_PIVOT_RESEARCH_GRAMMAR",
+                "result_hash": "frozen-result-hash",
+                "artifacts": {"result_json_path": "frozen-result.json"},
+                "fully_validated_edge_atoms": 0,
+            },
+            claim_token=str(execution_claim["claim_token"]),
+        )
+
+        action, progressed = controller.step(conn)
+        assert progressed and action["action_type"] == "PLAN_POST_RETEST_RESEARCH"
+        assert experiment_record(conn, POST_RETEST_DESIGN_EXPERIMENT_ID)["status"] == "QUEUED"
+
+        controller._run_experiment_with_heartbeat = lambda *_args, **_kwargs: {
+            "scientific_conclusion": "POST_RETEST_BRANCH_SELECTED:ZERO_SURVIVAL_GEOMETRY_PIVOT",
+            "selected_branch": "ZERO_SURVIVAL_GEOMETRY_PIVOT",
+            "paths": {"report": "post.md", "engineering_task": "task.json"},
+            "pilot_experiment_specification": {
+                "experiment_type": "counterfactual_market_state_geometry_pilot",
+                "q4_access_allowed": False,
+                "paid_data_allowed": False,
+            },
+        }
+        action, progressed = controller.step(conn)
+        assert progressed and action["action_type"] == "RUN_QUEUED_EXPERIMENT"
+        assert experiment_record(conn, POST_RETEST_DESIGN_EXPERIMENT_ID)["status"] == "COMPLETED"
+        pilot = experiment_record(conn, POST_RETEST_PILOT_EXPERIMENT_ID)
+        assert pilot is not None and pilot["status"] == "QUEUED" and pilot["attempt_count"] == 0
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]) == (
+            "ENGINEERING_BLOCKED"
+        )
+        blocked_action, blocked_progress = controller.step(conn)
+        assert not blocked_progress
+        assert blocked_action["action_type"] == "ENGINEERING_BLOCKED"
+    finally:
+        conn.close()
+
+
+def test_restart_reconciles_completed_post_design_to_one_queued_pilot_and_block(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    governance = SimpleNamespace(
+        manifest_hash="test-hash",
+        manifest_path="test-manifest",
+        result=SimpleNamespace(
+            passed=True,
+            details={"cumulative_actual_databento_spend_usd": 0.0, "q4_access_count": 0},
+        ),
+    )
+    monkeypatch.setattr("hydra.mission.controller.initialize_governance_kernel", lambda **_kwargs: governance)
+    monkeypatch.setattr(
+        "hydra.mission.controller.detect_engineering_capability",
+        lambda: SimpleNamespace(to_dict=lambda: {}),
+    )
+    monkeypatch.setattr("hydra.mission.controller.record_engineering", lambda *_args, **_kwargs: None)
+    try:
+        set_kv(conn, "mission_id", "test_mission")
+        set_kv(conn, "service_state", "RUNNING")
+        set_kv(conn, "last_shutdown", "unclean")
+        set_kv(conn, "current_phase", "RUNNING_EXPERIMENT")
+        enqueue_experiment(
+            conn,
+            POST_RETEST_DESIGN_EXPERIMENT_ID,
+            {"experiment_type": "post_calibration_retest_research_design"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            POST_RETEST_DESIGN_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": "POST_RETEST_BRANCH_SELECTED:ZERO_SURVIVAL_GEOMETRY_PIVOT",
+                "selected_branch": "ZERO_SURVIVAL_GEOMETRY_PIVOT",
+                "paths": {"report": "post.md", "engineering_task": "task.json"},
+                "pilot_experiment_specification": {
+                    "experiment_type": "counterfactual_market_state_geometry_pilot",
+                    "q4_access_allowed": False,
+                    "paid_data_allowed": False,
+                },
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+        controller._initialize(conn)
+        controller._initialize(conn)
+        pilot = experiment_record(conn, POST_RETEST_PILOT_EXPERIMENT_ID)
+        assert pilot is not None and pilot["status"] == "QUEUED" and pilot["attempt_count"] == 0
+        assert experiment_counts(conn)["TOTAL"] == 2
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]) == (
+            "ENGINEERING_BLOCKED"
+        )
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_blocker'").fetchone()[0]) == (
+            "MISSING_EXPERIMENT_HANDLER:counterfactual_market_state_geometry_pilot"
+        )
+    finally:
+        conn.close()
+
+
+def test_completed_experiment_reconciliation_retries_publication_after_crash(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        enqueue_experiment(
+            conn,
+            DESIGN_EXPERIMENT_ID,
+            {"experiment_type": "calibration_affected_atom_retest_design"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            DESIGN_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": "recovered design",
+                "paths": {"design": "d.json", "preregistration": "p.json", "report": "r.md"},
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+        original_record_evidence = __import__("hydra.mission.controller", fromlist=["record_evidence"]).record_evidence
+        monkeypatch.setattr(
+            "hydra.mission.controller.record_evidence",
+            lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("ledger unavailable")),
+        )
+        with pytest.raises(RuntimeError, match="ledger unavailable"):
+            controller._reconcile_completed_experiments(conn)
+        assert json.loads(
+            conn.execute("SELECT value FROM kv WHERE key='calibration_retest_design_completed'").fetchone()[0]
+        ) is True
+        assert not paths.evidence_ledger.exists()
+        monkeypatch.setattr("hydra.mission.controller.record_evidence", original_record_evidence)
+        controller._reconcile_completed_experiments(conn)
+        controller._reconcile_completed_experiments(conn)
+        assert conn.execute("SELECT COUNT(*) FROM events WHERE event_type='completed_experiment_reconciled'").fetchone()[0] == 1
+        reconciliation_rows = [
+            json.loads(line)
+            for line in paths.evidence_ledger.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        assert len([row for row in reconciliation_rows if row.get("reconciliation_id")]) == 1
+    finally:
+        conn.close()
+
+
+def test_watchdog_rejects_failed_service_and_stale_queued_work() -> None:
+    now = datetime.now(timezone.utc)
+    heartbeat = HeartbeatStatus("heartbeat", True, True, 1.0, {})
+    failed = scheduler_health(
+        heartbeat,
+        {"governance_passed": True, "service_state": "FAILED", "current_phase": "PLANNING_NEXT_ACTION"},
+        {"RUNNING": 0, "QUEUED": 0},
+        now=now,
+    )
+    assert failed["classification"] == "SERVICE_FAILED"
+    stale = scheduler_health(
+        heartbeat,
+        {
+            "governance_passed": True,
+            "service_state": "RUNNING",
+            "current_phase": "PLANNING_NEXT_ACTION",
+            "last_progress_at_utc": (now - timedelta(hours=2)).isoformat(),
+        },
+        {"RUNNING": 0, "QUEUED": 1},
+        now=now,
+        max_queue_age_seconds=90,
+    )
+    assert stale["classification"] == "ALIVE_BUT_SCHEDULER_STALLED"
+    for phase in ("PLANNING_NEXT_ACTION", "RECOVERING", "RETRY_SCHEDULED"):
+        stale_transition = scheduler_health(
+            heartbeat,
+            {
+                "governance_passed": True,
+                "service_state": "RUNNING",
+                "current_phase": phase,
+                "last_progress_at_utc": (now - timedelta(hours=2)).isoformat(),
+            },
+            {"RUNNING": 0, "QUEUED": 0},
+            now=now,
+            max_transition_age_seconds=90,
+        )
+        assert stale_transition["classification"] == "ALIVE_BUT_SCHEDULER_STALLED"
+
+
+def test_clean_worker_interruption_requeues_without_consuming_attempt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr("hydra.mission.controller.check_action_allowed", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        controller,
+        "_run_experiment_with_heartbeat",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(CleanWorkerInterruption("clean stop")),
+    )
+    try:
+        enqueue_experiment(
+            conn,
+            "clean-stop",
+            {"experiment_type": "calibration_affected_atom_retest_design", "max_attempts": 3},
+        )
+        controller._execute_queued_experiment(conn)
+        row = experiment_record(conn, "clean-stop")
+        assert row is not None
+        assert row["status"] == "QUEUED"
+        assert row["attempt_count"] == 0
+        assert row["claim_token"] is None
+        assert row["claimed_by"] is None
+        assert row["lease_expires_at"] is None
+        assert json.loads(conn.execute("SELECT value FROM kv WHERE key='current_experiment'").fetchone()[0]) is None
+    finally:
+        conn.close()
+
+
+def test_real_spawn_worker_is_terminated_on_clean_signal(tmp_path: Path) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    timer: threading.Timer | None = None
+    try:
+        enqueue_experiment(
+            conn,
+            "spawn-stop",
+            {"experiment_type": "calibration_affected_atom_retest_design", "max_attempts": 3},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        timer = threading.Timer(0.2, controller._handle_signal, args=(signal.SIGTERM, None))
+        timer.start()
+        with pytest.raises(CleanWorkerInterruption):
+            controller._run_experiment_with_heartbeat(
+                conn,
+                claimed,
+                worker_entrypoint=_blocking_spawn_worker,
+            )
+    finally:
+        if timer is not None:
+            timer.cancel()
+            timer.join(timeout=2.0)
+        conn.close()
+
+
+def test_heartbeat_json_is_written_atomically(tmp_path: Path) -> None:
+    from hydra.mission.mission_state import write_heartbeat
+
+    paths = mission_paths(str(tmp_path / "state"))
+    write_heartbeat(paths, {"mission_id": "test", "cycle_count": 1})
+    assert json.loads(paths.heartbeat_path.read_text(encoding="utf-8"))["cycle_count"] == 1
+    assert not list(paths.state_dir.glob("*.tmp"))
