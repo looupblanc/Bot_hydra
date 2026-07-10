@@ -34,31 +34,35 @@ def choose_policy_for_reason(reason: str | None) -> RemediationPolicy:
     return POLICIES[0]
 
 
-def mutation_patch_for_policy(policy: RemediationPolicy, risk: dict[str, Any], params: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+def mutation_patch_for_policy(policy: RemediationPolicy, risk: dict[str, Any], params: dict[str, Any], variant: int = 0) -> tuple[dict[str, Any], dict[str, Any]]:
     new_risk = dict(risk)
     new_params = dict(params)
+    variant_scale = 1.0 + 0.03 * (variant % 7)
+    variant_reduce = max(0.70, 1.0 - 0.025 * (variant % 9))
     if policy.name == "target_velocity_runner":
         new_risk["exit_policy"] = "partial_profit_take_then_runner"
-        new_risk["holding_period"] = min(int(new_risk.get("holding_period", 8)) + 3, 24)
+        new_risk["holding_period"] = min(int(new_risk.get("holding_period", 8)) + 2 + (variant % 5), 28)
+        new_risk["daily_profit_lock"] = min(float(new_risk.get("daily_profit_lock", 1500)) * variant_scale, 3500.0)
     elif policy.name == "mll_buffer_derisk":
-        new_risk["risk_scale"] = max(float(new_risk.get("risk_scale", 1.0)) * 0.80, 0.05)
+        new_risk["risk_scale"] = max(float(new_risk.get("risk_scale", 1.0)) * variant_reduce, 0.05)
         new_risk["exit_policy"] = "mll_buffer_protection_exit"
-        new_risk["internal_daily_stop"] = min(float(new_risk.get("internal_daily_stop", 1000)), 750.0)
+        new_risk["internal_daily_stop"] = min(float(new_risk.get("internal_daily_stop", 1000)), [500.0, 750.0, 1000.0][variant % 3])
     elif policy.name == "consistency_daily_lock":
-        new_risk["daily_profit_lock"] = min(float(new_risk.get("daily_profit_lock", 1500)), 1000.0)
+        new_risk["daily_profit_lock"] = min(float(new_risk.get("daily_profit_lock", 1500)), [750.0, 1000.0, 1250.0, 1500.0][variant % 4])
         new_risk["exit_policy"] = "daily_profit_lock_exit"
     elif policy.name == "oos_simplify":
         for key in list(new_params):
             if key.startswith("max_"):
                 new_params[key] = float(new_params[key])
-        new_risk["holding_period"] = max(4, min(int(new_risk.get("holding_period", 8)), 12))
+        new_risk["holding_period"] = max(3, min(int(new_risk.get("holding_period", 8)) + ((variant % 3) - 1), 14))
+        new_risk["risk_scale"] = max(float(new_risk.get("risk_scale", 1.0)) * variant_reduce, 0.05)
     elif policy.name == "sequence_fragility_smooth":
-        new_risk["risk_scale"] = max(float(new_risk.get("risk_scale", 1.0)) * 0.90, 0.05)
+        new_risk["risk_scale"] = max(float(new_risk.get("risk_scale", 1.0)) * variant_reduce, 0.05)
         new_risk["exit_policy"] = "trailing_after_R"
     elif policy.name == "payout_frequency":
-        new_risk["holding_period"] = max(3, int(new_risk.get("holding_period", 8)) - 2)
-        new_risk["daily_profit_lock"] = min(float(new_risk.get("daily_profit_lock", 1500)), 1500.0)
+        new_risk["holding_period"] = max(2, int(new_risk.get("holding_period", 8)) - 1 - (variant % 3))
+        new_risk["daily_profit_lock"] = min(float(new_risk.get("daily_profit_lock", 1500)) * variant_scale, 2500.0)
     elif policy.name == "portfolio_role_shift":
-        new_risk["holding_period"] = max(3, int(new_risk.get("holding_period", 8)) + 1)
+        new_risk["holding_period"] = max(3, int(new_risk.get("holding_period", 8)) + 1 + (variant % 4))
+    new_risk["remediation_variant"] = int(variant)
     return new_risk, new_params
-

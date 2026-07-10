@@ -1,0 +1,44 @@
+# Gate-Aware Remediation Checkpoint
+
+Generated: 2026-07-10T01:31:41+00:00
+
+- baseline_commit: bad3b5e77400ae676f1d7c0c047eb9fd3e41e9c1
+- current_commit: a5b3656e9060a799ef7226cf271c243e41a99caf
+- registry_integrity: ok
+- runtime_seconds: 113.61
+- workers_used: 3
+- starting_candidates: 18010
+- total_candidates: 18401
+- remediation_children_tested: 391
+- parent_to_child_improvement_rate: 0.219949
+- dossiers_generated: 391
+- topstep_viable_reaudited: 24
+- near_misses_analyzed: 162
+- economically_viable_analyzed: 200
+- hard_invalid_count: 5
+- repairable_count: 386
+- candidates_failing_exactly_one_gate: 1
+- candidates_failing_exactly_two_gates: 14
+- q1_promotion_finalists: 391
+- q2_confirmed_candidates: 0
+- q3_blind_validation_passes: 0
+- execution_validation_passes: 0
+- q4_lockbox_passes: 0
+- trading_ready_candidates: 0
+- economic_strategy_units: 14835
+- equivalence_clusters: 14835
+- best_pareto_candidates: ['rem_2c17d7bdc174', 'cand_73dfc9dbbd04', 'rem_e49fceafba04', 'rem_1299b5c29e4c', 'rem_ad2e79e821be', 'rem_6da2dd9ef1a7', 'cand_7d0b38decded', 'cand_c246d0ee5c7e', 'rem_1347685ea766', 'rem_5e2f7d15b7fa', 'cand_2ae4cb1a81df', 'rem_8f755cb1944d', 'rem_e5f73e2f9055', 'cand_a15a83d8f323', 'rem_bbabbb693c88', 'cand_84aabeac28f9', 'cand_ca84ada596f1', 'cand_e037e90e5142', 'cand_2d371a60c839', 'rem_5ebffd58ade5']
+- portfolio_baskets: [{'policy': 'balanced_pareto_one_account', 'candidate_ids': ['rem_2c17d7bdc174', 'cand_73dfc9dbbd04', 'cand_7d0b38decded', 'cand_c246d0ee5c7e', 'cand_c7dee5d0df2e', 'cand_ed88f3d3724e', 'cand_2ae4cb1a81df', 'cand_a15a83d8f323', 'rem_bbabbb693c88', 'cand_84aabeac28f9'], 'executable': True, 'shared_mll_respected': True, 'estimated_net_profit': 78426.61847550306, 'estimated_trader_net_payout': 52789.692872911764, 'notes': ['approximation_from_registry_metrics_not_trade_level_schedule']}]
+- status_distribution: {'TOPSTEP_COMBINE_FAILED_TARGET': 1357, 'TOPSTEP_COMBINE_FAILED_MLL': 643, 'DEAD_STRATEGY': 15679, 'ECONOMICALLY_VIABLE': 493, 'TOPSTEP_VIABLE': 29, 'PROMISING_NEEDS_MUTATION': 157, 'TOPSTEP_NEAR_MISS': 43}
+- effective_independent_trials_proxy: 17152.9
+- selection_adjusted_best_promotion_proxy: 0.877863348918319
+- budget_ledger_records: 11
+- q1_manifest_path: /root/hydra-bot/reports/lockbox/q1_remediation_freeze_fbaf42f9bcf7ecff.json
+- q3_manifest_path: /root/hydra-bot/reports/lockbox/q3_blind_validation_freeze_c926f52864bc2b42.json
+- q3_lockbox_contaminated: True
+- lockbox_integrity: Q3 contaminated for affected lineages; Q4 raw-only remains uninspected
+- rule_snapshot_path: config/prop_firms/topstep_150k_2026-07-10.yaml
+- budget_ledger_path: reports/data_budget/databento_spend_ledger.jsonl
+- data_access_ledger_path: reports/data_access/data_access_ledger.jsonl
+- checkpoint_folder: reports/checkpoints/gate_aware_remediation
+- resume_command: python scripts/run_gate_aware_remediation_factory.py --registry registry/hydra_registry.db --dataset GLBX.MDP3 --symbols ES MES NQ MNQ --development-start 2024-01-01 --development-end 2024-03-29 --q2-start 2024-04-01 --q2-end 2024-07-01 --q3-start 2024-07-01 --q3-end 2024-10-01 --q4-start 2024-10-01 --q4-end 2025-01-01 --schema ohlcv-1m --databento-budget-usd 100 --databento-budget-start 2026-07-10 --auto-purchase-under-budget --budget-safety-ceiling-usd 98 --primary-topstep-mode no-dll --evaluate-xfa-standard --evaluate-xfa-consistency --evaluate-optional-dll-sensitivity --account-size 150000 --profit-target 9000 --mll-distance 4500 --workers auto --single-writer-registry --runtime-hours 6 --checkpoint-every-minutes 20 --target-economic-strategy-units 50 --strict-lockbox --conservative-intrabar --seed 5050 --report-tag gate_aware_remediation_blind_validation_v2

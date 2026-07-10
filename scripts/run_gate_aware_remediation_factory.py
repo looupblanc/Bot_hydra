@@ -8,6 +8,7 @@ import sqlite3
 import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +33,8 @@ from hydra.data.databento_loader import (
     validate_ohlcv_frame,
 )
 from hydra.factory.gate_aware_remediation import child_from_registry_row
+from hydra.factory.remediation_policy import POLICIES
+from hydra.factory.run_control import RunControlConfig, RunControlState, evaluate_stop, validated_quality_target_reached
 from hydra.features.market_state import build_market_state
 from hydra.portfolio.remediation_portfolio import build_remediation_portfolio_candidates
 from hydra.promotion.candidate_dossier import build_candidate_dossier, write_dossiers
@@ -39,6 +42,7 @@ from hydra.promotion.equivalence_clusters import cluster_summary
 from hydra.promotion.failure_attribution import attribute_candidate_failure
 from hydra.promotion.pareto import pareto_frontier
 from hydra.promotion.pipeline import PromotionInput, run_promotion_pipeline
+from hydra.promotion.gates import strategy_fingerprint
 from hydra.propfirm.pass_path_optimizer import analyze_pass_path
 from hydra.propfirm.rule_versioning import DEFAULT_TOPSTEP_RULE_PATH, load_topstep_rule_snapshot
 from hydra.propfirm.topstep_150k import InternalRiskOverlay, Topstep150KConfig, evaluate_topstep_150k, trades_to_topstep_daily
@@ -87,7 +91,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mll-distance", type=float, default=4500)
     parser.add_argument("--workers", default="auto")
     parser.add_argument("--single-writer-registry", action="store_true")
-    parser.add_argument("--runtime-hours", type=float, default=6)
+    parser.add_argument("--runtime-hours", type=float, default=None, help="Deprecated alias for --max-runtime-hours.")
+    parser.add_argument("--min-runtime-hours", type=float, default=0.0)
+    parser.add_argument("--max-runtime-hours", type=float, default=6.0)
+    parser.add_argument("--continue-until-deadline", action="store_true")
+    parser.add_argument("--minimum-cycles", type=int, default=1)
+    parser.add_argument("--minimum-remediation-children", type=int, default=0)
+    parser.add_argument("--stop-only-on-valid-quality-target", action="store_true")
+    parser.add_argument("--allow-early-stop-on-exhaustion", action="store_true")
     parser.add_argument("--checkpoint-every-minutes", type=float, default=20)
     parser.add_argument("--target-economic-strategy-units", type=int, default=50)
     parser.add_argument("--strict-lockbox", action="store_true")
@@ -95,8 +106,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=4050)
     parser.add_argument("--report-tag", required=True)
     parser.add_argument("--max-remediation-children", type=int, default=600)
+    parser.add_argument("--cycle-size", type=int, default=150)
+    parser.add_argument("--creative-exploration-ratio", type=float, default=0.10)
     parser.add_argument("--skip-data-purchase", action="store_true")
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.runtime_hours is not None:
+        args.max_runtime_hours = args.runtime_hours
+    if args.min_runtime_hours > args.max_runtime_hours:
+        parser.error("--min-runtime-hours cannot exceed --max-runtime-hours")
+    return args
 
 
 def main() -> int:
@@ -112,6 +130,15 @@ def main() -> int:
     if integrity != "ok":
         raise RuntimeError(f"Registry integrity failed: {integrity}")
     workers = resolve_workers(args.workers)
+    run_control = RunControlConfig(
+        min_runtime_hours=args.min_runtime_hours,
+        max_runtime_hours=args.max_runtime_hours,
+        continue_until_deadline=args.continue_until_deadline,
+        minimum_cycles=args.minimum_cycles,
+        minimum_remediation_children=args.minimum_remediation_children,
+        stop_only_on_valid_quality_target=args.stop_only_on_valid_quality_target,
+        allow_early_stop_on_exhaustion=args.allow_early_stop_on_exhaustion,
+    )
     topstep_cfg = Topstep150KConfig(
         account_size=args.account_size,
         combine_starting_balance=args.account_size,
@@ -153,13 +180,14 @@ def main() -> int:
         reason="Q2 confirmation may become development for modified lineages",
         freeze_manifest_hash=q1_manifest_hash,
     )
+    q3_contaminated = lockbox_contaminated(f"{args.q3_start}:{args.q3_end}")
+    q3_manifest_name = "q3_quarantined_confirmation_manifest" if q3_contaminated else "q3_blind_validation_freeze"
     q3_manifest_path, q3_manifest_hash = freeze_candidates(
-        "q3_blind_validation_freeze",
+        q3_manifest_name,
         selected[:50],
         cache_audit.get("checksums", {}),
         args,
     )
-    q3_contaminated = lockbox_contaminated(f"{args.q3_start}:{args.q3_end}")
     q3_role = DataRole.SECONDARY_DEVELOPMENT_CONFIRMATION if q3_contaminated else DataRole.BLIND_VALIDATION
     enforce_data_access(
         period=f"{args.q3_start}:{args.q3_end}",
@@ -170,10 +198,10 @@ def main() -> int:
         freeze_manifest_hash=None if q3_contaminated else q3_manifest_hash,
     )
     key = load_api_key()
-    acquisition = acquire_governed_data(args, budget, key) if not args.skip_data_purchase else {"skipped": True}
+    acquisition = acquire_governed_data(args, budget, key, q3_contaminated=q3_contaminated) if not args.skip_data_purchase else {"skipped": True}
     cache_audit = audit_cache(args)
     existing_fingerprints = {str(row["strategy_fingerprint"]) for row in rows if row.get("strategy_fingerprint")}
-    children_tested, improved = run_remediation_children(
+    run_stats = run_remediation_cycles(
         conn,
         selected,
         states,
@@ -185,6 +213,7 @@ def main() -> int:
         existing_fingerprints,
         started,
         checkpoint_dir,
+        run_control,
     )
     final_rows = load_candidate_rows(conn)
     clusters = cluster_summary(final_rows)
@@ -198,8 +227,7 @@ def main() -> int:
         rows,
         final_rows,
         selected,
-        children_tested,
-        improved,
+        run_stats,
         dossier_paths,
         clusters,
         portfolios,
@@ -244,12 +272,19 @@ def lockbox_contaminated(period: str) -> bool:
     return False
 
 
-def acquire_governed_data(args: argparse.Namespace, budget: DatabentoBudgetConfig, key: str | None) -> dict[str, Any]:
+def acquire_governed_data(
+    args: argparse.Namespace,
+    budget: DatabentoBudgetConfig,
+    key: str | None,
+    *,
+    q3_contaminated: bool = False,
+) -> dict[str, Any]:
     cfg = load_config()
     results: dict[str, Any] = {}
+    q3_purpose = "Q3 quarantined confirmation cache; not blind validation" if q3_contaminated else "Q3 blind validation OHLCV after freeze"
     periods = [
         ("q2", args.q2_start, args.q2_end, "Q2 confirmation OHLCV"),
-        ("q3", args.q3_start, args.q3_end, "Q3 blind validation OHLCV after freeze"),
+        ("q3", args.q3_start, args.q3_end, q3_purpose),
         ("q4", args.q4_start, args.q4_end, "Q4 final lockbox raw-only acquisition"),
     ]
     for name, start, end, purpose in periods:
@@ -377,7 +412,7 @@ def freeze_candidates(name: str, rows: list[dict[str, Any]], data_fingerprints: 
     return str(path), digest
 
 
-def run_remediation_children(
+def run_remediation_cycles(
     conn: sqlite3.Connection,
     selected: list[dict[str, Any]],
     states: dict[str, pd.DataFrame],
@@ -389,38 +424,178 @@ def run_remediation_children(
     existing_fingerprints: set[str],
     started: float,
     checkpoint_dir: Path,
-) -> tuple[int, int]:
-    deadline = started + args.runtime_hours * 3600
-    children = [child_from_registry_row(row) for row in selected[: args.max_remediation_children]]
-    parent_scores = {str(row["candidate_id"]): float(row.get("promotion_score") or 0.0) for row in selected}
+    run_control: RunControlConfig,
+) -> dict[str, Any]:
+    deadline = started + args.max_runtime_hours * 3600
+    parent_pool = list(selected)
+    parent_scores = {str(row["candidate_id"]): float(row.get("promotion_score") or 0.0) for row in parent_pool}
     tested = 0
     improved = 0
+    cycles = 0
+    duplicate_attempts = 0
+    generated_total = 0
+    policy_counts: Counter[str] = Counter()
+    policy_improvements: Counter[str] = Counter()
+    policies_frozen: set[str] = set()
+    last_stop = None
     next_checkpoint = time.monotonic() + max(args.checkpoint_every_minutes, 0.1) * 60
-    if not children:
-        return 0, 0
-    if workers <= 1:
-        iterator = (evaluate_child(hyp, states, topstep_cfg, args.seed + i) for i, hyp in enumerate(children))
-    else:
-        initargs = (states, topstep_cfg)
-        pool = ProcessPoolExecutor(max_workers=workers, initializer=init_worker, initargs=initargs)
-        futures = {pool.submit(worker_evaluate_child, hyp, args.seed + i): hyp for i, hyp in enumerate(children)}
-        iterator = (future.result() for future in as_completed(futures))
-    try:
-        for result in iterator:
-            if time.monotonic() >= deadline:
+    while True:
+        elapsed = time.monotonic() - started
+        final_rows_for_stop = load_candidate_rows(conn)
+        valid_quality = validated_quality_target_reached(
+            trading_ready=sum(1 for row in final_rows_for_stop if row["validation_status"] == "TRADING_READY_CANDIDATE"),
+            q4_passes=0,
+            execution_passes=0,
+            target_units=args.target_economic_strategy_units,
+        )
+        provisional_quality = len(parent_pool) >= args.target_economic_strategy_units
+        stop = evaluate_stop(
+            run_control,
+            RunControlState(
+                elapsed_seconds=elapsed,
+                cycles_completed=cycles,
+                remediation_children_completed=tested,
+                queue_size=0,
+                eligible_parents=len(parent_pool),
+                valid_quality_target_reached=valid_quality,
+                provisional_quality_target_reached=provisional_quality,
+                proven_work_exhaustion=not parent_pool,
+            ),
+        )
+        last_stop = stop
+        if stop.should_stop:
+            break
+        cycle_work, cycle_duplicates = generate_cycle_work(parent_pool, existing_fingerprints, cycles, args, policies_frozen)
+        duplicate_attempts += cycle_duplicates
+        if not cycle_work:
+            if args.allow_early_stop_on_exhaustion and time.monotonic() >= deadline:
+                break
+            time.sleep(5)
+            cycles += 1
+            continue
+        generated_total += len(cycle_work)
+        for hyp in cycle_work:
+            policy_counts[hyp.policy.name] += 1
+        results = evaluate_cycle(cycle_work, states, topstep_cfg, args.seed + cycles * 100_000, workers)
+        for result in results:
+            if time.monotonic() >= deadline and tested >= args.minimum_remediation_children:
                 break
             promotion = store_child_result(conn, result, leak, data_validation, args, existing_fingerprints)
             tested += 1
+            policy = result["hypothesis"].policy.name
             parent_score = parent_scores.get(str(result["hypothesis"].parent_candidate_id), 0.0)
-            if float(promotion.get("promotion_score") or 0.0) > parent_score:
+            child_score = float(promotion.get("promotion_score") or 0.0)
+            if child_score > parent_score:
                 improved += 1
-            if time.monotonic() >= next_checkpoint:
-                write_checkpoint(checkpoint_dir, args.report_tag, {"remediation_children_tested": tested, "improved": improved, "status": "running"})
-                next_checkpoint = time.monotonic() + max(args.checkpoint_every_minutes, 0.1) * 60
-    finally:
-        if workers > 1:
-            pool.shutdown(cancel_futures=True)
-    return tested, improved
+                policy_improvements[policy] += 1
+            if (
+                not args.continue_until_deadline
+                and args.max_remediation_children > 0
+                and tested >= args.max_remediation_children
+                and tested >= args.minimum_remediation_children
+            ):
+                break
+        cycles += 1
+        final_rows = load_candidate_rows(conn)
+        parent_pool = refresh_parent_pool(final_rows)
+        parent_scores = {str(row["candidate_id"]): float(row.get("promotion_score") or 0.0) for row in parent_pool}
+        policies_frozen = freeze_policies(policy_counts, policy_improvements)
+        heartbeat = {
+            "elapsed_runtime_seconds": round(time.monotonic() - started, 2),
+            "remaining_runtime_seconds": round(max(deadline - time.monotonic(), 0.0), 2),
+            "cycle_number": cycles,
+            "queue_size": len(cycle_work),
+            "eligible_parents": len(parent_pool),
+            "children_generated_this_cycle": len(cycle_work),
+            "cumulative_children": tested,
+            "duplicate_rate": round(duplicate_attempts / max(generated_total + duplicate_attempts, 1), 6),
+            "parent_to_child_improvement_rate": round(improved / max(tested, 1), 6),
+            "policies_expanded": dict(policy_counts),
+            "policies_frozen": sorted(policies_frozen),
+            "current_stop_conditions": last_stop.diagnostics if last_stop else {},
+            "quality_target_validated": valid_quality,
+            "quality_target_provisional": provisional_quality,
+        }
+        print(json.dumps({"heartbeat": heartbeat}, sort_keys=True), flush=True)
+        if time.monotonic() >= next_checkpoint:
+            write_checkpoint(checkpoint_dir, args.report_tag, {"status": "running", **heartbeat})
+            next_checkpoint = time.monotonic() + max(args.checkpoint_every_minutes, 0.1) * 60
+        if (
+            not args.continue_until_deadline
+            and args.max_remediation_children > 0
+            and tested >= args.max_remediation_children
+            and tested >= args.minimum_remediation_children
+        ):
+            if not args.continue_until_deadline and time.monotonic() >= run_control.min_runtime_hours * 3600 + started:
+                break
+    return {
+        "remediation_children_tested": tested,
+        "remediation_children_generated": generated_total,
+        "parent_to_child_improved": improved,
+        "cycles_completed": cycles,
+        "duplicate_attempts": duplicate_attempts,
+        "duplicate_rate": round(duplicate_attempts / max(generated_total + duplicate_attempts, 1), 6),
+        "policy_counts": dict(policy_counts),
+        "policy_improvements": dict(policy_improvements),
+        "policies_frozen": sorted(policies_frozen),
+        "last_stop_reason": last_stop.reason if last_stop else "unknown",
+        "last_stop_diagnostics": last_stop.diagnostics if last_stop else {},
+    }
+
+
+def generate_cycle_work(
+    parent_pool: list[dict[str, Any]],
+    existing_fingerprints: set[str],
+    cycle: int,
+    args: argparse.Namespace,
+    frozen_policies: set[str] | None = None,
+) -> tuple[list[Any], int]:
+    if not parent_pool:
+        return [], 0
+    work = []
+    duplicates = 0
+    cycle_fingerprints: set[str] = set()
+    attempts = 0
+    max_attempts = max(args.cycle_size * 20, args.cycle_size)
+    frozen_policies = frozen_policies or set()
+    active_policies = [policy for policy in POLICIES if policy.name not in frozen_policies] or list(POLICIES)
+    while len(work) < args.cycle_size and attempts < max_attempts:
+        parent = parent_pool[(cycle * args.cycle_size + attempts) % len(parent_pool)]
+        creative = (attempts / max(args.cycle_size, 1)) < max(0.0, min(args.creative_exploration_ratio, 0.5))
+        policy_name = active_policies[(cycle + attempts) % len(active_policies)].name if creative else None
+        hyp = child_from_registry_row(parent, variant=cycle * max_attempts + attempts, policy_name=policy_name)
+        if hyp.policy.name in frozen_policies:
+            policy_name = active_policies[(cycle + attempts) % len(active_policies)].name
+            hyp = child_from_registry_row(parent, variant=cycle * max_attempts + attempts, policy_name=policy_name)
+        fingerprint = strategy_fingerprint(hyp.child)
+        if fingerprint in existing_fingerprints or fingerprint in cycle_fingerprints:
+            duplicates += 1
+            attempts += 1
+            continue
+        cycle_fingerprints.add(fingerprint)
+        work.append(hyp)
+        attempts += 1
+    return work, duplicates
+
+
+def evaluate_cycle(cycle_work, states, topstep_cfg, seed_base: int, workers: int) -> list[dict[str, Any]]:
+    if workers <= 1:
+        return [evaluate_child(hyp, states, topstep_cfg, seed_base + i) for i, hyp in enumerate(cycle_work)]
+    with ProcessPoolExecutor(max_workers=workers, initializer=init_worker, initargs=(states, topstep_cfg)) as pool:
+        futures = [pool.submit(worker_evaluate_child, hyp, seed_base + i) for i, hyp in enumerate(cycle_work)]
+        return [future.result() for future in as_completed(futures)]
+
+
+def refresh_parent_pool(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return select_priority_rows(rows)[:750]
+
+
+def freeze_policies(policy_counts: Counter[str], policy_improvements: Counter[str]) -> set[str]:
+    frozen = set()
+    for name, count in policy_counts.items():
+        if count >= 200 and policy_improvements.get(name, 0) / max(count, 1) < 0.02:
+            frozen.add(name)
+    return frozen
 
 
 def init_worker(states: dict[str, pd.DataFrame], topstep_cfg: Topstep150KConfig) -> None:
@@ -502,7 +677,7 @@ def split_daily_frames(daily: pd.DataFrame) -> dict[str, pd.DataFrame]:
     }
 
 
-def build_summary(args, integrity, workers, started, base_rows, final_rows, selected, children_tested, improved, dossier_paths, clusters, portfolios, frontier, cache_audit, acquisition, q1_manifest_path, q3_manifest_path, q3_contaminated):
+def build_summary(args, integrity, workers, started, base_rows, final_rows, selected, run_stats, dossier_paths, clusters, portfolios, frontier, cache_audit, acquisition, q1_manifest_path, q3_manifest_path, q3_contaminated):
     attributions = [attribute_candidate_failure(row) for row in selected]
     effective_trials = effective_independent_trials(len(final_rows), len(clusters))
     ledger = read_ledger(project_path("reports/data_budget/databento_spend_ledger.jsonl"))
@@ -517,8 +692,16 @@ def build_summary(args, integrity, workers, started, base_rows, final_rows, sele
         "workers_used": workers,
         "starting_candidates": len(base_rows),
         "total_candidates": len(final_rows),
-        "remediation_children_tested": children_tested,
-        "parent_to_child_improvement_rate": round(improved / max(children_tested, 1), 6),
+        "remediation_children_tested": run_stats["remediation_children_tested"],
+        "remediation_children_generated": run_stats["remediation_children_generated"],
+        "cycles_completed": run_stats["cycles_completed"],
+        "duplicate_rate": run_stats["duplicate_rate"],
+        "parent_to_child_improvement_rate": round(run_stats["parent_to_child_improved"] / max(run_stats["remediation_children_tested"], 1), 6),
+        "policy_counts": run_stats["policy_counts"],
+        "policy_improvements": run_stats["policy_improvements"],
+        "policies_frozen": run_stats["policies_frozen"],
+        "last_stop_reason": run_stats["last_stop_reason"],
+        "last_stop_diagnostics": run_stats["last_stop_diagnostics"],
         "dossiers_generated": len(dossier_paths),
         "topstep_viable_reaudited": sum(1 for row in selected if row["validation_status"] == "TOPSTEP_VIABLE"),
         "near_misses_analyzed": sum(1 for row in selected if row["validation_status"] in {"PROMISING_NEEDS_MUTATION", "TOPSTEP_NEAR_MISS"}),
@@ -527,13 +710,17 @@ def build_summary(args, integrity, workers, started, base_rows, final_rows, sele
         "repairable_count": sum(1 for item in attributions if item["policy_classification"] == "REPAIRABLE_NEAR_MISS"),
         "candidates_failing_exactly_one_gate": sum(1 for item in attributions if item["failed_gate_count"] == 1),
         "candidates_failing_exactly_two_gates": sum(1 for item in attributions if item["failed_gate_count"] == 2),
-        "q1_promotion_finalists": len(selected),
+        "q1_repair_parent_pool_size": len(selected),
+        "q1_promotion_finalists": 0,
+        "q1_promotion_finalists_status": "not_assigned_by_dossier_or_repairability_selection",
         "q2_confirmed_candidates": 0,
-        "q3_blind_validation_passes": 0,
+        "q3_blind_validation_passes": "not_applicable_q3_quarantined" if q3_contaminated else 0,
+        "q3_confirmation_passes": 0,
         "execution_validation_passes": 0,
         "q4_lockbox_passes": 0,
         "trading_ready_candidates": status_counts.get("TRADING_READY_CANDIDATE", 0),
-        "economic_strategy_units": len(clusters),
+        "economic_strategy_units": 0,
+        "economic_strategy_units_status": "not_validated_without_trade_level_behavioral_clustering",
         "equivalence_clusters": len(clusters),
         "best_pareto_candidates": [row["candidate_id"] for row in frontier[:20]],
         "portfolio_baskets": portfolios,
@@ -603,8 +790,13 @@ def resume_command(args: argparse.Namespace) -> str:
         f"--budget-safety-ceiling-usd {args.budget_safety_ceiling_usd:g} --primary-topstep-mode {args.primary_topstep_mode} "
         "--evaluate-xfa-standard --evaluate-xfa-consistency --evaluate-optional-dll-sensitivity "
         f"--account-size {args.account_size:g} --profit-target {args.profit_target:g} --mll-distance {args.mll_distance:g} "
-        f"--workers {args.workers} --single-writer-registry --runtime-hours {args.runtime_hours:g} "
+        f"--workers {args.workers} --single-writer-registry --min-runtime-hours {args.min_runtime_hours:g} --max-runtime-hours {args.max_runtime_hours:g} "
+        "--continue-until-deadline "
+        f"--minimum-cycles {args.minimum_cycles} --minimum-remediation-children {args.minimum_remediation_children} "
+        "--stop-only-on-valid-quality-target "
         f"--checkpoint-every-minutes {args.checkpoint_every_minutes:g} --target-economic-strategy-units {args.target_economic_strategy_units} "
+        f"--max-remediation-children {args.max_remediation_children} --cycle-size {args.cycle_size} "
+        f"--creative-exploration-ratio {args.creative_exploration_ratio:g} "
         "--strict-lockbox --conservative-intrabar "
         f"--seed {args.seed + 1000} --report-tag {args.report_tag}"
     )

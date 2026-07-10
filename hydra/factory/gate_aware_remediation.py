@@ -5,7 +5,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Any
 
-from hydra.factory.remediation_policy import RemediationPolicy, choose_policy_for_reason, mutation_patch_for_policy
+from hydra.factory.remediation_policy import RemediationPolicy, POLICIES, choose_policy_for_reason, mutation_patch_for_policy
 from hydra.strategies.dsl import StrategyCandidate
 
 
@@ -18,12 +18,14 @@ class RemediationHypothesis:
     child: StrategyCandidate
 
 
-def child_from_registry_row(row: dict[str, Any]) -> RemediationHypothesis:
+def child_from_registry_row(row: dict[str, Any], variant: int = 0, policy_name: str | None = None) -> RemediationHypothesis:
     reason = str(row.get("rejection_reason") or "")
     policy = choose_policy_for_reason(reason)
+    if policy_name:
+        policy = next((item for item in POLICIES if item.name == policy_name), policy)
     risk = _loads(row.get("risk_json"))
     params = _loads(row.get("parameters_json"))
-    child_risk, child_params = mutation_patch_for_policy(policy, risk, params)
+    child_risk, child_params = mutation_patch_for_policy(policy, risk, params, variant=variant)
     child = StrategyCandidate(
         candidate_id=f"rem_{uuid.uuid4().hex[:12]}",
         family=str(row["family"]),
@@ -50,4 +52,3 @@ def _loads(value: str | None) -> dict[str, Any]:
         return json.loads(value or "{}")
     except json.JSONDecodeError:
         return {}
-
