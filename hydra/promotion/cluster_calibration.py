@@ -8,8 +8,8 @@ from typing import Any
 
 @dataclass(frozen=True)
 class ClusterThresholds:
-    overlap_threshold: float = 0.90
-    pnl_correlation_threshold: float = 0.92
+    overlap_threshold: float = 0.95
+    pnl_correlation_threshold: float = 0.95
     tail_overlap_threshold: float = 0.80
     holding_similarity_threshold: float = 0.85
 
@@ -88,11 +88,12 @@ def should_cluster(left: dict[str, Any], right: dict[str, Any], thresholds: Clus
     if exact_signatures:
         return True
     score = sketch_similarity(left, right)
-    return score >= min(thresholds.overlap_threshold, thresholds.pnl_correlation_threshold)
+    return score >= max(thresholds.overlap_threshold, thresholds.pnl_correlation_threshold)
 
 
 def sketch_similarity(left: dict[str, Any], right: dict[str, Any]) -> float:
     components = [
+        1.0 if left.get("daily_pnl_hash") == right.get("daily_pnl_hash") else 0.0,
         1.0 if left.get("trade_timestamp_signature") == right.get("trade_timestamp_signature") else 0.0,
         1.0 if left.get("direction_signature") == right.get("direction_signature") else 0.0,
         1.0 if left.get("tail_event_signature") == right.get("tail_event_signature") else 0.0,
@@ -108,21 +109,44 @@ def build_controls(sketches: list[dict[str, Any]]) -> list[tuple[dict[str, Any],
         return []
     controls: list[tuple[dict[str, Any], dict[str, Any], bool, str]] = []
     base = sketches[0]
-    exact = copy.deepcopy(base)
-    exact["candidate_id"] = f"{base.get('candidate_id')}_metadata_variant"
-    exact["parent_candidate_id"] = "metadata_only_change"
-    controls.append((base, exact, True, "exact_duplicate_metadata_change"))
-    tiny_stop = copy.deepcopy(base)
-    tiny_stop["candidate_id"] = f"{base.get('candidate_id')}_tiny_stop_variant"
-    tiny_stop["validation_hash"] = "tiny_stop_variant"
-    controls.append((base, tiny_stop, True, "tiny_stop_target_neighbor"))
+    positive_labels = [
+        "exact_duplicate",
+        "metadata_only_change",
+        "tiny_stop_neighbor",
+        "tiny_target_neighbor",
+        "same_signal_neighboring_parameter",
+        "parent_child_high_trade_overlap",
+    ]
+    for label in positive_labels:
+        clone = copy.deepcopy(base)
+        clone["candidate_id"] = f"{base.get('candidate_id')}_{label}"
+        clone["validation_hash"] = label
+        clone["parent_candidate_id"] = base.get("candidate_id") if "parent_child" in label else base.get("parent_candidate_id")
+        controls.append((base, clone, True, label))
+
+    negative_templates = [
+        ("different_session", {"session_histogram": {"overnight": 10}, "trade_timestamp_signature": "neg_ts_1", "tail_event_signature": "neg_tail_1"}),
+        ("opposite_direction", {"direction_signature": "opposite_direction", "trade_timestamp_signature": "neg_ts_2", "tail_event_signature": "neg_tail_2"}),
+        ("different_instrument", {"symbol_exposure": {"ES": 10}, "trade_timestamp_signature": "neg_ts_3", "tail_event_signature": "neg_tail_3"}),
+        ("different_holding_horizon", {"holding_time_histogram": {"120-124": 10}, "trade_timestamp_signature": "neg_ts_4", "tail_event_signature": "neg_tail_4"}),
+        ("different_tail_behavior", {"tail_event_signature": "materially_different_tail", "trade_timestamp_signature": "neg_ts_5"}),
+        ("low_trade_overlap", {"trade_timestamp_signature": "low_overlap", "daily_pnl_hash": "low_overlap_pnl"}),
+        ("different_regime", {"regime_exposure": {"high_vol_failure": 10}, "trade_timestamp_signature": "neg_ts_6", "tail_event_signature": "neg_tail_6"}),
+        ("different_portfolio_role", {"symbol_exposure": {"MES": 5, "MNQ": 5}, "session_histogram": {"rth_open": 10}, "trade_timestamp_signature": "neg_ts_7", "tail_event_signature": "neg_tail_7"}),
+    ]
+    for label, overrides in negative_templates:
+        other = copy.deepcopy(base)
+        other["candidate_id"] = f"{base.get('candidate_id')}_{label}"
+        other.update(overrides)
+        controls.append((base, other, False, label))
+
     for left, right in combinations(sketches[: min(len(sketches), 20)], 2):
         different_symbol = left.get("symbol_exposure") != right.get("symbol_exposure")
         different_session = left.get("session_histogram") != right.get("session_histogram")
         different_tail = left.get("tail_event_signature") != right.get("tail_event_signature")
-        if different_symbol or (different_session and different_tail):
+        if (different_symbol or (different_session and different_tail)) and sketch_similarity(left, right) < 0.75:
             controls.append((left, right, False, "negative_behavioral_difference"))
-        if len(controls) >= 30:
+        if len(controls) >= 60:
             break
     return controls
 

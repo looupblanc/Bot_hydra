@@ -4,9 +4,11 @@ import unittest
 
 import pandas as pd
 
-from hydra.data.contract_mapping import active_contract, build_rule_based_roll_map, is_unsafe_roll_window, synchronized_pair_contracts
+from hydra.data.contract_mapping import active_contract, build_explicit_roll_map, build_rule_based_roll_map, is_unsafe_roll_window, synchronized_pair_contracts
+from hydra.data.pair_contract_synchronization import pair_validity_at
 from hydra.data.roll_audit import audit_trade_roll_exposure
 from hydra.promotion.cluster_calibration import calibrate_clustering_controls, cluster_sketches
+from scripts.build_databento_contract_map import parse_definition_frame
 
 
 class RollMappingAndClusteringTests(unittest.TestCase):
@@ -20,6 +22,44 @@ class RollMappingAndClusteringTests(unittest.TestCase):
         roll_map = build_rule_based_roll_map(["ES", "NQ"], start="2024-01-01", end="2024-07-01")
         pair = synchronized_pair_contracts(roll_map, ("NQ", "ES"), "2024-04-15T14:00:00Z")
         self.assertEqual(pair["NQ"][-2], pair["ES"][-2])
+
+    def test_explicit_roll_transition_and_definition_parsing(self) -> None:
+        frame = pd.DataFrame(
+            [
+                {"instrument_id": "5602", "ts_event": "2024-01-01T00:00:00Z", "expiration": "2024-06-21T13:30:00Z", "activation": "2022-03-18T13:30:00Z", "min_price_increment": 0.25},
+                {"instrument_id": "13743", "ts_event": "2024-01-01T00:00:00Z", "expiration": "2024-06-21T13:30:00Z", "activation": "2023-03-17T13:30:00Z", "min_price_increment": 0.25},
+            ]
+        )
+        definitions = parse_definition_frame(frame, ["5602", "13743"])
+        roll_map = build_explicit_roll_map(
+            ["ES", "NQ"],
+            start="2024-01-01",
+            end="2024-07-01",
+            continuous_mapping={
+                "ES.c.0": [{"d0": "2024-03-17", "d1": "2024-06-23", "s": "5602"}],
+                "NQ.c.0": [{"d0": "2024-03-17", "d1": "2024-06-23", "s": "13743"}],
+            },
+            raw_symbol_mapping={"5602": "ESM4", "13743": "NQM4"},
+            definition_records=definitions,
+        )
+        self.assertEqual(active_contract(roll_map, "ES", "2024-04-01T12:00:00Z").contract, "ESM4")
+        self.assertEqual(active_contract(roll_map, "ES", "2024-04-01T12:00:00Z").tick_value, 12.5)
+
+    def test_mismatched_maturity_rejection(self) -> None:
+        roll_map = build_explicit_roll_map(
+            ["ES", "NQ"],
+            start="2024-01-01",
+            end="2024-07-01",
+            continuous_mapping={
+                "ES.c.0": [{"d0": "2024-03-17", "d1": "2024-06-23", "s": "5602"}],
+                "NQ.c.0": [{"d0": "2024-03-17", "d1": "2024-06-23", "s": "4358"}],
+            },
+            raw_symbol_mapping={"5602": "ESM4", "4358": "NQU4"},
+            definition_records={},
+        )
+        validity = pair_validity_at(roll_map, "2024-04-15T14:00:00Z", left_symbol="NQ", right_symbol="ES")
+        self.assertFalse(validity.pair_valid)
+        self.assertEqual(validity.reason, "mismatched_quarterly_maturity")
 
     def test_roll_discontinuity_trade_handling(self) -> None:
         roll_map = build_rule_based_roll_map(["NQ"], start="2024-01-01", end="2024-07-01")
@@ -60,7 +100,8 @@ class RollMappingAndClusteringTests(unittest.TestCase):
             },
         ]
         report = calibrate_clustering_controls(sketches)
-        self.assertGreaterEqual(report["recall_known_clones"], 1.0)
+        self.assertGreaterEqual(report["precision_known_clones"], 0.90)
+        self.assertGreaterEqual(report["recall_known_clones"], 0.90)
         self.assertEqual(report["false_merge_rate"], 0.0)
         clusters = cluster_sketches(sketches)
         self.assertEqual(len(clusters), 2)

@@ -93,6 +93,62 @@ def synchronized_pair_audit(roll_map: RollMap, timestamps: list[Any], pair: tupl
     }
 
 
+def compare_roll_maps(
+    old_map: RollMap,
+    new_map: RollMap,
+    timestamps_by_symbol: dict[str, list[Any]],
+) -> dict[str, Any]:
+    disagreements: list[dict[str, Any]] = []
+    total = 0
+    by_symbol: dict[str, dict[str, Any]] = {}
+    for symbol, timestamps in timestamps_by_symbol.items():
+        symbol_total = 0
+        symbol_disagree = 0
+        samples = []
+        for ts in timestamps:
+            symbol_total += 1
+            total += 1
+            old_contract = active_contract(old_map, symbol, ts).contract
+            new_contract = active_contract(new_map, symbol, ts).contract
+            if old_contract != new_contract:
+                symbol_disagree += 1
+                row = {
+                    "timestamp": str(ts),
+                    "symbol": symbol,
+                    "old_contract": old_contract,
+                    "new_contract": new_contract,
+                }
+                if len(samples) < 10:
+                    samples.append(row)
+                if len(disagreements) < 100:
+                    disagreements.append(row)
+        by_symbol[symbol] = {
+            "timestamps_checked": symbol_total,
+            "disagreement_count": symbol_disagree,
+            "disagreement_rate": round(symbol_disagree / max(symbol_total, 1), 6),
+            "samples": samples,
+        }
+    return {
+        "old_map_type": old_map.map_type,
+        "new_map_type": new_map.map_type,
+        "timestamps_checked": total,
+        "disagreement_count": sum(item["disagreement_count"] for item in by_symbol.values()),
+        "disagreement_rate": round(sum(item["disagreement_count"] for item in by_symbol.values()) / max(total, 1), 6),
+        "by_symbol": by_symbol,
+        "samples": disagreements,
+    }
+
+
+def classify_roll_impact(roll_audit: dict[str, Any], *, pnl_share_threshold: float = 0.10) -> str:
+    if roll_audit.get("cross_roll_trade_count", 0):
+        return "ROLL_INVALIDATED"
+    if float(roll_audit.get("unsafe_roll_trade_share", 0.0)) >= pnl_share_threshold:
+        return "ROLL_MATERIAL_IMPACT"
+    if float(roll_audit.get("unsafe_roll_trade_share", 0.0)) > 0:
+        return "ROLL_MINOR_IMPACT"
+    return "ROLL_INVARIANT"
+
+
 def _volume_discontinuity(frame: pd.DataFrame) -> float:
     if "volume" not in frame.columns or frame.empty:
         return 0.0

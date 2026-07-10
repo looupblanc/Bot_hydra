@@ -47,6 +47,8 @@ def enforce_data_access(
     ledger_path: str = "reports/data_access/data_access_ledger.jsonl",
 ) -> DataAccessRecord:
     mutable = parameters_mutable(role)
+    if role == DataRole.SEALED_BLIND_HOLDOUT:
+        raise LockboxViolation("Sealed blind holdout data may not be loaded, summarized, or inspected before an approved freeze.")
     if role == DataRole.BLIND_VALIDATION and not freeze_manifest_hash:
         raise LockboxViolation("Q3 blind validation access requires a freeze manifest hash.")
     if role == DataRole.FINAL_LOCKBOX and not freeze_manifest_hash:

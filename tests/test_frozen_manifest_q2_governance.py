@@ -51,10 +51,19 @@ class FrozenManifestQ2GovernanceTests(unittest.TestCase):
                 reason="must have final manifest",
                 freeze_manifest_hash=None,
             )
+        with self.assertRaises(LockboxViolation):
+            enforce_data_access(
+                period="2024-10-01:2025-01-01",
+                role=DataRole.SEALED_BLIND_HOLDOUT,
+                requesting_module="test",
+                candidate_ids=["x"],
+                reason="q4 remains sealed",
+                freeze_manifest_hash="abc",
+            )
 
     def test_q2_mutation_policy_requires_developed_label(self) -> None:
         policy = {
-            "q2_result_may_confirm_or_reject": True,
+            "q2_result_is_diagnostic_only_after_consumption": True,
             "q2_modified_after_viewing_becomes_q2_developed": True,
         }
         self.assertTrue(policy["q2_modified_after_viewing_becomes_q2_developed"])
