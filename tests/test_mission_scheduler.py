@@ -815,6 +815,74 @@ def test_confirmed_map_defect_queues_one_repair_and_completion_remains_fail_clos
         conn.close()
 
 
+def test_clean_stop_restart_reconciles_map_block_before_queueing_repair(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    governance = SimpleNamespace(
+        manifest_hash="test-hash",
+        manifest_path="test-manifest",
+        result=SimpleNamespace(
+            passed=True,
+            details={"cumulative_actual_databento_spend_usd": 0.0, "q4_access_count": 0},
+        ),
+    )
+    monkeypatch.setattr(
+        "hydra.mission.controller.initialize_governance_kernel", lambda **_kwargs: governance
+    )
+    monkeypatch.setattr(
+        "hydra.mission.controller.detect_engineering_capability",
+        lambda: SimpleNamespace(to_dict=lambda: {}),
+    )
+    monkeypatch.setattr("hydra.mission.controller.record_engineering", lambda *_args, **_kwargs: None)
+    try:
+        set_kv(conn, "mission_id", "test_mission")
+        set_kv(conn, "service_state", "STOPPED_CLEANLY")
+        set_kv(conn, "last_shutdown", "clean")
+        set_kv(conn, "current_phase", "STOPPED_CLEANLY")
+        set_kv(conn, "current_blocker", "CONTRACT_MAP_REBUILD_REQUIRED")
+        enqueue_experiment(
+            conn,
+            POST_RETEST_PILOT_EXPERIMENT_ID,
+            {"experiment_type": "validator_integrity_repair_pilot"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            POST_RETEST_PILOT_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": "CONTRACT_MAP_DATE_FLATTENING_INTEGRITY_DEFECT_CONFIRMED_NO_CANDIDATE_RERUN",
+                "integrity_disposition": "CONTRACT_MAP_REBUILD_REQUIRED",
+                "result_hash": "pilot-result-hash",
+                "artifacts": {"result_json_path": "pilot.json"},
+                "contract_map_integrity_audit": {
+                    "frozen_contract_map_path": "frozen-map.json",
+                    "frozen_contract_map_sha256": "frozen-map-hash",
+                    "definition_dbn_path": "definitions.dbn.zst",
+                    "definition_dbn_sha256": "definition-hash",
+                },
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+        controller._initialize(conn)
+        repair = experiment_record(conn, CONTRACT_MAP_REPAIR_EXPERIMENT_ID)
+        assert repair is not None and repair["status"] == "QUEUED"
+        assert repair["attempt_count"] == 0
+        assert experiment_counts(conn)["TOTAL"] == 2
+        assert json.loads(
+            conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]
+        ) == "PLANNING_NEXT_ACTION"
+        event = conn.execute(
+            "SELECT payload FROM events WHERE event_type='controller_initialized' ORDER BY id DESC LIMIT 1"
+        ).fetchone()
+        assert event is not None
+        assert json.loads(event[0])["contract_map_repair_queued"] is True
+    finally:
+        conn.close()
+
+
 def test_watchdog_rejects_failed_service_and_stale_queued_work() -> None:
     now = datetime.now(timezone.utc)
     heartbeat = HeartbeatStatus("heartbeat", True, True, 1.0, {})

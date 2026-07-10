@@ -242,7 +242,7 @@ class AutonomousMissionController:
         previous_last_error = get_kv(conn, "last_error")
         blocked_phase = previous_phase in {"INTEGRITY_BLOCKED", "ENGINEERING_BLOCKED", "EXPERIMENT_BLOCKED"}
         resolved_missing_handler_type = self._resolved_missing_handler_type(previous_phase, previous_blocker)
-        resolved_contract_map_repair = bool(
+        contract_map_repair_required = bool(
             previous_phase == "INTEGRITY_BLOCKED"
             and str(previous_blocker or "") == "CONTRACT_MAP_REBUILD_REQUIRED"
         )
@@ -296,8 +296,12 @@ class AutonomousMissionController:
             set_kv(conn, "current_experiment", None)
         self._reconcile_planned_experiment_flags(conn)
         self._reconcile_completed_experiments(conn)
+        contract_map_repair_required = contract_map_repair_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "INTEGRITY_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "") == "CONTRACT_MAP_REBUILD_REQUIRED"
+        )
         contract_map_repair_queued = (
-            self._reconcile_contract_map_repair(conn) if resolved_contract_map_repair else False
+            self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
