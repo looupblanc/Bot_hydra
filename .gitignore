@@ -15,7 +15,9 @@ data/raw/
 *.dbn.zst
 registry/*.db
 registry/archive/*.db
+registry/snapshots/*.db
 reports/*.json
+reports/gate_aware_remediation/dossiers/*.json
 !reports/
 !reports/*.md
 .DS_Store

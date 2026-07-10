@@ -6,6 +6,10 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from hydra.propfirm.intraday_mll import conservative_intraday_mll_audit
+from hydra.propfirm.xfa_consistency import simulate_xfa_consistency
+from hydra.propfirm.xfa_standard import simulate_xfa_standard
+
 
 @dataclass(frozen=True)
 class Topstep150KConfig:
@@ -158,7 +162,21 @@ def evaluate_topstep_150k(
 ) -> TopstepEvaluation:
     daily = trades_to_topstep_daily(trades, df, overlay)
     combine = simulate_combine(daily, config)
-    funded = simulate_funded_xfa(daily, config)
+    intraday = conservative_intraday_mll_audit(
+        trades,
+        df,
+        starting_balance=config.combine_starting_balance,
+        starting_floor=config.combine_starting_mll,
+        mll_distance=config.combine_max_loss_limit,
+        floor_lock=config.combine_starting_balance,
+    )
+    combine["min_mll_buffer"] = min(float(combine["min_mll_buffer"]), float(intraday.min_buffer))
+    combine["intrabar_ambiguous_requires_tick_validation"] = bool(intraday.ambiguous_same_bar_count)
+    if intraday.breached:
+        combine["mll_breached"] = True
+    standard = simulate_xfa_standard(daily, mll_distance=config.combine_max_loss_limit)
+    consistency = simulate_xfa_consistency(daily, mll_distance=config.combine_max_loss_limit)
+    funded = choose_funded_path(standard, consistency)
     split_scores = _split_scores(split_daily or {}, config)
     pass_split_count = sum(1 for value in split_scores.values() if value >= 0.45)
     score = topstep_score(combine, funded, daily, config, split_scores)
@@ -195,6 +213,24 @@ def evaluate_topstep_150k(
         pass_split_count=pass_split_count,
         split_scores=split_scores,
     )
+
+
+def choose_funded_path(standard: dict[str, Any], consistency: dict[str, Any]) -> dict[str, Any]:
+    def key(item: dict[str, Any]) -> tuple[int, int, float, float]:
+        return (
+            int(bool(item.get("survived"))),
+            int(bool(item.get("payout_eligible"))),
+            float(item.get("trader_net_payout", 0.0)),
+            -float(item.get("payout_days_to_eligibility") or 9999),
+        )
+
+    chosen = max([standard, consistency], key=key)
+    out = dict(chosen)
+    out["standard"] = standard
+    out["consistency"] = consistency
+    out["recommended_xfa_path"] = chosen.get("path")
+    out["post_payout_mll_breach"] = not bool(chosen.get("survived")) and int(chosen.get("payout_cycles_survived", 0)) > 0
+    return out
 
 
 def simulate_combine(daily: pd.DataFrame, config: Topstep150KConfig) -> dict[str, Any]:
@@ -335,6 +371,8 @@ def topstep_status(
         return "TOPSTEP_FUNDED_FAILED_MLL", "funded_mll_breached"
     if not funded["payout_eligible"]:
         return "TOPSTEP_REJECTED_BAD_PAYOUT_PROFILE", "funded_payout_not_eligible"
+    if combine.get("intrabar_ambiguous_requires_tick_validation"):
+        return "INTRABAR_AMBIGUOUS_REQUIRES_TICK_VALIDATION", "same_bar_path_requires_higher_resolution_validation"
     if pass_split_count < 2:
         return "TOPSTEP_RESEARCH_CANDIDATE", "insufficient_month_to_month_stability"
     if funded["payout_cycles_survived"] > 0 and score >= 0.72 and pass_split_count == 3:

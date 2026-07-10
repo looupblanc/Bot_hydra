@@ -1,0 +1,142 @@
+{
+  "best_promotion_score_adjusted_for_selection_proxy": 0.8611767631576086,
+  "candidates_failing_exactly_one_gate": 0,
+  "candidates_failing_exactly_two_gates": 11,
+  "dossier_count": 381,
+  "dossier_paths_sample": [
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_73dfc9dbbd04.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_7d0b38decded.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_c246d0ee5c7e.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_c7dee5d0df2e.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_ed88f3d3724e.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_2ae4cb1a81df.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_64e9fe6e77d1.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_e0428bdd8a02.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_16b3e9449578.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_a15a83d8f323.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_3bf8c5b5f2fb.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_84aabeac28f9.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_ca84ada596f1.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_0a3d0e770b75.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_857f73be18ce.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_e037e90e5142.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_df97f2ac5cad.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_2d371a60c839.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_366fe22ca205.json",
+    "/root/hydra-bot/reports/gate_aware_remediation/dossiers/cand_c61c340b2cc6.json"
+  ],
+  "economic_strategy_units": 370,
+  "economically_viable_analyzed": 200,
+  "effective_independent_trials_proxy": 16751.5,
+  "equivalence_clusters": 370,
+  "failure_policy_distribution": {
+    "REPAIRABLE_NEAR_MISS": 381
+  },
+  "family_fdr_proxy": {
+    "topstep_micro_scaling_mes_mnq": {
+      "false_discovery_risk_proxy": 1.0,
+      "signal_rate": 0.0,
+      "strong_count": 0.0,
+      "topstep_viable_count": 0.0,
+      "trial_count": 453.0
+    },
+    "topstep_nq_es_divergence_controlled": {
+      "false_discovery_risk_proxy": 1.0,
+      "signal_rate": 0.007908264136022143,
+      "strong_count": 21.0,
+      "topstep_viable_count": 19.0,
+      "trial_count": 5058.0
+    },
+    "topstep_opening_range_controlled_runner": {
+      "false_discovery_risk_proxy": 1.0,
+      "signal_rate": 0.0005685048322910744,
+      "strong_count": 1.0,
+      "topstep_viable_count": 1.0,
+      "trial_count": 3518.0
+    },
+    "topstep_prior_level_reclaim_smooth_pnl": {
+      "false_discovery_risk_proxy": 1.0,
+      "signal_rate": 0.0,
+      "strong_count": 0.0,
+      "topstep_viable_count": 0.0,
+      "trial_count": 1971.0
+    },
+    "topstep_volatility_expansion_limited_risk": {
+      "false_discovery_risk_proxy": 1.0,
+      "signal_rate": 0.0005773672055427252,
+      "strong_count": 1.0,
+      "topstep_viable_count": 1.0,
+      "trial_count": 3464.0
+    },
+    "topstep_vwap_exhaustion_payout_engine": {
+      "false_discovery_risk_proxy": 1.0,
+      "signal_rate": 0.0,
+      "strong_count": 0.0,
+      "topstep_viable_count": 0.0,
+      "trial_count": 3530.0
+    }
+  },
+  "family_trial_counts": {
+    "topstep_micro_scaling_mes_mnq": 453,
+    "topstep_nq_es_divergence_controlled": 5058,
+    "topstep_opening_range_controlled_runner": 3518,
+    "topstep_prior_level_reclaim_smooth_pnl": 1971,
+    "topstep_volatility_expansion_limited_risk": 3464,
+    "topstep_vwap_exhaustion_payout_engine": 3530
+  },
+  "hard_invalid_count": 0,
+  "near_misses_analyzed": 160,
+  "pareto_candidate_count": 33,
+  "pareto_candidate_ids": [
+    "cand_73dfc9dbbd04",
+    "cand_7d0b38decded",
+    "cand_c246d0ee5c7e",
+    "cand_c7dee5d0df2e",
+    "cand_ed88f3d3724e",
+    "cand_2ae4cb1a81df",
+    "cand_a15a83d8f323",
+    "cand_84aabeac28f9",
+    "cand_ca84ada596f1",
+    "cand_e037e90e5142",
+    "cand_2d371a60c839",
+    "cand_366fe22ca205",
+    "cand_c61c340b2cc6",
+    "cand_32ce229d68d7",
+    "cand_3df28d2ab2dc",
+    "cand_19e9aab70e8b",
+    "cand_78724dc9f509",
+    "cand_e6724984107d",
+    "cand_f35423abe7f3",
+    "cand_e781dcff173b"
+  ],
+  "portfolio_basket_count": 1,
+  "portfolio_baskets": [
+    {
+      "candidate_ids": [
+        "cand_73dfc9dbbd04",
+        "cand_7d0b38decded",
+        "cand_c246d0ee5c7e",
+        "cand_c7dee5d0df2e",
+        "cand_ed88f3d3724e",
+        "cand_2ae4cb1a81df",
+        "cand_a15a83d8f323",
+        "cand_84aabeac28f9",
+        "cand_ca84ada596f1",
+        "cand_e037e90e5142"
+      ],
+      "estimated_net_profit": 89674.7958692688,
+      "estimated_trader_net_payout": 50382.208729249716,
+      "executable": true,
+      "notes": [
+        "approximation_from_registry_metrics_not_trade_level_schedule"
+      ],
+      "policy": "balanced_pareto_one_account",
+      "shared_mll_respected": true
+    }
+  ],
+  "registry_total": 17994,
+  "repairable_count": 381,
+  "selected_for_dossiers": 381,
+  "target_reaching_analyzed": 27,
+  "topstep_viable_analyzed": 21
+}

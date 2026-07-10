@@ -297,6 +297,36 @@ def download_historical_ohlcv(
     }
 
 
+def download_historical_raw_only(request: DatabentoRequest, key: str | None = None) -> dict[str, Any]:
+    """Download DBN/ZST without converting or inspecting rows.
+
+    This is used for protected lockbox periods where acquisition is allowed but
+    programmatic inspection must wait until a freeze manifest authorizes access.
+    """
+    if key is None:
+        key = validate_environment(dry_run=False)
+    db = _import_databento()
+    raw_path = Path(request.raw_output_path)
+    raw_path.parent.mkdir(parents=True, exist_ok=True)
+    client = db.Historical(key)
+    client.timeseries.get_range(
+        dataset=request.dataset,
+        start=request.start,
+        end=request.end,
+        symbols=request.api_symbols,
+        schema=request.schema,
+        stype_in=request.stype_in,
+        stype_out=request.stype_out,
+        path=request.raw_output_path,
+    )
+    return {
+        "network_request_made": True,
+        "raw_only": True,
+        "request": request.to_dict(),
+        "raw_output_path": request.raw_output_path,
+    }
+
+
 def load_cached_ohlcv(path: str | Path, symbol: str | None = None, timeframe: str = "1m") -> pd.DataFrame:
     source = Path(path)
     if source.suffix == ".csv":

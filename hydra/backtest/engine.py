@@ -73,7 +73,21 @@ def run_backtest(candidate: StrategyCandidate, df: pd.DataFrame, seed: int = 42)
                 pnl = (price - entry_price) * pos * point_value * risk_scale - cost * risk_scale
                 equity += pnl
                 daily_pnl[session_id] = daily_pnl.get(session_id, 0.0) + float(pnl)
-                trades.append({"entry_i": entry_i, "exit_i": i, "side": pos, "pnl": float(pnl), "mfe": float(mfe), "mae": float(mae), "exit_reason": exit_decision.reason})
+                trades.append(
+                    {
+                        "entry_i": entry_i,
+                        "exit_i": i,
+                        "side": pos,
+                        "pnl": float(pnl),
+                        "mfe": float(mfe),
+                        "mae": float(mae),
+                        "exit_reason": exit_decision.reason,
+                        "symbol": candidate.symbol,
+                        "point_value": float(point_value),
+                        "risk_scale": float(risk_scale),
+                        "max_position": int(max_position),
+                    }
+                )
                 pos = 0
                 entry_price = 0.0
                 mfe = 0.0

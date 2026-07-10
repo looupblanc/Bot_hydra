@@ -1,0 +1,90 @@
+verified_at_utc: "2026-07-10T00:00:00Z"
+rule_version_id: "topstep_150k_2026-07-10_no_dll_baseline"
+source_type: "official_topstep_help_center"
+source_urls:
+  - "https://help.topstep.com/en/articles/8284197-trading-combine-parameters"
+  - "https://help.topstep.com/en/articles/8284204-what-is-the-maximum-loss-limit"
+  - "https://help.topstep.com/en/articles/8284215-express-funded-account-parameters"
+  - "https://help.topstep.com/en/articles/8284223-what-is-the-scaling-plan"
+  - "https://help.topstep.com/en/articles/8284233-topstep-payout-policy"
+  - "https://help.topstep.com/en/articles/10490293-daily-loss-limit-in-the-trading-combine-and-express-funded-account"
+primary_mode: "NO_DLL_BASELINE"
+account:
+  program: "topstep"
+  account_size: 150000
+  dashboard_era: "new_dashboard"
+  no_activation_fee_path_is_commercial_not_risk_mechanics: true
+  profit_split_trader: 0.90
+  legacy_first_10000_exception_applied: false
+trading_combine:
+  starting_balance: 150000
+  profit_target: 9000
+  maximum_loss_limit_distance: 4500
+  initial_mll_floor: 145500
+  mll_rises_with_end_of_day_balance: true
+  mll_never_moves_down: true
+  mll_locks_at_starting_balance: true
+  mll_monitored_intraday: true
+  realized_and_unrealized_pnl_count: true
+  touching_or_crossing_mll_is_failure: true
+  consistency_best_day_max_pct_of_applicable_target: 0.50
+  consistency_target_inflates_required_profit: true
+  minimum_trading_days_to_pass: 2
+  maximum_position_mini_equivalent: 15
+  maximum_micros: 150
+  micro_to_mini_ratio: 10
+  flatten_cutoff_central_time: "15:10"
+  trading_day_start_central_time: "17:00"
+  trading_day_end_central_time: "15:10"
+xfa_common:
+  starting_balance: 0
+  initial_mll: -4500
+  mll_trails_upward: true
+  mll_locks_at_zero: true
+  after_first_payout_mll_set_to_zero: true
+  realized_and_unrealized_pnl_count: true
+  no_profit_target: true
+  scaling_plan_applies: true
+  no_daily_loss_limit_primary: true
+  micro_to_mini_ratio: 10
+  position_limit_increases_next_session: true
+xfa_scaling_plan:
+  - min_balance: -999999999
+    max_balance: 1499.99
+    max_mini_equivalent: 3
+  - min_balance: 1500
+    max_balance: 1999.99
+    max_mini_equivalent: 4
+  - min_balance: 2000
+    max_balance: 2999.99
+    max_mini_equivalent: 5
+  - min_balance: 3000
+    max_balance: 4499.99
+    max_mini_equivalent: 10
+  - min_balance: 4500
+    max_balance: 999999999
+    max_mini_equivalent: 15
+xfa_standard:
+  qualifying_winning_days: 5
+  qualifying_winning_day_min_profit: 150
+  payout_max_pct_of_balance: 0.50
+  no_dll_150k_payout_cap: 5000
+  minimum_payout: 125
+  profit_split_trader: 0.90
+  winning_day_count_restarts_after_payout: true
+xfa_consistency:
+  minimum_traded_days: 3
+  at_least_one_trade_each_counted_day: true
+  largest_winning_day_max_pct_of_total_profit: 0.40
+  consistency_resets_after_payout: true
+  payout_max_pct_of_balance: 0.50
+  no_dll_150k_payout_cap: 6000
+  minimum_payout: 125
+  profit_split_trader: 0.90
+optional_dll_sensitivity:
+  scenario_id: "OPTIONAL_DLL_LIMITED_OFFER"
+  model_as_primary: false
+  offer_may_expire: true
+  never_mix_with_no_dll_baseline: true
+  reclassify_existing_no_dll_using_dll_caps: false
+
