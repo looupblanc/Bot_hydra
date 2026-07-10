@@ -3,11 +3,11 @@
 - Budget start: 2026-07-10
 - Hard cap USD: 100.00
 - Safety ceiling USD: 98.00
-- Cumulative estimated spend USD: 3.892145
-- Cumulative actual spend USD: 3.892145
-- Remaining hard-cap budget USD: 96.107855
-- Remaining automatic safety budget USD: 94.107855
-- Ledger records: 16
+- Cumulative estimated spend USD: 3.893695
+- Cumulative actual spend USD: 3.893695
+- Remaining hard-cap budget USD: 96.106305
+- Remaining automatic safety budget USD: 94.106305
+- Ledger records: 19
 
 ## Recent Records
 - 2026-07-10T01:21:12.498374+00:00 GLBX.MDP3 ohlcv-1m ['ES', 'MES', 'NQ', 'MNQ'] 2024-04-01 to 2024-07-01 estimate=$1.291206 actual=$0.000000 status=ESTIMATED_ONLY
@@ -26,3 +26,6 @@
 - 2026-07-10T06:17:40.998023+00:00 GLBX.MDP3 definition ['10', '118', '750', '763', '4358', '5602', '7101', '7114', '13743', '13804', '13941', '17077'] 2024-01-01 to 2024-07-01 estimate=$0.000844 actual=$0.000000 status=ESTIMATED_ONLY
 - 2026-07-10T06:18:16.355345+00:00 GLBX.MDP3 definition ['10', '118', '750', '763', '4358', '5602', '7101', '7114', '13743', '13804', '13941', '17077'] 2024-01-01 to 2024-07-01 estimate=$0.000000 actual=$0.000844 status=DOWNLOADED
 - 2026-07-10T06:19:30.465113+00:00 GLBX.MDP3 definition ['10', '118', '750', '763', '4358', '5602', '7101', '7114', '13743', '13804', '13941', '17077'] 2024-01-01 to 2024-07-01 estimate=$0.000000 actual=$0.000000 status=CACHE_HIT
+- 2026-07-10T06:53:48.559612+00:00 GLBX.MDP3 definition ['10', '118', '750', '763', '4358', '5602', '7101', '7114', '13743', '13804', '13941', '17077', '106364', '183748', '42008411', '42034014'] 2024-01-01 to 2024-10-01 estimate=$0.001549 actual=$0.000000 status=ESTIMATED_ONLY
+- 2026-07-10T06:59:00.856151+00:00 GLBX.MDP3 definition ['10', '118', '750', '763', '4358', '5602', '7101', '7114', '13743', '13804', '13941', '17077', '106364', '183748', '42008411', '42034014'] 2024-01-01 to 2024-10-01 estimate=$0.000000 actual=$0.000000 status=CACHE_HIT
+- 2026-07-10T07:07:18.188435+00:00 GLBX.MDP3 definition ['10', '118', '750', '763', '4358', '5602', '7101', '7114', '13743', '13804', '13941', '17077', '106364', '183748', '42008411', '42034014'] 2024-01-01 to 2024-10-01 estimate=$0.000000 actual=$0.001549 status=DOWNLOADED_RECOVERED_AFTER_INTERRUPTED_MAP_BUILD

@@ -43,6 +43,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--report-tag", default="explicit_contract_map_q1_q2_v1")
     parser.add_argument("--budget-usd", type=float, default=100.0)
     parser.add_argument("--budget-safety-ceiling-usd", type=float, default=98.0)
+    parser.add_argument("--skip-ohlcv-audit", action="store_true", help="Build the map from symbology/definitions without scanning cached OHLCV bars.")
     return parser.parse_args()
 
 
@@ -96,16 +97,23 @@ def main() -> int:
     )
     explicit_path, explicit_hash = write_roll_map(explicit_map)
     rule_map = build_rule_based_roll_map(args.symbols, start=args.start, end=args.end, dataset=args.dataset, schema=args.schema)
-    q1 = load_cached_databento_range(args.dataset, args.schema, args.symbols, "2024-01-01", "2024-03-31")
-    q2 = load_cached_databento_range(args.dataset, args.schema, args.symbols, "2024-04-01", "2024-07-01")
-    combined = pd.concat([q1, q2], ignore_index=True)
-    sample = _sample_timestamps_by_symbol(combined, args.symbols)
-    comparison = compare_roll_maps(rule_map, explicit_map, sample)
-    pair_audits = {
-        "NQ_ES": audit_pair_synchronization(explicit_map, _sample_pair_timestamps(combined, ["NQ", "ES"]), left_symbol="NQ", right_symbol="ES"),
-        "MNQ_MES": audit_pair_synchronization(explicit_map, _sample_pair_timestamps(combined, ["MNQ", "MES"]), left_symbol="MNQ", right_symbol="MES"),
-    }
-    roll_audit = audit_roll_discontinuities(combined, explicit_map)
+    if args.skip_ohlcv_audit:
+        comparison = {"status": "SKIPPED", "reason": "--skip-ohlcv-audit"}
+        sample_timestamps = pd.date_range(args.start, args.end, periods=25, inclusive="left")
+        pair_audits = {
+            "NQ_ES": audit_pair_synchronization(explicit_map, list(sample_timestamps), left_symbol="NQ", right_symbol="ES"),
+            "MNQ_MES": audit_pair_synchronization(explicit_map, list(sample_timestamps), left_symbol="MNQ", right_symbol="MES"),
+        }
+        roll_audit = {"status": "SKIPPED", "reason": "--skip-ohlcv-audit"}
+    else:
+        combined = _load_cached_periods_for_audit(args.dataset, args.schema, args.symbols, args.start, args.end)
+        sample = _sample_timestamps_by_symbol(combined, args.symbols)
+        comparison = compare_roll_maps(rule_map, explicit_map, sample)
+        pair_audits = {
+            "NQ_ES": audit_pair_synchronization(explicit_map, _sample_pair_timestamps(combined, ["NQ", "ES"]), left_symbol="NQ", right_symbol="ES"),
+            "MNQ_MES": audit_pair_synchronization(explicit_map, _sample_pair_timestamps(combined, ["MNQ", "MES"]), left_symbol="MNQ", right_symbol="MES"),
+        }
+        roll_audit = audit_roll_discontinuities(combined, explicit_map)
     budget_summary = write_budget_summary(budget)
     summary = {
         "created_at": utc_now_iso(),
@@ -159,6 +167,24 @@ def load_or_download_definitions(
         }
         _append_cache_hit(budget, dataset, start, end, instrument_ids, status)
         return records, status
+    if cache_paths["raw"].exists():
+        db = _import_databento()
+        store = db.DBNStore.from_file(cache_paths["raw"])
+        frame = store.to_df(pretty_ts=True, map_symbols=False)
+        records = parse_definition_frame(frame, instrument_ids)
+        cache_paths["parsed"].write_text(json.dumps(records, indent=2, sort_keys=True, default=str), encoding="utf-8")
+        checksum = sha256_file(cache_paths["parsed"])
+        status = {
+            "download_status": "RAW_CACHE_PARSED",
+            "actual_cost_usd": 0.0,
+            "estimated_cost_usd": 0.0,
+            "parsed_path": str(cache_paths["parsed"]),
+            "raw_path": str(cache_paths["raw"]),
+            "checksum": checksum,
+            "record_count": len(frame),
+        }
+        _append_cache_hit(budget, dataset, start, end, instrument_ids, status)
+        return records, status
     payload = {
         "dataset": dataset,
         "schema": "definition",
@@ -166,7 +192,7 @@ def load_or_download_definitions(
         "stype_in": "instrument_id",
         "start": start,
         "end": end,
-        "purpose": "explicit contract definitions for Q1-Q2 roll map",
+        "purpose": f"explicit contract definitions for {start} to {end} roll map",
     }
     request_id = request_id_for(payload)
     estimate = float(
@@ -196,7 +222,7 @@ def load_or_download_definitions(
             cumulative_estimated_spend_usd=projected,
             cumulative_actual_spend_usd=actual,
             cache_hit=False,
-            research_purpose="explicit contract definitions for Q1-Q2 roll map",
+            research_purpose=f"explicit contract definitions for {start} to {end} roll map",
             candidate_tier="data_integrity",
             approval_mode=AUTO_UNDER_HARD_CAP,
             resulting_file=None,
@@ -235,7 +261,7 @@ def load_or_download_definitions(
             cumulative_estimated_spend_usd=projected,
             cumulative_actual_spend_usd=actual + estimate,
             cache_hit=False,
-            research_purpose="explicit contract definitions for Q1-Q2 roll map",
+            research_purpose=f"explicit contract definitions for {start} to {end} roll map",
             candidate_tier="data_integrity",
             approval_mode=AUTO_UNDER_HARD_CAP,
             resulting_file=str(cache_paths["parsed"]),
@@ -309,7 +335,7 @@ def _append_cache_hit(
         "stype_in": "instrument_id",
         "start": start,
         "end": end,
-        "purpose": "explicit contract definitions for Q1-Q2 roll map",
+        "purpose": f"explicit contract definitions for {start} to {end} roll map",
     }
     projected, actual = enforce_budget(budget, 0.0)
     append_spend_record(
@@ -328,7 +354,7 @@ def _append_cache_hit(
             cumulative_estimated_spend_usd=projected,
             cumulative_actual_spend_usd=actual,
             cache_hit=True,
-            research_purpose="explicit contract definitions for Q1-Q2 roll map",
+            research_purpose=f"explicit contract definitions for {start} to {end} roll map",
             candidate_tier="data_integrity",
             approval_mode=AUTO_UNDER_HARD_CAP,
             resulting_file=status["parsed_path"],
@@ -344,6 +370,26 @@ def _sample_timestamps_by_symbol(df: pd.DataFrame, symbols: list[str]) -> dict[s
         subset = df[df["symbol"] == symbol]
         out[symbol] = list(pd.to_datetime(subset["timestamp"], utc=True).iloc[:: max(len(subset) // 500, 1)][:500])
     return out
+
+
+def _load_cached_periods_for_audit(dataset: str, schema: str, symbols: list[str], start: str, end: str) -> pd.DataFrame:
+    requested_start = pd.Timestamp(start, tz="UTC")
+    requested_end = pd.Timestamp(end, tz="UTC")
+    chunks = [
+        ("2024-01-01", "2024-03-31"),
+        ("2024-04-01", "2024-07-01"),
+        ("2024-07-01", "2024-10-01"),
+    ]
+    frames = []
+    for chunk_start, chunk_end in chunks:
+        c_start = pd.Timestamp(chunk_start, tz="UTC")
+        c_end = pd.Timestamp(chunk_end, tz="UTC")
+        if c_end <= requested_start or c_start >= requested_end:
+            continue
+        frames.append(load_cached_databento_range(dataset, schema, symbols, chunk_start, chunk_end))
+    if not frames:
+        raise FileNotFoundError(f"No cached OHLCV periods available for contract-map audit {start} to {end}.")
+    return pd.concat(frames, ignore_index=True)
 
 
 def _sample_pair_timestamps(df: pd.DataFrame, symbols: list[str]) -> list[Any]:

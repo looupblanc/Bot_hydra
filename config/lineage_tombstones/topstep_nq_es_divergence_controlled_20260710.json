@@ -1,0 +1,30 @@
+{
+  "created_at_utc": "2026-07-10T00:00:00+00:00",
+  "lineage": "topstep_nq_es_divergence_controlled",
+  "disposition": "KILL_EXISTING_LINEAGE",
+  "reason": "Explicit-contract Q1/Q2 audit found zero surviving frozen-set candidates, roll sensitivity, and hidden directional NQ beta. The implementation was not a genuine ES/NQ paired relative-value strategy.",
+  "blocked_family_names": [
+    "topstep_nq_es_divergence_controlled",
+    "topstep_nq_es_divergence_controlled_v2",
+    "nq_es_divergence_controlled",
+    "nq_es_divergence_proxy",
+    "directional_nq_es_divergence"
+  ],
+  "blocked_parameter_markers": [
+    "divergence_min",
+    "max_range_expansion",
+    "directional_proxy",
+    "nq_es_divergence_controlled"
+  ],
+  "allowed_reformulation_requirements": [
+    "two explicit synchronized contracts",
+    "past-only hedge ratio",
+    "genuine paired exposure",
+    "two-leg costs",
+    "legging risk",
+    "roll-transition exclusion",
+    "directional beta audit"
+  ],
+  "q4_accessed": false,
+  "live_trading_authorized": false
+}
