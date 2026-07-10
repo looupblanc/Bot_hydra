@@ -1,0 +1,27 @@
+version: hydra_autonomous_v1
+objective: persistent_edge_atom_to_topstep_research_mission
+baseline_commit: b56c98b8179d67e87d0290690fd8b73f70040dbe
+no_live_trading: true
+validator_calibration_required: true
+q4_access_requires_freeze: true
+mission_state_dir: mission/state
+remaining_databento_budget_usd: 77.036754
+workers: 3
+checkpoint_every_minutes: 20
+milestones:
+  - M1_VALIDATOR_CALIBRATED
+  - M2_FIRST_VALIDATED_MECHANISM
+  - M3_FIRST_VALIDATED_STRATEGY
+  - M4_FIRST_Q4_PASS
+  - M5_FIRST_FINAL_LOCKBOX_PASS
+  - M6_FIRST_EXECUTABLE_BASKET
+  - M7_MINIMUM_OPERATIONAL_POOL
+  - MISSION_SUCCESS
+hard_stop_conditions:
+  - MISSION_SUCCESS
+  - budget_violation
+  - live_trading_required
+  - integrity_failure
+  - protected_holdout_unsafely_requested
+  - scientific_exhaustion_demonstrated
+  - manual_stop

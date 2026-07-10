@@ -1,0 +1,10 @@
+[Unit]
+Description=Run HYDRA mission watchdog periodically
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+Unit=hydra-autonomous-mission-watchdog.service
+
+[Install]
+WantedBy=timers.target

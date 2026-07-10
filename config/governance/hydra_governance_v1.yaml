@@ -1,0 +1,33 @@
+version: hydra_governance_v1
+created_utc: "2026-07-10T00:00:00+00:00"
+protected_invariants:
+  - no_live_trading
+  - no_broker_execution
+  - q4_sealed_until_freeze
+  - databento_budget_hard_cap
+  - evidence_scope_no_upward_promotion
+  - unknown_proxy_inherited_not_passed
+  - registry_integrity_required
+  - secrets_never_logged
+  - protected_files_not_autonomously_modified
+protected_files:
+  - config/governance/hydra_governance_v1.yaml
+  - hydra/governance/kernel.py
+  - hydra/governance/invariants.py
+  - hydra/governance/protected_manifest.py
+  - hydra/validation/evidence_scope.py
+  - hydra/validation/status_provenance.py
+  - hydra/validation/promotion_contract.py
+  - hydra/validation/lockbox_guard.py
+  - hydra/data/budget.py
+  - tests/test_mission_governance_and_calibration.py
+q4_policy:
+  sealed_start: "2024-10-01"
+  freeze_required: true
+  automatic_access_allowed_only_after_governance_pass: true
+budget_policy:
+  hard_cap_usd: 100.0
+  preserve_until_strategy_survivors_usd: 30.0
+live_trading:
+  allowed: false
+  broker_connectivity_allowed: false

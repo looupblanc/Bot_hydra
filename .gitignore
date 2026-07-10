@@ -16,7 +16,13 @@ data/raw/
 registry/*.db
 registry/archive/*.db
 registry/snapshots/*.db
+mission/state/
+mission/logs/
 reports/*.json
+reports/checkpoints/mission/*.md
+reports/mission/*_latest_summary.md
+reports/mission/governance_kernel_status.md
+reports/mission/governance_protected_manifest.json
 reports/gate_aware_remediation/dossiers/*.json
 !reports/
 !reports/*.md

@@ -1,0 +1,17 @@
+[Unit]
+Description=HYDRA Autonomous Research Mission
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/hydra-bot
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/root/hydra-bot/.venv/bin/python /root/hydra-bot/scripts/run_autonomous_hydra_mission.py --mission-id hydra_autonomous_v1 --baseline-commit b56c98b8179d67e87d0290690fd8b73f70040dbe --objective-config config/mission/hydra_autonomous_v1.yaml --remaining-databento-budget-usd 77.036754 --workers 3 --single-writer --checkpoint-every-minutes 20 --autonomous-engineering --information-gain-planning --validator-calibration-required --persistent --resume --no-live-trading
+Restart=on-failure
+RestartSec=30
+KillSignal=SIGTERM
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target

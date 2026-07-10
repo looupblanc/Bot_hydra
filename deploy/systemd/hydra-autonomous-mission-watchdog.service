@@ -1,0 +1,7 @@
+[Unit]
+Description=HYDRA Autonomous Research Mission Watchdog
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/hydra-bot
+ExecStart=/root/hydra-bot/.venv/bin/python /root/hydra-bot/scripts/hydra_mission_doctor.py --baseline-commit b56c98b8179d67e87d0290690fd8b73f70040dbe --remaining-databento-budget-usd 77.036754
