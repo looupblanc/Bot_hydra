@@ -47,6 +47,35 @@ def generate_candidates(
     return candidates
 
 
+def generate_topstep_lane_candidates(
+    count: int,
+    symbols: list[str],
+    timeframes: list[str],
+    seed: int,
+    lane_families: list[str],
+) -> list[StrategyCandidate]:
+    rng = np.random.default_rng(seed)
+    candidates: list[StrategyCandidate] = []
+    for i in range(count):
+        family = lane_families[i % len(lane_families)]
+        symbol_pool = _topstep_symbol_pool(symbols, family)
+        symbol = str(rng.choice(symbol_pool))
+        timeframe = str(rng.choice(timeframes))
+        candidates.append(
+            StrategyCandidate(
+                candidate_id=f"cand_{uuid.uuid4().hex[:12]}",
+                family=family,
+                symbol=symbol,
+                timeframe=timeframe,
+                parameters=_params_for_family(family, rng),
+                entry_logic=f"{family}_regime_path_entry",
+                exit_logic="topstep_searchable_exit_policy",
+                risk_parameters=_topstep_risk(symbol, rng),
+            )
+        )
+    return candidates
+
+
 def _params_for_family(family: str, rng: np.random.Generator, diagnostic_relaxed: bool = False) -> dict[str, float]:
     if family == "multi_session_momentum_exhaustion":
         if diagnostic_relaxed:

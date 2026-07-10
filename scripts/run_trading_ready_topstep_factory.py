@@ -3,10 +3,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sqlite3
 import sys
 import time
-from collections import Counter, defaultdict
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -17,17 +19,36 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hydra.backtest.engine import run_backtest
 from hydra.backtest.metrics import max_drawdown
 from hydra.data.databento_loader import load_cached_ohlcv, request_from_config, validate_ohlcv_frame
-from hydra.factory.adaptive_mutation import LANES
+from hydra.factory.adaptive_mutation import LANES, LANE_TO_FAMILY
 from hydra.features.market_state import build_market_state
 from hydra.promotion.pipeline import PromotionInput, run_promotion_pipeline
 from hydra.propfirm.pass_path_optimizer import analyze_pass_path
 from hydra.propfirm.topstep_150k import InternalRiskOverlay, Topstep150KConfig, evaluate_topstep_150k, trades_to_topstep_daily
-from hydra.registry.candidates import load_strategy_fingerprints, update_promotion_metadata, upsert_topstep_candidate
+from hydra.registry.candidates import update_promotion_metadata, upsert_topstep_candidate
 from hydra.registry.db import connect
-from hydra.strategies.generator import generate_candidates
+from hydra.strategies.generator import generate_topstep_lane_candidates
 from hydra.utils.config import load_config, project_path
 from hydra.utils.time import utc_now_iso
 from hydra.validation.no_leak import audit_no_lookahead
+
+
+WORKER_STATES: dict[str, pd.DataFrame] = {}
+WORKER_TOPSTEP_CFG: Topstep150KConfig | None = None
+WORKER_PROFIT_TARGET = 9000.0
+WORKER_MLL = 4500.0
+
+FOCUSED_LANES = [
+    "portfolio_diversification_lane",
+    "topstep_nq_es_divergence_controlled_v2",
+    "topstep_nq_es_divergence_controlled_v2",
+    "topstep_opening_range_controlled_runner_v2",
+    "topstep_vwap_exhaustion_payout_engine_v2",
+    "topstep_volatility_expansion_limited_risk_v2",
+    "near_miss_adaptive_mutator",
+    "creative_market_representation_lane",
+    "payout_cycle_smooth_climber_v1",
+    "consistency_safe_runner_v1",
+]
 
 
 def parse_args() -> argparse.Namespace:
@@ -82,14 +103,14 @@ def main() -> int:
         combine_max_loss_limit=args.mll,
         no_daily_loss_limit=bool(args.no_daily_loss_limit),
     )
-    existing_fingerprints = load_strategy_fingerprints(conn)
+    existing_fingerprints = load_all_strategy_fingerprints(conn)
     existing_curves: dict[str, pd.Series] = {}
     checkpoint_dir = project_path("reports", "checkpoints")
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     deadline = started + args.max_runtime_hours * 3600
     next_checkpoint = started + max(args.checkpoint_every_minutes, 0.1) * 60
     tested_this_run = 0
-    workers_used = 1 if args.workers == "auto" else max(1, int(args.workers))
+    workers_used = resolve_workers(args.workers)
     print(f"Workers used: {workers_used}")
     print(f"Resume fingerprints loaded: {len(existing_fingerprints)}")
     stop_reason = "max_runtime_reached"
@@ -101,36 +122,79 @@ def main() -> int:
         if total_candidates(conn) >= args.min_total_candidates and not args.continue_until_quality:
             stop_reason = "minimum_total_reached"
             break
-        batch = generate_candidates(args.batch_size, args.symbols, ["1m"], seed_cursor, topstep_mode=True)
+        batch_lanes = [lane_for_index(tested_this_run + i) for i in range(args.batch_size)]
+        lane_families = [LANE_TO_FAMILY[lane] for lane in batch_lanes]
+        batch = generate_topstep_lane_candidates(args.batch_size, args.symbols, ["1m"], seed_cursor, lane_families)
         seed_cursor += args.batch_size + 17
-        for offset, candidate in enumerate(batch):
+        tasks = [(candidate, batch_lanes[offset], args.seed + tested_this_run + offset) for offset, candidate in enumerate(batch)]
+        for promotion in evaluate_batch(
+            conn,
+            tasks,
+            states,
+            leak,
+            data_validation,
+            topstep_cfg,
+            args,
+            existing_fingerprints,
+            existing_curves,
+            workers_used,
+        ):
             if time.monotonic() >= deadline:
                 break
-            lane = LANES[(tested_this_run + offset) % len(LANES)]
-            promotion = evaluate_and_store(
-                conn,
-                candidate,
-                lane,
-                states,
-                leak,
-                data_validation,
-                topstep_cfg,
-                args,
-                existing_fingerprints,
-                existing_curves,
-                args.seed + tested_this_run + offset,
-            )
             if promotion.get("strategy_fingerprint"):
                 existing_fingerprints.add(promotion["strategy_fingerprint"])
             tested_this_run += 1
         if time.monotonic() >= next_checkpoint:
-            write_checkpoint(conn, args, checkpoint_dir, started, tested_this_run, stop_reason="running")
+            write_checkpoint(conn, args, checkpoint_dir, started, tested_this_run, workers_used, stop_reason="running")
             next_checkpoint = time.monotonic() + max(args.checkpoint_every_minutes, 0.1) * 60
         print(f"Factory progress: tested_this_run={tested_this_run} total_registry={total_candidates(conn)} ready={count_status(conn, 'TRADING_READY_CANDIDATE')}")
-    checkpoint_path = write_checkpoint(conn, args, checkpoint_dir, started, tested_this_run, stop_reason=stop_reason)
+    checkpoint_path = write_checkpoint(conn, args, checkpoint_dir, started, tested_this_run, workers_used, stop_reason=stop_reason)
     report_path = write_final_report(conn, args, started, tested_this_run, workers_used, checkpoint_dir, checkpoint_path, stop_reason)
     print_final(conn, args, started, tested_this_run, workers_used, report_path, checkpoint_dir)
     return 0
+
+
+def resolve_workers(value: str) -> int:
+    if value == "auto":
+        cpu_count = os.cpu_count() or 1
+        if cpu_count >= 4:
+            return max(2, cpu_count - 1)
+        if cpu_count == 2:
+            return 2
+        return 1
+    return max(1, int(value))
+
+
+def lane_for_index(index: int) -> str:
+    return FOCUSED_LANES[index % len(FOCUSED_LANES)]
+
+
+def load_all_strategy_fingerprints(conn: sqlite3.Connection) -> set[str]:
+    from hydra.promotion.gates import strategy_fingerprint
+    from hydra.strategies.dsl import StrategyCandidate
+
+    fingerprints: set[str] = set()
+    for row in conn.execute("SELECT * FROM candidates"):
+        if row["strategy_fingerprint"]:
+            fingerprints.add(row["strategy_fingerprint"])
+            continue
+        try:
+            candidate = StrategyCandidate(
+                candidate_id=row["candidate_id"],
+                family=row["family"],
+                symbol=row["symbol"],
+                timeframe=row["timeframe"],
+                parameters=json.loads(row["parameters_json"]),
+                entry_logic=f"{row['family']}_regime_path_entry",
+                exit_logic="unknown",
+                risk_parameters=json.loads(row["risk_json"]),
+                parent_candidate_id=row["parent_candidate_id"],
+                mutation_type=row["mutation_type"],
+            )
+            fingerprints.add(strategy_fingerprint(candidate))
+        except Exception:
+            continue
+    return fingerprints
 
 
 def load_cached_range(args: argparse.Namespace, cfg: dict[str, Any]) -> pd.DataFrame:
@@ -175,6 +239,131 @@ def build_states(raw: pd.DataFrame, symbols: list[str]) -> tuple[dict[str, pd.Da
             raise RuntimeError(f"No-lookahead audit failed for {symbol}: {leak[symbol][1]}")
         states[symbol] = state
     return states, leak
+
+
+def evaluate_batch(
+    conn: sqlite3.Connection,
+    tasks,
+    states: dict[str, pd.DataFrame],
+    leak: dict[str, tuple[bool, str]],
+    data_validation: dict[str, Any],
+    topstep_cfg: Topstep150KConfig,
+    args: argparse.Namespace,
+    existing_fingerprints: set[str],
+    existing_curves: dict[str, pd.Series],
+    workers_used: int,
+):
+    if workers_used <= 1:
+        for candidate, lane, seed in tasks:
+            yield evaluate_and_store(
+                conn,
+                candidate,
+                lane,
+                states,
+                leak,
+                data_validation,
+                topstep_cfg,
+                args,
+                existing_fingerprints,
+                existing_curves,
+                seed,
+            )
+        return
+    with ProcessPoolExecutor(
+        max_workers=workers_used,
+        initializer=init_worker,
+        initargs=(states, topstep_cfg, args.profit_target, args.mll),
+    ) as pool:
+        futures = [pool.submit(worker_evaluate_candidate, candidate, lane, seed) for candidate, lane, seed in tasks]
+        for future in as_completed(futures):
+            worker_result = future.result()
+            yield store_worker_result(
+                conn,
+                worker_result,
+                leak,
+                data_validation,
+                args,
+                existing_fingerprints,
+                existing_curves,
+            )
+
+
+def init_worker(states: dict[str, pd.DataFrame], topstep_cfg: Topstep150KConfig, profit_target: float, mll: float) -> None:
+    global WORKER_STATES, WORKER_TOPSTEP_CFG, WORKER_PROFIT_TARGET, WORKER_MLL
+    WORKER_STATES = states
+    WORKER_TOPSTEP_CFG = topstep_cfg
+    WORKER_PROFIT_TARGET = profit_target
+    WORKER_MLL = mll
+
+
+def worker_evaluate_candidate(candidate, lane: str, seed: int) -> dict[str, Any]:
+    if WORKER_TOPSTEP_CFG is None:
+        raise RuntimeError("Worker Topstep config was not initialized.")
+    df = WORKER_STATES[candidate.symbol]
+    result = run_backtest(candidate, df, seed)
+    overlay = InternalRiskOverlay(
+        daily_stop=float(candidate.risk_parameters.get("internal_daily_stop", 1000)),
+        daily_profit_lock=float(candidate.risk_parameters.get("daily_profit_lock", 1500)),
+    )
+    daily = trades_to_topstep_daily(result.trades, df, overlay)
+    split_daily = split_daily_frames(daily)
+    evaluation = evaluate_topstep_150k(result.trades, df, WORKER_TOPSTEP_CFG, overlay, split_daily=split_daily)
+    topstep_record = evaluation.to_record()
+    pass_path = analyze_pass_path(topstep_record, WORKER_PROFIT_TARGET, WORKER_MLL)
+    topstep_record["pass_path_diagnosis"] = pass_path.diagnosis
+    metrics = dict(result.metrics)
+    metrics["net_profit"] = topstep_record["adjusted_net_profit"]
+    metrics["max_drawdown"] = max_drawdown(pd.Series(daily["pnl"].cumsum(), dtype=float)) if len(daily) else 0.0
+    metrics["trade_count"] = topstep_record["trade_count"]
+    return {
+        "candidate": candidate,
+        "lane": lane,
+        "seed": seed,
+        "result": result,
+        "daily": daily,
+        "topstep_record": topstep_record,
+        "metrics": metrics,
+    }
+
+
+def store_worker_result(
+    conn: sqlite3.Connection,
+    worker_result: dict[str, Any],
+    leak: dict[str, tuple[bool, str]],
+    data_validation: dict[str, Any],
+    args: argparse.Namespace,
+    existing_fingerprints: set[str],
+    existing_curves: dict[str, pd.Series],
+) -> dict[str, Any]:
+    candidate = worker_result["candidate"]
+    result = worker_result["result"]
+    topstep_record = worker_result["topstep_record"]
+    metrics = worker_result["metrics"]
+    max_corr = max_correlation(result.equity_curve, existing_curves)
+    promotion = run_promotion_pipeline(
+        PromotionInput(
+            candidate=candidate,
+            result=result,
+            daily=worker_result["daily"],
+            topstep_record=topstep_record,
+            data_validation=data_validation,
+            split_scores=topstep_record.get("split_scores", {}),
+            leak_ok=leak[candidate.symbol][0],
+            leak_reason=leak[candidate.symbol][1],
+            existing_fingerprints=existing_fingerprints,
+            max_correlation=max_corr,
+            seed=worker_result["seed"],
+            lane=worker_result["lane"],
+            report_tag=args.report_tag,
+        )
+    )
+    upsert_topstep_candidate(conn, candidate, metrics, topstep_record["status"], topstep_record["rejection_reason"], topstep_record, robustness=topstep_record["topstep_score"])
+    update_promotion_metadata(conn, candidate.candidate_id, promotion)
+    if promotion["classification"] in {"ECONOMICALLY_VIABLE", "TOPSTEP_VIABLE", "TRADING_READY_CANDIDATE", "TOPSTEP_NEAR_MISS"}:
+        existing_curves[candidate.candidate_id] = result.equity_curve
+        if len(existing_curves) > 300:
+            existing_curves.pop(next(iter(existing_curves)))
+    return promotion
 
 
 def evaluate_and_store(
@@ -330,8 +519,8 @@ def gate_failure_distribution(conn: sqlite3.Connection) -> dict[str, int]:
     return dict(counts.most_common(20))
 
 
-def write_checkpoint(conn: sqlite3.Connection, args: argparse.Namespace, checkpoint_dir: Path, started: float, tested_this_run: int, stop_reason: str) -> Path:
-    data = summary(conn, args, started, tested_this_run, 1, checkpoint_dir, stop_reason)
+def write_checkpoint(conn: sqlite3.Connection, args: argparse.Namespace, checkpoint_dir: Path, started: float, tested_this_run: int, workers_used: int, stop_reason: str) -> Path:
+    data = summary(conn, args, started, tested_this_run, workers_used, checkpoint_dir, stop_reason)
     path = checkpoint_dir / f"trading_ready_checkpoint_{utc_now_iso().replace(':', '').replace('+', 'Z')}_{args.report_tag}.md"
     lines = ["# HYDRA Trading-Ready Factory Checkpoint", "", f"Generated: {utc_now_iso()}", ""]
     for key, value in data.items():
