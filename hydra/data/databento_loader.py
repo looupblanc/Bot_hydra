@@ -29,6 +29,14 @@ SUPPORTED_CONTINUOUS_ROOTS = {
     "MES": "MES.c.0",
     "NQ": "NQ.c.0",
     "MNQ": "MNQ.c.0",
+    "RTY": "RTY.c.0",
+    "M2K": "M2K.c.0",
+    "YM": "YM.c.0",
+    "MYM": "MYM.c.0",
+    "GC": "GC.c.0",
+    "MGC": "MGC.c.0",
+    "CL": "CL.c.0",
+    "MCL": "MCL.c.0",
 }
 RAW_CONTRACT_RE = re.compile(r"^[A-Z]{1,4}[FGHJKMNQUVXZ][0-9]{1,2}$")
 

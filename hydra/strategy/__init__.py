@@ -1,0 +1,2 @@
+"""Sparse strategy assembly primitives."""
+

@@ -1,0 +1,27 @@
+{
+  "created_utc": "2026-07-10T00:00:00+00:00",
+  "schema": "hydra_lineage_tombstone_v1",
+  "reason": "Strict unsampled temporal transfer replay found zero strong or weak transfer candidates, zero candidate-level complete matched-null passes, and zero Topstep replays. Existing complete formulations are retired and may not be promoted, mutated directly, renamed, or used as parents.",
+  "blocked_formulations": [
+    "overnight_inventory_rth_resolution",
+    "intraday_range_migration_path_asymmetry"
+  ],
+  "blocked_ids": [
+    "intraday_range_migration_path_asymmetry_06_00",
+    "overnight_inventory_rth_resolution_09_00",
+    "overnight_inventory_rth_resolution_05_00",
+    "intraday_range_migration_path_asymmetry_03_00",
+    "intraday_range_migration_path_asymmetry_02_00",
+    "overnight_inventory_rth_resolution_01_00",
+    "intraday_range_migration_path_asymmetry_00_00",
+    "intraday_range_migration_path_asymmetry_09_00",
+    "overnight_inventory_rth_resolution_00_00",
+    "intraday_range_migration_path_asymmetry_01_00",
+    "intraday_range_migration_path_asymmetry_04_00",
+    "intraday_range_migration_path_asymmetry_05_00"
+  ],
+  "allowed_research_reuse": [
+    "Unvalidated atomic concepts may be rewritten as new preregistered Edge Atom hypotheses with new atom IDs, no inherited performance, and no reuse of complete entry/exit/sizing formulations."
+  ],
+  "q4_status": "SEALED_BLIND_HOLDOUT_NOT_ACCESSED"
+}
