@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import multiprocessing
 import os
@@ -46,6 +47,7 @@ from hydra.mission.planner import plan_next_action
 from hydra.mission.reporting import write_mission_checkpoint, write_mission_summary
 from hydra.mission.research_memory import record_decision, record_engineering, record_evidence
 from hydra.mission.safety_governor import check_action_allowed
+from hydra.utils.config import project_path
 from hydra.utils.time import utc_now_iso
 
 
@@ -54,11 +56,14 @@ DESIGN_EXPERIMENT_ID = "calibration_affected_atom_retest_design_v1"
 EXECUTION_EXPERIMENT_ID = "calibration_affected_atom_retest_execution_v1"
 POST_RETEST_DESIGN_EXPERIMENT_ID = "post_calibration_retest_research_design_v1"
 POST_RETEST_PILOT_EXPERIMENT_ID = "post_calibration_retest_pilot_v1"
+CONTRACT_MAP_REPAIR_EXPERIMENT_ID = "contract_map_date_aware_repair_v1"
+CONTRACT_MAP_REPAIR_TASK_SHA256 = "92c73632fbff1dcc65de99fdef11b04026189b4033505f82d739f5e7e34216b8"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
     "post_calibration_retest_research_design",
     "validator_integrity_repair_pilot",
+    "contract_map_date_aware_repair",
 }
 
 
@@ -237,6 +242,10 @@ class AutonomousMissionController:
         previous_last_error = get_kv(conn, "last_error")
         blocked_phase = previous_phase in {"INTEGRITY_BLOCKED", "ENGINEERING_BLOCKED", "EXPERIMENT_BLOCKED"}
         resolved_missing_handler_type = self._resolved_missing_handler_type(previous_phase, previous_blocker)
+        resolved_contract_map_repair = bool(
+            previous_phase == "INTEGRITY_BLOCKED"
+            and str(previous_blocker or "") == "CONTRACT_MAP_REBUILD_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -287,6 +296,9 @@ class AutonomousMissionController:
             set_kv(conn, "current_experiment", None)
         self._reconcile_planned_experiment_flags(conn)
         self._reconcile_completed_experiments(conn)
+        contract_map_repair_queued = (
+            self._reconcile_contract_map_repair(conn) if resolved_contract_map_repair else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -294,7 +306,7 @@ class AutonomousMissionController:
             "ENGINEERING_BLOCKED",
             "EXPERIMENT_BLOCKED",
         }
-        if blocked_phase and resolved_missing_handler_type is None:
+        if blocked_phase and resolved_missing_handler_type is None and not contract_map_repair_queued:
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
             set_kv(conn, "last_error", previous_last_error)
@@ -314,6 +326,7 @@ class AutonomousMissionController:
                 ),
                 "resolved_missing_handler_type": resolved_missing_handler_type,
                 "requeued_legacy_missing_handler_rows": recovered_missing_handler_rows,
+                "contract_map_repair_queued": contract_map_repair_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -333,6 +346,7 @@ class AutonomousMissionController:
             (DESIGN_EXPERIMENT_ID, "bounded_retest_plan_written"),
             (EXECUTION_EXPERIMENT_ID, "calibration_retest_execution_plan_written"),
             (POST_RETEST_DESIGN_EXPERIMENT_ID, "post_retest_research_plan_written"),
+            (CONTRACT_MAP_REPAIR_EXPERIMENT_ID, "contract_map_repair_plan_written"),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -351,6 +365,11 @@ class AutonomousMissionController:
                 POST_RETEST_PILOT_EXPERIMENT_ID,
                 "validator_integrity_repair_pilot",
                 "validator_integrity_repair_pilot_completed",
+            ),
+            (
+                CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
+                "contract_map_date_aware_repair",
+                "contract_map_date_aware_repair_completed",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -375,6 +394,7 @@ class AutonomousMissionController:
                 "calibration_affected_atom_retest_execution": "calibration_retest_execution_result",
                 "post_calibration_retest_research_design": "post_retest_research_design_result",
                 "validator_integrity_repair_pilot": "validator_integrity_repair_pilot_result",
+                "contract_map_date_aware_repair": "contract_map_date_aware_repair_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -395,6 +415,14 @@ class AutonomousMissionController:
                     conn,
                     "last_error",
                     f"Validator-integrity pilot requires controlled resolution: {disposition}",
+                )
+            elif experiment_type == "contract_map_date_aware_repair":
+                set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+                set_kv(conn, "current_blocker", "FRESH_RETEST_WITH_REPAIRED_MAP_REQUIRED")
+                set_kv(
+                    conn,
+                    "last_error",
+                    "Repaired map is valid; a separate fresh preregistration with new atom IDs is required.",
                 )
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
@@ -440,6 +468,78 @@ class AutonomousMissionController:
                 "last_error",
                 f"Post-retest branch selected; approved pilot handler {pilot_type!r} must be implemented.",
             )
+
+    def _reconcile_contract_map_repair(self, conn: Any) -> bool:
+        existing = experiment_record(conn, CONTRACT_MAP_REPAIR_EXPERIMENT_ID)
+        if existing is not None:
+            return str(existing.get("status")) in {"QUEUED", "RUNNING"}
+        pilot = experiment_record(conn, POST_RETEST_PILOT_EXPERIMENT_ID)
+        result = (pilot or {}).get("result") or {}
+        if (pilot or {}).get("status") != "COMPLETED" or result.get("integrity_disposition") != (
+            "CONTRACT_MAP_REBUILD_REQUIRED"
+        ):
+            return False
+        contract_audit = result.get("contract_map_integrity_audit") or {}
+        artifacts = result.get("artifacts") or {}
+        task_path = project_path(
+            "reports", "engineering", "hydra_contract_map_date_repair_20260710_v2.md"
+        )
+        if not task_path.is_file() or hashlib.sha256(task_path.read_bytes()).hexdigest() != (
+            CONTRACT_MAP_REPAIR_TASK_SHA256
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "CONTRACT_MAP_REPAIR_TASK_HASH_MISMATCH")
+            set_kv(conn, "last_error", "Immutable contract-map repair task is missing or changed.")
+            return False
+        specification = {
+            "experiment_type": "contract_map_date_aware_repair",
+            "priority": 100.0,
+            "max_attempts": 3,
+            "integrity_pilot_result_path": str(artifacts.get("result_json_path") or ""),
+            "integrity_pilot_result_hash": str(result.get("result_hash") or ""),
+            "frozen_contract_map_path": str(contract_audit.get("frozen_contract_map_path") or ""),
+            "frozen_contract_map_sha256": str(contract_audit.get("frozen_contract_map_sha256") or ""),
+            "definition_dbn_path": str(contract_audit.get("definition_dbn_path") or ""),
+            "definition_dbn_sha256": str(contract_audit.get("definition_dbn_sha256") or ""),
+            "engineering_task_path": str(task_path),
+            "engineering_task_sha256": CONTRACT_MAP_REPAIR_TASK_SHA256,
+            "code_commit": self._git_commit(),
+            "data_role": "CACHED_DEFINITION_METADATA_ONLY",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "market_observation_read_allowed": False,
+        }
+        if not all(
+            specification[key]
+            for key in (
+                "integrity_pilot_result_path",
+                "integrity_pilot_result_hash",
+                "frozen_contract_map_path",
+                "frozen_contract_map_sha256",
+                "definition_dbn_path",
+                "definition_dbn_sha256",
+            )
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "CONTRACT_MAP_REPAIR_SOURCE_INCOMPLETE")
+            set_kv(conn, "last_error", "Integrity pilot lacks frozen map-repair source metadata.")
+            return False
+        enqueue_experiment(conn, CONTRACT_MAP_REPAIR_EXPERIMENT_ID, specification)
+        set_kv(conn, "contract_map_repair_plan_written", True)
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
+                "experiment_type": "contract_map_date_aware_repair",
+                "status": "QUEUED",
+                "reason": "Confirmed contract-map date-flattening integrity defect.",
+            },
+        )
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+        return True
 
     def _evidence_reconciliation_exists(self, reconciliation_id: str) -> bool:
         path = self.paths.evidence_ledger

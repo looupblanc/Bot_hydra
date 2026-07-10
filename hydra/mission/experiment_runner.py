@@ -111,4 +111,19 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             selected_post_retest_branch=str(experiment["selected_post_retest_branch"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "contract_map_date_aware_repair":
+        from hydra.validation.contract_map_date_repair import run_contract_map_date_aware_repair
+
+        return run_contract_map_date_aware_repair(
+            output_dir,
+            integrity_pilot_result_path=Path(str(experiment["integrity_pilot_result_path"])),
+            integrity_pilot_result_hash=str(experiment["integrity_pilot_result_hash"]),
+            frozen_contract_map_path=Path(str(experiment["frozen_contract_map_path"])),
+            frozen_contract_map_sha256=str(experiment["frozen_contract_map_sha256"]),
+            definition_dbn_path=Path(str(experiment["definition_dbn_path"])),
+            definition_dbn_sha256=str(experiment["definition_dbn_sha256"]),
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")

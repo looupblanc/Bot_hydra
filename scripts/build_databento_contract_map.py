@@ -85,6 +85,11 @@ def main() -> int:
         instrument_ids=instrument_ids,
         cache_paths=definition_cache,
     )
+    if not definition_cache["raw"].is_file():
+        raise RuntimeError("Date-aware contract mapping requires the cached raw definition DBN.")
+    definition_history = db.DBNStore.from_file(definition_cache["raw"]).to_df(
+        pretty_ts=True, map_symbols=False
+    ).reset_index()
     explicit_map = build_explicit_roll_map(
         args.symbols,
         start=args.start,
@@ -92,6 +97,7 @@ def main() -> int:
         continuous_mapping=continuous_mapping,
         raw_symbol_mapping=raw_symbol_mapping,
         definition_records=definition_records,
+        definition_history=definition_history,
         dataset=args.dataset,
         schema=args.schema,
     )

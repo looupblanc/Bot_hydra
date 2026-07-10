@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -14,6 +14,7 @@ from hydra.utils.config import project_path
 
 
 CONTRACT_MONTH_CODES = {3: "H", 6: "M", 9: "U", 12: "Z"}
+OUTRIGHT_FUTURES_MONTH_CODES = "FGHJKMNQUVXZ"
 
 
 @dataclass(frozen=True)
@@ -134,6 +135,7 @@ def build_explicit_roll_map(
     continuous_mapping: dict[str, list[dict[str, Any]]],
     raw_symbol_mapping: dict[str, str],
     definition_records: dict[str, dict[str, Any]],
+    definition_history: pd.DataFrame | None = None,
     dataset: str = "GLBX.MDP3",
     schema: str = "ohlcv-1m",
     unsafe_window_days: int = 3,
@@ -144,8 +146,21 @@ def build_explicit_roll_map(
         continuous_symbol = f"{root}.c.0"
         for segment in continuous_mapping.get(continuous_symbol, []):
             instrument_id = str(segment["s"])
-            raw_symbol = raw_symbol_mapping.get(instrument_id, instrument_id)
-            definition = definition_records.get(instrument_id, {})
+            if definition_history is not None:
+                definition = resolve_date_aware_definition(
+                    definition_history,
+                    instrument_id=instrument_id,
+                    active_start=str(segment["d0"]),
+                    root=root,
+                )
+                raw_symbol = str(definition["raw_symbol"])
+            else:
+                raw_symbol = raw_symbol_mapping.get(instrument_id, instrument_id)
+                definition = definition_records.get(instrument_id, {})
+                if not valid_outright_future_symbol(root, raw_symbol):
+                    raise ValueError(
+                        f"Raw symbol {raw_symbol!r} is not a valid outright futures contract for {root}."
+                    )
             month_code = _contract_month_code(root, raw_symbol)
             year = _contract_year(raw_symbol, segment.get("d0", start))
             expiry = _definition_timestamp(definition, "expiration") or third_friday(year, _month_from_code(month_code)).isoformat()
@@ -184,7 +199,11 @@ def build_explicit_roll_map(
     return RollMap(
         dataset=dataset,
         schema=schema,
-        map_type="EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DEFINITIONS",
+        map_type=(
+            "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2"
+            if definition_history is not None
+            else "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DEFINITIONS"
+        ),
         symbols=list(symbols),
         contracts=sorted(contracts, key=lambda item: (item.root, item.active_start, item.contract)),
         unsafe_window_days=unsafe_window_days,
@@ -198,8 +217,172 @@ def build_explicit_roll_map(
             "period_end": end,
             "continuous_symbols": [f"{symbol}.c.0" for symbol in symbols],
             "definition_record_count": len(definition_records),
+            "definition_resolution": (
+                "date_aware_end_of_segment_start_day"
+                if definition_history is not None
+                else "legacy_pre_resolved_raw_symbol_mapping"
+            ),
         },
     )
+
+
+def valid_outright_future_symbol(root: str, symbol: str) -> bool:
+    import re
+
+    return bool(
+        re.fullmatch(
+            rf"{re.escape(str(root))}[{OUTRIGHT_FUTURES_MONTH_CODES}]\d{{1,2}}",
+            str(symbol),
+        )
+    )
+
+
+def resolve_date_aware_definition(
+    definition_history: pd.DataFrame,
+    *,
+    instrument_id: str,
+    active_start: str,
+    root: str,
+) -> dict[str, Any]:
+    required = {
+        "ts_event",
+        "instrument_id",
+        "raw_symbol",
+        "instrument_class",
+        "security_type",
+        "asset",
+        "min_price_increment",
+    }
+    missing = sorted(required - set(definition_history.columns))
+    if missing:
+        raise ValueError(f"Definition history lacks required columns: {missing}")
+    frame = definition_history.copy()
+    frame["instrument_id_key"] = frame["instrument_id"].astype(str)
+    frame["ts_event"] = pd.to_datetime(frame["ts_event"], utc=True)
+    rows = frame[frame["instrument_id_key"] == str(instrument_id)].sort_values("ts_event")
+    if rows.empty:
+        raise ValueError(f"No definition history for instrument ID {instrument_id}.")
+    start = _as_utc_timestamp(active_start)
+    cutoff = start.normalize() + pd.Timedelta(days=1)
+    available = rows[rows["ts_event"] < cutoff]
+    selected_time = (available.iloc[-1] if not available.empty else rows.iloc[0])["ts_event"]
+    selected_rows = rows[rows["ts_event"] == selected_time]
+    signature_columns = [
+        "raw_symbol",
+        "instrument_class",
+        "security_type",
+        "asset",
+        "min_price_increment",
+        *(["expiration"] if "expiration" in rows.columns else []),
+        *(["activation"] if "activation" in rows.columns else []),
+    ]
+    signatures = selected_rows[signature_columns].astype(str).drop_duplicates()
+    if len(signatures) != 1:
+        raise ValueError(
+            f"Ambiguous definition history for instrument ID {instrument_id} at {selected_time}."
+        )
+    selected = selected_rows.iloc[-1].to_dict()
+    raw_symbol = str(selected.get("raw_symbol") or "")
+    if not valid_outright_future_symbol(root, raw_symbol):
+        raise ValueError(
+            f"Date-aware definition {raw_symbol!r} is not an outright futures symbol for {root}."
+        )
+    if str(selected.get("instrument_class") or "") != "F":
+        raise ValueError(f"Definition {raw_symbol} is not instrument_class=F.")
+    if str(selected.get("security_type") or "") != "FUT":
+        raise ValueError(f"Definition {raw_symbol} is not security_type=FUT.")
+    if str(selected.get("asset") or "") != str(root):
+        raise ValueError(f"Definition asset {selected.get('asset')!r} does not equal root {root!r}.")
+    spec = instrument_spec(root)
+    tick_size = float(selected.get("min_price_increment"))
+    if abs(tick_size - float(spec.tick_size)) > 1e-12:
+        raise ValueError(
+            f"Definition tick {tick_size} for {raw_symbol} differs from root spec {spec.tick_size}."
+        )
+    selected["ts_event"] = pd.Timestamp(selected_time).isoformat()
+    return selected
+
+
+def repair_roll_map_from_date_aware_definitions(
+    frozen: RollMap,
+    definition_history: pd.DataFrame,
+) -> tuple[RollMap, dict[str, Any]]:
+    repaired_contracts: list[ContractInfo] = []
+    changes: list[dict[str, Any]] = []
+    for contract in frozen.contracts:
+        if not contract.instrument_id:
+            raise ValueError(f"Contract {contract.contract} has no explicit instrument ID.")
+        definition = resolve_date_aware_definition(
+            definition_history,
+            instrument_id=str(contract.instrument_id),
+            active_start=contract.active_start,
+            root=contract.root,
+        )
+        raw_symbol = str(definition["raw_symbol"])
+        month_code = _contract_month_code(contract.root, raw_symbol)
+        year = _contract_year(raw_symbol, contract.active_start)
+        expiration = _definition_timestamp(definition, "expiration")
+        if expiration is None:
+            raise ValueError(f"Date-aware definition {raw_symbol} has no expiration.")
+        expiration_date = str(_as_utc_timestamp(expiration).date())
+        activation = _definition_timestamp(definition, "activation")
+        tick_size = float(definition["min_price_increment"])
+        repaired = replace(
+            contract,
+            contract=raw_symbol,
+            month_code=month_code,
+            year=year,
+            expiry_date=expiration_date,
+            last_trade_date=expiration_date,
+            tick_size=tick_size,
+            activation_time=activation,
+        )
+        repaired_contracts.append(repaired)
+        if repaired != contract:
+            changes.append(
+                {
+                    "root": contract.root,
+                    "instrument_id": contract.instrument_id,
+                    "active_start": contract.active_start,
+                    "active_end": contract.active_end,
+                    "definition_event_time": definition["ts_event"],
+                    "old_contract": contract.contract,
+                    "new_contract": repaired.contract,
+                    "old_tick_size": contract.tick_size,
+                    "new_tick_size": repaired.tick_size,
+                    "symbol_changed": contract.contract != repaired.contract,
+                    "tick_size_changed": abs(contract.tick_size - repaired.tick_size) > 1e-12,
+                }
+            )
+    repaired_map = RollMap(
+        dataset=frozen.dataset,
+        schema=frozen.schema,
+        map_type="EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+        symbols=list(frozen.symbols),
+        contracts=sorted(repaired_contracts, key=lambda item: (item.root, item.active_start, item.contract)),
+        unsafe_window_days=frozen.unsafe_window_days,
+        notes=[
+            *frozen.notes,
+            "Raw symbols and definition fields were resolved date-aware from cached Databento definition history.",
+            "The frozen predecessor map remains historical and must not be used for decision-changing evidence.",
+        ],
+        source_metadata={
+            **frozen.source_metadata,
+            "definition_resolution": "date_aware_end_of_segment_start_day",
+            "predecessor_roll_map_hash": frozen.roll_map_hash(),
+        },
+    )
+    audit = {
+        "segment_count": len(frozen.contracts),
+        "changed_segment_count": len(changes),
+        "symbol_change_count": sum(row["symbol_changed"] for row in changes),
+        "tick_size_change_count": sum(row["tick_size_changed"] for row in changes),
+        "all_resolved_symbols_valid": all(
+            valid_outright_future_symbol(row.root, row.contract) for row in repaired_map.contracts
+        ),
+        "changes": changes,
+    }
+    return repaired_map, audit
 
 
 def active_contract(roll_map: RollMap, symbol: str, timestamp: Any) -> ContractInfo:
@@ -254,7 +437,13 @@ def write_roll_map(roll_map: RollMap, folder: str = "data/cache/contract_maps") 
     target_dir.mkdir(parents=True, exist_ok=True)
     digest = roll_map.roll_map_hash()
     path = target_dir / f"roll_map_{roll_map.dataset.replace('.', '-')}_{roll_map.schema}_{digest[:16]}.json"
-    path.write_text(json.dumps(roll_map.to_dict(), indent=2, sort_keys=True, default=str), encoding="utf-8")
+    content = json.dumps(roll_map.to_dict(), indent=2, sort_keys=True, default=str) + "\n"
+    if path.exists() and path.read_text(encoding="utf-8") != content:
+        raise RuntimeError(f"Refusing to overwrite divergent roll-map artifact: {path}")
+    if not path.exists():
+        temporary = path.with_name(f".{path.name}.tmp")
+        temporary.write_text(content, encoding="utf-8")
+        temporary.replace(path)
     return path, digest
 
 

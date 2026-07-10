@@ -4,7 +4,13 @@ import unittest
 
 import pandas as pd
 
-from hydra.data.contract_mapping import active_contract, build_explicit_roll_map, build_rule_based_roll_map, is_unsafe_roll_window, synchronized_pair_contracts
+from hydra.data.contract_mapping import (
+    active_contract,
+    build_explicit_roll_map,
+    build_rule_based_roll_map,
+    is_unsafe_roll_window,
+    synchronized_pair_contracts,
+)
 from hydra.data.pair_contract_synchronization import pair_validity_at
 from hydra.data.roll_audit import audit_trade_roll_exposure
 from hydra.promotion.cluster_calibration import calibrate_clustering_controls, cluster_sketches
@@ -60,6 +66,51 @@ class RollMappingAndClusteringTests(unittest.TestCase):
         validity = pair_validity_at(roll_map, "2024-04-15T14:00:00Z", left_symbol="NQ", right_symbol="ES")
         self.assertFalse(validity.pair_valid)
         self.assertEqual(validity.reason, "mismatched_quarterly_maturity")
+
+    def test_explicit_builder_uses_date_aware_definition_for_reused_id(self) -> None:
+        history = pd.DataFrame(
+            [
+                {
+                    "ts_event": "2023-01-01T17:00:00Z",
+                    "instrument_id": 5602,
+                    "raw_symbol": "ZNH3",
+                    "instrument_class": "F",
+                    "security_type": "FUT",
+                    "asset": "ZN",
+                    "min_price_increment": 0.015625,
+                    "expiration": "2023-03-17T13:30:00Z",
+                    "activation": "2022-03-18T13:30:00Z",
+                },
+                {
+                    "ts_event": "2024-03-17T11:04:10Z",
+                    "instrument_id": 5602,
+                    "raw_symbol": "ESM4",
+                    "instrument_class": "F",
+                    "security_type": "FUT",
+                    "asset": "ES",
+                    "min_price_increment": 0.25,
+                    "expiration": "2024-06-21T13:30:00Z",
+                    "activation": "2023-06-16T13:30:00Z",
+                },
+            ]
+        )
+        roll_map = build_explicit_roll_map(
+            ["ES"],
+            start="2024-01-01",
+            end="2024-07-01",
+            continuous_mapping={
+                "ES.c.0": [{"d0": "2024-03-17", "d1": "2024-06-23", "s": "5602"}]
+            },
+            raw_symbol_mapping={"5602": "ZNH3"},
+            definition_records={},
+            definition_history=history,
+        )
+        self.assertEqual(roll_map.contracts[0].contract, "ESM4")
+        self.assertEqual(roll_map.contracts[0].tick_size, 0.25)
+        self.assertEqual(
+            roll_map.map_type,
+            "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+        )
 
     def test_roll_discontinuity_trade_handling(self) -> None:
         roll_map = build_rule_based_roll_map(["NQ"], start="2024-01-01", end="2024-07-01")

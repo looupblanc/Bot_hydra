@@ -14,6 +14,7 @@ import pytest
 from hydra.mission.controller import (
     AutonomousMissionController,
     CleanWorkerInterruption,
+    CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
     DESIGN_EXPERIMENT_ID,
     EXECUTION_EXPERIMENT_ID,
     MissionControllerConfig,
@@ -746,6 +747,70 @@ def test_completed_validator_integrity_pilot_is_reconciled_and_blocks_for_map_re
         assert len(
             [row for row in evidence if row.get("experiment_id") == POST_RETEST_PILOT_EXPERIMENT_ID]
         ) == 1
+    finally:
+        conn.close()
+
+
+def test_confirmed_map_defect_queues_one_repair_and_completion_remains_fail_closed(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        enqueue_experiment(
+            conn,
+            POST_RETEST_PILOT_EXPERIMENT_ID,
+            {"experiment_type": "validator_integrity_repair_pilot"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            POST_RETEST_PILOT_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": "CONTRACT_MAP_DATE_FLATTENING_INTEGRITY_DEFECT_CONFIRMED_NO_CANDIDATE_RERUN",
+                "integrity_disposition": "CONTRACT_MAP_REBUILD_REQUIRED",
+                "result_hash": "pilot-result-hash",
+                "artifacts": {"result_json_path": "pilot.json"},
+                "contract_map_integrity_audit": {
+                    "frozen_contract_map_path": "frozen-map.json",
+                    "frozen_contract_map_sha256": "frozen-map-hash",
+                    "definition_dbn_path": "definitions.dbn.zst",
+                    "definition_dbn_sha256": "definition-hash",
+                },
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+        assert controller._reconcile_contract_map_repair(conn)
+        assert controller._reconcile_contract_map_repair(conn)
+        repair = experiment_record(conn, CONTRACT_MAP_REPAIR_EXPERIMENT_ID)
+        assert repair is not None
+        assert repair["status"] == "QUEUED"
+        assert repair["specification"]["q4_access_allowed"] is False
+        assert repair["specification"]["paid_data_allowed"] is False
+        assert experiment_counts(conn)["TOTAL"] == 2
+
+        claimed_repair = claim_next_experiment(conn)
+        assert claimed_repair is not None
+        assert claimed_repair["experiment_id"] == CONTRACT_MAP_REPAIR_EXPERIMENT_ID
+        complete_experiment(
+            conn,
+            CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": "DATE_AWARE_EXPLICIT_CONTRACT_MAP_REPAIRED_AND_INTEGRITY_VALIDATED",
+                "result_hash": "repair-result-hash",
+                "report_path": "repair.md",
+                "fully_validated_edge_atoms": 0,
+            },
+            claim_token=str(claimed_repair["claim_token"]),
+        )
+        controller._reconcile_completed_experiments(conn)
+        assert json.loads(
+            conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]
+        ) == "INTEGRITY_BLOCKED"
+        assert json.loads(
+            conn.execute("SELECT value FROM kv WHERE key='current_blocker'").fetchone()[0]
+        ) == "FRESH_RETEST_WITH_REPAIRED_MAP_REQUIRED"
     finally:
         conn.close()
 
