@@ -104,6 +104,12 @@ ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID = (
 ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID = (
     "energy_metals_session_geometry_primary_v1"
 )
+SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID = (
+    "session_geometry_micro_execution_repair_v1"
+)
+SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID = (
+    "session_geometry_micro_shadow_activation_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -150,6 +156,17 @@ ENERGY_METALS_VOLUME_DATA_SHA256 = "6bca31351820713016426286de8ae3ce9f0350b6886f
 ENERGY_METALS_VOLUME_MAP_SHA256 = "2ac275f4043ef210afa092be8e7f6676c0409c6e2ec5e41a01aecb37427f3815"
 ENERGY_METALS_VOLUME_ROLL_HASH = "01ba149449a494a7a118884813abe10de8845c215b7390dbfbfa9d9dff89de13"
 ENERGY_METALS_SESSION_GEOMETRY_TASK_SHA256 = "74ff930eea1b6e5f80143e44179d6cbaa608aac4cede8986bece2d28d199ccb1"
+SESSION_GEOMETRY_MICRO_REPAIR_TASK_SHA256 = "1adfb59d86e51f3ef21b0bab94bd57bd06cbaf946f75f9b00916925ae1657378"
+SESSION_GEOMETRY_MICRO_SHADOW_TASK_SHA256 = "3f2dcbe971340d3193be8f9d81da482dfd68b34539eb83d07d22a8049b270558"
+SESSION_GEOMETRY_PARENT_RESULT_SHA256 = "b4f3158085697e63778849ec2b525f8c74b390fce308d1979a30c1164e4df630"
+SESSION_GEOMETRY_PARENT_RESULT_HASH = "651d2a3bfb1d2ab56ac6ccaceaf067a8767389a809e153853f309ceb0ed6f69f"
+SESSION_GEOMETRY_PARENT_MANIFEST_SHA256 = "e62d8b03dd74173c66183d9bca25d27006e5c2b799d2c2aa93f544cbb2fd89d8"
+SESSION_GEOMETRY_PARENT_MANIFEST_HASH = "f11a6f657e018f2d8b137eddb64cf497dcf63ed0ee17848744667fa968201d96"
+SESSION_GEOMETRY_PARENT_LEDGER_SHA256 = "5b3f7bc5a38ec38d5e576dcd4c60f1778410f4426e69cd394a11b33cbe9527e0"
+SESSION_GEOMETRY_MICRO_CHILD_ID = (
+    "strategy_session_geometry_CL_signal_MCL_execution_overnight_extreme_"
+    "position_continuation_q65_h60_prior_trend_agree_v2"
+)
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -183,6 +200,8 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "barrier_hazard_primary",
     "energy_metals_barrier_primary",
     "energy_metals_session_geometry_primary",
+    "session_geometry_micro_execution_repair",
+    "session_geometry_micro_shadow_activation",
     "immutable_shadow_activation",
 }
 
@@ -473,6 +492,16 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "ENERGY_METALS_SESSION_GEOMETRY_REQUIRED"
         )
+        session_geometry_micro_repair_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "ENERGY_METALS_SESSION_GEOMETRY_REPLICATION_REQUIRED"
+        )
+        session_geometry_micro_shadow_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "SESSION_GEOMETRY_MICRO_SHADOW_ACTIVATION_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -643,6 +672,22 @@ class AutonomousMissionController:
                 == "ENERGY_METALS_SESSION_GEOMETRY_REQUIRED"
             )
         )
+        session_geometry_micro_repair_required = (
+            session_geometry_micro_repair_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "ENERGY_METALS_SESSION_GEOMETRY_REPLICATION_REQUIRED"
+            )
+        )
+        session_geometry_micro_shadow_required = (
+            session_geometry_micro_shadow_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "SESSION_GEOMETRY_MICRO_SHADOW_ACTIVATION_REQUIRED"
+            )
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -732,6 +777,16 @@ class AutonomousMissionController:
             if energy_metals_session_geometry_required
             else False
         )
+        session_geometry_micro_repair_queued = (
+            self._reconcile_session_geometry_micro_repair(conn)
+            if session_geometry_micro_repair_required
+            else False
+        )
+        session_geometry_micro_shadow_queued = (
+            self._reconcile_session_geometry_micro_shadow(conn)
+            if session_geometry_micro_shadow_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -765,6 +820,8 @@ class AutonomousMissionController:
             and not barrier_shadow_activation_queued
             and not energy_metals_barrier_queued
             and not energy_metals_session_geometry_queued
+            and not session_geometry_micro_repair_queued
+            and not session_geometry_micro_shadow_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -808,6 +865,8 @@ class AutonomousMissionController:
                 "barrier_shadow_activation_queued": barrier_shadow_activation_queued,
                 "energy_metals_barrier_queued": energy_metals_barrier_queued,
                 "energy_metals_session_geometry_queued": energy_metals_session_geometry_queued,
+                "session_geometry_micro_repair_queued": session_geometry_micro_repair_queued,
+                "session_geometry_micro_shadow_queued": session_geometry_micro_shadow_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -888,6 +947,14 @@ class AutonomousMissionController:
             (
                 ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID,
                 "energy_metals_session_geometry_plan_written",
+            ),
+            (
+                SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID,
+                "session_geometry_micro_repair_plan_written",
+            ),
+            (
+                SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID,
+                "session_geometry_micro_shadow_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1037,6 +1104,16 @@ class AutonomousMissionController:
                 "energy_metals_session_geometry_primary",
                 "energy_metals_session_geometry_completed",
             ),
+            (
+                SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID,
+                "session_geometry_micro_execution_repair",
+                "session_geometry_micro_repair_completed",
+            ),
+            (
+                SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID,
+                "session_geometry_micro_shadow_activation",
+                "session_geometry_micro_shadow_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1089,6 +1166,8 @@ class AutonomousMissionController:
                 "immutable_shadow_activation": "barrier_shadow_activation_result",
                 "energy_metals_barrier_primary": "energy_metals_barrier_result",
                 "energy_metals_session_geometry_primary": "energy_metals_session_geometry_result",
+                "session_geometry_micro_execution_repair": "session_geometry_micro_repair_result",
+                "session_geometry_micro_shadow_activation": "session_geometry_micro_shadow_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -1177,6 +1256,10 @@ class AutonomousMissionController:
                 self._route_energy_metals_barrier_result(conn, result)
             elif experiment_type == "energy_metals_session_geometry_primary":
                 self._route_energy_metals_session_geometry_result(conn, result)
+            elif experiment_type == "session_geometry_micro_execution_repair":
+                self._route_session_geometry_micro_repair_result(conn, result)
+            elif experiment_type == "session_geometry_micro_shadow_activation":
+                self._route_session_geometry_micro_shadow_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -3350,6 +3433,197 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_session_geometry_micro_repair(self, conn: Any) -> bool:
+        existing = experiment_record(conn, SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(
+            conn, ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID
+        )
+        source = dict((predecessor or {}).get("result") or {})
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or source.get("result_hash") != SESSION_GEOMETRY_PARENT_RESULT_HASH
+            or source.get("scientific_conclusion")
+            != "ENERGY_METALS_SESSION_GEOMETRY_PROMISING_BUT_INSUFFICIENT"
+        ):
+            return False
+        source_root = Path(
+            "/root/hydra-bot/reports/mission_experiments/"
+            "energy_metals_session_geometry_primary_v1"
+        )
+        source_result = source_root / "session_geometry_result.json"
+        source_manifest = source_root / "session_geometry_primary_freeze.json"
+        source_ledger = source_root / "session_geometry_trade_ledger.jsonl"
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_session_geometry_micro_execution_repair_20260711.md",
+        )
+        cache_root = project_path("data", "cache")
+        energy_data = cache_root / "databento" / (
+            "GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_"
+            "2023-01-01_2024-10-01.parquet"
+        )
+        energy_map = cache_root / "contract_maps" / (
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+        )
+        if not energy_data.is_file():
+            energy_data = Path("/root/hydra-bot/data/cache/databento") / energy_data.name
+        if not energy_map.is_file():
+            energy_map = Path("/root/hydra-bot/data/cache/contract_maps") / energy_map.name
+        frozen = (
+            (task, SESSION_GEOMETRY_MICRO_REPAIR_TASK_SHA256, "engineering task"),
+            (source_result, SESSION_GEOMETRY_PARENT_RESULT_SHA256, "parent result"),
+            (
+                source_manifest,
+                SESSION_GEOMETRY_PARENT_MANIFEST_SHA256,
+                "parent manifest",
+            ),
+            (source_ledger, SESSION_GEOMETRY_PARENT_LEDGER_SHA256, "parent ledger"),
+            (energy_data, ENERGY_METALS_DATA_SHA256, "energy data"),
+            (energy_map, PATH_GEOMETRY_MAP_SHA256, "energy map"),
+        )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "MICRO_EXECUTION_REPAIR_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen micro-execution sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        specification = {
+            "experiment_type": "session_geometry_micro_execution_repair",
+            "priority": 106.0,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION_AND_DISCOVERY",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": SESSION_GEOMETRY_MICRO_REPAIR_TASK_SHA256,
+            "source_result_path": str(source_result),
+            "source_result_sha256": SESSION_GEOMETRY_PARENT_RESULT_SHA256,
+            "source_result_hash": SESSION_GEOMETRY_PARENT_RESULT_HASH,
+            "source_manifest_path": str(source_manifest),
+            "source_manifest_sha256": SESSION_GEOMETRY_PARENT_MANIFEST_SHA256,
+            "source_manifest_hash": SESSION_GEOMETRY_PARENT_MANIFEST_HASH,
+            "source_trade_ledger_path": str(source_ledger),
+            "source_trade_ledger_sha256": SESSION_GEOMETRY_PARENT_LEDGER_SHA256,
+            "energy_data_path": str(energy_data),
+            "energy_data_sha256": ENERGY_METALS_DATA_SHA256,
+            "energy_map_path": str(energy_map),
+            "energy_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "energy_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.999,
+        }
+        enqueue_experiment(conn, SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID, specification)
+        set_kv(conn, "session_geometry_micro_repair_plan_written", True)
+        set_kv(conn, "promotion_pipeline_status", "MICRO_EXECUTION_REPAIR_QUEUED")
+        set_kv(conn, "foundry_current_engine", "SYNCHRONIZED_MICRO_EXECUTION_REPAIR")
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_session_geometry_micro_shadow(self, conn: Any) -> bool:
+        existing = experiment_record(conn, SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(conn, SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID)
+        source = dict((predecessor or {}).get("result") or {})
+        candidates = [
+            item
+            for item in source.get("candidates") or []
+            if item.get("candidate_id") == SESSION_GEOMETRY_MICRO_CHILD_ID
+        ]
+        configurations = [
+            item
+            for item in source.get("shadow_configurations") or []
+            if item.get("candidate_id") == SESSION_GEOMETRY_MICRO_CHILD_ID
+        ]
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or source.get("scientific_conclusion")
+            != "SYNCHRONIZED_MCL_EXECUTION_SHADOW_CANDIDATE_FOUND"
+            or len(candidates) != 1
+            or candidates[0].get("status") != "SHADOW_RESEARCH_CANDIDATE"
+            or not bool(
+                (candidates[0].get("admission") or {}).get(
+                    "permits_zero_risk_shadow"
+                )
+            )
+            or len(configurations) != 1
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_session_geometry_micro_shadow_activation_20260711.md",
+        )
+        source_path = Path(
+            str((source.get("artifacts") or {}).get("result_json_path") or "")
+        )
+        configuration_path = Path(str(configurations[0].get("path") or ""))
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != SESSION_GEOMETRY_MICRO_SHADOW_TASK_SHA256
+            or not source_path.is_file()
+            or not configuration_path.is_file()
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "MICRO_SHADOW_ACTIVATION_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                "Synchronized-MCL source, activation task or configuration changed.",
+            )
+            return False
+        specification = {
+            "experiment_type": "session_geometry_micro_shadow_activation",
+            "priority": 110.0,
+            "max_attempts": 2,
+            "pipeline": "SHADOW",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": SESSION_GEOMETRY_MICRO_SHADOW_TASK_SHA256,
+            "source_result_path": str(source_path),
+            "source_result_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+            "source_result_hash": str(source["result_hash"]),
+            "candidate_id": SESSION_GEOMETRY_MICRO_CHILD_ID,
+            "shadow_configuration_path": str(configuration_path),
+            "shadow_configuration_sha256": hashlib.sha256(
+                configuration_path.read_bytes()
+            ).hexdigest(),
+            "shadow_configuration_hash": str(configurations[0]["configuration_hash"]),
+            "code_commit": self._git_commit(),
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 1.0,
+        }
+        enqueue_experiment(conn, SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID, specification)
+        set_kv(conn, "session_geometry_micro_shadow_plan_written", True)
+        set_kv(conn, "shadow_pipeline_status", "ACTIVATION_QUEUED")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -4333,6 +4607,94 @@ class AutonomousMissionController:
                 "pipeline": "SHADOW" if shadow_count else "PROMOTION_AND_DISCOVERY",
                 "parallel_discovery": True,
                 "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
+    def _route_session_geometry_micro_repair_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID
+        )
+        shadow_count = int(result.get("shadow_candidates") or 0)
+        conclusion = str(result.get("scientific_conclusion") or "")
+        if (
+            shadow_count > 0
+            and conclusion == "SYNCHRONIZED_MCL_EXECUTION_SHADOW_CANDIDATE_FOUND"
+        ):
+            blocker = "SESSION_GEOMETRY_MICRO_SHADOW_ACTIVATION_REQUIRED"
+        else:
+            blocker = "CROSS_ASSET_DAILY_HORIZON_REQUIRED"
+            killed = set(get_kv(conn, "foundry_killed_candidate_ids", []) or [])
+            if SESSION_GEOMETRY_MICRO_CHILD_ID not in killed:
+                killed.add(SESSION_GEOMETRY_MICRO_CHILD_ID)
+                set_kv(conn, "foundry_killed_candidate_ids", sorted(killed))
+                set_kv(
+                    conn,
+                    "strategies_killed",
+                    int(get_kv(conn, "strategies_killed", 0)) + 1,
+                )
+        set_kv(conn, "promotion_pipeline_status", "MICRO_EXECUTION_REPAIR_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "Synchronized MCL execution was recomputed from the immutable CL signal. "
+            "A positive result authorizes only zero-order forward shadow research.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "SHADOW" if shadow_count else "DISCOVERY",
+                "parallel_discovery": True,
+                "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+        if blocker == "SESSION_GEOMETRY_MICRO_SHADOW_ACTIVATION_REQUIRED":
+            self._reconcile_session_geometry_micro_shadow(conn)
+
+    def _route_session_geometry_micro_shadow_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID
+        )
+        entry = registry_entry_from_activation(result)
+        registry = dict(get_kv(conn, "shadow_active_registry", {}) or {})
+        candidate_id = str(result["candidate_id"])
+        existing = registry.get(candidate_id)
+        if existing is not None and existing != entry:
+            raise ShadowPipelineIntegrityError(
+                "Refusing in-place mutation of synchronized-MCL shadow candidate."
+            )
+        registry[candidate_id] = entry
+        set_kv(conn, "shadow_active_registry", registry)
+        set_kv(conn, "shadow_pipeline_status", "RUNNING_FAIL_CLOSED")
+        set_kv(conn, "shadow_active_candidates", len(registry))
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", "GC_SESSION_GEOMETRY_FRESH_ID_REQUIRED")
+        set_kv(
+            conn,
+            "last_error",
+            "Synchronized CL-signal/MCL-execution child is active with zero orders; "
+            "discovery continues in a distinct metals session niche.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": "GC_SESSION_GEOMETRY_FRESH_ID_REQUIRED",
+                "pipeline": "DISCOVERY",
+                "shadow_pipeline": "RUNNING_FAIL_CLOSED",
                 "q4_access_authorized": False,
             },
         )

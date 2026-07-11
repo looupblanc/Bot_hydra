@@ -604,6 +604,56 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             metals_roll_map_hash=str(experiment["metals_roll_map_hash"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "session_geometry_micro_execution_repair":
+        from hydra.research.energy_metals_session_execution_repair import (
+            run_session_geometry_micro_execution_repair,
+        )
+
+        return run_session_geometry_micro_execution_repair(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            source_result_path=Path(str(experiment["source_result_path"])),
+            source_result_sha256=str(experiment["source_result_sha256"]),
+            source_result_hash=str(experiment["source_result_hash"]),
+            source_manifest_path=Path(str(experiment["source_manifest_path"])),
+            source_manifest_sha256=str(experiment["source_manifest_sha256"]),
+            source_manifest_hash=str(experiment["source_manifest_hash"]),
+            source_trade_ledger_path=Path(
+                str(experiment["source_trade_ledger_path"])
+            ),
+            source_trade_ledger_sha256=str(
+                experiment["source_trade_ledger_sha256"]
+            ),
+            energy_data_path=Path(str(experiment["energy_data_path"])),
+            energy_data_sha256=str(experiment["energy_data_sha256"]),
+            energy_map_path=Path(str(experiment["energy_map_path"])),
+            energy_map_sha256=str(experiment["energy_map_sha256"]),
+            energy_roll_map_hash=str(experiment["energy_roll_map_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
+    if experiment_type == "session_geometry_micro_shadow_activation":
+        from hydra.shadow.activation import run_immutable_shadow_activation
+
+        return run_immutable_shadow_activation(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            source_result_path=Path(str(experiment["source_result_path"])),
+            source_result_sha256=str(experiment["source_result_sha256"]),
+            source_result_hash=str(experiment["source_result_hash"]),
+            candidate_id=str(experiment["candidate_id"]),
+            shadow_configuration_path=Path(
+                str(experiment["shadow_configuration_path"])
+            ),
+            shadow_configuration_sha256=str(
+                experiment["shadow_configuration_sha256"]
+            ),
+            shadow_configuration_hash=str(
+                experiment["shadow_configuration_hash"]
+            ),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     if experiment_type == "immutable_shadow_activation":
         from hydra.shadow.activation import run_immutable_shadow_activation
 

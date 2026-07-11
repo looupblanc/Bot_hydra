@@ -22,6 +22,10 @@ from hydra.mission.controller import (
     MissionControllerConfig,
     POST_RETEST_DESIGN_EXPERIMENT_ID,
     POST_RETEST_PILOT_EXPERIMENT_ID,
+    SESSION_GEOMETRY_MICRO_CHILD_ID,
+    SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID,
+    SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID,
+    SESSION_GEOMETRY_PARENT_RESULT_HASH,
     V3_DESIGN_EXPERIMENT_ID,
     V3_EXECUTION_EXPERIMENT_ID,
 )
@@ -1396,6 +1400,207 @@ def test_promising_session_geometry_counts_once_and_routes_to_replication(
         )
         assert get_kv(conn, "strategy_prototypes_generated") == 432
         assert get_kv(conn, "strategies_killed", 0) == 0
+    finally:
+        conn.close()
+
+
+def test_synchronized_mcl_repair_is_queued_from_frozen_parent(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        enqueue_experiment(
+            conn,
+            ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID,
+            {"experiment_type": "energy_metals_session_geometry_primary"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID,
+            {
+                "result_hash": SESSION_GEOMETRY_PARENT_RESULT_HASH,
+                "scientific_conclusion": (
+                    "ENERGY_METALS_SESSION_GEOMETRY_PROMISING_BUT_INSUFFICIENT"
+                ),
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_session_geometry_micro_repair(conn)
+        record = experiment_record(conn, SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID)
+
+        assert record is not None
+        assert record["status"] == "QUEUED"
+        assert record["experiment_type"] == "session_geometry_micro_execution_repair"
+        assert record["specification"]["pipeline"] == "PROMOTION_AND_DISCOVERY"
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["paid_data_allowed"] is False
+        assert record["specification"]["network_allowed"] is False
+        assert record["specification"]["live_or_broker_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_synchronized_mcl_shadow_candidate_routes_once_to_activation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr(
+        controller, "_reconcile_session_geometry_micro_shadow", lambda _conn: True
+    )
+    monkeypatch.setattr(controller, "_tick_shadow_pipeline", lambda _conn: {})
+    result = {
+        "candidate_count": 1,
+        "scientific_conclusion": (
+            "SYNCHRONIZED_MCL_EXECUTION_SHADOW_CANDIDATE_FOUND"
+        ),
+        "promising_candidates": 1,
+        "shadow_candidates": 1,
+        "paper_shadow_ready": 0,
+        "candidates": [
+            {
+                "candidate_id": SESSION_GEOMETRY_MICRO_CHILD_ID,
+                "status": "SHADOW_RESEARCH_CANDIDATE",
+                "mechanism_family": "overnight_inventory_transfer",
+                "primary_market": "CL",
+                "execution_market": "MCL",
+                "net_pnl": 223.0,
+                "admission": {"permits_zero_risk_shadow": True},
+                "topstep": {"path_candidate": False},
+            }
+        ],
+    }
+    try:
+        controller._route_session_geometry_micro_repair_result(conn, result)
+        controller._route_session_geometry_micro_repair_result(conn, result)
+
+        assert get_kv(conn, "current_blocker") == (
+            "SESSION_GEOMETRY_MICRO_SHADOW_ACTIVATION_REQUIRED"
+        )
+        assert get_kv(conn, "strategy_prototypes_generated") == 1
+        assert get_kv(conn, "shadow_candidates") == 1
+        assert get_kv(conn, "paper_shadow_ready_candidates") == 0
+        assert get_kv(conn, "strategies_killed", 0) == 0
+    finally:
+        conn.close()
+
+
+def test_synchronized_mcl_activation_queue_preserves_frozen_source(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    source_path = tmp_path / "repair-result.json"
+    configuration_path = tmp_path / "shadow-configuration.json"
+    source_path.write_text('{"result_hash":"repair-hash"}\n', encoding="utf-8")
+    configuration_path.write_text("{}\n", encoding="utf-8")
+    result = {
+        "result_hash": "repair-hash",
+        "scientific_conclusion": (
+            "SYNCHRONIZED_MCL_EXECUTION_SHADOW_CANDIDATE_FOUND"
+        ),
+        "candidates": [
+            {
+                "candidate_id": SESSION_GEOMETRY_MICRO_CHILD_ID,
+                "status": "SHADOW_RESEARCH_CANDIDATE",
+                "admission": {"permits_zero_risk_shadow": True},
+            }
+        ],
+        "shadow_configurations": [
+            {
+                "candidate_id": SESSION_GEOMETRY_MICRO_CHILD_ID,
+                "path": str(configuration_path),
+                "configuration_hash": "frozen-configuration-hash",
+            }
+        ],
+        "artifacts": {"result_json_path": str(source_path)},
+    }
+    try:
+        enqueue_experiment(
+            conn,
+            SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID,
+            {"experiment_type": "session_geometry_micro_execution_repair"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID,
+            result,
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_session_geometry_micro_shadow(conn)
+        record = experiment_record(conn, SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID)
+
+        assert record is not None
+        assert record["status"] == "QUEUED"
+        assert record["experiment_type"] == "session_geometry_micro_shadow_activation"
+        assert record["specification"]["candidate_id"] == (
+            SESSION_GEOMETRY_MICRO_CHILD_ID
+        )
+        assert record["specification"]["source_result_hash"] == "repair-hash"
+        assert record["specification"]["pipeline"] == "SHADOW"
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["live_or_broker_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_synchronized_mcl_shadow_activation_is_idempotent_and_zero_order(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from hydra.mission.calibration_retest_execution import _stable_hash
+
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr(controller, "_tick_shadow_pipeline", lambda _conn: {})
+    configuration = tmp_path / "mcl-shadow.json"
+    configuration.write_text("{}\n", encoding="utf-8")
+    manifest = {
+        "candidate_id": SESSION_GEOMETRY_MICRO_CHILD_ID,
+        "configuration_path": str(configuration),
+        "configuration_sha256": "frozen-sha",
+        "configuration_hash": "frozen-semantic-hash",
+        "stale_data_seconds": 180,
+        "outbound_orders_enabled": False,
+    }
+    manifest["activation_manifest_hash"] = _stable_hash(manifest)
+    result = {
+        "candidate_id": SESSION_GEOMETRY_MICRO_CHILD_ID,
+        "candidate_count": 0,
+        "scientific_conclusion": "IMMUTABLE_ZERO_ORDER_SHADOW_ACTIVATED",
+        "activation_manifest": manifest,
+        "candidates": [
+            {
+                "candidate_id": SESSION_GEOMETRY_MICRO_CHILD_ID,
+                "status": "SHADOW_ACTIVE",
+                "mechanism_family": "overnight_inventory_transfer",
+                "primary_market": "CL",
+                "execution_market": "MCL",
+                "net_pnl": 223.0,
+                "topstep": {"path_candidate": False},
+            }
+        ],
+    }
+    try:
+        controller._route_session_geometry_micro_shadow_result(conn, result)
+        controller._route_session_geometry_micro_shadow_result(conn, result)
+
+        registry = get_kv(conn, "shadow_active_registry")
+        assert list(registry) == [SESSION_GEOMETRY_MICRO_CHILD_ID]
+        assert registry[SESSION_GEOMETRY_MICRO_CHILD_ID][
+            "outbound_orders_enabled"
+        ] is False
+        assert get_kv(conn, "shadow_active_candidates") == 1
+        assert get_kv(conn, "current_blocker") == (
+            "GC_SESSION_GEOMETRY_FRESH_ID_REQUIRED"
+        )
+        assert get_kv(conn, "paper_shadow_ready_candidates") == 0
     finally:
         conn.close()
 
