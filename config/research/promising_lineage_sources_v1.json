@@ -1,0 +1,75 @@
+{
+  "baseline_commit": "82fceac04128a3accd2f166517ac2b251894cbf7",
+  "candidates": [
+    {"candidate_id": "strategy_accel_NQ_past_participation_continuation_all_q85_h60_30m_trend_agree_v2", "source": "accelerated_context"},
+    {"candidate_id": "strategy_accel_NQ_past_participation_reversal_middle_q65_h30_15m_volatility_expansion_v2", "source": "accelerated_context"},
+    {"candidate_id": "strategy_accel_NQ_past_volatility_reversal_open_q75_h30_none_v2", "source": "accelerated_context"},
+    {"candidate_id": "strategy_accel_YM_past_participation_reversal_late_q75_h60_15m_trend_agree_v2", "source": "accelerated_context"},
+    {"candidate_id": "strategy_barrier_hazard_NQ_signed_extreme_recovery_60_middle_q65_h30_s100_15m_expansion_v1", "source": "barrier_hazard"},
+    {"candidate_id": "strategy_daily_cross_CL_to_YM_source_prior_trend_continuation_q80_h120_v1", "source": "cross_asset_daily"},
+    {"candidate_id": "strategy_daily_cross_YM_to_GC_relative_prior_trend_reversal_q80_h120_v1", "source": "cross_asset_daily"},
+    {"candidate_id": "strategy_open_gap_continuation_ES_v1", "source": "equity_open_gap"},
+    {"candidate_id": "strategy_open_gap_continuation_NQ_v1", "source": "equity_open_gap"},
+    {"candidate_id": "strategy_open_gap_continuation_YM_v1", "source": "equity_open_gap"},
+    {"candidate_id": "strategy_opening_direction_hazard_ES_v1", "source": "opening_direction_hazard"},
+    {"candidate_id": "strategy_qd_ES_past_volatility_continuation_late_q75_h60_v1", "source": "qd_economic"},
+    {"candidate_id": "strategy_qd_NQ_past_participation_continuation_all_q85_h60_v1", "source": "qd_economic"},
+    {"candidate_id": "strategy_qd_NQ_shared_loss_risk_state_reversal_open_q75_h30_v1", "source": "qd_economic"},
+    {"candidate_id": "strategy_session_geometry_CL_overnight_extreme_position_continuation_q65_h60_prior_trend_agree_v1", "source": "session_geometry"},
+    {"candidate_id": "strategy_session_geometry_CL_signal_MCL_execution_overnight_extreme_position_continuation_q65_h60_prior_trend_agree_v2", "source": "session_geometry_micro"}
+  ],
+  "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+  "development_end_exclusive": "2024-10-01",
+  "live_or_broker_allowed": false,
+  "q4_access_allowed": false,
+  "sources": {
+    "accelerated_context": {
+      "ledger_path": "reports/mission_experiments/accelerated_context_tournament_v1/accelerated_context_trade_ledger.jsonl",
+      "ledger_sha256": "9c46487be0411974ee1b9a6f6ff6462c0971f1537c3bec3dd8fc7ec481e8911f",
+      "result_path": "reports/mission_experiments/accelerated_context_tournament_v1/accelerated_context_result.json",
+      "result_sha256": "ec9d3bcf8e1a2b07819dacadc297d354aad18b78f34e86165b982e0e01e6f465"
+    },
+    "barrier_hazard": {
+      "ledger_path": "reports/mission_experiments/barrier_hazard_primary_v1/barrier_hazard_trade_ledger.jsonl",
+      "ledger_sha256": "3b8ac95ccebc754c8a87b6b6d4f3f8eb52d20bdbe659b97176f277d186ef8e02",
+      "result_path": "reports/mission_experiments/barrier_hazard_primary_v1/barrier_hazard_result.json",
+      "result_sha256": "17c4f1bbae092901e408f1f1d03a15d5afcab358cfd66b64a5145e62858fc553"
+    },
+    "cross_asset_daily": {
+      "ledger_path": "reports/mission_experiments/cross_asset_daily_horizon_primary_v1/cross_asset_daily_trade_ledger.jsonl",
+      "ledger_sha256": "98e5da466bc7e594d781370ab8bc169a44b26757ac545709df4502c055abc01b",
+      "result_path": "reports/mission_experiments/cross_asset_daily_horizon_primary_v1/cross_asset_daily_result.json",
+      "result_sha256": "717c088194f9a377c8bc045e9e5b6fcb364f8a8a38209242df5f836505a877a5"
+    },
+    "equity_open_gap": {
+      "ledger_path": "reports/mission_experiments/equity_open_gap_continuation_pilot_v1/equity_open_gap_continuation_trade_ledger.jsonl",
+      "ledger_sha256": "e8f90171ae9efff1dfaca67312e47d05c2dff0200a8ea7a97c911186806cfba3",
+      "result_path": "reports/mission_experiments/equity_open_gap_continuation_pilot_v1/equity_open_gap_continuation_result.json",
+      "result_sha256": "b6a501dddd579875088d30c90fe03bb858d02489364fd41d8db48a944e7fe75d"
+    },
+    "opening_direction_hazard": {
+      "ledger_path": "reports/mission_experiments/opening_direction_hazard_pilot_v1/opening_direction_hazard_trade_ledger.jsonl",
+      "ledger_sha256": "8d34b809762cd13224a4d4ee08f1bf97460a12bad054e3df6b7f520e35668e83",
+      "result_path": "reports/mission_experiments/opening_direction_hazard_pilot_v1/opening_direction_hazard_result.json",
+      "result_sha256": "57ec77c3f772a5cafb111200e905afa5a00dca8e1a3a407d5fa79cf6a9a99b7d"
+    },
+    "qd_economic": {
+      "ledger_path": "reports/mission_experiments/qd_economic_tournament_v2/qd_economic_tournament_trade_ledger.jsonl",
+      "ledger_sha256": "3741738d1c76395bfe6e0215fedfe11ff613b9e765840a9a4790f49189be418c",
+      "result_path": "reports/mission_experiments/qd_economic_tournament_v2/qd_economic_tournament_result.json",
+      "result_sha256": "0bdeddd5db13a2e105f106111f9b9f7653cf617937365a5fd10efa0106a84aa1"
+    },
+    "session_geometry": {
+      "ledger_path": "reports/mission_experiments/energy_metals_session_geometry_primary_v1/session_geometry_trade_ledger.jsonl",
+      "ledger_sha256": "5b3f7bc5a38ec38d5e576dcd4c60f1778410f4426e69cd394a11b33cbe9527e0",
+      "result_path": "reports/mission_experiments/energy_metals_session_geometry_primary_v1/session_geometry_result.json",
+      "result_sha256": "b4f3158085697e63778849ec2b525f8c74b390fce308d1979a30c1164e4df630"
+    },
+    "session_geometry_micro": {
+      "ledger_path": "reports/mission_experiments/session_geometry_micro_execution_repair_v1/micro_execution_repair_trade_ledger.jsonl",
+      "ledger_sha256": "735a01c3f1b1c8585c872d83e5e6986da06fec8ca8424e8dfcc4a30fd4887cb1",
+      "result_path": "reports/mission_experiments/session_geometry_micro_execution_repair_v1/micro_execution_repair_result.json",
+      "result_sha256": "34f7ceaba8128d9491451762e266b422886b1545b637042ef8c49defcc8ec2eb"
+    }
+  }
+}
