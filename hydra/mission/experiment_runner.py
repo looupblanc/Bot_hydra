@@ -883,4 +883,23 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             contract_map_dir=Path(str(experiment["contract_map_dir"])),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "post_mutation_successive_halving":
+        from hydra.factory.post_mutation_successive_halving import (
+            run_post_mutation_successive_halving,
+        )
+
+        return run_post_mutation_successive_halving(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            mutation_result_path=Path(str(experiment["mutation_result_path"])),
+            mutation_result_sha256=str(experiment["mutation_result_sha256"]),
+            mutation_trade_ledger_path=Path(
+                str(experiment["mutation_trade_ledger_path"])
+            ),
+            mutation_trade_ledger_sha256=str(
+                experiment["mutation_trade_ledger_sha256"]
+            ),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")

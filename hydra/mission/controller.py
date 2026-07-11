@@ -134,6 +134,9 @@ FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID = "forward_shadow_feed_audit_v1"
 POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID = (
     "post_portfolio_mutation_meta_allocation_v1"
 )
+POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID = (
+    "post_mutation_successive_halving_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -222,6 +225,9 @@ PORTFOLIO_MUTATION_TASK_SHA256 = (
 FORWARD_SHADOW_FEED_TASK_SHA256 = (
     "96457b210acee37b2a4423e479e090b867f160463b414e61f278dc1e1a855240"
 )
+POST_MUTATION_SUCCESSIVE_HALVING_TASK_SHA256 = (
+    "f48f84c74e7ba714edcbe7a2d692ed4e538b1e46090d350f47c88f579c882dce"
+)
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -269,6 +275,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "promising_lineage_mutation",
     "portfolio_role_research",
     "forward_shadow_feed_audit",
+    "post_mutation_successive_halving",
 }
 
 
@@ -625,6 +632,15 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "PORTFOLIO_ROLE_AND_PROMISING_LINEAGE_MUTATION_REQUIRED"
         )
+        post_mutation_halving_required = bool(
+            previous_phase
+            in {"SCHEDULER_STALLED", "ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and bool(get_kv(conn, "portfolio_mutation_campaign_completed", False))
+            and experiment_record(
+                conn, POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID
+            )
+            is None
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -867,6 +883,13 @@ class AutonomousMissionController:
                 == "PORTFOLIO_ROLE_AND_PROMISING_LINEAGE_MUTATION_REQUIRED"
             )
         )
+        post_mutation_halving_required = post_mutation_halving_required or bool(
+            get_kv(conn, "portfolio_mutation_campaign_completed", False)
+            and experiment_record(
+                conn, POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID
+            )
+            is None
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -1011,6 +1034,11 @@ class AutonomousMissionController:
             if portfolio_mutation_campaign_required
             else False
         )
+        post_mutation_halving_queued = (
+            self._reconcile_post_mutation_successive_halving(conn)
+            if post_mutation_halving_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -1055,6 +1083,7 @@ class AutonomousMissionController:
             and not causal_transition_graph_queued
             and not rty_transition_matched_null_queued
             and not portfolio_mutation_campaign_queued
+            and not post_mutation_halving_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -1109,6 +1138,7 @@ class AutonomousMissionController:
                 "causal_transition_graph_queued": causal_transition_graph_queued,
                 "rty_transition_matched_null_queued": rty_transition_matched_null_queued,
                 "portfolio_mutation_campaign_queued": portfolio_mutation_campaign_queued,
+                "post_mutation_halving_queued": post_mutation_halving_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -1245,6 +1275,10 @@ class AutonomousMissionController:
             (
                 POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID,
                 "post_mutation_meta_allocation_plan_written",
+            ),
+            (
+                POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID,
+                "post_mutation_successive_halving_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1464,6 +1498,11 @@ class AutonomousMissionController:
                 "meta_failure_allocation",
                 "post_mutation_meta_allocation_completed",
             ),
+            (
+                POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID,
+                "post_mutation_successive_halving",
+                "post_mutation_successive_halving_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1529,6 +1568,7 @@ class AutonomousMissionController:
                 "promising_lineage_mutation": "promising_lineage_mutation_result",
                 "portfolio_role_research": "portfolio_role_research_result",
                 "forward_shadow_feed_audit": "forward_shadow_feed_audit_result",
+                "post_mutation_successive_halving": "post_mutation_successive_halving_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -1643,6 +1683,8 @@ class AutonomousMissionController:
                 self._route_portfolio_role_research_result(conn, result)
             elif experiment_type == "forward_shadow_feed_audit":
                 self._route_forward_shadow_feed_audit_result(conn, result)
+            elif experiment_type == "post_mutation_successive_halving":
+                self._route_post_mutation_successive_halving_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -5049,6 +5091,106 @@ class AutonomousMissionController:
             for record in records.values()
         )
 
+    def _reconcile_post_mutation_successive_halving(self, conn: Any) -> bool:
+        existing = experiment_record(
+            conn, POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID
+        )
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(
+            conn, PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID
+        )
+        source = dict((predecessor or {}).get("result") or {})
+        artifacts = dict(source.get("artifacts") or {})
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_post_mutation_successive_halving_20260711.md",
+        )
+        result_path = Path(str(artifacts.get("result_json_path") or ""))
+        ledger_path = Path(str(artifacts.get("trade_ledger_path") or ""))
+        frozen = (
+            (
+                task,
+                POST_MUTATION_SUCCESSIVE_HALVING_TASK_SHA256,
+                "successive-halving task",
+            ),
+            (
+                result_path,
+                str(artifacts.get("result_json_sha256") or ""),
+                "mutation result",
+            ),
+            (
+                ledger_path,
+                str(artifacts.get("trade_ledger_sha256") or ""),
+                "mutation trade ledger",
+            ),
+        )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not expected
+            or not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or int(source.get("q4_access_count") or 0) != 0
+            or bool(source.get("order_capability"))
+        ):
+            mismatches.append("mutation source governance")
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "POST_MUTATION_HALVING_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen successive-halving sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        enqueue_experiment(
+            conn,
+            POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID,
+            {
+                "experiment_type": "post_mutation_successive_halving",
+                "priority": 121.0,
+                "max_attempts": 2,
+                "pipeline": "PROMOTION",
+                "parallel_safe": True,
+                "writes_data_access_ledger": False,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": (
+                    POST_MUTATION_SUCCESSIVE_HALVING_TASK_SHA256
+                ),
+                "mutation_result_path": str(result_path),
+                "mutation_result_sha256": str(
+                    artifacts["result_json_sha256"]
+                ),
+                "mutation_trade_ledger_path": str(ledger_path),
+                "mutation_trade_ledger_sha256": str(
+                    artifacts["trade_ledger_sha256"]
+                ),
+                "source_experiment_id": PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+                "source_result_hash": str(source.get("result_hash") or ""),
+                "code_commit": self._git_commit(),
+                "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+                "development_end_exclusive": "2024-10-01",
+                "q4_access_allowed": False,
+                "paid_data_allowed": False,
+                "network_allowed": False,
+                "live_or_broker_allowed": False,
+                "expected_decision_information_gain": 0.97,
+            },
+        )
+        set_kv(conn, "post_mutation_successive_halving_plan_written", True)
+        set_kv(conn, "promotion_pipeline_status", "SUCCESSIVE_HALVING_QUEUED")
+        set_kv(conn, "foundry_current_engine", "POST_MUTATION_SUCCESSIVE_HALVING")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -6802,6 +6944,73 @@ class AutonomousMissionController:
             {
                 "action": "POST_MUTATION_META_ALLOCATION_AND_SUCCESSIVE_HALVING",
                 "pipeline": "META_RESEARCH_AND_PROMOTION",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+                "forward_data_blocker": get_kv(conn, "forward_data_blocker"),
+            },
+        )
+
+    def _route_post_mutation_successive_halving_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        # These are existing mutation IDs advancing through evidence, not new
+        # structural prototypes.  Update their scoped evidence without clone
+        # inflation in the production counters.
+        bank = dict(get_kv(conn, "foundry_candidate_bank", {}) or {})
+        for row in result.get("candidates") or []:
+            candidate_id = str(row.get("candidate_id") or "")
+            if not candidate_id:
+                continue
+            bank[candidate_id] = {
+                **dict(bank.get(candidate_id) or {}),
+                **dict(row),
+                "source_experiment_id": (
+                    POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID
+                ),
+            }
+        set_kv(conn, "foundry_candidate_bank", bank)
+        self._refresh_foundry_candidate_counts(conn)
+        selected = int(
+            result.get("selected_elite_count")
+            or result.get("selected_candidate_count")
+            or result.get("promising_candidates")
+            or 0
+        )
+        hard_rejected = int(result.get("hard_integrity_rejected") or 0)
+        next_action = (
+            "PROMISING_CHILD_RAW_REPLAY_AND_SHADOW_ADMISSION_REQUIRED"
+            if selected
+            else "ROLE_CONDITIONED_STRUCTURAL_DISCOVERY_EPOCH_REQUIRED"
+        )
+        set_kv(
+            conn,
+            "post_mutation_successive_halving_metrics",
+            {
+                "evaluated": int(result.get("evaluated_candidate_count") or 0),
+                "selected": selected,
+                "hard_integrity_rejected": hard_rejected,
+                "status_counts": result.get("status_counts") or {},
+                "pool_counts": result.get("pool_counts") or {},
+                "conclusion": result.get("scientific_conclusion"),
+            },
+        )
+        set_kv(conn, "promotion_pipeline_status", "SUCCESSIVE_HALVING_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", next_action)
+        set_kv(
+            conn,
+            "last_error",
+            "Successive halving is complete. The selected immutable children require "
+            "a fresh raw replay and deterministic shadow-admission implementation; "
+            "no status is inherited and Q4 remains sealed.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": next_action,
+                "pipeline": "PROMOTION_AND_DISCOVERY",
                 "parallel_shadow": True,
                 "q4_access_authorized": False,
                 "forward_data_blocker": get_kv(conn, "forward_data_blocker"),

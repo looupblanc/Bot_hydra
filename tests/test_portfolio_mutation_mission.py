@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 from hydra.mission.controller import (
@@ -8,6 +9,7 @@ from hydra.mission.controller import (
     MissionControllerConfig,
     PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
     POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID,
+    POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID,
     PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
     SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
 )
@@ -93,6 +95,60 @@ def test_blocker_recovery_queues_three_distinct_parallel_pipelines(tmp_path: Pat
         assert all(record["specification"]["live_or_broker_allowed"] is False for record in records)
         assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
         assert get_kv(conn, "current_blocker") is None
+    finally:
+        conn.close()
+
+
+def test_stalled_completed_campaign_queues_successive_halving(
+    tmp_path: Path,
+) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        result_path = tmp_path / "mutation_result.json"
+        ledger_path = tmp_path / "mutation_ledger.jsonl"
+        result_path.write_text("{}\n", encoding="utf-8")
+        ledger_path.write_text("{}\n", encoding="utf-8")
+        enqueue_experiment(
+            conn,
+            PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+            {"experiment_type": "promising_lineage_mutation"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+            {
+                "q4_access_count": 0,
+                "order_capability": False,
+                "result_hash": "frozen-result",
+                "artifacts": {
+                    "result_json_path": str(result_path),
+                    "result_json_sha256": hashlib.sha256(
+                        result_path.read_bytes()
+                    ).hexdigest(),
+                    "trade_ledger_path": str(ledger_path),
+                    "trade_ledger_sha256": hashlib.sha256(
+                        ledger_path.read_bytes()
+                    ).hexdigest(),
+                },
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+        set_kv(conn, "portfolio_mutation_campaign_completed", True)
+        set_kv(conn, "current_phase", "SCHEDULER_STALLED")
+
+        assert controller._reconcile_post_mutation_successive_halving(conn)
+        record = experiment_record(
+            conn, POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID
+        )
+        assert record is not None and record["status"] == "QUEUED"
+        assert record["specification"]["pipeline"] == "PROMOTION"
+        assert record["specification"]["parallel_safe"] is True
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["network_allowed"] is False
+        assert record["specification"]["live_or_broker_allowed"] is False
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
     finally:
         conn.close()
 
