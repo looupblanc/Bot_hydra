@@ -534,9 +534,12 @@ def run_accelerated_context_tournament(
     }
 
 
-def generate_executable_hypotheses() -> list[dict[str, Any]]:
+def generate_executable_hypotheses(batch_index: int = 0) -> list[dict[str, Any]]:
+    if batch_index < 0:
+        raise ValueError("Batch index must be non-negative.")
     bases = generate_prototypes()
     selected: list[dict[str, Any]] = []
+    candidate_version = batch_index + 2
     for market in MARKET_PAIRS:
         possibilities = []
         for base in bases:
@@ -565,7 +568,7 @@ def generate_executable_hypotheses() -> list[dict[str, Any]]:
                         **specification,
                         "candidate_id": (
                             f"strategy_accel_{market}_{base['feature']}_{base['policy_direction']}_"
-                            f"{base['profile']}_{context_label}_v2"
+                            f"{base['profile']}_{context_label}_v{candidate_version}"
                         ),
                         "lineage_id": f"lineage_accel_{fingerprint[:20]}",
                         "structural_fingerprint": fingerprint,
@@ -575,12 +578,13 @@ def generate_executable_hypotheses() -> list[dict[str, Any]]:
         possibilities.sort(key=lambda item: (item["structural_fingerprint"], item["candidate_id"]))
         families = sorted({str(item["mechanism_family"]) for item in possibilities})
         per_family = EXECUTABLE_PER_MARKET // len(families)
+        family_offset = batch_index * per_family
         market_selected = [
             item
             for family in families
             for item in [
                 row for row in possibilities if row["mechanism_family"] == family
-            ][:per_family]
+            ][family_offset : family_offset + per_family]
         ]
         if len(market_selected) < EXECUTABLE_PER_MARKET:
             chosen = {item["candidate_id"] for item in market_selected}

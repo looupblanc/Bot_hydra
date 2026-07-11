@@ -27,6 +27,18 @@ def test_executable_population_is_exact_balanced_and_deterministic() -> None:
     assert all(item["candidate_id"].endswith("_v2") for item in first)
 
 
+def test_next_executable_batch_is_new_version_and_structurally_disjoint() -> None:
+    first = generate_executable_hypotheses(0)
+    second = generate_executable_hypotheses(1)
+
+    assert len(second) == 300
+    assert all(item["candidate_id"].endswith("_v3") for item in second)
+    assert not (
+        {item["structural_fingerprint"] for item in first}
+        & {item["structural_fingerprint"] for item in second}
+    )
+
+
 def test_context_join_uses_only_completed_higher_timeframe_bar() -> None:
     timestamps = pd.date_range("2024-01-02T00:00:00Z", periods=20, freq="1min")
     frame = pd.DataFrame(
