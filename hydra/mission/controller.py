@@ -113,6 +113,10 @@ SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID = (
 GC_SESSION_GEOMETRY_FRESH_EXPERIMENT_ID = (
     "gc_session_geometry_fresh_primary_v1"
 )
+CROSS_ASSET_DAILY_EXPERIMENT_ID = "cross_asset_daily_horizon_primary_v1"
+CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID = (
+    "cross_asset_daily_shadow_activation_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -176,6 +180,12 @@ GC_SESSION_GEOMETRY_FRESH_CHILD_ID = (
     "strategy_session_geometry_GC_signal_MGC_execution_overnight_"
     "displacement_reversal_q65_h60_none_v2"
 )
+CROSS_ASSET_DAILY_TASK_SHA256 = "166bb01e3e2c027873d158cb8f1659e16940228b7ad71922715480ae6a9945a0"
+CROSS_ASSET_DAILY_SHADOW_TASK_SHA256 = "f9421885b6f9d1aee060c482c8ca7d5a859a2aaa91f4151ca5fdcc5ce76dc3dc"
+CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID = (
+    "strategy_daily_cross_CL_to_YM_source_prior_trend_"
+    "continuation_q80_h120_v1"
+)
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -212,6 +222,8 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "session_geometry_micro_execution_repair",
     "session_geometry_micro_shadow_activation",
     "gc_session_geometry_fresh_primary",
+    "cross_asset_daily_horizon_primary",
+    "cross_asset_daily_shadow_activation",
     "immutable_shadow_activation",
 }
 
@@ -517,6 +529,15 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "GC_SESSION_GEOMETRY_FRESH_ID_REQUIRED"
         )
+        cross_asset_daily_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "") == "CROSS_ASSET_DAILY_HORIZON_REQUIRED"
+        )
+        cross_asset_daily_shadow_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "CROSS_ASSET_DAILY_SHADOW_ACTIVATION_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -567,6 +588,7 @@ class AutonomousMissionController:
             set_kv(conn, "current_experiment", None)
         self._reconcile_planned_experiment_flags(conn)
         self._reconcile_completed_experiments(conn)
+        self._refresh_foundry_candidate_counts(conn)
         contract_map_repair_required = contract_map_repair_required or bool(
             str(get_kv(conn, "current_phase", "")) == "INTEGRITY_BLOCKED"
             and str(get_kv(conn, "current_blocker") or "") == "CONTRACT_MAP_REBUILD_REQUIRED"
@@ -711,6 +733,19 @@ class AutonomousMissionController:
                 == "GC_SESSION_GEOMETRY_FRESH_ID_REQUIRED"
             )
         )
+        cross_asset_daily_required = cross_asset_daily_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "CROSS_ASSET_DAILY_HORIZON_REQUIRED"
+        )
+        cross_asset_daily_shadow_required = (
+            cross_asset_daily_shadow_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "CROSS_ASSET_DAILY_SHADOW_ACTIVATION_REQUIRED"
+            )
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -815,6 +850,16 @@ class AutonomousMissionController:
             if gc_session_geometry_fresh_required
             else False
         )
+        cross_asset_daily_queued = (
+            self._reconcile_cross_asset_daily(conn)
+            if cross_asset_daily_required
+            else False
+        )
+        cross_asset_daily_shadow_queued = (
+            self._reconcile_cross_asset_daily_shadow(conn)
+            if cross_asset_daily_shadow_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -851,6 +896,8 @@ class AutonomousMissionController:
             and not session_geometry_micro_repair_queued
             and not session_geometry_micro_shadow_queued
             and not gc_session_geometry_fresh_queued
+            and not cross_asset_daily_queued
+            and not cross_asset_daily_shadow_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -897,6 +944,8 @@ class AutonomousMissionController:
                 "session_geometry_micro_repair_queued": session_geometry_micro_repair_queued,
                 "session_geometry_micro_shadow_queued": session_geometry_micro_shadow_queued,
                 "gc_session_geometry_fresh_queued": gc_session_geometry_fresh_queued,
+                "cross_asset_daily_queued": cross_asset_daily_queued,
+                "cross_asset_daily_shadow_queued": cross_asset_daily_shadow_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -989,6 +1038,14 @@ class AutonomousMissionController:
             (
                 GC_SESSION_GEOMETRY_FRESH_EXPERIMENT_ID,
                 "gc_session_geometry_fresh_plan_written",
+            ),
+            (
+                CROSS_ASSET_DAILY_EXPERIMENT_ID,
+                "cross_asset_daily_plan_written",
+            ),
+            (
+                CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID,
+                "cross_asset_daily_shadow_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1153,6 +1210,16 @@ class AutonomousMissionController:
                 "gc_session_geometry_fresh_primary",
                 "gc_session_geometry_fresh_completed",
             ),
+            (
+                CROSS_ASSET_DAILY_EXPERIMENT_ID,
+                "cross_asset_daily_horizon_primary",
+                "cross_asset_daily_completed",
+            ),
+            (
+                CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID,
+                "cross_asset_daily_shadow_activation",
+                "cross_asset_daily_shadow_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1208,6 +1275,8 @@ class AutonomousMissionController:
                 "session_geometry_micro_execution_repair": "session_geometry_micro_repair_result",
                 "session_geometry_micro_shadow_activation": "session_geometry_micro_shadow_result",
                 "gc_session_geometry_fresh_primary": "gc_session_geometry_fresh_result",
+                "cross_asset_daily_horizon_primary": "cross_asset_daily_result",
+                "cross_asset_daily_shadow_activation": "cross_asset_daily_shadow_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -1302,6 +1371,10 @@ class AutonomousMissionController:
                 self._route_session_geometry_micro_shadow_result(conn, result)
             elif experiment_type == "gc_session_geometry_fresh_primary":
                 self._route_gc_session_geometry_fresh_result(conn, result)
+            elif experiment_type == "cross_asset_daily_horizon_primary":
+                self._route_cross_asset_daily_result(conn, result)
+            elif experiment_type == "cross_asset_daily_shadow_activation":
+                self._route_cross_asset_daily_shadow_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -3774,6 +3847,204 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_cross_asset_daily(self, conn: Any) -> bool:
+        existing = experiment_record(conn, CROSS_ASSET_DAILY_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(conn, GC_SESSION_GEOMETRY_FRESH_EXPERIMENT_ID)
+        predecessor_result = dict((predecessor or {}).get("result") or {})
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or predecessor_result.get("scientific_conclusion")
+            != "GC_SESSION_GEOMETRY_FRESH_PRIMARY_FALSIFIED_OR_INSUFFICIENT"
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_cross_asset_daily_horizon_tournament_20260711.md",
+        )
+        cache_root = project_path("data", "cache")
+        core_data = cache_root / "databento" / (
+            "GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_"
+            "2023-01-01_2024-10-01.parquet"
+        )
+        core_map = cache_root / "contract_maps" / (
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+        )
+        metals_data = cache_root / "databento" / (
+            "GLBX-MDP3_ohlcv-1m_GC-v-0_MGC-v-0_"
+            "2023-01-01_2024-10-01.parquet"
+        )
+        metals_map = cache_root / "contract_maps" / (
+            "roll_map_GLBX-MDP3_ohlcv-1m_01ba149449a494a7.json"
+        )
+        fallbacks = {
+            "core_data": Path("/root/hydra-bot/data/cache/databento")
+            / core_data.name,
+            "core_map": Path("/root/hydra-bot/data/cache/contract_maps")
+            / core_map.name,
+            "metals_data": Path("/root/hydra-bot/data/cache/databento")
+            / metals_data.name,
+            "metals_map": Path("/root/hydra-bot/data/cache/contract_maps")
+            / metals_map.name,
+        }
+        core_data = core_data if core_data.is_file() else fallbacks["core_data"]
+        core_map = core_map if core_map.is_file() else fallbacks["core_map"]
+        metals_data = (
+            metals_data if metals_data.is_file() else fallbacks["metals_data"]
+        )
+        metals_map = metals_map if metals_map.is_file() else fallbacks["metals_map"]
+        frozen = (
+            (task, CROSS_ASSET_DAILY_TASK_SHA256, "engineering task"),
+            (core_data, ENERGY_METALS_DATA_SHA256, "core data"),
+            (core_map, PATH_GEOMETRY_MAP_SHA256, "core map"),
+            (metals_data, ENERGY_METALS_VOLUME_DATA_SHA256, "metals data"),
+            (metals_map, ENERGY_METALS_VOLUME_MAP_SHA256, "metals map"),
+        )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "CROSS_ASSET_DAILY_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen cross-asset daily sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        specification = {
+            "experiment_type": "cross_asset_daily_horizon_primary",
+            "priority": 105.0,
+            "max_attempts": 2,
+            "pipeline": "DISCOVERY_AND_PROMOTION",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": CROSS_ASSET_DAILY_TASK_SHA256,
+            "core_data_path": str(core_data),
+            "core_data_sha256": ENERGY_METALS_DATA_SHA256,
+            "core_map_path": str(core_map),
+            "core_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "core_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "metals_data_path": str(metals_data),
+            "metals_data_sha256": ENERGY_METALS_VOLUME_DATA_SHA256,
+            "metals_map_path": str(metals_map),
+            "metals_map_sha256": ENERGY_METALS_VOLUME_MAP_SHA256,
+            "metals_roll_map_hash": ENERGY_METALS_VOLUME_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "selection_end_exclusive": "2024-01-01",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.995,
+        }
+        enqueue_experiment(conn, CROSS_ASSET_DAILY_EXPERIMENT_ID, specification)
+        set_kv(conn, "cross_asset_daily_plan_written", True)
+        set_kv(conn, "discovery_pipeline_status", "CROSS_ASSET_DAILY_QUEUED")
+        set_kv(conn, "promotion_pipeline_status", "CROSS_ASSET_DAILY_QUEUED")
+        set_kv(conn, "foundry_current_engine", "CROSS_ASSET_DAILY_HORIZON")
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_cross_asset_daily_shadow(self, conn: Any) -> bool:
+        existing = experiment_record(conn, CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(conn, CROSS_ASSET_DAILY_EXPERIMENT_ID)
+        source = dict((predecessor or {}).get("result") or {})
+        candidates = [
+            row
+            for row in source.get("candidates") or []
+            if row.get("candidate_id") == CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID
+        ]
+        configurations = [
+            row
+            for row in source.get("shadow_configurations") or []
+            if row.get("candidate_id") == CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID
+        ]
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or source.get("scientific_conclusion")
+            != "CROSS_ASSET_DAILY_SHADOW_CANDIDATES_FOUND"
+            or len(candidates) != 1
+            or candidates[0].get("status") != "SHADOW_RESEARCH_CANDIDATE"
+            or not bool(
+                (candidates[0].get("admission") or {}).get(
+                    "permits_zero_risk_shadow"
+                )
+            )
+            or len(configurations) != 1
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_cross_asset_daily_shadow_activation_20260711.md",
+        )
+        source_path = Path(
+            str((source.get("artifacts") or {}).get("result_json_path") or "")
+        )
+        configuration_path = Path(str(configurations[0].get("path") or ""))
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != CROSS_ASSET_DAILY_SHADOW_TASK_SHA256
+            or not source_path.is_file()
+            or not configuration_path.is_file()
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "CROSS_ASSET_DAILY_SHADOW_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                "Cross-asset daily result, configuration or activation task changed.",
+            )
+            return False
+        specification = {
+            "experiment_type": "cross_asset_daily_shadow_activation",
+            "priority": 110.0,
+            "max_attempts": 2,
+            "pipeline": "SHADOW",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": CROSS_ASSET_DAILY_SHADOW_TASK_SHA256,
+            "source_result_path": str(source_path),
+            "source_result_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+            "source_result_hash": str(source["result_hash"]),
+            "candidate_id": CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+            "shadow_configuration_path": str(configuration_path),
+            "shadow_configuration_sha256": hashlib.sha256(
+                configuration_path.read_bytes()
+            ).hexdigest(),
+            "shadow_configuration_hash": str(
+                configurations[0]["configuration_hash"]
+            ),
+            "code_commit": self._git_commit(),
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 1.0,
+        }
+        enqueue_experiment(
+            conn, CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "cross_asset_daily_shadow_plan_written", True)
+        set_kv(conn, "shadow_pipeline_status", "ACTIVATION_QUEUED")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -4875,6 +5146,7 @@ class AutonomousMissionController:
                     "strategies_killed",
                     int(get_kv(conn, "strategies_killed", 0)) + 1,
                 )
+            self._refresh_foundry_candidate_counts(conn)
         candidates = list(result.get("candidates") or [])
         candidate = dict(candidates[0]) if len(candidates) == 1 else {}
         set_kv(
@@ -4913,6 +5185,136 @@ class AutonomousMissionController:
                 "action": blocker,
                 "pipeline": "SHADOW" if shadow_count else "DISCOVERY",
                 "parallel_shadow": True,
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
+    def _route_cross_asset_daily_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, CROSS_ASSET_DAILY_EXPERIMENT_ID
+        )
+        set_kv(
+            conn,
+            "quality_diversity_archive",
+            {
+                "engine": "CROSS_ASSET_DAILY_HORIZON",
+                "selector_audit": result.get("selector_audit") or {},
+                "elite_candidate_ids": result.get("elite_candidate_ids") or [],
+                "negative_controls": result.get("negative_controls") or [],
+            },
+        )
+        killed = set(get_kv(conn, "foundry_killed_candidate_ids", []) or [])
+        newly_killed = 0
+        retained_tiers = {
+            "PROMISING_RESEARCH_CANDIDATE",
+            "ROBUST_RESEARCH_CANDIDATE",
+            "SHADOW_RESEARCH_CANDIDATE",
+        }
+        for candidate in result.get("candidates") or []:
+            candidate_id = str(candidate.get("candidate_id") or "")
+            if (
+                candidate_id
+                and str(candidate.get("status") or "") not in retained_tiers
+                and candidate_id not in killed
+            ):
+                killed.add(candidate_id)
+                newly_killed += 1
+        if newly_killed:
+            set_kv(conn, "foundry_killed_candidate_ids", sorted(killed))
+            set_kv(
+                conn,
+                "strategies_killed",
+                int(get_kv(conn, "strategies_killed", 0)) + newly_killed,
+            )
+        self._refresh_foundry_candidate_counts(conn)
+        shadow_count = int(result.get("shadow_candidates") or 0)
+        if shadow_count > 0:
+            blocker = "CROSS_ASSET_DAILY_SHADOW_ACTIVATION_REQUIRED"
+        else:
+            blocker = "DISTRIBUTIONAL_PORTFOLIO_ROLE_PIVOT_REQUIRED"
+        set_kv(
+            conn,
+            "cross_asset_daily_metrics",
+            {
+                "structural_prototypes": int(result.get("structural_prototypes", 0)),
+                "round1_survivors": int(result.get("round1_survivors", 0)),
+                "round2_survivors": int(result.get("round2_survivors", 0)),
+                "elite_count": int(result.get("elite_count", 0)),
+                "promising_candidates": int(result.get("promising_candidates", 0)),
+                "shadow_candidates": shadow_count,
+                "topstep_path_candidates": int(
+                    result.get("topstep_path_candidates", 0)
+                ),
+                "performance": result.get("performance") or {},
+                "conclusion": result.get("scientific_conclusion"),
+            },
+        )
+        set_kv(conn, "discovery_pipeline_status", "CROSS_ASSET_DAILY_COMPLETED")
+        set_kv(conn, "promotion_pipeline_status", "CROSS_ASSET_DAILY_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "Cross-asset daily elites were frozen on 2023 and replayed unchanged on "
+            "2024 Q1-Q3. Only exact calibrated survivors may enter zero-order shadow.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "SHADOW" if shadow_count else "DISCOVERY",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+        if shadow_count > 0:
+            self._reconcile_cross_asset_daily_shadow(conn)
+
+    def _route_cross_asset_daily_shadow_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID
+        )
+        entry = registry_entry_from_activation(result)
+        registry = dict(get_kv(conn, "shadow_active_registry", {}) or {})
+        candidate_id = str(result["candidate_id"])
+        existing = registry.get(candidate_id)
+        if existing is not None and existing != entry:
+            raise ShadowPipelineIntegrityError(
+                "Refusing in-place mutation of cross-asset daily shadow candidate."
+            )
+        registry[candidate_id] = entry
+        set_kv(conn, "shadow_active_registry", registry)
+        set_kv(conn, "shadow_pipeline_status", "RUNNING_FAIL_CLOSED")
+        set_kv(conn, "shadow_active_candidates", len(registry))
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(
+            conn,
+            "current_blocker",
+            "PORTFOLIO_BASKET_AND_DISTRIBUTIONAL_SEARCH_REQUIRED",
+        )
+        set_kv(
+            conn,
+            "last_error",
+            "Fourth distinct zero-order shadow is active; shared-account baskets and "
+            "the next distributional search must now run in parallel.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": "PORTFOLIO_BASKET_AND_DISTRIBUTIONAL_SEARCH_REQUIRED",
+                "pipeline": "PORTFOLIO_AND_DISCOVERY",
+                "shadow_pipeline": "RUNNING_FAIL_CLOSED",
                 "q4_access_authorized": False,
             },
         )
@@ -4992,7 +5394,31 @@ class AutonomousMissionController:
                 ),
                 "source_experiment": experiment_id,
             }
-        statuses = [str(row.get("status") or "") for row in bank.values()]
+        set_kv(conn, "foundry_candidate_bank", bank)
+        baseline = int(get_kv(conn, "foundry_bootstrap_prototype_baseline", 0))
+        candidate_total = baseline + len(bank)
+        set_kv(
+            conn,
+            "strategy_prototypes_generated",
+            max(int(get_kv(conn, "strategy_prototypes_generated", 0)), candidate_total),
+        )
+        set_kv(
+            conn,
+            "strategies_screened",
+            max(int(get_kv(conn, "strategies_screened", 0)), candidate_total),
+        )
+        AutonomousMissionController._refresh_foundry_candidate_counts(conn)
+
+    @staticmethod
+    def _refresh_foundry_candidate_counts(conn: Any) -> None:
+        bank = dict(get_kv(conn, "foundry_candidate_bank", {}) or {})
+        killed = set(get_kv(conn, "foundry_killed_candidate_ids", []) or [])
+        active_rows = {
+            candidate_id: row
+            for candidate_id, row in bank.items()
+            if candidate_id not in killed
+        }
+        statuses = [str(row.get("status") or "") for row in active_rows.values()]
         promising_tiers = {
             "PROMISING_RESEARCH_CANDIDATE",
             "ROBUST_RESEARCH_CANDIDATE",
@@ -5007,36 +5433,35 @@ class AutonomousMissionController:
             "SHADOW_ACTIVE",
             "SHADOW_CONFIRMED",
         }
-        set_kv(conn, "foundry_candidate_bank", bank)
-        baseline = int(get_kv(conn, "foundry_bootstrap_prototype_baseline", 0))
-        candidate_total = baseline + len(bank)
         set_kv(
             conn,
-            "strategy_prototypes_generated",
-            max(int(get_kv(conn, "strategy_prototypes_generated", 0)), candidate_total),
+            "promising_candidates",
+            sum(status in promising_tiers for status in statuses),
         )
         set_kv(
             conn,
-            "strategies_screened",
-            max(int(get_kv(conn, "strategies_screened", 0)), candidate_total),
+            "shadow_candidates",
+            sum(status in shadow_tiers for status in statuses),
         )
-        set_kv(conn, "promising_candidates", sum(item in promising_tiers for item in statuses))
-        set_kv(conn, "shadow_candidates", sum(item in shadow_tiers for item in statuses))
         set_kv(
             conn,
             "paper_shadow_ready_candidates",
-            sum(item == "PAPER_SHADOW_READY" for item in statuses),
+            sum(status == "PAPER_SHADOW_READY" for status in statuses),
         )
         set_kv(
             conn,
             "shadow_active_candidates",
-            sum(item == "SHADOW_ACTIVE" for item in statuses),
+            sum(status == "SHADOW_ACTIVE" for status in statuses),
         )
         set_kv(
             conn,
             "topstep_path_candidates",
-            sum(bool(row.get("topstep_path_candidate")) for row in bank.values()),
+            sum(
+                bool(row.get("topstep_path_candidate"))
+                for row in active_rows.values()
+            ),
         )
+
     def _evidence_reconciliation_exists(self, reconciliation_id: str) -> bool:
         path = self.paths.evidence_ledger
         if not path.exists():

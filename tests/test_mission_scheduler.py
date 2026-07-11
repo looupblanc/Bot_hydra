@@ -15,6 +15,9 @@ from hydra.mission.controller import (
     AutonomousMissionController,
     CleanWorkerInterruption,
     CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
+    CROSS_ASSET_DAILY_EXPERIMENT_ID,
+    CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+    CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID,
     DESIGN_EXPERIMENT_ID,
     ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID,
     ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID,
@@ -1694,6 +1697,227 @@ def test_concentrated_fresh_gc_primary_is_killed_once_and_pivots(
                 "GC_SESSION_GEOMETRY_FRESH_PRIMARY_FALSIFIED_OR_INSUFFICIENT"
             ),
         }
+        assert get_kv(conn, "paper_shadow_ready_candidates") == 0
+    finally:
+        conn.close()
+
+
+def test_cross_asset_daily_tournament_is_queued_after_gc_pivot(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        enqueue_experiment(
+            conn,
+            GC_SESSION_GEOMETRY_FRESH_EXPERIMENT_ID,
+            {"experiment_type": "gc_session_geometry_fresh_primary"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            GC_SESSION_GEOMETRY_FRESH_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": (
+                    "GC_SESSION_GEOMETRY_FRESH_PRIMARY_FALSIFIED_OR_INSUFFICIENT"
+                )
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_cross_asset_daily(conn)
+        record = experiment_record(conn, CROSS_ASSET_DAILY_EXPERIMENT_ID)
+
+        assert record is not None
+        assert record["status"] == "QUEUED"
+        assert record["experiment_type"] == "cross_asset_daily_horizon_primary"
+        assert record["specification"]["pipeline"] == "DISCOVERY_AND_PROMOTION"
+        assert record["specification"]["selection_end_exclusive"] == "2024-01-01"
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["paid_data_allowed"] is False
+        assert record["specification"]["network_allowed"] is False
+        assert record["specification"]["live_or_broker_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_cross_asset_daily_result_kills_weak_elites_once_and_routes_shadow(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr(
+        controller, "_reconcile_cross_asset_daily_shadow", lambda _conn: True
+    )
+    monkeypatch.setattr(controller, "_tick_shadow_pipeline", lambda _conn: {})
+    candidates = []
+    for index in range(8):
+        status = (
+            "SHADOW_RESEARCH_CANDIDATE"
+            if index == 0
+            else "PROMISING_RESEARCH_CANDIDATE"
+            if index == 1
+            else "RESEARCH_PROTOTYPE"
+        )
+        candidates.append(
+            {
+                "candidate_id": (
+                    CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID
+                    if index == 0
+                    else f"daily-elite-{index}"
+                ),
+                "status": status,
+                "mechanism_family": f"daily-family-{index % 4}",
+                "primary_market": ("YM", "GC", "CL", "RTY")[index % 4],
+                "execution_market": ("MYM", "MGC", "MCL", "M2K")[index % 4],
+                "net_pnl": 500.0 - index * 100,
+                "topstep": {"path_candidate": index == 1},
+            }
+        )
+    result = {
+        "candidate_count": 720,
+        "structural_prototypes": 720,
+        "round1_survivors": 296,
+        "round2_survivors": 97,
+        "elite_count": 8,
+        "scientific_conclusion": "CROSS_ASSET_DAILY_SHADOW_CANDIDATES_FOUND",
+        "promising_candidates": 2,
+        "shadow_candidates": 1,
+        "paper_shadow_ready": 0,
+        "topstep_path_candidates": 1,
+        "candidates": candidates,
+        "selector_audit": {"uses_2024_results": False},
+        "elite_candidate_ids": [row["candidate_id"] for row in candidates],
+        "negative_controls": ["control-a", "control-b"],
+    }
+    try:
+        controller._route_cross_asset_daily_result(conn, result)
+        controller._route_cross_asset_daily_result(conn, result)
+
+        assert get_kv(conn, "current_blocker") == (
+            "CROSS_ASSET_DAILY_SHADOW_ACTIVATION_REQUIRED"
+        )
+        assert get_kv(conn, "strategy_prototypes_generated") == 720
+        assert get_kv(conn, "strategies_killed") == 6
+        assert get_kv(conn, "promising_candidates") == 2
+        assert get_kv(conn, "shadow_candidates") == 1
+        assert get_kv(conn, "topstep_path_candidates") == 1
+        assert get_kv(conn, "paper_shadow_ready_candidates") == 0
+        assert get_kv(conn, "quality_diversity_archive")[
+            "negative_controls"
+        ] == ["control-a", "control-b"]
+    finally:
+        conn.close()
+
+
+def test_cross_asset_daily_shadow_queue_preserves_frozen_candidate(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    source_path = tmp_path / "daily-result.json"
+    configuration_path = tmp_path / "daily-configuration.json"
+    source_path.write_text('{"result_hash":"daily-result-hash"}\n', encoding="utf-8")
+    configuration_path.write_text("{}\n", encoding="utf-8")
+    result = {
+        "result_hash": "daily-result-hash",
+        "scientific_conclusion": "CROSS_ASSET_DAILY_SHADOW_CANDIDATES_FOUND",
+        "candidates": [
+            {
+                "candidate_id": CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+                "status": "SHADOW_RESEARCH_CANDIDATE",
+                "admission": {"permits_zero_risk_shadow": True},
+            }
+        ],
+        "shadow_configurations": [
+            {
+                "candidate_id": CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+                "path": str(configuration_path),
+                "configuration_hash": "daily-configuration-hash",
+            }
+        ],
+        "artifacts": {"result_json_path": str(source_path)},
+    }
+    try:
+        enqueue_experiment(
+            conn,
+            CROSS_ASSET_DAILY_EXPERIMENT_ID,
+            {"experiment_type": "cross_asset_daily_horizon_primary"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            CROSS_ASSET_DAILY_EXPERIMENT_ID,
+            result,
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_cross_asset_daily_shadow(conn)
+        record = experiment_record(conn, CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID)
+
+        assert record is not None
+        assert record["status"] == "QUEUED"
+        assert record["experiment_type"] == "cross_asset_daily_shadow_activation"
+        assert record["specification"]["candidate_id"] == (
+            CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID
+        )
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["live_or_broker_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_cross_asset_daily_shadow_activation_registers_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from hydra.mission.calibration_retest_execution import _stable_hash
+
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr(controller, "_tick_shadow_pipeline", lambda _conn: {})
+    configuration = tmp_path / "daily-shadow.json"
+    configuration.write_text("{}\n", encoding="utf-8")
+    manifest = {
+        "candidate_id": CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+        "configuration_path": str(configuration),
+        "configuration_sha256": "frozen-sha",
+        "configuration_hash": "frozen-configuration-hash",
+        "stale_data_seconds": 75,
+        "outbound_orders_enabled": False,
+    }
+    manifest["activation_manifest_hash"] = _stable_hash(manifest)
+    result = {
+        "candidate_id": CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+        "candidate_count": 0,
+        "scientific_conclusion": "IMMUTABLE_ZERO_ORDER_SHADOW_ACTIVATED",
+        "activation_manifest": manifest,
+        "candidates": [
+            {
+                "candidate_id": CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+                "status": "SHADOW_ACTIVE",
+                "mechanism_family": "daily_direction_transfer",
+                "primary_market": "YM",
+                "execution_market": "MYM",
+                "net_pnl": 513.5,
+                "topstep": {"path_candidate": False},
+            }
+        ],
+    }
+    try:
+        controller._route_cross_asset_daily_shadow_result(conn, result)
+        controller._route_cross_asset_daily_shadow_result(conn, result)
+
+        registry = get_kv(conn, "shadow_active_registry")
+        assert list(registry) == [CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID]
+        assert registry[CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID][
+            "outbound_orders_enabled"
+        ] is False
+        assert get_kv(conn, "shadow_active_candidates") == 1
+        assert get_kv(conn, "current_blocker") == (
+            "PORTFOLIO_BASKET_AND_DISTRIBUTIONAL_SEARCH_REQUIRED"
+        )
         assert get_kv(conn, "paper_shadow_ready_candidates") == 0
     finally:
         conn.close()
