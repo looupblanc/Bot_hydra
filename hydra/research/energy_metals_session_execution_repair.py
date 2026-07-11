@@ -86,21 +86,54 @@ def synchronize_mcl_execution(
     *,
     entry_delay_bars: int = 0,
 ) -> tuple[pd.DataFrame, list[dict[str, str]]]:
+    return synchronize_micro_execution(
+        cl_signals,
+        mcl_table,
+        signal_symbol="CL",
+        execution_symbol="MCL",
+        candidate_id=CHILD_ID,
+        parent_candidate_id=PARENT_ID,
+        entry_prefix="overnight",
+        horizon=60,
+        entry_delay_bars=entry_delay_bars,
+    )
+
+
+def synchronize_micro_execution(
+    signals: pd.DataFrame,
+    execution_table: pd.DataFrame,
+    *,
+    signal_symbol: str,
+    execution_symbol: str,
+    candidate_id: str,
+    parent_candidate_id: str,
+    entry_prefix: str,
+    horizon: int,
+    entry_delay_bars: int = 0,
+) -> tuple[pd.DataFrame, list[dict[str, str]]]:
+    """Replay a liquid-market signal on an exact-time micro execution path."""
     suffix = "" if entry_delay_bars == 0 else "_delay1"
-    indexed = mcl_table.set_index("session_id", drop=False)
-    point_value = instrument_spec("MCL").point_value
-    cost = _round_turn_cost_all("MCL")
+    indexed = execution_table.set_index("session_id", drop=False)
+    point_value = instrument_spec(execution_symbol).point_value
+    cost = _round_turn_cost_all(execution_symbol)
     records: list[dict[str, Any]] = []
     missing: list[dict[str, str]] = []
-    for signal in cl_signals.to_dict("records"):
+    for signal in signals.to_dict("records"):
         session_id = str(signal["trading_session_id"])
         if session_id not in indexed.index:
-            missing.append({"session_id": session_id, "reason": "missing_mcl_session"})
+            missing.append(
+                {
+                    "session_id": session_id,
+                    "reason": f"missing_{execution_symbol.lower()}_session",
+                }
+            )
             continue
         row = indexed.loc[session_id]
         if isinstance(row, pd.DataFrame):
             row = row.iloc[0]
-        entry_timestamp = pd.Timestamp(row[f"overnight_entry_timestamp{suffix}"])
+        entry_timestamp = pd.Timestamp(
+            row[f"{entry_prefix}_entry_timestamp{suffix}"]
+        )
         expected_entry = pd.Timestamp(signal["entry_timestamp"]) + pd.Timedelta(
             minutes=entry_delay_bars
         )
@@ -109,26 +142,37 @@ def synchronize_mcl_execution(
                 {"session_id": session_id, "reason": "entry_timestamp_mismatch"}
             )
             continue
-        exit_column = f"overnight_exit_60{suffix}"
-        exit_time_column = f"overnight_exit_timestamp_60{suffix}"
+        exit_column = f"{entry_prefix}_exit_{horizon}{suffix}"
+        exit_time_column = f"{entry_prefix}_exit_timestamp_{horizon}{suffix}"
         if pd.isna(row.get(exit_column)) or pd.isna(row.get(exit_time_column)):
-            missing.append({"session_id": session_id, "reason": "missing_mcl_exit"})
+            missing.append(
+                {
+                    "session_id": session_id,
+                    "reason": f"missing_{execution_symbol.lower()}_exit",
+                }
+            )
             continue
         side = float(signal["side"])
-        entry_price = float(row[f"overnight_entry_price{suffix}"])
+        entry_price = float(row[f"{entry_prefix}_entry_price{suffix}"])
         exit_price = float(row[exit_column])
         gross = side * (exit_price - entry_price) * point_value
-        long_mae = float(row[f"overnight_long_mae_60{suffix}"]) * point_value
-        short_mae = float(row[f"overnight_short_mae_60{suffix}"]) * point_value
+        long_mae = (
+            float(row[f"{entry_prefix}_long_mae_{horizon}{suffix}"])
+            * point_value
+        )
+        short_mae = (
+            float(row[f"{entry_prefix}_short_mae_{horizon}{suffix}"])
+            * point_value
+        )
         records.append(
             {
-                "candidate_id": CHILD_ID,
-                "parent_candidate_id": PARENT_ID,
+                "candidate_id": candidate_id,
+                "parent_candidate_id": parent_candidate_id,
                 "event_session_id": session_id,
                 "trading_session_id": session_id,
-                "symbol": "MCL",
+                "symbol": execution_symbol,
                 "active_contract": str(row["active_contract"]),
-                "signal_symbol": "CL",
+                "signal_symbol": signal_symbol,
                 "side": side,
                 "entry_timestamp": entry_timestamp,
                 "exit_timestamp": pd.Timestamp(row[exit_time_column]),
@@ -139,6 +183,7 @@ def synchronize_mcl_execution(
                 "net_pnl": gross - cost,
                 "mae_dollars": (long_mae if side > 0 else short_mae) - cost / 2,
                 "entry_delay_bars": entry_delay_bars,
+                "signal_recomputed_from_micro": False,
                 "signal_recomputed_from_mcl": False,
             }
         )
