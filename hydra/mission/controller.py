@@ -73,6 +73,9 @@ OPENING_DIRECTION_HAZARD_EXPERIMENT_ID = "opening_direction_hazard_pilot_v1"
 CROSS_ECOLOGY_OPENING_ACCEPTANCE_EXPERIMENT_ID = (
     "cross_ecology_opening_acceptance_pilot_v1"
 )
+MTF_SESSION_TREND_CONFIRMATION_EXPERIMENT_ID = (
+    "mtf_session_trend_confirmation_pilot_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -91,6 +94,7 @@ EQUITY_OPEN_GAP_CONTINUATION_TASK_SHA256 = "06996cb6666a2eb1f03ba66defc1300651f7
 Q4_CANDIDATE_FREEZE_TASK_SHA256 = "42be968728c7dfebc690a6fa0d496305c3ea8f74ed13b64c87302076755100fe"
 OPENING_DIRECTION_HAZARD_TASK_SHA256 = "2ad28070ed623b74c86a78647b69bd63b2233de97c290674ed5254a8d4aa7080"
 CROSS_ECOLOGY_OPENING_ACCEPTANCE_TASK_SHA256 = "4e2c6e4a5a10249169396a9aac5afc1caae16c591232c117569d4f2dc1acb017"
+MTF_SESSION_TREND_CONFIRMATION_TASK_SHA256 = "1358287cba48702049149e0ae37e81bda95990610ded48692facc930898894b1"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -109,6 +113,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "q4_candidate_freeze",
     "opening_direction_hazard_pilot",
     "cross_ecology_opening_acceptance_pilot",
+    "mtf_session_trend_confirmation_pilot",
 }
 
 
@@ -332,6 +337,11 @@ class AutonomousMissionController:
             previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
             and str(previous_blocker or "") == "CROSS_ECOLOGY_INVARIANT_SEARCH_REQUIRED"
         )
+        mtf_session_trend_confirmation_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "MULTITIMEFRAME_SESSION_DAILY_INVARIANT_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -434,6 +444,14 @@ class AutonomousMissionController:
                 == "CROSS_ECOLOGY_INVARIANT_SEARCH_REQUIRED"
             )
         )
+        mtf_session_trend_confirmation_required = (
+            mtf_session_trend_confirmation_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "MULTITIMEFRAME_SESSION_DAILY_INVARIANT_REQUIRED"
+            )
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -468,6 +486,11 @@ class AutonomousMissionController:
             if cross_ecology_opening_acceptance_required
             else False
         )
+        mtf_session_trend_confirmation_queued = (
+            self._reconcile_mtf_session_trend_confirmation(conn)
+            if mtf_session_trend_confirmation_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -490,6 +513,7 @@ class AutonomousMissionController:
             and not q4_candidate_freeze_queued
             and not opening_direction_hazard_queued
             and not cross_ecology_opening_acceptance_queued
+            and not mtf_session_trend_confirmation_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -522,6 +546,7 @@ class AutonomousMissionController:
                 "q4_candidate_freeze_queued": q4_candidate_freeze_queued,
                 "opening_direction_hazard_queued": opening_direction_hazard_queued,
                 "cross_ecology_opening_acceptance_queued": cross_ecology_opening_acceptance_queued,
+                "mtf_session_trend_confirmation_queued": mtf_session_trend_confirmation_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -559,6 +584,10 @@ class AutonomousMissionController:
             (
                 CROSS_ECOLOGY_OPENING_ACCEPTANCE_EXPERIMENT_ID,
                 "cross_ecology_opening_acceptance_plan_written",
+            ),
+            (
+                MTF_SESSION_TREND_CONFIRMATION_EXPERIMENT_ID,
+                "mtf_session_trend_confirmation_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -628,6 +657,11 @@ class AutonomousMissionController:
                 "cross_ecology_opening_acceptance_pilot",
                 "cross_ecology_opening_acceptance_completed",
             ),
+            (
+                MTF_SESSION_TREND_CONFIRMATION_EXPERIMENT_ID,
+                "mtf_session_trend_confirmation_pilot",
+                "mtf_session_trend_confirmation_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -664,6 +698,7 @@ class AutonomousMissionController:
                 "q4_candidate_freeze": "q4_candidate_freeze_result",
                 "opening_direction_hazard_pilot": "opening_direction_hazard_result",
                 "cross_ecology_opening_acceptance_pilot": "cross_ecology_opening_acceptance_result",
+                "mtf_session_trend_confirmation_pilot": "mtf_session_trend_confirmation_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -720,6 +755,8 @@ class AutonomousMissionController:
                 self._route_opening_direction_hazard_result(conn, result)
             elif experiment_type == "cross_ecology_opening_acceptance_pilot":
                 self._route_cross_ecology_opening_acceptance_result(conn, result)
+            elif experiment_type == "mtf_session_trend_confirmation_pilot":
+                self._route_mtf_session_trend_confirmation_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -1598,6 +1635,75 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_mtf_session_trend_confirmation(self, conn: Any) -> bool:
+        existing = experiment_record(conn, MTF_SESSION_TREND_CONFIRMATION_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path(
+            "reports", "engineering", "hydra_mtf_session_trend_confirmation_20260711.md"
+        )
+        map_path = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not map_path.is_file():
+            map_path = Path("/root/hydra-bot") / map_path.relative_to(project_path())
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != MTF_SESSION_TREND_CONFIRMATION_TASK_SHA256
+            or not map_path.is_file()
+            or hashlib.sha256(map_path.read_bytes()).hexdigest()
+            != PATH_GEOMETRY_MAP_SHA256
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "MTF_SESSION_CONFIRMATION_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", "MTF task or explicit map changed.")
+            return False
+        specification = {
+            "experiment_type": "mtf_session_trend_confirmation_pilot",
+            "priority": 105.0,
+            "max_attempts": 2,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": MTF_SESSION_TREND_CONFIRMATION_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.92,
+        }
+        enqueue_experiment(
+            conn, MTF_SESSION_TREND_CONFIRMATION_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "mtf_session_trend_confirmation_plan_written", True)
+        set_kv(conn, "foundry_current_engine", "ENGINE_E_MTF_INVARIANT")
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": MTF_SESSION_TREND_CONFIRMATION_EXPERIMENT_ID,
+                "experiment_type": "mtf_session_trend_confirmation_pilot",
+                "status": "QUEUED",
+                "reason": (
+                    "First strategy-level causal join of completed session state, completed 30m "
+                    "confirmation and 1m execution across four contractual pairs."
+                ),
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -1884,9 +1990,8 @@ class AutonomousMissionController:
         if blocker == "CROSS_ECOLOGY_INVARIANT_SEARCH_REQUIRED":
             self._reconcile_cross_ecology_opening_acceptance(conn)
 
-    @staticmethod
     def _route_cross_ecology_opening_acceptance_result(
-        conn: Any, result: dict[str, Any]
+        self, conn: Any, result: dict[str, Any]
     ) -> None:
         AutonomousMissionController._update_foundry_candidate_bank(
             conn, result, CROSS_ECOLOGY_OPENING_ACCEPTANCE_EXPERIMENT_ID
@@ -1904,6 +2009,41 @@ class AutonomousMissionController:
         else:
             blocker = "MULTITIMEFRAME_SESSION_DAILY_INVARIANT_REQUIRED"
             message = "Opening acceptance failed or was insufficient; pivot to session/daily invariants."
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(conn, "last_error", message)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "parallel_blocker": get_kv(conn, "q4_access_blocker"),
+                "q4_access_authorized": False,
+            },
+        )
+        if blocker == "MULTITIMEFRAME_SESSION_DAILY_INVARIANT_REQUIRED":
+            self._reconcile_mtf_session_trend_confirmation(conn)
+
+    @staticmethod
+    def _route_mtf_session_trend_confirmation_result(
+        conn: Any, result: dict[str, Any]
+    ) -> None:
+        AutonomousMissionController._update_foundry_candidate_bank(
+            conn, result, MTF_SESSION_TREND_CONFIRMATION_EXPERIMENT_ID
+        )
+        set_kv(conn, "foundry_current_engine", "ENGINE_E_MTF_INVARIANT")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        shadow = int(result.get("shadow_candidates", 0))
+        promising = int(result.get("promising_candidates", 0))
+        if shadow:
+            blocker = "DISTINCT_MTF_FREEZE_OR_FORWARD_SHADOW_REQUIRED"
+            message = "An MTF candidate reached shadow research and requires a distinct freeze/forward plan."
+        elif promising:
+            blocker = "MTF_ABLATION_AND_FAILURE_SURFACE_REQUIRED"
+            message = "MTF confirmation is promising but requires its frozen ablation/failure surface."
+        else:
+            blocker = "RELATIVE_VALUE_OR_DEFENSIVE_PORTFOLIO_REQUIRED"
+            message = "MTF trend confirmation failed; pivot to relative-value or defensive account utility."
         set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
         set_kv(conn, "current_blocker", blocker)
         set_kv(conn, "last_error", message)

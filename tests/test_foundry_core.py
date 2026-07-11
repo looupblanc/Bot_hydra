@@ -40,6 +40,9 @@ from hydra.foundry.q4_freeze import Q4CandidateFreezeError, _validate_candidate
 from hydra.research.cross_ecology_opening_acceptance import (
     build_opening_acceptance_events,
 )
+from hydra.research.mtf_session_trend_confirmation import (
+    build_mtf_session_confirmation_events,
+)
 from hydra.shadow.runner import ShadowRunner
 from hydra.shadow.signal_bus import ShadowSignal
 from hydra.shadow.specification import ShadowSpecification
@@ -358,6 +361,19 @@ def test_cross_ecology_opening_window_is_closed_and_prefix_invariant() -> None:
     pd.testing.assert_series_equal(
         shared.loc[prefix.index, "threshold_q65"], prefix["threshold_q65"], check_names=False
     )
+
+
+def test_mtf_session_join_never_uses_current_incomplete_session() -> None:
+    source = _synthetic_open_gap_frame(sessions=70)
+    events = build_mtf_session_confirmation_events(source, minimum_history=2)
+    assert len(events) > 0
+    assert (events["prior_session_availability"] <= events["decision_timestamp"]).all()
+    assert events["prior_session_id"].ne(events["event_session_id"]).all()
+    assert (
+        events["decision_timestamp"]
+        == events["current_open_timestamp"] + pd.Timedelta(minutes=30)
+    ).all()
+    assert (events["timestamp"] == events["current_open_timestamp"] + pd.Timedelta(minutes=29)).all()
 
 
 def test_foundry_bootstrap_routes_exactly_once_to_gap_pilot(tmp_path: Path) -> None:
