@@ -86,6 +86,7 @@ YM_SHARED_RISK_OFF_EXPERIMENT_ID = "ym_shared_risk_off_overlay_v1"
 QD_ECONOMIC_TOURNAMENT_EXPERIMENT_ID = "qd_economic_tournament_v2"
 YM_STRICT_PROMOTION_EXPERIMENT_ID = "ym_open_gap_strict_promotion_v1"
 YM_SHADOW_ACTIVATION_EXPERIMENT_ID = "ym_immutable_shadow_activation_v1"
+ACCELERATED_CONTEXT_TOURNAMENT_EXPERIMENT_ID = "accelerated_context_tournament_v1"
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -118,6 +119,7 @@ YM_FREEZE_MANIFEST_HASH = "6aae37537aa39b0b7ad70d00afd0526b64b9fccfcbf396e0a7941
 YM_SHADOW_CONFIGURATION_SHA256 = "4cc734a43ae429bb760a7228dcd22e211f5bc925d57cf71b0717323faea3de4d"
 YM_SHADOW_CONFIGURATION_HASH = "d8ab9d9741aedd8c4b2ab9609d97124d8d66752873bf53eec24f39a13c23ff10"
 YM_SHADOW_ACTIVATION_TASK_SHA256 = "0ba6b7b53e42d77c2362ed361c8eee81ace9198f4714b54432ce97b6fd9333fc"
+ACCELERATED_CONTEXT_TASK_SHA256 = "07296001c77726aeb99dcb8b6ac6ea44c2bae1f9276489eb1cf2c0f1adaf5753"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -142,6 +144,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "qd_economic_tournament",
     "ym_open_gap_strict_promotion",
     "ym_immutable_shadow_activation",
+    "accelerated_context_tournament",
 }
 
 
@@ -708,6 +711,10 @@ class AutonomousMissionController:
             ),
             (YM_STRICT_PROMOTION_EXPERIMENT_ID, "ym_strict_promotion_plan_written"),
             (YM_SHADOW_ACTIVATION_EXPERIMENT_ID, "ym_shadow_activation_plan_written"),
+            (
+                ACCELERATED_CONTEXT_TOURNAMENT_EXPERIMENT_ID,
+                "accelerated_context_tournament_plan_written",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -806,6 +813,11 @@ class AutonomousMissionController:
                 "ym_immutable_shadow_activation",
                 "ym_shadow_activation_completed",
             ),
+            (
+                ACCELERATED_CONTEXT_TOURNAMENT_EXPERIMENT_ID,
+                "accelerated_context_tournament",
+                "accelerated_context_tournament_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -848,6 +860,7 @@ class AutonomousMissionController:
                 "qd_economic_tournament": "qd_economic_tournament_result",
                 "ym_open_gap_strict_promotion": "ym_strict_promotion_result",
                 "ym_immutable_shadow_activation": "ym_shadow_activation_result",
+                "accelerated_context_tournament": "accelerated_context_tournament_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -916,6 +929,8 @@ class AutonomousMissionController:
                 self._route_ym_strict_promotion_result(conn, result)
             elif experiment_type == "ym_immutable_shadow_activation":
                 self._route_ym_shadow_activation_result(conn, result)
+            elif experiment_type == "accelerated_context_tournament":
+                self._route_accelerated_context_tournament_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -2306,6 +2321,69 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_accelerated_context_tournament(self, conn: Any) -> bool:
+        existing = experiment_record(conn, ACCELERATED_CONTEXT_TOURNAMENT_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path(
+            "reports", "engineering", "hydra_accelerated_context_tournament_20260711.md"
+        )
+        selector_task = project_path(
+            "reports", "engineering", "hydra_qd_selector_v2_20260711.md"
+        )
+        map_path = project_path(
+            "data", "cache", "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not map_path.is_file():
+            map_path = Path("/root/hydra-bot/data/cache/contract_maps") / map_path.name
+        contracts = (
+            (task, ACCELERATED_CONTEXT_TASK_SHA256, "accelerated task"),
+            (selector_task, QD_SELECTOR_V2_TASK_SHA256, "selector task"),
+            (map_path, PATH_GEOMETRY_MAP_SHA256, "explicit map"),
+        )
+        mismatch = [
+            label for path, expected, label in contracts
+            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatch:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "ACCELERATED_CONTEXT_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", f"Frozen accelerated sources changed: {', '.join(mismatch)}.")
+            return False
+        specification = {
+            "experiment_type": "accelerated_context_tournament",
+            "priority": 107.0,
+            "max_attempts": 2,
+            "pipeline": "DISCOVERY",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": ACCELERATED_CONTEXT_TASK_SHA256,
+            "selector_task_path": str(selector_task),
+            "selector_task_sha256": QD_SELECTOR_V2_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.97,
+        }
+        enqueue_experiment(
+            conn, ACCELERATED_CONTEXT_TOURNAMENT_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "accelerated_context_tournament_plan_written", True)
+        set_kv(conn, "discovery_pipeline_status", "QUEUED")
+        set_kv(conn, "foundry_current_engine", "PARALLEL_MULTI_ENGINE_CONTEXT_SEARCH")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -2840,6 +2918,53 @@ class AutonomousMissionController:
             },
         )
         self._tick_shadow_pipeline(conn)
+        self._reconcile_accelerated_context_tournament(conn)
+
+    @staticmethod
+    def _route_accelerated_context_tournament_result(
+        conn: Any, result: dict[str, Any]
+    ) -> None:
+        AutonomousMissionController._update_foundry_candidate_bank(
+            conn, result, ACCELERATED_CONTEXT_TOURNAMENT_EXPERIMENT_ID
+        )
+        set_kv(conn, "discovery_pipeline_status", "COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(
+            conn,
+            "accelerated_tournament_metrics",
+            {
+                "structural_prototypes": int(result.get("structural_prototypes", 0)),
+                "executable_hypotheses": int(result.get("executable_hypotheses", 0)),
+                "round1_survivors": int(result.get("round1_survivors", 0)),
+                "round2_survivors": int(result.get("round2_survivors", 0)),
+                "validation_elites": int(result.get("validation_elites", 0)),
+            },
+        )
+        shadow = int(result.get("shadow_candidates", 0))
+        promising = int(result.get("promising_candidates", 0))
+        if shadow:
+            blocker = "ACCELERATED_SHADOW_FREEZE_AND_ACTIVATION_REQUIRED"
+        elif promising:
+            blocker = "ACCELERATED_TARGETED_CONFIRMATION_AND_META_RESEARCH_REQUIRED"
+        else:
+            blocker = "ACCELERATED_FAILURE_MAP_AND_NEW_REPRESENTATION_REQUIRED"
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "Accelerated batch completed; a preregistered non-clone follow-up is required.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "DISCOVERY_AND_PROMOTION",
+                "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
+                "q4_access_authorized": False,
+            },
+        )
 
     @staticmethod
     def _update_foundry_candidate_bank(

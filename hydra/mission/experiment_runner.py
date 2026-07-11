@@ -442,4 +442,20 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             shadow_configuration_hash=str(experiment["shadow_configuration_hash"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "accelerated_context_tournament":
+        from hydra.research.accelerated_context_tournament import (
+            run_accelerated_context_tournament,
+        )
+
+        return run_accelerated_context_tournament(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            selector_task_path=Path(str(experiment["selector_task_path"])),
+            selector_task_sha256=str(experiment["selector_task_sha256"]),
+            repaired_map_path=Path(str(experiment["repaired_map_path"])),
+            repaired_map_sha256=str(experiment["repaired_map_sha256"]),
+            repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")
