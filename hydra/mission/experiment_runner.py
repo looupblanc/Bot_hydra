@@ -174,4 +174,18 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
                 "fresh calibration-affected atom v3 retest on repaired date-aware map; Q4 excluded"
             ),
         )
+    if experiment_type == "path_geometry_candidate_audit":
+        from hydra.research.path_geometry_candidate_audit import (
+            run_path_geometry_candidate_audit,
+        )
+
+        return run_path_geometry_candidate_audit(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            repaired_map_path=Path(str(experiment["repaired_map_path"])),
+            repaired_map_sha256=str(experiment["repaired_map_sha256"]),
+            repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")

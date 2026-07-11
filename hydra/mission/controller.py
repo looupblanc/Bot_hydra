@@ -60,11 +60,15 @@ CONTRACT_MAP_REPAIR_EXPERIMENT_ID = "contract_map_date_aware_repair_v1"
 CONTRACT_MAP_REPAIR_TASK_SHA256 = "92c73632fbff1dcc65de99fdef11b04026189b4033505f82d739f5e7e34216b8"
 V3_DESIGN_EXPERIMENT_ID = "calibration_affected_atom_retest_v3_design_v1"
 V3_EXECUTION_EXPERIMENT_ID = "calibration_affected_atom_retest_v3_execution_v1"
+PATH_GEOMETRY_AUDIT_EXPERIMENT_ID = "path_geometry_candidate_audit_v1"
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
 V3_INVALID_EXECUTION_RESULT_HASH = "22123708ac5ce71d89a75b73d7f3b5ee03cfd87d48655f5e28e1d828ddb12de9"
 V3_INVALID_EXECUTION_FILE_SHA256 = "34e4f5d937971f277d8b86d64c69e8078bb8ffbb7e5c9ed841a4409a42c75233"
+PATH_GEOMETRY_TASK_SHA256 = "5b3c795ab658c3d8a5ba799ed1f2e6c95f65daa5a3e0a97ba46599e174127023"
+PATH_GEOMETRY_MAP_SHA256 = "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda"
+PATH_GEOMETRY_ROLL_HASH = "705ce6fe27bac7dea9cb9d492413a5112bb60765c66aa75d03f9711bef348208"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -73,6 +77,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "contract_map_date_aware_repair",
     "calibration_affected_atom_retest_v3_design",
     "calibration_affected_atom_retest_v3_execution",
+    "path_geometry_candidate_audit",
 }
 
 
@@ -259,6 +264,11 @@ class AutonomousMissionController:
             previous_phase in {"INTEGRITY_BLOCKED", "STOPPED_CLEANLY"}
             and str(previous_blocker or "") == "FRESH_RETEST_WITH_REPAIRED_MAP_REQUIRED"
         )
+        path_geometry_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "V3_INSUFFICIENT_EVIDENCE_RESOLUTION_DESIGN_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -318,11 +328,19 @@ class AutonomousMissionController:
             and str(get_kv(conn, "current_blocker") or "")
             == "FRESH_RETEST_WITH_REPAIRED_MAP_REQUIRED"
         )
+        path_geometry_required = path_geometry_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "V3_INSUFFICIENT_EVIDENCE_RESOLUTION_DESIGN_REQUIRED"
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
         fresh_v3_retest_queued = (
             self._reconcile_fresh_v3_retest(conn) if fresh_v3_retest_required else False
+        )
+        path_geometry_queued = (
+            self._reconcile_path_geometry_audit(conn) if path_geometry_required else False
         )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
@@ -336,6 +354,7 @@ class AutonomousMissionController:
             and resolved_missing_handler_type is None
             and not contract_map_repair_queued
             and not fresh_v3_retest_queued
+            and not path_geometry_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -358,6 +377,7 @@ class AutonomousMissionController:
                 "requeued_legacy_missing_handler_rows": recovered_missing_handler_rows,
                 "contract_map_repair_queued": contract_map_repair_queued,
                 "fresh_v3_retest_queued": fresh_v3_retest_queued,
+                "path_geometry_queued": path_geometry_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -380,6 +400,7 @@ class AutonomousMissionController:
             (CONTRACT_MAP_REPAIR_EXPERIMENT_ID, "contract_map_repair_plan_written"),
             (V3_DESIGN_EXPERIMENT_ID, "calibration_retest_v3_design_plan_written"),
             (V3_EXECUTION_EXPERIMENT_ID, "calibration_retest_v3_execution_plan_written"),
+            (PATH_GEOMETRY_AUDIT_EXPERIMENT_ID, "path_geometry_audit_plan_written"),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -414,6 +435,11 @@ class AutonomousMissionController:
                 "calibration_affected_atom_retest_v3_execution",
                 "calibration_retest_v3_execution_completed",
             ),
+            (
+                PATH_GEOMETRY_AUDIT_EXPERIMENT_ID,
+                "path_geometry_candidate_audit",
+                "path_geometry_candidate_audit_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -440,6 +466,7 @@ class AutonomousMissionController:
                 "contract_map_date_aware_repair": "contract_map_date_aware_repair_result",
                 "calibration_affected_atom_retest_v3_design": "calibration_retest_v3_design_result",
                 "calibration_affected_atom_retest_v3_execution": "calibration_retest_v3_execution_result",
+                "path_geometry_candidate_audit": "path_geometry_candidate_audit_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -476,6 +503,8 @@ class AutonomousMissionController:
                     set_kv(conn, "last_error", "Completed v3 design cannot produce a frozen execution spec.")
             elif experiment_type == "calibration_affected_atom_retest_v3_execution":
                 self._route_v3_execution_result(conn, result)
+            elif experiment_type == "path_geometry_candidate_audit":
+                self._route_path_geometry_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -758,6 +787,47 @@ class AutonomousMissionController:
         set_kv(conn, "last_error", None)
         return True
 
+    def _reconcile_path_geometry_audit(self, conn: Any) -> bool:
+        existing = experiment_record(conn, PATH_GEOMETRY_AUDIT_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task_path = project_path("reports", "engineering", "hydra_candidate_path_geometry_audit_20260711.md")
+        map_path = project_path("data", "cache", "contract_maps", "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json")
+        if not task_path.is_file() or hashlib.sha256(task_path.read_bytes()).hexdigest() != PATH_GEOMETRY_TASK_SHA256:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "PATH_GEOMETRY_TASK_HASH_MISMATCH")
+            set_kv(conn, "last_error", "Immutable path-geometry task is missing or changed.")
+            return False
+        specification = {
+            "experiment_type": "path_geometry_candidate_audit",
+            "priority": 100.0,
+            "max_attempts": 2,
+            "engineering_task_path": str(task_path),
+            "engineering_task_sha256": PATH_GEOMETRY_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+        }
+        enqueue_experiment(conn, PATH_GEOMETRY_AUDIT_EXPERIMENT_ID, specification)
+        set_kv(conn, "path_geometry_audit_plan_written", True)
+        set_kv(conn, "current_research_experiment_selected", {
+            "experiment": PATH_GEOMETRY_AUDIT_EXPERIMENT_ID,
+            "experiment_type": "path_geometry_candidate_audit",
+            "status": "QUEUED",
+            "reason": "Highest-priority candidate-level audit after the historical screen and defensive identifiability freeze.",
+        })
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -802,6 +872,16 @@ class AutonomousMissionController:
             "Fresh v3 result requires its preregistered scientific follow-up; no atom or strategy is validated.",
         )
 
+    @staticmethod
+    def _route_path_geometry_result(conn: Any, result: dict[str, Any]) -> None:
+        status = str(result.get("candidate_status") or "NOT_VALIDATED")
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        if status == "DEVELOPMENT_SURVIVOR":
+            set_kv(conn, "current_blocker", "PATH_GEOMETRY_INDEPENDENT_REPLICATION_REQUIRED")
+            set_kv(conn, "last_error", "Candidate survived development gates only; independent replication and Topstep replay remain mandatory.")
+        else:
+            set_kv(conn, "current_blocker", "MARKET_ECOLOGY_PIVOT_REQUIRED")
+            set_kv(conn, "last_error", "Path-geometry candidate failed or lacked evidence; no strategy was validated.")
     def _evidence_reconciliation_exists(self, reconciliation_id: str) -> bool:
         path = self.paths.evidence_ledger
         if not path.exists():
