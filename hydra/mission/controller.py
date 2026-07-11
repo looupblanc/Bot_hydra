@@ -9,6 +9,7 @@ import subprocess
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any
 
 from hydra.calibration.validator_benchmark import benchmark_validator, write_calibration_report
@@ -64,6 +65,11 @@ PATH_GEOMETRY_AUDIT_EXPERIMENT_ID = "path_geometry_candidate_audit_v1"
 METAL_ENERGY_PILOT_EXPERIMENT_ID = "metal_energy_session_transition_pilot_v1"
 CROSS_MARKET_PILOT_EXPERIMENT_ID = "cross_market_lead_lag_pilot_v2"
 VOLATILITY_TRANSITION_PILOT_ID = "volatility_transition_pilot_v1"
+FOUNDRY_BOOTSTRAP_EXPERIMENT_ID = "foundry_bootstrap_v1"
+EQUITY_OPEN_GAP_REVERSAL_EXPERIMENT_ID = "equity_open_gap_reversal_pilot_v1"
+EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID = "equity_open_gap_continuation_pilot_v1"
+Q4_CANDIDATE_FREEZE_EXPERIMENT_ID = "q4_candidate_freeze_v1"
+OPENING_DIRECTION_HAZARD_EXPERIMENT_ID = "opening_direction_hazard_pilot_v1"
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -73,6 +79,14 @@ PATH_GEOMETRY_TASK_SHA256 = "5b3c795ab658c3d8a5ba799ed1f2e6c95f65daa5a3e0a97ba46
 PATH_GEOMETRY_MAP_SHA256 = "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda"
 PATH_GEOMETRY_ROLL_HASH = "705ce6fe27bac7dea9cb9d492413a5112bb60765c66aa75d03f9711bef348208"
 METAL_ENERGY_TASK_SHA256 = ""
+FOUNDRY_TASK_SHA256 = "0cde0fa68f8fb53ee4f3d5560b997af602331e20bfa6978716e814666af78d07"
+FOUNDRY_TOURNAMENT_PREREG_SHA256 = "2578377a0623ae1337eef7980bcee6cd30db421810923c4ab6f2d388011960d5"
+FOUNDRY_TOURNAMENT_REPORT_SHA256 = "49f38ef88b0142aa769677cb4f6dedb5d05089228ee1abf8f056ec115426ce88"
+FOUNDRY_TOURNAMENT_CHECKPOINT_SHA256 = "021ad20268d4b2cd31f36039f831dabeefb85baf44a9b28c12f9da00dc09f1fb"
+EQUITY_OPEN_GAP_TASK_SHA256 = "2c76e52c14324bdc8a3e1f4128b08bf433be9b5a18c5e73eeba3a2a7062e2f49"
+EQUITY_OPEN_GAP_CONTINUATION_TASK_SHA256 = "06996cb6666a2eb1f03ba66defc1300651f71525597bff858ec876288aaf78bf"
+Q4_CANDIDATE_FREEZE_TASK_SHA256 = "42be968728c7dfebc690a6fa0d496305c3ea8f74ed13b64c87302076755100fe"
+OPENING_DIRECTION_HAZARD_TASK_SHA256 = "2ad28070ed623b74c86a78647b69bd63b2233de97c290674ed5254a8d4aa7080"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -85,6 +99,11 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "metal_energy_session_transition_pilot",
     "cross_market_lead_lag_pilot",
     "volatility_transition_pilot",
+    "foundry_bootstrap",
+    "equity_open_gap_reversal_pilot",
+    "equity_open_gap_continuation_pilot",
+    "q4_candidate_freeze",
+    "opening_direction_hazard_pilot",
 }
 
 
@@ -282,6 +301,28 @@ class AutonomousMissionController:
         )
         cross_market_required = bool(previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"} and str(previous_blocker or "") == "MARKET_ECOLOGY_REPRESENTATION_PIVOT_REQUIRED")
         volatility_required = bool(previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"} and str(previous_blocker or "") == "NEW_REPRESENTATION_PIVOT_REQUIRED")
+        foundry_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "") == "NEW_REPRESENTATION_PIVOT_REQUIRED"
+        )
+        equity_open_gap_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "") == "EQUITY_OPEN_GAP_REVERSAL_PILOT_REQUIRED"
+        )
+        equity_open_gap_continuation_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "EQUITY_OPEN_GAP_CONTINUATION_PILOT_REQUIRED"
+        )
+        q4_candidate_freeze_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "") == "Q4_FREEZE_PROTOCOL_REQUIRED"
+        )
+        opening_direction_hazard_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "DISTRIBUTIONAL_OPENING_HAZARD_PILOT_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -352,6 +393,30 @@ class AutonomousMissionController:
         )
         cross_market_required = cross_market_required or bool(str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED" and str(get_kv(conn, "current_blocker") or "") == "MARKET_ECOLOGY_REPRESENTATION_PIVOT_REQUIRED")
         volatility_required = volatility_required or bool(str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED" and str(get_kv(conn, "current_blocker") or "") == "NEW_REPRESENTATION_PIVOT_REQUIRED")
+        foundry_required = foundry_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "NEW_REPRESENTATION_PIVOT_REQUIRED"
+        )
+        equity_open_gap_required = equity_open_gap_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "EQUITY_OPEN_GAP_REVERSAL_PILOT_REQUIRED"
+        )
+        equity_open_gap_continuation_required = equity_open_gap_continuation_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "EQUITY_OPEN_GAP_CONTINUATION_PILOT_REQUIRED"
+        )
+        q4_candidate_freeze_required = q4_candidate_freeze_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "") == "Q4_FREEZE_PROTOCOL_REQUIRED"
+        )
+        opening_direction_hazard_required = opening_direction_hazard_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "DISTRIBUTIONAL_OPENING_HAZARD_PILOT_REQUIRED"
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -364,6 +429,23 @@ class AutonomousMissionController:
         metal_energy_queued = self._reconcile_metal_energy_pilot(conn) if metal_energy_required else False
         cross_market_queued = self._reconcile_cross_market_pilot(conn) if cross_market_required else False
         volatility_queued = self._reconcile_volatility_pilot(conn) if volatility_required else False
+        foundry_queued = self._reconcile_foundry_bootstrap(conn) if foundry_required else False
+        equity_open_gap_queued = (
+            self._reconcile_equity_open_gap_pilot(conn) if equity_open_gap_required else False
+        )
+        equity_open_gap_continuation_queued = (
+            self._reconcile_equity_open_gap_continuation_pilot(conn)
+            if equity_open_gap_continuation_required
+            else False
+        )
+        q4_candidate_freeze_queued = (
+            self._reconcile_q4_candidate_freeze(conn) if q4_candidate_freeze_required else False
+        )
+        opening_direction_hazard_queued = (
+            self._reconcile_opening_direction_hazard(conn)
+            if opening_direction_hazard_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -380,6 +462,11 @@ class AutonomousMissionController:
             and not metal_energy_queued
             and not cross_market_queued
             and not volatility_queued
+            and not foundry_queued
+            and not equity_open_gap_queued
+            and not equity_open_gap_continuation_queued
+            and not q4_candidate_freeze_queued
+            and not opening_direction_hazard_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -406,6 +493,11 @@ class AutonomousMissionController:
                 "metal_energy_queued": metal_energy_queued,
                 "cross_market_queued": cross_market_queued,
                 "volatility_queued": volatility_queued,
+                "foundry_bootstrap_queued": foundry_queued,
+                "equity_open_gap_queued": equity_open_gap_queued,
+                "equity_open_gap_continuation_queued": equity_open_gap_continuation_queued,
+                "q4_candidate_freeze_queued": q4_candidate_freeze_queued,
+                "opening_direction_hazard_queued": opening_direction_hazard_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -432,6 +524,14 @@ class AutonomousMissionController:
             (METAL_ENERGY_PILOT_EXPERIMENT_ID, "metal_energy_pilot_plan_written"),
             (CROSS_MARKET_PILOT_EXPERIMENT_ID, "cross_market_pilot_plan_written"),
             (VOLATILITY_TRANSITION_PILOT_ID, "volatility_transition_plan_written"),
+            (FOUNDRY_BOOTSTRAP_EXPERIMENT_ID, "foundry_bootstrap_plan_written"),
+            (EQUITY_OPEN_GAP_REVERSAL_EXPERIMENT_ID, "equity_open_gap_plan_written"),
+            (
+                EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID,
+                "equity_open_gap_continuation_plan_written",
+            ),
+            (Q4_CANDIDATE_FREEZE_EXPERIMENT_ID, "q4_candidate_freeze_plan_written"),
+            (OPENING_DIRECTION_HAZARD_EXPERIMENT_ID, "opening_direction_hazard_plan_written"),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -474,6 +574,27 @@ class AutonomousMissionController:
             (METAL_ENERGY_PILOT_EXPERIMENT_ID, "metal_energy_session_transition_pilot", "metal_energy_pilot_completed"),
             (CROSS_MARKET_PILOT_EXPERIMENT_ID, "cross_market_lead_lag_pilot", "cross_market_pilot_completed"),
             (VOLATILITY_TRANSITION_PILOT_ID, "volatility_transition_pilot", "volatility_transition_completed"),
+            (FOUNDRY_BOOTSTRAP_EXPERIMENT_ID, "foundry_bootstrap", "foundry_bootstrap_completed"),
+            (
+                EQUITY_OPEN_GAP_REVERSAL_EXPERIMENT_ID,
+                "equity_open_gap_reversal_pilot",
+                "equity_open_gap_reversal_completed",
+            ),
+            (
+                EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID,
+                "equity_open_gap_continuation_pilot",
+                "equity_open_gap_continuation_completed",
+            ),
+            (
+                Q4_CANDIDATE_FREEZE_EXPERIMENT_ID,
+                "q4_candidate_freeze",
+                "q4_candidate_freeze_completed",
+            ),
+            (
+                OPENING_DIRECTION_HAZARD_EXPERIMENT_ID,
+                "opening_direction_hazard_pilot",
+                "opening_direction_hazard_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -504,6 +625,11 @@ class AutonomousMissionController:
                 "metal_energy_session_transition_pilot": "metal_energy_pilot_result",
                 "cross_market_lead_lag_pilot": "cross_market_pilot_result",
                 "volatility_transition_pilot": "volatility_transition_result",
+                "foundry_bootstrap": "foundry_bootstrap_result",
+                "equity_open_gap_reversal_pilot": "equity_open_gap_reversal_result",
+                "equity_open_gap_continuation_pilot": "equity_open_gap_continuation_result",
+                "q4_candidate_freeze": "q4_candidate_freeze_result",
+                "opening_direction_hazard_pilot": "opening_direction_hazard_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -548,6 +674,16 @@ class AutonomousMissionController:
                 self._route_cross_market_result(conn, result)
             elif experiment_type == "volatility_transition_pilot":
                 self._route_volatility_result(conn, result)
+            elif experiment_type == "foundry_bootstrap":
+                self._route_foundry_bootstrap_result(conn, result)
+            elif experiment_type == "equity_open_gap_reversal_pilot":
+                self._route_equity_open_gap_result(conn, result)
+            elif experiment_type == "equity_open_gap_continuation_pilot":
+                self._route_equity_open_gap_continuation_result(conn, result)
+            elif experiment_type == "q4_candidate_freeze":
+                self._route_q4_candidate_freeze_result(conn, result)
+            elif experiment_type == "opening_direction_hazard_pilot":
+                self._route_opening_direction_hazard_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -908,6 +1044,451 @@ class AutonomousMissionController:
         spec={"experiment_type":"volatility_transition_pilot","priority":100.0,"max_attempts":2,"engineering_task_path":str(task),"engineering_task_sha256":hashlib.sha256(task.read_bytes()).hexdigest(),"repaired_map_path":str(mp),"repaired_map_sha256":PATH_GEOMETRY_MAP_SHA256,"repaired_roll_map_hash":PATH_GEOMETRY_ROLL_HASH,"code_commit":self._git_commit(),"q4_access_allowed":False,"paid_data_allowed":False,"network_allowed":False,"live_or_broker_allowed":False}
         enqueue_experiment(conn,VOLATILITY_TRANSITION_PILOT_ID,spec);set_kv(conn,"volatility_transition_plan_written",True);self._clear_resolved_resume_block(conn);return True
 
+    def _reconcile_foundry_bootstrap(self, conn: Any) -> bool:
+        existing = experiment_record(conn, FOUNDRY_BOOTSTRAP_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path("reports", "engineering", "hydra_foundry_core_20260711.md")
+        runtime_root = project_path()
+        tournament_preregistration = runtime_root / (
+            "reports/edge_atom_lab/"
+            "edge_atom_preregistration_20260711T053018+0000_governed_strategy_tournament_20_v1.json"
+        )
+        tournament_report = runtime_root / (
+            "reports/edge_atom_lab/"
+            "edge_atom_lab_20260711T053018+0000_governed_strategy_tournament_20_v1.md"
+        )
+        tournament_checkpoint = runtime_root / (
+            "reports/checkpoints/edge_atom_lab/"
+            "edge_atom_checkpoint_20260711T053018+0000_governed_strategy_tournament_20_v1.md"
+        )
+        # Isolated engineering worktrees do not copy runtime evidence; the
+        # deployed service always resolves it from the canonical repository.
+        if not tournament_report.is_file():
+            canonical = Path("/root/hydra-bot")
+            tournament_preregistration = canonical / tournament_preregistration.relative_to(runtime_root)
+            tournament_report = canonical / tournament_report.relative_to(runtime_root)
+            tournament_checkpoint = canonical / tournament_checkpoint.relative_to(runtime_root)
+        frozen = {
+            task: FOUNDRY_TASK_SHA256,
+            tournament_preregistration: FOUNDRY_TOURNAMENT_PREREG_SHA256,
+            tournament_report: FOUNDRY_TOURNAMENT_REPORT_SHA256,
+            tournament_checkpoint: FOUNDRY_TOURNAMENT_CHECKPOINT_SHA256,
+        }
+        changed = [str(path) for path, digest in frozen.items() if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest]
+        if changed:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "FOUNDRY_FROZEN_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", f"Foundry frozen sources missing or changed: {changed}")
+            return False
+        specification = {
+            "experiment_type": "foundry_bootstrap",
+            "priority": 110.0,
+            "max_attempts": 2,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": FOUNDRY_TASK_SHA256,
+            "tournament_preregistration_path": str(tournament_preregistration),
+            "tournament_preregistration_sha256": FOUNDRY_TOURNAMENT_PREREG_SHA256,
+            "tournament_report_path": str(tournament_report),
+            "tournament_report_sha256": FOUNDRY_TOURNAMENT_REPORT_SHA256,
+            "tournament_checkpoint_path": str(tournament_checkpoint),
+            "tournament_checkpoint_sha256": FOUNDRY_TOURNAMENT_CHECKPOINT_SHA256,
+            "code_commit": self._git_commit(),
+            "data_role": "FROZEN_DEVELOPMENT_EVIDENCE_AND_SYNTHETIC_CONTROLS_ONLY",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+        }
+        enqueue_experiment(conn, FOUNDRY_BOOTSTRAP_EXPERIMENT_ID, specification)
+        set_kv(conn, "foundry_bootstrap_plan_written", True)
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": FOUNDRY_BOOTSTRAP_EXPERIMENT_ID,
+                "experiment_type": "foundry_bootstrap",
+                "status": "QUEUED",
+                "reason": (
+                    "Reconcile the zero-survivor direct tournament, calibrate shadow semantics, "
+                    "and prove MTF/QD/fail-closed shadow infrastructure before new production."
+                ),
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_equity_open_gap_pilot(self, conn: Any) -> bool:
+        existing = experiment_record(conn, EQUITY_OPEN_GAP_REVERSAL_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path(
+            "reports", "engineering", "hydra_equity_open_gap_reversal_20260711.md"
+        )
+        map_path = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not map_path.is_file():
+            map_path = Path("/root/hydra-bot") / map_path.relative_to(project_path())
+        frozen = {
+            task: EQUITY_OPEN_GAP_TASK_SHA256,
+            map_path: PATH_GEOMETRY_MAP_SHA256,
+        }
+        changed = [
+            str(path)
+            for path, digest in frozen.items()
+            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest
+        ]
+        if changed:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "EQUITY_OPEN_GAP_FROZEN_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", f"Frozen gap-pilot source missing or changed: {changed}")
+            return False
+        specification = {
+            "experiment_type": "equity_open_gap_reversal_pilot",
+            "priority": 109.0,
+            "max_attempts": 2,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": EQUITY_OPEN_GAP_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.94,
+        }
+        enqueue_experiment(conn, EQUITY_OPEN_GAP_REVERSAL_EXPERIMENT_ID, specification)
+        set_kv(conn, "equity_open_gap_plan_written", True)
+        set_kv(conn, "foundry_current_engine", "ENGINE_A_DIRECT_STATE_MACHINE")
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": EQUITY_OPEN_GAP_REVERSAL_EXPERIMENT_ID,
+                "experiment_type": "equity_open_gap_reversal_pilot",
+                "status": "QUEUED",
+                "reason": (
+                    "Highest EDIG direct sparse strategy after the zero-survivor tournament: "
+                    "one daily event, four mini/micro contractual pairs, $0 data cost, and "
+                    "candidate-level shadow/MLL evidence."
+                ),
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_equity_open_gap_continuation_pilot(self, conn: Any) -> bool:
+        existing = experiment_record(conn, EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        reversal_record = experiment_record(conn, EQUITY_OPEN_GAP_REVERSAL_EXPERIMENT_ID)
+        reversal = (reversal_record or {}).get("result") or {}
+        if (
+            (reversal_record or {}).get("status") != "COMPLETED"
+            or reversal.get("scientific_conclusion")
+            != "EQUITY_OPEN_GAP_REVERSAL_FALSIFIED_OR_INSUFFICIENT"
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "CONTINUATION_SOURCE_REVERSAL_INVALID")
+            set_kv(
+                conn,
+                "last_error",
+                "Fresh continuation pilot requires the frozen negative reversal result.",
+            )
+            return False
+        reversal_path = Path(
+            str((reversal.get("artifacts") or {}).get("result_json_path") or "")
+        )
+        reversal_hash = str(reversal.get("result_hash") or "")
+        if not reversal_path.is_file() or not reversal_hash:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "CONTINUATION_SOURCE_ARTIFACT_MISSING")
+            set_kv(conn, "last_error", "Frozen reversal result path/hash is unavailable.")
+            return False
+        task = project_path(
+            "reports", "engineering", "hydra_equity_open_gap_continuation_20260711.md"
+        )
+        map_path = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not map_path.is_file():
+            map_path = Path("/root/hydra-bot") / map_path.relative_to(project_path())
+        frozen = {
+            task: EQUITY_OPEN_GAP_CONTINUATION_TASK_SHA256,
+            map_path: PATH_GEOMETRY_MAP_SHA256,
+        }
+        changed = [
+            str(path)
+            for path, digest in frozen.items()
+            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest
+        ]
+        if changed:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "CONTINUATION_FROZEN_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", f"Continuation frozen source changed: {changed}")
+            return False
+        specification = {
+            "experiment_type": "equity_open_gap_continuation_pilot",
+            "priority": 108.0,
+            "max_attempts": 2,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": EQUITY_OPEN_GAP_CONTINUATION_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "source_reversal_result_path": str(reversal_path),
+            "source_reversal_result_sha256": hashlib.sha256(
+                reversal_path.read_bytes()
+            ).hexdigest(),
+            "source_reversal_result_hash": reversal_hash,
+            "source_reversal_specification_hash": (reversal_record or {}).get(
+                "specification_hash"
+            ),
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.97,
+            "inherits_reversal_status": False,
+        }
+        enqueue_experiment(
+            conn, EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "equity_open_gap_continuation_plan_written", True)
+        set_kv(conn, "foundry_current_engine", "ENGINE_A_TARGETED_MUTATION")
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID,
+                "experiment_type": "equity_open_gap_continuation_pilot",
+                "status": "QUEUED",
+                "reason": (
+                    "The preregistered opposite-sign control changed the directional decision "
+                    "on three markets; fresh IDs and candidate-level evidence test it without inheritance."
+                ),
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_q4_candidate_freeze(self, conn: Any) -> bool:
+        existing = experiment_record(conn, Q4_CANDIDATE_FREEZE_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        continuation_record = experiment_record(
+            conn, EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID
+        )
+        continuation = (continuation_record or {}).get("result") or {}
+        eligible = list(continuation.get("q4_freeze_eligible_candidate_ids") or [])
+        candidates = {
+            str(row.get("candidate_id")): row
+            for row in continuation.get("candidates") or []
+        }
+        ranked = sorted(
+            (candidates[item] for item in eligible if item in candidates),
+            key=lambda row: (
+                float(
+                    (row.get("null_evidence") or {}).get(
+                        "family_adjusted_probability", 1.0
+                    )
+                ),
+                -int(row.get("supportive_temporal_folds", 0)),
+                -float(row.get("net_pnl", 0.0)),
+                str(row.get("candidate_id")),
+            ),
+        )
+        if (continuation_record or {}).get("status") != "COMPLETED" or not ranked:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "Q4_FREEZE_ELIGIBLE_SOURCE_MISSING")
+            set_kv(conn, "last_error", "No frozen continuation candidate is eligible for Q4 freeze.")
+            return False
+        candidate_id = str(ranked[0]["candidate_id"])
+        artifacts = continuation.get("artifacts") or {}
+        result_path = Path(str(artifacts.get("result_json_path") or ""))
+        trade_ledger = Path(str(artifacts.get("trade_ledger_path") or ""))
+        configurations = {
+            str(row.get("candidate_id")): row
+            for row in continuation.get("shadow_configurations") or []
+        }
+        configuration = configurations.get(candidate_id) or {}
+        configuration_path = Path(str(configuration.get("path") or ""))
+        task = project_path(
+            "reports", "engineering", "hydra_q4_candidate_freeze_20260711.md"
+        )
+        frozen = {
+            task: Q4_CANDIDATE_FREEZE_TASK_SHA256,
+            result_path: hashlib.sha256(result_path.read_bytes()).hexdigest()
+            if result_path.is_file()
+            else "",
+            trade_ledger: hashlib.sha256(trade_ledger.read_bytes()).hexdigest()
+            if trade_ledger.is_file()
+            else "",
+            configuration_path: hashlib.sha256(configuration_path.read_bytes()).hexdigest()
+            if configuration_path.is_file()
+            else "",
+        }
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != Q4_CANDIDATE_FREEZE_TASK_SHA256
+            or any(not path.is_file() or not digest for path, digest in frozen.items())
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "Q4_FREEZE_SOURCE_ARTIFACT_MISSING")
+            set_kv(conn, "last_error", "Continuation freeze source artifacts are incomplete.")
+            return False
+        specification = {
+            "experiment_type": "q4_candidate_freeze",
+            "priority": 120.0,
+            "max_attempts": 2,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": Q4_CANDIDATE_FREEZE_TASK_SHA256,
+            "source_continuation_result_path": str(result_path),
+            "source_continuation_result_sha256": frozen[result_path],
+            "source_continuation_result_hash": str(
+                continuation.get("result_hash") or ""
+            ),
+            "source_trade_ledger_path": str(trade_ledger),
+            "source_trade_ledger_sha256": frozen[trade_ledger],
+            "source_shadow_configuration_path": str(configuration_path),
+            "source_shadow_configuration_sha256": frozen[configuration_path],
+            "source_shadow_configuration_hash": str(
+                configuration.get("configuration_hash") or ""
+            ),
+            "candidate_id": candidate_id,
+            "code_commit": self._git_commit(),
+            "governance_baseline_commit": self.config.baseline_commit,
+            "remaining_databento_budget_usd": float(
+                get_kv(
+                    conn,
+                    "remaining_databento_budget_usd",
+                    self.config.remaining_databento_budget_usd,
+                )
+            ),
+            "data_role": "METADATA_AND_FROZEN_DEVELOPMENT_EVIDENCE_ONLY",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "market_data_reads_allowed": False,
+            "expected_decision_information_gain": 0.99,
+        }
+        if not specification["source_continuation_result_hash"] or not specification[
+            "source_shadow_configuration_hash"
+        ]:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "Q4_FREEZE_HASH_CONTRACT_INCOMPLETE")
+            return False
+        enqueue_experiment(conn, Q4_CANDIDATE_FREEZE_EXPERIMENT_ID, specification)
+        set_kv(conn, "q4_candidate_freeze_plan_written", True)
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": Q4_CANDIDATE_FREEZE_EXPERIMENT_ID,
+                "experiment_type": "q4_candidate_freeze",
+                "candidate_id": candidate_id,
+                "status": "QUEUED",
+                "reason": "Mandatory immutable boundary before any one-shot Q4 decision.",
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_opening_direction_hazard(self, conn: Any) -> bool:
+        existing = experiment_record(conn, OPENING_DIRECTION_HAZARD_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path(
+            "reports", "engineering", "hydra_opening_direction_hazard_20260711.md"
+        )
+        map_path = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not map_path.is_file():
+            map_path = Path("/root/hydra-bot") / map_path.relative_to(project_path())
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != OPENING_DIRECTION_HAZARD_TASK_SHA256
+            or not map_path.is_file()
+            or hashlib.sha256(map_path.read_bytes()).hexdigest()
+            != PATH_GEOMETRY_MAP_SHA256
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "OPENING_HAZARD_FROZEN_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", "Opening-hazard task or explicit map changed.")
+            return False
+        specification = {
+            "experiment_type": "opening_direction_hazard_pilot",
+            "priority": 107.0,
+            "max_attempts": 2,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": OPENING_DIRECTION_HAZARD_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.93,
+        }
+        enqueue_experiment(conn, OPENING_DIRECTION_HAZARD_EXPERIMENT_ID, specification)
+        set_kv(conn, "opening_direction_hazard_plan_written", True)
+        set_kv(conn, "foundry_current_engine", "ENGINE_B_DISTRIBUTIONAL_HAZARD")
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": OPENING_DIRECTION_HAZARD_EXPERIMENT_ID,
+                "experiment_type": "opening_direction_hazard_pilot",
+                "status": "QUEUED",
+                "reason": (
+                    "Directional instability is the dominant gap failure surface; rolling-origin "
+                    "probabilities test conditional continuation/reversal with abstention."
+                ),
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -980,6 +1561,278 @@ class AutonomousMissionController:
     @staticmethod
     def _route_volatility_result(conn: Any, result: dict[str, Any]) -> None:
         set_kv(conn,"current_phase","ENGINEERING_BLOCKED");set_kv(conn,"current_blocker","NEW_REPRESENTATION_PIVOT_REQUIRED");set_kv(conn,"last_error","Volatility transition pilot completed; no strategy or mechanism is validated.")
+
+    def _route_foundry_bootstrap_result(self, conn: Any, result: dict[str, Any]) -> None:
+        if result.get("scientific_conclusion") != (
+            "FOUNDRY_CORE_CALIBRATED_TOURNAMENT_RECONCILED"
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "FOUNDRY_BOOTSTRAP_INVALID")
+            set_kv(conn, "last_error", "Foundry bootstrap did not meet its frozen contract.")
+            return
+        status = result.get("foundry_status") or {}
+        for key, value in {
+            "strategy_prototypes_generated": status.get("strategy_prototypes_generated", 0),
+            "strategies_screened": status.get("strategies_screened", 0),
+            "promising_candidates": status.get("promising_candidates", 0),
+            "shadow_candidates": status.get("shadow_candidates", 0),
+            "paper_shadow_ready_candidates": status.get("paper_shadow_ready", 0),
+            "shadow_active_candidates": status.get("shadow_active", 0),
+            "mechanisms_represented": status.get("mechanisms_represented", 0),
+            "market_ecologies_represented": status.get("market_ecologies_represented", 0),
+            "timeframes_represented": status.get("timeframes_represented", 0),
+            "strategies_killed": status.get("strategies_killed", 0),
+            "lineages_frozen": status.get("lineages_frozen", 0),
+            "q4_candidates": status.get("q4_candidates", 0),
+            "model_quota_state": status.get("model_quota_state", "UNKNOWN"),
+        }.items():
+            set_kv(conn, key, value)
+        set_kv(conn, "foundry_core_ready", True)
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", "EQUITY_OPEN_GAP_REVERSAL_PILOT_REQUIRED")
+        set_kv(
+            conn,
+            "last_error",
+            "Foundry core is calibrated; queue the first distinct low-turnover event strategy pilot.",
+        )
+        self._reconcile_equity_open_gap_pilot(conn)
+
+    def _route_equity_open_gap_result(self, conn: Any, result: dict[str, Any]) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, EQUITY_OPEN_GAP_REVERSAL_EXPERIMENT_ID
+        )
+        shadow = int(result.get("shadow_candidates", 0))
+        candidates = list(result.get("candidates") or [])
+        q4_candidates = sum(
+            1
+            for row in candidates
+            if str(row.get("status")) == "SHADOW_RESEARCH_CANDIDATE"
+            and not bool((row.get("attacks") or {}).get("event_dominated", True))
+        )
+        set_kv(conn, "q4_candidates", q4_candidates)
+        set_kv(conn, "foundry_current_engine", "ENGINE_A_DIRECT_STATE_MACHINE")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        if q4_candidates:
+            blocker = "Q4_FREEZE_PROTOCOL_REQUIRED"
+            message = (
+                "At least one pre-Q4 shadow-research candidate warrants an immutable "
+                "one-shot freeze protocol; Q4 remains unopened."
+            )
+            set_kv(conn, "milestone", "PRE_Q4_SHADOW_CANDIDATE")
+        elif shadow:
+            blocker = "SHADOW_CANDIDATE_FAILURE_SURFACE_REQUIRED"
+            message = (
+                "A zero-risk shadow-research candidate exists but event concentration or another "
+                "diagnostic must be resolved before Q4 freeze."
+            )
+        elif result.get("scientific_conclusion") == (
+            "EQUITY_OPEN_GAP_REVERSAL_FALSIFIED_OR_INSUFFICIENT"
+        ):
+            blocker = "EQUITY_OPEN_GAP_CONTINUATION_PILOT_REQUIRED"
+            message = (
+                "Direct reversal failed, but its frozen sign-flip control changed the directional "
+                "decision; test a fresh continuation formulation without inherited evidence."
+            )
+        else:
+            blocker = "DISTRIBUTIONAL_OPENING_HAZARD_PILOT_REQUIRED"
+            message = "Gap reversal outcome requires a distributional opening-state pivot."
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(conn, "last_error", message)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "reason": message,
+                "q4_access_authorized": False,
+            },
+        )
+        if blocker == "EQUITY_OPEN_GAP_CONTINUATION_PILOT_REQUIRED":
+            self._reconcile_equity_open_gap_continuation_pilot(conn)
+
+    def _route_equity_open_gap_continuation_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        AutonomousMissionController._update_foundry_candidate_bank(
+            conn, result, EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID
+        )
+        eligible = list(result.get("q4_freeze_eligible_candidate_ids") or [])
+        shadow = int(result.get("shadow_candidates", 0))
+        set_kv(conn, "q4_candidates", len(eligible))
+        set_kv(conn, "foundry_current_engine", "ENGINE_A_TARGETED_MUTATION")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        if eligible:
+            blocker = "Q4_FREEZE_PROTOCOL_REQUIRED"
+            message = (
+                "Fresh continuation evidence produced a non-event-dominated shadow-research "
+                "candidate; create an immutable one-shot Q4 freeze before any Q4 read."
+            )
+            set_kv(conn, "milestone", "PRE_Q4_SHADOW_CANDIDATE")
+        elif shadow:
+            blocker = "CONTINUATION_FAILURE_SURFACE_REQUIRED"
+            message = "Shadow admission exists, but concentration prevents Q4 freeze."
+        else:
+            blocker = "DISTRIBUTIONAL_OPENING_HAZARD_PILOT_REQUIRED"
+            message = (
+                "Continuation did not reach shadow admission; pivot to target-before-invalidation hazard."
+            )
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(conn, "last_error", message)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {"action": blocker, "reason": message, "q4_access_authorized": False},
+        )
+        if blocker == "Q4_FREEZE_PROTOCOL_REQUIRED":
+            self._reconcile_q4_candidate_freeze(conn)
+
+    def _route_q4_candidate_freeze_result(self, conn: Any, result: dict[str, Any]) -> None:
+        if result.get("scientific_conclusion") != "Q4_FREEZE_READY":
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "Q4_FREEZE_INVALID")
+            set_kv(conn, "last_error", "Q4 freeze experiment did not meet its immutable contract.")
+            return
+        set_kv(
+            conn,
+            "q4_freeze_manifest",
+            {
+                "candidate_id": result.get("candidate_id"),
+                "path": result.get("freeze_manifest_path"),
+                "hash": result.get("freeze_manifest_hash"),
+                "status": "FROZEN_Q4_UNOPENED",
+            },
+        )
+        accounted_hash = get_kv(conn, "q4_freeze_accounted_result_hash")
+        if accounted_hash != result.get("result_hash"):
+            set_kv(
+                conn,
+                "lineages_frozen",
+                int(get_kv(conn, "lineages_frozen", 0)) + 1,
+            )
+            set_kv(conn, "q4_freeze_accounted_result_hash", result.get("result_hash"))
+        set_kv(conn, "q4_access_blocker", "GOVERNANCE_CHANGE_REQUIRED_FOR_FROZEN_ONE_SHOT_Q4")
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", "DISTRIBUTIONAL_OPENING_HAZARD_PILOT_REQUIRED")
+        set_kv(
+            conn,
+            "last_error",
+            "Candidate is frozen and Q4 remains sealed; protected governor blocks Q4, while independent research must continue.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": "DISTRIBUTIONAL_OPENING_HAZARD_PILOT_REQUIRED",
+                "parallel_blocker": "GOVERNANCE_CHANGE_REQUIRED_FOR_FROZEN_ONE_SHOT_Q4",
+                "q4_access_authorized": False,
+            },
+        )
+        self._reconcile_opening_direction_hazard(conn)
+
+    @staticmethod
+    def _route_opening_direction_hazard_result(
+        conn: Any, result: dict[str, Any]
+    ) -> None:
+        AutonomousMissionController._update_foundry_candidate_bank(
+            conn, result, OPENING_DIRECTION_HAZARD_EXPERIMENT_ID
+        )
+        set_kv(conn, "foundry_current_engine", "ENGINE_B_DISTRIBUTIONAL_HAZARD")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        eligible = list(result.get("q4_freeze_eligible_candidate_ids") or [])
+        if eligible:
+            blocker = "DISTINCT_HAZARD_FREEZE_PROTOCOL_REQUIRED"
+            message = "A distinct hazard candidate reached shadow research and requires its own freeze lineage."
+        elif int(result.get("promising_candidates", 0)) > 0:
+            blocker = "CROSS_ECOLOGY_INVARIANT_SEARCH_REQUIRED"
+            message = (
+                "Hazard policy produced only sparse promising evidence; expand to a different ecology/representation."
+            )
+        else:
+            blocker = "CROSS_ECOLOGY_INVARIANT_SEARCH_REQUIRED"
+            message = "Opening hazard was falsified or underpowered; pivot to cross-ecology invariants."
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(conn, "last_error", message)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "parallel_blocker": get_kv(conn, "q4_access_blocker"),
+                "q4_access_authorized": False,
+            },
+        )
+
+    @staticmethod
+    def _update_foundry_candidate_bank(
+        conn: Any, result: dict[str, Any], experiment_id: str
+    ) -> None:
+        accounted = set(get_kv(conn, "foundry_accounted_experiments", []) or [])
+        if experiment_id not in accounted:
+            count = int(result.get("candidate_count", 0))
+            set_kv(
+                conn,
+                "strategy_prototypes_generated",
+                int(get_kv(conn, "strategy_prototypes_generated", 0)) + count,
+            )
+            set_kv(
+                conn,
+                "strategies_screened",
+                int(get_kv(conn, "strategies_screened", 0)) + count,
+            )
+            accounted.add(experiment_id)
+            set_kv(conn, "foundry_accounted_experiments", sorted(accounted))
+        bank = dict(get_kv(conn, "foundry_candidate_bank", {}) or {})
+        for row in result.get("candidates") or []:
+            candidate_id = str(row.get("candidate_id") or "")
+            if not candidate_id:
+                continue
+            bank[candidate_id] = {
+                "status": row.get("status"),
+                "mechanism_family": row.get("mechanism_family"),
+                "primary_market": row.get("primary_market"),
+                "execution_market": row.get("execution_market"),
+                "net_pnl": row.get("net_pnl"),
+                "topstep_path_candidate": bool(
+                    (row.get("topstep") or {}).get("path_candidate")
+                ),
+                "source_experiment": experiment_id,
+            }
+        statuses = [str(row.get("status") or "") for row in bank.values()]
+        promising_tiers = {
+            "PROMISING_RESEARCH_CANDIDATE",
+            "ROBUST_RESEARCH_CANDIDATE",
+            "SHADOW_RESEARCH_CANDIDATE",
+            "PAPER_SHADOW_READY",
+            "SHADOW_ACTIVE",
+            "SHADOW_CONFIRMED",
+        }
+        shadow_tiers = {
+            "SHADOW_RESEARCH_CANDIDATE",
+            "PAPER_SHADOW_READY",
+            "SHADOW_ACTIVE",
+            "SHADOW_CONFIRMED",
+        }
+        set_kv(conn, "foundry_candidate_bank", bank)
+        set_kv(conn, "promising_candidates", sum(item in promising_tiers for item in statuses))
+        set_kv(conn, "shadow_candidates", sum(item in shadow_tiers for item in statuses))
+        set_kv(
+            conn,
+            "paper_shadow_ready_candidates",
+            sum(item == "PAPER_SHADOW_READY" for item in statuses),
+        )
+        set_kv(
+            conn,
+            "shadow_active_candidates",
+            sum(item == "SHADOW_ACTIVE" for item in statuses),
+        )
+        set_kv(
+            conn,
+            "topstep_path_candidates",
+            sum(bool(row.get("topstep_path_candidate")) for row in bank.values()),
+        )
     def _evidence_reconciliation_exists(self, reconciliation_id: str) -> bool:
         path = self.paths.evidence_ledger
         if not path.exists():
@@ -1433,6 +2286,29 @@ class AutonomousMissionController:
             "validated_mechanisms": snapshot.get("validated_mechanisms", 0),
             "validated_strategies": snapshot.get("validated_strategies", 0),
             "executable_baskets": snapshot.get("executable_baskets", 0),
+            "foundry_current_engine": snapshot.get("foundry_current_engine"),
+            "strategy_prototypes_generated": snapshot.get("strategy_prototypes_generated", 0),
+            "strategies_screened": snapshot.get("strategies_screened", 0),
+            "promising_candidates": snapshot.get("promising_candidates", 0),
+            "shadow_candidates": snapshot.get("shadow_candidates", 0),
+            "paper_shadow_ready_candidates": snapshot.get(
+                "paper_shadow_ready_candidates", 0
+            ),
+            "shadow_active_candidates": snapshot.get("shadow_active_candidates", 0),
+            "mechanisms_represented": snapshot.get("mechanisms_represented", 0),
+            "market_ecologies_represented": snapshot.get(
+                "market_ecologies_represented", 0
+            ),
+            "timeframes_represented": snapshot.get("timeframes_represented", 0),
+            "strategies_killed": snapshot.get("strategies_killed", 0),
+            "lineages_frozen": snapshot.get("lineages_frozen", 0),
+            "topstep_path_candidates": snapshot.get("topstep_path_candidates", 0),
+            "q4_candidates": snapshot.get("q4_candidates", 0),
+            "model_quota_state": snapshot.get("model_quota_state", "UNKNOWN"),
+            "last_meaningful_progress_at_utc": snapshot.get(
+                "last_meaningful_progress_at_utc"
+            ),
+            "foundry_next_planned_action": snapshot.get("foundry_next_planned_action"),
             "current_blocker": snapshot.get("current_blocker"),
             "cumulative_databento_spend_usd": snapshot.get("cumulative_databento_spend_usd"),
             "remaining_databento_budget_usd": snapshot.get("remaining_databento_budget_usd"),

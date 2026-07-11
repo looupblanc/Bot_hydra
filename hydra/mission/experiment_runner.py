@@ -205,4 +205,106 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
     if experiment_type == "volatility_transition_pilot":
         from hydra.research.volatility_transition import run_volatility_transition_pilot
         return run_volatility_transition_pilot(output_dir, engineering_task_path=Path(str(experiment["engineering_task_path"])), engineering_task_sha256=str(experiment["engineering_task_sha256"]), repaired_map_path=Path(str(experiment["repaired_map_path"])), repaired_map_sha256=str(experiment["repaired_map_sha256"]), repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]), code_commit=str(experiment.get("code_commit") or "unknown"))
+    if experiment_type == "foundry_bootstrap":
+        from hydra.foundry.bootstrap import run_foundry_bootstrap
+
+        return run_foundry_bootstrap(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            tournament_preregistration_path=Path(
+                str(experiment["tournament_preregistration_path"])
+            ),
+            tournament_preregistration_sha256=str(
+                experiment["tournament_preregistration_sha256"]
+            ),
+            tournament_report_path=Path(str(experiment["tournament_report_path"])),
+            tournament_report_sha256=str(experiment["tournament_report_sha256"]),
+            tournament_checkpoint_path=Path(str(experiment["tournament_checkpoint_path"])),
+            tournament_checkpoint_sha256=str(experiment["tournament_checkpoint_sha256"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
+    if experiment_type == "equity_open_gap_reversal_pilot":
+        from hydra.research.equity_open_gap_reversal import (
+            run_equity_open_gap_reversal_pilot,
+        )
+
+        return run_equity_open_gap_reversal_pilot(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            repaired_map_path=Path(str(experiment["repaired_map_path"])),
+            repaired_map_sha256=str(experiment["repaired_map_sha256"]),
+            repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
+    if experiment_type == "equity_open_gap_continuation_pilot":
+        from hydra.research.equity_open_gap_continuation import (
+            run_equity_open_gap_continuation_pilot,
+        )
+
+        return run_equity_open_gap_continuation_pilot(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            repaired_map_path=Path(str(experiment["repaired_map_path"])),
+            repaired_map_sha256=str(experiment["repaired_map_sha256"]),
+            repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
+            source_reversal_result_path=Path(
+                str(experiment["source_reversal_result_path"])
+            ),
+            source_reversal_result_sha256=str(
+                experiment["source_reversal_result_sha256"]
+            ),
+            source_reversal_result_hash=str(experiment["source_reversal_result_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
+    if experiment_type == "q4_candidate_freeze":
+        from hydra.foundry.q4_freeze import run_q4_candidate_freeze
+
+        return run_q4_candidate_freeze(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            source_continuation_result_path=Path(
+                str(experiment["source_continuation_result_path"])
+            ),
+            source_continuation_result_sha256=str(
+                experiment["source_continuation_result_sha256"]
+            ),
+            source_continuation_result_hash=str(
+                experiment["source_continuation_result_hash"]
+            ),
+            source_trade_ledger_path=Path(str(experiment["source_trade_ledger_path"])),
+            source_trade_ledger_sha256=str(experiment["source_trade_ledger_sha256"]),
+            source_shadow_configuration_path=Path(
+                str(experiment["source_shadow_configuration_path"])
+            ),
+            source_shadow_configuration_sha256=str(
+                experiment["source_shadow_configuration_sha256"]
+            ),
+            source_shadow_configuration_hash=str(
+                experiment["source_shadow_configuration_hash"]
+            ),
+            candidate_id=str(experiment["candidate_id"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+            governance_baseline_commit=str(experiment["governance_baseline_commit"]),
+            remaining_databento_budget_usd=float(
+                experiment["remaining_databento_budget_usd"]
+            ),
+        )
+    if experiment_type == "opening_direction_hazard_pilot":
+        from hydra.research.opening_direction_hazard import (
+            run_opening_direction_hazard_pilot,
+        )
+
+        return run_opening_direction_hazard_pilot(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            repaired_map_path=Path(str(experiment["repaired_map_path"])),
+            repaired_map_sha256=str(experiment["repaired_map_sha256"]),
+            repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")
