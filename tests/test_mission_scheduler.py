@@ -1167,3 +1167,29 @@ def test_failed_selection_null_calibration_routes_to_repair_without_name_error(
         assert get_kv(conn, "current_phase") == "ENGINEERING_BLOCKED"
     finally:
         conn.close()
+
+
+def test_calibrated_single_primary_route_is_not_overwritten_by_legacy_blockers(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        controller._route_single_primary_alpha_result(
+            conn,
+            {
+                "calibration_passed": True,
+                "selected_alpha": 0.03,
+                "prospective_policy_contract": {
+                    "promotion_primary_count": 1,
+                    "candidate_probability_threshold": 0.03,
+                },
+            },
+        )
+
+        assert get_kv(conn, "current_blocker") == "NEW_SINGLE_PRIMARY_TOURNAMENT_REQUIRED"
+        assert get_kv(conn, "foundry_next_planned_action")["action"] == (
+            "NEW_SINGLE_PRIMARY_TOURNAMENT_REQUIRED"
+        )
+    finally:
+        conn.close()

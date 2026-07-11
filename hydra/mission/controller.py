@@ -3210,52 +3210,6 @@ class AutonomousMissionController:
                 "q4_access_authorized": False,
             },
         )
-        if bool(result.get("calibration_passed")):
-            blocker = "NEW_MECHANISM_OR_FRESH_CONFIRMATION_REQUIRED"
-        else:
-            blocker = "SELECTION_NULL_POLICY_REPAIR_REQUIRED"
-        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
-        set_kv(conn, "current_blocker", blocker)
-        set_kv(
-            conn,
-            "last_error",
-            "Validator calibration completed without changing any historical candidate status.",
-        )
-        set_kv(
-            conn,
-            "foundry_next_planned_action",
-            {
-                "action": blocker,
-                "pipeline": "PROMOTION_VALIDATOR",
-                "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
-                "q4_access_authorized": False,
-            },
-        )
-        shadow = int(result.get("shadow_candidates", 0))
-        promising = int(result.get("promising_candidates", 0))
-        if shadow:
-            blocker = "ACCELERATED_SHADOW_FREEZE_AND_ACTIVATION_REQUIRED"
-        elif promising:
-            blocker = "ACCELERATED_TARGETED_CONFIRMATION_AND_META_RESEARCH_REQUIRED"
-        else:
-            blocker = "ACCELERATED_FAILURE_MAP_AND_NEW_REPRESENTATION_REQUIRED"
-        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
-        set_kv(conn, "current_blocker", blocker)
-        set_kv(
-            conn,
-            "last_error",
-            "Accelerated batch completed; a preregistered non-clone follow-up is required.",
-        )
-        set_kv(
-            conn,
-            "foundry_next_planned_action",
-            {
-                "action": blocker,
-                "pipeline": "DISCOVERY_AND_PROMOTION",
-                "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
-                "q4_access_authorized": False,
-            },
-        )
 
     @staticmethod
     def _update_foundry_candidate_bank(
