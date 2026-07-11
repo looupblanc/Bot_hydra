@@ -25,6 +25,7 @@ from hydra.mission.controller import (
     GC_SESSION_GEOMETRY_FRESH_CHILD_ID,
     GC_SESSION_GEOMETRY_FRESH_EXPERIMENT_ID,
     MissionControllerConfig,
+    META_FAILURE_ALLOCATION_EXPERIMENT_ID,
     POST_RETEST_DESIGN_EXPERIMENT_ID,
     POST_RETEST_PILOT_EXPERIMENT_ID,
     SESSION_GEOMETRY_MICRO_CHILD_ID,
@@ -32,6 +33,7 @@ from hydra.mission.controller import (
     SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID,
     SESSION_GEOMETRY_PARENT_RESULT_HASH,
     SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
+    SURVIVAL_HAZARD_EXPERIMENT_ID,
     V3_DESIGN_EXPERIMENT_ID,
     V3_EXECUTION_EXPERIMENT_ID,
 )
@@ -2016,6 +2018,116 @@ def test_three_shared_account_baskets_route_to_new_distributional_search(
             "DISTRIBUTIONAL_SURVIVAL_HAZARD_SEARCH_REQUIRED"
         )
         assert get_kv(conn, "paper_shadow_ready_candidates", 0) == 0
+    finally:
+        conn.close()
+
+
+def test_hazard_and_meta_research_queue_as_distinct_parallel_pipelines(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        enqueue_experiment(
+            conn,
+            SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
+            {"experiment_type": "shadow_shared_account_baskets"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": "THREE_EXECUTABLE_SHADOW_BASKETS_FOUND",
+                "executable_baskets": 3,
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+        set_kv(conn, "strategy_prototypes_generated", 7998)
+        set_kv(conn, "promising_candidates", 16)
+        set_kv(conn, "shadow_active_candidates", 4)
+        set_kv(conn, "executable_baskets", 3)
+        set_kv(conn, "strategies_killed", 110)
+
+        assert controller._reconcile_survival_hazard(conn)
+        assert controller._reconcile_meta_failure_allocation(conn)
+        hazard = experiment_record(conn, SURVIVAL_HAZARD_EXPERIMENT_ID)
+        meta = experiment_record(conn, META_FAILURE_ALLOCATION_EXPERIMENT_ID)
+
+        assert hazard["status"] == meta["status"] == "QUEUED"
+        assert hazard["specification"]["pipeline"] == "DISCOVERY"
+        assert meta["specification"]["pipeline"] == "META_RESEARCH"
+        assert hazard["specification"]["parallel_safe"] is True
+        assert meta["specification"]["parallel_safe"] is True
+        assert hazard["specification"]["writes_data_access_ledger"] is True
+        assert meta["specification"]["writes_data_access_ledger"] is False
+        assert hazard["specification"]["q4_access_allowed"] is False
+        assert meta["specification"]["q4_access_allowed"] is False
+        assert meta["specification"]["snapshot_hash"]
+    finally:
+        conn.close()
+
+
+def test_failed_hazard_models_are_killed_once_and_meta_does_not_override_pivot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr(controller, "_tick_shadow_pipeline", lambda _conn: {})
+    hazard_result = {
+        "candidate_count": 4,
+        "structural_prototypes": 4,
+        "scientific_conclusion": "SURVIVAL_HAZARD_INSUFFICIENT_OR_DIAGNOSTIC_ONLY",
+        "promising_candidates": 0,
+        "robust_hazard_models": 0,
+        "shadow_candidates": 0,
+        "paper_shadow_ready": 0,
+        "validator_controls": {"passed": True},
+        "candidates": [
+            {
+                "candidate_id": f"hazard-{index}",
+                "status": "RESEARCH_PROTOTYPE",
+                "mechanism_family": "distributional_tail_survival_hazard",
+                "primary_market": market,
+                "execution_market": micro,
+                "net_pnl": 0.0,
+                "topstep": {"path_candidate": False},
+            }
+            for index, (market, micro) in enumerate(
+                (("YM", "MYM"), ("RTY", "M2K"), ("CL", "MCL"), ("GC", "MGC"))
+            )
+        ],
+    }
+    try:
+        controller._route_survival_hazard_result(conn, hazard_result)
+        controller._route_survival_hazard_result(conn, hazard_result)
+        controller._route_meta_failure_allocation_result(
+            conn,
+            {
+                "recommended_compute_allocation_pct": {
+                    "structural_discovery": 20,
+                    "targeted_mutation": 22,
+                    "multitimeframe_cross_asset": 20,
+                    "distribution_hazard": 18,
+                    "defensive_portfolio": 8,
+                    "novel_methods": 12,
+                },
+                "engine_posteriors": [{"engine": "test"}],
+            },
+        )
+
+        assert get_kv(conn, "current_blocker") == (
+            "CAUSAL_TRANSITION_GRAPH_SEARCH_REQUIRED"
+        )
+        assert get_kv(conn, "strategy_prototypes_generated") == 4
+        assert get_kv(conn, "strategies_killed") == 4
+        assert get_kv(conn, "promising_candidates") == 0
+        assert get_kv(conn, "meta_research_pipeline_status") == (
+            "ALLOCATION_AUDIT_COMPLETED"
+        )
+        assert get_kv(conn, "meta_failure_allocation")["novel_methods"] == 12
+        assert get_kv(conn, "paper_shadow_ready_candidates") == 0
     finally:
         conn.close()
 

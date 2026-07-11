@@ -121,6 +121,8 @@ CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID = (
 SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID = (
     "shadow_shared_account_baskets_v1"
 )
+SURVIVAL_HAZARD_EXPERIMENT_ID = "distributional_survival_hazard_v1"
+META_FAILURE_ALLOCATION_EXPERIMENT_ID = "meta_failure_allocation_v1"
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -191,6 +193,8 @@ CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID = (
     "continuation_q80_h120_v1"
 )
 SHADOW_SHARED_ACCOUNT_BASKETS_TASK_SHA256 = "8fe0c161e451a0b27d4e9ff0bdaab5b6ad8ed9d66edcd63c2ccd178ca2ffce0c"
+SURVIVAL_HAZARD_TASK_SHA256 = "9c24a8419e82a7fe2aaafb306aee3670e8e6e759df213bbb4a77ffb9bc8da92e"
+META_FAILURE_ALLOCATION_TASK_SHA256 = "e637f4f50d01326a10f3a5a00e4bbdb9c5229abaa7d488831a38067c74ec0129"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -230,6 +234,8 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "cross_asset_daily_horizon_primary",
     "cross_asset_daily_shadow_activation",
     "shadow_shared_account_baskets",
+    "distributional_survival_hazard",
+    "meta_failure_allocation",
     "immutable_shadow_activation",
 }
 
@@ -567,6 +573,11 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "PORTFOLIO_BASKET_AND_DISTRIBUTIONAL_SEARCH_REQUIRED"
         )
+        parallel_hazard_meta_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "DISTRIBUTIONAL_SURVIVAL_HAZARD_SEARCH_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -783,6 +794,11 @@ class AutonomousMissionController:
                 == "PORTFOLIO_BASKET_AND_DISTRIBUTIONAL_SEARCH_REQUIRED"
             )
         )
+        parallel_hazard_meta_required = parallel_hazard_meta_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "DISTRIBUTIONAL_SURVIVAL_HAZARD_SEARCH_REQUIRED"
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -902,6 +918,16 @@ class AutonomousMissionController:
             if shadow_shared_account_baskets_required
             else False
         )
+        survival_hazard_queued = (
+            self._reconcile_survival_hazard(conn)
+            if parallel_hazard_meta_required
+            else False
+        )
+        meta_failure_allocation_queued = (
+            self._reconcile_meta_failure_allocation(conn)
+            if parallel_hazard_meta_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -941,6 +967,8 @@ class AutonomousMissionController:
             and not cross_asset_daily_queued
             and not cross_asset_daily_shadow_queued
             and not shadow_shared_account_baskets_queued
+            and not survival_hazard_queued
+            and not meta_failure_allocation_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -990,6 +1018,8 @@ class AutonomousMissionController:
                 "cross_asset_daily_queued": cross_asset_daily_queued,
                 "cross_asset_daily_shadow_queued": cross_asset_daily_shadow_queued,
                 "shadow_shared_account_baskets_queued": shadow_shared_account_baskets_queued,
+                "survival_hazard_queued": survival_hazard_queued,
+                "meta_failure_allocation_queued": meta_failure_allocation_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -1094,6 +1124,14 @@ class AutonomousMissionController:
             (
                 SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
                 "shadow_shared_account_baskets_plan_written",
+            ),
+            (
+                SURVIVAL_HAZARD_EXPERIMENT_ID,
+                "survival_hazard_plan_written",
+            ),
+            (
+                META_FAILURE_ALLOCATION_EXPERIMENT_ID,
+                "meta_failure_allocation_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1273,6 +1311,16 @@ class AutonomousMissionController:
                 "shadow_shared_account_baskets",
                 "shadow_shared_account_baskets_completed",
             ),
+            (
+                SURVIVAL_HAZARD_EXPERIMENT_ID,
+                "distributional_survival_hazard",
+                "survival_hazard_completed",
+            ),
+            (
+                META_FAILURE_ALLOCATION_EXPERIMENT_ID,
+                "meta_failure_allocation",
+                "meta_failure_allocation_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1331,6 +1379,8 @@ class AutonomousMissionController:
                 "cross_asset_daily_horizon_primary": "cross_asset_daily_result",
                 "cross_asset_daily_shadow_activation": "cross_asset_daily_shadow_result",
                 "shadow_shared_account_baskets": "shadow_shared_account_baskets_result",
+                "distributional_survival_hazard": "survival_hazard_result",
+                "meta_failure_allocation": "meta_failure_allocation_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -1431,6 +1481,10 @@ class AutonomousMissionController:
                 self._route_cross_asset_daily_shadow_result(conn, result)
             elif experiment_type == "shadow_shared_account_baskets":
                 self._route_shadow_shared_account_baskets_result(conn, result)
+            elif experiment_type == "distributional_survival_hazard":
+                self._route_survival_hazard_result(conn, result)
+            elif experiment_type == "meta_failure_allocation":
+                self._route_meta_failure_allocation_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -4265,6 +4319,216 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_survival_hazard(self, conn: Any) -> bool:
+        existing = experiment_record(conn, SURVIVAL_HAZARD_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(
+            conn, SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID
+        )
+        source = dict((predecessor or {}).get("result") or {})
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or source.get("scientific_conclusion")
+            != "THREE_EXECUTABLE_SHADOW_BASKETS_FOUND"
+            or int(source.get("executable_baskets") or 0) < 3
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_distributional_survival_hazard_20260711.md",
+        )
+        cache_root = project_path("data", "cache")
+        core_data = cache_root / "databento" / (
+            "GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_"
+            "2023-01-01_2024-10-01.parquet"
+        )
+        core_map = cache_root / "contract_maps" / (
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+        )
+        metals_data = cache_root / "databento" / (
+            "GLBX-MDP3_ohlcv-1m_GC-v-0_MGC-v-0_"
+            "2023-01-01_2024-10-01.parquet"
+        )
+        metals_map = cache_root / "contract_maps" / (
+            "roll_map_GLBX-MDP3_ohlcv-1m_01ba149449a494a7.json"
+        )
+        if not core_data.is_file():
+            core_data = Path("/root/hydra-bot/data/cache/databento") / core_data.name
+        if not core_map.is_file():
+            core_map = Path("/root/hydra-bot/data/cache/contract_maps") / core_map.name
+        if not metals_data.is_file():
+            metals_data = Path("/root/hydra-bot/data/cache/databento") / metals_data.name
+        if not metals_map.is_file():
+            metals_map = Path("/root/hydra-bot/data/cache/contract_maps") / metals_map.name
+        frozen = (
+            (task, SURVIVAL_HAZARD_TASK_SHA256, "hazard task"),
+            (core_data, ENERGY_METALS_DATA_SHA256, "core data"),
+            (core_map, PATH_GEOMETRY_MAP_SHA256, "core map"),
+            (metals_data, ENERGY_METALS_VOLUME_DATA_SHA256, "metals data"),
+            (metals_map, ENERGY_METALS_VOLUME_MAP_SHA256, "metals map"),
+        )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "SURVIVAL_HAZARD_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen survival-hazard sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        specification = {
+            "experiment_type": "distributional_survival_hazard",
+            "priority": 105.0,
+            "max_attempts": 2,
+            "pipeline": "DISCOVERY",
+            "parallel_safe": True,
+            "writes_data_access_ledger": True,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": SURVIVAL_HAZARD_TASK_SHA256,
+            "core_data_path": str(core_data),
+            "core_data_sha256": ENERGY_METALS_DATA_SHA256,
+            "core_map_path": str(core_map),
+            "core_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "core_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "metals_data_path": str(metals_data),
+            "metals_data_sha256": ENERGY_METALS_VOLUME_DATA_SHA256,
+            "metals_map_path": str(metals_map),
+            "metals_map_sha256": ENERGY_METALS_VOLUME_MAP_SHA256,
+            "metals_roll_map_hash": ENERGY_METALS_VOLUME_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.97,
+        }
+        enqueue_experiment(conn, SURVIVAL_HAZARD_EXPERIMENT_ID, specification)
+        set_kv(conn, "survival_hazard_plan_written", True)
+        set_kv(conn, "discovery_pipeline_status", "SURVIVAL_HAZARD_QUEUED")
+        set_kv(conn, "foundry_current_engine", "DISTRIBUTIONAL_SURVIVAL_HAZARD")
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_meta_failure_allocation(self, conn: Any) -> bool:
+        existing = experiment_record(conn, META_FAILURE_ALLOCATION_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(
+            conn, SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID
+        )
+        source = dict((predecessor or {}).get("result") or {})
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or source.get("scientific_conclusion")
+            != "THREE_EXECUTABLE_SHADOW_BASKETS_FOUND"
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_meta_failure_allocation_20260711.md",
+        )
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != META_FAILURE_ALLOCATION_TASK_SHA256
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "META_ALLOCATION_TASK_MISMATCH")
+            set_kv(conn, "last_error", "Frozen meta-allocation task changed.")
+            return False
+        snapshot = self._meta_failure_snapshot(conn)
+        snapshot_hash = hashlib.sha256(
+            json.dumps(
+                snapshot, sort_keys=True, separators=(",", ":"), default=str
+            ).encode("utf-8")
+        ).hexdigest()
+        specification = {
+            "experiment_type": "meta_failure_allocation",
+            "priority": 103.0,
+            "max_attempts": 2,
+            "pipeline": "META_RESEARCH",
+            "parallel_safe": True,
+            "writes_data_access_ledger": False,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": META_FAILURE_ALLOCATION_TASK_SHA256,
+            "snapshot": snapshot,
+            "snapshot_hash": snapshot_hash,
+            "code_commit": self._git_commit(),
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.85,
+        }
+        enqueue_experiment(
+            conn, META_FAILURE_ALLOCATION_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "meta_failure_allocation_plan_written", True)
+        set_kv(conn, "meta_research_pipeline_status", "ALLOCATION_AUDIT_QUEUED")
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    @staticmethod
+    def _meta_failure_snapshot(conn: Any) -> dict[str, Any]:
+        experiments: list[dict[str, Any]] = []
+        rows = conn.execute(
+            "SELECT experiment_id,experiment_type,result FROM experiments "
+            "WHERE status='COMPLETED' AND result IS NOT NULL ORDER BY completed_at,experiment_id"
+        ).fetchall()
+        for experiment_id, experiment_type, result_text in rows:
+            result = json.loads(result_text)
+            experiments.append(
+                {
+                    "experiment_id": str(experiment_id),
+                    "experiment_type": str(experiment_type),
+                    "engine": str(result.get("schema") or experiment_type),
+                    "structural_prototypes": int(
+                        result.get("structural_prototypes")
+                        or result.get("candidate_count")
+                        or 0
+                    ),
+                    "promising_candidates": int(
+                        result.get("promising_candidates") or 0
+                    ),
+                    "shadow_candidates": int(result.get("shadow_candidates") or 0),
+                    "topstep_path_candidates": int(
+                        result.get("topstep_path_candidates") or 0
+                    ),
+                    "scientific_conclusion": result.get("scientific_conclusion"),
+                    "performance": result.get("performance") or {},
+                }
+            )
+        return {
+            "strategy_prototypes_generated": int(
+                get_kv(conn, "strategy_prototypes_generated", 0)
+            ),
+            "promising_candidates": int(get_kv(conn, "promising_candidates", 0)),
+            "shadow_active_candidates": int(
+                get_kv(conn, "shadow_active_candidates", 0)
+            ),
+            "executable_baskets": int(get_kv(conn, "executable_baskets", 0)),
+            "strategies_killed": int(get_kv(conn, "strategies_killed", 0)),
+            "q4_access_count": int(get_kv(conn, "q4_access_count", 0)),
+            "experiments": experiments,
+        }
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -5598,6 +5862,92 @@ class AutonomousMissionController:
             },
         )
         self._tick_shadow_pipeline(conn)
+
+    def _route_survival_hazard_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, SURVIVAL_HAZARD_EXPERIMENT_ID
+        )
+        killed = set(get_kv(conn, "foundry_killed_candidate_ids", []) or [])
+        newly_killed = 0
+        for candidate in result.get("candidates") or []:
+            candidate_id = str(candidate.get("candidate_id") or "")
+            if (
+                candidate_id
+                and candidate.get("status")
+                not in {
+                    "PROMISING_RESEARCH_CANDIDATE",
+                    "ROBUST_RESEARCH_CANDIDATE",
+                }
+                and candidate_id not in killed
+            ):
+                killed.add(candidate_id)
+                newly_killed += 1
+        if newly_killed:
+            set_kv(conn, "foundry_killed_candidate_ids", sorted(killed))
+            set_kv(
+                conn,
+                "strategies_killed",
+                int(get_kv(conn, "strategies_killed", 0)) + newly_killed,
+            )
+        self._refresh_foundry_candidate_counts(conn)
+        robust = int(result.get("robust_hazard_models") or 0)
+        blocker = (
+            "HAZARD_DEFENSIVE_POLICY_CONSTRUCTION_REQUIRED"
+            if robust
+            else "CAUSAL_TRANSITION_GRAPH_SEARCH_REQUIRED"
+        )
+        set_kv(
+            conn,
+            "survival_hazard_metrics",
+            {
+                "model_count": int(result.get("candidate_count") or 0),
+                "promising_candidates": int(result.get("promising_candidates") or 0),
+                "robust_hazard_models": robust,
+                "validator_controls": result.get("validator_controls") or {},
+                "performance": result.get("performance") or {},
+                "conclusion": result.get("scientific_conclusion"),
+            },
+        )
+        set_kv(conn, "discovery_pipeline_status", "SURVIVAL_HAZARD_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "Distributional hazard controls passed, but only role-specific calibrated "
+            "models may proceed; no direct alpha or shadow status is inherited.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "DISCOVERY",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
+    @staticmethod
+    def _route_meta_failure_allocation_result(
+        conn: Any, result: dict[str, Any]
+    ) -> None:
+        set_kv(
+            conn,
+            "meta_failure_allocation",
+            result.get("recommended_compute_allocation_pct") or {},
+        )
+        set_kv(
+            conn,
+            "meta_failure_posteriors",
+            result.get("engine_posteriors") or [],
+        )
+        set_kv(conn, "meta_research_pipeline_status", "ALLOCATION_AUDIT_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
 
     def _route_barrier_shadow_activation_result(
         self, conn: Any, result: dict[str, Any]
