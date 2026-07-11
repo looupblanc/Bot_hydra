@@ -16,7 +16,6 @@ import pandas as pd
 from hydra.data.contract_mapping import load_roll_map
 from hydra.factory.quality_diversity import structural_fingerprint
 from hydra.foundry.status import EvidenceTier, ShadowEvidence, decide_shadow_admission
-from hydra.markets.instruments import instrument_spec
 from hydra.mission.calibration_retest_execution import (
     DEFAULT_HISTORICAL_REPORT,
     _build_past_only_feature_frame,
@@ -26,8 +25,10 @@ from hydra.mission.calibration_retest_execution import (
     _strict_json_value,
     _verify_development_manifest,
 )
-from hydra.research.accelerated_context_tournament import (
-    _apply_context,
+from hydra.research.accelerated_context_tournament import _apply_context
+from hydra.research.counterfactual_hazard_primary import (
+    _one_sided_binomial_probability,
+    build_counterfactual_base_events,
 )
 from hydra.research.equity_open_gap_reversal import (
     MAP_TYPE,
@@ -40,19 +41,14 @@ from hydra.research.qd_economic_tournament import (
     SESSION_CLOCKS,
     SYMBOLS,
     THRESHOLD_HISTORY_SESSIONS,
-    VALIDATION_FOLDS,
     _causal_session_thresholds,
-    _non_overlapping_events,
     _period_events,
     _period_metrics,
     _prepare_execution_cache,
     _prepare_feature_frame,
-    _profile_session_mask,
     _round_turn_cost_all,
     _validation_events,
     _validation_metrics,
-    attach_event_mae,
-    build_market_path_cache,
 )
 from hydra.shadow.specification import ShadowSpecification
 from hydra.utils.config import project_path
@@ -60,65 +56,93 @@ from hydra.validation.data_roles import DataRole
 from hydra.validation.lockbox_guard import enforce_data_access
 
 
-VERSION = "counterfactual_hazard_primary_v1"
+VERSION = "barrier_hazard_primary_v1"
 PRIMARY_ALPHA = 0.03
 EARLY_ROUND_1 = ("2023-01-01", "2023-07-01")
 EARLY_ROUND_2 = ("2023-07-01", "2024-01-01")
 FEATURES = (
-    "path_efficiency_30",
-    "failed_displacement_recovery_30_5",
-    "range_compression_30_180",
-    "accepted_price_migration_30",
+    "signed_close_location_persistence_30",
+    "range_acceleration_15_120",
+    "return_sign_persistence_30",
+    "signed_extreme_recovery_60",
 )
-SIGNED_FEATURES = frozenset({"accepted_price_migration_30"})
+SIGNED_FEATURES = frozenset(
+    {
+        "signed_close_location_persistence_30",
+        "return_sign_persistence_30",
+        "signed_extreme_recovery_60",
+    }
+)
 FEATURE_FAMILIES = {
-    "path_efficiency_30": "counterfactual_path_efficiency",
-    "failed_displacement_recovery_30_5": "counterfactual_recovery_hazard",
-    "range_compression_30_180": "counterfactual_expansion_hazard",
-    "accepted_price_migration_30": "counterfactual_acceptance_migration",
+    "signed_close_location_persistence_30": "accepted_location_hazard",
+    "range_acceleration_15_120": "range_expansion_hazard",
+    "return_sign_persistence_30": "path_curvature_hazard",
+    "signed_extreme_recovery_60": "extreme_recovery_hazard",
 }
 RECIPES = (
     {
-        "name": "open_q65_h15_5m_agree",
+        "name": "open_q65_h15_s075_5m_agree",
         "session": "open",
         "quantile": 0.65,
         "horizon": 15,
+        "barrier_scale_multiplier": 0.75,
         "policy_direction": "continuation",
         "activation_context": "completed_5m_trend_agree",
     },
     {
-        "name": "middle_q75_h30_15m_disagree",
-        "session": "middle",
+        "name": "open_q75_h30_s100_15m_disagree",
+        "session": "open",
         "quantile": 0.75,
         "horizon": 30,
+        "barrier_scale_multiplier": 1.00,
         "policy_direction": "reversal",
         "activation_context": "completed_15m_trend_disagree",
     },
     {
-        "name": "late_q65_h30_15m_expansion",
-        "session": "late",
+        "name": "middle_q65_h30_s100_15m_expansion",
+        "session": "middle",
         "quantile": 0.65,
         "horizon": 30,
+        "barrier_scale_multiplier": 1.00,
         "policy_direction": "continuation",
         "activation_context": "completed_15m_volatility_expansion",
     },
     {
-        "name": "all_q75_h60_30m_agree",
-        "session": "all",
+        "name": "late_q75_h60_s150_30m_agree",
+        "session": "late",
         "quantile": 0.75,
         "horizon": 60,
-        "policy_direction": "reversal",
+        "barrier_scale_multiplier": 1.50,
+        "policy_direction": "continuation",
         "activation_context": "completed_30m_trend_agree",
+    },
+    {
+        "name": "all_q85_h30_s075_5m_disagree",
+        "session": "all",
+        "quantile": 0.85,
+        "horizon": 30,
+        "barrier_scale_multiplier": 0.75,
+        "policy_direction": "reversal",
+        "activation_context": "completed_5m_trend_disagree",
+    },
+    {
+        "name": "all_q65_h60_s125_30m_disagree",
+        "session": "all",
+        "quantile": 0.65,
+        "horizon": 60,
+        "barrier_scale_multiplier": 1.25,
+        "policy_direction": "reversal",
+        "activation_context": "completed_30m_trend_disagree",
     },
 )
 
 
-class CounterfactualHazardPrimaryError(RuntimeError):
+class BarrierHazardPrimaryError(RuntimeError):
     pass
 
 
-def generate_counterfactual_hypotheses() -> list[dict[str, Any]]:
-    hypotheses: list[dict[str, Any]] = []
+def generate_barrier_hypotheses() -> list[dict[str, Any]]:
+    population: list[dict[str, Any]] = []
     for market, execution_market in MARKET_PAIRS.items():
         ecology = (
             "equity_indices"
@@ -135,17 +159,18 @@ def generate_counterfactual_hypotheses() -> list[dict[str, Any]]:
                     "execution_market": execution_market,
                     "market_ecology": ecology,
                     "feature": feature,
+                    "feature_signed": feature in SIGNED_FEATURES,
                     "mechanism_family": FEATURE_FAMILIES[feature],
                     **recipe,
                 }
                 fingerprint = structural_fingerprint(specification)
-                hypotheses.append(
+                population.append(
                     {
                         **specification,
                         "candidate_id": (
-                            f"strategy_cf_hazard_{market}_{feature}_{recipe['name']}_v1"
+                            f"strategy_barrier_hazard_{market}_{feature}_{recipe['name']}_v1"
                         ),
-                        "lineage_id": f"lineage_cf_hazard_{fingerprint[:20]}",
+                        "lineage_id": f"lineage_barrier_hazard_{fingerprint[:20]}",
                         "structural_fingerprint": fingerprint,
                         "portfolio_role": (
                             "reversal"
@@ -154,354 +179,218 @@ def generate_counterfactual_hypotheses() -> list[dict[str, Any]]:
                         ),
                     }
                 )
-    hypotheses.sort(key=lambda item: item["candidate_id"])
-    return hypotheses
+    population.sort(key=lambda item: item["candidate_id"])
+    return population
 
 
-def add_counterfactual_features(frame: pd.DataFrame) -> pd.DataFrame:
+def add_barrier_features(frame: pd.DataFrame) -> pd.DataFrame:
     out = frame.copy()
     key = out["contiguous_segment_id"]
     close = out["close"].astype(float)
+    high = out["high"].astype(float)
+    low = out["low"].astype(float)
     grouped_close = close.groupby(key, sort=False)
-    one_bar_change = grouped_close.diff()
-    one_bar_return = grouped_close.pct_change(fill_method=None)
+    returns = grouped_close.pct_change(fill_method=None)
 
     def past_rolling(
         series: pd.Series, window: int, minimum: int, operation: str
     ) -> pd.Series:
         grouped = series.groupby(key, sort=False).rolling(window, min_periods=minimum)
-        result = getattr(grouped, operation)().reset_index(level=0, drop=True).sort_index()
-        return result.groupby(key, sort=False).shift(1)
+        value = getattr(grouped, operation)().reset_index(level=0, drop=True).sort_index()
+        return value.groupby(key, sort=False).shift(1)
 
-    path_length = past_rolling(one_bar_change.abs(), 30, 15, "sum")
-    displacement_30 = grouped_close.diff(30).groupby(key, sort=False).shift(1)
-    out["path_efficiency_30"] = displacement_30.abs() / path_length.replace(0, np.nan)
-    return_30 = grouped_close.pct_change(30, fill_method=None).groupby(
-        key, sort=False
-    ).shift(1)
-    return_5 = grouped_close.pct_change(5, fill_method=None).groupby(
-        key, sort=False
-    ).shift(1)
-    out["failed_displacement_recovery_30_5"] = (
-        -np.sign(return_30) * return_5
-    ).clip(lower=0)
-    short_variation = past_rolling(one_bar_return.abs(), 30, 15, "mean")
-    long_variation = past_rolling(one_bar_return.abs(), 180, 60, "mean")
-    out["range_compression_30_180"] = short_variation / long_variation.replace(
-        0, np.nan
+    high_30 = past_rolling(high, 30, 15, "max")
+    low_30 = past_rolling(low, 30, 15, "min")
+    width_30 = (high_30 - low_30).replace(0, np.nan)
+    lagged_close = grouped_close.shift(1)
+    location = (lagged_close - low_30) / width_30
+    location_sign = np.sign(location - 0.5)
+    persistence = past_rolling(location_sign, 30, 15, "mean")
+    out["signed_close_location_persistence_30"] = persistence
+    true_range = (high - low).abs()
+    short_range = past_rolling(true_range, 15, 8, "mean")
+    long_range = past_rolling(true_range, 120, 40, "mean")
+    out["range_acceleration_15_120"] = short_range / long_range.replace(0, np.nan)
+    out["return_sign_persistence_30"] = past_rolling(
+        np.sign(returns), 30, 15, "mean"
     )
-    accepted_now = past_rolling(close, 15, 10, "mean")
-    accepted_before = accepted_now.groupby(key, sort=False).shift(15)
-    lagged_close = grouped_close.shift(1).abs().replace(0, np.nan)
-    out["accepted_price_migration_30"] = (
-        accepted_now - accepted_before
-    ) / lagged_close
-    out[list(FEATURES)] = out[list(FEATURES)].replace([np.inf, -np.inf], np.nan)
+    high_60 = past_rolling(high, 60, 20, "max")
+    low_60 = past_rolling(low, 60, 20, "min")
+    width_60 = (high_60 - low_60).replace(0, np.nan)
+    location_60 = (lagged_close - low_60) / width_60
+    past_return_60 = grouped_close.pct_change(60, fill_method=None).groupby(
+        key, sort=False
+    ).shift(1)
+    out["signed_extreme_recovery_60"] = np.where(
+        past_return_60 < 0,
+        location_60,
+        np.where(past_return_60 > 0, -(1.0 - location_60), np.nan),
+    )
+    out["barrier_range_scale"] = past_rolling(true_range, 60, 20, "median")
+    columns = [*FEATURES, "barrier_range_scale"]
+    out[columns] = out[columns].replace([np.inf, -np.inf], np.nan)
     return out
 
 
-def build_counterfactual_base_events(
+def build_barrier_path_cache(
     frame: pd.DataFrame,
-    hypothesis: dict[str, Any],
+) -> dict[
+    tuple[str, str, str, int],
+    tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+]:
+    cache = {}
+    grouping = ["symbol", "active_contract", "trading_session_id", "contiguous_segment_id"]
+    for keys, group in frame.groupby(grouping, sort=False, observed=True):
+        ordered = group.sort_values("timestamp")
+        cache[(str(keys[0]), str(keys[1]), str(keys[2]), int(keys[3]))] = (
+            pd.to_datetime(ordered["timestamp"], utc=True)
+            .dt.tz_localize(None)
+            .to_numpy(dtype="datetime64[ns]")
+            .astype(np.int64),
+            ordered["open"].to_numpy(dtype=float),
+            ordered["high"].to_numpy(dtype=float),
+            ordered["low"].to_numpy(dtype=float),
+            ordered["close"].to_numpy(dtype=float),
+        )
+    return cache
+
+
+def resolve_barrier_events(
+    events: pd.DataFrame,
+    path_cache: dict[
+        tuple[str, str, str, int],
+        tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+    ],
     *,
-    threshold_override: pd.Series | None = None,
+    barrier_scale_multiplier: float,
+    entry_delay_bars: int = 0,
 ) -> pd.DataFrame:
-    data = frame
-    feature = str(hypothesis["feature"])
-    values = pd.to_numeric(data[feature], errors="coerce")
-    quantile = float(hypothesis["quantile"])
-    threshold = (
-        threshold_override.reindex(data.index)
-        if threshold_override is not None
-        else _causal_session_thresholds(
-            values, data["trading_session_id"], [quantile]
-        )[quantile]
-    )
-    segment = data["contiguous_segment_id"]
-    magnitudes = values.abs()
-    crossing = (magnitudes >= threshold) & (
-        magnitudes.groupby(segment, sort=False).shift(1)
-        < threshold.groupby(segment, sort=False).shift(1)
-    )
-    anchor = (
-        np.sign(values)
-        if feature in SIGNED_FEATURES or bool(hypothesis.get("feature_signed"))
-        else np.sign(pd.to_numeric(data["past_return_60"], errors="coerce"))
-    )
-    policy_sign = 1 if hypothesis["policy_direction"] == "continuation" else -1
-    side = pd.Series(anchor * policy_sign, index=data.index, dtype=float)
-    horizon = int(hypothesis["horizon"])
-    session_mask = _profile_session_mask(
-        data, str(hypothesis["session"]), horizon=horizon
-    )
-    opportunity_frequency = (
-        crossing.astype(float)
-        .groupby(segment, sort=False)
-        .rolling(120, min_periods=30)
-        .mean()
-        .reset_index(level=0, drop=True)
-        .sort_index()
-        .groupby(segment, sort=False)
-        .shift(1)
-    )
-    valid_timing = (
-        data["next_timestamp"].eq(data["timestamp"] + pd.Timedelta(minutes=1))
-        & data["entry_timestamp"].eq(
-            data["timestamp"] + pd.Timedelta(minutes=2)
+    output = events.copy()
+    if output.empty:
+        return output.assign(
+            barrier_outcome=pd.Series(dtype=str),
+            barrier_ambiguous_stop_first=pd.Series(dtype=bool),
+            barrier_distance_points=pd.Series(dtype=float),
+            mfe_dollars=pd.Series(dtype=float),
         )
-        & data[f"exit_timestamp_{horizon}"].eq(
-            data["entry_timestamp"] + pd.Timedelta(minutes=horizon)
+    records: list[dict[str, Any]] = []
+    for row in output.to_dict("records"):
+        key = (
+            str(row["symbol"]),
+            str(row["active_contract"]),
+            str(row["trading_session_id"]),
+            int(row["contiguous_segment_id"]),
         )
-    )
-    mask = (
-        crossing
-        & session_mask
-        & side.notna()
-        & side.ne(0)
-        & valid_timing
-        & data["entry_price"].notna()
-        & data[f"exit_price_{horizon}"].notna()
-        & opportunity_frequency.notna()
-    )
-    columns = [
-        "timestamp",
-        "symbol",
-        "active_contract",
-        "trading_session_id",
-        "contiguous_segment_id",
-        "symbol_position",
-        "session_phase_15m",
-        "past_volatility",
-        "past_return_60",
-        "past_participation",
-    ]
-    selected = data.loc[mask, columns].copy()
-    if selected.empty:
-        return _empty_counterfactual_events()
-    selected["feature_value"] = values.loc[selected.index]
-    selected["threshold"] = threshold.loc[selected.index]
-    selected["past_opportunity_frequency"] = opportunity_frequency.loc[selected.index]
-    selected["side"] = side.loc[selected.index].astype(int)
-    selected["decision_timestamp"] = selected["timestamp"] + pd.Timedelta(minutes=1)
-    selected["entry_timestamp"] = data.loc[selected.index, "entry_timestamp"]
-    selected["entry_price"] = data.loc[selected.index, "entry_price"].astype(float)
-    selected["exit_timestamp"] = data.loc[
-        selected.index, f"exit_timestamp_{horizon}"
-    ]
-    selected["exit_price"] = data.loc[
-        selected.index, f"exit_price_{horizon}"
-    ].astype(float)
-    selected["event_session_id"] = selected["trading_session_id"].astype(str)
-    selected["point_value"] = _point_value(str(hypothesis["market"]))
-    selected["cost"] = _round_turn_cost_all(str(hypothesis["market"]))
-    selected["gross_pnl"] = (
-        selected["side"]
-        * (selected["exit_price"] - selected["entry_price"])
-        * selected["point_value"]
-    )
-    selected["net_pnl"] = selected["gross_pnl"] - selected["cost"]
-    selected["mae_dollars"] = np.nan
-    selected["holding_horizon_minutes"] = horizon
-    selected["profile"] = str(hypothesis["name"])
-    selected["feature"] = feature
-    selected["activation_context"] = "base_counterfactual_pool"
-    return _non_overlapping_events(selected).sort_values("entry_timestamp").reset_index(
-        drop=True
-    )
-
-
-def match_counterfactual_events(
-    treated: pd.DataFrame, controls: pd.DataFrame
-) -> pd.DataFrame:
-    if treated.empty or controls.empty:
-        return _empty_pairs()
-    treatment = treated.copy().sort_values("entry_timestamp").reset_index(drop=True)
-    pool = controls.copy().sort_values("entry_timestamp").reset_index(drop=True)
-    covariates = [
-        "past_volatility",
-        "past_return_60",
-        "past_participation",
-        "past_opportunity_frequency",
-    ]
-    union = pd.concat([treatment[covariates], pool[covariates]], ignore_index=True)
-    center = union.median(numeric_only=True)
-    scale = (union.quantile(0.75) - union.quantile(0.25)).replace(0, np.nan)
-    scale = scale.fillna(union.std().replace(0, 1.0)).fillna(1.0)
-    used: set[int] = set()
-    pairs: list[dict[str, Any]] = []
-    pool["session_bucket"] = (pool["session_phase_15m"].astype(int) // 8).astype(int)
-    for treated_index, event in treatment.iterrows():
-        session_bucket = int(event["session_phase_15m"]) // 8
-        candidates = pool[
-            pool["active_contract"].astype(str).eq(str(event["active_contract"]))
-            & pool["session_bucket"].eq(session_bucket)
-            & pool["trading_session_id"].astype(str).ne(
-                str(event["trading_session_id"])
-            )
-            & ~pool.index.isin(used)
-        ]
-        candidates = candidates.dropna(subset=covariates)
-        if candidates.empty or any(pd.isna(event[column]) for column in covariates):
+        timestamps, opens, highs, lows, closes = path_cache[key]
+        original_entry = pd.Timestamp(row["entry_timestamp"]).value
+        start = int(np.searchsorted(timestamps, original_entry)) + int(entry_delay_bars)
+        original_end = int(np.searchsorted(timestamps, pd.Timestamp(row["exit_timestamp"]).value))
+        end = min(original_end + int(entry_delay_bars), len(timestamps))
+        if start >= end or start >= len(timestamps) or timestamps[start] < original_entry:
             continue
-        treated_values = event[covariates].astype(float)
-        distances = (((candidates[covariates] - treated_values) / scale) ** 2).sum(
-            axis=1
+        entry_price = float(opens[start])
+        entry_timestamp = pd.Timestamp(int(timestamps[start]), tz="UTC")
+        horizon = int(row["holding_horizon_minutes"])
+        distance = (
+            float(row["barrier_range_scale"])
+            * math.sqrt(max(horizon, 1) / 15.0)
+            * float(barrier_scale_multiplier)
         )
-        control_index = int(
-            sorted(
-                distances.items(),
-                key=lambda item: (
-                    float(item[1]),
-                    str(candidates.loc[item[0], "entry_timestamp"]),
-                    int(item[0]),
-                ),
-            )[0][0]
+        if not np.isfinite(distance) or distance <= 0:
+            continue
+        side = int(row["side"])
+        target = entry_price + side * distance
+        stop = entry_price - side * distance
+        outcome = "TIMEOUT"
+        ambiguous = False
+        exit_price = float(closes[end - 1])
+        exit_timestamp = pd.Timestamp(int(timestamps[end - 1]), tz="UTC")
+        favorable_points = 0.0
+        adverse_points = 0.0
+        for position in range(start, end):
+            high = float(highs[position])
+            low = float(lows[position])
+            open_price = float(opens[position])
+            if side > 0:
+                target_hit = high >= target
+                stop_hit = low <= stop
+                favorable_points = max(favorable_points, high - entry_price)
+                adverse_points = min(adverse_points, low - entry_price)
+            else:
+                target_hit = low <= target
+                stop_hit = high >= stop
+                favorable_points = max(favorable_points, entry_price - low)
+                adverse_points = min(adverse_points, entry_price - high)
+            if stop_hit:
+                outcome = "STOP_FIRST"
+                ambiguous = bool(target_hit)
+                exit_price = (
+                    min(stop, open_price) if side > 0 else max(stop, open_price)
+                )
+                exit_timestamp = pd.Timestamp(int(timestamps[position]), tz="UTC")
+                break
+            if target_hit:
+                outcome = "TARGET_FIRST"
+                exit_price = target
+                exit_timestamp = pd.Timestamp(int(timestamps[position]), tz="UTC")
+                break
+        point_value = float(row["point_value"])
+        row.update(
+            {
+                "entry_timestamp": entry_timestamp,
+                "entry_price": entry_price,
+                "exit_timestamp": exit_timestamp,
+                "exit_price": exit_price,
+                "gross_pnl": side * (exit_price - entry_price) * point_value,
+                "net_pnl": side * (exit_price - entry_price) * point_value
+                - float(row["cost"]),
+                "barrier_outcome": outcome,
+                "barrier_ambiguous_stop_first": ambiguous,
+                "barrier_distance_points": distance,
+                "target_price": target,
+                "stop_price": stop,
+                "mfe_dollars": favorable_points * point_value,
+                "mae_dollars": adverse_points * point_value - float(row["cost"]) / 2,
+                "entry_delay_bars": int(entry_delay_bars),
+            }
         )
-        control = pool.loc[control_index]
-        used.add(control_index)
-        row: dict[str, Any] = {
-            "pair_id": f"pair_{treated_index:06d}_{control_index:06d}",
-            "symbol": str(event["symbol"]),
-            "active_contract": str(event["active_contract"]),
-            "session_bucket": session_bucket,
-            "treated_session": str(event["trading_session_id"]),
-            "control_session": str(control["trading_session_id"]),
-            "treated_entry_timestamp": event["entry_timestamp"],
-            "control_entry_timestamp": control["entry_timestamp"],
-            "treated_net_pnl": float(event["net_pnl"]),
-            "control_net_pnl": float(control["net_pnl"]),
-            "treated_positive": int(float(event["net_pnl"]) > 0),
-            "control_positive": int(float(control["net_pnl"]) > 0),
-            "distance": float(distances.loc[control_index]),
-        }
-        for column in covariates:
-            row[f"treated_{column}"] = float(event[column])
-            row[f"control_{column}"] = float(control[column])
-        pairs.append(row)
-    return pd.DataFrame(pairs) if pairs else _empty_pairs()
+        records.append(row)
+    return pd.DataFrame(records) if records else output.iloc[0:0].copy()
 
 
-def paired_hazard_metrics(pairs: pd.DataFrame) -> dict[str, Any]:
-    if pairs.empty:
+def barrier_hazard_metrics(events: pd.DataFrame) -> dict[str, Any]:
+    if events.empty:
         return {
-            "pairs": 0,
-            "treated_positive_probability": 0.0,
-            "control_positive_probability": 0.0,
-            "probability_uplift": 0.0,
-            "treated_mean_net": 0.0,
-            "control_mean_net": 0.0,
-            "discordant_pairs": 0,
-            "positive_discordant_pairs": 0,
-            "paired_probability": 1.0,
-            "maximum_standardized_covariate_difference": float("inf"),
+            "events": 0,
+            "resolved_barrier_events": 0,
+            "target_first": 0,
+            "stop_first": 0,
+            "ambiguous_stop_first": 0,
+            "timeouts": 0,
+            "target_first_probability": 0.0,
+            "exact_probability": 1.0,
+            "resolution_rate": 0.0,
         }
-    treated_positive = pairs["treated_positive"].astype(int)
-    control_positive = pairs["control_positive"].astype(int)
-    positive_discordant = int(((treated_positive == 1) & (control_positive == 0)).sum())
-    negative_discordant = int(((treated_positive == 0) & (control_positive == 1)).sum())
-    discordant = positive_discordant + negative_discordant
-    probability = _one_sided_binomial_probability(positive_discordant, discordant)
-    balance = []
-    for column in (
-        "past_volatility",
-        "past_return_60",
-        "past_participation",
-        "past_opportunity_frequency",
-    ):
-        treated_values = pairs[f"treated_{column}"].astype(float)
-        control_values = pairs[f"control_{column}"].astype(float)
-        pooled = math.sqrt(
-            max((float(treated_values.var()) + float(control_values.var())) / 2.0, 0.0)
-        )
-        balance.append(
-            abs(float(treated_values.mean() - control_values.mean())) / pooled
-            if pooled > 0
-            else 0.0
-        )
+    outcomes = events["barrier_outcome"].astype(str)
+    target = int(outcomes.eq("TARGET_FIRST").sum())
+    stop = int(outcomes.eq("STOP_FIRST").sum())
+    resolved = target + stop
     return {
-        "pairs": int(len(pairs)),
-        "treated_positive_probability": float(treated_positive.mean()),
-        "control_positive_probability": float(control_positive.mean()),
-        "probability_uplift": float((treated_positive - control_positive).mean()),
-        "treated_mean_net": float(pairs["treated_net_pnl"].mean()),
-        "control_mean_net": float(pairs["control_net_pnl"].mean()),
-        "discordant_pairs": discordant,
-        "positive_discordant_pairs": positive_discordant,
-        "paired_probability": probability,
-        "maximum_standardized_covariate_difference": float(max(balance, default=0.0)),
+        "events": int(len(events)),
+        "resolved_barrier_events": resolved,
+        "target_first": target,
+        "stop_first": stop,
+        "ambiguous_stop_first": int(
+            events["barrier_ambiguous_stop_first"].astype(bool).sum()
+        ),
+        "timeouts": int(outcomes.eq("TIMEOUT").sum()),
+        "target_first_probability": float(target / resolved) if resolved else 0.0,
+        "exact_probability": _one_sided_binomial_probability(target, resolved),
+        "resolution_rate": float(resolved / len(events)),
     }
 
 
-def _one_sided_binomial_probability(successes: int, trials: int) -> float:
-    if trials <= 0:
-        return 1.0
-    return float(
-        sum(math.comb(trials, value) for value in range(successes, trials + 1))
-        / (2**trials)
-    )
-
-
-def _point_value(symbol: str) -> float:
-    return float(instrument_spec(symbol).point_value)
-
-
-def _empty_counterfactual_events() -> pd.DataFrame:
-    return pd.DataFrame(
-        columns=[
-            "timestamp",
-            "symbol",
-            "active_contract",
-            "trading_session_id",
-            "contiguous_segment_id",
-            "symbol_position",
-            "session_phase_15m",
-            "past_volatility",
-            "past_return_60",
-            "past_participation",
-            "past_opportunity_frequency",
-            "feature_value",
-            "threshold",
-            "side",
-            "decision_timestamp",
-            "entry_timestamp",
-            "entry_price",
-            "exit_timestamp",
-            "exit_price",
-            "event_session_id",
-            "point_value",
-            "cost",
-            "gross_pnl",
-            "net_pnl",
-            "mae_dollars",
-            "holding_horizon_minutes",
-            "profile",
-            "feature",
-            "activation_context",
-        ]
-    )
-
-
-def _empty_pairs() -> pd.DataFrame:
-    return pd.DataFrame(
-        columns=[
-            "pair_id",
-            "symbol",
-            "active_contract",
-            "session_bucket",
-            "treated_session",
-            "control_session",
-            "treated_entry_timestamp",
-            "control_entry_timestamp",
-            "treated_net_pnl",
-            "control_net_pnl",
-            "treated_positive",
-            "control_positive",
-            "distance",
-        ]
-    )
-
-
-def run_counterfactual_hazard_primary(
+def run_barrier_hazard_primary(
     output_dir: str | Path,
     *,
     engineering_task_path: str | Path,
@@ -519,18 +408,18 @@ def run_counterfactual_hazard_primary(
     _verify(map_path, repaired_map_sha256, "explicit-contract map")
     roll_map = load_roll_map(map_path)
     if roll_map.map_type != MAP_TYPE or roll_map.roll_map_hash() != repaired_roll_map_hash:
-        raise CounterfactualHazardPrimaryError("Explicit-contract map changed.")
+        raise BarrierHazardPrimaryError("Explicit-contract map changed.")
     if len(code_commit) == 40:
         actual = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
         if actual != code_commit:
-            raise CounterfactualHazardPrimaryError(
+            raise BarrierHazardPrimaryError(
                 "Worker commit differs from queued specification."
             )
-    hypotheses = generate_counterfactual_hypotheses()
-    if len(hypotheses) != 96 or len(
+    hypotheses = generate_barrier_hypotheses()
+    if len(hypotheses) != 144 or len(
         {item["structural_fingerprint"] for item in hypotheses}
-    ) != 96:
-        raise CounterfactualHazardPrimaryError("Frozen population drifted.")
+    ) != 144:
+        raise BarrierHazardPrimaryError("Frozen barrier population drifted.")
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
     preregistration = _preregistration(
@@ -540,17 +429,17 @@ def run_counterfactual_hazard_primary(
         repaired_roll_map_hash=repaired_roll_map_hash,
         code_commit=code_commit,
     )
-    preregistration_path = destination / "counterfactual_hazard_preregistration.json"
+    preregistration_path = destination / "barrier_hazard_preregistration.json"
+    population_path = destination / "barrier_hazard_population.json"
     _write_immutable(
         preregistration_path,
         json.dumps(preregistration, indent=2, sort_keys=True) + "\n",
     )
-    population_path = destination / "counterfactual_hazard_population.json"
     _write_immutable(
         population_path,
         json.dumps(
             {
-                "schema": "counterfactual_hazard_population_v1",
+                "schema": "barrier_hazard_population_v1",
                 "population_hash": preregistration["population_hash"],
                 "hypotheses": hypotheses,
             },
@@ -585,7 +474,7 @@ def run_counterfactual_hazard_primary(
         required_contract_map_type=MAP_TYPE,
     )
     latest_source_timestamp = pd.to_datetime(raw["timestamp"], utc=True).max()
-    features = add_counterfactual_features(
+    features = add_barrier_features(
         _prepare_feature_frame(_build_past_only_feature_frame(raw))
     )
     del raw
@@ -612,23 +501,33 @@ def run_counterfactual_hazard_primary(
         for frame in early_frames.values()
         if not frame.empty
     ):
-        raise CounterfactualHazardPrimaryError("Early selection exposed 2024.")
+        raise BarrierHazardPrimaryError("Early selection exposed 2024.")
     preparation_seconds = time.perf_counter() - started
 
     early_context_cache: dict[tuple[str, int], pd.DataFrame] = {}
-    early_sets = _build_event_sets(early_frames, hypotheses, early_context_cache)
+    early_path_caches = {
+        market: build_barrier_path_cache(early_frames[market])
+        for market in SYMBOLS
+    }
+    early_events = _build_barrier_event_sets(
+        early_frames,
+        hypotheses,
+        early_context_cache,
+        early_path_caches,
+    )
     round1_survivors: list[dict[str, Any]] = []
     dispositions: list[dict[str, Any]] = []
     for hypothesis in hypotheses:
-        base, treated = early_sets[hypothesis["candidate_id"]]
-        direct = _period_metrics(_period_events(treated, *EARLY_ROUND_1))
-        pairs = _period_pairs(base, treated, *EARLY_ROUND_1)
-        hazard = paired_hazard_metrics(pairs)
+        events = _period_events(
+            early_events[hypothesis["candidate_id"]], *EARLY_ROUND_1
+        )
+        direct = _period_metrics(events)
+        hazard = barrier_hazard_metrics(events)
         passed = bool(
             direct["events"] >= 8
             and direct["net_pnl"] > 0
             and direct["cost_stress_1_5x_net"] > 0
-            and hazard["pairs"] >= 5
+            and hazard["resolved_barrier_events"] >= 5
         )
         row = {
             **hypothesis,
@@ -648,17 +547,18 @@ def run_counterfactual_hazard_primary(
             )
     round2_survivors: list[dict[str, Any]] = []
     for hypothesis in round1_survivors:
-        base, treated = early_sets[hypothesis["candidate_id"]]
-        direct = _period_metrics(_period_events(treated, *EARLY_ROUND_2))
-        pairs = _period_pairs(base, treated, *EARLY_ROUND_2)
-        hazard = paired_hazard_metrics(pairs)
+        events = _period_events(
+            early_events[hypothesis["candidate_id"]], *EARLY_ROUND_2
+        )
+        direct = _period_metrics(events)
+        hazard = barrier_hazard_metrics(events)
         passed = bool(
             direct["events"] >= 10
             and direct["net_pnl"] > 0
             and direct["cost_stress_1_5x_net"] > 0
             and direct["best_positive_event_share"] <= 0.40
-            and hazard["pairs"] >= 8
-            and hazard["probability_uplift"] > 0
+            and hazard["resolved_barrier_events"] >= 8
+            and hazard["target_first_probability"] > 0.50
         )
         row = {
             **hypothesis,
@@ -676,7 +576,6 @@ def run_counterfactual_hazard_primary(
                     "reason": _early_failure_reason(direct, hazard, round_number=2),
                 }
             )
-
     micro_hypotheses = [
         {
             **item,
@@ -685,11 +584,14 @@ def run_counterfactual_hazard_primary(
         }
         for item in round2_survivors
     ]
-    early_micro_sets = _build_event_sets(
-        early_frames, micro_hypotheses, early_context_cache
+    early_micro_events = _build_barrier_event_sets(
+        early_frames,
+        micro_hypotheses,
+        early_context_cache,
+        early_path_caches,
     )
     archive, ranking = _build_archive_and_primary_ranking(
-        round2_survivors, early_micro_sets
+        round2_survivors, early_micro_events
     )
     primary_id = next(
         (row["candidate_id"] for row in ranking if row["eligible"]), None
@@ -702,7 +604,7 @@ def run_counterfactual_hazard_primary(
         dispositions=dispositions,
         population_hash=preregistration["population_hash"],
     )
-    archive_path = destination / "counterfactual_hazard_archive_manifest.json"
+    archive_path = destination / "barrier_hazard_archive_manifest.json"
     _write_immutable(
         archive_path, json.dumps(archive_manifest, indent=2, sort_keys=True) + "\n"
     )
@@ -712,7 +614,7 @@ def run_counterfactual_hazard_primary(
         archive_hash=archive_manifest["archive_manifest_hash"],
         population_hash=preregistration["population_hash"],
     )
-    primary_manifest_path = destination / "counterfactual_hazard_primary_freeze.json"
+    primary_manifest_path = destination / "barrier_hazard_primary_freeze.json"
     _write_immutable(
         primary_manifest_path,
         json.dumps(primary_manifest, indent=2, sort_keys=True) + "\n",
@@ -720,70 +622,67 @@ def run_counterfactual_hazard_primary(
     freeze_seconds = time.perf_counter() - started
 
     candidates: list[dict[str, Any]] = []
-    pair_ledger = pd.DataFrame()
     trade_ledger = pd.DataFrame()
     shadow_configurations: list[dict[str, Any]] = []
     if primary is not None:
         full_context_cache: dict[tuple[str, int], pd.DataFrame] = {}
-        full_sets = _build_event_sets(full_frames, [primary], full_context_cache)
-        base, treated = full_sets[primary["candidate_id"]]
-        validation_treated = _validation_events(treated)
-        validation_base = _validation_events(base)
-        control = _control_pool(validation_base, validation_treated)
-        pair_ledger = match_counterfactual_events(validation_treated, control)
-        hazard = paired_hazard_metrics(pair_ledger)
+        needed_markets = {str(primary["market"]), str(primary["execution_market"])}
+        full_path_caches = {
+            market: build_barrier_path_cache(full_frames[market])
+            for market in needed_markets
+        }
+        mini_events = _build_barrier_event_sets(
+            full_frames,
+            [primary],
+            full_context_cache,
+            full_path_caches,
+        )[primary["candidate_id"]]
+        validation_mini = _validation_events(mini_events)
         micro_hypothesis = {
             **primary,
             "market": primary["execution_market"],
             "candidate_id": f"{primary['candidate_id']}__micro",
         }
-        micro_sets = _build_event_sets(
-            full_frames, [micro_hypothesis], full_context_cache
-        )
-        micro_base, micro_treated = micro_sets[micro_hypothesis["candidate_id"]]
-        validation_micro = _validation_events(micro_treated)
-        micro_pairs = match_counterfactual_events(
-            validation_micro,
-            _control_pool(_validation_events(micro_base), validation_micro),
-        )
-        micro_hazard = paired_hazard_metrics(micro_pairs)
-        mini_metrics = _validation_metrics(validation_treated)
+        micro_events = _build_barrier_event_sets(
+            full_frames,
+            [micro_hypothesis],
+            full_context_cache,
+            full_path_caches,
+        )[micro_hypothesis["candidate_id"]]
+        validation_micro = _validation_events(micro_events)
+        mini_metrics = _validation_metrics(validation_mini)
         micro_metrics = _validation_metrics(validation_micro)
-        path_caches = {
-            primary["market"]: build_market_path_cache(
-                full_frames[primary["market"]]
-            ),
-            primary["execution_market"]: build_market_path_cache(
-                full_frames[primary["execution_market"]]
-            ),
-        }
-        validation_treated = attach_event_mae(
-            validation_treated,
-            full_frames[primary["market"]],
-            path_cache=path_caches[primary["market"]],
-        )
-        validation_micro = attach_event_mae(
-            validation_micro,
-            full_frames[primary["execution_market"]],
-            path_cache=path_caches[primary["execution_market"]],
-        )
+        hazard = barrier_hazard_metrics(validation_mini)
+        micro_hazard = barrier_hazard_metrics(validation_micro)
         parameter = _parameter_diagnostics(
-            full_frames, primary, full_context_cache
+            full_frames, primary, full_context_cache, full_path_caches
         )
+        delayed_events = _build_barrier_event_sets(
+            full_frames,
+            [primary],
+            full_context_cache,
+            full_path_caches,
+            entry_delay_bars=1,
+        )[primary["candidate_id"]]
+        delay_metrics = _validation_metrics(_validation_events(delayed_events))
         contract_evidence = bool(
             mini_metrics["net_pnl"] > 0
             and micro_metrics["net_pnl"] > 0
             and micro_metrics["supportive_temporal_folds"] >= 1
-            and micro_hazard["probability_uplift"] >= 0
+            and micro_hazard["target_first_probability"] >= 0.50
         )
         account = _account_replay(
             validation_micro.rename(columns={"net_pnl": "net_pnl_60"}).copy()
         )
-        null_pass = bool(
-            hazard["pairs"] >= 12
-            and hazard["probability_uplift"] > 0
-            and hazard["paired_probability"] <= PRIMARY_ALPHA
-            and hazard["maximum_standardized_covariate_difference"] <= 0.50
+        promotion_null_pass = bool(
+            hazard["resolved_barrier_events"] >= 12
+            and hazard["target_first_probability"] > 0.50
+            and hazard["exact_probability"] <= PRIMARY_ALPHA
+        )
+        shadow_null_support = bool(
+            hazard["resolved_barrier_events"] >= 12
+            and hazard["target_first_probability"] > 0.50
+            and hazard["exact_probability"] <= 0.20
         )
         evidence = ShadowEvidence(
             candidate_id=primary["candidate_id"],
@@ -793,8 +692,8 @@ def run_counterfactual_hazard_primary(
             net_after_costs=float(mini_metrics["net_pnl"]),
             supportive_temporal_folds=int(mini_metrics["supportive_temporal_folds"]),
             catastrophic_transfer=bool(mini_metrics["catastrophic_transfer"]),
-            candidate_null_pass=null_pass,
-            null_probability=float(hazard["paired_probability"]),
+            candidate_null_pass=shadow_null_support,
+            null_probability=float(hazard["exact_probability"]),
             parameter_stable=bool(parameter["supportive_neighbor_count"] >= 1),
             contract_evidence=contract_evidence,
             account_mll_safe=bool(account.get("micro_one_contract_mll_safe", False)),
@@ -804,11 +703,11 @@ def run_counterfactual_hazard_primary(
             observability_complete=True,
             untouched_holdout_passed=False,
             sample_size=int(mini_metrics["events"]),
-            uncertainty="counterfactual_development_confirmation_q4_unopened",
+            uncertainty="barrier_hazard_development_confirmation_q4_unopened",
         )
         admission = decide_shadow_admission(evidence)
         if admission.tier == EvidenceTier.PAPER_SHADOW_READY:
-            raise CounterfactualHazardPrimaryError(
+            raise BarrierHazardPrimaryError(
                 "Development-only experiment attempted paper promotion."
             )
         candidate = {
@@ -837,14 +736,17 @@ def run_counterfactual_hazard_primary(
             "cost_stress_1_5x_net": float(
                 mini_metrics["cost_stress_1_5x_net"]
             ),
-            "counterfactual_hazard": hazard,
-            "micro_counterfactual_hazard": micro_hazard,
+            "barrier_hazard": hazard,
+            "micro_barrier_hazard": micro_hazard,
             "null_evidence": {
-                "method": "preselected_primary_exact_paired_positive_outcome_test",
-                "raw_probability": float(hazard["paired_probability"]),
+                "method": "preselected_primary_exact_target_before_stop_binomial",
+                "null_probability": 0.50,
+                "raw_probability": float(hazard["exact_probability"]),
                 "prospective_alpha": PRIMARY_ALPHA,
                 "promotion_test_count": 1,
-                "passed": null_pass,
+                "promotion_passed": promotion_null_pass,
+                "shadow_research_support_threshold": 0.20,
+                "shadow_research_support_passed": shadow_null_support,
             },
             "contract_transfer": {
                 "mini": primary["market"],
@@ -860,9 +762,10 @@ def run_counterfactual_hazard_primary(
                     mini_metrics["best_positive_fold_share"]
                 ),
                 "event_dominated": bool(mini_metrics["event_dominated"]),
-                "one_bar_execution_delay_embedded": True,
+                "one_additional_bar_delay_net": float(delay_metrics["net_pnl"]),
+                "same_bar_ambiguity_stop_first": True,
+                "gap_stop_worse_fill": True,
                 "completed_higher_timeframe_only": True,
-                "outcome_blind_matching": True,
             },
             "topstep": account,
             "shadow_evidence": evidence.__dict__,
@@ -873,9 +776,7 @@ def run_counterfactual_hazard_primary(
                 primary, primary_manifest["primary_manifest_hash"]
             )
             path = specification.write_immutable(
-                destination
-                / "shadow_configurations"
-                / f"{primary['candidate_id']}.json"
+                destination / "shadow_configurations" / f"{primary['candidate_id']}.json"
             )
             shadow_configurations.append(
                 {
@@ -888,7 +789,7 @@ def run_counterfactual_hazard_primary(
             )
         trade_ledger = pd.concat(
             [
-                validation_treated.assign(contract_role="primary_mini"),
+                validation_mini.assign(contract_role="primary_mini"),
                 validation_micro.assign(contract_role="primary_micro"),
             ],
             ignore_index=True,
@@ -905,9 +806,7 @@ def run_counterfactual_hazard_primary(
     topstep_count = sum(
         bool((row.get("topstep") or {}).get("path_candidate")) for row in candidates
     )
-    pair_path = destination / "counterfactual_hazard_pair_ledger.jsonl"
-    trade_path = destination / "counterfactual_hazard_trade_ledger.jsonl"
-    _write_dataframe_ledger(pair_path, pair_ledger, ["treated_entry_timestamp", "pair_id"])
+    trade_path = destination / "barrier_hazard_trade_ledger.jsonl"
     _write_dataframe_ledger(
         trade_path, trade_ledger, ["entry_timestamp", "symbol", "contract_role"]
     )
@@ -917,30 +816,29 @@ def run_counterfactual_hazard_primary(
         primary=primary,
         primary_manifest=primary_manifest,
         archive=archive,
-        pair_ledger=pair_ledger,
         trade_ledger=trade_ledger,
         latest_source_timestamp=latest_source_timestamp,
     )
     if not all(integrity.values()):
-        raise CounterfactualHazardPrimaryError(f"Integrity proof failed: {integrity}")
+        raise BarrierHazardPrimaryError(f"Integrity proof failed: {integrity}")
     if shadow_count:
-        conclusion = "COUNTERFACTUAL_HAZARD_SHADOW_CANDIDATE_FOUND"
-        next_action = "ACTIVATE_COUNTERFACTUAL_SHADOW_AND_REPLICATE"
+        conclusion = "BARRIER_HAZARD_SHADOW_CANDIDATE_FOUND"
+        next_action = "ACTIVATE_BARRIER_SHADOW_AND_REPLICATE"
     elif promising:
-        conclusion = "COUNTERFACTUAL_HAZARD_PROMISING_BUT_INSUFFICIENT"
+        conclusion = "BARRIER_HAZARD_PROMISING_BUT_INSUFFICIENT"
         next_action = "FRESH_ID_REPLICATION_OR_FORWARD_SHADOW_RESEARCH"
     elif primary is None:
-        conclusion = "COUNTERFACTUAL_HAZARD_NO_EARLY_PRIMARY"
-        next_action = "PIVOT_HAZARD_TARGET_OR_MARKET_ECOLOGY"
+        conclusion = "BARRIER_HAZARD_NO_EARLY_PRIMARY"
+        next_action = "PIVOT_MARKET_ECOLOGY_OR_DEFENSIVE_HAZARD"
     else:
-        conclusion = "COUNTERFACTUAL_HAZARD_PRIMARY_FALSIFIED_OR_INSUFFICIENT"
-        next_action = "KILL_EXACT_PRIMARY_AND_PIVOT_DISTRIBUTIONAL_TARGET"
+        conclusion = "BARRIER_HAZARD_PRIMARY_FALSIFIED_OR_INSUFFICIENT"
+        next_action = "KILL_EXACT_PRIMARY_AND_PIVOT_PORTFOLIO_ROLE"
     payload: dict[str, Any] = {
         "schema": VERSION,
         "scientific_conclusion": conclusion,
         "interpretation_boundary": (
-            "Exactly one primary at most was frozen on 2023 before its unchanged 2024 "
-            "confirmation. Archive candidates are diagnostic-only. Q4 remained sealed; "
+            "Exactly one primary at most was frozen using 2023 before unchanged 2024 "
+            "confirmation. Same-bar ambiguity is stop-first. Q4 remained sealed and "
             "PAPER_SHADOW_READY is prohibited."
         ),
         "code_commit": code_commit,
@@ -989,8 +887,8 @@ def run_counterfactual_hazard_primary(
     }
     payload = _strict_json_value(payload)
     payload["result_hash"] = _stable_hash(payload)
-    result_path = destination / "counterfactual_hazard_result.json"
-    report_path = destination / "counterfactual_hazard_report.md"
+    result_path = destination / "barrier_hazard_result.json"
+    report_path = destination / "barrier_hazard_report.md"
     _write_immutable(result_path, json.dumps(payload, indent=2, sort_keys=True) + "\n")
     _write_immutable(report_path, _render_report(payload))
     return {
@@ -1000,19 +898,27 @@ def run_counterfactual_hazard_primary(
             "report_path": str(report_path),
             "primary_manifest_path": str(primary_manifest_path),
             "archive_manifest_path": str(archive_path),
-            "pair_ledger_path": str(pair_path),
             "trade_ledger_path": str(trade_path),
         },
         "report_path": str(report_path),
     }
 
 
-def _build_event_sets(
+def _build_barrier_event_sets(
     frames: dict[str, pd.DataFrame],
     hypotheses: list[dict[str, Any]],
     context_cache: dict[tuple[str, int], pd.DataFrame],
-) -> dict[str, tuple[pd.DataFrame, pd.DataFrame]]:
-    output: dict[str, tuple[pd.DataFrame, pd.DataFrame]] = {}
+    path_caches: dict[
+        str,
+        dict[
+            tuple[str, str, str, int],
+            tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+        ],
+    ],
+    *,
+    entry_delay_bars: int = 0,
+) -> dict[str, pd.DataFrame]:
+    output: dict[str, pd.DataFrame] = {}
     for market in sorted({str(item["market"]) for item in hypotheses}):
         frame = frames[market]
         market_hypotheses = [item for item in hypotheses if item["market"] == market]
@@ -1025,12 +931,15 @@ def _build_event_sets(
                     if item["feature"] == feature
                 }
             )
-            values = _causal_session_thresholds(
+            causal = _causal_session_thresholds(
                 frame[feature], frame["trading_session_id"], quantiles
             )
             thresholds.update(
-                {(feature, quantile): values[quantile] for quantile in quantiles}
+                {(feature, quantile): causal[quantile] for quantile in quantiles}
             )
+        scale_lookup = frame.set_index(
+            ["contiguous_segment_id", "symbol_position"]
+        )["barrier_range_scale"]
         base_cache: dict[tuple[Any, ...], pd.DataFrame] = {}
         for hypothesis in market_hypotheses:
             key = (
@@ -1041,83 +950,78 @@ def _build_event_sets(
                 int(hypothesis["horizon"]),
             )
             if key not in base_cache:
-                base_cache[key] = build_counterfactual_base_events(
+                base = build_counterfactual_base_events(
                     frame,
                     hypothesis,
                     threshold_override=thresholds[
                         (str(hypothesis["feature"]), float(hypothesis["quantile"]))
                     ],
                 )
-            base = base_cache[key]
+                if not base.empty:
+                    lookup_index = pd.MultiIndex.from_arrays(
+                        [
+                            base["contiguous_segment_id"].astype(int),
+                            base["symbol_position"].astype(int),
+                        ]
+                    )
+                    base["barrier_range_scale"] = scale_lookup.reindex(
+                        lookup_index
+                    ).to_numpy(dtype=float)
+                    base = base.dropna(subset=["barrier_range_scale"]).reset_index(
+                        drop=True
+                    )
+                base_cache[key] = base
             treated = _apply_context(
-                base,
+                base_cache[key],
                 frame,
                 str(hypothesis["activation_context"]),
                 context_cache,
             )
-            output[str(hypothesis["candidate_id"])] = (base, treated)
+            output[str(hypothesis["candidate_id"])] = resolve_barrier_events(
+                treated,
+                path_caches[market],
+                barrier_scale_multiplier=float(
+                    hypothesis["barrier_scale_multiplier"]
+                ),
+                entry_delay_bars=entry_delay_bars,
+            )
     return output
-
-
-def _control_pool(base: pd.DataFrame, treated: pd.DataFrame) -> pd.DataFrame:
-    if base.empty:
-        return base.copy()
-    treated_keys = {
-        (str(row.active_contract), pd.Timestamp(row.entry_timestamp).value)
-        for row in treated[["active_contract", "entry_timestamp"]].itertuples(
-            index=False
-        )
-    }
-    keep = [
-        (str(row.active_contract), pd.Timestamp(row.entry_timestamp).value)
-        not in treated_keys
-        for row in base[["active_contract", "entry_timestamp"]].itertuples(
-            index=False
-        )
-    ]
-    return base.loc[keep].copy().reset_index(drop=True)
-
-
-def _period_pairs(
-    base: pd.DataFrame, treated: pd.DataFrame, start: str, end: str
-) -> pd.DataFrame:
-    period_base = _period_events(base, start, end)
-    period_treated = _period_events(treated, start, end)
-    return match_counterfactual_events(
-        period_treated, _control_pool(period_base, period_treated)
-    )
 
 
 def _early_failure_reason(
     direct: dict[str, Any], hazard: dict[str, Any], *, round_number: int
 ) -> str:
     minimum_events = 8 if round_number == 1 else 10
-    minimum_pairs = 5 if round_number == 1 else 8
-    if direct["events"] < minimum_events or hazard["pairs"] < minimum_pairs:
-        return "INSUFFICIENT_SAMPLES_OR_MATCHES"
+    minimum_resolved = 5 if round_number == 1 else 8
+    if (
+        direct["events"] < minimum_events
+        or hazard["resolved_barrier_events"] < minimum_resolved
+    ):
+        return "INSUFFICIENT_EVENTS_OR_RESOLVED_BARRIERS"
     if direct["net_pnl"] <= 0:
         return "NEGATIVE_ECONOMICS"
     if direct["cost_stress_1_5x_net"] <= 0:
         return "COST_FRAGILITY"
     if round_number == 2 and direct["best_positive_event_share"] > 0.40:
         return "CONCENTRATION"
-    if round_number == 2 and hazard["probability_uplift"] <= 0:
-        return "NO_COUNTERFACTUAL_HAZARD_UPLIFT"
+    if round_number == 2 and hazard["target_first_probability"] <= 0.50:
+        return "NO_TARGET_BEFORE_STOP_HAZARD"
     return "UNSPECIFIED_FAILURE"
 
 
 def _build_archive_and_primary_ranking(
     survivors: list[dict[str, Any]],
-    early_micro_sets: dict[str, tuple[pd.DataFrame, pd.DataFrame]],
+    early_micro_events: dict[str, pd.DataFrame],
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    scored: list[dict[str, Any]] = []
+    scored = []
     for item in survivors:
         direct = item["round2_direct"]
         hazard = item["round2_hazard"]
         score = (
             float(direct["net_pnl"])
             / max(float(direct["maximum_drawdown"]), 1.0)
-            + 4.0 * float(hazard["probability_uplift"])
+            + 4.0 * (float(hazard["target_first_probability"]) - 0.50)
+            + float(hazard["resolution_rate"])
         )
         scored.append({**item, "archive_score": score})
     scored.sort(
@@ -1132,20 +1036,18 @@ def _build_archive_and_primary_ranking(
         niche = (str(item["market_ecology"]), str(item["mechanism_family"]))
         if niche in occupied:
             continue
-        archive.append(item)
         occupied.add(niche)
+        archive.append(item)
         if len(archive) >= 12:
             break
     ranking: list[dict[str, Any]] = []
     for item in archive:
-        micro_id = f"{item['candidate_id']}__early_micro"
-        micro_base, micro_treated = early_micro_sets[micro_id]
-        micro_direct = _period_metrics(
-            _period_events(micro_treated, *EARLY_ROUND_2)
+        micro = _period_events(
+            early_micro_events[f"{item['candidate_id']}__early_micro"],
+            *EARLY_ROUND_2,
         )
-        micro_hazard = paired_hazard_metrics(
-            _period_pairs(micro_base, micro_treated, *EARLY_ROUND_2)
-        )
+        micro_direct = _period_metrics(micro)
+        micro_hazard = barrier_hazard_metrics(micro)
         direct = item["round2_direct"]
         hazard = item["round2_hazard"]
         eligible = bool(
@@ -1153,23 +1055,22 @@ def _build_archive_and_primary_ranking(
             and direct["cost_stress_1_5x_net"] > 0
             and micro_direct["net_pnl"] > 0
             and micro_direct["cost_stress_1_5x_net"] > 0
-            and hazard["probability_uplift"] > 0
-            and micro_hazard["probability_uplift"] >= 0
-        )
-        minimum_efficiency = min(
-            float(direct["net_pnl"])
-            / max(float(direct["maximum_drawdown"]), 1.0),
-            float(micro_direct["net_pnl"])
-            / max(float(micro_direct["maximum_drawdown"]), 1.0),
+            and hazard["target_first_probability"] > 0.50
+            and micro_hazard["target_first_probability"] >= 0.50
         )
         ranking.append(
             {
                 "candidate_id": item["candidate_id"],
                 "eligible": eligible,
-                "minimum_mini_micro_net_to_drawdown": minimum_efficiency,
-                "minimum_mini_micro_hazard_uplift": min(
-                    float(hazard["probability_uplift"]),
-                    float(micro_hazard["probability_uplift"]),
+                "minimum_target_first_probability": min(
+                    float(hazard["target_first_probability"]),
+                    float(micro_hazard["target_first_probability"]),
+                ),
+                "minimum_mini_micro_net_to_drawdown": min(
+                    float(direct["net_pnl"])
+                    / max(float(direct["maximum_drawdown"]), 1.0),
+                    float(micro_direct["net_pnl"])
+                    / max(float(micro_direct["maximum_drawdown"]), 1.0),
                 ),
                 "mini_direct": direct,
                 "mini_hazard": hazard,
@@ -1181,7 +1082,7 @@ def _build_archive_and_primary_ranking(
     ranking.sort(
         key=lambda row: (
             -int(row["eligible"]),
-            -float(row["minimum_mini_micro_hazard_uplift"]),
+            -float(row["minimum_target_first_probability"]),
             -float(row["minimum_mini_micro_net_to_drawdown"]),
             str(row["structural_fingerprint"]),
         )
@@ -1196,7 +1097,7 @@ def _archive_manifest(
     population_hash: str,
 ) -> dict[str, Any]:
     payload = {
-        "schema": "counterfactual_hazard_archive_manifest_v1",
+        "schema": "barrier_hazard_archive_manifest_v1",
         "population_hash": population_hash,
         "selection_data_start": "2023-01-01",
         "selection_data_end_exclusive": "2024-01-01",
@@ -1220,7 +1121,7 @@ def _primary_manifest(
     population_hash: str,
 ) -> dict[str, Any]:
     payload = {
-        "schema": "counterfactual_hazard_primary_freeze_v1",
+        "schema": "barrier_hazard_primary_freeze_v1",
         "primary_candidate_id": primary["candidate_id"] if primary else None,
         "primary_specification": (
             {
@@ -1237,6 +1138,7 @@ def _primary_manifest(
                     "session",
                     "quantile",
                     "horizon",
+                    "barrier_scale_multiplier",
                     "activation_context",
                 )
             }
@@ -1248,19 +1150,10 @@ def _primary_manifest(
         "population_hash": population_hash,
         "promotion_test_count": int(primary is not None),
         "candidate_probability_threshold": PRIMARY_ALPHA,
-        "matching_policy": {
-            "contract": "exact",
-            "session_phase_bucket_2h": "exact",
-            "different_trading_session": True,
-            "covariates": [
-                "past_volatility",
-                "past_return_60",
-                "past_participation",
-                "past_opportunity_frequency",
-            ],
-            "distance": "outcome_blind_scaled_euclidean",
-            "control_reuse": False,
-        },
+        "hazard_null_probability": 0.50,
+        "same_bar_policy": "STOP_FIRST",
+        "stop_gap_policy": "WORSE_OF_STOP_LEVEL_AND_BAR_OPEN",
+        "target_gap_policy": "NO_PRICE_IMPROVEMENT_BEYOND_TARGET",
         "selection_data_end_exclusive": "2024-01-01",
         "confirmation_data_start": "2024-01-01",
         "confirmation_data_end_exclusive": "2024-10-01",
@@ -1276,35 +1169,38 @@ def _parameter_diagnostics(
     frames: dict[str, pd.DataFrame],
     primary: dict[str, Any],
     context_cache: dict[tuple[str, int], pd.DataFrame],
+    path_caches: dict[
+        str,
+        dict[
+            tuple[str, str, str, int],
+            tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+        ],
+    ],
 ) -> dict[str, Any]:
     variants: dict[str, Any] = {}
-    for delta in (-0.10, 0.10):
-        quantile = min(max(float(primary["quantile"]) + delta, 0.50), 0.90)
-        label = f"quantile_{int(round(quantile * 100))}"
+    for delta in (-0.25, 0.25):
+        scale = max(float(primary["barrier_scale_multiplier"]) + delta, 0.50)
+        label = f"barrier_scale_{int(round(scale * 100))}"
         variant = {
             **primary,
             "candidate_id": f"{primary['candidate_id']}__diagnostic_{label}",
-            "quantile": quantile,
+            "barrier_scale_multiplier": scale,
         }
-        base, treated = _build_event_sets(
-            frames, [variant], context_cache
+        events = _build_barrier_event_sets(
+            frames, [variant], context_cache, path_caches
         )[variant["candidate_id"]]
-        validation = _validation_events(treated)
-        hazard = paired_hazard_metrics(
-            match_counterfactual_events(
-                validation,
-                _control_pool(_validation_events(base), validation),
-            )
-        )
-        direct = _validation_metrics(validation)
-        variants[label] = {"direct": direct, "hazard": hazard}
+        validation = _validation_events(events)
+        variants[label] = {
+            "direct": _validation_metrics(validation),
+            "hazard": barrier_hazard_metrics(validation),
+        }
     return {
         "diagnostic_only": True,
         "variants": variants,
         "supportive_neighbor_count": int(
             sum(
                 row["direct"]["net_pnl"] > 0
-                and row["hazard"]["probability_uplift"] > 0
+                and row["hazard"]["target_first_probability"] > 0.50
                 for row in variants.values()
             )
         ),
@@ -1319,11 +1215,11 @@ def _shadow_specification(
     context_minutes = int(context.split("m_", 1)[0].removeprefix("completed_"))
     return ShadowSpecification(
         strategy_id=str(primary["candidate_id"]),
-        strategy_version="v1_counterfactual_hazard_pre_holdout",
+        strategy_version="v1_barrier_hazard_pre_holdout",
         feature_versions=(
-            "counterfactual_path_state_features_v1",
+            "past_only_barrier_path_features_v1",
             "closed_bar_context_v1",
-            "outcome_blind_matching_policy_v1",
+            "conservative_symmetric_barrier_execution_v1",
         ),
         markets=(market,),
         timeframes=("1m", f"{context_minutes}m"),
@@ -1334,7 +1230,7 @@ def _shadow_specification(
             "mandatory_flatten_before_session_end": True,
         },
         entry_rules={
-            "event": "past_only_counterfactual_state_threshold_crossing",
+            "event": "past_only_barrier_state_threshold_crossing",
             "feature": primary["feature"],
             "quantile": primary["quantile"],
             "direction": primary["policy_direction"],
@@ -1346,7 +1242,12 @@ def _shadow_specification(
             "missing_feature_or_context_policy": "fail_closed_skip_signal",
         },
         exit_rules={
-            "holding_completed_1m_bars": int(primary["horizon"]),
+            "symmetric_target_stop": True,
+            "past_range_scale_multiplier": primary["barrier_scale_multiplier"],
+            "maximum_holding_completed_1m_bars": int(primary["horizon"]),
+            "same_bar_policy": "stop_first",
+            "stop_gap_policy": "worse_of_stop_and_open",
+            "target_gap_policy": "target_level_no_improvement",
             "no_overnight": True,
         },
         sizing={"contracts": 1, "instrument": market, "micro_first": True},
@@ -1373,6 +1274,7 @@ def _shadow_specification(
             "jsonl": True,
             "signals": True,
             "virtual_fills": True,
+            "barrier_resolution": True,
             "rejections": True,
             "attribution": True,
         },
@@ -1395,7 +1297,7 @@ def _preregistration(
     code_commit: str,
 ) -> dict[str, Any]:
     payload = {
-        "schema": "counterfactual_hazard_preregistration_v1",
+        "schema": "barrier_hazard_preregistration_v1",
         "population_count": len(hypotheses),
         "population_hash": _stable_hash(
             [
@@ -1410,8 +1312,10 @@ def _preregistration(
         "round2": EARLY_ROUND_2,
         "promotion_primary_maximum": 1,
         "primary_alpha": PRIMARY_ALPHA,
-        "counterfactual_target": "positive_net_outcome_probability",
-        "matching_outcome_blind": True,
+        "hazard_target": "symmetric_target_before_stop",
+        "hazard_null_probability": 0.50,
+        "same_bar_policy": "STOP_FIRST",
+        "stop_gap_policy": "WORSE_OF_STOP_LEVEL_AND_BAR_OPEN",
         "archive_diagnostic_only": True,
         "engineering_task_sha256": engineering_task_sha256,
         "repaired_map_sha256": repaired_map_sha256,
@@ -1434,7 +1338,6 @@ def _integrity(
     primary: dict[str, Any] | None,
     primary_manifest: dict[str, Any],
     archive: list[dict[str, Any]],
-    pair_ledger: pd.DataFrame,
     trade_ledger: pd.DataFrame,
     latest_source_timestamp: pd.Timestamp,
 ) -> dict[str, bool]:
@@ -1444,29 +1347,19 @@ def _integrity(
         < pd.Timestamp("2024-01-01", tz="UTC")
         for frame in early_frames.values()
     )
-    pairs_distinct = bool(
-        pair_ledger.empty
-        or (
-            pair_ledger["treated_session"].astype(str)
-            != pair_ledger["control_session"].astype(str)
-        ).all()
-    )
-    pairs_contract = bool(
-        pair_ledger.empty or pair_ledger["active_contract"].notna().all()
-    )
     timing = True
     context_timing = True
     contracts = True
+    ambiguity = True
+    finite = True
     if not trade_ledger.empty:
         timing = bool(
             (
                 trade_ledger["decision_timestamp"]
                 == trade_ledger["timestamp"] + pd.Timedelta(minutes=1)
             ).all()
-            and (
-                trade_ledger["entry_timestamp"]
-                == trade_ledger["decision_timestamp"] + pd.Timedelta(minutes=1)
-            ).all()
+            and (trade_ledger["entry_timestamp"] >= trade_ledger["decision_timestamp"]).all()
+            and (trade_ledger["exit_timestamp"] >= trade_ledger["entry_timestamp"]).all()
         )
         available = trade_ledger["context_availability_timestamp"].notna()
         context_timing = bool(
@@ -1477,16 +1370,27 @@ def _integrity(
             ).all()
         )
         contracts = bool(trade_ledger["active_contract"].notna().all())
+        ambiguous_rows = trade_ledger["barrier_ambiguous_stop_first"].astype(bool)
+        ambiguity = bool(
+            trade_ledger.loc[ambiguous_rows, "barrier_outcome"]
+            .astype(str)
+            .eq("STOP_FIRST")
+            .all()
+        )
+        finite = bool(
+            np.isfinite(trade_ledger["net_pnl"].to_numpy(dtype=float)).all()
+            and np.isfinite(
+                trade_ledger["barrier_distance_points"].to_numpy(dtype=float)
+            ).all()
+        )
     return {
-        "exact_unique_population": len(hypotheses) == 96
-        and len({item["structural_fingerprint"] for item in hypotheses}) == 96,
+        "exact_unique_population": len(hypotheses) == 144
+        and len({item["structural_fingerprint"] for item in hypotheses}) == 144,
         "balanced_markets": all(
-            sum(item["market"] == market for item in hypotheses) == 16
+            sum(item["market"] == market for item in hypotheses) == 24
             for market in MARKET_PAIRS
         ),
-        "new_representation_features_only": set(
-            item["feature"] for item in hypotheses
-        )
+        "new_barrier_features_only": set(item["feature"] for item in hypotheses)
         == set(FEATURES),
         "early_selection_excludes_2024": early_only,
         "one_primary_maximum": int(primary is not None) <= 1,
@@ -1504,12 +1408,11 @@ def _integrity(
             }
         )
         == len(archive),
-        "matched_controls_distinct_sessions": pairs_distinct,
-        "matched_controls_explicit_contract": pairs_contract,
-        "matching_outcome_blind": True,
-        "one_bar_execution_delay": timing,
+        "one_bar_or_later_entry": timing,
         "completed_higher_timeframe_only": context_timing,
         "explicit_contracts": contracts,
+        "ambiguous_bar_is_stop_first": ambiguity,
+        "finite_barrier_paths": finite,
         "q4_excluded": bool(
             latest_source_timestamp < pd.Timestamp("2024-10-01", tz="UTC")
         ),
@@ -1521,7 +1424,7 @@ def _integrity(
 def _record_access_once(hypotheses: list[dict[str, Any]]) -> dict[str, Any]:
     candidate_ids = [item["candidate_id"] for item in hypotheses]
     period = "2023-01-01:2024-10-01"
-    reason = "counterfactual hazard single-primary tournament; Q4 excluded"
+    reason = "barrier-hazard single-primary tournament; Q4 excluded"
     ledger = project_path("reports", "data_access", "data_access_ledger.jsonl")
     if ledger.exists():
         for line in ledger.read_text(encoding="utf-8").splitlines():
@@ -1531,7 +1434,7 @@ def _record_access_once(hypotheses: list[dict[str, Any]]) -> dict[str, Any]:
             if (
                 row.get("period_accessed") == period
                 and row.get("requesting_module")
-                == "hydra.research.counterfactual_hazard_primary"
+                == "hydra.research.barrier_hazard_primary"
                 and sorted(row.get("candidate_ids") or []) == sorted(candidate_ids)
                 and row.get("reason_for_access") == reason
             ):
@@ -1539,7 +1442,7 @@ def _record_access_once(hypotheses: list[dict[str, Any]]) -> dict[str, Any]:
     record = enforce_data_access(
         period,
         DataRole.DEVELOPMENT,
-        "hydra.research.counterfactual_hazard_primary",
+        "hydra.research.barrier_hazard_primary",
         candidate_ids,
         reason,
         None,
@@ -1564,15 +1467,13 @@ def _write_dataframe_ledger(
 
 def _verify(path: Path, expected: str, label: str) -> None:
     if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
-        raise CounterfactualHazardPrimaryError(
-            f"Frozen {label} missing or changed: {path}"
-        )
+        raise BarrierHazardPrimaryError(f"Frozen {label} missing or changed: {path}")
 
 
 def _render_report(payload: dict[str, Any]) -> str:
     return "\n".join(
         [
-            "# Counterfactual Hazard Primary v1",
+            "# Barrier-Hazard Primary v1",
             "",
             f"- Conclusion: `{payload['scientific_conclusion']}`",
             f"- Structural prototypes: `{payload['structural_prototypes']}`",
@@ -1581,6 +1482,7 @@ def _render_report(payload: dict[str, Any]) -> str:
             f"- Frozen primary: `{payload['primary_candidate_id']}`",
             f"- Promising / shadow: `{payload['promising_candidates']}` / `{payload['shadow_candidates']}`",
             f"- Topstep path: `{payload['topstep_path_candidates']}`",
+            "- Same-bar ambiguity: `STOP_FIRST`",
             "- Promotion tests: at most `1`",
             "- Q4 access: `0`",
             "- PAPER_SHADOW_READY: `0`",
