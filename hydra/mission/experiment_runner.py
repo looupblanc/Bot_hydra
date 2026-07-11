@@ -548,4 +548,40 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "barrier_hazard_primary":
+        from hydra.research.barrier_hazard_primary import (
+            run_barrier_hazard_primary,
+        )
+
+        return run_barrier_hazard_primary(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            repaired_map_path=Path(str(experiment["repaired_map_path"])),
+            repaired_map_sha256=str(experiment["repaired_map_sha256"]),
+            repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
+    if experiment_type == "immutable_shadow_activation":
+        from hydra.shadow.activation import run_immutable_shadow_activation
+
+        return run_immutable_shadow_activation(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            source_result_path=Path(str(experiment["source_result_path"])),
+            source_result_sha256=str(experiment["source_result_sha256"]),
+            source_result_hash=str(experiment["source_result_hash"]),
+            candidate_id=str(experiment["candidate_id"]),
+            shadow_configuration_path=Path(
+                str(experiment["shadow_configuration_path"])
+            ),
+            shadow_configuration_sha256=str(
+                experiment["shadow_configuration_sha256"]
+            ),
+            shadow_configuration_hash=str(
+                experiment["shadow_configuration_hash"]
+            ),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")

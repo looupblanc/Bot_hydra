@@ -94,6 +94,10 @@ SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID = (
     "single_primary_context_tournament_v1"
 )
 COUNTERFACTUAL_HAZARD_PRIMARY_EXPERIMENT_ID = "counterfactual_hazard_primary_v1"
+BARRIER_HAZARD_PRIMARY_EXPERIMENT_ID = "barrier_hazard_primary_v1"
+BARRIER_HAZARD_SHADOW_ACTIVATION_EXPERIMENT_ID = (
+    "barrier_hazard_shadow_activation_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -132,6 +136,8 @@ SELECTION_NULL_POLICY_REPAIR_TASK_SHA256 = "8ec374ea09e4f7f6f6c80b4b16665b2cfa74
 SINGLE_PRIMARY_ALPHA_TASK_SHA256 = "b805c986145cbd0003eb46f512acd5989e9967e898bee0d2cf20b9558f01cb93"
 SINGLE_PRIMARY_CONTEXT_TASK_SHA256 = "e66daf691c5a6e6aee54da064aaa8f6e9165f6eac54229ae17d834df38d2839b"
 COUNTERFACTUAL_HAZARD_TASK_SHA256 = "d8771ee8af93edffde574c366bbc411d70531acc828726c6bb44607d559b7b79"
+BARRIER_HAZARD_TASK_SHA256 = "38b7262566c4f90333993fd335bf02d93add244020867f8f46a5d3a117da8a7f"
+BARRIER_SHADOW_ACTIVATION_TASK_SHA256 = "bbf681bd583fc636f48a61da1e3785c05ed8e14b1d81ab03db46b6d80740f7b6"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -162,6 +168,8 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "single_primary_alpha_calibration",
     "single_primary_context_tournament",
     "counterfactual_hazard_primary",
+    "barrier_hazard_primary",
+    "immutable_shadow_activation",
 }
 
 
@@ -431,6 +439,16 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "COUNTERFACTUAL_HAZARD_PRIMARY_REQUIRED"
         )
+        barrier_hazard_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "DISTRIBUTIONAL_BARRIER_HAZARD_PRIMARY_REQUIRED"
+        )
+        barrier_shadow_activation_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "BARRIER_HAZARD_SHADOW_ACTIVATION_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -575,6 +593,19 @@ class AutonomousMissionController:
             and str(get_kv(conn, "current_blocker") or "")
             == "COUNTERFACTUAL_HAZARD_PRIMARY_REQUIRED"
         )
+        barrier_hazard_required = barrier_hazard_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "DISTRIBUTIONAL_BARRIER_HAZARD_PRIMARY_REQUIRED"
+        )
+        barrier_shadow_activation_required = (
+            barrier_shadow_activation_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "BARRIER_HAZARD_SHADOW_ACTIVATION_REQUIRED"
+            )
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -644,6 +675,16 @@ class AutonomousMissionController:
             if counterfactual_hazard_required
             else False
         )
+        barrier_hazard_queued = (
+            self._reconcile_barrier_hazard_primary(conn)
+            if barrier_hazard_required
+            else False
+        )
+        barrier_shadow_activation_queued = (
+            self._reconcile_barrier_shadow_activation(conn)
+            if barrier_shadow_activation_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -673,6 +714,8 @@ class AutonomousMissionController:
             and not ym_strict_promotion_queued
             and not single_primary_context_queued
             and not counterfactual_hazard_queued
+            and not barrier_hazard_queued
+            and not barrier_shadow_activation_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -712,6 +755,8 @@ class AutonomousMissionController:
                 "ym_strict_promotion_queued": ym_strict_promotion_queued,
                 "single_primary_context_queued": single_primary_context_queued,
                 "counterfactual_hazard_queued": counterfactual_hazard_queued,
+                "barrier_hazard_queued": barrier_hazard_queued,
+                "barrier_shadow_activation_queued": barrier_shadow_activation_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -779,6 +824,11 @@ class AutonomousMissionController:
             (
                 COUNTERFACTUAL_HAZARD_PRIMARY_EXPERIMENT_ID,
                 "counterfactual_hazard_plan_written",
+            ),
+            (BARRIER_HAZARD_PRIMARY_EXPERIMENT_ID, "barrier_hazard_plan_written"),
+            (
+                BARRIER_HAZARD_SHADOW_ACTIVATION_EXPERIMENT_ID,
+                "barrier_shadow_activation_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -908,6 +958,16 @@ class AutonomousMissionController:
                 "counterfactual_hazard_primary",
                 "counterfactual_hazard_completed",
             ),
+            (
+                BARRIER_HAZARD_PRIMARY_EXPERIMENT_ID,
+                "barrier_hazard_primary",
+                "barrier_hazard_completed",
+            ),
+            (
+                BARRIER_HAZARD_SHADOW_ACTIVATION_EXPERIMENT_ID,
+                "immutable_shadow_activation",
+                "barrier_shadow_activation_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -956,6 +1016,8 @@ class AutonomousMissionController:
                 "single_primary_alpha_calibration": "single_primary_alpha_result",
                 "single_primary_context_tournament": "single_primary_context_result",
                 "counterfactual_hazard_primary": "counterfactual_hazard_result",
+                "barrier_hazard_primary": "barrier_hazard_result",
+                "immutable_shadow_activation": "barrier_shadow_activation_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -1036,6 +1098,10 @@ class AutonomousMissionController:
                 self._route_single_primary_context_result(conn, result)
             elif experiment_type == "counterfactual_hazard_primary":
                 self._route_counterfactual_hazard_result(conn, result)
+            elif experiment_type == "barrier_hazard_primary":
+                self._route_barrier_hazard_result(conn, result)
+            elif experiment_type == "immutable_shadow_activation":
+                self._route_barrier_shadow_activation_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -2818,6 +2884,185 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_barrier_hazard_primary(self, conn: Any) -> bool:
+        existing = experiment_record(conn, BARRIER_HAZARD_PRIMARY_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(conn, COUNTERFACTUAL_HAZARD_PRIMARY_EXPERIMENT_ID)
+        predecessor_result = dict((predecessor or {}).get("result") or {})
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or predecessor_result.get("scientific_conclusion")
+            != "COUNTERFACTUAL_HAZARD_NO_EARLY_PRIMARY"
+        ):
+            return False
+        task = project_path(
+            "reports", "engineering", "hydra_barrier_hazard_primary_20260711.md"
+        )
+        map_path = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not map_path.is_file():
+            map_path = Path("/root/hydra-bot/data/cache/contract_maps") / map_path.name
+        contracts = (
+            (task, BARRIER_HAZARD_TASK_SHA256, "barrier task"),
+            (map_path, PATH_GEOMETRY_MAP_SHA256, "explicit map"),
+        )
+        mismatch = [
+            label
+            for path, expected, label in contracts
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatch:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "BARRIER_HAZARD_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen barrier sources changed: {', '.join(mismatch)}.",
+            )
+            return False
+        specification = {
+            "experiment_type": "barrier_hazard_primary",
+            "priority": 104.7,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION_AND_DISCOVERY",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": BARRIER_HAZARD_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "source_experiment_id": COUNTERFACTUAL_HAZARD_PRIMARY_EXPERIMENT_ID,
+            "source_result_hash": str(predecessor_result.get("result_hash") or ""),
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.995,
+        }
+        enqueue_experiment(conn, BARRIER_HAZARD_PRIMARY_EXPERIMENT_ID, specification)
+        set_kv(conn, "barrier_hazard_plan_written", True)
+        set_kv(conn, "promotion_pipeline_status", "BARRIER_HAZARD_QUEUED")
+        set_kv(conn, "discovery_pipeline_status", "BARRIER_HAZARD_QUEUED")
+        set_kv(conn, "foundry_current_engine", "DISTRIBUTIONAL_BARRIER_HAZARD")
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_barrier_shadow_activation(self, conn: Any) -> bool:
+        existing = experiment_record(
+            conn, BARRIER_HAZARD_SHADOW_ACTIVATION_EXPERIMENT_ID
+        )
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        source_record = experiment_record(conn, BARRIER_HAZARD_PRIMARY_EXPERIMENT_ID)
+        source = dict((source_record or {}).get("result") or {})
+        candidate_id = str(source.get("primary_candidate_id") or "")
+        candidates = [
+            item
+            for item in source.get("candidates") or []
+            if str(item.get("candidate_id") or "") == candidate_id
+        ]
+        configurations = [
+            item
+            for item in source.get("shadow_configurations") or []
+            if str(item.get("candidate_id") or "") == candidate_id
+        ]
+        if (
+            (source_record or {}).get("status") != "COMPLETED"
+            or source.get("scientific_conclusion")
+            != "BARRIER_HAZARD_SHADOW_CANDIDATE_FOUND"
+            or len(candidates) != 1
+            or candidates[0].get("status") != "SHADOW_RESEARCH_CANDIDATE"
+            or not bool(
+                (candidates[0].get("admission") or {}).get(
+                    "permits_zero_risk_shadow"
+                )
+            )
+            or len(configurations) != 1
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_barrier_shadow_activation_20260711.md",
+        )
+        source_path = Path(
+            str((source.get("artifacts") or {}).get("result_json_path") or "")
+        )
+        if not source_path.is_file():
+            source_path = (
+                Path("/root/hydra-bot/reports/mission_experiments")
+                / BARRIER_HAZARD_PRIMARY_EXPERIMENT_ID
+                / "barrier_hazard_result.json"
+            )
+        configuration = configurations[0]
+        configuration_path = Path(str(configuration.get("path") or ""))
+        if not configuration_path.is_file():
+            configuration_path = (
+                Path("/root/hydra-bot/reports/mission_experiments")
+                / BARRIER_HAZARD_PRIMARY_EXPERIMENT_ID
+                / "shadow_configurations"
+                / f"{candidate_id}.json"
+            )
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != BARRIER_SHADOW_ACTIVATION_TASK_SHA256
+            or not source_path.is_file()
+            or not configuration_path.is_file()
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "BARRIER_SHADOW_ACTIVATION_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                "Barrier source result, activation task or configuration changed.",
+            )
+            return False
+        specification = {
+            "experiment_type": "immutable_shadow_activation",
+            "priority": 110.0,
+            "max_attempts": 2,
+            "pipeline": "SHADOW",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": BARRIER_SHADOW_ACTIVATION_TASK_SHA256,
+            "source_result_path": str(source_path),
+            "source_result_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+            "source_result_hash": str(source["result_hash"]),
+            "candidate_id": candidate_id,
+            "shadow_configuration_path": str(configuration_path),
+            "shadow_configuration_sha256": hashlib.sha256(
+                configuration_path.read_bytes()
+            ).hexdigest(),
+            "shadow_configuration_hash": str(configuration["configuration_hash"]),
+            "code_commit": self._git_commit(),
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 1.0,
+        }
+        enqueue_experiment(
+            conn, BARRIER_HAZARD_SHADOW_ACTIVATION_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "barrier_shadow_activation_plan_written", True)
+        set_kv(conn, "shadow_pipeline_status", "ACTIVATION_QUEUED")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -3595,6 +3840,116 @@ class AutonomousMissionController:
                 "action": blocker,
                 "pipeline": "PROMOTION_AND_DISCOVERY",
                 "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+        if blocker == "DISTRIBUTIONAL_BARRIER_HAZARD_PRIMARY_REQUIRED":
+            self._reconcile_barrier_hazard_primary(conn)
+
+    def _route_barrier_hazard_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, BARRIER_HAZARD_PRIMARY_EXPERIMENT_ID
+        )
+        primary_id = str(result.get("primary_candidate_id") or "")
+        conclusion = str(result.get("scientific_conclusion") or "")
+        shadow_count = int(result.get("shadow_candidates") or 0)
+        promising_count = int(result.get("promising_candidates") or 0)
+        killed = set(get_kv(conn, "foundry_killed_candidate_ids", []) or [])
+        if (
+            primary_id
+            and conclusion == "BARRIER_HAZARD_PRIMARY_FALSIFIED_OR_INSUFFICIENT"
+            and primary_id not in killed
+        ):
+            killed.add(primary_id)
+            set_kv(conn, "foundry_killed_candidate_ids", sorted(killed))
+            set_kv(
+                conn,
+                "strategies_killed",
+                int(get_kv(conn, "strategies_killed", 0)) + 1,
+            )
+        if shadow_count > 0:
+            blocker = "BARRIER_HAZARD_SHADOW_ACTIVATION_REQUIRED"
+        elif promising_count > 0:
+            blocker = "BARRIER_HAZARD_FRESH_ID_REPLICATION_REQUIRED"
+        else:
+            blocker = "ENERGY_METALS_ECOLOGY_SEARCH_REQUIRED"
+        set_kv(conn, "promotion_pipeline_status", "BARRIER_HAZARD_COMPLETED")
+        set_kv(conn, "discovery_pipeline_status", "BARRIER_HAZARD_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(
+            conn,
+            "barrier_hazard_metrics",
+            {
+                "structural_prototypes": int(result.get("structural_prototypes", 0)),
+                "round1_survivors": int(result.get("round1_survivors", 0)),
+                "round2_survivors": int(result.get("round2_survivors", 0)),
+                "diagnostic_archive_size": int(
+                    result.get("diagnostic_archive_size", 0)
+                ),
+                "primary_candidate_id": primary_id or None,
+                "conclusion": conclusion,
+            },
+        )
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "Barrier-hazard primary completed under conservative path ordering; "
+            "shadow classification does not imply final null or holdout passage.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "SHADOW" if shadow_count else "PROMOTION_AND_DISCOVERY",
+                "parallel_discovery": True,
+                "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+        if blocker == "BARRIER_HAZARD_SHADOW_ACTIVATION_REQUIRED":
+            self._reconcile_barrier_shadow_activation(conn)
+
+    def _route_barrier_shadow_activation_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, BARRIER_HAZARD_SHADOW_ACTIVATION_EXPERIMENT_ID
+        )
+        entry = registry_entry_from_activation(result)
+        registry = dict(get_kv(conn, "shadow_active_registry", {}) or {})
+        candidate_id = str(result["candidate_id"])
+        existing = registry.get(candidate_id)
+        if existing is not None and existing != entry:
+            raise ShadowPipelineIntegrityError(
+                "Refusing in-place mutation of an active barrier shadow candidate."
+            )
+        registry[candidate_id] = entry
+        set_kv(conn, "shadow_active_registry", registry)
+        set_kv(conn, "shadow_pipeline_status", "RUNNING_FAIL_CLOSED")
+        set_kv(conn, "shadow_active_candidates", len(registry))
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", "ENERGY_METALS_ECOLOGY_SEARCH_REQUIRED")
+        set_kv(
+            conn,
+            "last_error",
+            "Barrier candidate is active for zero-order forward research; discovery "
+            "must now diversify beyond the equity-index ecology.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": "ENERGY_METALS_ECOLOGY_SEARCH_REQUIRED",
+                "pipeline": "DISCOVERY",
+                "shadow_pipeline": "RUNNING_FAIL_CLOSED",
                 "q4_access_authorized": False,
             },
         )

@@ -1265,3 +1265,42 @@ def test_counterfactual_no_primary_routes_to_barrier_hazard_without_fake_kill(
         ] == 2
     finally:
         conn.close()
+
+
+def test_barrier_shadow_candidate_routes_to_zero_order_activation(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    candidate_id = "strategy_barrier_hazard_NQ_v1"
+    result = {
+        "candidate_count": 144,
+        "structural_prototypes": 144,
+        "round1_survivors": 8,
+        "round2_survivors": 4,
+        "diagnostic_archive_size": 2,
+        "primary_candidate_id": candidate_id,
+        "scientific_conclusion": "BARRIER_HAZARD_SHADOW_CANDIDATE_FOUND",
+        "promising_candidates": 1,
+        "shadow_candidates": 1,
+        "candidates": [
+            {
+                "candidate_id": candidate_id,
+                "status": "SHADOW_RESEARCH_CANDIDATE",
+                "admission": {"permits_zero_risk_shadow": True},
+                "topstep": {"path_candidate": False},
+            }
+        ],
+        "shadow_configurations": [],
+    }
+    try:
+        controller._route_barrier_hazard_result(conn, result)
+
+        assert get_kv(conn, "current_blocker") == (
+            "BARRIER_HAZARD_SHADOW_ACTIVATION_REQUIRED"
+        )
+        assert get_kv(conn, "strategy_prototypes_generated") == 144
+        assert get_kv(conn, "barrier_hazard_metrics")["round2_survivors"] == 4
+        assert get_kv(conn, "shadow_candidates") == 1
+    finally:
+        conn.close()
