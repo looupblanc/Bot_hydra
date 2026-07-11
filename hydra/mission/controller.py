@@ -101,6 +101,9 @@ BARRIER_HAZARD_SHADOW_ACTIVATION_EXPERIMENT_ID = (
 ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID = (
     "energy_metals_barrier_primary_v1"
 )
+ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID = (
+    "energy_metals_session_geometry_primary_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -146,6 +149,7 @@ ENERGY_METALS_DATA_SHA256 = "07b3093ed8ef5888898abc3e531e0b522273a6c2047489b60eb
 ENERGY_METALS_VOLUME_DATA_SHA256 = "6bca31351820713016426286de8ae3ce9f0350b6886f780cccc5565fd65da78d"
 ENERGY_METALS_VOLUME_MAP_SHA256 = "2ac275f4043ef210afa092be8e7f6676c0409c6e2ec5e41a01aecb37427f3815"
 ENERGY_METALS_VOLUME_ROLL_HASH = "01ba149449a494a7a118884813abe10de8845c215b7390dbfbfa9d9dff89de13"
+ENERGY_METALS_SESSION_GEOMETRY_TASK_SHA256 = "74ff930eea1b6e5f80143e44179d6cbaa608aac4cede8986bece2d28d199ccb1"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -178,6 +182,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "counterfactual_hazard_primary",
     "barrier_hazard_primary",
     "energy_metals_barrier_primary",
+    "energy_metals_session_geometry_primary",
     "immutable_shadow_activation",
 }
 
@@ -463,6 +468,11 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "ENERGY_METALS_ECOLOGY_SEARCH_REQUIRED"
         )
+        energy_metals_session_geometry_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "ENERGY_METALS_SESSION_GEOMETRY_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -625,6 +635,14 @@ class AutonomousMissionController:
             and str(get_kv(conn, "current_blocker") or "")
             == "ENERGY_METALS_ECOLOGY_SEARCH_REQUIRED"
         )
+        energy_metals_session_geometry_required = (
+            energy_metals_session_geometry_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "ENERGY_METALS_SESSION_GEOMETRY_REQUIRED"
+            )
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -709,6 +727,11 @@ class AutonomousMissionController:
             if energy_metals_barrier_required
             else False
         )
+        energy_metals_session_geometry_queued = (
+            self._reconcile_energy_metals_session_geometry(conn)
+            if energy_metals_session_geometry_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -741,6 +764,7 @@ class AutonomousMissionController:
             and not barrier_hazard_queued
             and not barrier_shadow_activation_queued
             and not energy_metals_barrier_queued
+            and not energy_metals_session_geometry_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -783,6 +807,7 @@ class AutonomousMissionController:
                 "barrier_hazard_queued": barrier_hazard_queued,
                 "barrier_shadow_activation_queued": barrier_shadow_activation_queued,
                 "energy_metals_barrier_queued": energy_metals_barrier_queued,
+                "energy_metals_session_geometry_queued": energy_metals_session_geometry_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -859,6 +884,10 @@ class AutonomousMissionController:
             (
                 ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID,
                 "energy_metals_barrier_plan_written",
+            ),
+            (
+                ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID,
+                "energy_metals_session_geometry_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1003,6 +1032,11 @@ class AutonomousMissionController:
                 "energy_metals_barrier_primary",
                 "energy_metals_barrier_completed",
             ),
+            (
+                ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID,
+                "energy_metals_session_geometry_primary",
+                "energy_metals_session_geometry_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1054,6 +1088,7 @@ class AutonomousMissionController:
                 "barrier_hazard_primary": "barrier_hazard_result",
                 "immutable_shadow_activation": "barrier_shadow_activation_result",
                 "energy_metals_barrier_primary": "energy_metals_barrier_result",
+                "energy_metals_session_geometry_primary": "energy_metals_session_geometry_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -1140,6 +1175,8 @@ class AutonomousMissionController:
                 self._route_barrier_shadow_activation_result(conn, result)
             elif experiment_type == "energy_metals_barrier_primary":
                 self._route_energy_metals_barrier_result(conn, result)
+            elif experiment_type == "energy_metals_session_geometry_primary":
+                self._route_energy_metals_session_geometry_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -3206,6 +3243,113 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_energy_metals_session_geometry(self, conn: Any) -> bool:
+        existing = experiment_record(
+            conn, ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID
+        )
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(
+            conn, ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID
+        )
+        if (predecessor or {}).get("status") != "COMPLETED":
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_energy_metals_session_geometry_primary_20260711.md",
+        )
+        cache_root = project_path("data", "cache")
+        energy_data = cache_root / "databento" / (
+            "GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_"
+            "2023-01-01_2024-10-01.parquet"
+        )
+        energy_map = cache_root / "contract_maps" / (
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+        )
+        metals_data = cache_root / "databento" / (
+            "GLBX-MDP3_ohlcv-1m_GC-v-0_MGC-v-0_"
+            "2023-01-01_2024-10-01.parquet"
+        )
+        metals_map = cache_root / "contract_maps" / (
+            "roll_map_GLBX-MDP3_ohlcv-1m_01ba149449a494a7.json"
+        )
+        main_cache = Path("/root/hydra-bot/data/cache")
+        resolved = []
+        for path in (energy_data, energy_map, metals_data, metals_map):
+            resolved.append(
+                path
+                if path.is_file()
+                else main_cache / path.relative_to(cache_root)
+            )
+        energy_data, energy_map, metals_data, metals_map = resolved
+        frozen = (
+            (task, ENERGY_METALS_SESSION_GEOMETRY_TASK_SHA256, "engineering task"),
+            (energy_data, ENERGY_METALS_DATA_SHA256, "energy data"),
+            (energy_map, PATH_GEOMETRY_MAP_SHA256, "energy map"),
+            (metals_data, ENERGY_METALS_VOLUME_DATA_SHA256, "metals data"),
+            (metals_map, ENERGY_METALS_VOLUME_MAP_SHA256, "metals map"),
+        )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(
+                conn, "current_blocker", "SESSION_GEOMETRY_FROZEN_SOURCE_MISMATCH"
+            )
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen session-geometry sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        specification = {
+            "experiment_type": "energy_metals_session_geometry_primary",
+            "priority": 105.2,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION_AND_DISCOVERY",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": ENERGY_METALS_SESSION_GEOMETRY_TASK_SHA256,
+            "energy_data_path": str(energy_data),
+            "energy_data_sha256": ENERGY_METALS_DATA_SHA256,
+            "energy_map_path": str(energy_map),
+            "energy_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "energy_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "metals_data_path": str(metals_data),
+            "metals_data_sha256": ENERGY_METALS_VOLUME_DATA_SHA256,
+            "metals_map_path": str(metals_map),
+            "metals_map_sha256": ENERGY_METALS_VOLUME_MAP_SHA256,
+            "metals_roll_map_hash": ENERGY_METALS_VOLUME_ROLL_HASH,
+            "source_experiment_id": ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID,
+            "source_result_hash": str(
+                ((predecessor or {}).get("result") or {}).get("result_hash") or ""
+            ),
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.999,
+        }
+        enqueue_experiment(
+            conn, ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "energy_metals_session_geometry_plan_written", True)
+        set_kv(conn, "promotion_pipeline_status", "SESSION_GEOMETRY_QUEUED")
+        set_kv(conn, "discovery_pipeline_status", "SESSION_GEOMETRY_QUEUED")
+        set_kv(conn, "foundry_current_engine", "ENERGY_METALS_SESSION_GEOMETRY")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -4120,6 +4264,73 @@ class AutonomousMissionController:
             {
                 "action": blocker,
                 "pipeline": "SHADOW" if shadow_count else "DISCOVERY",
+                "parallel_discovery": True,
+                "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
+    def _route_energy_metals_session_geometry_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID
+        )
+        primary_id = str(result.get("primary_candidate_id") or "")
+        conclusion = str(result.get("scientific_conclusion") or "")
+        shadow_count = int(result.get("shadow_candidates") or 0)
+        promising_count = int(result.get("promising_candidates") or 0)
+        killed = set(get_kv(conn, "foundry_killed_candidate_ids", []) or [])
+        if (
+            primary_id
+            and conclusion == "ENERGY_METALS_SESSION_GEOMETRY_PRIMARY_FALSIFIED"
+            and primary_id not in killed
+        ):
+            killed.add(primary_id)
+            set_kv(conn, "foundry_killed_candidate_ids", sorted(killed))
+            set_kv(
+                conn,
+                "strategies_killed",
+                int(get_kv(conn, "strategies_killed", 0)) + 1,
+            )
+        if shadow_count > 0:
+            blocker = "ENERGY_METALS_SESSION_SHADOW_ACTIVATION_REQUIRED"
+        elif promising_count > 0:
+            blocker = "ENERGY_METALS_SESSION_GEOMETRY_REPLICATION_REQUIRED"
+        else:
+            blocker = "CROSS_ASSET_DAILY_HORIZON_REQUIRED"
+        set_kv(conn, "promotion_pipeline_status", "SESSION_GEOMETRY_COMPLETED")
+        set_kv(conn, "discovery_pipeline_status", "SESSION_GEOMETRY_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(
+            conn,
+            "energy_metals_session_geometry_metrics",
+            {
+                "structural_prototypes": int(result.get("structural_prototypes", 0)),
+                "round1_survivors": int(result.get("round1_survivors", 0)),
+                "round2_survivors": int(result.get("round2_survivors", 0)),
+                "diagnostic_archive_size": int(
+                    result.get("diagnostic_archive_size", 0)
+                ),
+                "primary_candidate_id": primary_id or None,
+                "conclusion": conclusion,
+            },
+        )
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "Session geometry completed under a frozen primary. A promising lineage "
+            "may be reformulated with a fresh ID, but the tested version inherits no shadow pass.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "SHADOW" if shadow_count else "PROMOTION_AND_DISCOVERY",
                 "parallel_discovery": True,
                 "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
                 "q4_access_authorized": False,

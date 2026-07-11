@@ -17,6 +17,7 @@ from hydra.mission.controller import (
     CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
     DESIGN_EXPERIMENT_ID,
     ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID,
+    ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID,
     EXECUTION_EXPERIMENT_ID,
     MissionControllerConfig,
     POST_RETEST_DESIGN_EXPERIMENT_ID,
@@ -1316,6 +1317,84 @@ def test_energy_metals_no_primary_counts_once_and_pivots_representation(
             "ENERGY_METALS_SESSION_GEOMETRY_REQUIRED"
         )
         assert get_kv(conn, "strategy_prototypes_generated") == 48
+        assert get_kv(conn, "strategies_killed", 0) == 0
+    finally:
+        conn.close()
+
+
+def test_session_geometry_is_queued_after_energy_barrier_completion(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        enqueue_experiment(
+            conn,
+            ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID,
+            {"experiment_type": "energy_metals_barrier_primary"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID,
+            {"scientific_conclusion": "ENERGY_METALS_BARRIER_NO_EARLY_PRIMARY"},
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_energy_metals_session_geometry(conn)
+        record = experiment_record(
+            conn, ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID
+        )
+
+        assert record is not None
+        assert record["status"] == "QUEUED"
+        assert record["experiment_type"] == (
+            "energy_metals_session_geometry_primary"
+        )
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["network_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_promising_session_geometry_counts_once_and_routes_to_replication(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    result = {
+        "candidate_count": 432,
+        "structural_prototypes": 432,
+        "round1_survivors": 129,
+        "round2_survivors": 30,
+        "diagnostic_archive_size": 11,
+        "primary_candidate_id": "session-primary",
+        "scientific_conclusion": (
+            "ENERGY_METALS_SESSION_GEOMETRY_PROMISING_BUT_INSUFFICIENT"
+        ),
+        "promising_candidates": 1,
+        "shadow_candidates": 0,
+        "candidates": [
+            {
+                "candidate_id": "session-primary",
+                "status": "PROMISING_RESEARCH_CANDIDATE",
+                "mechanism_family": "overnight_inventory_transfer",
+                "primary_market": "CL",
+                "execution_market": "MCL",
+                "net_pnl": 1992.0,
+                "topstep": {"path_candidate": False},
+            }
+        ],
+    }
+    try:
+        controller._route_energy_metals_session_geometry_result(conn, result)
+        controller._route_energy_metals_session_geometry_result(conn, result)
+
+        assert get_kv(conn, "current_blocker") == (
+            "ENERGY_METALS_SESSION_GEOMETRY_REPLICATION_REQUIRED"
+        )
+        assert get_kv(conn, "strategy_prototypes_generated") == 432
         assert get_kv(conn, "strategies_killed", 0) == 0
     finally:
         conn.close()
