@@ -37,6 +37,9 @@ from hydra.research.equity_open_gap_reversal import (
 )
 from hydra.research.opening_direction_hazard import FEATURES, _prepare_features
 from hydra.foundry.q4_freeze import Q4CandidateFreezeError, _validate_candidate
+from hydra.research.cross_ecology_opening_acceptance import (
+    build_opening_acceptance_events,
+)
 from hydra.shadow.runner import ShadowRunner
 from hydra.shadow.signal_bus import ShadowSignal
 from hydra.shadow.specification import ShadowSpecification
@@ -302,6 +305,59 @@ def test_q4_freeze_requires_complete_non_dominated_shadow_evidence() -> None:
     candidate["attacks"]["event_dominated"] = True
     with pytest.raises(Q4CandidateFreezeError, match="not_event_dominated"):
         _validate_candidate(candidate)
+
+
+def test_cross_ecology_opening_window_is_closed_and_prefix_invariant() -> None:
+    rows: list[dict[str, object]] = []
+    previous_close = 75.0
+    for index, day in enumerate(pd.bdate_range("2024-01-02", periods=50)):
+        start = pd.Timestamp(day.date(), tz="America/Chicago") + pd.Timedelta(hours=8)
+        gap = 0.20 + (index % 5) * 0.05
+        for minute in range(92):
+            timestamp = start + pd.Timedelta(minutes=minute)
+            price = previous_close + gap + 0.01 * minute
+            rows.append(
+                {
+                    "timestamp": timestamp.tz_convert("UTC"),
+                    "symbol": "CL",
+                    "active_contract": "CLH4",
+                    "open": price,
+                    "high": price + 0.01,
+                    "low": price - 0.01,
+                    "close": price + 0.005,
+                    "volume": 100.0,
+                }
+            )
+        close_time = pd.Timestamp(day.date(), tz="America/Chicago") + pd.Timedelta(
+            hours=13, minutes=29
+        )
+        previous_close += 0.02
+        rows.append(
+            {
+                "timestamp": close_time.tz_convert("UTC"),
+                "symbol": "CL",
+                "active_contract": "CLH4",
+                "open": previous_close,
+                "high": previous_close + 0.01,
+                "low": previous_close - 0.01,
+                "close": previous_close,
+                "volume": 100.0,
+            }
+        )
+    source = pd.DataFrame(rows)
+    full = build_opening_acceptance_events(source, minimum_history=2)
+    prefix_source = source[source["timestamp"] < pd.Timestamp("2024-02-15", tz="UTC")]
+    prefix = build_opening_acceptance_events(prefix_source, minimum_history=2)
+    assert (
+        full["decision_timestamp"]
+        == full["session_open_timestamp"] + pd.Timedelta(minutes=15)
+    ).all()
+    assert (full["timestamp"] == full["session_open_timestamp"] + pd.Timedelta(minutes=14)).all()
+    shared = full[full["timestamp"].isin(prefix["timestamp"])].set_index("timestamp")
+    prefix = prefix.set_index("timestamp")
+    pd.testing.assert_series_equal(
+        shared.loc[prefix.index, "threshold_q65"], prefix["threshold_q65"], check_names=False
+    )
 
 
 def test_foundry_bootstrap_routes_exactly_once_to_gap_pilot(tmp_path: Path) -> None:

@@ -461,6 +461,7 @@ def _evaluate_candidate(
     mechanism_family: str = "equity_rth_open_gap_reversal",
     direction: str = "contrarian",
     parameter_diagnostics_override: dict[str, Any] | None = None,
+    shadow_spec_complete_override: bool | None = None,
 ) -> dict[str, Any]:
     mini_all = events[events["symbol"].eq(mini)].copy()
     micro_all = events[events["symbol"].eq(micro)].copy()
@@ -497,12 +498,16 @@ def _evaluate_candidate(
         and any(value < -2.0 * abs(overall_mean) for value in transfer_means)
     )
     candidate_id = f"{candidate_prefix}_{mini}_v1"
-    shadow_spec_complete = _shadow_specification_contract_valid(
-        mini=mini,
-        micro=micro,
-        candidate_id=candidate_id,
-        preregistration_hash=preregistration_hash,
-        direction=direction,
+    shadow_spec_complete = (
+        bool(shadow_spec_complete_override)
+        if shadow_spec_complete_override is not None
+        else _shadow_specification_contract_valid(
+            mini=mini,
+            micro=micro,
+            candidate_id=candidate_id,
+            preregistration_hash=preregistration_hash,
+            direction=direction,
+        )
     )
     shadow_evidence = {
         "candidate_id": candidate_id,
