@@ -35,7 +35,13 @@ from hydra.mission.experiment_queue import (
     fail_experiment,
     recover_running_experiments,
 )
-from hydra.mission.mission_state import connect_state, connect_state_readonly, mission_paths, set_kv
+from hydra.mission.mission_state import (
+    connect_state,
+    connect_state_readonly,
+    get_kv,
+    mission_paths,
+    set_kv,
+)
 from hydra.mission.watchdog import HeartbeatStatus, scheduler_health
 
 
@@ -1132,3 +1138,32 @@ def test_heartbeat_json_is_written_atomically(tmp_path: Path) -> None:
     write_heartbeat(paths, {"mission_id": "test", "cycle_count": 1})
     assert json.loads(paths.heartbeat_path.read_text(encoding="utf-8"))["cycle_count"] == 1
     assert not list(paths.state_dir.glob("*.tmp"))
+
+
+def test_failed_selection_null_calibration_routes_to_repair_without_name_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    calls: list[bool] = []
+    monkeypatch.setattr(
+        controller,
+        "_reconcile_selection_null_policy_repair",
+        lambda _conn: calls.append(True) or True,
+    )
+    try:
+        controller._route_selection_null_power_result(
+            conn,
+            {
+                "scientific_conclusion": "SELECTION_NULL_POLICY_FALSE_POSITIVE_CONTROL_FAILED",
+                "maximum_family_false_admission_rate": 0.23,
+                "minimum_meaningful_effect_power_n120_plus": 0.80,
+                "calibration_passed": False,
+            },
+        )
+
+        assert calls == [True]
+        assert get_kv(conn, "current_blocker") == "SELECTION_NULL_POLICY_REPAIR_REQUIRED"
+        assert get_kv(conn, "current_phase") == "ENGINEERING_BLOCKED"
+    finally:
+        conn.close()

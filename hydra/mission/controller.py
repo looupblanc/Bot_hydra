@@ -3141,6 +3141,28 @@ class AutonomousMissionController:
                 "passed": bool(result.get("calibration_passed")),
             },
         )
+        blocker = (
+            "NEW_MECHANISM_OR_FRESH_CONFIRMATION_REQUIRED"
+            if bool(result.get("calibration_passed"))
+            else "SELECTION_NULL_POLICY_REPAIR_REQUIRED"
+        )
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "Validator calibration completed without changing historical candidate status.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "PROMOTION_VALIDATOR",
+                "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
+                "q4_access_authorized": False,
+            },
+        )
         if blocker == "SELECTION_NULL_POLICY_REPAIR_REQUIRED":
             self._reconcile_selection_null_policy_repair(conn)
 
