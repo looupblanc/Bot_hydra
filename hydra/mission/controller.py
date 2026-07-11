@@ -53,6 +53,7 @@ from hydra.pipelines.shadow_pipeline import (
     registry_entry_from_activation,
     tick_shadow_pipeline,
 )
+from hydra.pipelines.resource_scheduler import claim_parallel_batch
 from hydra.utils.config import project_path
 from hydra.utils.time import utc_now_iso
 
@@ -370,6 +371,24 @@ class AutonomousMissionController:
                     "action_type": "ENGINEERING_BLOCKED",
                     "rationale": blocker,
                 }, False
+            if bool(next_experiment.get("parallel_safe")) and self.config.workers > 1:
+                action = {
+                    "action_id": "execute_parallel_safe_pipeline_batch",
+                    "action_type": "RUN_PARALLEL_EXPERIMENT_BATCH",
+                    "worker_limit": int(self.config.workers),
+                    "data_cost": 0.0,
+                    "expected_decision_information_gain": float(
+                        next_experiment.get("expected_decision_information_gain", 1.0)
+                    ),
+                    "rationale": (
+                        "Independent preregistered pipelines are ready for isolated "
+                        "workers and serial single-writer result commits."
+                    ),
+                }
+                self._record_action(conn, action)
+                self._execute_queued_experiment_batch(conn)
+                self._record_progress(conn)
+                return action, True
             action = {
                 "action_id": "execute_highest_priority_queued_experiment",
                 "action_type": "RUN_QUEUED_EXPERIMENT",
@@ -6022,6 +6041,289 @@ class AutonomousMissionController:
             set_kv(conn, "last_error", None)
             set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
 
+    def _execute_queued_experiment_batch(self, conn: Any) -> None:
+        plan = claim_parallel_batch(
+            conn,
+            claimed_by=f"{self.config.mission_id}:{os.getpid()}:parallel",
+            worker_limit=self.config.workers,
+        )
+        experiments = list(plan.experiments)
+        if not experiments:
+            return
+        accepted: list[dict[str, Any]] = []
+        for experiment in experiments:
+            experiment_id = str(experiment["experiment_id"])
+            experiment_type = str(experiment["experiment_type"])
+            try:
+                self._check_experiment_allowed(conn, experiment)
+                if experiment_type not in SUPPORTED_EXPERIMENT_TYPES:
+                    raise RuntimeError(
+                        f"No approved handler for experiment type {experiment_type!r}."
+                    )
+            except Exception as exc:
+                block_experiment(
+                    conn,
+                    experiment_id,
+                    f"parallel_governance_or_handler:{exc}",
+                    claim_token=str(experiment["claim_token"]),
+                )
+                set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+                set_kv(conn, "current_blocker", "PARALLEL_EXPERIMENT_GUARD_FAILED")
+                set_kv(conn, "last_error", str(exc)[:4000])
+                continue
+            accepted.append(experiment)
+        if not accepted:
+            set_kv(conn, "current_experiment", None)
+            set_kv(conn, "active_experiments", [])
+            return
+        active = [
+            {
+                "experiment_id": str(experiment["experiment_id"]),
+                "experiment_type": str(experiment["experiment_type"]),
+                "pipeline": str(experiment.get("pipeline") or "UNSPECIFIED"),
+                "specification_hash": str(experiment["specification_hash"]),
+                "attempt_count": int(experiment["attempt_count"]),
+                "claim_token": str(experiment["claim_token"]),
+                "lease_expires_at": str(experiment["lease_expires_at"]),
+                "started_at_utc": utc_now_iso(),
+            }
+            for experiment in accepted
+        ]
+        set_kv(conn, "current_phase", "RUNNING_PARALLEL_EXPERIMENTS")
+        set_kv(conn, "active_experiments", active)
+        set_kv(conn, "current_experiment", active[0])
+        set_kv(conn, "parallel_worker_limit", int(self.config.workers))
+        set_kv(conn, "last_progress_at_utc", utc_now_iso())
+        write_heartbeat(
+            self.paths,
+            self._heartbeat_payload(
+                conn,
+                current_action={
+                    "action_type": "RUN_PARALLEL_EXPERIMENT_BATCH",
+                    "experiment_ids": [row["experiment_id"] for row in active],
+                    "pipelines": [row["pipeline"] for row in active],
+                },
+                checkpoint=str(get_kv(conn, "last_successful_checkpoint", "")),
+            ),
+        )
+        try:
+            outcomes = self._run_parallel_experiment_workers(conn, accepted)
+        except CleanWorkerInterruption as exc:
+            for experiment in accepted:
+                release_experiment_claim_for_shutdown(
+                    conn,
+                    str(experiment["experiment_id"]),
+                    claim_token=str(experiment["claim_token"]),
+                    reason=str(exc),
+                )
+            set_kv(conn, "current_experiment", None)
+            set_kv(conn, "active_experiments", [])
+            set_kv(conn, "current_phase", "STOPPING")
+            set_kv(conn, "current_blocker", None)
+            set_kv(conn, "last_error", None)
+            return
+        terminal_failures: list[str] = []
+        retry_scheduled = False
+        for experiment in accepted:
+            experiment_id = str(experiment["experiment_id"])
+            outcome = dict(outcomes.get(experiment_id) or {})
+            if bool(outcome.get("ok")):
+                complete_experiment(
+                    conn,
+                    experiment_id,
+                    dict(outcome["result"]),
+                    claim_token=str(experiment["claim_token"]),
+                )
+                continue
+            error = str(outcome.get("error") or "parallel_worker_failed")[:4000]
+            status = fail_experiment(
+                conn,
+                experiment_id,
+                error,
+                retryable=True,
+                claim_token=str(experiment["claim_token"]),
+            )
+            retry_scheduled = retry_scheduled or status == "QUEUED"
+            if status != "QUEUED":
+                terminal_failures.append(experiment_id)
+            record_evidence(
+                self.paths,
+                {
+                    "scope": "EXPERIMENT",
+                    "experiment_id": experiment_id,
+                    "status": status,
+                    "reason": error,
+                    "parallel_batch": True,
+                },
+            )
+        set_kv(conn, "current_experiment", None)
+        set_kv(conn, "active_experiments", [])
+        self._reconcile_completed_experiments(conn)
+        if terminal_failures:
+            set_kv(conn, "current_phase", "EXPERIMENT_BLOCKED")
+            set_kv(
+                conn,
+                "current_blocker",
+                f"PARALLEL_EXPERIMENT_FAILED:{','.join(terminal_failures)}",
+            )
+            set_kv(conn, "last_error", "One parallel worker exhausted retries.")
+        elif retry_scheduled and str(get_kv(conn, "current_phase", "")) not in {
+            "INTEGRITY_BLOCKED",
+            "ENGINEERING_BLOCKED",
+            "EXPERIMENT_BLOCKED",
+        }:
+            set_kv(conn, "current_phase", "RETRY_SCHEDULED")
+        elif str(get_kv(conn, "current_phase", "")) not in {
+            "INTEGRITY_BLOCKED",
+            "ENGINEERING_BLOCKED",
+            "EXPERIMENT_BLOCKED",
+        }:
+            set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+            set_kv(conn, "current_blocker", None)
+            set_kv(conn, "last_error", None)
+
+    def _run_parallel_experiment_workers(
+        self,
+        conn: Any,
+        experiments: list[dict[str, Any]],
+        *,
+        worker_entrypoint: Any = experiment_worker_entry,
+    ) -> dict[str, dict[str, Any]]:
+        result_dir = self.paths.state_dir / "worker_results"
+        result_dir.mkdir(parents=True, exist_ok=True)
+        outcomes: dict[str, dict[str, Any]] = {}
+        workers: dict[str, Any] = {}
+        result_paths: dict[str, Path] = {}
+        context = multiprocessing.get_context("spawn")
+        for experiment in experiments:
+            experiment_id = str(experiment["experiment_id"])
+            specification_hash = str(experiment["specification_hash"])
+            result_path = result_dir / (
+                f"{experiment_id}_{specification_hash[:16]}.json"
+            )
+            result_paths[experiment_id] = result_path
+            if result_path.exists():
+                envelope = json.loads(result_path.read_text(encoding="utf-8"))
+                if (
+                    envelope.get("ok")
+                    and envelope.get("experiment_id") == experiment_id
+                    and envelope.get("specification_hash") == specification_hash
+                ):
+                    outcomes[experiment_id] = {
+                        "ok": True,
+                        "result": dict(envelope["result"]),
+                    }
+                    continue
+                result_path.unlink()
+            worker = context.Process(
+                target=worker_entrypoint,
+                args=(experiment, str(result_path)),
+                name=f"hydra-pipeline-{experiment_id[:24]}",
+            )
+            worker.start()
+            workers[experiment_id] = worker
+        last_lease_renewal = 0.0
+        while any(worker.is_alive() for worker in workers.values()):
+            for worker in workers.values():
+                worker.join(timeout=0.05)
+            if self._shutdown or stop_requested(self.paths):
+                for worker in workers.values():
+                    if worker.is_alive():
+                        self._signal_worker_tree(worker, signal.SIGTERM)
+                for worker in workers.values():
+                    worker.join(timeout=10.0)
+                    if worker.is_alive():
+                        self._signal_worker_tree(worker, signal.SIGKILL)
+                        worker.join(timeout=5.0)
+                raise CleanWorkerInterruption(
+                    "parallel_experiment_workers_interrupted_for_clean_shutdown"
+                )
+            now_monotonic = time.monotonic()
+            if now_monotonic - last_lease_renewal >= 15.0:
+                active_rows: list[dict[str, Any]] = []
+                for experiment in experiments:
+                    experiment_id = str(experiment["experiment_id"])
+                    worker = workers.get(experiment_id)
+                    if worker is None or not worker.is_alive():
+                        continue
+                    lease = renew_experiment_lease(
+                        conn,
+                        experiment_id,
+                        str(experiment["claim_token"]),
+                        lease_seconds=180.0,
+                    )
+                    active_rows.append(
+                        {
+                            "experiment_id": experiment_id,
+                            "experiment_type": str(experiment["experiment_type"]),
+                            "pipeline": str(
+                                experiment.get("pipeline") or "UNSPECIFIED"
+                            ),
+                            "worker_pid": int(worker.pid),
+                            "lease_expires_at": lease,
+                        }
+                    )
+                set_kv(conn, "active_experiments", active_rows)
+                if active_rows:
+                    set_kv(conn, "current_experiment", active_rows[0])
+                write_heartbeat(
+                    self.paths,
+                    self._heartbeat_payload(
+                        conn,
+                        current_action={
+                            "action_type": "RUN_PARALLEL_EXPERIMENT_BATCH",
+                            "active_experiments": active_rows,
+                        },
+                        checkpoint=str(
+                            get_kv(conn, "last_successful_checkpoint", "")
+                        ),
+                    ),
+                )
+                self._tick_shadow_pipeline(conn)
+                last_lease_renewal = now_monotonic
+            time.sleep(0.10)
+        for worker in workers.values():
+            worker.join(timeout=1.0)
+        for experiment in experiments:
+            experiment_id = str(experiment["experiment_id"])
+            if experiment_id in outcomes:
+                continue
+            result_path = result_paths[experiment_id]
+            worker = workers.get(experiment_id)
+            if not result_path.exists():
+                outcomes[experiment_id] = {
+                    "ok": False,
+                    "error": (
+                        "parallel_worker_exited_without_result:"
+                        f"exitcode={getattr(worker, 'exitcode', None)}"
+                    ),
+                }
+                continue
+            envelope = json.loads(result_path.read_text(encoding="utf-8"))
+            if (
+                envelope.get("experiment_id") != experiment_id
+                or envelope.get("specification_hash")
+                != str(experiment["specification_hash"])
+            ):
+                outcomes[experiment_id] = {
+                    "ok": False,
+                    "error": "parallel_worker_result_provenance_mismatch",
+                }
+            elif not envelope.get("ok"):
+                outcomes[experiment_id] = {
+                    "ok": False,
+                    "error": (
+                        f"worker:{envelope.get('error_type')}:"
+                        f"{envelope.get('error')}\n{envelope.get('traceback', '')}"
+                    )[:8000],
+                }
+            else:
+                outcomes[experiment_id] = {
+                    "ok": True,
+                    "result": dict(envelope["result"]),
+                }
+        return outcomes
+
     def _check_experiment_allowed(self, conn: Any, experiment: dict[str, Any]) -> None:
         experiment_type = str(experiment.get("experiment_type") or "")
         check_action_allowed(
@@ -6217,6 +6519,10 @@ class AutonomousMissionController:
             "experiment_counts": experiment_counts(conn),
             "queue_size": queue_size(conn),
             "current_experiment": snapshot.get("current_experiment"),
+            "active_experiments": snapshot.get("active_experiments", []),
+            "parallel_worker_limit": snapshot.get(
+                "parallel_worker_limit", int(self.config.workers)
+            ),
             "latest_completed_experiment": snapshot.get("latest_completed_experiment"),
             "latest_scientific_finding": snapshot.get("latest_scientific_finding"),
             "validated_mechanisms": snapshot.get("validated_mechanisms", 0),
@@ -6236,6 +6542,9 @@ class AutonomousMissionController:
             ),
             "promotion_pipeline_status": snapshot.get(
                 "promotion_pipeline_status", "NOT_INITIALIZED"
+            ),
+            "portfolio_pipeline_status": snapshot.get(
+                "portfolio_pipeline_status", "NOT_INITIALIZED"
             ),
             "shadow_pipeline_status": snapshot.get(
                 "shadow_pipeline_status", "NOT_INITIALIZED"
