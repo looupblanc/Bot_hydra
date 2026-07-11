@@ -13,6 +13,7 @@ import pytest
 
 from hydra.mission.controller import (
     AutonomousMissionController,
+    CAUSAL_TRANSITION_GRAPH_EXPERIMENT_ID,
     CleanWorkerInterruption,
     CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
     CROSS_ASSET_DAILY_EXPERIMENT_ID,
@@ -2128,6 +2129,105 @@ def test_failed_hazard_models_are_killed_once_and_meta_does_not_override_pivot(
         )
         assert get_kv(conn, "meta_failure_allocation")["novel_methods"] == 12
         assert get_kv(conn, "paper_shadow_ready_candidates") == 0
+    finally:
+        conn.close()
+
+
+def test_causal_transition_graph_is_queued_from_calibrated_hazard_failure(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        enqueue_experiment(
+            conn,
+            SURVIVAL_HAZARD_EXPERIMENT_ID,
+            {"experiment_type": "distributional_survival_hazard"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            SURVIVAL_HAZARD_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": (
+                    "SURVIVAL_HAZARD_INSUFFICIENT_OR_DIAGNOSTIC_ONLY"
+                ),
+                "robust_hazard_models": 0,
+                "validator_controls": {"passed": True},
+                "result_hash": "frozen-hazard-result",
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_causal_transition_graph(conn)
+        record = experiment_record(conn, CAUSAL_TRANSITION_GRAPH_EXPERIMENT_ID)
+
+        assert record["status"] == "QUEUED"
+        assert record["specification"]["pipeline"] == "DISCOVERY"
+        assert record["specification"]["parallel_safe"] is True
+        assert record["specification"]["writes_data_access_ledger"] is True
+        assert record["specification"]["predecessor_result_hash"] == (
+            "frozen-hazard-result"
+        )
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["paid_data_allowed"] is False
+        assert record["specification"]["live_or_broker_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_causal_transition_result_retains_promising_and_kills_failures_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr(controller, "_tick_shadow_pipeline", lambda _conn: {})
+    candidates = [
+        {
+            "candidate_id": f"transition-{index}",
+            "status": (
+                "PROMISING_RESEARCH_CANDIDATE"
+                if index == 0
+                else "RESEARCH_PROTOTYPE"
+            ),
+            "mechanism_family": "causal_transition_same_market_state",
+            "primary_market": "RTY",
+            "execution_market": "M2K",
+            "market_ecology": "equity_indices",
+            "net_pnl": 100.0 if index == 0 else -1.0,
+            "topstep": {"path_candidate": False},
+        }
+        for index in range(8)
+    ]
+    result = {
+        "candidate_count": 384,
+        "structural_prototypes": 384,
+        "scientific_conclusion": (
+            "CAUSAL_TRANSITION_GRAPH_PROMISING_BUT_INSUFFICIENT"
+        ),
+        "round1_survivors": 114,
+        "round2_survivors": 35,
+        "elite_count": 8,
+        "promising_candidates": 1,
+        "shadow_candidates": 0,
+        "paper_shadow_ready": 0,
+        "validator_controls": {"passed": True},
+        "candidates": candidates,
+    }
+    try:
+        controller._route_causal_transition_graph_result(conn, result)
+        controller._route_causal_transition_graph_result(conn, result)
+
+        assert get_kv(conn, "current_blocker") == (
+            "CAUSAL_TRANSITION_MATCHED_NULL_AND_MUTATION_REQUIRED"
+        )
+        assert get_kv(conn, "strategy_prototypes_generated") == 384
+        assert get_kv(conn, "strategies_killed") == 7
+        assert get_kv(conn, "promising_candidates") == 1
+        assert get_kv(conn, "shadow_candidates") == 0
+        assert get_kv(conn, "paper_shadow_ready_candidates") == 0
+        assert get_kv(conn, "causal_transition_graph_metrics")["elite_count"] == 8
     finally:
         conn.close()
 

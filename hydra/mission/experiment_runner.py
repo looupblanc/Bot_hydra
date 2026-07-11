@@ -767,6 +767,27 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             snapshot_hash=str(experiment["snapshot_hash"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "causal_transition_graph":
+        from hydra.research.causal_transition_graph import (
+            run_causal_transition_graph,
+        )
+
+        return run_causal_transition_graph(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            core_data_path=Path(str(experiment["core_data_path"])),
+            core_data_sha256=str(experiment["core_data_sha256"]),
+            core_map_path=Path(str(experiment["core_map_path"])),
+            core_map_sha256=str(experiment["core_map_sha256"]),
+            core_roll_map_hash=str(experiment["core_roll_map_hash"]),
+            metals_data_path=Path(str(experiment["metals_data_path"])),
+            metals_data_sha256=str(experiment["metals_data_sha256"]),
+            metals_map_path=Path(str(experiment["metals_map_path"])),
+            metals_map_sha256=str(experiment["metals_map_sha256"]),
+            metals_roll_map_hash=str(experiment["metals_roll_map_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     if experiment_type == "immutable_shadow_activation":
         from hydra.shadow.activation import run_immutable_shadow_activation
 
