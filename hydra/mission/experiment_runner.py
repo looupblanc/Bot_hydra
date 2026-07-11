@@ -562,6 +562,27 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "energy_metals_barrier_primary":
+        from hydra.research.energy_metals_barrier_primary import (
+            run_energy_metals_barrier_primary,
+        )
+
+        return run_energy_metals_barrier_primary(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            energy_data_path=Path(str(experiment["energy_data_path"])),
+            energy_data_sha256=str(experiment["energy_data_sha256"]),
+            energy_map_path=Path(str(experiment["energy_map_path"])),
+            energy_map_sha256=str(experiment["energy_map_sha256"]),
+            energy_roll_map_hash=str(experiment["energy_roll_map_hash"]),
+            metals_data_path=Path(str(experiment["metals_data_path"])),
+            metals_data_sha256=str(experiment["metals_data_sha256"]),
+            metals_map_path=Path(str(experiment["metals_map_path"])),
+            metals_map_sha256=str(experiment["metals_map_sha256"]),
+            metals_roll_map_hash=str(experiment["metals_roll_map_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     if experiment_type == "immutable_shadow_activation":
         from hydra.shadow.activation import run_immutable_shadow_activation
 

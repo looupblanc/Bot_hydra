@@ -16,6 +16,7 @@ from hydra.mission.controller import (
     CleanWorkerInterruption,
     CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
     DESIGN_EXPERIMENT_ID,
+    ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID,
     EXECUTION_EXPERIMENT_ID,
     MissionControllerConfig,
     POST_RETEST_DESIGN_EXPERIMENT_ID,
@@ -1263,6 +1264,59 @@ def test_counterfactual_no_primary_routes_to_barrier_hazard_without_fake_kill(
         assert get_kv(conn, "counterfactual_hazard_metrics")[
             "round2_survivors"
         ] == 2
+    finally:
+        conn.close()
+
+
+def test_energy_metals_barrier_is_queued_from_ecology_blocker(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", "ENERGY_METALS_ECOLOGY_SEARCH_REQUIRED")
+
+        assert controller._reconcile_energy_metals_barrier_primary(conn)
+        record = experiment_record(conn, ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID)
+
+        assert record is not None
+        assert record["status"] == "QUEUED"
+        assert record["experiment_type"] == "energy_metals_barrier_primary"
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["paid_data_allowed"] is False
+        assert record["specification"]["network_allowed"] is False
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+    finally:
+        conn.close()
+
+
+def test_energy_metals_no_primary_counts_once_and_pivots_representation(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    result = {
+        "candidate_count": 48,
+        "structural_prototypes": 48,
+        "round1_survivors": 0,
+        "round2_survivors": 0,
+        "diagnostic_archive_size": 0,
+        "primary_candidate_id": None,
+        "scientific_conclusion": "ENERGY_METALS_BARRIER_NO_EARLY_PRIMARY",
+        "promising_candidates": 0,
+        "shadow_candidates": 0,
+        "candidates": [],
+    }
+    try:
+        controller._route_energy_metals_barrier_result(conn, result)
+        controller._route_energy_metals_barrier_result(conn, result)
+
+        assert get_kv(conn, "current_blocker") == (
+            "ENERGY_METALS_SESSION_GEOMETRY_REQUIRED"
+        )
+        assert get_kv(conn, "strategy_prototypes_generated") == 48
+        assert get_kv(conn, "strategies_killed", 0) == 0
     finally:
         conn.close()
 
