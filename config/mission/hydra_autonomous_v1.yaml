@@ -1,5 +1,5 @@
-version: hydra_autonomous_v1
-objective: persistent_edge_atom_to_topstep_research_mission
+version: hydra_strategy_shadow_foundry_v1
+objective: persistent_multi_engine_strategy_research_and_shadow_deployment_foundry
 baseline_commit: b56c98b8179d67e87d0290690fd8b73f70040dbe
 no_live_trading: true
 validator_calibration_required: true
@@ -10,18 +10,48 @@ workers: 3
 checkpoint_every_minutes: 20
 milestones:
   - M1_VALIDATOR_CALIBRATED
-  - M2_FIRST_VALIDATED_MECHANISM
-  - M3_FIRST_VALIDATED_STRATEGY
-  - M4_FIRST_Q4_PASS
-  - M5_FIRST_FINAL_LOCKBOX_PASS
-  - M6_FIRST_EXECUTABLE_BASKET
-  - M7_MINIMUM_OPERATIONAL_POOL
+  - M2_FIRST_SHADOW_RESEARCH_CANDIDATE
+  - M3_FIRST_PAPER_SHADOW_READY
+  - M4_FIVE_PAPER_SHADOW_READY
+  - M5_TEN_STRATEGIES_FOUR_MECHANISMS
+  - M6_THREE_EXECUTABLE_SHADOW_BASKETS
+  - M7_FIFTEEN_TO_TWENTY_FIVE_PRIMARY_STRATEGIES
   - MISSION_SUCCESS
+evidence_tiers:
+  - RESEARCH_PROTOTYPE
+  - RAW_ECONOMIC_SIGNAL
+  - PROMISING_RESEARCH_CANDIDATE
+  - ROBUST_RESEARCH_CANDIDATE
+  - SHADOW_RESEARCH_CANDIDATE
+  - PAPER_SHADOW_READY
+  - SHADOW_ACTIVE
+  - SHADOW_CONFIRMED
+  - SHADOW_REJECTED
+  - TRADING_READY_CANDIDATE
+  - FUNDED_DEPLOYMENT_ELIGIBLE
+research_allocation:
+  broad_structural_production: 0.35
+  targeted_mutation: 0.20
+  multi_timeframe_and_cross_asset: 0.15
+  distributional_and_hazard: 0.10
+  defensive_and_portfolio_only: 0.10
+  invented_methods: 0.10
+diversity_caps:
+  maximum_family_share: 0.25
+  maximum_market_ecology_share: 0.35
+  maximum_lineage_share: 0.02
+  minimum_exploration_share: 0.15
+shadow_policy:
+  outbound_orders_allowed: false
+  paper_shadow_ready_requires_untouched_holdout: true
+  statistical_uncertainty_may_enter_shadow_research: true
+  fatal_integrity_failures_remain_fatal: true
 hard_stop_conditions:
   - MISSION_SUCCESS
   - budget_violation
   - live_trading_required
   - integrity_failure
   - protected_holdout_unsafely_requested
+  - protected_governance_change_required
   - scientific_exhaustion_demonstrated
   - manual_stop
