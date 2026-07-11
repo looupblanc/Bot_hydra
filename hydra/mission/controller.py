@@ -62,6 +62,7 @@ V3_DESIGN_EXPERIMENT_ID = "calibration_affected_atom_retest_v3_design_v1"
 V3_EXECUTION_EXPERIMENT_ID = "calibration_affected_atom_retest_v3_execution_v1"
 PATH_GEOMETRY_AUDIT_EXPERIMENT_ID = "path_geometry_candidate_audit_v1"
 METAL_ENERGY_PILOT_EXPERIMENT_ID = "metal_energy_session_transition_pilot_v1"
+CROSS_MARKET_PILOT_EXPERIMENT_ID = "cross_market_lead_lag_pilot_v1"
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -81,6 +82,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_v3_execution",
     "path_geometry_candidate_audit",
     "metal_energy_session_transition_pilot",
+    "cross_market_lead_lag_pilot",
 }
 
 
@@ -276,6 +278,7 @@ class AutonomousMissionController:
             previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
             and str(previous_blocker or "") == "MARKET_ECOLOGY_PIVOT_REQUIRED"
         )
+        cross_market_required = bool(previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"} and str(previous_blocker or "") == "MARKET_ECOLOGY_REPRESENTATION_PIVOT_REQUIRED")
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -344,6 +347,7 @@ class AutonomousMissionController:
             str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
             and str(get_kv(conn, "current_blocker") or "") == "MARKET_ECOLOGY_PIVOT_REQUIRED"
         )
+        cross_market_required = cross_market_required or bool(str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED" and str(get_kv(conn, "current_blocker") or "") == "MARKET_ECOLOGY_REPRESENTATION_PIVOT_REQUIRED")
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -354,6 +358,7 @@ class AutonomousMissionController:
             self._reconcile_path_geometry_audit(conn) if path_geometry_required else False
         )
         metal_energy_queued = self._reconcile_metal_energy_pilot(conn) if metal_energy_required else False
+        cross_market_queued = self._reconcile_cross_market_pilot(conn) if cross_market_required else False
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -368,6 +373,7 @@ class AutonomousMissionController:
             and not fresh_v3_retest_queued
             and not path_geometry_queued
             and not metal_energy_queued
+            and not cross_market_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -392,6 +398,7 @@ class AutonomousMissionController:
                 "fresh_v3_retest_queued": fresh_v3_retest_queued,
                 "path_geometry_queued": path_geometry_queued,
                 "metal_energy_queued": metal_energy_queued,
+                "cross_market_queued": cross_market_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -416,6 +423,7 @@ class AutonomousMissionController:
             (V3_EXECUTION_EXPERIMENT_ID, "calibration_retest_v3_execution_plan_written"),
             (PATH_GEOMETRY_AUDIT_EXPERIMENT_ID, "path_geometry_audit_plan_written"),
             (METAL_ENERGY_PILOT_EXPERIMENT_ID, "metal_energy_pilot_plan_written"),
+            (CROSS_MARKET_PILOT_EXPERIMENT_ID, "cross_market_pilot_plan_written"),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -456,6 +464,7 @@ class AutonomousMissionController:
                 "path_geometry_candidate_audit_completed",
             ),
             (METAL_ENERGY_PILOT_EXPERIMENT_ID, "metal_energy_session_transition_pilot", "metal_energy_pilot_completed"),
+            (CROSS_MARKET_PILOT_EXPERIMENT_ID, "cross_market_lead_lag_pilot", "cross_market_pilot_completed"),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -484,6 +493,7 @@ class AutonomousMissionController:
                 "calibration_affected_atom_retest_v3_execution": "calibration_retest_v3_execution_result",
                 "path_geometry_candidate_audit": "path_geometry_candidate_audit_result",
                 "metal_energy_session_transition_pilot": "metal_energy_pilot_result",
+                "cross_market_lead_lag_pilot": "cross_market_pilot_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -524,6 +534,8 @@ class AutonomousMissionController:
                 self._route_path_geometry_result(conn, result)
             elif experiment_type == "metal_energy_session_transition_pilot":
                 self._route_metal_energy_result(conn, result)
+            elif experiment_type == "cross_market_lead_lag_pilot":
+                self._route_cross_market_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -862,6 +874,17 @@ class AutonomousMissionController:
         spec = {"experiment_type": "metal_energy_session_transition_pilot", "priority": 100.0, "max_attempts": 2, "engineering_task_path": str(task), "engineering_task_sha256": task_hash, "repaired_map_path": str(map_path), "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256, "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH, "code_commit": self._git_commit(), "q4_access_allowed": False, "paid_data_allowed": False, "network_allowed": False, "live_or_broker_allowed": False, "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY"}
         enqueue_experiment(conn, METAL_ENERGY_PILOT_EXPERIMENT_ID, spec); set_kv(conn, "metal_energy_pilot_plan_written", True); self._clear_resolved_resume_block(conn); return True
 
+    def _reconcile_cross_market_pilot(self, conn: Any) -> bool:
+        existing = experiment_record(conn, CROSS_MARKET_PILOT_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}: self._clear_resolved_resume_block(conn); return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path("reports", "engineering", "hydra_cross_market_lead_lag_20260711.md")
+        if not task.is_file(): return False
+        mp = project_path("data", "cache", "contract_maps", "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json")
+        spec={"experiment_type":"cross_market_lead_lag_pilot","priority":100.0,"max_attempts":2,"engineering_task_path":str(task),"engineering_task_sha256":hashlib.sha256(task.read_bytes()).hexdigest(),"repaired_map_path":str(mp),"repaired_map_sha256":PATH_GEOMETRY_MAP_SHA256,"repaired_roll_map_hash":PATH_GEOMETRY_ROLL_HASH,"code_commit":self._git_commit(),"q4_access_allowed":False,"paid_data_allowed":False,"network_allowed":False,"live_or_broker_allowed":False}
+        enqueue_experiment(conn,CROSS_MARKET_PILOT_EXPERIMENT_ID,spec); set_kv(conn,"cross_market_pilot_plan_written",True); self._clear_resolved_resume_block(conn); return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -924,6 +947,12 @@ class AutonomousMissionController:
         else:
             blocker = "MARKET_ECOLOGY_REPRESENTATION_PIVOT_REQUIRED"
         set_kv(conn, "current_phase", "ENGINEERING_BLOCKED"); set_kv(conn, "current_blocker", blocker); set_kv(conn, "last_error", "Metal/energy pilot completed; no strategy or mechanism is validated.")
+
+    @staticmethod
+    def _route_cross_market_result(conn: Any, result: dict[str, Any]) -> None:
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", "NEW_REPRESENTATION_PIVOT_REQUIRED")
+        set_kv(conn, "last_error", "Cross-market lead/lag pilot completed; no strategy or mechanism is validated.")
     def _evidence_reconciliation_exists(self, reconciliation_id: str) -> bool:
         path = self.paths.evidence_ledger
         if not path.exists():
