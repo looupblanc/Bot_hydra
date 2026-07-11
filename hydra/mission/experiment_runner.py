@@ -654,6 +654,30 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             ),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "gc_session_geometry_fresh_primary":
+        from hydra.research.gc_session_geometry_fresh_primary import (
+            run_gc_session_geometry_fresh_primary,
+        )
+
+        return run_gc_session_geometry_fresh_primary(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            source_preregistration_path=Path(
+                str(experiment["source_preregistration_path"])
+            ),
+            source_preregistration_sha256=str(
+                experiment["source_preregistration_sha256"]
+            ),
+            source_freeze_path=Path(str(experiment["source_freeze_path"])),
+            source_freeze_sha256=str(experiment["source_freeze_sha256"]),
+            metals_data_path=Path(str(experiment["metals_data_path"])),
+            metals_data_sha256=str(experiment["metals_data_sha256"]),
+            metals_map_path=Path(str(experiment["metals_map_path"])),
+            metals_map_sha256=str(experiment["metals_map_sha256"]),
+            metals_roll_map_hash=str(experiment["metals_roll_map_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     if experiment_type == "immutable_shadow_activation":
         from hydra.shadow.activation import run_immutable_shadow_activation
 

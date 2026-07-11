@@ -19,6 +19,8 @@ from hydra.mission.controller import (
     ENERGY_METALS_BARRIER_PRIMARY_EXPERIMENT_ID,
     ENERGY_METALS_SESSION_GEOMETRY_EXPERIMENT_ID,
     EXECUTION_EXPERIMENT_ID,
+    GC_SESSION_GEOMETRY_FRESH_CHILD_ID,
+    GC_SESSION_GEOMETRY_FRESH_EXPERIMENT_ID,
     MissionControllerConfig,
     POST_RETEST_DESIGN_EXPERIMENT_ID,
     POST_RETEST_PILOT_EXPERIMENT_ID,
@@ -1600,6 +1602,98 @@ def test_synchronized_mcl_shadow_activation_is_idempotent_and_zero_order(
         assert get_kv(conn, "current_blocker") == (
             "GC_SESSION_GEOMETRY_FRESH_ID_REQUIRED"
         )
+        assert get_kv(conn, "paper_shadow_ready_candidates") == 0
+    finally:
+        conn.close()
+
+
+def test_fresh_gc_primary_is_queued_after_micro_shadow_activation(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        enqueue_experiment(
+            conn,
+            SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID,
+            {"experiment_type": "session_geometry_micro_shadow_activation"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": "IMMUTABLE_ZERO_ORDER_SHADOW_ACTIVATED",
+                "candidate_id": SESSION_GEOMETRY_MICRO_CHILD_ID,
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_gc_session_geometry_fresh(conn)
+        record = experiment_record(conn, GC_SESSION_GEOMETRY_FRESH_EXPERIMENT_ID)
+
+        assert record is not None
+        assert record["status"] == "QUEUED"
+        assert record["experiment_type"] == "gc_session_geometry_fresh_primary"
+        assert record["specification"]["selection_end_exclusive"] == "2024-01-01"
+        assert record["specification"]["development_end_exclusive"] == "2024-10-01"
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["paid_data_allowed"] is False
+        assert record["specification"]["network_allowed"] is False
+        assert record["specification"]["live_or_broker_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_concentrated_fresh_gc_primary_is_killed_once_and_pivots(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr(controller, "_tick_shadow_pipeline", lambda _conn: {})
+    result = {
+        "candidate_count": 1,
+        "scientific_conclusion": (
+            "GC_SESSION_GEOMETRY_FRESH_PRIMARY_FALSIFIED_OR_INSUFFICIENT"
+        ),
+        "promising_candidates": 1,
+        "shadow_candidates": 0,
+        "paper_shadow_ready": 0,
+        "candidates": [
+            {
+                "candidate_id": GC_SESSION_GEOMETRY_FRESH_CHILD_ID,
+                "status": "PROMISING_RESEARCH_CANDIDATE",
+                "mechanism_family": "overnight_inventory_reversal",
+                "primary_market": "GC",
+                "execution_market": "MGC",
+                "events": 62,
+                "net_pnl": 262.0,
+                "null_evidence": {"raw_probability": 0.1308},
+                "topstep": {"path_candidate": False},
+            }
+        ],
+    }
+    try:
+        controller._route_gc_session_geometry_fresh_result(conn, result)
+        controller._route_gc_session_geometry_fresh_result(conn, result)
+
+        assert get_kv(conn, "current_blocker") == "CROSS_ASSET_DAILY_HORIZON_REQUIRED"
+        assert get_kv(conn, "strategy_prototypes_generated") == 1
+        assert get_kv(conn, "strategies_killed") == 1
+        assert GC_SESSION_GEOMETRY_FRESH_CHILD_ID in get_kv(
+            conn, "foundry_killed_candidate_ids"
+        )
+        assert get_kv(conn, "gc_session_geometry_fresh_metrics") == {
+            "candidate_id": GC_SESSION_GEOMETRY_FRESH_CHILD_ID,
+            "status": "PROMISING_RESEARCH_CANDIDATE",
+            "events": 62,
+            "net_pnl": 262.0,
+            "null_probability": 0.1308,
+            "conclusion": (
+                "GC_SESSION_GEOMETRY_FRESH_PRIMARY_FALSIFIED_OR_INSUFFICIENT"
+            ),
+        }
         assert get_kv(conn, "paper_shadow_ready_candidates") == 0
     finally:
         conn.close()
