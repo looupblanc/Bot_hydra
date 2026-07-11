@@ -77,6 +77,7 @@ MTF_SESSION_TREND_CONFIRMATION_EXPERIMENT_ID = (
     "mtf_session_trend_confirmation_pilot_v1"
 )
 RTY_YM_RELATIVE_VALUE_EXPERIMENT_ID = "rty_ym_relative_value_pilot_v1"
+YM_SHARED_RISK_OFF_EXPERIMENT_ID = "ym_shared_risk_off_overlay_v1"
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -97,6 +98,10 @@ OPENING_DIRECTION_HAZARD_TASK_SHA256 = "2ad28070ed623b74c86a78647b69bd63b2233de9
 CROSS_ECOLOGY_OPENING_ACCEPTANCE_TASK_SHA256 = "4e2c6e4a5a10249169396a9aac5afc1caae16c591232c117569d4f2dc1acb017"
 MTF_SESSION_TREND_CONFIRMATION_TASK_SHA256 = "1358287cba48702049149e0ae37e81bda95990610ded48692facc930898894b1"
 RTY_YM_RELATIVE_VALUE_TASK_SHA256 = "eeb031aa4ddbe744a964a0fa1d2ab7340c788bce37fb7025251c179098e243e1"
+YM_SHARED_RISK_OFF_TASK_SHA256 = "0b686391803d0f7700c9e166c1bbec4bcb19f79c584963a670bb05adb59e95ac"
+YM_SHARED_RISK_OFF_PARENT_RESULT_SHA256 = "b6a501dddd579875088d30c90fe03bb858d02489364fd41d8db48a944e7fe75d"
+YM_SHARED_RISK_OFF_PARENT_RESULT_HASH = "5d8935510337b92c89ee4ae00ba472700c9c436fe37aadcb92d50c78cd4f68c3"
+YM_SHARED_RISK_OFF_PARENT_LEDGER_SHA256 = "e8f90171ae9efff1dfaca67312e47d05c2dff0200a8ea7a97c911186806cfba3"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -117,6 +122,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "cross_ecology_opening_acceptance_pilot",
     "mtf_session_trend_confirmation_pilot",
     "rty_ym_relative_value_pilot",
+    "ym_shared_risk_off_overlay",
 }
 
 
@@ -349,6 +355,10 @@ class AutonomousMissionController:
             previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
             and str(previous_blocker or "") == "RELATIVE_VALUE_OR_DEFENSIVE_PORTFOLIO_REQUIRED"
         )
+        ym_shared_risk_off_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "") == "DEFENSIVE_PORTFOLIO_RISK_ENGINE_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -464,6 +474,11 @@ class AutonomousMissionController:
             and str(get_kv(conn, "current_blocker") or "")
             == "RELATIVE_VALUE_OR_DEFENSIVE_PORTFOLIO_REQUIRED"
         )
+        ym_shared_risk_off_required = ym_shared_risk_off_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "DEFENSIVE_PORTFOLIO_RISK_ENGINE_REQUIRED"
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -508,6 +523,11 @@ class AutonomousMissionController:
             if rty_ym_relative_value_required
             else False
         )
+        ym_shared_risk_off_queued = (
+            self._reconcile_ym_shared_risk_off(conn)
+            if ym_shared_risk_off_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -532,6 +552,7 @@ class AutonomousMissionController:
             and not cross_ecology_opening_acceptance_queued
             and not mtf_session_trend_confirmation_queued
             and not rty_ym_relative_value_queued
+            and not ym_shared_risk_off_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -566,6 +587,7 @@ class AutonomousMissionController:
                 "cross_ecology_opening_acceptance_queued": cross_ecology_opening_acceptance_queued,
                 "mtf_session_trend_confirmation_queued": mtf_session_trend_confirmation_queued,
                 "rty_ym_relative_value_queued": rty_ym_relative_value_queued,
+                "ym_shared_risk_off_queued": ym_shared_risk_off_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -609,6 +631,7 @@ class AutonomousMissionController:
                 "mtf_session_trend_confirmation_plan_written",
             ),
             (RTY_YM_RELATIVE_VALUE_EXPERIMENT_ID, "rty_ym_relative_value_plan_written"),
+            (YM_SHARED_RISK_OFF_EXPERIMENT_ID, "ym_shared_risk_off_plan_written"),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -687,6 +710,11 @@ class AutonomousMissionController:
                 "rty_ym_relative_value_pilot",
                 "rty_ym_relative_value_completed",
             ),
+            (
+                YM_SHARED_RISK_OFF_EXPERIMENT_ID,
+                "ym_shared_risk_off_overlay",
+                "ym_shared_risk_off_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -725,6 +753,7 @@ class AutonomousMissionController:
                 "cross_ecology_opening_acceptance_pilot": "cross_ecology_opening_acceptance_result",
                 "mtf_session_trend_confirmation_pilot": "mtf_session_trend_confirmation_result",
                 "rty_ym_relative_value_pilot": "rty_ym_relative_value_result",
+                "ym_shared_risk_off_overlay": "ym_shared_risk_off_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -785,6 +814,8 @@ class AutonomousMissionController:
                 self._route_mtf_session_trend_confirmation_result(conn, result)
             elif experiment_type == "rty_ym_relative_value_pilot":
                 self._route_rty_ym_relative_value_result(conn, result)
+            elif experiment_type == "ym_shared_risk_off_overlay":
+                self._route_ym_shared_risk_off_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -1799,6 +1830,115 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_ym_shared_risk_off(self, conn: Any) -> bool:
+        existing = experiment_record(conn, YM_SHARED_RISK_OFF_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path(
+            "reports", "engineering", "hydra_ym_shared_risk_off_overlay_20260711.md"
+        )
+        map_path = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        parent_directory = project_path(
+            "reports", "mission_experiments", EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID
+        )
+        parent_result_path = parent_directory / "equity_open_gap_continuation_result.json"
+        parent_ledger_path = parent_directory / "equity_open_gap_continuation_trade_ledger.jsonl"
+        root = Path("/root/hydra-bot")
+        if not map_path.is_file():
+            map_path = root / map_path.relative_to(project_path())
+        if not parent_result_path.is_file():
+            parent_result_path = (
+                root
+                / "reports"
+                / "mission_experiments"
+                / EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID
+                / parent_result_path.name
+            )
+        if not parent_ledger_path.is_file():
+            parent_ledger_path = (
+                root
+                / "reports"
+                / "mission_experiments"
+                / EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID
+                / parent_ledger_path.name
+            )
+        source_valid = False
+        if parent_result_path.is_file():
+            try:
+                parent_payload = json.loads(parent_result_path.read_text(encoding="utf-8"))
+                source_valid = (
+                    parent_payload.get("result_hash") == YM_SHARED_RISK_OFF_PARENT_RESULT_HASH
+                )
+            except (OSError, json.JSONDecodeError):
+                source_valid = False
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest() != YM_SHARED_RISK_OFF_TASK_SHA256
+            or not map_path.is_file()
+            or hashlib.sha256(map_path.read_bytes()).hexdigest() != PATH_GEOMETRY_MAP_SHA256
+            or not parent_result_path.is_file()
+            or hashlib.sha256(parent_result_path.read_bytes()).hexdigest()
+            != YM_SHARED_RISK_OFF_PARENT_RESULT_SHA256
+            or not parent_ledger_path.is_file()
+            or hashlib.sha256(parent_ledger_path.read_bytes()).hexdigest()
+            != YM_SHARED_RISK_OFF_PARENT_LEDGER_SHA256
+            or not source_valid
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "YM_SHARED_RISK_OFF_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", "Frozen parent, defensive task or explicit map changed.")
+            return False
+        specification = {
+            "experiment_type": "ym_shared_risk_off_overlay",
+            "priority": 105.0,
+            "max_attempts": 2,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": YM_SHARED_RISK_OFF_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "source_parent_result_path": str(parent_result_path),
+            "source_parent_result_sha256": YM_SHARED_RISK_OFF_PARENT_RESULT_SHA256,
+            "source_parent_result_hash": YM_SHARED_RISK_OFF_PARENT_RESULT_HASH,
+            "source_parent_trade_ledger_path": str(parent_ledger_path),
+            "source_parent_trade_ledger_sha256": YM_SHARED_RISK_OFF_PARENT_LEDGER_SHA256,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "q4_lineage_reuse_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.95,
+        }
+        enqueue_experiment(conn, YM_SHARED_RISK_OFF_EXPERIMENT_ID, specification)
+        set_kv(conn, "ym_shared_risk_off_plan_written", True)
+        set_kv(conn, "foundry_current_engine", "ENGINE_H_DEFENSIVE_PORTFOLIO")
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": YM_SHARED_RISK_OFF_EXPERIMENT_ID,
+                "experiment_type": "ym_shared_risk_off_overlay",
+                "status": "QUEUED",
+                "reason": (
+                    "Causal shared-risk deactivation of the only current shadow/Topstep child; "
+                    "it tests drawdown and MLL uncertainty without adding exposure or touching Q4."
+                ),
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -2171,6 +2311,37 @@ class AutonomousMissionController:
         else:
             blocker = "DEFENSIVE_PORTFOLIO_RISK_ENGINE_REQUIRED"
             message = "The frozen relative-value formulation failed or had no executable events; pivot defensive."
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(conn, "last_error", message)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "parallel_blocker": get_kv(conn, "q4_access_blocker"),
+                "q4_access_authorized": False,
+            },
+        )
+
+    @staticmethod
+    def _route_ym_shared_risk_off_result(conn: Any, result: dict[str, Any]) -> None:
+        AutonomousMissionController._update_foundry_candidate_bank(
+            conn, result, YM_SHARED_RISK_OFF_EXPERIMENT_ID
+        )
+        set_kv(conn, "foundry_current_engine", "ENGINE_H_DEFENSIVE_PORTFOLIO")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        shadow = int(result.get("shadow_candidates", 0))
+        promising = int(result.get("promising_candidates", 0))
+        if shadow:
+            blocker = "DEFENSIVE_FORWARD_SHADOW_AND_BASKET_REQUIRED"
+            message = "The defensive child reached safe shadow research; start forward evidence and basket replay."
+        elif promising:
+            blocker = "DEFENSIVE_FAILURE_SURFACE_REQUIRED"
+            message = "The defensive child retained utility but needs a frozen failure-surface audit."
+        else:
+            blocker = "INVENTED_METHOD_OR_PORTFOLIO_SEARCH_REQUIRED"
+            message = "The preregistered shared-risk overlay failed; pivot representation instead of tuning it."
         set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
         set_kv(conn, "current_blocker", blocker)
         set_kv(conn, "last_error", message)

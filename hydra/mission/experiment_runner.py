@@ -347,4 +347,27 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "ym_shared_risk_off_overlay":
+        from hydra.research.ym_shared_risk_off_overlay import (
+            run_ym_shared_risk_off_overlay,
+        )
+
+        return run_ym_shared_risk_off_overlay(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            repaired_map_path=Path(str(experiment["repaired_map_path"])),
+            repaired_map_sha256=str(experiment["repaired_map_sha256"]),
+            repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
+            source_parent_result_path=Path(str(experiment["source_parent_result_path"])),
+            source_parent_result_sha256=str(experiment["source_parent_result_sha256"]),
+            source_parent_result_hash=str(experiment["source_parent_result_hash"]),
+            source_parent_trade_ledger_path=Path(
+                str(experiment["source_parent_trade_ledger_path"])
+            ),
+            source_parent_trade_ledger_sha256=str(
+                experiment["source_parent_trade_ledger_sha256"]
+            ),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")
