@@ -15,6 +15,7 @@ from hydra.utils.config import project_path
 
 
 TASK_SHA256 = "21e39bd03cacf5291cbd7191d23b85dcbab788dd714832a3b28c5d3c5bc660d5"
+RECOVERY_TASK_SHA256 = "94b58ef3eed584171cf6601347a4b91f1b1a204b7f4feaa1434efe0cc77695d1"
 
 
 def main() -> int:
@@ -43,6 +44,17 @@ def main() -> int:
         or hashlib.sha256(task.read_bytes()).hexdigest() != TASK_SHA256
     ):
         raise RuntimeError("Frozen volume-front engineering task is missing or changed.")
+    recovery_task = project_path(
+        "reports",
+        "engineering",
+        "hydra_gc_volume_front_definition_recovery_20260711.md",
+    )
+    if (
+        not recovery_task.is_file()
+        or hashlib.sha256(recovery_task.read_bytes()).hexdigest()
+        != RECOVERY_TASK_SHA256
+    ):
+        raise RuntimeError("Frozen volume-front recovery task is missing or changed.")
     request = volume_front_request()
     if not args.execute:
         print(
@@ -54,6 +66,7 @@ def main() -> int:
                     "maximum_cost_usd": args.max_cost_usd,
                     "minimum_remaining_usd": args.minimum_remaining_usd,
                     "task_sha256": TASK_SHA256,
+                    "recovery_task_sha256": RECOVERY_TASK_SHA256,
                 },
                 indent=2,
                 sort_keys=True,

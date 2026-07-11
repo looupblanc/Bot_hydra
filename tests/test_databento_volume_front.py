@@ -18,7 +18,10 @@ from hydra.data.databento_volume_front import (
     VolumeFrontDataError,
     acquire_volume_front,
     build_volume_front_roll_map,
+    has_unreconciled_download,
+    missing_volume_definition_segments,
     normalize_volume_mappings,
+    supplemental_contracts_from_definitions,
     validate_volume_front_frame,
     volume_front_request,
 )
@@ -216,3 +219,111 @@ def test_acquisition_rejects_cost_and_reserve_before_download(tmp_path: Path) ->
             output_report_dir=tmp_path / "report",
             estimate={"estimated_cost_usd": 4.5},
         )
+
+
+def test_missing_volume_definitions_are_repaired_date_aware() -> None:
+    base = RollMap(
+        dataset="GLBX.MDP3",
+        schema="ohlcv-1m",
+        map_type="BASE",
+        symbols=["GC", "MGC"],
+        contracts=[
+            _contract("GC", "101", "GCJ4"),
+            _contract("MGC", "201", "MGCJ4"),
+        ],
+        unsafe_window_days=3,
+        notes=[],
+    )
+    mappings = {
+        "GC.v.0": [{"d0": "2024-07-31", "d1": "2024-10-01", "s": "393"}],
+        "MGC.v.0": [{"d0": "2024-08-01", "d1": "2024-10-01", "s": "1974"}],
+    }
+    missing = missing_volume_definition_segments(mappings, base)
+    definitions = pd.DataFrame(
+        [
+            {
+                "ts_event": "2024-07-30T12:00:00Z",
+                "instrument_id": 393,
+                "raw_symbol": "GCZ4",
+                "instrument_class": "F",
+                "security_type": "FUT",
+                "asset": "GC",
+                "min_price_increment": 0.1,
+                "expiration": "2024-11-27T17:30:00Z",
+                "activation": "2021-12-01T00:00:00Z",
+                "unit_of_measure_qty": 100.0,
+            },
+            {
+                "ts_event": "2024-07-30T12:00:00Z",
+                "instrument_id": 1974,
+                "raw_symbol": "MGCZ4",
+                "instrument_class": "F",
+                "security_type": "FUT",
+                "asset": "MGC",
+                "min_price_increment": 0.1,
+                "expiration": "2024-11-27T17:30:00Z",
+                "activation": "2021-12-01T00:00:00Z",
+                "unit_of_measure_qty": 10.0,
+            },
+        ]
+    )
+
+    supplemental = supplemental_contracts_from_definitions(missing, definitions)
+    result = build_volume_front_roll_map(
+        mappings,
+        base,
+        roots=("GC", "MGC"),
+        start="2023-01-01",
+        end="2024-10-01",
+        data_checksum="b" * 64,
+        supplemental_contracts=supplemental,
+    )
+
+    assert [row["instrument_id"] for row in missing] == ["393", "1974"]
+    assert {contract.contract for contract in supplemental} == {"GCZ4", "MGCZ4"}
+    assert {contract.contract_multiplier for contract in supplemental} == {10.0, 100.0}
+    assert {contract.contract for contract in result.contracts} == {"GCZ4", "MGCZ4"}
+
+
+def test_unreconciled_download_is_detected_exactly_once(tmp_path: Path) -> None:
+    budget = DatabentoBudgetConfig(
+        ledger_path=str(tmp_path / "ledger.jsonl"),
+        summary_path=str(tmp_path / "summary.md"),
+    )
+    planned = DatabentoSpendRecord(
+        request_id="volume-request",
+        timestamp_utc="2026-07-11T00:00:00Z",
+        dataset="GLBX.MDP3",
+        schema="ohlcv-1m",
+        symbols=["GC.v.0", "MGC.v.0"],
+        stype_in="continuous",
+        start="2023-01-01",
+        end="2024-10-01",
+        estimated_cost_usd=4.4,
+        actual_cost_usd=None,
+        cumulative_estimated_spend_usd=4.4,
+        cumulative_actual_spend_usd=0.0,
+        cache_hit=False,
+        research_purpose="volume repair",
+        candidate_tier="DATA_REPRESENTATION_REPAIR",
+        approval_mode="AUTO_UNDER_HARD_CAP",
+        resulting_file=None,
+        checksum=None,
+        download_status="ESTIMATED_ONLY",
+    )
+    append_spend_record(budget, planned)
+    assert has_unreconciled_download(budget, "volume-request")
+
+    append_spend_record(
+        budget,
+        DatabentoSpendRecord(
+            **{
+                **planned.__dict__,
+                "estimated_cost_usd": 0.0,
+                "actual_cost_usd": 4.4,
+                "resulting_file": "cache.parquet",
+                "download_status": "DOWNLOADED",
+            }
+        ),
+    )
+    assert not has_unreconciled_download(budget, "volume-request")
