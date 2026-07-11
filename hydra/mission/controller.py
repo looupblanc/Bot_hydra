@@ -58,12 +58,21 @@ POST_RETEST_DESIGN_EXPERIMENT_ID = "post_calibration_retest_research_design_v1"
 POST_RETEST_PILOT_EXPERIMENT_ID = "post_calibration_retest_pilot_v1"
 CONTRACT_MAP_REPAIR_EXPERIMENT_ID = "contract_map_date_aware_repair_v1"
 CONTRACT_MAP_REPAIR_TASK_SHA256 = "92c73632fbff1dcc65de99fdef11b04026189b4033505f82d739f5e7e34216b8"
+V3_DESIGN_EXPERIMENT_ID = "calibration_affected_atom_retest_v3_design_v1"
+V3_EXECUTION_EXPERIMENT_ID = "calibration_affected_atom_retest_v3_execution_v1"
+V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
+V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
+V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
+V3_INVALID_EXECUTION_RESULT_HASH = "22123708ac5ce71d89a75b73d7f3b5ee03cfd87d48655f5e28e1d828ddb12de9"
+V3_INVALID_EXECUTION_FILE_SHA256 = "34e4f5d937971f277d8b86d64c69e8078bb8ffbb7e5c9ed841a4409a42c75233"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
     "post_calibration_retest_research_design",
     "validator_integrity_repair_pilot",
     "contract_map_date_aware_repair",
+    "calibration_affected_atom_retest_v3_design",
+    "calibration_affected_atom_retest_v3_execution",
 }
 
 
@@ -243,8 +252,12 @@ class AutonomousMissionController:
         blocked_phase = previous_phase in {"INTEGRITY_BLOCKED", "ENGINEERING_BLOCKED", "EXPERIMENT_BLOCKED"}
         resolved_missing_handler_type = self._resolved_missing_handler_type(previous_phase, previous_blocker)
         contract_map_repair_required = bool(
-            previous_phase == "INTEGRITY_BLOCKED"
+            previous_phase in {"INTEGRITY_BLOCKED", "STOPPED_CLEANLY"}
             and str(previous_blocker or "") == "CONTRACT_MAP_REBUILD_REQUIRED"
+        )
+        fresh_v3_retest_required = bool(
+            previous_phase in {"INTEGRITY_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "") == "FRESH_RETEST_WITH_REPAIRED_MAP_REQUIRED"
         )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
@@ -300,8 +313,16 @@ class AutonomousMissionController:
             str(get_kv(conn, "current_phase", "")) == "INTEGRITY_BLOCKED"
             and str(get_kv(conn, "current_blocker") or "") == "CONTRACT_MAP_REBUILD_REQUIRED"
         )
+        fresh_v3_retest_required = fresh_v3_retest_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "INTEGRITY_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "FRESH_RETEST_WITH_REPAIRED_MAP_REQUIRED"
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
+        )
+        fresh_v3_retest_queued = (
+            self._reconcile_fresh_v3_retest(conn) if fresh_v3_retest_required else False
         )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
@@ -310,7 +331,12 @@ class AutonomousMissionController:
             "ENGINEERING_BLOCKED",
             "EXPERIMENT_BLOCKED",
         }
-        if blocked_phase and resolved_missing_handler_type is None and not contract_map_repair_queued:
+        if (
+            blocked_phase
+            and resolved_missing_handler_type is None
+            and not contract_map_repair_queued
+            and not fresh_v3_retest_queued
+        ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
             set_kv(conn, "last_error", previous_last_error)
@@ -331,6 +357,7 @@ class AutonomousMissionController:
                 "resolved_missing_handler_type": resolved_missing_handler_type,
                 "requeued_legacy_missing_handler_rows": recovered_missing_handler_rows,
                 "contract_map_repair_queued": contract_map_repair_queued,
+                "fresh_v3_retest_queued": fresh_v3_retest_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -351,6 +378,8 @@ class AutonomousMissionController:
             (EXECUTION_EXPERIMENT_ID, "calibration_retest_execution_plan_written"),
             (POST_RETEST_DESIGN_EXPERIMENT_ID, "post_retest_research_plan_written"),
             (CONTRACT_MAP_REPAIR_EXPERIMENT_ID, "contract_map_repair_plan_written"),
+            (V3_DESIGN_EXPERIMENT_ID, "calibration_retest_v3_design_plan_written"),
+            (V3_EXECUTION_EXPERIMENT_ID, "calibration_retest_v3_execution_plan_written"),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -374,6 +403,16 @@ class AutonomousMissionController:
                 CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
                 "contract_map_date_aware_repair",
                 "contract_map_date_aware_repair_completed",
+            ),
+            (
+                V3_DESIGN_EXPERIMENT_ID,
+                "calibration_affected_atom_retest_v3_design",
+                "calibration_retest_v3_design_completed",
+            ),
+            (
+                V3_EXECUTION_EXPERIMENT_ID,
+                "calibration_affected_atom_retest_v3_execution",
+                "calibration_retest_v3_execution_completed",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -399,6 +438,8 @@ class AutonomousMissionController:
                 "post_calibration_retest_research_design": "post_retest_research_design_result",
                 "validator_integrity_repair_pilot": "validator_integrity_repair_pilot_result",
                 "contract_map_date_aware_repair": "contract_map_date_aware_repair_result",
+                "calibration_affected_atom_retest_v3_design": "calibration_retest_v3_design_result",
+                "calibration_affected_atom_retest_v3_execution": "calibration_retest_v3_execution_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -428,6 +469,13 @@ class AutonomousMissionController:
                     "last_error",
                     "Repaired map is valid; a separate fresh preregistration with new atom IDs is required.",
                 )
+            elif experiment_type == "calibration_affected_atom_retest_v3_design":
+                if not self._queue_v3_execution(conn, record):
+                    set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+                    set_kv(conn, "current_blocker", "V3_EXECUTION_SPECIFICATION_INCOMPLETE")
+                    set_kv(conn, "last_error", "Completed v3 design cannot produce a frozen execution spec.")
+            elif experiment_type == "calibration_affected_atom_retest_v3_execution":
+                self._route_v3_execution_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -544,6 +592,215 @@ class AutonomousMissionController:
         set_kv(conn, "current_blocker", None)
         set_kv(conn, "last_error", None)
         return True
+
+    def _reconcile_fresh_v3_retest(self, conn: Any) -> bool:
+        execution = experiment_record(conn, V3_EXECUTION_EXPERIMENT_ID)
+        if execution is not None:
+            if str(execution.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return False
+        design = experiment_record(conn, V3_DESIGN_EXPERIMENT_ID)
+        if design is not None:
+            if design.get("status") == "COMPLETED":
+                return self._queue_v3_execution(conn, design)
+            if str(design.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return False
+
+        repair = experiment_record(conn, CONTRACT_MAP_REPAIR_EXPERIMENT_ID)
+        invalid_execution = experiment_record(conn, EXECUTION_EXPERIMENT_ID)
+        repair_result = (repair or {}).get("result") or {}
+        invalid_result = (invalid_execution or {}).get("result") or {}
+        if (
+            (repair or {}).get("status") != "COMPLETED"
+            or repair_result.get("result_hash") != V3_REPAIR_RESULT_HASH
+            or (invalid_execution or {}).get("status") != "COMPLETED"
+            or invalid_result.get("result_hash") != V3_INVALID_EXECUTION_RESULT_HASH
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "V3_FROZEN_PREDECESSOR_MISMATCH")
+            set_kv(conn, "last_error", "Fresh v3 retest predecessors are missing or have changed.")
+            return False
+        task_path = project_path(
+            "reports", "engineering", "hydra_calibration_retest_v3_20260710.md"
+        )
+        if not task_path.is_file() or hashlib.sha256(task_path.read_bytes()).hexdigest() != (
+            V3_TASK_SHA256
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "V3_ENGINEERING_TASK_HASH_MISMATCH")
+            set_kv(conn, "last_error", "Immutable v3 engineering task is missing or changed.")
+            return False
+        repair_artifacts = repair_result.get("artifacts") or {}
+        invalid_artifacts = invalid_result.get("artifacts") or {}
+        repaired_map = repair_result.get("repaired_map") or {}
+        specification = {
+            "experiment_type": "calibration_affected_atom_retest_v3_design",
+            "priority": 100.0,
+            "max_attempts": 3,
+            "contract_map_repair_result_path": str(
+                repair_artifacts.get("result_json_path") or ""
+            ),
+            "contract_map_repair_result_hash": V3_REPAIR_RESULT_HASH,
+            "contract_map_repair_file_sha256": V3_REPAIR_FILE_SHA256,
+            "invalid_v2_execution_result_path": str(
+                invalid_artifacts.get("result_json_path") or ""
+            ),
+            "invalid_v2_execution_result_hash": V3_INVALID_EXECUTION_RESULT_HASH,
+            "invalid_v2_execution_file_sha256": V3_INVALID_EXECUTION_FILE_SHA256,
+            "repaired_map_path": str(repaired_map.get("path") or ""),
+            "repaired_map_sha256": str(repaired_map.get("sha256") or ""),
+            "repaired_roll_map_hash": str(repaired_map.get("roll_map_hash") or ""),
+            "engineering_task_path": str(task_path),
+            "engineering_task_sha256": V3_TASK_SHA256,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_DESIGN_ONLY",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "market_observation_read_allowed": False,
+        }
+        required = (
+            "contract_map_repair_result_path",
+            "invalid_v2_execution_result_path",
+            "repaired_map_path",
+            "repaired_map_sha256",
+            "repaired_roll_map_hash",
+        )
+        if not all(specification[key] for key in required):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "V3_SOURCE_SPECIFICATION_INCOMPLETE")
+            set_kv(conn, "last_error", "Fresh v3 design lacks frozen predecessor metadata.")
+            return False
+        enqueue_experiment(conn, V3_DESIGN_EXPERIMENT_ID, specification)
+        set_kv(conn, "calibration_retest_v3_design_plan_written", True)
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": V3_DESIGN_EXPERIMENT_ID,
+                "experiment_type": "calibration_affected_atom_retest_v3_design",
+                "status": "QUEUED",
+                "reason": (
+                    "Highest-EDIG resolution of the integrity-conditioned v2 decision using new IDs "
+                    "and the repaired date-aware map."
+                ),
+            },
+        )
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+        return True
+
+    def _queue_v3_execution(self, conn: Any, design: dict[str, Any]) -> bool:
+        existing = experiment_record(conn, V3_EXECUTION_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        result = design.get("result") or {}
+        if result.get("scientific_conclusion") != (
+            "FRESH_V3_RETEST_PREREGISTERED_ON_DATE_AWARE_MAP_NO_EVIDENCE_INHERITED"
+        ):
+            return False
+        paths = result.get("paths") or result.get("artifacts") or {}
+        design_path = paths.get("design") or result.get("design_path")
+        preregistration_path = paths.get("preregistration") or result.get("preregistration_path")
+        manifest = (result.get("source") or {}).get("development_data_manifest") or {}
+        repaired_map = manifest.get("contract_map") or {}
+        if not design_path or not preregistration_path or not repaired_map.get("path"):
+            return False
+        specification = {
+            "experiment_type": "calibration_affected_atom_retest_v3_execution",
+            "priority": 99.0,
+            "max_attempts": 3,
+            "design_path": str(design_path),
+            "design_preregistration_path": str(preregistration_path),
+            "design_hash": str(result.get("design_hash") or ""),
+            "preregistration_hash": str(
+                (result.get("preregistration") or {}).get("preregistration_hash") or ""
+            ),
+            "repaired_map_path": str(repaired_map.get("path")),
+            "repaired_map_sha256": str(repaired_map.get("sha256") or ""),
+            "repaired_roll_map_hash": str(repaired_map.get("roll_map_hash") or ""),
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+        }
+        if not all(
+            specification[key]
+            for key in (
+                "design_hash",
+                "preregistration_hash",
+                "repaired_map_sha256",
+                "repaired_roll_map_hash",
+            )
+        ):
+            return False
+        enqueue_experiment(conn, V3_EXECUTION_EXPERIMENT_ID, specification)
+        set_kv(conn, "calibration_retest_v3_execution_plan_written", True)
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": V3_EXECUTION_EXPERIMENT_ID,
+                "experiment_type": "calibration_affected_atom_retest_v3_execution",
+                "status": "QUEUED",
+                "reason": "Execute the immutable v3 preregistration on the repaired map.",
+            },
+        )
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+        return True
+
+    @staticmethod
+    def _clear_resolved_resume_block(conn: Any) -> None:
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+
+    @staticmethod
+    def _route_v3_execution_result(conn: Any, result: dict[str, Any]) -> None:
+        conclusion = str(result.get("scientific_conclusion") or "")
+        evidence_valid = bool(result.get("evidence_valid_for_decision_change"))
+        survivor_count = int(result.get("calibration_sensitive_survivor_count") or 0)
+        if evidence_valid and survivor_count > 0:
+            phase = "ENGINEERING_BLOCKED"
+            blocker = "V3_SURVIVOR_REPLICATION_DESIGN_REQUIRED"
+        elif conclusion == "ZERO_SURVIVAL_PERSISTS_UNDER_CORRECTED_RETEST_PIVOT_RESEARCH_GRAMMAR":
+            phase = "ENGINEERING_BLOCKED"
+            blocker = "V3_ZERO_SURVIVAL_GEOMETRY_PIVOT_DESIGN_REQUIRED"
+        elif "INSUFFICIENT" in conclusion:
+            phase = "ENGINEERING_BLOCKED"
+            blocker = "V3_INSUFFICIENT_EVIDENCE_RESOLUTION_DESIGN_REQUIRED"
+        elif conclusion.startswith("INVALID_") or conclusion.startswith("INTEGRITY_FAIL"):
+            phase = "INTEGRITY_BLOCKED"
+            blocker = "V3_RETEST_INTEGRITY_RESOLUTION_REQUIRED"
+        else:
+            phase = "ENGINEERING_BLOCKED"
+            blocker = "V3_RETEST_OUTCOME_ROUTING_REQUIRED"
+        set_kv(
+            conn,
+            "v3_retest_outcome",
+            {
+                "scientific_conclusion": conclusion,
+                "evidence_valid_for_decision_change": evidence_valid,
+                "calibration_sensitive_survivor_count": survivor_count,
+                "required_next_action": blocker,
+            },
+        )
+        set_kv(conn, "current_phase", phase)
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "Fresh v3 result requires its preregistered scientific follow-up; no atom or strategy is validated.",
+        )
 
     def _evidence_reconciliation_exists(self, reconciliation_id: str) -> bool:
         path = self.paths.evidence_ledger

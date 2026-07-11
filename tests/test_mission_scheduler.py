@@ -20,6 +20,8 @@ from hydra.mission.controller import (
     MissionControllerConfig,
     POST_RETEST_DESIGN_EXPERIMENT_ID,
     POST_RETEST_PILOT_EXPERIMENT_ID,
+    V3_DESIGN_EXPERIMENT_ID,
+    V3_EXECUTION_EXPERIMENT_ID,
 )
 from hydra.mission.experiment_queue import (
     ExperimentSpecificationConflict,
@@ -879,6 +881,150 @@ def test_clean_stop_restart_reconciles_map_block_before_queueing_repair(
         ).fetchone()
         assert event is not None
         assert json.loads(event[0])["contract_map_repair_queued"] is True
+    finally:
+        conn.close()
+
+
+def test_clean_restart_queues_one_v3_design_then_one_execution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    governance = SimpleNamespace(
+        manifest_hash="test-hash",
+        manifest_path="test-manifest",
+        result=SimpleNamespace(
+            passed=True,
+            details={"cumulative_actual_databento_spend_usd": 0.0, "q4_access_count": 0},
+        ),
+    )
+    monkeypatch.setattr(
+        "hydra.mission.controller.initialize_governance_kernel", lambda **_kwargs: governance
+    )
+    monkeypatch.setattr(
+        "hydra.mission.controller.detect_engineering_capability",
+        lambda: SimpleNamespace(to_dict=lambda: {}),
+    )
+    monkeypatch.setattr("hydra.mission.controller.record_engineering", lambda *_args, **_kwargs: None)
+    try:
+        set_kv(conn, "mission_id", "test_mission")
+        set_kv(conn, "service_state", "STOPPED_CLEANLY")
+        set_kv(conn, "last_shutdown", "clean")
+        set_kv(conn, "current_phase", "STOPPED_CLEANLY")
+        set_kv(conn, "current_blocker", "FRESH_RETEST_WITH_REPAIRED_MAP_REQUIRED")
+
+        enqueue_experiment(
+            conn,
+            EXECUTION_EXPERIMENT_ID,
+            {"experiment_type": "calibration_affected_atom_retest_execution"},
+        )
+        invalid_claim = claim_next_experiment(conn)
+        assert invalid_claim is not None
+        complete_experiment(
+            conn,
+            EXECUTION_EXPERIMENT_ID,
+            {
+                "result_hash": "22123708ac5ce71d89a75b73d7f3b5ee03cfd87d48655f5e28e1d828ddb12de9",
+                "artifacts": {"result_json_path": "invalid-v2.json"},
+            },
+            claim_token=str(invalid_claim["claim_token"]),
+        )
+        enqueue_experiment(
+            conn,
+            CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
+            {"experiment_type": "contract_map_date_aware_repair"},
+        )
+        repair_claim = claim_next_experiment(conn)
+        assert repair_claim is not None
+        complete_experiment(
+            conn,
+            CONTRACT_MAP_REPAIR_EXPERIMENT_ID,
+            {
+                "result_hash": "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d",
+                "artifacts": {"result_json_path": "repair.json"},
+                "repaired_map": {
+                    "path": "repaired-map.json",
+                    "sha256": "map-sha",
+                    "roll_map_hash": "roll-map-hash",
+                },
+            },
+            claim_token=str(repair_claim["claim_token"]),
+        )
+        set_kv(conn, "calibration_retest_execution_completed", True)
+        set_kv(conn, "contract_map_date_aware_repair_completed", True)
+
+        controller._initialize(conn)
+        controller._initialize(conn)
+        design = experiment_record(conn, V3_DESIGN_EXPERIMENT_ID)
+        assert design is not None and design["status"] == "QUEUED"
+        assert design["attempt_count"] == 0
+        assert design["specification"]["q4_access_allowed"] is False
+        assert design["specification"]["market_observation_read_allowed"] is False
+        assert experiment_counts(conn)["TOTAL"] == 3
+        assert json.loads(
+            conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]
+        ) == "PLANNING_NEXT_ACTION"
+
+        design_claim = claim_next_experiment(conn)
+        assert design_claim is not None
+        assert design_claim["experiment_id"] == V3_DESIGN_EXPERIMENT_ID
+        complete_experiment(
+            conn,
+            V3_DESIGN_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": (
+                    "FRESH_V3_RETEST_PREREGISTERED_ON_DATE_AWARE_MAP_NO_EVIDENCE_INHERITED"
+                ),
+                "design_hash": "v3-design-hash",
+                "preregistration": {"preregistration_hash": "v3-prereg-hash"},
+                "paths": {"design": "v3-design.json", "preregistration": "v3-prereg.json"},
+                "source": {
+                    "development_data_manifest": {
+                        "contract_map": {
+                            "path": "repaired-map.json",
+                            "sha256": "map-sha",
+                            "roll_map_hash": "roll-map-hash",
+                        }
+                    }
+                },
+                "report_path": "v3-design.md",
+            },
+            claim_token=str(design_claim["claim_token"]),
+        )
+        controller._reconcile_completed_experiments(conn)
+        controller._reconcile_completed_experiments(conn)
+        execution = experiment_record(conn, V3_EXECUTION_EXPERIMENT_ID)
+        assert execution is not None and execution["status"] == "QUEUED"
+        assert execution["attempt_count"] == 0
+        assert execution["specification"]["repaired_map_path"] == "repaired-map.json"
+        assert experiment_counts(conn)["TOTAL"] == 4
+    finally:
+        conn.close()
+
+
+def test_v3_zero_survival_routes_to_geometry_pivot_without_validation(tmp_path: Path) -> None:
+    conn, paths = _connection(tmp_path)
+    try:
+        AutonomousMissionController._route_v3_execution_result(
+            conn,
+            {
+                "scientific_conclusion": (
+                    "ZERO_SURVIVAL_PERSISTS_UNDER_CORRECTED_RETEST_PIVOT_RESEARCH_GRAMMAR"
+                ),
+                "evidence_valid_for_decision_change": True,
+                "calibration_sensitive_survivor_count": 0,
+            },
+        )
+        assert json.loads(
+            conn.execute("SELECT value FROM kv WHERE key='current_phase'").fetchone()[0]
+        ) == "ENGINEERING_BLOCKED"
+        assert json.loads(
+            conn.execute("SELECT value FROM kv WHERE key='current_blocker'").fetchone()[0]
+        ) == "V3_ZERO_SURVIVAL_GEOMETRY_PIVOT_DESIGN_REQUIRED"
+        outcome = json.loads(
+            conn.execute("SELECT value FROM kv WHERE key='v3_retest_outcome'").fetchone()[0]
+        )
+        assert outcome["calibration_sensitive_survivor_count"] == 0
     finally:
         conn.close()
 

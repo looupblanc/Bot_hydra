@@ -4,7 +4,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from hydra.data.contract_mapping import ContractInfo, RollMap
 from hydra.mission.calibration_retest_execution import (
+    CalibrationRetestExecutionError,
     FOLDS,
     _add_selected_past_only_features,
     _apply_benjamini_hochberg,
@@ -14,8 +16,10 @@ from hydra.mission.calibration_retest_execution import (
     _clustered_contract_bootstrap,
     _matching_fields,
     _matching_covariates,
+    _apply_explicit_contract_map,
     _trading_day_window,
 )
+from hydra.mission.calibration_retest_v3 import REQUIRED_MAP_TYPE
 from hydra.atoms.atom_library import add_atom_features
 
 
@@ -50,6 +54,49 @@ def test_future_return_never_bleeds_across_contract_or_session() -> None:
     assert np.isnan(target.iloc[3])
     assert target.iloc[4] == pytest.approx(0.01)
     assert np.isnan(target.iloc[5])
+
+
+def test_repaired_date_aware_map_is_accepted_only_when_explicitly_required() -> None:
+    roll_map = RollMap(
+        dataset="GLBX.MDP3",
+        schema="ohlcv-1m",
+        map_type=REQUIRED_MAP_TYPE,
+        symbols=["ES"],
+        contracts=[
+            ContractInfo(
+                root="ES",
+                contract="ESH4",
+                month_code="H",
+                year=2024,
+                expiry_date="2024-03-15",
+                last_trade_date="2024-03-15",
+                active_start="2024-01-01",
+                active_end="2024-03-15",
+                roll_date="2024-03-15",
+                tick_size=0.25,
+                tick_value=12.5,
+                point_value=50.0,
+                contract_multiplier=50.0,
+                is_micro=False,
+                instrument_id="1",
+            )
+        ],
+        unsafe_window_days=3,
+        notes=[],
+    )
+    frame = pd.DataFrame(
+        {
+            "symbol": ["ES"],
+            "timestamp": pd.to_datetime(["2024-02-01T12:00:00Z"], utc=True),
+        }
+    )
+    repaired, details = _apply_explicit_contract_map(
+        frame, roll_map, required_map_type=REQUIRED_MAP_TYPE
+    )
+    assert repaired["active_contract"].tolist() == ["ESH4"]
+    assert details["unmapped_contract_rows_excluded"] == 0
+    with pytest.raises(CalibrationRetestExecutionError, match="requires map type"):
+        _apply_explicit_contract_map(frame, roll_map)
 
 
 def test_defensive_target_is_binary_hazard_not_signed_mae() -> None:

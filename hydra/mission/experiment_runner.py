@@ -126,4 +126,52 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             engineering_task_sha256=str(experiment["engineering_task_sha256"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "calibration_affected_atom_retest_v3_design":
+        from hydra.mission.calibration_retest_v3 import (
+            run_calibration_affected_atom_retest_v3_design,
+        )
+
+        return run_calibration_affected_atom_retest_v3_design(
+            output_dir,
+            contract_map_repair_result_path=Path(
+                str(experiment["contract_map_repair_result_path"])
+            ),
+            contract_map_repair_result_hash=str(experiment["contract_map_repair_result_hash"]),
+            contract_map_repair_file_sha256=str(experiment["contract_map_repair_file_sha256"]),
+            invalid_v2_execution_result_path=Path(
+                str(experiment["invalid_v2_execution_result_path"])
+            ),
+            invalid_v2_execution_result_hash=str(
+                experiment["invalid_v2_execution_result_hash"]
+            ),
+            invalid_v2_execution_file_sha256=str(
+                experiment["invalid_v2_execution_file_sha256"]
+            ),
+            repaired_map_path=Path(str(experiment["repaired_map_path"])),
+            repaired_map_sha256=str(experiment["repaired_map_sha256"]),
+            repaired_roll_map_hash=str(experiment["repaired_roll_map_hash"]),
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
+    if experiment_type == "calibration_affected_atom_retest_v3_execution":
+        from hydra.mission.calibration_retest_execution import (
+            run_calibration_affected_atom_retest_execution,
+        )
+        from hydra.mission.calibration_retest_v3 import DESIGN_VERSION, REQUIRED_MAP_TYPE
+
+        return run_calibration_affected_atom_retest_execution(
+            output_dir,
+            design_preregistration_path=Path(str(experiment["design_preregistration_path"])),
+            design_path=Path(str(experiment["design_path"])),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+            contract_map_path=Path(str(experiment["repaired_map_path"])),
+            required_contract_map_type=REQUIRED_MAP_TYPE,
+            expected_design_version=DESIGN_VERSION,
+            execution_version="calibration_affected_atom_retest_execution_v3",
+            output_stem="calibration_affected_atom_retest_v3_execution",
+            data_access_reason=(
+                "fresh calibration-affected atom v3 retest on repaired date-aware map; Q4 excluded"
+            ),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")

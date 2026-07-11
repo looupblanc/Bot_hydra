@@ -57,6 +57,14 @@ def run_calibration_affected_atom_retest_execution(
     historical_report_path: str | Path = DEFAULT_HISTORICAL_REPORT,
     record_data_access: bool = True,
     random_seed: int = 9173,
+    contract_map_path: str | Path | None = None,
+    required_contract_map_type: str = "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DEFINITIONS",
+    expected_design_version: str | None = None,
+    execution_version: str = EXECUTION_VERSION,
+    output_stem: str = "calibration_affected_atom_retest_execution",
+    data_access_reason: str = (
+        "fresh calibration-affected atom v2 retests; expanding walk-forward folds; Q4 excluded"
+    ),
 ) -> dict[str, Any]:
     """Execute only the fresh bounded v2 preregistration on pre-Q4 cached data."""
     design_file = Path(design_path)
@@ -71,6 +79,24 @@ def run_calibration_affected_atom_retest_execution(
         historical_report_path=report_file,
         random_seed=random_seed,
     )
+    if expected_design_version is not None and (
+        design.get("design_version") != expected_design_version
+        or preregistration.get("design_version") != expected_design_version
+    ):
+        raise CalibrationRetestExecutionError("Frozen design version differs from the required execution version.")
+    manifest_contract_map = (
+        (preregistration.get("source") or {}).get("development_data_manifest") or {}
+    ).get("contract_map") or {}
+    selected_contract_map_path: Path | None = None
+    if contract_map_path is not None:
+        selected_contract_map_path = Path(contract_map_path)
+        manifest_path = Path(str(manifest_contract_map.get("path") or ""))
+        if not manifest_path.is_file() or selected_contract_map_path.resolve() != manifest_path.resolve():
+            raise CalibrationRetestExecutionError(
+                "Execution contract map does not equal the frozen preregistration manifest."
+            )
+        if manifest_contract_map.get("map_type") not in {None, required_contract_map_type}:
+            raise CalibrationRetestExecutionError("Frozen manifest contract-map type is not authorized.")
     atoms = list(preregistration["atoms"])
     atom_ids = [str(atom["atom_id"]) for atom in atoms]
 
@@ -91,13 +117,18 @@ def run_calibration_affected_atom_retest_execution(
         access_record = _record_data_access_once(
             "2023-01-01:2024-10-01",
             atom_ids,
-            "fresh calibration-affected atom v2 retests; expanding walk-forward folds; Q4 excluded",
+            data_access_reason,
         )
     else:
         access_record = None
     # The role guard must precede the first market-data read. Manifest and
     # historical-report validation above inspect only frozen metadata/hashes.
-    frame, data_provenance = _load_governed_development_frame(historical, atoms)
+    frame, data_provenance = _load_governed_development_frame(
+        historical,
+        atoms,
+        contract_map_path=selected_contract_map_path,
+        required_contract_map_type=required_contract_map_type,
+    )
 
     feature_frame = _build_past_only_feature_frame(frame)
     prefix_invariance = _verify_prefix_invariance(
@@ -153,8 +184,8 @@ def run_calibration_affected_atom_retest_execution(
         conclusion = "ZERO_SURVIVAL_PERSISTS_UNDER_CORRECTED_RETEST_PIVOT_RESEARCH_GRAMMAR"
 
     payload: dict[str, Any] = {
-        "schema": "calibration_affected_atom_retest_execution_v2",
-        "execution_version": EXECUTION_VERSION,
+        "schema": execution_version,
+        "execution_version": execution_version,
         "scientific_conclusion": conclusion,
         "interpretation_boundary": (
             "A surviving retest supports only bounded family reopening. No atom is labeled validated, no strategy may be assembled, "
@@ -199,8 +230,10 @@ def run_calibration_affected_atom_retest_execution(
     payload["result_hash"] = _stable_hash(payload)
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
-    json_path = destination / "calibration_affected_atom_retest_execution.json"
-    report_path = destination / "calibration_affected_atom_retest_execution.md"
+    if not re.fullmatch(r"[a-z0-9_]+", output_stem):
+        raise CalibrationRetestExecutionError("Execution output stem is invalid.")
+    json_path = destination / f"{output_stem}.json"
+    report_path = destination / f"{output_stem}.md"
     _atomic_write(json_path, json.dumps(payload, indent=2, sort_keys=True, default=str, allow_nan=False) + "\n")
     _atomic_write(report_path, _render_report(payload))
     return {
@@ -736,7 +769,11 @@ def _verify_synthetic_control_prefixes(
 
 
 def _load_governed_development_frame(
-    historical: dict[str, Any], atoms: list[dict[str, Any]]
+    historical: dict[str, Any],
+    atoms: list[dict[str, Any]],
+    *,
+    contract_map_path: Path | None = None,
+    required_contract_map_type: str = "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DEFINITIONS",
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
     symbols = sorted({str(symbol) for atom in atoms for symbol in atom.get("target_markets", [])})
     coverage_rows = list(historical.get("cached_coverage") or [])
@@ -774,11 +811,15 @@ def _load_governed_development_frame(
     )
     if combined["timestamp"].max() >= pd.Timestamp("2024-10-01", tz="UTC"):
         raise CalibrationRetestExecutionError("A loaded observation crosses the sealed Q4 boundary.")
-    contract_map_path = Path(str(historical.get("contract_map_path") or ""))
-    if not contract_map_path.is_file():
+    selected_contract_map_path = contract_map_path or Path(
+        str(historical.get("contract_map_path") or "")
+    )
+    if not selected_contract_map_path.is_file():
         raise CalibrationRetestExecutionError("Explicit contract map required by preregistration is missing.")
-    roll_map = load_roll_map(contract_map_path)
-    combined, roll_details = _apply_explicit_contract_map(combined, roll_map)
+    roll_map = load_roll_map(selected_contract_map_path)
+    combined, roll_details = _apply_explicit_contract_map(
+        combined, roll_map, required_map_type=required_contract_map_type
+    )
     if combined.empty:
         raise CalibrationRetestExecutionError("All selected observations were excluded by explicit contract/roll guards.")
     provenance = {
@@ -787,8 +828,8 @@ def _load_governed_development_frame(
         "period_end_exclusive": "2024-10-01",
         "rows_after_contract_and_roll_guards": int(len(combined)),
         "files": fingerprints,
-        "contract_map_path": str(contract_map_path),
-        "contract_map_sha256": _file_sha256(contract_map_path),
+        "contract_map_path": str(selected_contract_map_path),
+        "contract_map_sha256": _file_sha256(selected_contract_map_path),
         "contract_map_type": roll_map.map_type,
         "contract_evidence_caveat": (
             "Continuous-root OHLCV is annotated with Databento mapped active-contract intervals; this is stronger "
@@ -800,10 +841,15 @@ def _load_governed_development_frame(
     return combined, provenance
 
 
-def _apply_explicit_contract_map(frame: pd.DataFrame, roll_map: RollMap) -> tuple[pd.DataFrame, dict[str, Any]]:
-    if roll_map.map_type != "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DEFINITIONS":
+def _apply_explicit_contract_map(
+    frame: pd.DataFrame,
+    roll_map: RollMap,
+    *,
+    required_map_type: str = "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DEFINITIONS",
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    if roll_map.map_type != required_map_type:
         raise CalibrationRetestExecutionError(
-            f"Retest requires explicit Databento symbology definitions, got {roll_map.map_type!r}."
+            f"Retest requires map type {required_map_type!r}, got {roll_map.map_type!r}."
         )
     out = frame.copy()
     out["active_contract"] = pd.Series(pd.NA, index=out.index, dtype="string")
@@ -822,7 +868,12 @@ def _apply_explicit_contract_map(frame: pd.DataFrame, roll_map: RollMap) -> tupl
         if np.any(starts[1:] < ends[:-1]):
             raise CalibrationRetestExecutionError(f"Overlapping explicit contract intervals for {symbol}.")
         row_positions = np.asarray(list(positions), dtype=int)
-        values = timestamps.iloc[row_positions].astype("int64").to_numpy(dtype=np.int64)
+        values = (
+            timestamps.iloc[row_positions]
+            .astype("datetime64[ns, UTC]")
+            .astype("int64")
+            .to_numpy(dtype=np.int64)
+        )
         interval_index = np.searchsorted(starts, values, side="right") - 1
         valid = (interval_index >= 0) & (interval_index < len(contracts))
         valid &= values < ends[np.clip(interval_index, 0, len(contracts) - 1)]
@@ -834,7 +885,13 @@ def _apply_explicit_contract_map(frame: pd.DataFrame, roll_map: RollMap) -> tupl
             dtype=np.int64,
         )
         if len(roll_days):
-            days = timestamps.iloc[row_positions].dt.normalize().astype("int64").to_numpy(dtype=np.int64)
+            days = (
+                timestamps.iloc[row_positions]
+                .dt.normalize()
+                .astype("datetime64[ns, UTC]")
+                .astype("int64")
+                .to_numpy(dtype=np.int64)
+            )
             insertion = np.searchsorted(roll_days, days)
             left = roll_days[np.clip(insertion - 1, 0, len(roll_days) - 1)]
             right = roll_days[np.clip(insertion, 0, len(roll_days) - 1)]
