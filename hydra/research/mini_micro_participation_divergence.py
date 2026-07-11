@@ -829,7 +829,7 @@ def run_mini_micro_participation_divergence(
     candidate_ids = [row["candidate_id"] for row in population]
     if record_data_access:
         enforce_data_access(
-            "2023-01-01:2024-10-01_EXCLUSIVE",
+            "2023-01-01:2024-10-01",
             DataRole.CONTAMINATED_DEVELOPMENT,
             "hydra.research.mini_micro_participation_divergence",
             candidate_ids,

@@ -553,7 +553,7 @@ def _matched_event_probability(
     if len(events) < 10:
         return 1.0
     pool = _score_rows(contexts, specification)
-    pool = pool.loc[pool["structurally_eligible"].astype(bool)].copy()
+    pool = pool.loc[pool["structurally_eligible"].astype(bool)].copy().reset_index(drop=True)
     if pool.empty:
         return 1.0
     pool["period"] = np.where(
@@ -745,7 +745,7 @@ def run_equity_preclose_inventory_dispersion(
     candidate_ids = [row["candidate_id"] for row in population]
     if record_data_access:
         enforce_data_access(
-            "2023-01-01:2024-10-01_EXCLUSIVE",
+            "2023-01-01:2024-10-01",
             DataRole.CONTAMINATED_DEVELOPMENT,
             "hydra.research.equity_preclose_inventory_dispersion",
             candidate_ids,

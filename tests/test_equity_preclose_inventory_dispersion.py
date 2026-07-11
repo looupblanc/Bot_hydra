@@ -11,6 +11,7 @@ from hydra.research.equity_preclose_inventory_dispersion import (
     MINI_TO_MICRO,
     _bh_family,
     _materialize_events,
+    _matched_event_probability,
     _session_symbol_rows,
     _score_rows,
     apply_causal_thresholds,
@@ -184,4 +185,7 @@ def test_micro_execution_cost_delay_mae_and_account_fields() -> None:
     assert (events["entry_timestamp"] < events["exit_timestamp"]).all()
     assert (events["source_bar_close"] <= events["entry_timestamp"]).all()
     assert events["status_inherited"].eq(False).all()
-
+    probability = _matched_event_probability(
+        contexts, events, specification, seed=17, draws=7
+    )
+    assert 0.0 < probability <= 1.0
