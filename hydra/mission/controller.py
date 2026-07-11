@@ -88,6 +88,8 @@ YM_STRICT_PROMOTION_EXPERIMENT_ID = "ym_open_gap_strict_promotion_v1"
 YM_SHADOW_ACTIVATION_EXPERIMENT_ID = "ym_immutable_shadow_activation_v1"
 ACCELERATED_CONTEXT_TOURNAMENT_EXPERIMENT_ID = "accelerated_context_tournament_v1"
 SELECTION_NULL_POWER_EXPERIMENT_ID = "selection_null_power_calibration_v1"
+SELECTION_NULL_POLICY_REPAIR_EXPERIMENT_ID = "selection_null_policy_repair_v2"
+SINGLE_PRIMARY_ALPHA_EXPERIMENT_ID = "single_primary_alpha_calibration_v3"
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -122,6 +124,8 @@ YM_SHADOW_CONFIGURATION_HASH = "d8ab9d9741aedd8c4b2ab9609d97124d8d66752873bf53ee
 YM_SHADOW_ACTIVATION_TASK_SHA256 = "0ba6b7b53e42d77c2362ed361c8eee81ace9198f4714b54432ce97b6fd9333fc"
 ACCELERATED_CONTEXT_TASK_SHA256 = "07296001c77726aeb99dcb8b6ac6ea44c2bae1f9276489eb1cf2c0f1adaf5753"
 SELECTION_NULL_POWER_TASK_SHA256 = "780fbe3b85473e81e0247777399ac5184d3190f50bddc08a0c3cf8ee4530c7b6"
+SELECTION_NULL_POLICY_REPAIR_TASK_SHA256 = "8ec374ea09e4f7f6f6c80b4b16665b2cfa744dd7661203306d84add3d1ade349"
+SINGLE_PRIMARY_ALPHA_TASK_SHA256 = "b805c986145cbd0003eb46f512acd5989e9967e898bee0d2cf20b9558f01cb93"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -148,6 +152,8 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "ym_immutable_shadow_activation",
     "accelerated_context_tournament",
     "selection_null_power_calibration",
+    "selection_null_policy_repair",
+    "single_primary_alpha_calibration",
 }
 
 
@@ -719,6 +725,11 @@ class AutonomousMissionController:
                 "accelerated_context_tournament_plan_written",
             ),
             (SELECTION_NULL_POWER_EXPERIMENT_ID, "selection_null_power_plan_written"),
+            (
+                SELECTION_NULL_POLICY_REPAIR_EXPERIMENT_ID,
+                "selection_null_policy_repair_plan_written",
+            ),
+            (SINGLE_PRIMARY_ALPHA_EXPERIMENT_ID, "single_primary_alpha_plan_written"),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -827,6 +838,16 @@ class AutonomousMissionController:
                 "selection_null_power_calibration",
                 "selection_null_power_completed",
             ),
+            (
+                SELECTION_NULL_POLICY_REPAIR_EXPERIMENT_ID,
+                "selection_null_policy_repair",
+                "selection_null_policy_repair_completed",
+            ),
+            (
+                SINGLE_PRIMARY_ALPHA_EXPERIMENT_ID,
+                "single_primary_alpha_calibration",
+                "single_primary_alpha_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -871,6 +892,8 @@ class AutonomousMissionController:
                 "ym_immutable_shadow_activation": "ym_shadow_activation_result",
                 "accelerated_context_tournament": "accelerated_context_tournament_result",
                 "selection_null_power_calibration": "selection_null_power_result",
+                "selection_null_policy_repair": "selection_null_policy_repair_result",
+                "single_primary_alpha_calibration": "single_primary_alpha_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -943,6 +966,10 @@ class AutonomousMissionController:
                 self._route_accelerated_context_tournament_result(conn, result)
             elif experiment_type == "selection_null_power_calibration":
                 self._route_selection_null_power_result(conn, result)
+            elif experiment_type == "selection_null_policy_repair":
+                self._route_selection_null_policy_repair_result(conn, result)
+            elif experiment_type == "single_primary_alpha_calibration":
+                self._route_single_primary_alpha_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -2435,6 +2462,109 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_selection_null_policy_repair(self, conn: Any) -> bool:
+        existing = experiment_record(conn, SELECTION_NULL_POLICY_REPAIR_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        source_record = experiment_record(conn, SELECTION_NULL_POWER_EXPERIMENT_ID)
+        if source_record is None or source_record.get("status") != "COMPLETED":
+            return False
+        source = dict(source_record.get("result") or {})
+        task = project_path(
+            "reports", "engineering", "hydra_selection_null_policy_repair_v2_20260711.md"
+        )
+        source_path = Path(str((source.get("artifacts") or {}).get("result_json_path") or ""))
+        if not source_path.is_file():
+            source_path = Path("/root/hydra-bot/reports/mission_experiments") / SELECTION_NULL_POWER_EXPERIMENT_ID / "selection_null_power_result.json"
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != SELECTION_NULL_POLICY_REPAIR_TASK_SHA256
+            or not source_path.is_file()
+            or source.get("scientific_conclusion")
+            != "SELECTION_NULL_POLICY_FALSE_POSITIVE_CONTROL_FAILED"
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "SELECTION_NULL_POLICY_REPAIR_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", "Policy-repair task or calibration v1 source changed.")
+            return False
+        specification = {
+            "experiment_type": "selection_null_policy_repair",
+            "priority": 105.5,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION_VALIDATOR",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": SELECTION_NULL_POLICY_REPAIR_TASK_SHA256,
+            "source_calibration_result_path": str(source_path),
+            "source_calibration_result_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+            "source_calibration_result_hash": str(source["result_hash"]),
+            "code_commit": self._git_commit(),
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.99,
+        }
+        enqueue_experiment(
+            conn, SELECTION_NULL_POLICY_REPAIR_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "selection_null_policy_repair_plan_written", True)
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_single_primary_alpha(self, conn: Any) -> bool:
+        existing = experiment_record(conn, SINGLE_PRIMARY_ALPHA_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        source_record = experiment_record(conn, SELECTION_NULL_POLICY_REPAIR_EXPERIMENT_ID)
+        if source_record is None or source_record.get("status") != "COMPLETED":
+            return False
+        source = dict(source_record.get("result") or {})
+        task = project_path(
+            "reports", "engineering", "hydra_single_primary_alpha_calibration_v3_20260711.md"
+        )
+        source_path = Path(str((source.get("artifacts") or {}).get("result_json_path") or ""))
+        if not source_path.is_file():
+            source_path = Path("/root/hydra-bot/reports/mission_experiments") / SELECTION_NULL_POLICY_REPAIR_EXPERIMENT_ID / "selection_null_policy_repair_result.json"
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest() != SINGLE_PRIMARY_ALPHA_TASK_SHA256
+            or not source_path.is_file()
+            or source.get("scientific_conclusion")
+            != "NO_PROSPECTIVE_POLICY_MET_BOTH_FPR_AND_POWER"
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "SINGLE_PRIMARY_ALPHA_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", "Single-primary task or policy v2 source changed.")
+            return False
+        specification = {
+            "experiment_type": "single_primary_alpha_calibration",
+            "priority": 105.0,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION_VALIDATOR",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": SINGLE_PRIMARY_ALPHA_TASK_SHA256,
+            "source_policy_repair_result_path": str(source_path),
+            "source_policy_repair_result_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+            "source_policy_repair_result_hash": str(source["result_hash"]),
+            "code_commit": self._git_commit(),
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.995,
+        }
+        enqueue_experiment(conn, SINGLE_PRIMARY_ALPHA_EXPERIMENT_ID, specification)
+        set_kv(conn, "single_primary_alpha_plan_written", True)
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -2992,9 +3122,8 @@ class AutonomousMissionController:
         )
         self._reconcile_selection_null_power(conn)
 
-    @staticmethod
     def _route_selection_null_power_result(
-        conn: Any, result: dict[str, Any]
+        self, conn: Any, result: dict[str, Any]
     ) -> None:
         set_kv(conn, "promotion_pipeline_status", "VALIDATOR_CALIBRATION_COMPLETED")
         set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
@@ -3010,6 +3139,53 @@ class AutonomousMissionController:
                     "minimum_meaningful_effect_power_n120_plus"
                 ),
                 "passed": bool(result.get("calibration_passed")),
+            },
+        )
+        if blocker == "SELECTION_NULL_POLICY_REPAIR_REQUIRED":
+            self._reconcile_selection_null_policy_repair(conn)
+
+    def _route_selection_null_policy_repair_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        passed = bool(result.get("calibration_passed"))
+        blocker = (
+            "NEW_SINGLE_PRIMARY_TOURNAMENT_REQUIRED"
+            if passed
+            else "TIGHTER_SINGLE_PRIMARY_ALPHA_CALIBRATION_REQUIRED"
+        )
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(conn, "last_error", "Prospective policy comparison completed; historical statuses unchanged.")
+        if not passed:
+            self._reconcile_single_primary_alpha(conn)
+
+    @staticmethod
+    def _route_single_primary_alpha_result(
+        conn: Any, result: dict[str, Any]
+    ) -> None:
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "single_primary_null_policy", result.get("prospective_policy_contract"))
+        if bool(result.get("calibration_passed")):
+            blocker = "NEW_SINGLE_PRIMARY_TOURNAMENT_REQUIRED"
+            message = (
+                f"Prospective single-primary alpha {result.get('selected_alpha')} calibrated; "
+                "build a new-ID early-fold selection/later-fold confirmation tournament."
+            )
+        else:
+            blocker = "NEW_VALIDATION_STATISTIC_REQUIRED"
+            message = "The bounded alpha grid failed; invent a new calibrated statistic."
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(conn, "last_error", message)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "PROMOTION",
+                "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
+                "q4_access_authorized": False,
             },
         )
         if bool(result.get("calibration_passed")):

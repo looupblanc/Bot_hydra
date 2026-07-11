@@ -469,4 +469,44 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             engineering_task_sha256=str(experiment["engineering_task_sha256"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "selection_null_policy_repair":
+        from hydra.calibration.selection_null_policy_repair import (
+            run_selection_null_policy_repair,
+        )
+
+        return run_selection_null_policy_repair(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            source_calibration_result_path=Path(
+                str(experiment["source_calibration_result_path"])
+            ),
+            source_calibration_result_sha256=str(
+                experiment["source_calibration_result_sha256"]
+            ),
+            source_calibration_result_hash=str(
+                experiment["source_calibration_result_hash"]
+            ),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
+    if experiment_type == "single_primary_alpha_calibration":
+        from hydra.calibration.single_primary_alpha import (
+            run_single_primary_alpha_calibration,
+        )
+
+        return run_single_primary_alpha_calibration(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            source_policy_repair_result_path=Path(
+                str(experiment["source_policy_repair_result_path"])
+            ),
+            source_policy_repair_result_sha256=str(
+                experiment["source_policy_repair_result_sha256"]
+            ),
+            source_policy_repair_result_hash=str(
+                experiment["source_policy_repair_result_hash"]
+            ),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")
