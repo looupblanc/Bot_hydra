@@ -29,6 +29,7 @@ from hydra.mission.controller import (
     META_FAILURE_ALLOCATION_EXPERIMENT_ID,
     POST_RETEST_DESIGN_EXPERIMENT_ID,
     POST_RETEST_PILOT_EXPERIMENT_ID,
+    RTY_TRANSITION_MATCHED_NULL_EXPERIMENT_ID,
     SESSION_GEOMETRY_MICRO_CHILD_ID,
     SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID,
     SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID,
@@ -2228,6 +2229,110 @@ def test_causal_transition_result_retains_promising_and_kills_failures_once(
         assert get_kv(conn, "shadow_candidates") == 0
         assert get_kv(conn, "paper_shadow_ready_candidates") == 0
         assert get_kv(conn, "causal_transition_graph_metrics")["elite_count"] == 8
+    finally:
+        conn.close()
+
+
+def test_rty_matched_null_is_queued_from_exact_transition_parent(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    try:
+        enqueue_experiment(
+            conn,
+            CAUSAL_TRANSITION_GRAPH_EXPERIMENT_ID,
+            {"experiment_type": "causal_transition_graph"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            CAUSAL_TRANSITION_GRAPH_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": (
+                    "CAUSAL_TRANSITION_GRAPH_PROMISING_BUT_INSUFFICIENT"
+                ),
+                "result_hash": (
+                    "873fe9a2d4bc613ca9c0b0285e8168e1cf03a5ab25994b1aa27ca45a43bd56cf"
+                ),
+                "promising_candidates": 1,
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_rty_transition_matched_null(conn)
+        record = experiment_record(conn, RTY_TRANSITION_MATCHED_NULL_EXPERIMENT_ID)
+
+        assert record["status"] == "QUEUED"
+        assert record["specification"]["pipeline"] == "PROMOTION"
+        assert record["specification"]["parallel_safe"] is True
+        assert record["specification"]["writes_data_access_ledger"] is True
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["paid_data_allowed"] is False
+        assert record["specification"]["live_or_broker_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_unsupported_rty_matched_null_freezes_parent_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr(controller, "_tick_shadow_pipeline", lambda _conn: {})
+    parent_id = "strategy_transition_RTY_to_RTY_up_expansion_long_h60_v1"
+    graph_result = {
+        "candidate_count": 384,
+        "structural_prototypes": 384,
+        "scientific_conclusion": (
+            "CAUSAL_TRANSITION_GRAPH_PROMISING_BUT_INSUFFICIENT"
+        ),
+        "promising_candidates": 1,
+        "shadow_candidates": 0,
+        "paper_shadow_ready": 0,
+        "candidates": [
+            {
+                "candidate_id": parent_id,
+                "status": "PROMISING_RESEARCH_CANDIDATE",
+                "mechanism_family": "causal_transition_same_market_state",
+                "primary_market": "RTY",
+                "execution_market": "M2K",
+                "market_ecology": "equity_indices",
+                "net_pnl": 773.0,
+                "topstep": {"path_candidate": False},
+            }
+        ],
+    }
+    matched_result = {
+        "candidate_count": 0,
+        "structural_prototypes": 0,
+        "scientific_conclusion": "RTY_EXPANSION_MATCHED_MECHANISM_NOT_SUPPORTED",
+        "mechanism_supported": False,
+        "matched_pairs": 11,
+        "paired_mean_net_effect": 0.27,
+        "paired_delayed_mean_net_effect": -8.05,
+        "paired_sign_flip_probability": 0.495,
+        "supportive_quarters": 4,
+        "parent_disposition": "FREEZE_EXACT_PARENT_MATCHED_NULL_UNSUPPORTED",
+        "promising_candidates": 0,
+        "shadow_candidates": 0,
+        "paper_shadow_ready": 0,
+        "candidates": [],
+    }
+    try:
+        controller._route_causal_transition_graph_result(conn, graph_result)
+        controller._route_rty_transition_matched_null_result(conn, matched_result)
+        controller._route_rty_transition_matched_null_result(conn, matched_result)
+
+        assert get_kv(conn, "current_blocker") == (
+            "PORTFOLIO_ROLE_AND_PROMISING_LINEAGE_MUTATION_REQUIRED"
+        )
+        assert get_kv(conn, "promising_candidates") == 0
+        assert get_kv(conn, "strategies_killed") == 1
+        assert get_kv(conn, "lineages_frozen") == 1
+        assert parent_id in get_kv(conn, "foundry_killed_candidate_ids")
+        assert get_kv(conn, "paper_shadow_ready_candidates") == 0
     finally:
         conn.close()
 

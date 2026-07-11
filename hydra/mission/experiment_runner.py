@@ -788,6 +788,39 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             metals_roll_map_hash=str(experiment["metals_roll_map_hash"]),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "rty_transition_matched_null":
+        from hydra.research.rty_transition_matched_null import (
+            run_rty_transition_matched_null,
+        )
+
+        return run_rty_transition_matched_null(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            source_result_path=Path(str(experiment["source_result_path"])),
+            source_result_sha256=str(experiment["source_result_sha256"]),
+            source_result_hash=str(experiment["source_result_hash"]),
+            source_manifest_path=Path(str(experiment["source_manifest_path"])),
+            source_manifest_sha256=str(experiment["source_manifest_sha256"]),
+            source_manifest_hash=str(experiment["source_manifest_hash"]),
+            source_trade_ledger_path=Path(
+                str(experiment["source_trade_ledger_path"])
+            ),
+            source_trade_ledger_sha256=str(
+                experiment["source_trade_ledger_sha256"]
+            ),
+            core_data_path=Path(str(experiment["core_data_path"])),
+            core_data_sha256=str(experiment["core_data_sha256"]),
+            core_map_path=Path(str(experiment["core_map_path"])),
+            core_map_sha256=str(experiment["core_map_sha256"]),
+            core_roll_map_hash=str(experiment["core_roll_map_hash"]),
+            metals_data_path=Path(str(experiment["metals_data_path"])),
+            metals_data_sha256=str(experiment["metals_data_sha256"]),
+            metals_map_path=Path(str(experiment["metals_map_path"])),
+            metals_map_sha256=str(experiment["metals_map_sha256"]),
+            metals_roll_map_hash=str(experiment["metals_roll_map_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     if experiment_type == "immutable_shadow_activation":
         from hydra.shadow.activation import run_immutable_shadow_activation
 

@@ -124,6 +124,10 @@ SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID = (
 SURVIVAL_HAZARD_EXPERIMENT_ID = "distributional_survival_hazard_v1"
 META_FAILURE_ALLOCATION_EXPERIMENT_ID = "meta_failure_allocation_v1"
 CAUSAL_TRANSITION_GRAPH_EXPERIMENT_ID = "causal_transition_graph_v1"
+RTY_TRANSITION_MATCHED_NULL_EXPERIMENT_ID = "rty_transition_matched_null_v1"
+RTY_TRANSITION_PARENT_ID = (
+    "strategy_transition_RTY_to_RTY_up_expansion_long_h60_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -197,6 +201,12 @@ SHADOW_SHARED_ACCOUNT_BASKETS_TASK_SHA256 = "8fe0c161e451a0b27d4e9ff0bdaab5b6ad8
 SURVIVAL_HAZARD_TASK_SHA256 = "9c24a8419e82a7fe2aaafb306aee3670e8e6e759df213bbb4a77ffb9bc8da92e"
 META_FAILURE_ALLOCATION_TASK_SHA256 = "e637f4f50d01326a10f3a5a00e4bbdb9c5229abaa7d488831a38067c74ec0129"
 CAUSAL_TRANSITION_GRAPH_TASK_SHA256 = "d2333ad6aed8d0fec648e7c87dd0853e47085c44809859b0536a18c72dd63393"
+RTY_TRANSITION_MATCHED_NULL_TASK_SHA256 = "56f11f71091f4eb8b84a35248904004ae9c76cd136c589158457a161f0ff4dc5"
+CAUSAL_TRANSITION_RESULT_SHA256 = "bed857199813968b216046a70a595bc1477f5482d44dd777dbedb862a4300fd7"
+CAUSAL_TRANSITION_RESULT_HASH = "873fe9a2d4bc613ca9c0b0285e8168e1cf03a5ab25994b1aa27ca45a43bd56cf"
+CAUSAL_TRANSITION_MANIFEST_SHA256 = "b4776e5f9db87350f8ad0c39900a2ecdd99210d2319685ebaa756d031eb6b8ec"
+CAUSAL_TRANSITION_MANIFEST_HASH = "c4c0698c1e168b8c8b2546a58185350e0aef7cf72a3bae9e6f736197f576368f"
+CAUSAL_TRANSITION_LEDGER_SHA256 = "29e93fa7cfb2c0471857f9ab3468da2e92f6cd90417630c0f8639156c9c2cbc3"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -239,6 +249,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "distributional_survival_hazard",
     "meta_failure_allocation",
     "causal_transition_graph",
+    "rty_transition_matched_null",
     "immutable_shadow_activation",
 }
 
@@ -586,6 +597,11 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "CAUSAL_TRANSITION_GRAPH_SEARCH_REQUIRED"
         )
+        rty_transition_matched_null_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "CAUSAL_TRANSITION_MATCHED_NULL_AND_MUTATION_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -812,6 +828,14 @@ class AutonomousMissionController:
             and str(get_kv(conn, "current_blocker") or "")
             == "CAUSAL_TRANSITION_GRAPH_SEARCH_REQUIRED"
         )
+        rty_transition_matched_null_required = (
+            rty_transition_matched_null_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "CAUSAL_TRANSITION_MATCHED_NULL_AND_MUTATION_REQUIRED"
+            )
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -946,6 +970,11 @@ class AutonomousMissionController:
             if causal_transition_graph_required
             else False
         )
+        rty_transition_matched_null_queued = (
+            self._reconcile_rty_transition_matched_null(conn)
+            if rty_transition_matched_null_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -988,6 +1017,7 @@ class AutonomousMissionController:
             and not survival_hazard_queued
             and not meta_failure_allocation_queued
             and not causal_transition_graph_queued
+            and not rty_transition_matched_null_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -1040,6 +1070,7 @@ class AutonomousMissionController:
                 "survival_hazard_queued": survival_hazard_queued,
                 "meta_failure_allocation_queued": meta_failure_allocation_queued,
                 "causal_transition_graph_queued": causal_transition_graph_queued,
+                "rty_transition_matched_null_queued": rty_transition_matched_null_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -1156,6 +1187,10 @@ class AutonomousMissionController:
             (
                 CAUSAL_TRANSITION_GRAPH_EXPERIMENT_ID,
                 "causal_transition_graph_plan_written",
+            ),
+            (
+                RTY_TRANSITION_MATCHED_NULL_EXPERIMENT_ID,
+                "rty_transition_matched_null_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1350,6 +1385,11 @@ class AutonomousMissionController:
                 "causal_transition_graph",
                 "causal_transition_graph_completed",
             ),
+            (
+                RTY_TRANSITION_MATCHED_NULL_EXPERIMENT_ID,
+                "rty_transition_matched_null",
+                "rty_transition_matched_null_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1411,6 +1451,7 @@ class AutonomousMissionController:
                 "distributional_survival_hazard": "survival_hazard_result",
                 "meta_failure_allocation": "meta_failure_allocation_result",
                 "causal_transition_graph": "causal_transition_graph_result",
+                "rty_transition_matched_null": "rty_transition_matched_null_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -1517,6 +1558,8 @@ class AutonomousMissionController:
                 self._route_meta_failure_allocation_result(conn, result)
             elif experiment_type == "causal_transition_graph":
                 self._route_causal_transition_graph_result(conn, result)
+            elif experiment_type == "rty_transition_matched_null":
+                self._route_rty_transition_matched_null_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -4664,6 +4707,129 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_rty_transition_matched_null(self, conn: Any) -> bool:
+        existing = experiment_record(conn, RTY_TRANSITION_MATCHED_NULL_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(conn, CAUSAL_TRANSITION_GRAPH_EXPERIMENT_ID)
+        source = dict((predecessor or {}).get("result") or {})
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or source.get("result_hash") != CAUSAL_TRANSITION_RESULT_HASH
+            or source.get("scientific_conclusion")
+            != "CAUSAL_TRANSITION_GRAPH_PROMISING_BUT_INSUFFICIENT"
+            or int(source.get("promising_candidates") or 0) != 1
+        ):
+            return False
+        task = project_path(
+            "reports", "engineering", "hydra_rty_transition_matched_null_20260711.md"
+        )
+        source_root = project_path(
+            "reports", "mission_experiments", CAUSAL_TRANSITION_GRAPH_EXPERIMENT_ID
+        )
+        if not source_root.is_dir():
+            source_root = Path("/root/hydra-bot/reports/mission_experiments") / (
+                CAUSAL_TRANSITION_GRAPH_EXPERIMENT_ID
+            )
+        source_result = source_root / "transition_graph_result.json"
+        source_manifest = source_root / "transition_graph_elite_freeze.json"
+        source_ledger = source_root / "transition_graph_trade_ledger.jsonl"
+        cache_root = project_path("data", "cache")
+        core_data = cache_root / "databento" / (
+            "GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_"
+            "2023-01-01_2024-10-01.parquet"
+        )
+        core_map = cache_root / "contract_maps" / (
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+        )
+        metals_data = cache_root / "databento" / (
+            "GLBX-MDP3_ohlcv-1m_GC-v-0_MGC-v-0_"
+            "2023-01-01_2024-10-01.parquet"
+        )
+        metals_map = cache_root / "contract_maps" / (
+            "roll_map_GLBX-MDP3_ohlcv-1m_01ba149449a494a7.json"
+        )
+        if not core_data.is_file():
+            core_data = Path("/root/hydra-bot/data/cache/databento") / core_data.name
+        if not core_map.is_file():
+            core_map = Path("/root/hydra-bot/data/cache/contract_maps") / core_map.name
+        if not metals_data.is_file():
+            metals_data = Path("/root/hydra-bot/data/cache/databento") / metals_data.name
+        if not metals_map.is_file():
+            metals_map = Path("/root/hydra-bot/data/cache/contract_maps") / metals_map.name
+        frozen = (
+            (task, RTY_TRANSITION_MATCHED_NULL_TASK_SHA256, "matched-null task"),
+            (source_result, CAUSAL_TRANSITION_RESULT_SHA256, "source result"),
+            (source_manifest, CAUSAL_TRANSITION_MANIFEST_SHA256, "source manifest"),
+            (source_ledger, CAUSAL_TRANSITION_LEDGER_SHA256, "source ledger"),
+            (core_data, ENERGY_METALS_DATA_SHA256, "core data"),
+            (core_map, PATH_GEOMETRY_MAP_SHA256, "core map"),
+            (metals_data, ENERGY_METALS_VOLUME_DATA_SHA256, "metals data"),
+            (metals_map, ENERGY_METALS_VOLUME_MAP_SHA256, "metals map"),
+        )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "RTY_MATCHED_NULL_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen RTY matched-null sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        specification = {
+            "experiment_type": "rty_transition_matched_null",
+            "priority": 106.0,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION",
+            "parallel_safe": True,
+            "writes_data_access_ledger": True,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": RTY_TRANSITION_MATCHED_NULL_TASK_SHA256,
+            "source_result_path": str(source_result),
+            "source_result_sha256": CAUSAL_TRANSITION_RESULT_SHA256,
+            "source_result_hash": CAUSAL_TRANSITION_RESULT_HASH,
+            "source_manifest_path": str(source_manifest),
+            "source_manifest_sha256": CAUSAL_TRANSITION_MANIFEST_SHA256,
+            "source_manifest_hash": CAUSAL_TRANSITION_MANIFEST_HASH,
+            "source_trade_ledger_path": str(source_ledger),
+            "source_trade_ledger_sha256": CAUSAL_TRANSITION_LEDGER_SHA256,
+            "core_data_path": str(core_data),
+            "core_data_sha256": ENERGY_METALS_DATA_SHA256,
+            "core_map_path": str(core_map),
+            "core_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "core_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "metals_data_path": str(metals_data),
+            "metals_data_sha256": ENERGY_METALS_VOLUME_DATA_SHA256,
+            "metals_map_path": str(metals_map),
+            "metals_map_sha256": ENERGY_METALS_VOLUME_MAP_SHA256,
+            "metals_roll_map_hash": ENERGY_METALS_VOLUME_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.97,
+        }
+        enqueue_experiment(
+            conn, RTY_TRANSITION_MATCHED_NULL_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "rty_transition_matched_null_plan_written", True)
+        set_kv(conn, "promotion_pipeline_status", "RTY_MATCHED_NULL_QUEUED")
+        set_kv(conn, "foundry_current_engine", "COUNTERFACTUAL_MATCHED_NULL")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -6156,6 +6322,82 @@ class AutonomousMissionController:
             {
                 "action": blocker,
                 "pipeline": "PROMOTION_AND_MUTATION" if promising else "DISCOVERY",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
+    def _route_rty_transition_matched_null_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, RTY_TRANSITION_MATCHED_NULL_EXPERIMENT_ID
+        )
+        supported = bool(result.get("mechanism_supported"))
+        if not supported:
+            killed = set(get_kv(conn, "foundry_killed_candidate_ids", []) or [])
+            if RTY_TRANSITION_PARENT_ID not in killed:
+                killed.add(RTY_TRANSITION_PARENT_ID)
+                set_kv(conn, "foundry_killed_candidate_ids", sorted(killed))
+                set_kv(
+                    conn,
+                    "strategies_killed",
+                    int(get_kv(conn, "strategies_killed", 0)) + 1,
+                )
+            frozen = set(get_kv(conn, "foundry_frozen_lineage_ids", []) or [])
+            lineage_id = "lineage_transition_ded12ad185c66d666190"
+            if lineage_id not in frozen:
+                frozen.add(lineage_id)
+                set_kv(conn, "foundry_frozen_lineage_ids", sorted(frozen))
+                set_kv(
+                    conn,
+                    "lineages_frozen",
+                    int(get_kv(conn, "lineages_frozen", 0)) + 1,
+                )
+        self._refresh_foundry_candidate_counts(conn)
+        blocker = (
+            "FORWARD_ONLY_TRANSITION_CHILD_SPECIFICATION_REQUIRED"
+            if supported
+            else "PORTFOLIO_ROLE_AND_PROMISING_LINEAGE_MUTATION_REQUIRED"
+        )
+        set_kv(
+            conn,
+            "rty_transition_matched_null_metrics",
+            {
+                "mechanism_supported": supported,
+                "matched_pairs": int(result.get("matched_pairs") or 0),
+                "paired_mean_net_effect": float(
+                    result.get("paired_mean_net_effect") or 0.0
+                ),
+                "paired_delayed_mean_net_effect": float(
+                    result.get("paired_delayed_mean_net_effect") or 0.0
+                ),
+                "paired_sign_flip_probability": float(
+                    result.get("paired_sign_flip_probability") or 1.0
+                ),
+                "supportive_quarters": int(result.get("supportive_quarters") or 0),
+                "parent_disposition": result.get("parent_disposition"),
+                "conclusion": result.get("scientific_conclusion"),
+            },
+        )
+        set_kv(conn, "promotion_pipeline_status", "RTY_MATCHED_NULL_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "The outcome-blind matched counterfactual tested expansion against "
+            "the simpler RTY up-state baseline. No parent status, Q4 access, shadow "
+            "activation or order capability is inherited.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "MUTATION_AND_PORTFOLIO",
                 "parallel_shadow": True,
                 "q4_access_authorized": False,
             },
