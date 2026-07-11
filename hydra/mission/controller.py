@@ -149,6 +149,9 @@ ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID = (
 EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID = (
     "equity_preclose_inventory_dispersion_primary_v1"
 )
+MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID = (
+    "mini_micro_participation_divergence_primary_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -249,6 +252,9 @@ ROLE_CONDITIONED_STRUCTURAL_EPOCH_TASK_SHA256 = (
 EQUITY_PRECLOSE_INVENTORY_DISPERSION_TASK_SHA256 = (
     "5c9fe702eee36b467a5fa0b1c27bc58373829b6f5615e374f9775ff3c42e385c"
 )
+MINI_MICRO_PARTICIPATION_DIVERGENCE_TASK_SHA256 = (
+    "75b40efb442b928074af36c9809aad075d56c7b21502b9e9105c3860d51f1bac"
+)
 EQUITY_PRECLOSE_DATA_SHA256S = (
     "19be0a539802cd06fea20425ef14feca529fd60ece7e9eb5a88837e1d4e01862",
     "4540b7585caa2798998bd39a7d787c948f1f7c82f1d692e55118c4d4fffc5911",
@@ -307,6 +313,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "post_mutation_shadow_admission",
     "role_conditioned_structural_epoch",
     "equity_preclose_inventory_dispersion",
+    "mini_micro_participation_divergence",
 }
 
 
@@ -1405,6 +1412,10 @@ class AutonomousMissionController:
                 EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID,
                 "equity_preclose_inventory_dispersion_plan_written",
             ),
+            (
+                MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID,
+                "mini_micro_participation_divergence_plan_written",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -1648,6 +1659,11 @@ class AutonomousMissionController:
                 "equity_preclose_inventory_dispersion",
                 "equity_preclose_inventory_dispersion_completed",
             ),
+            (
+                MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID,
+                "mini_micro_participation_divergence",
+                "mini_micro_participation_divergence_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1717,6 +1733,7 @@ class AutonomousMissionController:
                 "post_mutation_shadow_admission": "post_mutation_shadow_admission_result",
                 "role_conditioned_structural_epoch": "role_conditioned_structural_epoch_result",
                 "equity_preclose_inventory_dispersion": "equity_preclose_inventory_dispersion_result",
+                "mini_micro_participation_divergence": "mini_micro_participation_divergence_result",
             }[experiment_type]
             if experiment_id == POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID:
                 result_key = "post_mutation_child_shadow_activation_result"
@@ -1844,6 +1861,8 @@ class AutonomousMissionController:
                 self._route_role_conditioned_structural_epoch_result(conn, result)
             elif experiment_type == "equity_preclose_inventory_dispersion":
                 self._route_equity_preclose_inventory_dispersion_result(conn, result)
+            elif experiment_type == "mini_micro_participation_divergence":
+                self._route_mini_micro_participation_divergence_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -4841,6 +4860,123 @@ class AutonomousMissionController:
         )
         set_kv(conn, "meta_failure_allocation_plan_written", True)
         set_kv(conn, "meta_research_pipeline_status", "ALLOCATION_AUDIT_QUEUED")
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_mini_micro_participation_divergence(self, conn: Any) -> bool:
+        existing = experiment_record(
+            conn, MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID
+        )
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(
+            conn, EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID
+        )
+        source = dict((predecessor or {}).get("result") or {})
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or int(source.get("promising_candidates") or 0) != 0
+            or source.get("scientific_conclusion")
+            != "PRECLOSE_PRIMARY_INSUFFICIENT_PIVOT_MARKET_ECOLOGY"
+            or int(source.get("q4_access_count") or 0) != 0
+            or bool(source.get("order_capability"))
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_mini_micro_participation_divergence_20260711.md",
+        )
+        data_root = project_path("data", "cache", "databento")
+        data_names = (
+            "GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2023-01-01_2024-01-01.parquet",
+            "GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-01-01_2024-03-31.parquet",
+            "GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-04-01_2024-07-01.parquet",
+            "GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-07-01_2024-10-01.parquet",
+            "GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_2023-01-01_2024-10-01.parquet",
+        )
+        data_paths = [data_root / name for name in data_names]
+        if not all(path.is_file() for path in data_paths):
+            canonical = Path("/root/hydra-bot/data/cache/databento")
+            data_paths = [canonical / name for name in data_names]
+        roll_map = project_path(
+            "data", "cache", "contract_maps", "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+        )
+        if not roll_map.is_file():
+            roll_map = Path("/root/hydra-bot/data/cache/contract_maps") / (
+                "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+            )
+        frozen = [
+            (task, MINI_MICRO_PARTICIPATION_DIVERGENCE_TASK_SHA256, "task")
+        ]
+        frozen.extend(
+            (path, expected, f"core data {index}")
+            for index, (path, expected) in enumerate(
+                zip(data_paths, EQUITY_PRECLOSE_DATA_SHA256S, strict=True), start=1
+            )
+        )
+        frozen.append((roll_map, PATH_GEOMETRY_MAP_SHA256, "roll map"))
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "MINI_MICRO_PARTICIPATION_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen mini/micro participation sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        enqueue_experiment(
+            conn,
+            MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID,
+            {
+                "experiment_type": "mini_micro_participation_divergence",
+                "priority": 124.0,
+                "max_attempts": 2,
+                "pipeline": "DISCOVERY",
+                "parallel_safe": False,
+                "writes_data_access_ledger": True,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": MINI_MICRO_PARTICIPATION_DIVERGENCE_TASK_SHA256,
+                "core_data_paths": [str(path) for path in data_paths],
+                "core_data_sha256s": list(EQUITY_PRECLOSE_DATA_SHA256S),
+                "roll_map_path": str(roll_map),
+                "roll_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+                "roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+                "source_preclose_result_hash": str(source.get("result_hash") or ""),
+                "code_commit": self._git_commit(),
+                "record_data_access": True,
+                "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+                "development_end_exclusive": "2024-10-01",
+                "q4_access_allowed": False,
+                "paid_data_allowed": False,
+                "network_allowed": False,
+                "live_or_broker_allowed": False,
+                "expected_decision_information_gain": 0.94,
+            },
+        )
+        set_kv(conn, "mini_micro_participation_divergence_plan_written", True)
+        set_kv(conn, "discovery_pipeline_status", "MINI_MICRO_PARTICIPATION_QUEUED")
+        set_kv(conn, "foundry_current_engine", "MINI_MICRO_PARTICIPATION_DIVERGENCE")
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID,
+                "pipeline": "DISCOVERY",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+                "data_cost_usd": 0.0,
+            },
+        )
         self._clear_resolved_resume_block(conn)
         return True
 
@@ -7963,6 +8099,70 @@ class AutonomousMissionController:
                 "forward_data_blocker": get_kv(conn, "forward_data_blocker"),
             },
         )
+        self._tick_shadow_pipeline(conn)
+        if not promising:
+            self._reconcile_mini_micro_participation_divergence(conn)
+
+    def _route_mini_micro_participation_divergence_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID
+        )
+        promising = int(result.get("promising_candidates") or 0)
+        blocker = (
+            "MINI_MICRO_PARTICIPATION_FROZEN_PROMOTION_REQUIRED"
+            if promising
+            else "DISTINCT_MECHANISM_OR_FORWARD_DATA_REQUIRED"
+        )
+        set_kv(
+            conn,
+            "mini_micro_participation_divergence_metrics",
+            {
+                "structural_prototypes": int(result.get("structural_prototypes") or 0),
+                "stage1_survivors": int(result.get("stage1_survivors") or 0),
+                "frozen_elites": int(result.get("frozen_elite_count") or 0),
+                "promising_candidates": promising,
+                "status_counts": result.get("status_counts") or {},
+                "performance": result.get("performance") or {},
+                "conclusion": result.get("scientific_conclusion"),
+                "q4_access_count": int(result.get("q4_access_count") or 0),
+                "paper_shadow_ready": int(result.get("paper_shadow_ready") or 0),
+            },
+        )
+        set_kv(conn, "discovery_pipeline_status", "MINI_MICRO_PARTICIPATION_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "The preregistered mini/micro participant-segmentation primary completed "
+            "on development data only. Survivors require a new promotion freeze; a "
+            "negative family requires a distinct mechanism or authorized forward data.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "PROMOTION" if promising else "DISCOVERY_OR_FORWARD",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+                "forward_data_blocker": get_kv(conn, "forward_data_blocker"),
+            },
+        )
+        if not promising:
+            frozen = set(get_kv(conn, "foundry_frozen_lineage_ids", []) or [])
+            lineage_id = "MINI_MICRO_PARTICIPATION_DIVERGENCE_PRIMARY_V1"
+            if lineage_id not in frozen:
+                frozen.add(lineage_id)
+                set_kv(conn, "foundry_frozen_lineage_ids", sorted(frozen))
+                set_kv(
+                    conn,
+                    "lineages_frozen",
+                    int(get_kv(conn, "lineages_frozen", 0)) + 1,
+                )
         self._tick_shadow_pipeline(conn)
 
     def _route_barrier_shadow_activation_result(

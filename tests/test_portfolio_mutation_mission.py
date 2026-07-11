@@ -7,6 +7,7 @@ from hydra.mission.controller import (
     AutonomousMissionController,
     FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID,
     EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID,
+    MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID,
     MissionControllerConfig,
     PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
     POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID,
@@ -508,5 +509,81 @@ def test_negative_role_epoch_queues_distinct_preclose_pivot(tmp_path: Path) -> N
         assert specification["live_or_broker_allowed"] is False
         assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
         assert get_kv(conn, "current_blocker") is None
+    finally:
+        conn.close()
+
+
+def test_negative_preclose_queues_distinct_mini_micro_participation_pivot(
+    tmp_path: Path,
+) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        enqueue_experiment(
+            conn,
+            EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID,
+            {"experiment_type": "equity_preclose_inventory_dispersion"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": (
+                    "PRECLOSE_PRIMARY_INSUFFICIENT_PIVOT_MARKET_ECOLOGY"
+                ),
+                "promising_candidates": 0,
+                "q4_access_count": 0,
+                "order_capability": False,
+                "result_hash": "a" * 64,
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_mini_micro_participation_divergence(conn)
+        record = experiment_record(
+            conn, MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID
+        )
+        assert record is not None and record["status"] == "QUEUED"
+        specification = record["specification"]
+        assert specification["experiment_type"] == "mini_micro_participation_divergence"
+        assert specification["pipeline"] == "DISCOVERY"
+        assert len(specification["core_data_paths"]) == 5
+        assert specification["source_preclose_result_hash"] == "a" * 64
+        assert specification["q4_access_allowed"] is False
+        assert specification["paid_data_allowed"] is False
+        assert specification["network_allowed"] is False
+        assert specification["live_or_broker_allowed"] is False
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+        assert get_kv(conn, "current_blocker") is None
+    finally:
+        conn.close()
+
+
+def test_negative_mini_micro_result_freezes_family_idempotently(tmp_path: Path) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    result = {
+        "scientific_conclusion": (
+            "MINI_MICRO_PARTICIPATION_PRIMARY_INSUFFICIENT_PIVOT_MECHANISM"
+        ),
+        "candidate_count": 96,
+        "structural_prototypes": 96,
+        "stage1_survivors": 5,
+        "frozen_elite_count": 3,
+        "promising_candidates": 0,
+        "status_counts": {"INSUFFICIENT_EVIDENCE": 3},
+        "candidates": [],
+        "q4_access_count": 0,
+        "paper_shadow_ready": 0,
+    }
+    try:
+        controller._route_mini_micro_participation_divergence_result(conn, result)
+        controller._route_mini_micro_participation_divergence_result(conn, result)
+        assert get_kv(conn, "current_phase") == "ENGINEERING_BLOCKED"
+        assert get_kv(conn, "current_blocker") == "DISTINCT_MECHANISM_OR_FORWARD_DATA_REQUIRED"
+        assert get_kv(conn, "lineages_frozen") == 1
+        assert get_kv(conn, "foundry_frozen_lineage_ids") == [
+            "MINI_MICRO_PARTICIPATION_DIVERGENCE_PRIMARY_V1"
+        ]
     finally:
         conn.close()

@@ -995,4 +995,22 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             code_commit=str(experiment.get("code_commit") or "unknown"),
             record_data_access=bool(experiment.get("record_data_access", True)),
         )
+    if experiment_type == "mini_micro_participation_divergence":
+        from hydra.research.mini_micro_participation_divergence import (
+            run_mini_micro_participation_divergence,
+        )
+
+        return run_mini_micro_participation_divergence(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            core_data_paths=[Path(str(value)) for value in experiment["core_data_paths"]],
+            core_data_sha256s=[str(value) for value in experiment["core_data_sha256s"]],
+            roll_map_path=Path(str(experiment["roll_map_path"])),
+            roll_map_sha256=str(experiment["roll_map_sha256"]),
+            roll_map_hash=str(experiment["roll_map_hash"]),
+            source_preclose_result_hash=str(experiment["source_preclose_result_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+            record_data_access=bool(experiment.get("record_data_access", True)),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")
