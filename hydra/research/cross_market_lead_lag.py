@@ -33,8 +33,12 @@ def run_cross_market_lead_lag_pilot(output_dir: str|Path, *, engineering_task_pa
 def _evaluate(f:pd.DataFrame)->dict[str,Any]:
     out={}
     for fold,(start,end) in FOLDS.items():
-        x=f[(f.trading_session_id>=start)&(f.trading_session_id<end)].copy(); x['leader_return']=x[x.symbol=='NQ'].groupby(['active_contract','contiguous_segment_id']).close.pct_change(5).shift(1)
-        leader=x[x.symbol=='NQ'][['timestamp','leader_return']].drop_duplicates('timestamp'); lag=x[x.symbol!='NQ'].merge(leader,on='timestamp',how='inner').dropna(subset=['leader_return','target']); lag=lag[lag.leader_return.abs()>0.00015]; lag['pnl']=np.sign(lag.leader_return)*lag.target*lag.close*lag.symbol.map(POINT)-lag.symbol.map(COST); out[fold]={'net':float(lag.pnl.sum()),'events':int(len(lag)),'markets':{str(m):int((lag.symbol==m).sum()) for m in MARKETS if m!='NQ'}}
+        x=f[(f.trading_session_id>=start)&(f.trading_session_id<end)].copy()
+        leader=x[x.symbol=='NQ'][['timestamp','active_contract','contiguous_segment_id','close']].copy()
+        leader['leader_return']=leader.groupby(['active_contract','contiguous_segment_id'],sort=False).close.pct_change(5).shift(1)
+        leader=leader[['timestamp','leader_return']].drop_duplicates('timestamp')
+        lag=x[x.symbol!='NQ'].merge(leader,on='timestamp',how='inner').dropna(subset=['leader_return','target'])
+        lag=lag[lag.leader_return.abs()>0.00015]; lag['pnl']=np.sign(lag.leader_return)*lag.target*lag.close*lag.symbol.map(POINT)-lag.symbol.map(COST); out[fold]={'net':float(lag.pnl.sum()),'events':int(len(lag)),'markets':{str(m):int((lag.symbol==m).sum()) for m in MARKETS if m!='NQ'}}
     return out
 
 def _verify(path:Path,sha:str)->None:
