@@ -13,7 +13,12 @@ from hydra.pipelines.shadow_pipeline import (
     registry_entry_from_activation,
     tick_shadow_pipeline,
 )
-from hydra.shadow.activation import audit_zero_order_surface, run_ym_shadow_activation
+from hydra.shadow.activation import (
+    ShadowActivationError,
+    audit_zero_order_surface,
+    run_immutable_shadow_activation,
+    run_ym_shadow_activation,
+)
 from hydra.shadow.specification import ShadowSpecification
 
 
@@ -125,3 +130,111 @@ def test_order_surface_audit_detects_submission_capability(tmp_path: Path) -> No
 
     assert not audit["passed"]
     assert audit["violations"][0]["reason"] == "prohibited_function:submit_order"
+
+
+def test_generic_activation_requires_official_shadow_candidate_and_hashes(
+    tmp_path: Path,
+) -> None:
+    candidate_id = "strategy_barrier_hazard_NQ_v1"
+    task = tmp_path / "task.md"
+    task.write_text("immutable generic activation\n", encoding="utf-8")
+    configuration_path = tmp_path / "configuration.json"
+    specification = ShadowSpecification(
+        strategy_id=candidate_id,
+        strategy_version="v1",
+        feature_versions=("barrier_hazard_v1",),
+        markets=("MNQ",),
+        timeframes=("1m", "15m"),
+        session_rules={"timezone": "America/Chicago"},
+        entry_rules={"decision": "completed_bar"},
+        exit_rules={"same_bar_policy": "stop_first"},
+        sizing={"instrument": "MNQ", "contracts": 1},
+        costs={"round_turn_usd": 3.0},
+        stale_data_seconds=120,
+        expected_update_seconds=60,
+        duplicate_signal_window_seconds=3600,
+        maximum_exposure=1.0,
+        simulated_mll_floor=-2500.0,
+        internal_daily_risk_limit=500.0,
+        kill_conditions=("stale_data", "mll_floor"),
+        logging={"events": True},
+        reconciliation={"startup": "fail_closed"},
+        source_manifest_hash="b" * 64,
+    )
+    specification.write_immutable(configuration_path)
+    source = {
+        "scientific_conclusion": "BARRIER_HAZARD_SHADOW_CANDIDATE_FOUND",
+        "candidates": [
+            {
+                "candidate_id": candidate_id,
+                "status": "SHADOW_RESEARCH_CANDIDATE",
+                "net_pnl": 1000.0,
+                "micro_net_pnl": 100.0,
+                "admission": {
+                    "permits_zero_risk_shadow": True,
+                    "fatal_reasons": [],
+                },
+                "shadow_evidence": {
+                    "hard_invalidations": [],
+                    "account_mll_safe": True,
+                    "deterministic_signals": True,
+                    "realtime_features_available": True,
+                    "observability_complete": True,
+                },
+                "topstep": {"path_candidate": False},
+            }
+        ],
+        "shadow_configurations": [
+            {
+                "candidate_id": candidate_id,
+                "configuration_hash": specification.configuration_hash,
+                "outbound_orders_enabled": False,
+            }
+        ],
+    }
+    source["result_hash"] = _stable_hash(source)
+    source_path = tmp_path / "source.json"
+    source_path.write_text(json.dumps(source, sort_keys=True) + "\n", encoding="utf-8")
+    surface = tmp_path / "surface.py"
+    surface.write_text("def virtual_fill():\n    return 0\n", encoding="utf-8")
+
+    result = run_immutable_shadow_activation(
+        tmp_path / "output",
+        engineering_task_path=task,
+        engineering_task_sha256=_sha(task),
+        source_result_path=source_path,
+        source_result_sha256=_sha(source_path),
+        source_result_hash=source["result_hash"],
+        candidate_id=candidate_id,
+        shadow_configuration_path=configuration_path,
+        shadow_configuration_sha256=_sha(configuration_path),
+        shadow_configuration_hash=specification.configuration_hash,
+        code_commit="test",
+        code_surface_paths=[surface],
+    )
+
+    assert result["candidate_id"] == candidate_id
+    assert result["candidates"][0]["status"] == "SHADOW_ACTIVE"
+    assert result["activation_manifest"]["outbound_orders_enabled"] is False
+    assert registry_entry_from_activation(result)["candidate_id"] == candidate_id
+
+    source["candidates"][0]["status"] = "PROMISING_RESEARCH_CANDIDATE"
+    source["result_hash"] = _stable_hash(
+        {key: value for key, value in source.items() if key != "result_hash"}
+    )
+    source_path.write_text(json.dumps(source, sort_keys=True) + "\n", encoding="utf-8")
+    with pytest.raises(ShadowActivationError):
+        run_immutable_shadow_activation(
+            tmp_path / "rejected",
+            engineering_task_path=task,
+            engineering_task_sha256=_sha(task),
+            source_result_path=source_path,
+            source_result_sha256=_sha(source_path),
+            source_result_hash=source["result_hash"],
+            candidate_id=candidate_id,
+            shadow_configuration_path=configuration_path,
+            shadow_configuration_sha256=_sha(configuration_path),
+            shadow_configuration_hash=specification.configuration_hash,
+            code_commit="test",
+            code_surface_paths=[surface],
+        )

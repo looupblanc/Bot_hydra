@@ -24,6 +24,183 @@ class ShadowActivationError(RuntimeError):
     pass
 
 
+def run_immutable_shadow_activation(
+    output_dir: str | Path,
+    *,
+    engineering_task_path: str | Path,
+    engineering_task_sha256: str,
+    source_result_path: str | Path,
+    source_result_sha256: str,
+    source_result_hash: str,
+    candidate_id: str,
+    shadow_configuration_path: str | Path,
+    shadow_configuration_sha256: str,
+    shadow_configuration_hash: str,
+    code_commit: str,
+    code_surface_paths: Iterable[str | Path] | None = None,
+) -> dict[str, Any]:
+    task = Path(engineering_task_path)
+    result_path = Path(source_result_path)
+    configuration_path = Path(shadow_configuration_path)
+    _verify(task, engineering_task_sha256, "engineering task")
+    _verify(result_path, source_result_sha256, "source candidate result")
+    _verify(configuration_path, shadow_configuration_sha256, "shadow configuration")
+    if len(code_commit) == 40:
+        actual = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+        if actual != code_commit:
+            raise ShadowActivationError(
+                "Worker commit differs from the queued specification."
+            )
+    source = json.loads(result_path.read_text(encoding="utf-8"))
+    if source.get("result_hash") != source_result_hash:
+        raise ShadowActivationError("Source result hash does not match.")
+    candidates = [
+        item
+        for item in source.get("candidates") or []
+        if str(item.get("candidate_id") or "") == candidate_id
+    ]
+    if len(candidates) != 1:
+        raise ShadowActivationError("Source result does not contain one exact candidate.")
+    candidate = dict(candidates[0])
+    admission = dict(candidate.get("admission") or {})
+    shadow_evidence = dict(candidate.get("shadow_evidence") or {})
+    hard = list(shadow_evidence.get("hard_invalidations") or []) + list(
+        admission.get("fatal_reasons") or []
+    )
+    if (
+        candidate.get("status") != "SHADOW_RESEARCH_CANDIDATE"
+        or not bool(admission.get("permits_zero_risk_shadow"))
+        or hard
+        or float(candidate.get("net_pnl") or 0.0) <= 0
+        or float(candidate.get("micro_net_pnl") or 0.0) <= 0
+        or not bool(shadow_evidence.get("account_mll_safe"))
+        or not bool(shadow_evidence.get("deterministic_signals"))
+        or not bool(shadow_evidence.get("realtime_features_available"))
+        or not bool(shadow_evidence.get("observability_complete"))
+    ):
+        raise ShadowActivationError(
+            "Source candidate does not authorize zero-order shadow research."
+        )
+    configurations = [
+        item
+        for item in source.get("shadow_configurations") or []
+        if str(item.get("candidate_id") or "") == candidate_id
+    ]
+    if len(configurations) != 1:
+        raise ShadowActivationError("Source result lacks one frozen configuration record.")
+    recorded_configuration = configurations[0]
+    specification = _load_specification(configuration_path)
+    if (
+        specification.strategy_id != candidate_id
+        or specification.configuration_hash != shadow_configuration_hash
+        or recorded_configuration.get("configuration_hash")
+        != shadow_configuration_hash
+        or specification.outbound_orders_enabled
+    ):
+        raise ShadowActivationError(
+            "Frozen configuration is not the authorized zero-order version."
+        )
+    surfaces = list(code_surface_paths or _default_code_surfaces())
+    surface_audit = audit_zero_order_surface(surfaces)
+    if not surface_audit["passed"]:
+        raise ShadowActivationError(
+            f"Prohibited order surface found: {surface_audit['violations']}"
+        )
+    destination = Path(output_dir)
+    destination.mkdir(parents=True, exist_ok=True)
+    manifest: dict[str, Any] = {
+        "schema": "hydra_shadow_activation_manifest_v1",
+        "candidate_id": candidate_id,
+        "registry_evidence_tier": "SHADOW_ACTIVE",
+        "operational_classification": "SHADOW_RESEARCH_ACTIVE",
+        "source_result_hash": source_result_hash,
+        "source_scientific_conclusion": source.get("scientific_conclusion"),
+        "configuration_path": str(configuration_path),
+        "configuration_sha256": shadow_configuration_sha256,
+        "configuration_hash": shadow_configuration_hash,
+        "markets": list(specification.markets),
+        "timeframes": list(specification.timeframes),
+        "stale_data_seconds": specification.stale_data_seconds,
+        "maximum_exposure": specification.maximum_exposure,
+        "simulated_mll_floor": specification.simulated_mll_floor,
+        "internal_daily_risk_limit": specification.internal_daily_risk_limit,
+        "kill_conditions": list(specification.kill_conditions),
+        "outbound_orders_enabled": False,
+        "broker_connections_allowed": 0,
+        "virtual_execution_only": True,
+        "missing_or_stale_data_policy": "FAIL_CLOSED_NO_SIGNAL_NO_FILL",
+        "initial_runtime_state": "WAITING_FOR_FRESH_FORWARD_DATA",
+        "q4_access_allowed": False,
+        "live_or_broker_allowed": False,
+        "code_surface_audit": surface_audit,
+        "code_commit": code_commit,
+    }
+    manifest["activation_manifest_hash"] = _stable_hash(manifest)
+    manifest_path = destination / f"shadow_activation_manifest_{candidate_id}.json"
+    _write_immutable(
+        manifest_path, json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+    )
+    active_candidate = {
+        **candidate,
+        "status": "SHADOW_ACTIVE",
+        "operational_classification": "SHADOW_RESEARCH_ACTIVE",
+        "activation_manifest_hash": manifest["activation_manifest_hash"],
+    }
+    payload: dict[str, Any] = {
+        "schema": "immutable_zero_order_shadow_activation_v1",
+        "scientific_conclusion": "IMMUTABLE_ZERO_ORDER_SHADOW_ACTIVATED",
+        "interpretation_boundary": (
+            "Activation starts fail-closed forward observation only. It does not change the "
+            "source null result, prove persistence, authorize orders, or confer "
+            "PAPER_SHADOW_READY."
+        ),
+        "candidate_id": candidate_id,
+        "candidate_count": 0,
+        "candidates": [active_candidate],
+        "shadow_active": 1,
+        "shadow_candidates": 1,
+        "promising_candidates": 1,
+        "paper_shadow_ready": 0,
+        "topstep_path_candidates": int(
+            bool((active_candidate.get("topstep") or {}).get("path_candidate"))
+        ),
+        "activation_manifest": manifest,
+        "activation_manifest_path": str(manifest_path),
+        "runtime_state": "WAITING_FOR_FRESH_FORWARD_DATA",
+        "forward_signals": 0,
+        "virtual_fills": 0,
+        "governance": {
+            "q4_access_count_delta": 0,
+            "market_data_rows_read": 0,
+            "network_requests": 0,
+            "incremental_databento_spend_usd": 0.0,
+            "live_or_broker_execution": False,
+            "outbound_order_capability": False,
+        },
+        "next_recommended_action": (
+            "RUN_SHADOW_PIPELINE_WHILE_DISCOVERY_AND_PROMOTION_CONTINUE"
+        ),
+        "code_commit": code_commit,
+    }
+    payload = _strict_json_value(payload)
+    payload["result_hash"] = _stable_hash(payload)
+    output_result = destination / f"shadow_activation_result_{candidate_id}.json"
+    report_path = destination / f"shadow_activation_report_{candidate_id}.md"
+    _write_immutable(
+        output_result, json.dumps(payload, indent=2, sort_keys=True) + "\n"
+    )
+    _write_immutable(report_path, _render_generic_report(payload))
+    return {
+        **payload,
+        "artifacts": {
+            "result_json_path": str(output_result),
+            "report_path": str(report_path),
+            "activation_manifest_path": str(manifest_path),
+        },
+        "report_path": str(report_path),
+    }
+
+
 def run_ym_shadow_activation(
     output_dir: str | Path,
     *,
@@ -228,6 +405,29 @@ def _render_report(payload: dict[str, Any]) -> str:
         [
             "# Immutable YM Zero-Order Shadow Activation",
             "",
+            f"- Conclusion: `{payload['scientific_conclusion']}`",
+            f"- Operational classification: `{payload['activation_manifest']['operational_classification']}`",
+            f"- Runtime state: `{payload['runtime_state']}`",
+            f"- Configuration: `{payload['activation_manifest']['configuration_hash']}`",
+            "- Outbound order capability: `false`",
+            "- Broker connections: `0`",
+            "- Q4 access: `0`",
+            "- PAPER_SHADOW_READY: `0`",
+            "",
+            "## Interpretation boundary",
+            "",
+            str(payload["interpretation_boundary"]),
+            "",
+        ]
+    )
+
+
+def _render_generic_report(payload: dict[str, Any]) -> str:
+    return "\n".join(
+        [
+            "# Immutable Zero-Order Shadow Activation",
+            "",
+            f"- Candidate: `{payload['candidate_id']}`",
             f"- Conclusion: `{payload['scientific_conclusion']}`",
             f"- Operational classification: `{payload['activation_manifest']['operational_classification']}`",
             f"- Runtime state: `{payload['runtime_state']}`",
