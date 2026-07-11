@@ -48,6 +48,11 @@ from hydra.mission.planner import plan_next_action
 from hydra.mission.reporting import write_mission_checkpoint, write_mission_summary
 from hydra.mission.research_memory import record_decision, record_engineering, record_evidence
 from hydra.mission.safety_governor import check_action_allowed
+from hydra.pipelines.shadow_pipeline import (
+    ShadowPipelineIntegrityError,
+    registry_entry_from_activation,
+    tick_shadow_pipeline,
+)
 from hydra.utils.config import project_path
 from hydra.utils.time import utc_now_iso
 
@@ -78,6 +83,9 @@ MTF_SESSION_TREND_CONFIRMATION_EXPERIMENT_ID = (
 )
 RTY_YM_RELATIVE_VALUE_EXPERIMENT_ID = "rty_ym_relative_value_pilot_v1"
 YM_SHARED_RISK_OFF_EXPERIMENT_ID = "ym_shared_risk_off_overlay_v1"
+QD_ECONOMIC_TOURNAMENT_EXPERIMENT_ID = "qd_economic_tournament_v2"
+YM_STRICT_PROMOTION_EXPERIMENT_ID = "ym_open_gap_strict_promotion_v1"
+YM_SHADOW_ACTIVATION_EXPERIMENT_ID = "ym_immutable_shadow_activation_v1"
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -102,6 +110,14 @@ YM_SHARED_RISK_OFF_TASK_SHA256 = "0b686391803d0f7700c9e166c1bbec4bcb19f79c584963
 YM_SHARED_RISK_OFF_PARENT_RESULT_SHA256 = "b6a501dddd579875088d30c90fe03bb858d02489364fd41d8db48a944e7fe75d"
 YM_SHARED_RISK_OFF_PARENT_RESULT_HASH = "5d8935510337b92c89ee4ae00ba472700c9c436fe37aadcb92d50c78cd4f68c3"
 YM_SHARED_RISK_OFF_PARENT_LEDGER_SHA256 = "e8f90171ae9efff1dfaca67312e47d05c2dff0200a8ea7a97c911186806cfba3"
+QD_ECONOMIC_TOURNAMENT_TASK_SHA256 = "f6f4b91a2d138f816ee1a4f033fa161dbe49c3449830a00f48abf6395e87cc3f"
+QD_SELECTOR_V2_TASK_SHA256 = "a38de867f0e711a40ad3d9f044d9b44c54cbf523d9b0447d0f371a953ba09670"
+YM_STRICT_PROMOTION_TASK_SHA256 = "81085a66b7452a2a75572c0489b5a255f2826144e65fd84481041465f30d382b"
+YM_FREEZE_MANIFEST_SHA256 = "12af2ee1f520207b33b05f539ad0b195f0f69c3304e32924719fab376e2bac21"
+YM_FREEZE_MANIFEST_HASH = "6aae37537aa39b0b7ad70d00afd0526b64b9fccfcbf396e0a7941f55300bd62a"
+YM_SHADOW_CONFIGURATION_SHA256 = "4cc734a43ae429bb760a7228dcd22e211f5bc925d57cf71b0717323faea3de4d"
+YM_SHADOW_CONFIGURATION_HASH = "d8ab9d9741aedd8c4b2ab9609d97124d8d66752873bf53eec24f39a13c23ff10"
+YM_SHADOW_ACTIVATION_TASK_SHA256 = "0ba6b7b53e42d77c2362ed361c8eee81ace9198f4714b54432ce97b6fd9333fc"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -123,6 +139,9 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "mtf_session_trend_confirmation_pilot",
     "rty_ym_relative_value_pilot",
     "ym_shared_risk_off_overlay",
+    "qd_economic_tournament",
+    "ym_open_gap_strict_promotion",
+    "ym_immutable_shadow_activation",
 }
 
 
@@ -206,6 +225,14 @@ class AutonomousMissionController:
                 conn.close()
 
     def step(self, conn: Any) -> tuple[dict[str, Any], bool]:
+        try:
+            self._tick_shadow_pipeline(conn)
+        except ShadowPipelineIntegrityError as exc:
+            return {
+                "action_id": "shadow_pipeline_integrity_blocked",
+                "action_type": "INTEGRITY_BLOCKED",
+                "rationale": str(exc),
+            }, False
         phase = str(get_kv(conn, "current_phase", ""))
         if phase in {"INTEGRITY_BLOCKED", "ENGINEERING_BLOCKED", "EXPERIMENT_BLOCKED"}:
             return {
@@ -359,6 +386,21 @@ class AutonomousMissionController:
             previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
             and str(previous_blocker or "") == "DEFENSIVE_PORTFOLIO_RISK_ENGINE_REQUIRED"
         )
+        qd_economic_tournament_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "INVENTED_METHOD_OR_PORTFOLIO_SEARCH_REQUIRED"
+        )
+        ym_strict_promotion_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            in {
+                "INVENTED_METHOD_OR_PORTFOLIO_SEARCH_REQUIRED",
+                "QD_TARGETED_CONFIRMATION_AND_YM_STRICT_REPLAY_REQUIRED",
+                "QD_SHADOW_ACTIVATION_AND_YM_STRICT_REPLAY_REQUIRED",
+                "QD_FAILURE_MAP_AND_YM_STRICT_REPLAY_REQUIRED",
+            }
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -479,6 +521,20 @@ class AutonomousMissionController:
             and str(get_kv(conn, "current_blocker") or "")
             == "DEFENSIVE_PORTFOLIO_RISK_ENGINE_REQUIRED"
         )
+        qd_economic_tournament_required = qd_economic_tournament_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "INVENTED_METHOD_OR_PORTFOLIO_SEARCH_REQUIRED"
+        )
+        ym_strict_promotion_required = ym_strict_promotion_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            in {
+                "QD_TARGETED_CONFIRMATION_AND_YM_STRICT_REPLAY_REQUIRED",
+                "QD_SHADOW_ACTIVATION_AND_YM_STRICT_REPLAY_REQUIRED",
+                "QD_FAILURE_MAP_AND_YM_STRICT_REPLAY_REQUIRED",
+            }
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -528,6 +584,16 @@ class AutonomousMissionController:
             if ym_shared_risk_off_required
             else False
         )
+        qd_economic_tournament_queued = (
+            self._reconcile_qd_economic_tournament(conn)
+            if qd_economic_tournament_required
+            else False
+        )
+        ym_strict_promotion_queued = (
+            self._reconcile_ym_strict_promotion(conn)
+            if ym_strict_promotion_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -553,6 +619,8 @@ class AutonomousMissionController:
             and not mtf_session_trend_confirmation_queued
             and not rty_ym_relative_value_queued
             and not ym_shared_risk_off_queued
+            and not qd_economic_tournament_queued
+            and not ym_strict_promotion_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -588,6 +656,8 @@ class AutonomousMissionController:
                 "mtf_session_trend_confirmation_queued": mtf_session_trend_confirmation_queued,
                 "rty_ym_relative_value_queued": rty_ym_relative_value_queued,
                 "ym_shared_risk_off_queued": ym_shared_risk_off_queued,
+                "qd_economic_tournament_queued": qd_economic_tournament_queued,
+                "ym_strict_promotion_queued": ym_strict_promotion_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -632,6 +702,12 @@ class AutonomousMissionController:
             ),
             (RTY_YM_RELATIVE_VALUE_EXPERIMENT_ID, "rty_ym_relative_value_plan_written"),
             (YM_SHARED_RISK_OFF_EXPERIMENT_ID, "ym_shared_risk_off_plan_written"),
+            (
+                QD_ECONOMIC_TOURNAMENT_EXPERIMENT_ID,
+                "qd_economic_tournament_plan_written",
+            ),
+            (YM_STRICT_PROMOTION_EXPERIMENT_ID, "ym_strict_promotion_plan_written"),
+            (YM_SHADOW_ACTIVATION_EXPERIMENT_ID, "ym_shadow_activation_plan_written"),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -715,6 +791,21 @@ class AutonomousMissionController:
                 "ym_shared_risk_off_overlay",
                 "ym_shared_risk_off_completed",
             ),
+            (
+                QD_ECONOMIC_TOURNAMENT_EXPERIMENT_ID,
+                "qd_economic_tournament",
+                "qd_economic_tournament_completed",
+            ),
+            (
+                YM_STRICT_PROMOTION_EXPERIMENT_ID,
+                "ym_open_gap_strict_promotion",
+                "ym_strict_promotion_completed",
+            ),
+            (
+                YM_SHADOW_ACTIVATION_EXPERIMENT_ID,
+                "ym_immutable_shadow_activation",
+                "ym_shadow_activation_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -754,6 +845,9 @@ class AutonomousMissionController:
                 "mtf_session_trend_confirmation_pilot": "mtf_session_trend_confirmation_result",
                 "rty_ym_relative_value_pilot": "rty_ym_relative_value_result",
                 "ym_shared_risk_off_overlay": "ym_shared_risk_off_result",
+                "qd_economic_tournament": "qd_economic_tournament_result",
+                "ym_open_gap_strict_promotion": "ym_strict_promotion_result",
+                "ym_immutable_shadow_activation": "ym_shadow_activation_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -816,6 +910,12 @@ class AutonomousMissionController:
                 self._route_rty_ym_relative_value_result(conn, result)
             elif experiment_type == "ym_shared_risk_off_overlay":
                 self._route_ym_shared_risk_off_result(conn, result)
+            elif experiment_type == "qd_economic_tournament":
+                self._route_qd_economic_tournament_result(conn, result)
+            elif experiment_type == "ym_open_gap_strict_promotion":
+                self._route_ym_strict_promotion_result(conn, result)
+            elif experiment_type == "ym_immutable_shadow_activation":
+                self._route_ym_shadow_activation_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -1939,6 +2039,273 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_qd_economic_tournament(self, conn: Any) -> bool:
+        """Queue the frozen selector-v2 tournament without inspecting 2024 outcomes."""
+        existing = experiment_record(conn, QD_ECONOMIC_TOURNAMENT_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path(
+            "reports", "engineering", "hydra_qd_economic_tournament_20260711.md"
+        )
+        selector_task = project_path(
+            "reports", "engineering", "hydra_qd_selector_v2_20260711.md"
+        )
+        map_path = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        root = Path("/root/hydra-bot")
+        if not map_path.is_file():
+            map_path = root / "data/cache/contract_maps" / map_path.name
+        contracts = (
+            (task, QD_ECONOMIC_TOURNAMENT_TASK_SHA256, "tournament task"),
+            (selector_task, QD_SELECTOR_V2_TASK_SHA256, "selector v2 task"),
+            (map_path, PATH_GEOMETRY_MAP_SHA256, "explicit-contract map"),
+        )
+        mismatch = [
+            label
+            for path, expected, label in contracts
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatch:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "QD_TOURNAMENT_FROZEN_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen quality-diversity inputs changed: {', '.join(mismatch)}.",
+            )
+            return False
+        specification = {
+            "experiment_type": "qd_economic_tournament",
+            "priority": 110.0,
+            "max_attempts": 2,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": QD_ECONOMIC_TOURNAMENT_TASK_SHA256,
+            "selector_task_path": str(selector_task),
+            "selector_task_sha256": QD_SELECTOR_V2_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "pipeline": "PROMOTION",
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "selection_data_end_exclusive": "2024-01-01",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.99,
+        }
+        enqueue_experiment(
+            conn, QD_ECONOMIC_TOURNAMENT_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "qd_economic_tournament_plan_written", True)
+        set_kv(conn, "foundry_current_engine", "ENGINE_J_QUALITY_DIVERSITY")
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": QD_ECONOMIC_TOURNAMENT_EXPERIMENT_ID,
+                "experiment_type": "qd_economic_tournament",
+                "pipeline": "PROMOTION",
+                "status": "QUEUED",
+                "reason": (
+                    "Selector v2 freezes the maximum feasible diversified 2023 elite set "
+                    "before unchanged 2024 Q1-Q3 promotion; Q4 and network access stay closed."
+                ),
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_ym_strict_promotion(self, conn: Any) -> bool:
+        existing = experiment_record(conn, YM_STRICT_PROMOTION_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path(
+            "reports", "engineering", "hydra_ym_strict_promotion_replay_20260711.md"
+        )
+        map_path = project_path(
+            "data", "cache", "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        parent_dir = project_path(
+            "reports", "mission_experiments", EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID
+        )
+        parent_result = parent_dir / "equity_open_gap_continuation_result.json"
+        parent_ledger = parent_dir / "equity_open_gap_continuation_trade_ledger.jsonl"
+        shadow_configuration = (
+            parent_dir / "shadow_configurations" / f"strategy_open_gap_continuation_YM_v1.json"
+        )
+        freeze_manifest = project_path(
+            "reports", "mission_experiments", Q4_CANDIDATE_FREEZE_EXPERIMENT_ID,
+            "q4_freeze_manifest_strategy_open_gap_continuation_YM_v1.json",
+        )
+        root = Path("/root/hydra-bot")
+        fallbacks = {
+            "map": root / "data/cache/contract_maps" / map_path.name,
+            "parent_result": root / "reports/mission_experiments" / EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID / parent_result.name,
+            "parent_ledger": root / "reports/mission_experiments" / EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID / parent_ledger.name,
+            "shadow": root / "reports/mission_experiments" / EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID / "shadow_configurations" / shadow_configuration.name,
+            "freeze": root / "reports/mission_experiments" / Q4_CANDIDATE_FREEZE_EXPERIMENT_ID / freeze_manifest.name,
+        }
+        if not map_path.is_file():
+            map_path = fallbacks["map"]
+        if not parent_result.is_file():
+            parent_result = fallbacks["parent_result"]
+        if not parent_ledger.is_file():
+            parent_ledger = fallbacks["parent_ledger"]
+        if not shadow_configuration.is_file():
+            shadow_configuration = fallbacks["shadow"]
+        if not freeze_manifest.is_file():
+            freeze_manifest = fallbacks["freeze"]
+        contracts = (
+            (task, YM_STRICT_PROMOTION_TASK_SHA256, "strict task"),
+            (map_path, PATH_GEOMETRY_MAP_SHA256, "explicit map"),
+            (parent_result, YM_SHARED_RISK_OFF_PARENT_RESULT_SHA256, "parent result"),
+            (parent_ledger, YM_SHARED_RISK_OFF_PARENT_LEDGER_SHA256, "parent ledger"),
+            (freeze_manifest, YM_FREEZE_MANIFEST_SHA256, "freeze manifest"),
+            (shadow_configuration, YM_SHADOW_CONFIGURATION_SHA256, "shadow configuration"),
+        )
+        mismatch = [
+            label for path, expected, label in contracts
+            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatch:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "YM_STRICT_PROMOTION_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", f"Frozen YM strict sources changed: {', '.join(mismatch)}.")
+            return False
+        specification = {
+            "experiment_type": "ym_open_gap_strict_promotion",
+            "priority": 109.0,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": YM_STRICT_PROMOTION_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "source_parent_result_path": str(parent_result),
+            "source_parent_result_sha256": YM_SHARED_RISK_OFF_PARENT_RESULT_SHA256,
+            "source_parent_result_hash": YM_SHARED_RISK_OFF_PARENT_RESULT_HASH,
+            "source_parent_trade_ledger_path": str(parent_ledger),
+            "source_parent_trade_ledger_sha256": YM_SHARED_RISK_OFF_PARENT_LEDGER_SHA256,
+            "source_freeze_manifest_path": str(freeze_manifest),
+            "source_freeze_manifest_sha256": YM_FREEZE_MANIFEST_SHA256,
+            "source_freeze_manifest_hash": YM_FREEZE_MANIFEST_HASH,
+            "source_shadow_configuration_path": str(shadow_configuration),
+            "source_shadow_configuration_sha256": YM_SHADOW_CONFIGURATION_SHA256,
+            "source_shadow_configuration_hash": YM_SHADOW_CONFIGURATION_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.98,
+        }
+        enqueue_experiment(conn, YM_STRICT_PROMOTION_EXPERIMENT_ID, specification)
+        set_kv(conn, "ym_strict_promotion_plan_written", True)
+        set_kv(conn, "promotion_pipeline_status", "QUEUED")
+        set_kv(
+            conn,
+            "current_research_experiment_selected",
+            {
+                "experiment": YM_STRICT_PROMOTION_EXPERIMENT_ID,
+                "experiment_type": "ym_open_gap_strict_promotion",
+                "pipeline": "PROMOTION",
+                "status": "QUEUED",
+                "reason": "Resolve temporal concentration and zero-order shadow safety of the exact frozen YM parent.",
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_ym_shadow_activation(self, conn: Any) -> bool:
+        existing = experiment_record(conn, YM_SHADOW_ACTIVATION_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        strict_record = experiment_record(conn, YM_STRICT_PROMOTION_EXPERIMENT_ID)
+        if strict_record is None or strict_record.get("status") != "COMPLETED":
+            return False
+        strict_result = dict(strict_record.get("result") or {})
+        if (
+            not bool(strict_result.get("shadow_activation_eligible"))
+            or list(strict_result.get("hard_invalidations") or [])
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "YM_SHADOW_ACTIVATION_NOT_AUTHORIZED")
+            set_kv(conn, "last_error", "Frozen strict result prohibits shadow activation.")
+            return False
+        task = project_path(
+            "reports", "engineering", "hydra_ym_shadow_activation_20260711.md"
+        )
+        strict_path = Path(
+            str((strict_result.get("artifacts") or {}).get("result_json_path") or "")
+        )
+        shadow_configuration = project_path(
+            "reports", "mission_experiments", EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID,
+            "shadow_configurations", "strategy_open_gap_continuation_YM_v1.json",
+        )
+        root = Path("/root/hydra-bot")
+        if not strict_path.is_file():
+            strict_path = root / "reports/mission_experiments" / YM_STRICT_PROMOTION_EXPERIMENT_ID / "ym_strict_promotion_result.json"
+        if not shadow_configuration.is_file():
+            shadow_configuration = root / "reports/mission_experiments" / EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID / "shadow_configurations" / shadow_configuration.name
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest() != YM_SHADOW_ACTIVATION_TASK_SHA256
+            or not strict_path.is_file()
+            or not shadow_configuration.is_file()
+            or hashlib.sha256(shadow_configuration.read_bytes()).hexdigest()
+            != YM_SHADOW_CONFIGURATION_SHA256
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "YM_SHADOW_ACTIVATION_SOURCE_MISMATCH")
+            set_kv(conn, "last_error", "Strict result, activation task or shadow configuration changed.")
+            return False
+        specification = {
+            "experiment_type": "ym_immutable_shadow_activation",
+            "priority": 108.0,
+            "max_attempts": 2,
+            "pipeline": "SHADOW",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": YM_SHADOW_ACTIVATION_TASK_SHA256,
+            "strict_result_path": str(strict_path),
+            "strict_result_sha256": hashlib.sha256(strict_path.read_bytes()).hexdigest(),
+            "strict_result_hash": str(strict_result["result_hash"]),
+            "shadow_configuration_path": str(shadow_configuration),
+            "shadow_configuration_sha256": YM_SHADOW_CONFIGURATION_SHA256,
+            "shadow_configuration_hash": YM_SHADOW_CONFIGURATION_HASH,
+            "code_commit": self._git_commit(),
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.99,
+        }
+        enqueue_experiment(conn, YM_SHADOW_ACTIVATION_EXPERIMENT_ID, specification)
+        set_kv(conn, "ym_shadow_activation_plan_written", True)
+        set_kv(conn, "shadow_pipeline_status", "ACTIVATION_QUEUED")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -2355,6 +2722,125 @@ class AutonomousMissionController:
             },
         )
 
+    def _route_qd_economic_tournament_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        AutonomousMissionController._update_foundry_candidate_bank(
+            conn, result, QD_ECONOMIC_TOURNAMENT_EXPERIMENT_ID
+        )
+        set_kv(conn, "foundry_current_engine", "ENGINE_J_QUALITY_DIVERSITY")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(
+            conn,
+            "quality_diversity_archive",
+            result.get("quality_diversity_archive") or {},
+        )
+        set_kv(
+            conn,
+            "qd_stage1_survivors",
+            int(result.get("stage1_survivors", 0)),
+        )
+        set_kv(
+            conn,
+            "qd_validation_elites",
+            int(result.get("validation_elites", 0)),
+        )
+        shadow = int(result.get("shadow_candidates", 0))
+        promising = int(result.get("promising_candidates", 0))
+        if shadow:
+            blocker = "QD_SHADOW_ACTIVATION_AND_YM_STRICT_REPLAY_REQUIRED"
+            message = "Frozen QD candidates may enter zero-order shadow while strict promotion continues."
+        elif promising:
+            blocker = "QD_TARGETED_CONFIRMATION_AND_YM_STRICT_REPLAY_REQUIRED"
+            message = "QD transfer found promising exact versions; preregister confirmations and resolve frozen YM."
+        else:
+            blocker = "QD_FAILURE_MAP_AND_YM_STRICT_REPLAY_REQUIRED"
+            message = "The first feasible QD promotion found no shadow admission; use its failure map and resolve frozen YM."
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(conn, "last_error", message)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "PROMOTION",
+                "parallel_discovery": True,
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+            },
+        )
+        self._reconcile_ym_strict_promotion(conn)
+
+    def _route_ym_strict_promotion_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        AutonomousMissionController._update_foundry_candidate_bank(
+            conn, result, YM_STRICT_PROMOTION_EXPERIMENT_ID
+        )
+        set_kv(conn, "promotion_pipeline_status", "COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        eligible = bool(result.get("shadow_activation_eligible"))
+        hard = list(result.get("hard_invalidations") or [])
+        if eligible and not hard:
+            blocker = "YM_IMMUTABLE_SHADOW_ACTIVATION_REQUIRED"
+            message = (
+                "YM lacks two-quarter strict confirmation but passes integrity, matched-null, "
+                "concentration and risk safety needed for zero-order forward shadow research."
+            )
+        else:
+            blocker = "YM_SHADOW_HARD_INVALIDATION_RESOLUTION_REQUIRED"
+            message = f"YM shadow activation is prohibited by hard invalidations: {hard}."
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(conn, "last_error", message)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "SHADOW" if eligible else "ENGINEERING",
+                "parallel_discovery": True,
+                "q4_access_authorized": False,
+            },
+        )
+        if eligible and not hard:
+            self._reconcile_ym_shadow_activation(conn)
+
+    def _route_ym_shadow_activation_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        AutonomousMissionController._update_foundry_candidate_bank(
+            conn, result, YM_SHADOW_ACTIVATION_EXPERIMENT_ID
+        )
+        entry = registry_entry_from_activation(result)
+        registry = dict(get_kv(conn, "shadow_active_registry", {}) or {})
+        candidate_id = str(result["candidate_id"])
+        existing = registry.get(candidate_id)
+        if existing is not None and existing != entry:
+            raise ShadowPipelineIntegrityError(
+                "Refusing in-place mutation of an active shadow candidate."
+            )
+        registry[candidate_id] = entry
+        set_kv(conn, "shadow_active_registry", registry)
+        set_kv(conn, "shadow_pipeline_status", "RUNNING_FAIL_CLOSED")
+        set_kv(conn, "shadow_active_candidates", len(registry))
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": "PARALLEL_DISCOVERY_AND_QD_TARGETED_CONFIRMATION",
+                "pipeline": "DISCOVERY",
+                "shadow_pipeline": "RUNNING_FAIL_CLOSED",
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
     @staticmethod
     def _update_foundry_candidate_bank(
         conn: Any, result: dict[str, Any], experiment_id: str
@@ -2694,6 +3180,18 @@ class AutonomousMissionController:
                 {"experiment_id": experiment_id, "reason": str(exc)},
             )
             return
+        except ShadowPipelineIntegrityError as exc:
+            block_experiment(
+                conn,
+                experiment_id,
+                f"shadow_pipeline_integrity:{exc}",
+                claim_token=str(experiment["claim_token"]),
+            )
+            set_kv(conn, "current_experiment", None)
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "SHADOW_PIPELINE_INTEGRITY_FAILURE")
+            set_kv(conn, "last_error", str(exc)[:4000])
+            return
         except Exception as exc:
             status = fail_experiment(
                 conn,
@@ -2801,6 +3299,15 @@ class AutonomousMissionController:
                         checkpoint=str(get_kv(conn, "last_successful_checkpoint", "")),
                     ),
                 )
+                try:
+                    self._tick_shadow_pipeline(conn)
+                except ShadowPipelineIntegrityError:
+                    self._signal_worker_tree(worker, signal.SIGTERM)
+                    worker.join(timeout=10.0)
+                    if worker.is_alive():
+                        self._signal_worker_tree(worker, signal.SIGKILL)
+                        worker.join(timeout=5.0)
+                    raise
                 last_lease_renewal = now_monotonic
         worker.join(timeout=1.0)
         if self._shutdown or stop_requested(self.paths):
@@ -2844,6 +3351,32 @@ class AutonomousMissionController:
             "paid_data_allowed": False,
             "selection_rule": "bounded_expected_decision_information_gain_with_positive_negative_and_invariant_controls",
         }
+
+    def _tick_shadow_pipeline(self, conn: Any) -> dict[str, Any]:
+        registry = dict(get_kv(conn, "shadow_active_registry", {}) or {})
+        mission_state_dir = Path(self.config.state_dir).resolve()
+        runtime_root = (
+            mission_state_dir.parent.parent
+            if mission_state_dir.name == "state" and mission_state_dir.parent.name == "mission"
+            else mission_state_dir.parent
+        )
+        state_dir = runtime_root / "shadow" / "state"
+        try:
+            status = tick_shadow_pipeline(state_dir, registry)
+        except ShadowPipelineIntegrityError as exc:
+            set_kv(conn, "shadow_pipeline_status", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "SHADOW_PIPELINE_INTEGRITY_FAILURE")
+            set_kv(conn, "last_error", str(exc)[:4000])
+            raise
+        set_kv(conn, "shadow_pipeline_status", status["status"])
+        set_kv(conn, "shadow_pipeline_runtime", status)
+        set_kv(
+            conn,
+            "shadow_active_candidates",
+            int(status.get("shadow_research_active", 0)),
+        )
+        return status
 
     def _checkpoint_due(self, conn: Any, action: dict[str, Any], *, progressed: bool) -> bool:
         if progressed:
@@ -2897,6 +3430,16 @@ class AutonomousMissionController:
                 "paper_shadow_ready_candidates", 0
             ),
             "shadow_active_candidates": snapshot.get("shadow_active_candidates", 0),
+            "discovery_pipeline_status": snapshot.get(
+                "discovery_pipeline_status", "NOT_INITIALIZED"
+            ),
+            "promotion_pipeline_status": snapshot.get(
+                "promotion_pipeline_status", "NOT_INITIALIZED"
+            ),
+            "shadow_pipeline_status": snapshot.get(
+                "shadow_pipeline_status", "NOT_INITIALIZED"
+            ),
+            "shadow_pipeline_runtime": snapshot.get("shadow_pipeline_runtime", {}),
             "mechanisms_represented": snapshot.get("mechanisms_represented", 0),
             "market_ecologies_represented": snapshot.get(
                 "market_ecologies_represented", 0

@@ -18,6 +18,7 @@ registry/archive/*.db
 registry/snapshots/*.db
 mission/state/
 mission/logs/
+shadow/state/
 reports/*.json
 reports/checkpoints/mission/*.md
 reports/mission/*_latest_summary.md
