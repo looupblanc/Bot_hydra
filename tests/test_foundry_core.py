@@ -392,6 +392,7 @@ def test_foundry_bootstrap_routes_exactly_once_to_gap_pilot(tmp_path: Path) -> N
         assert record["specification"]["q4_access_allowed"] is False
         assert record["specification"]["paid_data_allowed"] is False
         assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+        assert get_kv(conn, "strategy_prototypes_generated") == 696
     finally:
         conn.close()
 
@@ -424,6 +425,47 @@ def test_experiment_runner_dispatches_open_gap_pilot(
     )
     assert result["scientific_conclusion"] == "controlled"
     assert captured["repaired_roll_map_hash"] == "roll-hash"
+
+
+def test_foundry_candidate_metrics_are_idempotent(tmp_path: Path) -> None:
+    paths = mission_paths(str(tmp_path / "state"))
+    conn = connect_state(paths)
+    result = {
+        "candidate_count": 2,
+        "candidates": [
+            {
+                "candidate_id": "a",
+                "status": "PROMISING_RESEARCH_CANDIDATE",
+                "mechanism_family": "f",
+                "primary_market": "CL",
+                "execution_market": "MCL",
+                "net_pnl": 1.0,
+                "topstep": {"path_candidate": False},
+            },
+            {
+                "candidate_id": "b",
+                "status": "SHADOW_RESEARCH_CANDIDATE",
+                "mechanism_family": "f",
+                "primary_market": "YM",
+                "execution_market": "MYM",
+                "net_pnl": 2.0,
+                "topstep": {"path_candidate": True},
+            },
+        ],
+    }
+    try:
+        from hydra.mission.mission_state import set_kv
+
+        set_kv(conn, "foundry_bootstrap_prototype_baseline", 696)
+        AutonomousMissionController._update_foundry_candidate_bank(conn, result, "exp")
+        AutonomousMissionController._update_foundry_candidate_bank(conn, result, "exp")
+        assert get_kv(conn, "strategy_prototypes_generated") == 698
+        assert get_kv(conn, "strategies_screened") == 698
+        assert get_kv(conn, "promising_candidates") == 2
+        assert get_kv(conn, "shadow_candidates") == 1
+        assert get_kv(conn, "topstep_path_candidates") == 1
+    finally:
+        conn.close()
 
 
 def _specification(**updates: object) -> ShadowSpecification:

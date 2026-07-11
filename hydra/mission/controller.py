@@ -1695,7 +1695,15 @@ class AutonomousMissionController:
             "q4_candidates": status.get("q4_candidates", 0),
             "model_quota_state": status.get("model_quota_state", "UNKNOWN"),
         }.items():
-            set_kv(conn, key, value)
+            if key == "model_quota_state":
+                set_kv(conn, key, value)
+            else:
+                set_kv(conn, key, max(int(get_kv(conn, key, 0)), int(value or 0)))
+        set_kv(
+            conn,
+            "foundry_bootstrap_prototype_baseline",
+            int(status.get("strategy_prototypes_generated", 0)),
+        )
         set_kv(conn, "foundry_core_ready", True)
         set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
         set_kv(conn, "current_blocker", "EQUITY_OPEN_GAP_REVERSAL_PILOT_REQUIRED")
@@ -1821,6 +1829,7 @@ class AutonomousMissionController:
                 int(get_kv(conn, "lineages_frozen", 0)) + 1,
             )
             set_kv(conn, "q4_freeze_accounted_result_hash", result.get("result_hash"))
+        set_kv(conn, "lineages_frozen", max(int(get_kv(conn, "lineages_frozen", 0)), 1))
         set_kv(conn, "q4_access_blocker", "GOVERNANCE_CHANGE_REQUIRED_FOR_FROZEN_ONE_SHOT_Q4")
         set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
         set_kv(conn, "current_blocker", "DISTRIBUTIONAL_OPENING_HAZARD_PILOT_REQUIRED")
@@ -1959,6 +1968,18 @@ class AutonomousMissionController:
             "SHADOW_CONFIRMED",
         }
         set_kv(conn, "foundry_candidate_bank", bank)
+        baseline = int(get_kv(conn, "foundry_bootstrap_prototype_baseline", 0))
+        candidate_total = baseline + len(bank)
+        set_kv(
+            conn,
+            "strategy_prototypes_generated",
+            max(int(get_kv(conn, "strategy_prototypes_generated", 0)), candidate_total),
+        )
+        set_kv(
+            conn,
+            "strategies_screened",
+            max(int(get_kv(conn, "strategies_screened", 0)), candidate_total),
+        )
         set_kv(conn, "promising_candidates", sum(item in promising_tiers for item in statuses))
         set_kv(conn, "shadow_candidates", sum(item in shadow_tiers for item in statuses))
         set_kv(
