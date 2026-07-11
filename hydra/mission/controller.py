@@ -90,6 +90,9 @@ ACCELERATED_CONTEXT_TOURNAMENT_EXPERIMENT_ID = "accelerated_context_tournament_v
 SELECTION_NULL_POWER_EXPERIMENT_ID = "selection_null_power_calibration_v1"
 SELECTION_NULL_POLICY_REPAIR_EXPERIMENT_ID = "selection_null_policy_repair_v2"
 SINGLE_PRIMARY_ALPHA_EXPERIMENT_ID = "single_primary_alpha_calibration_v3"
+SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID = (
+    "single_primary_context_tournament_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -126,6 +129,7 @@ ACCELERATED_CONTEXT_TASK_SHA256 = "07296001c77726aeb99dcb8b6ac6ea44c2bae1f927648
 SELECTION_NULL_POWER_TASK_SHA256 = "780fbe3b85473e81e0247777399ac5184d3190f50bddc08a0c3cf8ee4530c7b6"
 SELECTION_NULL_POLICY_REPAIR_TASK_SHA256 = "8ec374ea09e4f7f6f6c80b4b16665b2cfa744dd7661203306d84add3d1ade349"
 SINGLE_PRIMARY_ALPHA_TASK_SHA256 = "b805c986145cbd0003eb46f512acd5989e9967e898bee0d2cf20b9558f01cb93"
+SINGLE_PRIMARY_CONTEXT_TASK_SHA256 = "e66daf691c5a6e6aee54da064aaa8f6e9165f6eac54229ae17d834df38d2839b"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -154,6 +158,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "selection_null_power_calibration",
     "selection_null_policy_repair",
     "single_primary_alpha_calibration",
+    "single_primary_context_tournament",
 }
 
 
@@ -413,6 +418,11 @@ class AutonomousMissionController:
                 "QD_FAILURE_MAP_AND_YM_STRICT_REPLAY_REQUIRED",
             }
         )
+        single_primary_context_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "NEW_SINGLE_PRIMARY_TOURNAMENT_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -547,6 +557,11 @@ class AutonomousMissionController:
                 "QD_FAILURE_MAP_AND_YM_STRICT_REPLAY_REQUIRED",
             }
         )
+        single_primary_context_required = single_primary_context_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "NEW_SINGLE_PRIMARY_TOURNAMENT_REQUIRED"
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -606,6 +621,11 @@ class AutonomousMissionController:
             if ym_strict_promotion_required
             else False
         )
+        single_primary_context_queued = (
+            self._reconcile_single_primary_context_tournament(conn)
+            if single_primary_context_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -633,6 +653,7 @@ class AutonomousMissionController:
             and not ym_shared_risk_off_queued
             and not qd_economic_tournament_queued
             and not ym_strict_promotion_queued
+            and not single_primary_context_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -670,6 +691,7 @@ class AutonomousMissionController:
                 "ym_shared_risk_off_queued": ym_shared_risk_off_queued,
                 "qd_economic_tournament_queued": qd_economic_tournament_queued,
                 "ym_strict_promotion_queued": ym_strict_promotion_queued,
+                "single_primary_context_queued": single_primary_context_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -730,6 +752,10 @@ class AutonomousMissionController:
                 "selection_null_policy_repair_plan_written",
             ),
             (SINGLE_PRIMARY_ALPHA_EXPERIMENT_ID, "single_primary_alpha_plan_written"),
+            (
+                SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID,
+                "single_primary_context_plan_written",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is not None:
@@ -848,6 +874,11 @@ class AutonomousMissionController:
                 "single_primary_alpha_calibration",
                 "single_primary_alpha_completed",
             ),
+            (
+                SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID,
+                "single_primary_context_tournament",
+                "single_primary_context_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -894,6 +925,7 @@ class AutonomousMissionController:
                 "selection_null_power_calibration": "selection_null_power_result",
                 "selection_null_policy_repair": "selection_null_policy_repair_result",
                 "single_primary_alpha_calibration": "single_primary_alpha_result",
+                "single_primary_context_tournament": "single_primary_context_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -970,6 +1002,8 @@ class AutonomousMissionController:
                 self._route_selection_null_policy_repair_result(conn, result)
             elif experiment_type == "single_primary_alpha_calibration":
                 self._route_single_primary_alpha_result(conn, result)
+            elif experiment_type == "single_primary_context_tournament":
+                self._route_single_primary_context_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -2565,6 +2599,113 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_single_primary_context_tournament(self, conn: Any) -> bool:
+        existing = experiment_record(
+            conn, SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID
+        )
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        policy_record = experiment_record(conn, SINGLE_PRIMARY_ALPHA_EXPERIMENT_ID)
+        if policy_record is None or policy_record.get("status") != "COMPLETED":
+            return False
+        policy = dict(policy_record.get("result") or {})
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_single_primary_context_tournament_20260711.md",
+        )
+        selector_task = project_path(
+            "reports", "engineering", "hydra_qd_selector_v2_20260711.md"
+        )
+        policy_path = Path(
+            str((policy.get("artifacts") or {}).get("result_json_path") or "")
+        )
+        if not policy_path.is_file():
+            policy_path = (
+                Path("/root/hydra-bot/reports/mission_experiments")
+                / SINGLE_PRIMARY_ALPHA_EXPERIMENT_ID
+                / "single_primary_alpha_result.json"
+            )
+        map_path = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not map_path.is_file():
+            map_path = Path("/root/hydra-bot/data/cache/contract_maps") / map_path.name
+        contracts = (
+            (task, SINGLE_PRIMARY_CONTEXT_TASK_SHA256, "single-primary task"),
+            (selector_task, QD_SELECTOR_V2_TASK_SHA256, "selector task"),
+            (map_path, PATH_GEOMETRY_MAP_SHA256, "explicit map"),
+        )
+        mismatch = [
+            label
+            for path, expected, label in contracts
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        policy_valid = bool(
+            policy_path.is_file()
+            and policy.get("scientific_conclusion")
+            == "SINGLE_PRIMARY_ALPHA_CALIBRATED"
+            and policy.get("calibration_passed")
+            and float(policy.get("selected_alpha") or 0.0) == 0.03
+            and int(
+                (policy.get("prospective_policy_contract") or {}).get(
+                    "promotion_primary_count", -1
+                )
+            )
+            == 1
+        )
+        if mismatch or not policy_valid:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "SINGLE_PRIMARY_CONTEXT_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                "Frozen single-primary sources changed: "
+                + ", ".join(mismatch or ["calibrated policy"]),
+            )
+            return False
+        specification = {
+            "experiment_type": "single_primary_context_tournament",
+            "priority": 104.9,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": SINGLE_PRIMARY_CONTEXT_TASK_SHA256,
+            "selector_task_path": str(selector_task),
+            "selector_task_sha256": QD_SELECTOR_V2_TASK_SHA256,
+            "calibrated_policy_result_path": str(policy_path),
+            "calibrated_policy_result_sha256": hashlib.sha256(
+                policy_path.read_bytes()
+            ).hexdigest(),
+            "calibrated_policy_result_hash": str(policy["result_hash"]),
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.995,
+        }
+        enqueue_experiment(
+            conn, SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "single_primary_context_plan_written", True)
+        set_kv(conn, "promotion_pipeline_status", "SINGLE_PRIMARY_CONTEXT_QUEUED")
+        set_kv(conn, "foundry_current_engine", "CALIBRATED_SINGLE_PRIMARY_CONTEXT")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -3182,9 +3323,8 @@ class AutonomousMissionController:
         if not passed:
             self._reconcile_single_primary_alpha(conn)
 
-    @staticmethod
     def _route_single_primary_alpha_result(
-        conn: Any, result: dict[str, Any]
+        self, conn: Any, result: dict[str, Any]
     ) -> None:
         set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
         set_kv(conn, "single_primary_null_policy", result.get("prospective_policy_contract"))
@@ -3210,6 +3350,74 @@ class AutonomousMissionController:
                 "q4_access_authorized": False,
             },
         )
+        if bool(result.get("calibration_passed")):
+            self._reconcile_single_primary_context_tournament(conn)
+
+    def _route_single_primary_context_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID
+        )
+        primary_id = str(result.get("primary_candidate_id") or "")
+        conclusion = str(result.get("scientific_conclusion") or "")
+        shadow_count = int(result.get("shadow_candidates") or 0)
+        promising_count = int(result.get("promising_candidates") or 0)
+        killed = set(get_kv(conn, "foundry_killed_candidate_ids", []) or [])
+        if (
+            primary_id
+            and conclusion
+            == "SINGLE_PRIMARY_CONTEXT_CONFIRMATION_FALSIFIED_OR_INSUFFICIENT"
+            and primary_id not in killed
+        ):
+            killed.add(primary_id)
+            set_kv(conn, "foundry_killed_candidate_ids", sorted(killed))
+            set_kv(
+                conn,
+                "strategies_killed",
+                int(get_kv(conn, "strategies_killed", 0)) + 1,
+            )
+        if shadow_count > 0:
+            blocker = "SINGLE_PRIMARY_SHADOW_ACTIVATION_REQUIRED"
+        elif promising_count > 0:
+            blocker = "SINGLE_PRIMARY_NEW_ID_CONFIRMATION_REQUIRED"
+        else:
+            blocker = "COUNTERFACTUAL_HAZARD_PRIMARY_REQUIRED"
+        set_kv(conn, "promotion_pipeline_status", "SINGLE_PRIMARY_CONTEXT_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(
+            conn,
+            "single_primary_context_metrics",
+            {
+                "structural_prototypes": int(result.get("structural_prototypes", 0)),
+                "round1_survivors": int(result.get("round1_survivors", 0)),
+                "round2_survivors": int(result.get("round2_survivors", 0)),
+                "diagnostic_archive_size": int(
+                    result.get("diagnostic_archive_size", 0)
+                ),
+                "primary_candidate_id": primary_id or None,
+                "conclusion": conclusion,
+            },
+        )
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "The exact frozen primary was resolved prospectively; historical or "
+            "diagnostic candidates received no inherited status.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "PROMOTION_AND_DISCOVERY",
+                "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
 
     @staticmethod
     def _update_foundry_candidate_bank(

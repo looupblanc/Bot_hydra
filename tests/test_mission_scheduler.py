@@ -1193,3 +1193,42 @@ def test_calibrated_single_primary_route_is_not_overwritten_by_legacy_blockers(
         )
     finally:
         conn.close()
+
+
+def test_falsified_single_primary_is_counted_once_and_routes_to_new_representation(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    result = {
+        "candidate_count": 300,
+        "structural_prototypes": 300,
+        "round1_survivors": 71,
+        "round2_survivors": 14,
+        "diagnostic_archive_size": 14,
+        "primary_candidate_id": "primary_v3",
+        "scientific_conclusion": (
+            "SINGLE_PRIMARY_CONTEXT_CONFIRMATION_FALSIFIED_OR_INSUFFICIENT"
+        ),
+        "promising_candidates": 0,
+        "shadow_candidates": 0,
+        "candidates": [
+            {
+                "candidate_id": "primary_v3",
+                "status": "RESEARCH_PROTOTYPE",
+                "topstep": {"path_candidate": False},
+            }
+        ],
+    }
+    try:
+        controller._route_single_primary_context_result(conn, result)
+        controller._route_single_primary_context_result(conn, result)
+
+        assert get_kv(conn, "current_blocker") == (
+            "COUNTERFACTUAL_HAZARD_PRIMARY_REQUIRED"
+        )
+        assert get_kv(conn, "strategies_killed") == 1
+        assert get_kv(conn, "strategy_prototypes_generated") == 300
+        assert get_kv(conn, "foundry_killed_candidate_ids") == ["primary_v3"]
+    finally:
+        conn.close()
