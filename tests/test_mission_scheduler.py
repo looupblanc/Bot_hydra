@@ -31,6 +31,7 @@ from hydra.mission.controller import (
     SESSION_GEOMETRY_MICRO_REPAIR_EXPERIMENT_ID,
     SESSION_GEOMETRY_MICRO_SHADOW_EXPERIMENT_ID,
     SESSION_GEOMETRY_PARENT_RESULT_HASH,
+    SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
     V3_DESIGN_EXPERIMENT_ID,
     V3_EXECUTION_EXPERIMENT_ID,
 )
@@ -1919,6 +1920,102 @@ def test_cross_asset_daily_shadow_activation_registers_once(
             "PORTFOLIO_BASKET_AND_DISTRIBUTIONAL_SEARCH_REQUIRED"
         )
         assert get_kv(conn, "paper_shadow_ready_candidates") == 0
+    finally:
+        conn.close()
+
+
+def test_shared_account_baskets_queue_requires_four_active_shadows(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    required = {
+        "strategy_open_gap_continuation_YM_v1",
+        (
+            "strategy_barrier_hazard_NQ_signed_extreme_recovery_60_middle_q65_"
+            "h30_s100_15m_expansion_v1"
+        ),
+        SESSION_GEOMETRY_MICRO_CHILD_ID,
+        CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+    }
+    try:
+        enqueue_experiment(
+            conn,
+            CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID,
+            {"experiment_type": "cross_asset_daily_shadow_activation"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": "IMMUTABLE_ZERO_ORDER_SHADOW_ACTIVATED",
+                "candidate_id": CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+        set_kv(
+            conn,
+            "shadow_active_registry",
+            {candidate_id: {"candidate_id": candidate_id} for candidate_id in required},
+        )
+
+        assert controller._reconcile_shadow_shared_account_baskets(conn)
+        record = experiment_record(
+            conn, SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID
+        )
+
+        assert record is not None
+        assert record["status"] == "QUEUED"
+        assert record["experiment_type"] == "shadow_shared_account_baskets"
+        assert record["specification"]["pipeline"] == "PORTFOLIO"
+        assert len(record["specification"]["sources"]) == 4
+        assert record["specification"]["q4_access_allowed"] is False
+        assert record["specification"]["paid_data_allowed"] is False
+        assert record["specification"]["live_or_broker_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_three_shared_account_baskets_route_to_new_distributional_search(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    monkeypatch.setattr(controller, "_tick_shadow_pipeline", lambda _conn: {})
+    result = {
+        "scientific_conclusion": "THREE_EXECUTABLE_SHADOW_BASKETS_FOUND",
+        "basket_count": 3,
+        "executable_baskets": 3,
+        "manifest_hash": "basket-manifest-hash",
+        "selected_baskets": [
+            {"basket_id": f"basket-{index}", "role": f"role-{index}"}
+            for index in range(3)
+        ],
+        "basket_configurations": [
+            {
+                "basket_id": f"basket-{index}",
+                "role": f"role-{index}",
+                "path": f"/tmp/basket-{index}.json",
+                "configuration_hash": f"hash-{index}",
+            }
+            for index in range(3)
+        ],
+    }
+    try:
+        controller._route_shadow_shared_account_baskets_result(conn, result)
+
+        assert get_kv(conn, "executable_baskets") == 3
+        assert len(get_kv(conn, "shadow_basket_registry")) == 3
+        assert all(
+            not row["outbound_orders_enabled"]
+            for row in get_kv(conn, "shadow_basket_registry").values()
+        )
+        assert get_kv(conn, "current_blocker") == (
+            "DISTRIBUTIONAL_SURVIVAL_HAZARD_SEARCH_REQUIRED"
+        )
+        assert get_kv(conn, "paper_shadow_ready_candidates", 0) == 0
     finally:
         conn.close()
 

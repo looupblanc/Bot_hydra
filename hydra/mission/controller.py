@@ -117,6 +117,9 @@ CROSS_ASSET_DAILY_EXPERIMENT_ID = "cross_asset_daily_horizon_primary_v1"
 CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID = (
     "cross_asset_daily_shadow_activation_v1"
 )
+SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID = (
+    "shadow_shared_account_baskets_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -186,6 +189,7 @@ CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID = (
     "strategy_daily_cross_CL_to_YM_source_prior_trend_"
     "continuation_q80_h120_v1"
 )
+SHADOW_SHARED_ACCOUNT_BASKETS_TASK_SHA256 = "8fe0c161e451a0b27d4e9ff0bdaab5b6ad8ed9d66edcd63c2ccd178ca2ffce0c"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -224,6 +228,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "gc_session_geometry_fresh_primary",
     "cross_asset_daily_horizon_primary",
     "cross_asset_daily_shadow_activation",
+    "shadow_shared_account_baskets",
     "immutable_shadow_activation",
 }
 
@@ -538,6 +543,11 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "CROSS_ASSET_DAILY_SHADOW_ACTIVATION_REQUIRED"
         )
+        shadow_shared_account_baskets_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "PORTFOLIO_BASKET_AND_DISTRIBUTIONAL_SEARCH_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -746,6 +756,14 @@ class AutonomousMissionController:
                 == "CROSS_ASSET_DAILY_SHADOW_ACTIVATION_REQUIRED"
             )
         )
+        shadow_shared_account_baskets_required = (
+            shadow_shared_account_baskets_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "PORTFOLIO_BASKET_AND_DISTRIBUTIONAL_SEARCH_REQUIRED"
+            )
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -860,6 +878,11 @@ class AutonomousMissionController:
             if cross_asset_daily_shadow_required
             else False
         )
+        shadow_shared_account_baskets_queued = (
+            self._reconcile_shadow_shared_account_baskets(conn)
+            if shadow_shared_account_baskets_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -898,6 +921,7 @@ class AutonomousMissionController:
             and not gc_session_geometry_fresh_queued
             and not cross_asset_daily_queued
             and not cross_asset_daily_shadow_queued
+            and not shadow_shared_account_baskets_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -946,6 +970,7 @@ class AutonomousMissionController:
                 "gc_session_geometry_fresh_queued": gc_session_geometry_fresh_queued,
                 "cross_asset_daily_queued": cross_asset_daily_queued,
                 "cross_asset_daily_shadow_queued": cross_asset_daily_shadow_queued,
+                "shadow_shared_account_baskets_queued": shadow_shared_account_baskets_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -1046,6 +1071,10 @@ class AutonomousMissionController:
             (
                 CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID,
                 "cross_asset_daily_shadow_plan_written",
+            ),
+            (
+                SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
+                "shadow_shared_account_baskets_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1220,6 +1249,11 @@ class AutonomousMissionController:
                 "cross_asset_daily_shadow_activation",
                 "cross_asset_daily_shadow_completed",
             ),
+            (
+                SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
+                "shadow_shared_account_baskets",
+                "shadow_shared_account_baskets_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1277,6 +1311,7 @@ class AutonomousMissionController:
                 "gc_session_geometry_fresh_primary": "gc_session_geometry_fresh_result",
                 "cross_asset_daily_horizon_primary": "cross_asset_daily_result",
                 "cross_asset_daily_shadow_activation": "cross_asset_daily_shadow_result",
+                "shadow_shared_account_baskets": "shadow_shared_account_baskets_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -1375,6 +1410,8 @@ class AutonomousMissionController:
                 self._route_cross_asset_daily_result(conn, result)
             elif experiment_type == "cross_asset_daily_shadow_activation":
                 self._route_cross_asset_daily_shadow_result(conn, result)
+            elif experiment_type == "shadow_shared_account_baskets":
+                self._route_shadow_shared_account_baskets_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -4045,6 +4082,170 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_shadow_shared_account_baskets(self, conn: Any) -> bool:
+        existing = experiment_record(
+            conn, SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID
+        )
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(conn, CROSS_ASSET_DAILY_SHADOW_EXPERIMENT_ID)
+        predecessor_result = dict((predecessor or {}).get("result") or {})
+        registry = dict(get_kv(conn, "shadow_active_registry", {}) or {})
+        required_ids = {
+            "strategy_open_gap_continuation_YM_v1",
+            "strategy_barrier_hazard_NQ_signed_extreme_recovery_60_middle_q65_h30_s100_15m_expansion_v1",
+            SESSION_GEOMETRY_MICRO_CHILD_ID,
+            CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+        }
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or predecessor_result.get("scientific_conclusion")
+            != "IMMUTABLE_ZERO_ORDER_SHADOW_ACTIVATED"
+            or predecessor_result.get("candidate_id")
+            != CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID
+            or not required_ids.issubset(registry)
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_shadow_shared_account_baskets_20260711.md",
+        )
+        root = Path("/root/hydra-bot/reports/mission_experiments")
+        sources = [
+            {
+                "candidate_id": "strategy_open_gap_continuation_YM_v1",
+                "result_path": str(
+                    root
+                    / "ym_open_gap_strict_promotion_v1"
+                    / "ym_strict_promotion_result.json"
+                ),
+                "result_sha256": "17921561a4b464d961bd23f2f469052a89dbc9f4551202a3c4a325a6efca2a31",
+                "result_hash": "89c63a68d52a8b3a1277df0cbe8553c2382bf057c8bc2e1fd3ccfb9707c2eecf",
+                "ledger_path": str(
+                    root
+                    / "ym_open_gap_strict_promotion_v1"
+                    / "ym_strict_promotion_candidate_ledger.jsonl"
+                ),
+                "ledger_sha256": "fbb20c9cf5a33f8867b48e0fba8d75a6ebdf083950765187cc5e6fc8a2f63826",
+                "expected_2024": {"events": 46, "net_pnl": 652.5},
+            },
+            {
+                "candidate_id": "strategy_barrier_hazard_NQ_signed_extreme_recovery_60_middle_q65_h30_s100_15m_expansion_v1",
+                "result_path": str(
+                    root / "barrier_hazard_primary_v1" / "barrier_hazard_result.json"
+                ),
+                "result_sha256": "17c4f1bbae092901e408f1f1d03a15d5afcab358cfd66b64a5145e62858fc553",
+                "result_hash": "9243e40d8f08fadec401004f752b0c69bf53800262d5af08a081ea4a075e4bbf",
+                "ledger_path": str(
+                    root
+                    / "barrier_hazard_primary_v1"
+                    / "barrier_hazard_trade_ledger.jsonl"
+                ),
+                "ledger_sha256": "3b8ac95ccebc754c8a87b6b6d4f3f8eb52d20bdbe659b97176f277d186ef8e02",
+                "expected_2024": {
+                    "events": 68,
+                    "net_pnl": 229.8100102579483,
+                },
+            },
+            {
+                "candidate_id": SESSION_GEOMETRY_MICRO_CHILD_ID,
+                "result_path": str(
+                    root
+                    / "session_geometry_micro_execution_repair_v1"
+                    / "micro_execution_repair_result.json"
+                ),
+                "result_sha256": "34f7ceaba8128d9491451762e266b422886b1545b637042ef8c49defcc8ec2eb",
+                "result_hash": "8336f9231adf63828707b2c31e17d247cfd4ea0d614a330dd83bff0817eceb3b",
+                "ledger_path": str(
+                    root
+                    / "session_geometry_micro_execution_repair_v1"
+                    / "micro_execution_repair_trade_ledger.jsonl"
+                ),
+                "ledger_sha256": "735a01c3f1b1c8585c872d83e5e6986da06fec8ca8424e8dfcc4a30fd4887cb1",
+                "expected_2024": {
+                    "events": 22,
+                    "net_pnl": 223.00000000000847,
+                },
+            },
+            {
+                "candidate_id": CROSS_ASSET_DAILY_SHADOW_CANDIDATE_ID,
+                "result_path": str(
+                    root
+                    / "cross_asset_daily_horizon_primary_v1"
+                    / "cross_asset_daily_result.json"
+                ),
+                "result_sha256": "717c088194f9a377c8bc045e9e5b6fcb364f8a8a38209242df5f836505a877a5",
+                "result_hash": "a76176fc6619dfb669343c65650e0a5b09f795a1715ec3385c7b59d44069b553",
+                "ledger_path": str(
+                    root
+                    / "cross_asset_daily_horizon_primary_v1"
+                    / "cross_asset_daily_trade_ledger.jsonl"
+                ),
+                "ledger_sha256": "98e5da466bc7e594d781370ab8bc169a44b26757ac545709df4502c055abc01b",
+                "expected_2024": {"events": 28, "net_pnl": 513.5},
+            },
+        ]
+        frozen = [(task, SHADOW_SHARED_ACCOUNT_BASKETS_TASK_SHA256, "task")]
+        for source in sources:
+            frozen.extend(
+                [
+                    (
+                        Path(str(source["result_path"])),
+                        str(source["result_sha256"]),
+                        f"{source['candidate_id']} result",
+                    ),
+                    (
+                        Path(str(source["ledger_path"])),
+                        str(source["ledger_sha256"]),
+                        f"{source['candidate_id']} ledger",
+                    ),
+                ]
+            )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "SHADOW_BASKET_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen shadow-basket sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        specification = {
+            "experiment_type": "shadow_shared_account_baskets",
+            "priority": 108.0,
+            "max_attempts": 2,
+            "pipeline": "PORTFOLIO",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": SHADOW_SHARED_ACCOUNT_BASKETS_TASK_SHA256,
+            "sources": sources,
+            "code_commit": self._git_commit(),
+            "data_role": "FROZEN_DEVELOPMENT_EVIDENCE_ONLY",
+            "development_start": "2024-01-01",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.99,
+        }
+        enqueue_experiment(
+            conn, SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "shadow_shared_account_baskets_plan_written", True)
+        set_kv(conn, "portfolio_pipeline_status", "SHARED_ACCOUNT_BASKETS_QUEUED")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -5314,6 +5515,65 @@ class AutonomousMissionController:
             {
                 "action": "PORTFOLIO_BASKET_AND_DISTRIBUTIONAL_SEARCH_REQUIRED",
                 "pipeline": "PORTFOLIO_AND_DISCOVERY",
+                "shadow_pipeline": "RUNNING_FAIL_CLOSED",
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
+    def _route_shadow_shared_account_baskets_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        executable = int(result.get("executable_baskets") or 0)
+        conclusion = str(result.get("scientific_conclusion") or "")
+        if conclusion == "THREE_EXECUTABLE_SHADOW_BASKETS_FOUND" and executable >= 3:
+            blocker = "DISTRIBUTIONAL_SURVIVAL_HAZARD_SEARCH_REQUIRED"
+        else:
+            blocker = "SHARED_ACCOUNT_RISK_REMEDIATION_REQUIRED"
+        set_kv(conn, "executable_baskets", executable)
+        set_kv(
+            conn,
+            "shadow_basket_registry",
+            {
+                row["basket_id"]: {
+                    "role": row["role"],
+                    "path": row["path"],
+                    "configuration_hash": row["configuration_hash"],
+                    "outbound_orders_enabled": False,
+                }
+                for row in result.get("basket_configurations") or []
+            },
+        )
+        set_kv(
+            conn,
+            "shadow_shared_account_baskets_metrics",
+            {
+                "basket_count": int(result.get("basket_count") or 0),
+                "executable_baskets": executable,
+                "selected_baskets": result.get("selected_baskets") or [],
+                "manifest_hash": result.get("manifest_hash"),
+                "conclusion": conclusion,
+            },
+        )
+        set_kv(conn, "portfolio_pipeline_status", "SHARED_ACCOUNT_BASKETS_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            (
+                "Shared-account baskets were recomputed from exact trade ledgers. "
+                "They remain zero-order development configurations, not Paper evidence."
+            ),
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "DISCOVERY",
+                "portfolio_pipeline": "SHARED_ACCOUNT_BASKETS_COMPLETED",
                 "shadow_pipeline": "RUNNING_FAIL_CLOSED",
                 "q4_access_authorized": False,
             },

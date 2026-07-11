@@ -721,6 +721,18 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             ),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "shadow_shared_account_baskets":
+        from hydra.portfolio.shadow_shared_account import (
+            run_shadow_shared_account_baskets,
+        )
+
+        return run_shadow_shared_account_baskets(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            sources=[dict(row) for row in experiment["sources"]],
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     if experiment_type == "immutable_shadow_activation":
         from hydra.shadow.activation import run_immutable_shadow_activation
 
