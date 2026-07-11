@@ -947,9 +947,8 @@ def _shadow_specification(
             "expected_vs_observed_virtual_fill": True,
             "fail_on_configuration_hash_mismatch": True,
         },
+        source_manifest_hash=source_manifest_hash,
         outbound_orders_enabled=False,
-        broker_connections_allowed=0,
-        fail_closed=True,
     )
 
 
