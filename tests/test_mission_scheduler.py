@@ -1232,3 +1232,36 @@ def test_falsified_single_primary_is_counted_once_and_routes_to_new_representati
         assert get_kv(conn, "foundry_killed_candidate_ids") == ["primary_v3"]
     finally:
         conn.close()
+
+
+def test_counterfactual_no_primary_routes_to_barrier_hazard_without_fake_kill(
+    tmp_path: Path,
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    result = {
+        "candidate_count": 96,
+        "structural_prototypes": 96,
+        "round1_survivors": 13,
+        "round2_survivors": 2,
+        "diagnostic_archive_size": 1,
+        "primary_candidate_id": None,
+        "scientific_conclusion": "COUNTERFACTUAL_HAZARD_NO_EARLY_PRIMARY",
+        "promising_candidates": 0,
+        "shadow_candidates": 0,
+        "candidates": [],
+    }
+    try:
+        controller._route_counterfactual_hazard_result(conn, result)
+        controller._route_counterfactual_hazard_result(conn, result)
+
+        assert get_kv(conn, "current_blocker") == (
+            "DISTRIBUTIONAL_BARRIER_HAZARD_PRIMARY_REQUIRED"
+        )
+        assert get_kv(conn, "strategies_killed", 0) == 0
+        assert get_kv(conn, "strategy_prototypes_generated") == 96
+        assert get_kv(conn, "counterfactual_hazard_metrics")[
+            "round2_survivors"
+        ] == 2
+    finally:
+        conn.close()

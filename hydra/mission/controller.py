@@ -93,6 +93,7 @@ SINGLE_PRIMARY_ALPHA_EXPERIMENT_ID = "single_primary_alpha_calibration_v3"
 SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID = (
     "single_primary_context_tournament_v1"
 )
+COUNTERFACTUAL_HAZARD_PRIMARY_EXPERIMENT_ID = "counterfactual_hazard_primary_v1"
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -130,6 +131,7 @@ SELECTION_NULL_POWER_TASK_SHA256 = "780fbe3b85473e81e0247777399ac5184d3190f50bdd
 SELECTION_NULL_POLICY_REPAIR_TASK_SHA256 = "8ec374ea09e4f7f6f6c80b4b16665b2cfa744dd7661203306d84add3d1ade349"
 SINGLE_PRIMARY_ALPHA_TASK_SHA256 = "b805c986145cbd0003eb46f512acd5989e9967e898bee0d2cf20b9558f01cb93"
 SINGLE_PRIMARY_CONTEXT_TASK_SHA256 = "e66daf691c5a6e6aee54da064aaa8f6e9165f6eac54229ae17d834df38d2839b"
+COUNTERFACTUAL_HAZARD_TASK_SHA256 = "d8771ee8af93edffde574c366bbc411d70531acc828726c6bb44607d559b7b79"
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -159,6 +161,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "selection_null_policy_repair",
     "single_primary_alpha_calibration",
     "single_primary_context_tournament",
+    "counterfactual_hazard_primary",
 }
 
 
@@ -423,6 +426,11 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "NEW_SINGLE_PRIMARY_TOURNAMENT_REQUIRED"
         )
+        counterfactual_hazard_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "COUNTERFACTUAL_HAZARD_PRIMARY_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -562,6 +570,11 @@ class AutonomousMissionController:
             and str(get_kv(conn, "current_blocker") or "")
             == "NEW_SINGLE_PRIMARY_TOURNAMENT_REQUIRED"
         )
+        counterfactual_hazard_required = counterfactual_hazard_required or bool(
+            str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+            and str(get_kv(conn, "current_blocker") or "")
+            == "COUNTERFACTUAL_HAZARD_PRIMARY_REQUIRED"
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -626,6 +639,11 @@ class AutonomousMissionController:
             if single_primary_context_required
             else False
         )
+        counterfactual_hazard_queued = (
+            self._reconcile_counterfactual_hazard_primary(conn)
+            if counterfactual_hazard_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -654,6 +672,7 @@ class AutonomousMissionController:
             and not qd_economic_tournament_queued
             and not ym_strict_promotion_queued
             and not single_primary_context_queued
+            and not counterfactual_hazard_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -692,6 +711,7 @@ class AutonomousMissionController:
                 "qd_economic_tournament_queued": qd_economic_tournament_queued,
                 "ym_strict_promotion_queued": ym_strict_promotion_queued,
                 "single_primary_context_queued": single_primary_context_queued,
+                "counterfactual_hazard_queued": counterfactual_hazard_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -755,6 +775,10 @@ class AutonomousMissionController:
             (
                 SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID,
                 "single_primary_context_plan_written",
+            ),
+            (
+                COUNTERFACTUAL_HAZARD_PRIMARY_EXPERIMENT_ID,
+                "counterfactual_hazard_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -879,6 +903,11 @@ class AutonomousMissionController:
                 "single_primary_context_tournament",
                 "single_primary_context_completed",
             ),
+            (
+                COUNTERFACTUAL_HAZARD_PRIMARY_EXPERIMENT_ID,
+                "counterfactual_hazard_primary",
+                "counterfactual_hazard_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -926,6 +955,7 @@ class AutonomousMissionController:
                 "selection_null_policy_repair": "selection_null_policy_repair_result",
                 "single_primary_alpha_calibration": "single_primary_alpha_result",
                 "single_primary_context_tournament": "single_primary_context_result",
+                "counterfactual_hazard_primary": "counterfactual_hazard_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -1004,6 +1034,8 @@ class AutonomousMissionController:
                 self._route_single_primary_alpha_result(conn, result)
             elif experiment_type == "single_primary_context_tournament":
                 self._route_single_primary_context_result(conn, result)
+            elif experiment_type == "counterfactual_hazard_primary":
+                self._route_counterfactual_hazard_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -2706,6 +2738,86 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_counterfactual_hazard_primary(self, conn: Any) -> bool:
+        existing = experiment_record(conn, COUNTERFACTUAL_HAZARD_PRIMARY_EXPERIMENT_ID)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(
+            conn, SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID
+        )
+        predecessor_result = dict((predecessor or {}).get("result") or {})
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or predecessor_result.get("scientific_conclusion")
+            != "SINGLE_PRIMARY_CONTEXT_CONFIRMATION_FALSIFIED_OR_INSUFFICIENT"
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_counterfactual_hazard_primary_20260711.md",
+        )
+        map_path = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not map_path.is_file():
+            map_path = Path("/root/hydra-bot/data/cache/contract_maps") / map_path.name
+        contracts = (
+            (task, COUNTERFACTUAL_HAZARD_TASK_SHA256, "counterfactual task"),
+            (map_path, PATH_GEOMETRY_MAP_SHA256, "explicit map"),
+        )
+        mismatch = [
+            label
+            for path, expected, label in contracts
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatch:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "COUNTERFACTUAL_HAZARD_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen counterfactual sources changed: {', '.join(mismatch)}.",
+            )
+            return False
+        specification = {
+            "experiment_type": "counterfactual_hazard_primary",
+            "priority": 104.8,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION_AND_DISCOVERY",
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": COUNTERFACTUAL_HAZARD_TASK_SHA256,
+            "repaired_map_path": str(map_path),
+            "repaired_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "repaired_roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "source_experiment_id": SINGLE_PRIMARY_CONTEXT_TOURNAMENT_EXPERIMENT_ID,
+            "source_result_hash": str(predecessor_result.get("result_hash") or ""),
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "expected_decision_information_gain": 0.995,
+        }
+        enqueue_experiment(
+            conn, COUNTERFACTUAL_HAZARD_PRIMARY_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "counterfactual_hazard_plan_written", True)
+        set_kv(conn, "promotion_pipeline_status", "COUNTERFACTUAL_HAZARD_QUEUED")
+        set_kv(conn, "discovery_pipeline_status", "COUNTERFACTUAL_HAZARD_QUEUED")
+        set_kv(conn, "foundry_current_engine", "COUNTERFACTUAL_HAZARD_MATCHING")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -3406,6 +3518,75 @@ class AutonomousMissionController:
             "last_error",
             "The exact frozen primary was resolved prospectively; historical or "
             "diagnostic candidates received no inherited status.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "PROMOTION_AND_DISCOVERY",
+                "shadow_pipeline": get_kv(conn, "shadow_pipeline_status"),
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+        if blocker == "COUNTERFACTUAL_HAZARD_PRIMARY_REQUIRED":
+            self._reconcile_counterfactual_hazard_primary(conn)
+
+    def _route_counterfactual_hazard_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, COUNTERFACTUAL_HAZARD_PRIMARY_EXPERIMENT_ID
+        )
+        primary_id = str(result.get("primary_candidate_id") or "")
+        conclusion = str(result.get("scientific_conclusion") or "")
+        shadow_count = int(result.get("shadow_candidates") or 0)
+        promising_count = int(result.get("promising_candidates") or 0)
+        killed = set(get_kv(conn, "foundry_killed_candidate_ids", []) or [])
+        if (
+            primary_id
+            and conclusion
+            == "COUNTERFACTUAL_HAZARD_PRIMARY_FALSIFIED_OR_INSUFFICIENT"
+            and primary_id not in killed
+        ):
+            killed.add(primary_id)
+            set_kv(conn, "foundry_killed_candidate_ids", sorted(killed))
+            set_kv(
+                conn,
+                "strategies_killed",
+                int(get_kv(conn, "strategies_killed", 0)) + 1,
+            )
+        if shadow_count > 0:
+            blocker = "COUNTERFACTUAL_HAZARD_SHADOW_ACTIVATION_REQUIRED"
+        elif promising_count > 0:
+            blocker = "COUNTERFACTUAL_HAZARD_NEW_ID_REPLICATION_REQUIRED"
+        else:
+            blocker = "DISTRIBUTIONAL_BARRIER_HAZARD_PRIMARY_REQUIRED"
+        set_kv(conn, "promotion_pipeline_status", "COUNTERFACTUAL_HAZARD_COMPLETED")
+        set_kv(conn, "discovery_pipeline_status", "COUNTERFACTUAL_HAZARD_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(
+            conn,
+            "counterfactual_hazard_metrics",
+            {
+                "structural_prototypes": int(result.get("structural_prototypes", 0)),
+                "round1_survivors": int(result.get("round1_survivors", 0)),
+                "round2_survivors": int(result.get("round2_survivors", 0)),
+                "diagnostic_archive_size": int(
+                    result.get("diagnostic_archive_size", 0)
+                ),
+                "primary_candidate_id": primary_id or None,
+                "conclusion": conclusion,
+            },
+        )
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "Counterfactual positive-outcome hazard completed under its frozen "
+            "single-primary contract; archive diagnostics inherited no status.",
         )
         set_kv(
             conn,
