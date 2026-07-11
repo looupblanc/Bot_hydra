@@ -653,6 +653,11 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
                 experiment["shadow_configuration_hash"]
             ),
             code_commit=str(experiment.get("code_commit") or "unknown"),
+            code_surface_paths=(
+                [Path(str(value)) for value in experiment["code_surface_paths"]]
+                if experiment.get("code_surface_paths")
+                else None
+            ),
         )
     if experiment_type == "gc_session_geometry_fresh_primary":
         from hydra.research.gc_session_geometry_fresh_primary import (
@@ -899,6 +904,40 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             ),
             mutation_trade_ledger_sha256=str(
                 experiment["mutation_trade_ledger_sha256"]
+            ),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
+    if experiment_type == "post_mutation_shadow_admission":
+        from hydra.factory.post_mutation_shadow_admission import (
+            run_post_mutation_shadow_admission,
+        )
+
+        return run_post_mutation_shadow_admission(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            halving_result_path=Path(str(experiment["halving_result_path"])),
+            halving_result_sha256=str(experiment["halving_result_sha256"]),
+            halving_result_hash=str(experiment["halving_result_hash"]),
+            elite_manifest_path=Path(str(experiment["elite_manifest_path"])),
+            elite_manifest_sha256=str(experiment["elite_manifest_sha256"]),
+            elite_manifest_hash=str(experiment["elite_manifest_hash"]),
+            candidate_evidence_path=Path(str(experiment["candidate_evidence_path"])),
+            candidate_evidence_sha256=str(experiment["candidate_evidence_sha256"]),
+            parent_source_result_path=Path(
+                str(experiment["parent_source_result_path"])
+            ),
+            parent_source_result_sha256=str(
+                experiment["parent_source_result_sha256"]
+            ),
+            parent_shadow_configuration_path=Path(
+                str(experiment["parent_shadow_configuration_path"])
+            ),
+            parent_shadow_configuration_sha256=str(
+                experiment["parent_shadow_configuration_sha256"]
+            ),
+            parent_shadow_configuration_hash=str(
+                experiment["parent_shadow_configuration_hash"]
             ),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )

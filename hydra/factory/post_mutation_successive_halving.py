@@ -544,6 +544,26 @@ def _evaluate_candidate(candidate: dict[str, Any], frame: pd.DataFrame) -> dict[
     if sequence["best_month_removed_net"] <= 0.0:
         uncertainty.append("BEST_MONTH_CONCENTRATION")
     adjusted_p = float((candidate.get("metrics") or {}).get("candidate_null_bh_adjusted_p", 1.0))
+    source_metrics = dict(candidate.get("metrics") or {})
+    mutation_evidence = {
+        # Evidence-only propagation for a separately preregistered downstream
+        # shadow-admission audit.  None of these fields participates in the
+        # halving score, Pareto vector, deduplication, or elite selection.
+        "hypothesis": dict(candidate.get("hypothesis") or {}),
+        "guard": dict(candidate.get("guard") or {}),
+        "structural_fingerprint": str(candidate.get("structural_fingerprint") or ""),
+        "parent_behavior_fingerprint": str(
+            candidate.get("parent_behavior_fingerprint") or ""
+        ),
+        "source_behavior_fingerprint": str(candidate.get("behavior_fingerprint") or ""),
+        "retained_fraction": float(source_metrics.get("retained_fraction") or 0.0),
+        "full_2023_replay_available": bool(
+            source_metrics.get("full_2023_replay_available")
+        ),
+        "candidate_null_bh_adjusted_p": adjusted_p,
+        "topstep": dict(source_metrics.get("topstep") or {}),
+    }
+    mutation_evidence["evidence_hash"] = _canonical_hash(mutation_evidence)
     if adjusted_p > 0.20:
         uncertainty.append("CANDIDATE_NULL_NOT_SUPPORTIVE")
     if cost_stress["2.0x"] <= 0.0:
@@ -627,6 +647,7 @@ def _evaluate_candidate(candidate: dict[str, Any], frame: pd.DataFrame) -> dict[
         "block_bootstrap": boot,
         "defensive_evidence": defensive,
         "candidate_null_bh_adjusted_p": adjusted_p,
+        "mutation_evidence": mutation_evidence,
         "uncertainty_flags": sorted(set(uncertainty)),
         "objective_score": objective_score,
         "pareto_front": False,

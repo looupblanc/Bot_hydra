@@ -8,7 +8,9 @@ from hydra.mission.controller import (
     FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID,
     MissionControllerConfig,
     PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
+    POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID,
     POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID,
+    POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID,
     POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID,
     PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
     SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
@@ -219,5 +221,121 @@ def test_completed_campaign_queues_next_meta_action_without_feed_blocking(
         assert next_record is not None and next_record["status"] == "QUEUED"
         assert next_record["specification"]["q4_access_allowed"] is False
         assert next_record["specification"]["live_or_broker_allowed"] is False
+    finally:
+        conn.close()
+
+
+def test_completed_halving_queues_frozen_shadow_admission(tmp_path: Path) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        result_path = tmp_path / "halving_result.json"
+        manifest_path = tmp_path / "elite_manifest.json"
+        evidence_path = tmp_path / "candidate_evidence.jsonl"
+        result_path.write_text("{}\n", encoding="utf-8")
+        manifest_path.write_text('{"manifest_hash":"frozen-manifest"}\n', encoding="utf-8")
+        evidence_path.write_text("{}\n", encoding="utf-8")
+        enqueue_experiment(
+            conn,
+            POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID,
+            {"experiment_type": "post_mutation_successive_halving"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID,
+            {
+                "result_hash": "frozen-halving",
+                "artifacts": {
+                    "result": {
+                        "path": str(result_path),
+                        "sha256": hashlib.sha256(result_path.read_bytes()).hexdigest(),
+                    },
+                    "elite_manifest": {
+                        "path": str(manifest_path),
+                        "sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+                    },
+                    "candidate_evidence": {
+                        "path": str(evidence_path),
+                        "sha256": hashlib.sha256(evidence_path.read_bytes()).hexdigest(),
+                    },
+                },
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_post_mutation_shadow_admission(conn)
+        record = experiment_record(conn, POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID)
+        assert record is not None and record["status"] == "QUEUED"
+        specification = record["specification"]
+        assert specification["pipeline"] == "PROMOTION"
+        assert specification["q4_access_allowed"] is False
+        assert specification["network_allowed"] is False
+        assert specification["live_or_broker_allowed"] is False
+        assert specification["parent_source_result_path"].endswith(
+            "equity_open_gap_continuation_result.json"
+        )
+        assert len(specification["parent_source_result_sha256"]) == 64
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+    finally:
+        conn.close()
+
+
+def test_admitted_child_queues_generic_fail_closed_activation(tmp_path: Path) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        result_path = tmp_path / "admission_result.json"
+        configuration_path = tmp_path / "child_shadow.json"
+        result_path.write_text("{}\n", encoding="utf-8")
+        configuration_path.write_text("{}\n", encoding="utf-8")
+        configuration_sha = hashlib.sha256(configuration_path.read_bytes()).hexdigest()
+        enqueue_experiment(
+            conn,
+            POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID,
+            {"experiment_type": "post_mutation_shadow_admission"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": (
+                    "ONE_POST_MUTATION_SHADOW_RESEARCH_CANDIDATE_ADMITTED"
+                ),
+                "result_hash": "frozen-admission",
+                "candidates": [{"candidate_id": "child_v1"}],
+                "shadow_configurations": [
+                    {
+                        "path": str(configuration_path),
+                        "sha256": configuration_sha,
+                        "configuration_hash": "semantic-child-hash",
+                    }
+                ],
+                "artifacts": {
+                    "result": {
+                        "path": str(result_path),
+                        "sha256": hashlib.sha256(result_path.read_bytes()).hexdigest(),
+                    }
+                },
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_post_mutation_child_shadow_activation(conn)
+        record = experiment_record(
+            conn, POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID
+        )
+        assert record is not None and record["status"] == "QUEUED"
+        specification = record["specification"]
+        assert specification["experiment_type"] == "immutable_shadow_activation"
+        assert specification["pipeline"] == "SHADOW"
+        assert specification["q4_access_allowed"] is False
+        assert specification["network_allowed"] is False
+        assert specification["live_or_broker_allowed"] is False
+        assert any(
+            path.endswith("hydra/shadow/prior_trade_guard.py")
+            for path in specification["code_surface_paths"]
+        )
     finally:
         conn.close()

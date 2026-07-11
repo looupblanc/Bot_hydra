@@ -135,7 +135,13 @@ POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID = (
     "post_portfolio_mutation_meta_allocation_v1"
 )
 POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID = (
-    "post_mutation_successive_halving_v1"
+    "post_mutation_successive_halving_evidence_v2"
+)
+POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID = (
+    "post_mutation_shadow_admission_v1"
+)
+POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID = (
+    "post_mutation_child_shadow_activation_v1"
 )
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
@@ -228,6 +234,9 @@ FORWARD_SHADOW_FEED_TASK_SHA256 = (
 POST_MUTATION_SUCCESSIVE_HALVING_TASK_SHA256 = (
     "f48f84c74e7ba714edcbe7a2d692ed4e538b1e46090d350f47c88f579c882dce"
 )
+POST_MUTATION_SHADOW_ADMISSION_TASK_SHA256 = (
+    "d18078d3a45bbcd18a96f5623ad46cdbfa70ec08813852e8530ca1a763e540b6"
+)
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -276,6 +285,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "portfolio_role_research",
     "forward_shadow_feed_audit",
     "post_mutation_successive_halving",
+    "post_mutation_shadow_admission",
 }
 
 
@@ -641,6 +651,16 @@ class AutonomousMissionController:
             )
             is None
         )
+        post_mutation_shadow_admission_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "PROMISING_CHILD_RAW_REPLAY_AND_SHADOW_ADMISSION_REQUIRED"
+        )
+        post_mutation_child_activation_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "POST_MUTATION_CHILD_SHADOW_ACTIVATION_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -890,6 +910,22 @@ class AutonomousMissionController:
             )
             is None
         )
+        post_mutation_shadow_admission_required = (
+            post_mutation_shadow_admission_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "PROMISING_CHILD_RAW_REPLAY_AND_SHADOW_ADMISSION_REQUIRED"
+            )
+        )
+        post_mutation_child_activation_required = (
+            post_mutation_child_activation_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "POST_MUTATION_CHILD_SHADOW_ACTIVATION_REQUIRED"
+            )
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -1039,6 +1075,16 @@ class AutonomousMissionController:
             if post_mutation_halving_required
             else False
         )
+        post_mutation_shadow_admission_queued = (
+            self._reconcile_post_mutation_shadow_admission(conn)
+            if post_mutation_shadow_admission_required
+            else False
+        )
+        post_mutation_child_activation_queued = (
+            self._reconcile_post_mutation_child_shadow_activation(conn)
+            if post_mutation_child_activation_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -1084,6 +1130,8 @@ class AutonomousMissionController:
             and not rty_transition_matched_null_queued
             and not portfolio_mutation_campaign_queued
             and not post_mutation_halving_queued
+            and not post_mutation_shadow_admission_queued
+            and not post_mutation_child_activation_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -1139,6 +1187,8 @@ class AutonomousMissionController:
                 "rty_transition_matched_null_queued": rty_transition_matched_null_queued,
                 "portfolio_mutation_campaign_queued": portfolio_mutation_campaign_queued,
                 "post_mutation_halving_queued": post_mutation_halving_queued,
+                "post_mutation_shadow_admission_queued": post_mutation_shadow_admission_queued,
+                "post_mutation_child_activation_queued": post_mutation_child_activation_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -1279,6 +1329,14 @@ class AutonomousMissionController:
             (
                 POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID,
                 "post_mutation_successive_halving_plan_written",
+            ),
+            (
+                POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID,
+                "post_mutation_shadow_admission_plan_written",
+            ),
+            (
+                POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID,
+                "post_mutation_child_shadow_activation_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1503,6 +1561,16 @@ class AutonomousMissionController:
                 "post_mutation_successive_halving",
                 "post_mutation_successive_halving_completed",
             ),
+            (
+                POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID,
+                "post_mutation_shadow_admission",
+                "post_mutation_shadow_admission_completed",
+            ),
+            (
+                POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID,
+                "immutable_shadow_activation",
+                "post_mutation_child_shadow_activation_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1569,7 +1637,10 @@ class AutonomousMissionController:
                 "portfolio_role_research": "portfolio_role_research_result",
                 "forward_shadow_feed_audit": "forward_shadow_feed_audit_result",
                 "post_mutation_successive_halving": "post_mutation_successive_halving_result",
+                "post_mutation_shadow_admission": "post_mutation_shadow_admission_result",
             }[experiment_type]
+            if experiment_id == POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID:
+                result_key = "post_mutation_child_shadow_activation_result"
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
             set_kv(conn, "latest_scientific_finding", finding)
@@ -1652,7 +1723,10 @@ class AutonomousMissionController:
             elif experiment_type == "barrier_hazard_primary":
                 self._route_barrier_hazard_result(conn, result)
             elif experiment_type == "immutable_shadow_activation":
-                self._route_barrier_shadow_activation_result(conn, result)
+                if experiment_id == POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID:
+                    self._route_post_mutation_child_shadow_activation_result(conn, result)
+                else:
+                    self._route_barrier_shadow_activation_result(conn, result)
             elif experiment_type == "energy_metals_barrier_primary":
                 self._route_energy_metals_barrier_result(conn, result)
             elif experiment_type == "energy_metals_session_geometry_primary":
@@ -1685,6 +1759,8 @@ class AutonomousMissionController:
                 self._route_forward_shadow_feed_audit_result(conn, result)
             elif experiment_type == "post_mutation_successive_halving":
                 self._route_post_mutation_successive_halving_result(conn, result)
+            elif experiment_type == "post_mutation_shadow_admission":
+                self._route_post_mutation_shadow_admission_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -5191,6 +5267,252 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_post_mutation_shadow_admission(self, conn: Any) -> bool:
+        existing = experiment_record(
+            conn, POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID
+        )
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(
+            conn, POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID
+        )
+        source = dict((predecessor or {}).get("result") or {})
+        if (predecessor or {}).get("status") != "COMPLETED":
+            return False
+        artifacts = dict(source.get("artifacts") or {})
+        result_artifact = dict(artifacts.get("result") or {})
+        manifest_artifact = dict(artifacts.get("elite_manifest") or {})
+        evidence_artifact = dict(artifacts.get("candidate_evidence") or {})
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_post_mutation_shadow_admission_20260711.md",
+        )
+        parent_config = project_path(
+            "reports",
+            "mission_experiments",
+            EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID,
+            "shadow_configurations",
+            "strategy_open_gap_continuation_YM_v1.json",
+        )
+        if not parent_config.is_file():
+            parent_config = Path("/root/hydra-bot/reports/mission_experiments") / (
+                "equity_open_gap_continuation_pilot_v1/shadow_configurations/"
+                "strategy_open_gap_continuation_YM_v1.json"
+            )
+        parent_source_result = project_path(
+            "reports",
+            "mission_experiments",
+            EQUITY_OPEN_GAP_CONTINUATION_EXPERIMENT_ID,
+            "equity_open_gap_continuation_result.json",
+        )
+        if not parent_source_result.is_file():
+            parent_source_result = Path("/root/hydra-bot/reports/mission_experiments") / (
+                "equity_open_gap_continuation_pilot_v1/"
+                "equity_open_gap_continuation_result.json"
+            )
+        result_path = Path(str(result_artifact.get("path") or ""))
+        manifest_path = Path(str(manifest_artifact.get("path") or ""))
+        evidence_path = Path(str(evidence_artifact.get("path") or ""))
+        frozen = (
+            (task, POST_MUTATION_SHADOW_ADMISSION_TASK_SHA256, "admission task"),
+            (result_path, str(result_artifact.get("sha256") or ""), "halving result"),
+            (
+                manifest_path,
+                str(manifest_artifact.get("sha256") or ""),
+                "halving elite manifest",
+            ),
+            (
+                evidence_path,
+                str(evidence_artifact.get("sha256") or ""),
+                "halving candidate evidence",
+            ),
+            (
+                parent_config,
+                YM_SHADOW_CONFIGURATION_SHA256,
+                "immutable YM parent configuration",
+            ),
+            (
+                parent_source_result,
+                YM_SHARED_RISK_OFF_PARENT_RESULT_SHA256,
+                "frozen complete-development parent result",
+            ),
+        )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not expected
+            or not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "POST_MUTATION_ADMISSION_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen post-mutation admission sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest_hash = str(manifest.get("manifest_hash") or "")
+        if not manifest_hash:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "POST_MUTATION_ELITE_MANIFEST_INVALID")
+            return False
+        enqueue_experiment(
+            conn,
+            POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID,
+            {
+                "experiment_type": "post_mutation_shadow_admission",
+                "priority": 122.0,
+                "max_attempts": 2,
+                "pipeline": "PROMOTION",
+                "parallel_safe": True,
+                "writes_data_access_ledger": False,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": (
+                    POST_MUTATION_SHADOW_ADMISSION_TASK_SHA256
+                ),
+                "halving_result_path": str(result_path),
+                "halving_result_sha256": str(result_artifact["sha256"]),
+                "halving_result_hash": str(source.get("result_hash") or ""),
+                "elite_manifest_path": str(manifest_path),
+                "elite_manifest_sha256": str(manifest_artifact["sha256"]),
+                "elite_manifest_hash": manifest_hash,
+                "candidate_evidence_path": str(evidence_path),
+                "candidate_evidence_sha256": str(evidence_artifact["sha256"]),
+                "parent_source_result_path": str(parent_source_result),
+                "parent_source_result_sha256": (
+                    YM_SHARED_RISK_OFF_PARENT_RESULT_SHA256
+                ),
+                "parent_shadow_configuration_path": str(parent_config),
+                "parent_shadow_configuration_sha256": (
+                    YM_SHADOW_CONFIGURATION_SHA256
+                ),
+                "parent_shadow_configuration_hash": YM_SHADOW_CONFIGURATION_HASH,
+                "code_commit": self._git_commit(),
+                "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+                "development_end_exclusive": "2024-10-01",
+                "q4_access_allowed": False,
+                "paid_data_allowed": False,
+                "network_allowed": False,
+                "live_or_broker_allowed": False,
+                "expected_decision_information_gain": 0.99,
+            },
+        )
+        set_kv(conn, "post_mutation_shadow_admission_plan_written", True)
+        set_kv(conn, "promotion_pipeline_status", "SHADOW_ADMISSION_AUDIT_QUEUED")
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_post_mutation_child_shadow_activation(self, conn: Any) -> bool:
+        existing = experiment_record(
+            conn, POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID
+        )
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(
+            conn, POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID
+        )
+        source = dict((predecessor or {}).get("result") or {})
+        candidates = list(source.get("candidates") or [])
+        configurations = list(source.get("shadow_configurations") or [])
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or source.get("scientific_conclusion")
+            != "ONE_POST_MUTATION_SHADOW_RESEARCH_CANDIDATE_ADMITTED"
+            or len(candidates) != 1
+            or len(configurations) != 1
+        ):
+            return False
+        candidate = dict(candidates[0])
+        configuration = dict(configurations[0])
+        candidate_id = str(candidate.get("candidate_id") or "")
+        result_artifact = dict((source.get("artifacts") or {}).get("result") or {})
+        result_path = Path(str(result_artifact.get("path") or ""))
+        configuration_path = Path(str(configuration.get("path") or ""))
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_post_mutation_shadow_admission_20260711.md",
+        )
+        frozen = (
+            (task, POST_MUTATION_SHADOW_ADMISSION_TASK_SHA256, "activation task"),
+            (result_path, str(result_artifact.get("sha256") or ""), "admission result"),
+            (
+                configuration_path,
+                str(configuration.get("sha256") or ""),
+                "child shadow configuration",
+            ),
+        )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not expected
+            or not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if not candidate_id or mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "POST_MUTATION_ACTIVATION_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen child activation sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        root = project_path()
+        code_surfaces = [
+            root / "hydra/shadow/runner.py",
+            root / "hydra/shadow/virtual_execution.py",
+            root / "hydra/shadow/risk_guard.py",
+            root / "hydra/shadow/signal_bus.py",
+            root / "hydra/shadow/specification.py",
+            root / "hydra/shadow/prior_trade_guard.py",
+            root / "scripts/run_shadow_portfolio.py",
+        ]
+        enqueue_experiment(
+            conn,
+            POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID,
+            {
+                "experiment_type": "immutable_shadow_activation",
+                "priority": 123.0,
+                "max_attempts": 2,
+                "pipeline": "SHADOW",
+                "parallel_safe": True,
+                "writes_data_access_ledger": False,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": (
+                    POST_MUTATION_SHADOW_ADMISSION_TASK_SHA256
+                ),
+                "source_result_path": str(result_path),
+                "source_result_sha256": str(result_artifact["sha256"]),
+                "source_result_hash": str(source.get("result_hash") or ""),
+                "candidate_id": candidate_id,
+                "shadow_configuration_path": str(configuration_path),
+                "shadow_configuration_sha256": str(configuration["sha256"]),
+                "shadow_configuration_hash": str(configuration["configuration_hash"]),
+                "code_surface_paths": [str(path) for path in code_surfaces],
+                "code_commit": self._git_commit(),
+                "q4_access_allowed": False,
+                "paid_data_allowed": False,
+                "network_allowed": False,
+                "live_or_broker_allowed": False,
+                "expected_decision_information_gain": 1.0,
+            },
+        )
+        set_kv(conn, "post_mutation_child_shadow_activation_plan_written", True)
+        set_kv(conn, "shadow_pipeline_status", "CHILD_ACTIVATION_QUEUED")
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -7016,6 +7338,106 @@ class AutonomousMissionController:
                 "forward_data_blocker": get_kv(conn, "forward_data_blocker"),
             },
         )
+        if selected:
+            self._reconcile_post_mutation_shadow_admission(conn)
+
+    def _route_post_mutation_shadow_admission_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID
+        )
+        self._refresh_foundry_candidate_counts(conn)
+        admitted = int(result.get("shadow_candidates") or 0)
+        set_kv(
+            conn,
+            "post_mutation_shadow_admission_metrics",
+            {
+                "admitted": admitted,
+                "candidate_id": (
+                    str((result.get("candidates") or [{}])[0].get("candidate_id") or "")
+                    if admitted
+                    else None
+                ),
+                "decision_hash": result.get("decision_hash"),
+                "conclusion": result.get("scientific_conclusion"),
+                "q4_access_count": int(result.get("q4_access_count") or 0),
+                "order_capability": bool(result.get("order_capability")),
+            },
+        )
+        set_kv(conn, "promotion_pipeline_status", "SHADOW_ADMISSION_AUDIT_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        if admitted == 1:
+            set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+            set_kv(
+                conn,
+                "current_blocker",
+                "POST_MUTATION_CHILD_SHADOW_ACTIVATION_REQUIRED",
+            )
+            set_kv(
+                conn,
+                "last_error",
+                "One child passed the frozen zero-order shadow-admission audit; generic "
+                "activation safety checks remain mandatory.",
+            )
+            self._reconcile_post_mutation_child_shadow_activation(conn)
+        else:
+            set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+            set_kv(
+                conn,
+                "current_blocker",
+                "ROLE_CONDITIONED_STRUCTURAL_DISCOVERY_EPOCH_REQUIRED",
+            )
+            set_kv(
+                conn,
+                "last_error",
+                "No child met every frozen shadow-admission gate; Discovery must continue.",
+            )
+
+    def _route_post_mutation_child_shadow_activation_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID
+        )
+        entry = registry_entry_from_activation(result)
+        registry = dict(get_kv(conn, "shadow_active_registry", {}) or {})
+        candidate_id = str(result["candidate_id"])
+        existing = registry.get(candidate_id)
+        if existing is not None and existing != entry:
+            raise ShadowPipelineIntegrityError(
+                "Refusing in-place mutation of an active post-mutation child."
+            )
+        registry[candidate_id] = entry
+        set_kv(conn, "shadow_active_registry", registry)
+        set_kv(conn, "shadow_active_candidates", len(registry))
+        set_kv(conn, "shadow_pipeline_status", "RUNNING_FAIL_CLOSED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(
+            conn,
+            "current_blocker",
+            "ROLE_CONDITIONED_STRUCTURAL_DISCOVERY_EPOCH_REQUIRED",
+        )
+        set_kv(
+            conn,
+            "last_error",
+            "The immutable child is active for zero-order forward research and waits "
+            "fail-closed for an authorized data source. Discovery and independent "
+            "promotion must continue; no Paper or funded status was granted.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": "ROLE_CONDITIONED_STRUCTURAL_DISCOVERY_EPOCH_REQUIRED",
+                "pipeline": "DISCOVERY",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+                "forward_data_blocker": get_kv(conn, "forward_data_blocker"),
+            },
+        )
+        self._tick_shadow_pipeline(conn)
 
     def _route_barrier_shadow_activation_result(
         self, conn: Any, result: dict[str, Any]

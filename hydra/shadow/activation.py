@@ -9,6 +9,10 @@ from typing import Any, Iterable
 
 from hydra.mission.calibration_retest_execution import _stable_hash, _strict_json_value
 from hydra.research.equity_open_gap_reversal import _write_immutable
+from hydra.shadow.prior_trade_guard import (
+    PriorTradeGuardError,
+    PriorTradeGuardSpecification,
+)
 from hydra.shadow.specification import ShadowSpecification
 
 
@@ -106,6 +110,12 @@ def run_immutable_shadow_activation(
         raise ShadowActivationError(
             f"Prohibited order surface found: {surface_audit['violations']}"
         )
+    guard_wiring_audit = audit_prior_trade_guard_wiring(specification, surfaces)
+    if not guard_wiring_audit["passed"]:
+        raise ShadowActivationError(
+            "Prior-trade guard is not wired fail-closed: "
+            f"{guard_wiring_audit['failures']}"
+        )
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
     manifest: dict[str, Any] = {
@@ -133,6 +143,7 @@ def run_immutable_shadow_activation(
         "q4_access_allowed": False,
         "live_or_broker_allowed": False,
         "code_surface_audit": surface_audit,
+        "prior_trade_guard_wiring_audit": guard_wiring_audit,
         "code_commit": code_commit,
     }
     manifest["activation_manifest_hash"] = _stable_hash(manifest)
@@ -371,6 +382,97 @@ def audit_zero_order_surface(paths: Iterable[str | Path]) -> dict[str, Any]:
     }
 
 
+def audit_prior_trade_guard_wiring(
+    specification: ShadowSpecification, paths: Iterable[str | Path]
+) -> dict[str, Any]:
+    """Bind a guarded config to the audited fail-closed runtime surfaces."""
+
+    guard_payload = specification.entry_rules.get("prior_trade_guard")
+    if guard_payload is None:
+        return {"required": False, "passed": True, "failures": [], "files": {}}
+    try:
+        guard = PriorTradeGuardSpecification.from_mapping(guard_payload)
+    except (TypeError, PriorTradeGuardError, ValueError) as exc:
+        return {
+            "required": True,
+            "passed": False,
+            "failures": [f"invalid_guard_specification:{exc}"],
+            "files": {},
+        }
+    failures: list[str] = []
+    surfaces = [Path(value) for value in paths]
+    runner = next((path for path in surfaces if path.name == "runner.py"), None)
+    guard_module = next(
+        (path for path in surfaces if path.name == "prior_trade_guard.py"), None
+    )
+    hashes: dict[str, str] = {}
+    if runner is None or not runner.is_file():
+        failures.append("missing_shadow_runner_surface")
+    if guard_module is None or not guard_module.is_file():
+        failures.append("missing_prior_trade_guard_surface")
+    if str(specification.reconciliation.get("prior_trade_guard_restart") or "") != (
+        "verify_state_hash_or_fail_closed"
+    ):
+        failures.append("restart_reconciliation_not_fail_closed")
+    if not bool(specification.logging.get("prior_trade_guard_decisions")) or not bool(
+        specification.logging.get("prior_trade_guard_state_hash")
+    ):
+        failures.append("guard_observability_not_pinned")
+    if runner is not None and runner.is_file():
+        source = runner.read_text(encoding="utf-8")
+        hashes[str(runner)] = hashlib.sha256(source.encode()).hexdigest()
+        tree = ast.parse(source, filename=str(runner))
+        calls = [
+            (str(node.func.attr), int(getattr(node, "lineno", 0)))
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+        ]
+        names = {name for name, _line in calls}
+        for required in (
+            "evaluate",
+            "publish",
+            "record_completed_trade",
+            "restore",
+            "export_state",
+        ):
+            if required not in names:
+                failures.append(f"runner_missing_call:{required}")
+        evaluate_lines = [line for name, line in calls if name == "evaluate"]
+        publish_lines = [line for name, line in calls if name == "publish"]
+        if (
+            not evaluate_lines
+            or not publish_lines
+            or min(evaluate_lines) >= min(publish_lines)
+        ):
+            failures.append("guard_decision_not_before_signal_publication")
+        for token in (
+            "record_completed_virtual_trade",
+            "MISSING_STATE_FAIL_CLOSED",
+            "INVALID_RESTART_STATE_FAIL_CLOSED",
+            "PRIOR_TRADE_GUARD_DECISION",
+        ):
+            if token not in source:
+                failures.append(f"runner_missing_contract:{token}")
+    if guard_module is not None and guard_module.is_file():
+        source = guard_module.read_text(encoding="utf-8")
+        hashes[str(guard_module)] = hashlib.sha256(source.encode()).hexdigest()
+        for token in (
+            "NON_PRIOR_COMPLETED_TRADE_FAIL_CLOSED",
+            "current_event_outcome_used",
+            "COMPLETED_TRADES_ONLY",
+            "state_hash",
+        ):
+            if token not in source:
+                failures.append(f"guard_module_missing_contract:{token}")
+    return {
+        "required": True,
+        "passed": not failures,
+        "failures": failures,
+        "guard_specification_hash": guard.specification_hash,
+        "files": hashes,
+    }
+
+
 def _default_code_surfaces() -> tuple[Path, ...]:
     root = Path(__file__).resolve().parents[2]
     return (
@@ -379,6 +481,7 @@ def _default_code_surfaces() -> tuple[Path, ...]:
         root / "hydra/shadow/risk_guard.py",
         root / "hydra/shadow/signal_bus.py",
         root / "hydra/shadow/specification.py",
+        root / "hydra/shadow/prior_trade_guard.py",
         root / "scripts/run_shadow_portfolio.py",
     )
 
