@@ -941,4 +941,58 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             ),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "role_conditioned_structural_epoch":
+        from hydra.research.role_conditioned_structural_epoch import (
+            run_role_conditioned_structural_epoch,
+        )
+
+        return run_role_conditioned_structural_epoch(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            mutation_result_path=Path(str(experiment["mutation_result_path"])),
+            mutation_result_sha256=str(experiment["mutation_result_sha256"]),
+            mutation_result_hash=str(experiment["mutation_result_hash"]),
+            mutation_ledger_path=Path(str(experiment["mutation_ledger_path"])),
+            mutation_ledger_sha256=str(experiment["mutation_ledger_sha256"]),
+            halving_result_path=Path(str(experiment["halving_result_path"])),
+            halving_result_sha256=str(experiment["halving_result_sha256"]),
+            halving_result_hash=str(experiment["halving_result_hash"]),
+            halving_evidence_path=Path(str(experiment["halving_evidence_path"])),
+            halving_evidence_sha256=str(experiment["halving_evidence_sha256"]),
+            halving_manifest_path=Path(str(experiment["halving_manifest_path"])),
+            halving_manifest_sha256=str(experiment["halving_manifest_sha256"]),
+            halving_manifest_hash=str(experiment["halving_manifest_hash"]),
+            portfolio_role_result_path=Path(
+                str(experiment["portfolio_result_path"])
+            ),
+            portfolio_role_result_sha256=str(
+                experiment["portfolio_result_sha256"]
+            ),
+            portfolio_role_result_hash=str(experiment["portfolio_result_hash"]),
+            meta_result_path=Path(str(experiment["meta_result_path"])),
+            meta_result_sha256=str(experiment["meta_result_sha256"]),
+            meta_result_hash=str(experiment["meta_result_hash"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
+    if experiment_type == "equity_preclose_inventory_dispersion":
+        from hydra.research.equity_preclose_inventory_dispersion import (
+            run_equity_preclose_inventory_dispersion,
+        )
+
+        return run_equity_preclose_inventory_dispersion(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            core_data_paths=[Path(str(value)) for value in experiment["core_data_paths"]],
+            core_data_sha256s=[str(value) for value in experiment["core_data_sha256s"]],
+            roll_map_path=Path(str(experiment["roll_map_path"])),
+            roll_map_sha256=str(experiment["roll_map_sha256"]),
+            roll_map_hash=str(experiment["roll_map_hash"]),
+            source_role_epoch_result_hash=str(
+                experiment["source_role_epoch_result_hash"]
+            ),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+            record_data_access=bool(experiment.get("record_data_access", True)),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")

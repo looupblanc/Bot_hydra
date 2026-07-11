@@ -143,6 +143,12 @@ POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID = (
 POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID = (
     "post_mutation_child_shadow_activation_v1"
 )
+ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID = (
+    "role_conditioned_structural_epoch_v1"
+)
+EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID = (
+    "equity_preclose_inventory_dispersion_primary_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -237,6 +243,19 @@ POST_MUTATION_SUCCESSIVE_HALVING_TASK_SHA256 = (
 POST_MUTATION_SHADOW_ADMISSION_TASK_SHA256 = (
     "d18078d3a45bbcd18a96f5623ad46cdbfa70ec08813852e8530ca1a763e540b6"
 )
+ROLE_CONDITIONED_STRUCTURAL_EPOCH_TASK_SHA256 = (
+    "50a202914661f2b34bef1366658e741a55f9bd88c15ffd65aacf633838240948"
+)
+EQUITY_PRECLOSE_INVENTORY_DISPERSION_TASK_SHA256 = (
+    "5c9fe702eee36b467a5fa0b1c27bc58373829b6f5615e374f9775ff3c42e385c"
+)
+EQUITY_PRECLOSE_DATA_SHA256S = (
+    "19be0a539802cd06fea20425ef14feca529fd60ece7e9eb5a88837e1d4e01862",
+    "4540b7585caa2798998bd39a7d787c948f1f7c82f1d692e55118c4d4fffc5911",
+    "c1af5bb43aa0ac5b83d9d7bab8d20b2ef52c97089f7acccc8d19231ce9e647dc",
+    "97914227a87a5cd6b1c90f11de2061054a66f0a2b313f8120b8831af06b6c85e",
+    ENERGY_METALS_DATA_SHA256,
+)
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -286,6 +305,8 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "forward_shadow_feed_audit",
     "post_mutation_successive_halving",
     "post_mutation_shadow_admission",
+    "role_conditioned_structural_epoch",
+    "equity_preclose_inventory_dispersion",
 }
 
 
@@ -661,6 +682,18 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "POST_MUTATION_CHILD_SHADOW_ACTIVATION_REQUIRED"
         )
+        role_conditioned_epoch_required = bool(
+            previous_phase
+            in {"SCHEDULER_STALLED", "ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "ROLE_CONDITIONED_STRUCTURAL_DISCOVERY_EPOCH_REQUIRED"
+        )
+        equity_preclose_required = bool(
+            previous_phase
+            in {"SCHEDULER_STALLED", "ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "EQUITY_PRECLOSE_INVENTORY_DISPERSION_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -926,6 +959,18 @@ class AutonomousMissionController:
                 == "POST_MUTATION_CHILD_SHADOW_ACTIVATION_REQUIRED"
             )
         )
+        role_conditioned_epoch_required = role_conditioned_epoch_required or bool(
+            str(get_kv(conn, "current_phase", ""))
+            in {"SCHEDULER_STALLED", "ENGINEERING_BLOCKED"}
+            and str(get_kv(conn, "current_blocker") or "")
+            == "ROLE_CONDITIONED_STRUCTURAL_DISCOVERY_EPOCH_REQUIRED"
+        )
+        equity_preclose_required = equity_preclose_required or bool(
+            str(get_kv(conn, "current_phase", ""))
+            in {"SCHEDULER_STALLED", "ENGINEERING_BLOCKED"}
+            and str(get_kv(conn, "current_blocker") or "")
+            == "EQUITY_PRECLOSE_INVENTORY_DISPERSION_REQUIRED"
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -1085,6 +1130,16 @@ class AutonomousMissionController:
             if post_mutation_child_activation_required
             else False
         )
+        role_conditioned_epoch_queued = (
+            self._reconcile_role_conditioned_structural_epoch(conn)
+            if role_conditioned_epoch_required
+            else False
+        )
+        equity_preclose_queued = (
+            self._reconcile_equity_preclose_inventory_dispersion(conn)
+            if equity_preclose_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -1132,6 +1187,8 @@ class AutonomousMissionController:
             and not post_mutation_halving_queued
             and not post_mutation_shadow_admission_queued
             and not post_mutation_child_activation_queued
+            and not role_conditioned_epoch_queued
+            and not equity_preclose_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -1189,6 +1246,8 @@ class AutonomousMissionController:
                 "post_mutation_halving_queued": post_mutation_halving_queued,
                 "post_mutation_shadow_admission_queued": post_mutation_shadow_admission_queued,
                 "post_mutation_child_activation_queued": post_mutation_child_activation_queued,
+                "role_conditioned_epoch_queued": role_conditioned_epoch_queued,
+                "equity_preclose_queued": equity_preclose_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -1337,6 +1396,14 @@ class AutonomousMissionController:
             (
                 POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID,
                 "post_mutation_child_shadow_activation_plan_written",
+            ),
+            (
+                ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID,
+                "role_conditioned_structural_epoch_plan_written",
+            ),
+            (
+                EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID,
+                "equity_preclose_inventory_dispersion_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1571,6 +1638,16 @@ class AutonomousMissionController:
                 "immutable_shadow_activation",
                 "post_mutation_child_shadow_activation_completed",
             ),
+            (
+                ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID,
+                "role_conditioned_structural_epoch",
+                "role_conditioned_structural_epoch_completed",
+            ),
+            (
+                EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID,
+                "equity_preclose_inventory_dispersion",
+                "equity_preclose_inventory_dispersion_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1638,6 +1715,8 @@ class AutonomousMissionController:
                 "forward_shadow_feed_audit": "forward_shadow_feed_audit_result",
                 "post_mutation_successive_halving": "post_mutation_successive_halving_result",
                 "post_mutation_shadow_admission": "post_mutation_shadow_admission_result",
+                "role_conditioned_structural_epoch": "role_conditioned_structural_epoch_result",
+                "equity_preclose_inventory_dispersion": "equity_preclose_inventory_dispersion_result",
             }[experiment_type]
             if experiment_id == POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID:
                 result_key = "post_mutation_child_shadow_activation_result"
@@ -1761,6 +1840,10 @@ class AutonomousMissionController:
                 self._route_post_mutation_successive_halving_result(conn, result)
             elif experiment_type == "post_mutation_shadow_admission":
                 self._route_post_mutation_shadow_admission_result(conn, result)
+            elif experiment_type == "role_conditioned_structural_epoch":
+                self._route_role_conditioned_structural_epoch_result(conn, result)
+            elif experiment_type == "equity_preclose_inventory_dispersion":
+                self._route_equity_preclose_inventory_dispersion_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -5513,6 +5596,320 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_role_conditioned_structural_epoch(self, conn: Any) -> bool:
+        existing = experiment_record(
+            conn, ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID
+        )
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        required_records = {
+            "mutation": experiment_record(conn, PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID),
+            "halving": experiment_record(
+                conn, POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID
+            ),
+            "portfolio": experiment_record(conn, PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID),
+            "meta": experiment_record(conn, POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID),
+            "activation": experiment_record(
+                conn, POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID
+            ),
+        }
+        if any(
+            record is None or str(record.get("status")) != "COMPLETED"
+            for record in required_records.values()
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_role_conditioned_structural_epoch_20260711.md",
+        )
+        mutation = dict(required_records["mutation"].get("result") or {})
+        halving = dict(required_records["halving"].get("result") or {})
+        portfolio = dict(required_records["portfolio"].get("result") or {})
+        meta = dict(required_records["meta"].get("result") or {})
+        activation = dict(required_records["activation"].get("result") or {})
+        mutation_artifacts = dict(mutation.get("artifacts") or {})
+        halving_artifacts = dict(halving.get("artifacts") or {})
+        portfolio_artifacts = dict(portfolio.get("artifacts") or {})
+        meta_artifacts = dict(meta.get("artifacts") or {})
+        paths_and_hashes = {
+            "mutation_result": (
+                Path(str(mutation_artifacts.get("result_json_path") or "")),
+                str(mutation_artifacts.get("result_json_sha256") or ""),
+            ),
+            "mutation_ledger": (
+                Path(str(mutation_artifacts.get("trade_ledger_path") or "")),
+                str(mutation_artifacts.get("trade_ledger_sha256") or ""),
+            ),
+            "halving_result": (
+                Path(str((halving_artifacts.get("result") or {}).get("path") or "")),
+                str((halving_artifacts.get("result") or {}).get("sha256") or ""),
+            ),
+            "halving_evidence": (
+                Path(
+                    str(
+                        (halving_artifacts.get("candidate_evidence") or {}).get(
+                            "path"
+                        )
+                        or ""
+                    )
+                ),
+                str(
+                    (halving_artifacts.get("candidate_evidence") or {}).get(
+                        "sha256"
+                    )
+                    or ""
+                ),
+            ),
+            "halving_manifest": (
+                Path(
+                    str(
+                        (halving_artifacts.get("elite_manifest") or {}).get("path")
+                        or ""
+                    )
+                ),
+                str(
+                    (halving_artifacts.get("elite_manifest") or {}).get("sha256")
+                    or ""
+                ),
+            ),
+            "portfolio_result": (
+                Path(str(portfolio_artifacts.get("result_json_path") or "")),
+                str(portfolio_artifacts.get("result_json_sha256") or ""),
+            ),
+            "meta_result": (
+                Path(str(meta_artifacts.get("result_json_path") or "")),
+                "",
+            ),
+        }
+        meta_path = paths_and_hashes["meta_result"][0]
+        if meta_path.is_file():
+            paths_and_hashes["meta_result"] = (
+                meta_path,
+                hashlib.sha256(meta_path.read_bytes()).hexdigest(),
+            )
+        mismatches = []
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != ROLE_CONDITIONED_STRUCTURAL_EPOCH_TASK_SHA256
+        ):
+            mismatches.append("engineering task")
+        for label, (path, expected) in paths_and_hashes.items():
+            if (
+                not expected
+                or not path.is_file()
+                or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+            ):
+                mismatches.append(label)
+        protected_sources = (mutation, halving, portfolio)
+        if any(
+            int(source.get("q4_access_count") or 0) != 0
+            or int(source.get("network_requests") or 0) != 0
+            or bool(source.get("order_capability"))
+            or int(source.get("outbound_orders") or 0) != 0
+            for source in protected_sources
+        ) or int((meta.get("governance") or {}).get("q4_access_count") or 0) != 0:
+            mismatches.append("source governance")
+        if (
+            activation.get("scientific_conclusion")
+            != "IMMUTABLE_ZERO_ORDER_SHADOW_ACTIVATED"
+            or int(activation.get("paper_shadow_ready") or 0) != 0
+            or bool((activation.get("governance") or {}).get("outbound_order_capability"))
+        ):
+            mismatches.append("child activation ceiling")
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "ROLE_CONDITIONED_EPOCH_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen role-conditioned epoch sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        manifest_payload = json.loads(
+            paths_and_hashes["halving_manifest"][0].read_text(encoding="utf-8")
+        )
+        enqueue_experiment(
+            conn,
+            ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID,
+            {
+                "experiment_type": "role_conditioned_structural_epoch",
+                "priority": 124.0,
+                "max_attempts": 2,
+                "pipeline": "DISCOVERY_AND_PORTFOLIO",
+                "parallel_safe": True,
+                "writes_data_access_ledger": False,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": (
+                    ROLE_CONDITIONED_STRUCTURAL_EPOCH_TASK_SHA256
+                ),
+                **{
+                    f"{label}_path": str(path)
+                    for label, (path, _sha) in paths_and_hashes.items()
+                },
+                **{
+                    f"{label}_sha256": sha
+                    for label, (_path, sha) in paths_and_hashes.items()
+                },
+                "mutation_result_hash": str(mutation.get("result_hash") or ""),
+                "halving_result_hash": str(halving.get("result_hash") or ""),
+                "halving_manifest_hash": str(
+                    manifest_payload.get("manifest_hash") or ""
+                ),
+                "portfolio_result_hash": str(portfolio.get("result_hash") or ""),
+                "meta_result_hash": str(meta.get("result_hash") or ""),
+                "code_commit": self._git_commit(),
+                "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+                "development_end_exclusive": "2024-10-01",
+                "q4_access_allowed": False,
+                "paid_data_allowed": False,
+                "network_allowed": False,
+                "live_or_broker_allowed": False,
+                "expected_decision_information_gain": 0.91,
+            },
+        )
+        set_kv(conn, "role_conditioned_structural_epoch_plan_written", True)
+        set_kv(conn, "discovery_pipeline_status", "ROLE_CONDITIONED_EPOCH_QUEUED")
+        set_kv(conn, "portfolio_pipeline_status", "ROLE_CONDITIONED_EPOCH_QUEUED")
+        set_kv(conn, "foundry_current_engine", "ROLE_CONDITIONED_ACCOUNT_STRUCTURES")
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID,
+                "pipeline": "DISCOVERY_AND_PORTFOLIO",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_equity_preclose_inventory_dispersion(self, conn: Any) -> bool:
+        existing = experiment_record(
+            conn, EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID
+        )
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        predecessor = experiment_record(
+            conn, ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID
+        )
+        source = dict((predecessor or {}).get("result") or {})
+        if (
+            (predecessor or {}).get("status") != "COMPLETED"
+            or int(source.get("promising_candidates") or 0) != 0
+            or source.get("scientific_conclusion")
+            != "ROLE_CONDITIONED_ACCOUNT_POLICY_EVIDENCE_INSUFFICIENT"
+            or int(source.get("q4_access_count") or 0) != 0
+            or bool(source.get("order_capability"))
+        ):
+            return False
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_equity_preclose_inventory_dispersion_20260711.md",
+        )
+        data_root = project_path("data", "cache", "databento")
+        data_names = (
+            "GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2023-01-01_2024-01-01.parquet",
+            "GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-01-01_2024-03-31.parquet",
+            "GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-04-01_2024-07-01.parquet",
+            "GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-07-01_2024-10-01.parquet",
+            "GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_2023-01-01_2024-10-01.parquet",
+        )
+        data_paths = [data_root / name for name in data_names]
+        if not all(path.is_file() for path in data_paths):
+            canonical_data_root = Path("/root/hydra-bot/data/cache/databento")
+            data_paths = [canonical_data_root / name for name in data_names]
+        roll_map = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not roll_map.is_file():
+            roll_map = Path("/root/hydra-bot/data/cache/contract_maps") / (
+                "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+            )
+        frozen = [(task, EQUITY_PRECLOSE_INVENTORY_DISPERSION_TASK_SHA256, "task")]
+        frozen.extend(
+            (path, expected, f"core data {index}")
+            for index, (path, expected) in enumerate(
+                zip(data_paths, EQUITY_PRECLOSE_DATA_SHA256S, strict=True),
+                start=1,
+            )
+        )
+        frozen.append((roll_map, PATH_GEOMETRY_MAP_SHA256, "roll map"))
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "EQUITY_PRECLOSE_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen pre-close sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        enqueue_experiment(
+            conn,
+            EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID,
+            {
+                "experiment_type": "equity_preclose_inventory_dispersion",
+                "priority": 125.0,
+                "max_attempts": 2,
+                "pipeline": "DISCOVERY",
+                "parallel_safe": False,
+                "writes_data_access_ledger": True,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": (
+                    EQUITY_PRECLOSE_INVENTORY_DISPERSION_TASK_SHA256
+                ),
+                "core_data_paths": [str(path) for path in data_paths],
+                "core_data_sha256s": list(EQUITY_PRECLOSE_DATA_SHA256S),
+                "roll_map_path": str(roll_map),
+                "roll_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+                "roll_map_hash": PATH_GEOMETRY_ROLL_HASH,
+                "source_role_epoch_result_hash": str(source.get("result_hash") or ""),
+                "code_commit": self._git_commit(),
+                "record_data_access": True,
+                "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+                "development_end_exclusive": "2024-10-01",
+                "q4_access_allowed": False,
+                "paid_data_allowed": False,
+                "network_allowed": False,
+                "live_or_broker_allowed": False,
+                "expected_decision_information_gain": 0.93,
+            },
+        )
+        set_kv(conn, "equity_preclose_inventory_dispersion_plan_written", True)
+        set_kv(conn, "discovery_pipeline_status", "EQUITY_PRECLOSE_QUEUED")
+        set_kv(conn, "foundry_current_engine", "EQUITY_PRECLOSE_INVENTORY_DISPERSION")
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID,
+                "pipeline": "DISCOVERY",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+                "data_cost_usd": 0.0,
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -7438,6 +7835,135 @@ class AutonomousMissionController:
             },
         )
         self._tick_shadow_pipeline(conn)
+        self._reconcile_role_conditioned_structural_epoch(conn)
+
+    def _route_role_conditioned_structural_epoch_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID
+        )
+        killed = set(get_kv(conn, "foundry_killed_candidate_ids", []) or [])
+        newly_killed = 0
+        for candidate in result.get("candidates") or []:
+            candidate_id = str(candidate.get("candidate_id") or "")
+            if (
+                candidate_id
+                and str(candidate.get("status") or "")
+                in {"RESEARCH_REJECTED", "HARD_INTEGRITY_REJECTED"}
+                and candidate_id not in killed
+            ):
+                killed.add(candidate_id)
+                newly_killed += 1
+        if newly_killed:
+            set_kv(conn, "foundry_killed_candidate_ids", sorted(killed))
+            set_kv(
+                conn,
+                "strategies_killed",
+                int(get_kv(conn, "strategies_killed", 0)) + newly_killed,
+            )
+        self._refresh_foundry_candidate_counts(conn)
+        promising = int(result.get("promising_candidates") or 0)
+        blocker = (
+            "ROLE_SPECIFIC_ACCOUNT_POLICY_PROMOTION_REQUIRED"
+            if promising
+            else "EQUITY_PRECLOSE_INVENTORY_DISPERSION_REQUIRED"
+        )
+        set_kv(
+            conn,
+            "role_conditioned_structural_epoch_metrics",
+            {
+                "structures": int(
+                    result.get("structural_prototypes")
+                    or result.get("candidate_count")
+                    or 0
+                ),
+                "promising": promising,
+                "pool_counts": result.get("pool_counts") or {},
+                "status_counts": result.get("status_counts") or {},
+                "control_count": int(result.get("matched_control_count") or 0),
+                "conclusion": result.get("scientific_conclusion"),
+                "paper_shadow_ready": int(result.get("paper_shadow_ready") or 0),
+                "q4_access_count": int(result.get("q4_access_count") or 0),
+            },
+        )
+        set_kv(conn, "discovery_pipeline_status", "ROLE_CONDITIONED_EPOCH_COMPLETED")
+        set_kv(conn, "portfolio_pipeline_status", "ROLE_CONDITIONED_EPOCH_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "The preregistered account-structure epoch completed with development-role "
+            "evidence only. A distinct frozen promotion or methodology is required; "
+            "no alpha, shadow, Paper or funded status is inherited.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "PROMOTION_AND_PORTFOLIO" if promising else "DISCOVERY",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+                "forward_data_blocker": get_kv(conn, "forward_data_blocker"),
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+        if not promising:
+            self._reconcile_equity_preclose_inventory_dispersion(conn)
+
+    def _route_equity_preclose_inventory_dispersion_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID
+        )
+        promising = int(result.get("promising_candidates") or 0)
+        blocker = (
+            "EQUITY_PRECLOSE_FROZEN_PROMOTION_REQUIRED"
+            if promising
+            else "MARKET_ECOLOGY_PIVOT_OR_FORWARD_DATA_REQUIRED"
+        )
+        set_kv(
+            conn,
+            "equity_preclose_inventory_dispersion_metrics",
+            {
+                "structural_prototypes": int(result.get("structural_prototypes") or 0),
+                "stage1_survivors": int(result.get("stage1_survivors") or 0),
+                "frozen_elites": int(result.get("frozen_elite_count") or 0),
+                "promising_candidates": promising,
+                "status_counts": result.get("status_counts") or {},
+                "performance": result.get("performance") or {},
+                "conclusion": result.get("scientific_conclusion"),
+                "q4_access_count": int(result.get("q4_access_count") or 0),
+                "paper_shadow_ready": int(result.get("paper_shadow_ready") or 0),
+            },
+        )
+        set_kv(conn, "discovery_pipeline_status", "EQUITY_PRECLOSE_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", blocker)
+        set_kv(
+            conn,
+            "last_error",
+            "The frozen pre-close inventory/dispersion primary completed on development "
+            "data only. Exact survivors require a new promotion freeze; a negative result "
+            "requires a distinct ecology or forward evidence, never nearby thresholds.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": blocker,
+                "pipeline": "PROMOTION" if promising else "DISCOVERY_OR_FORWARD",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+                "forward_data_blocker": get_kv(conn, "forward_data_blocker"),
+            },
+        )
+        self._tick_shadow_pipeline(conn)
 
     def _route_barrier_shadow_activation_result(
         self, conn: Any, result: dict[str, Any]
@@ -7502,15 +8028,32 @@ class AutonomousMissionController:
             candidate_id = str(row.get("candidate_id") or "")
             if not candidate_id:
                 continue
+            previous = dict(bank.get(candidate_id) or {})
             bank[candidate_id] = {
+                **previous,
                 "status": row.get("status"),
-                "mechanism_family": row.get("mechanism_family"),
-                "primary_market": row.get("primary_market"),
-                "execution_market": row.get("execution_market"),
-                "net_pnl": row.get("net_pnl"),
+                "mechanism_family": row.get("mechanism_family")
+                or previous.get("mechanism_family"),
+                "primary_market": row.get("primary_market")
+                or previous.get("primary_market"),
+                "execution_market": row.get("execution_market")
+                or previous.get("execution_market"),
+                "role": row.get("role")
+                or row.get("strategy_role")
+                or previous.get("role"),
+                "objective_pool": row.get("objective_pool")
+                or row.get("target_pool")
+                or previous.get("objective_pool"),
+                "account_policy_only": bool(
+                    row.get("account_policy_only")
+                    or previous.get("account_policy_only")
+                ),
+                "net_pnl": row.get("net_pnl", previous.get("net_pnl")),
                 "topstep_path_candidate": bool(
                     (row.get("topstep") or {}).get("path_candidate")
-                ),
+                )
+                if "topstep" in row
+                else bool(previous.get("topstep_path_candidate")),
                 "source_experiment": experiment_id,
             }
         set_kv(conn, "foundry_candidate_bank", bank)

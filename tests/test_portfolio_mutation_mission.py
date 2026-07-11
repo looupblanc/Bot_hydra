@@ -6,6 +6,7 @@ from pathlib import Path
 from hydra.mission.controller import (
     AutonomousMissionController,
     FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID,
+    EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID,
     MissionControllerConfig,
     PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
     POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID,
@@ -13,6 +14,7 @@ from hydra.mission.controller import (
     POST_MUTATION_SHADOW_ADMISSION_EXPERIMENT_ID,
     POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID,
     PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+    ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID,
     SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
 )
 from hydra.mission.experiment_queue import (
@@ -337,5 +339,174 @@ def test_admitted_child_queues_generic_fail_closed_activation(tmp_path: Path) ->
             path.endswith("hydra/shadow/prior_trade_guard.py")
             for path in specification["code_surface_paths"]
         )
+    finally:
+        conn.close()
+
+
+def test_child_activation_queues_role_conditioned_epoch_without_idle_gap(
+    tmp_path: Path,
+) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        def frozen(name: str, content: str = "{}\n") -> tuple[Path, str]:
+            path = tmp_path / name
+            path.write_text(content, encoding="utf-8")
+            return path, hashlib.sha256(path.read_bytes()).hexdigest()
+
+        mutation_result, mutation_result_sha = frozen("mutation.json")
+        mutation_ledger, mutation_ledger_sha = frozen("mutation.jsonl")
+        halving_result, halving_result_sha = frozen("halving.json")
+        halving_evidence, halving_evidence_sha = frozen("halving.jsonl")
+        halving_manifest, halving_manifest_sha = frozen(
+            "manifest.json", '{"manifest_hash":"manifest-semantic-hash"}\n'
+        )
+        portfolio_result, portfolio_result_sha = frozen("portfolio.json")
+        meta_result, _meta_result_sha = frozen("meta.json")
+        completed = [
+            (
+                PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+                "promising_lineage_mutation",
+                {
+                    "result_hash": "mutation-hash",
+                    "q4_access_count": 0,
+                    "network_requests": 0,
+                    "order_capability": False,
+                    "artifacts": {
+                        "result_json_path": str(mutation_result),
+                        "result_json_sha256": mutation_result_sha,
+                        "trade_ledger_path": str(mutation_ledger),
+                        "trade_ledger_sha256": mutation_ledger_sha,
+                    },
+                },
+            ),
+            (
+                POST_MUTATION_SUCCESSIVE_HALVING_EXPERIMENT_ID,
+                "post_mutation_successive_halving",
+                {
+                    "result_hash": "halving-hash",
+                    "q4_access_count": 0,
+                    "network_requests": 0,
+                    "order_capability": False,
+                    "artifacts": {
+                        "result": {
+                            "path": str(halving_result),
+                            "sha256": halving_result_sha,
+                        },
+                        "candidate_evidence": {
+                            "path": str(halving_evidence),
+                            "sha256": halving_evidence_sha,
+                        },
+                        "elite_manifest": {
+                            "path": str(halving_manifest),
+                            "sha256": halving_manifest_sha,
+                        },
+                    },
+                },
+            ),
+            (
+                PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
+                "portfolio_role_research",
+                {
+                    "result_hash": "portfolio-hash",
+                    "q4_access_count": 0,
+                    "network_requests": 0,
+                    "outbound_orders": 0,
+                    "artifacts": {
+                        "result_json_path": str(portfolio_result),
+                        "result_json_sha256": portfolio_result_sha,
+                    },
+                },
+            ),
+            (
+                POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID,
+                "meta_failure_allocation",
+                {
+                    "result_hash": "meta-hash",
+                    "governance": {"q4_access_count": 0},
+                    "artifacts": {"result_json_path": str(meta_result)},
+                },
+            ),
+            (
+                POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID,
+                "immutable_shadow_activation",
+                {
+                    "scientific_conclusion": "IMMUTABLE_ZERO_ORDER_SHADOW_ACTIVATED",
+                    "paper_shadow_ready": 0,
+                    "governance": {"outbound_order_capability": False},
+                },
+            ),
+        ]
+        for experiment_id, experiment_type, result in completed:
+            enqueue_experiment(
+                conn, experiment_id, {"experiment_type": experiment_type}
+            )
+            claimed = claim_next_experiment(conn)
+            assert claimed is not None and claimed["experiment_id"] == experiment_id
+            complete_experiment(
+                conn,
+                experiment_id,
+                result,
+                claim_token=str(claimed["claim_token"]),
+            )
+
+        assert controller._reconcile_role_conditioned_structural_epoch(conn)
+        record = experiment_record(
+            conn, ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID
+        )
+        assert record is not None and record["status"] == "QUEUED"
+        specification = record["specification"]
+        assert specification["pipeline"] == "DISCOVERY_AND_PORTFOLIO"
+        assert specification["parallel_safe"] is True
+        assert specification["q4_access_allowed"] is False
+        assert specification["network_allowed"] is False
+        assert specification["live_or_broker_allowed"] is False
+        assert specification["halving_manifest_hash"] == "manifest-semantic-hash"
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+        assert get_kv(conn, "current_blocker") is None
+    finally:
+        conn.close()
+
+
+def test_negative_role_epoch_queues_distinct_preclose_pivot(tmp_path: Path) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        enqueue_experiment(
+            conn,
+            ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID,
+            {"experiment_type": "role_conditioned_structural_epoch"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": (
+                    "ROLE_CONDITIONED_ACCOUNT_POLICY_EVIDENCE_INSUFFICIENT"
+                ),
+                "promising_candidates": 0,
+                "q4_access_count": 0,
+                "order_capability": False,
+                "result_hash": "negative-role-epoch",
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        assert controller._reconcile_equity_preclose_inventory_dispersion(conn)
+        record = experiment_record(
+            conn, EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID
+        )
+        assert record is not None and record["status"] == "QUEUED"
+        specification = record["specification"]
+        assert specification["pipeline"] == "DISCOVERY"
+        assert specification["writes_data_access_ledger"] is True
+        assert len(specification["core_data_paths"]) == 5
+        assert len(specification["core_data_sha256s"]) == 5
+        assert specification["q4_access_allowed"] is False
+        assert specification["paid_data_allowed"] is False
+        assert specification["network_allowed"] is False
+        assert specification["live_or_broker_allowed"] is False
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+        assert get_kv(conn, "current_blocker") is None
     finally:
         conn.close()
