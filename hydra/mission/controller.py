@@ -128,6 +128,12 @@ RTY_TRANSITION_MATCHED_NULL_EXPERIMENT_ID = "rty_transition_matched_null_v1"
 RTY_TRANSITION_PARENT_ID = (
     "strategy_transition_RTY_to_RTY_up_expansion_long_h60_v1"
 )
+PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID = "promising_lineage_mutation_v1"
+PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID = "portfolio_role_research_v1"
+FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID = "forward_shadow_feed_audit_v1"
+POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID = (
+    "post_portfolio_mutation_meta_allocation_v1"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -207,6 +213,15 @@ CAUSAL_TRANSITION_RESULT_HASH = "873fe9a2d4bc613ca9c0b0285e8168e1cf03a5ab25994b1
 CAUSAL_TRANSITION_MANIFEST_SHA256 = "b4776e5f9db87350f8ad0c39900a2ecdd99210d2319685ebaa756d031eb6b8ec"
 CAUSAL_TRANSITION_MANIFEST_HASH = "c4c0698c1e168b8c8b2546a58185350e0aef7cf72a3bae9e6f736197f576368f"
 CAUSAL_TRANSITION_LEDGER_SHA256 = "29e93fa7cfb2c0471857f9ab3468da2e92f6cd90417630c0f8639156c9c2cbc3"
+PROMISING_LINEAGE_SOURCE_MANIFEST_SHA256 = (
+    "07ad9310d5719e9aad4840680c54cc208c6572796064a73f5a8766cba780b271"
+)
+PORTFOLIO_MUTATION_TASK_SHA256 = (
+    "051fb8bf623ed75ea69f4dfa7b13d265b67a5947e2c7a7d8739101161761ac88"
+)
+FORWARD_SHADOW_FEED_TASK_SHA256 = (
+    "96457b210acee37b2a4423e479e090b867f160463b414e61f278dc1e1a855240"
+)
 SUPPORTED_EXPERIMENT_TYPES = {
     "calibration_affected_atom_retest_design",
     "calibration_affected_atom_retest_execution",
@@ -251,6 +266,9 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "causal_transition_graph",
     "rty_transition_matched_null",
     "immutable_shadow_activation",
+    "promising_lineage_mutation",
+    "portfolio_role_research",
+    "forward_shadow_feed_audit",
 }
 
 
@@ -602,6 +620,11 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "CAUSAL_TRANSITION_MATCHED_NULL_AND_MUTATION_REQUIRED"
         )
+        portfolio_mutation_campaign_required = bool(
+            previous_phase in {"ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            == "PORTFOLIO_ROLE_AND_PROMISING_LINEAGE_MUTATION_REQUIRED"
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -836,6 +859,14 @@ class AutonomousMissionController:
                 == "CAUSAL_TRANSITION_MATCHED_NULL_AND_MUTATION_REQUIRED"
             )
         )
+        portfolio_mutation_campaign_required = (
+            portfolio_mutation_campaign_required
+            or bool(
+                str(get_kv(conn, "current_phase", "")) == "ENGINEERING_BLOCKED"
+                and str(get_kv(conn, "current_blocker") or "")
+                == "PORTFOLIO_ROLE_AND_PROMISING_LINEAGE_MUTATION_REQUIRED"
+            )
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -975,6 +1006,11 @@ class AutonomousMissionController:
             if rty_transition_matched_null_required
             else False
         )
+        portfolio_mutation_campaign_queued = (
+            self._reconcile_portfolio_mutation_campaign(conn)
+            if portfolio_mutation_campaign_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -1018,6 +1054,7 @@ class AutonomousMissionController:
             and not meta_failure_allocation_queued
             and not causal_transition_graph_queued
             and not rty_transition_matched_null_queued
+            and not portfolio_mutation_campaign_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -1071,6 +1108,7 @@ class AutonomousMissionController:
                 "meta_failure_allocation_queued": meta_failure_allocation_queued,
                 "causal_transition_graph_queued": causal_transition_graph_queued,
                 "rty_transition_matched_null_queued": rty_transition_matched_null_queued,
+                "portfolio_mutation_campaign_queued": portfolio_mutation_campaign_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -1191,6 +1229,22 @@ class AutonomousMissionController:
             (
                 RTY_TRANSITION_MATCHED_NULL_EXPERIMENT_ID,
                 "rty_transition_matched_null_plan_written",
+            ),
+            (
+                PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+                "promising_lineage_mutation_plan_written",
+            ),
+            (
+                PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
+                "portfolio_role_research_plan_written",
+            ),
+            (
+                FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID,
+                "forward_shadow_feed_audit_plan_written",
+            ),
+            (
+                POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID,
+                "post_mutation_meta_allocation_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1390,6 +1444,26 @@ class AutonomousMissionController:
                 "rty_transition_matched_null",
                 "rty_transition_matched_null_completed",
             ),
+            (
+                PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+                "promising_lineage_mutation",
+                "promising_lineage_mutation_completed",
+            ),
+            (
+                PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
+                "portfolio_role_research",
+                "portfolio_role_research_completed",
+            ),
+            (
+                FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID,
+                "forward_shadow_feed_audit",
+                "forward_shadow_feed_audit_completed",
+            ),
+            (
+                POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID,
+                "meta_failure_allocation",
+                "post_mutation_meta_allocation_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1452,6 +1526,9 @@ class AutonomousMissionController:
                 "meta_failure_allocation": "meta_failure_allocation_result",
                 "causal_transition_graph": "causal_transition_graph_result",
                 "rty_transition_matched_null": "rty_transition_matched_null_result",
+                "promising_lineage_mutation": "promising_lineage_mutation_result",
+                "portfolio_role_research": "portfolio_role_research_result",
+                "forward_shadow_feed_audit": "forward_shadow_feed_audit_result",
             }[experiment_type]
             set_kv(conn, result_key, compact)
             set_kv(conn, "latest_completed_experiment", compact)
@@ -1560,6 +1637,12 @@ class AutonomousMissionController:
                 self._route_causal_transition_graph_result(conn, result)
             elif experiment_type == "rty_transition_matched_null":
                 self._route_rty_transition_matched_null_result(conn, result)
+            elif experiment_type == "promising_lineage_mutation":
+                self._route_promising_lineage_mutation_result(conn, result)
+            elif experiment_type == "portfolio_role_research":
+                self._route_portfolio_role_research_result(conn, result)
+            elif experiment_type == "forward_shadow_feed_audit":
+                self._route_forward_shadow_feed_audit_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -4830,6 +4913,142 @@ class AutonomousMissionController:
         self._clear_resolved_resume_block(conn)
         return True
 
+    def _reconcile_portfolio_mutation_campaign(self, conn: Any) -> bool:
+        experiment_ids = (
+            PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+            PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
+            FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID,
+        )
+        records = {
+            experiment_id: experiment_record(conn, experiment_id)
+            for experiment_id in experiment_ids
+        }
+        if all(
+            record is not None
+            and str(record.get("status")) in {"QUEUED", "RUNNING", "COMPLETED"}
+            for record in records.values()
+        ):
+            self._clear_resolved_resume_block(conn)
+            return True
+
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_promising_lineage_portfolio_mutation_20260711.md",
+        )
+        feed_task = project_path(
+            "reports", "engineering", "hydra_shadow_forward_feed_20260711.md"
+        )
+        source_manifest = project_path(
+            "config", "research", "promising_lineage_sources_v1.json"
+        )
+        frozen = (
+            (task, PORTFOLIO_MUTATION_TASK_SHA256, "portfolio/mutation task"),
+            (feed_task, FORWARD_SHADOW_FEED_TASK_SHA256, "forward-feed task"),
+            (
+                source_manifest,
+                PROMISING_LINEAGE_SOURCE_MANIFEST_SHA256,
+                "promising-lineage source manifest",
+            ),
+        )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        basket_record = experiment_record(
+            conn, SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID
+        )
+        basket_sources = list(
+            ((basket_record or {}).get("specification") or {}).get("sources") or []
+        )
+        if (
+            (basket_record or {}).get("status") != "COMPLETED"
+            or len(basket_sources) != 4
+            or len({str(row.get("candidate_id")) for row in basket_sources}) != 4
+        ):
+            mismatches.append("four active-shadow frozen sources")
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "PORTFOLIO_MUTATION_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen portfolio/mutation inputs changed: {', '.join(mismatches)}.",
+            )
+            return False
+
+        common = {
+            "max_attempts": 2,
+            "parallel_safe": True,
+            "writes_data_access_ledger": False,
+            "code_commit": self._git_commit(),
+            "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+            "development_end_exclusive": "2024-10-01",
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+        }
+        specifications = {
+            PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID: {
+                **common,
+                "experiment_type": "promising_lineage_mutation",
+                "priority": 120.0,
+                "pipeline": "TARGETED_MUTATION",
+                "source_manifest_path": str(source_manifest),
+                "source_manifest_sha256": PROMISING_LINEAGE_SOURCE_MANIFEST_SHA256,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": PORTFOLIO_MUTATION_TASK_SHA256,
+                "expected_decision_information_gain": 0.99,
+            },
+            PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID: {
+                **common,
+                "experiment_type": "portfolio_role_research",
+                "priority": 119.0,
+                "pipeline": "PORTFOLIO_ROLE",
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": PORTFOLIO_MUTATION_TASK_SHA256,
+                "sources": basket_sources,
+                "defensive_control_count": 4096,
+                "inclusion_control_count": 255,
+                "expected_decision_information_gain": 0.98,
+            },
+            FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID: {
+                **common,
+                "experiment_type": "forward_shadow_feed_audit",
+                "priority": 118.0,
+                "pipeline": "SHADOW_INFRASTRUCTURE",
+                "engineering_task_path": str(feed_task),
+                "engineering_task_sha256": FORWARD_SHADOW_FEED_TASK_SHA256,
+                "required_roots": ["CL", "MCL", "MNQ", "MYM", "YM"],
+                "contract_map_dir": str(project_path("data", "cache", "contract_maps")),
+                "expected_decision_information_gain": 0.95,
+            },
+        }
+        queued = False
+        for experiment_id, specification in specifications.items():
+            existing = records[experiment_id]
+            if existing is None:
+                queued = enqueue_experiment(conn, experiment_id, specification) or queued
+            elif str(existing.get("status")) not in {"QUEUED", "RUNNING", "COMPLETED"}:
+                return False
+        set_kv(conn, "promising_lineage_mutation_plan_written", True)
+        set_kv(conn, "portfolio_role_research_plan_written", True)
+        set_kv(conn, "forward_shadow_feed_audit_plan_written", True)
+        set_kv(conn, "portfolio_mutation_campaign_plan_written", True)
+        set_kv(conn, "discovery_pipeline_status", "TARGETED_MUTATION_QUEUED")
+        set_kv(conn, "promotion_pipeline_status", "ROLE_SPECIFIC_RESEARCH_QUEUED")
+        set_kv(conn, "shadow_pipeline_status", "FORWARD_FEED_AUDIT_QUEUED")
+        set_kv(conn, "foundry_current_engine", "PORTFOLIO_ROLE_AND_TARGETED_MUTATION")
+        self._clear_resolved_resume_block(conn)
+        return queued or all(
+            record is not None
+            and str(record.get("status")) in {"QUEUED", "RUNNING", "COMPLETED"}
+            for record in records.values()
+        )
+
     @staticmethod
     def _clear_resolved_resume_block(conn: Any) -> None:
         set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
@@ -6403,6 +6622,191 @@ class AutonomousMissionController:
             },
         )
         self._tick_shadow_pipeline(conn)
+
+    def _route_promising_lineage_mutation_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        self._update_foundry_candidate_bank(
+            conn, result, PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID
+        )
+        self._refresh_foundry_candidate_counts(conn)
+        set_kv(
+            conn,
+            "promising_lineage_mutation_metrics",
+            {
+                "parent_count": int(result.get("parent_count") or 0),
+                "hypotheses": int(result.get("mutation_hypothesis_count") or 0),
+                "primary_children": int(result.get("primary_child_count") or 0),
+                "ym_versioned_hypotheses": int(
+                    result.get("ym_versioned_hypotheses") or 0
+                ),
+                "accepted_research_prototypes": int(
+                    result.get("accepted_research_prototypes") or 0
+                ),
+                "behavioral_duplicates_rejected": int(
+                    result.get("behavioral_duplicates_rejected") or 0
+                ),
+                "objective_pool_counts": result.get("objective_pool_counts") or {},
+                "topstep_path_candidates": int(
+                    result.get("topstep_path_candidates") or 0
+                ),
+                "conclusion": result.get("scientific_conclusion"),
+            },
+        )
+        set_kv(conn, "discovery_pipeline_status", "TARGETED_MUTATION_COMPLETED")
+        set_kv(conn, "promotion_pipeline_status", "MUTATION_CHILD_EVIDENCE_AUDITED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        self._finalize_portfolio_mutation_campaign_if_ready(conn)
+
+    def _route_portfolio_role_research_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        accounted = set(get_kv(conn, "foundry_accounted_experiments", []) or [])
+        if PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID not in accounted:
+            count = int(result.get("candidate_count") or 0)
+            set_kv(
+                conn,
+                "strategy_prototypes_generated",
+                int(get_kv(conn, "strategy_prototypes_generated", 0)) + count,
+            )
+            set_kv(
+                conn,
+                "strategies_screened",
+                int(get_kv(conn, "strategies_screened", 0)) + count,
+            )
+            accounted.add(PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID)
+            set_kv(conn, "foundry_accounted_experiments", sorted(accounted))
+        set_kv(
+            conn,
+            "portfolio_role_research_metrics",
+            {
+                "generated": int(
+                    result.get("portfolio_role_candidates_generated") or 0
+                ),
+                "defensive_generated": int(
+                    result.get("defensive_role_candidates_generated") or 0
+                ),
+                "research_candidates": int(
+                    result.get("research_candidate_count") or 0
+                ),
+                "pool_counts": result.get("pool_counts") or {},
+                "status_counts": result.get("status_counts") or {},
+                "matched_deactivation_controls_per_policy": int(
+                    result.get("matched_deactivation_controls_per_policy") or 0
+                ),
+                "conclusion": result.get("scientific_conclusion"),
+            },
+        )
+        set_kv(conn, "portfolio_pipeline_status", "ROLE_SPECIFIC_RESEARCH_COMPLETED")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        self._finalize_portfolio_mutation_campaign_if_ready(conn)
+
+    def _route_forward_shadow_feed_audit_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        conclusion = str(result.get("scientific_conclusion") or "")
+        set_kv(
+            conn,
+            "forward_shadow_feed_status",
+            {
+                "status": result.get("status"),
+                "conclusion": conclusion,
+                "required_roots": result.get("required_roots") or [],
+                "candidate_heartbeats_published": int(
+                    result.get("candidate_heartbeats_published") or 0
+                ),
+                "next_action": result.get("next_action"),
+                "network_requests": int(result.get("network_requests") or 0),
+                "incremental_databento_spend_usd": float(
+                    result.get("incremental_databento_spend_usd") or 0.0
+                ),
+                "outbound_orders": int(result.get("outbound_orders") or 0),
+            },
+        )
+        if conclusion == "FORWARD_DATA_SOURCE_REQUIRED":
+            set_kv(conn, "forward_data_blocker", "FORWARD_DATA_SOURCE_REQUIRED")
+            set_kv(conn, "shadow_pipeline_status", "WAITING_FOR_FRESH_FORWARD_DATA")
+        else:
+            set_kv(conn, "forward_data_blocker", None)
+            set_kv(conn, "shadow_pipeline_status", "FORWARD_FEED_AUDIT_COMPLETED")
+        # A missing read-only feed never blocks deterministic Discovery/Promotion.
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        self._finalize_portfolio_mutation_campaign_if_ready(conn)
+
+    def _finalize_portfolio_mutation_campaign_if_ready(self, conn: Any) -> None:
+        required = (
+            PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+            PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
+            FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID,
+        )
+        if any(
+            (experiment_record(conn, experiment_id) or {}).get("status")
+            != "COMPLETED"
+            for experiment_id in required
+        ):
+            set_kv(conn, "current_phase", "RUNNING_PARALLEL_EXPERIMENTS")
+            set_kv(conn, "current_blocker", None)
+            return
+        set_kv(conn, "portfolio_mutation_campaign_completed", True)
+        set_kv(conn, "current_phase", "TARGETED_RESEARCH_RESUMED")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+        next_record = experiment_record(
+            conn, POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID
+        )
+        if next_record is None:
+            task = project_path(
+                "reports", "engineering", "hydra_meta_failure_allocation_20260711.md"
+            )
+            if (
+                not task.is_file()
+                or hashlib.sha256(task.read_bytes()).hexdigest()
+                != META_FAILURE_ALLOCATION_TASK_SHA256
+            ):
+                set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+                set_kv(conn, "current_blocker", "POST_MUTATION_META_TASK_MISMATCH")
+                return
+            snapshot = self._meta_failure_snapshot(conn)
+            snapshot_hash = hashlib.sha256(
+                json.dumps(
+                    snapshot, sort_keys=True, separators=(",", ":"), default=str
+                ).encode("utf-8")
+            ).hexdigest()
+            enqueue_experiment(
+                conn,
+                POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID,
+                {
+                    "experiment_type": "meta_failure_allocation",
+                    "priority": 117.0,
+                    "max_attempts": 2,
+                    "pipeline": "META_RESEARCH",
+                    "parallel_safe": True,
+                    "writes_data_access_ledger": False,
+                    "engineering_task_path": str(task),
+                    "engineering_task_sha256": META_FAILURE_ALLOCATION_TASK_SHA256,
+                    "snapshot": snapshot,
+                    "snapshot_hash": snapshot_hash,
+                    "code_commit": self._git_commit(),
+                    "q4_access_allowed": False,
+                    "paid_data_allowed": False,
+                    "network_allowed": False,
+                    "live_or_broker_allowed": False,
+                    "expected_decision_information_gain": 0.90,
+                },
+            )
+            set_kv(conn, "post_mutation_meta_allocation_plan_written", True)
+            set_kv(conn, "meta_research_pipeline_status", "POST_MUTATION_ALLOCATION_QUEUED")
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": "POST_MUTATION_META_ALLOCATION_AND_SUCCESSIVE_HALVING",
+                "pipeline": "META_RESEARCH_AND_PROMOTION",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+                "forward_data_blocker": get_kv(conn, "forward_data_blocker"),
+            },
+        )
 
     def _route_barrier_shadow_activation_result(
         self, conn: Any, result: dict[str, Any]

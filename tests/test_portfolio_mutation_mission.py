@@ -1,0 +1,167 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from hydra.mission.controller import (
+    AutonomousMissionController,
+    FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID,
+    MissionControllerConfig,
+    PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
+    POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID,
+    PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+    SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
+)
+from hydra.mission.experiment_queue import (
+    claim_next_experiment,
+    complete_experiment,
+    enqueue_experiment,
+    experiment_record,
+)
+from hydra.mission.mission_state import connect_state, get_kv, mission_paths, set_kv
+
+
+def _controller(tmp_path: Path) -> tuple[AutonomousMissionController, object, object]:
+    paths = mission_paths(str(tmp_path / "state"))
+    conn = connect_state(paths)
+    controller = AutonomousMissionController(
+        MissionControllerConfig(
+            mission_id="portfolio-mutation-test",
+            baseline_commit="test",
+            objective_config="test",
+            remaining_databento_budget_usd=72.0,
+            persistent=False,
+            state_dir=str(paths.state_dir),
+            sleep_seconds=0.0,
+        )
+    )
+    return controller, conn, paths
+
+
+def _seed_completed_basket(conn: object) -> None:
+    sources = [
+        {
+            "candidate_id": f"active_shadow_{index}",
+            "result_path": f"result_{index}.json",
+            "result_sha256": str(index) * 64,
+            "result_hash": str(index + 1) * 64,
+            "ledger_path": f"ledger_{index}.jsonl",
+            "ledger_sha256": str(index + 2) * 64,
+        }
+        for index in range(4)
+    ]
+    enqueue_experiment(
+        conn,
+        SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
+        {"experiment_type": "shadow_shared_account_baskets", "sources": sources},
+    )
+    claimed = claim_next_experiment(conn)
+    assert claimed is not None
+    complete_experiment(
+        conn,
+        SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
+        {"scientific_conclusion": "THREE_EXECUTABLE_SHADOW_BASKETS_FOUND"},
+        claim_token=str(claimed["claim_token"]),
+    )
+
+
+def test_blocker_recovery_queues_three_distinct_parallel_pipelines(tmp_path: Path) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        _seed_completed_basket(conn)
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(
+            conn,
+            "current_blocker",
+            "PORTFOLIO_ROLE_AND_PROMISING_LINEAGE_MUTATION_REQUIRED",
+        )
+
+        assert controller._reconcile_portfolio_mutation_campaign(conn)
+        records = [
+            experiment_record(conn, experiment_id)
+            for experiment_id in (
+                PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+                PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
+                FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID,
+            )
+        ]
+        assert all(record is not None and record["status"] == "QUEUED" for record in records)
+        assert len({record["specification"]["pipeline"] for record in records}) == 3
+        assert all(record["specification"]["parallel_safe"] is True for record in records)
+        assert all(record["specification"]["q4_access_allowed"] is False for record in records)
+        assert all(record["specification"]["paid_data_allowed"] is False for record in records)
+        assert all(record["specification"]["network_allowed"] is False for record in records)
+        assert all(record["specification"]["live_or_broker_allowed"] is False for record in records)
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+        assert get_kv(conn, "current_blocker") is None
+    finally:
+        conn.close()
+
+
+def test_completed_campaign_queues_next_meta_action_without_feed_blocking(
+    tmp_path: Path,
+) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        _seed_completed_basket(conn)
+        assert controller._reconcile_portfolio_mutation_campaign(conn)
+        results = {
+            PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID: {
+                "candidate_count": 18,
+                "candidates": [],
+                "parent_count": 16,
+                "mutation_hypothesis_count": 18,
+                "primary_child_count": 16,
+                "ym_versioned_hypotheses": 3,
+                "accepted_research_prototypes": 10,
+                "scientific_conclusion": "TARGETED_MUTATIONS_CREATED_FORWARD_EVIDENCE_REQUIRED",
+            },
+            PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID: {
+                "candidate_count": 5,
+                "portfolio_role_candidates_generated": 5,
+                "defensive_role_candidates_generated": 3,
+                "research_candidate_count": 1,
+                "scientific_conclusion": "PORTFOLIO_ROLE_RESEARCH_CANDIDATES_FOUND",
+            },
+            FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID: {
+                "scientific_conclusion": "FORWARD_DATA_SOURCE_REQUIRED",
+                "status": "SOURCE_REQUIRED",
+                "required_roots": ["MYM"],
+                "candidate_heartbeats_published": 0,
+                "network_requests": 0,
+                "outbound_orders": 0,
+            },
+        }
+        for experiment_id in (
+            PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
+            PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID,
+            FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID,
+        ):
+            claimed = claim_next_experiment(conn)
+            assert claimed is not None
+            # Priority order is deterministic and matches the tuple above.
+            assert claimed["experiment_id"] == experiment_id
+            complete_experiment(
+                conn,
+                experiment_id,
+                results[experiment_id],
+                claim_token=str(claimed["claim_token"]),
+            )
+        controller._route_promising_lineage_mutation_result(
+            conn, results[PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID]
+        )
+        controller._route_portfolio_role_research_result(
+            conn, results[PORTFOLIO_ROLE_RESEARCH_EXPERIMENT_ID]
+        )
+        controller._route_forward_shadow_feed_audit_result(
+            conn, results[FORWARD_SHADOW_FEED_AUDIT_EXPERIMENT_ID]
+        )
+
+        assert get_kv(conn, "portfolio_mutation_campaign_completed") is True
+        assert get_kv(conn, "forward_data_blocker") == "FORWARD_DATA_SOURCE_REQUIRED"
+        assert get_kv(conn, "current_blocker") is None
+        next_record = experiment_record(conn, POST_MUTATION_META_ALLOCATION_EXPERIMENT_ID)
+        assert next_record is not None and next_record["status"] == "QUEUED"
+        assert next_record["specification"]["q4_access_allowed"] is False
+        assert next_record["specification"]["live_or_broker_allowed"] is False
+    finally:
+        conn.close()

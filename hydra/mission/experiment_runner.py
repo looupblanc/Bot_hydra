@@ -843,4 +843,44 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             ),
             code_commit=str(experiment.get("code_commit") or "unknown"),
         )
+    if experiment_type == "promising_lineage_mutation":
+        from hydra.factory.promising_lineage_mutator import (
+            run_promising_lineage_mutation,
+        )
+
+        return run_promising_lineage_mutation(
+            output_dir,
+            source_manifest_path=Path(str(experiment["source_manifest_path"])),
+            source_manifest_sha256=str(experiment["source_manifest_sha256"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
+    if experiment_type == "portfolio_role_research":
+        from hydra.mission.portfolio_mutation_action import (
+            run_portfolio_role_research,
+        )
+
+        return run_portfolio_role_research(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            sources=[dict(row) for row in experiment["sources"]],
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+            defensive_control_count=int(
+                experiment.get("defensive_control_count") or 4096
+            ),
+            inclusion_control_count=int(
+                experiment.get("inclusion_control_count") or 255
+            ),
+        )
+    if experiment_type == "forward_shadow_feed_audit":
+        from hydra.mission.portfolio_mutation_action import run_forward_feed_audit
+
+        return run_forward_feed_audit(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            required_roots=[str(value) for value in experiment["required_roots"]],
+            contract_map_dir=Path(str(experiment["contract_map_dir"])),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")
