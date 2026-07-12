@@ -41,7 +41,10 @@ def _controller(tmp_path: Path):
     return controller, conn
 
 
-def test_blocker_queues_one_preparation_without_q4_access(tmp_path: Path) -> None:
+def test_blocker_queues_one_preparation_without_q4_access(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("hydra.mission.controller.q4_access_count", lambda: 0)
     controller, conn = _controller(tmp_path)
     try:
         source = (
