@@ -96,7 +96,10 @@ def registry_entry_from_activation(result: dict[str, Any]) -> dict[str, Any]:
         "configuration_sha256": manifest["configuration_sha256"],
         "configuration_hash": manifest["configuration_hash"],
         "stale_data_seconds": int(manifest["stale_data_seconds"]),
-        "operational_classification": "SHADOW_CONFIG_COMPLETE",
+        # Preserve the immutable activation-registry value for backward
+        # compatibility. Runtime liveness is derived exclusively from the feed
+        # heartbeat in _candidate_runtime_state and may be WAITING_FOR_FEED.
+        "operational_classification": "SHADOW_RESEARCH_ACTIVE",
         "outbound_orders_enabled": False,
     }
 

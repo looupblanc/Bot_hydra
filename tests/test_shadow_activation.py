@@ -91,6 +91,7 @@ def test_activation_and_pipeline_are_immutable_and_fail_closed(tmp_path: Path) -
         code_surface_paths=[surface],
     )
     entry = registry_entry_from_activation(result)
+    assert entry["operational_classification"] == "SHADOW_RESEARCH_ACTIVE"
     state_dir = tmp_path / "state"
     waiting = tick_shadow_pipeline(
         state_dir,
