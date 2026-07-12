@@ -1,0 +1,96 @@
+{
+  "CONTRE": "Minute aggregation retains aggressor imbalance but discards within-minute queue and exact sweep ordering; event bars must be built separately before testing hypotheses that depend on sub-minute burst geometry.",
+  "acquisition_plan_sha256": "37022f048337f173db9e01997087b998051a4512aa444e46f0f5d31cc45b29f2",
+  "aggressor_side_encoding": {
+    "A": "SELL_AGGRESSOR",
+    "B": "BUY_AGGRESSOR",
+    "N": "UNKNOWN"
+  },
+  "audit": {
+    "buy_aggressor_volume": 40247855,
+    "excluded_instrument_record_count": 0,
+    "excluded_session_record_count": 7100801,
+    "invalid_action_record_count": 0,
+    "minute_group_count": 33220,
+    "retained_rth_record_count": 25176216,
+    "sell_aggressor_volume": 40302742,
+    "source_record_count": 32277017,
+    "unknown_side_volume": 740
+  },
+  "data_role": "DEVELOPMENT_ONLY",
+  "definitions": {
+    "explicit_contracts": [
+      "ESU4",
+      "ESZ4",
+      "MESU4",
+      "MESZ4"
+    ],
+    "path": "data/cache/contract_maps/definitions_GLBX-MDP3_2024-01-01_2024-10-01_dbf3b43b85c57f1e.dbn.zst",
+    "sha256": "72d7a5276cdfed7c6e710bd2b7eacdd3131aa1603190589d84224005a5bbc7c9"
+  },
+  "feature_availability": "minute_start_ns + 60 seconds",
+  "feature_columns": [
+    "product",
+    "contract",
+    "instrument_id",
+    "minute_start_ns",
+    "source_close_ns",
+    "availability_ns",
+    "first_trade_ns",
+    "last_trade_ns",
+    "open",
+    "high",
+    "low",
+    "close",
+    "vwap",
+    "trade_count",
+    "total_volume",
+    "buy_aggressor_volume",
+    "sell_aggressor_volume",
+    "unknown_side_volume",
+    "signed_aggressor_volume",
+    "signed_aggressor_fraction",
+    "price_change_points",
+    "path_length_points",
+    "signed_path_efficiency",
+    "transformation_version"
+  ],
+  "forward_gap_access_count": 0,
+  "outbound_order_count": 0,
+  "outcome_or_pnl_columns": [],
+  "output": {
+    "contracts": [
+      "ESU4",
+      "ESZ4",
+      "MESU4",
+      "MESZ4"
+    ],
+    "first_minute_start_ns": 1722519000000000000,
+    "last_minute_start_ns": 1727726940000000000,
+    "path": "data/cache/v7_d1/rth_minute_print_features_v1.parquet",
+    "products": [
+      "ES",
+      "MES"
+    ],
+    "row_count": 33220,
+    "sha256": "472f974d6cf8ae4e3028c0909e13e50124192c2774c3b843b36e9a331eb3f4d5"
+  },
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "schema": "hydra_v7_d1_trade_feature_manifest_v1",
+  "session_filter": {
+    "end_exclusive": "15:10:00",
+    "start_inclusive": "08:30:00",
+    "timezone": "America/Chicago",
+    "weekdays_only": true
+  },
+  "source": {
+    "end_exclusive": "2024-10-01T00:00:00Z",
+    "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+    "record_count": 32277017,
+    "schema": "trades",
+    "sha256": "a312d6df524205c2d1632c20f1033ecb74081c98d6608eacc1a9cdb08bcf9b63",
+    "start_inclusive": "2024-08-01T00:00:00Z"
+  },
+  "transformation_version": "hydra_v7_d1_rth_minute_print_features_v1"
+}
