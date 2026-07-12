@@ -1,0 +1,103 @@
+{
+  "schema": "hydra_v7_d1_event_representation_preregistration_v1",
+  "representation_id": "v7_d1_date_matched_event_bars_0001",
+  "preregistered_at_utc": "2026-07-12T17:29:00Z",
+  "contract_sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+  "sources": [
+    {
+      "year": 2023,
+      "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2023-08-02_2023-09-01.dbn.zst",
+      "sha256": "d93e5c8bd657a28bff5f05560b845caa3bb04e9252882ddc2751033fedd1c468",
+      "start_inclusive": "2023-08-02T00:00:00Z",
+      "end_exclusive": "2023-09-01T00:00:00Z",
+      "explicit_contracts": ["ESU3", "MESU3"],
+      "instrument_ids": [3445, 2922]
+    },
+    {
+      "year": 2024,
+      "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+      "sha256": "a312d6df524205c2d1632c20f1033ecb74081c98d6608eacc1a9cdb08bcf9b63",
+      "matched_slice_start_inclusive": "2024-08-02T00:00:00Z",
+      "matched_slice_end_exclusive": "2024-09-01T00:00:00Z",
+      "explicit_contracts": ["ESU4", "MESU4"],
+      "instrument_ids": [118, 7114]
+    }
+  ],
+  "definitions": {
+    "path": "data/cache/contract_maps/definitions_GLBX-MDP3_2023-01-01_2024-10-01_1faa319bb6354a47.dbn.zst",
+    "sha256": "a5374a723fdf442f8c5e31f98af26ff813070a61008d24e46f848df69c819dcc",
+    "required_tick_size": 0.25,
+    "point_values": {"ES": 50.0, "MES": 5.0}
+  },
+  "filter": {
+    "timezone": "America/Chicago",
+    "rth_start_inclusive": "08:30:00",
+    "rth_end_exclusive": "15:10:00",
+    "weekdays_only": true,
+    "trade_action_only": true
+  },
+  "ordering": {
+    "primary": "ts_event",
+    "tie_breakers": ["ts_recv", "sequence"],
+    "availability_timestamp": "maximum ts_recv of every print in the completed event bar",
+    "trigger_trade_split": false,
+    "next_bar_starts_after_trigger_trade": true
+  },
+  "aggressor_side": {
+    "B": 1,
+    "A": -1,
+    "N": 0
+  },
+  "representations": {
+    "VOLUME_BAR": {
+      "ES_threshold_contracts": 1000,
+      "MES_threshold_contracts": 250,
+      "close_rule": "cumulative total traded contracts >= threshold"
+    },
+    "SIGNED_IMBALANCE_BAR": {
+      "ES_threshold_contracts": 500,
+      "MES_threshold_contracts": 125,
+      "close_rule": "absolute cumulative signed aggressor contracts >= threshold"
+    },
+    "DOLLAR_BAR": {
+      "ES_threshold_usd": 25000000.0,
+      "MES_threshold_usd": 2500000.0,
+      "close_rule": "cumulative price * point_value * contracts >= threshold"
+    }
+  },
+  "bar_features": [
+    "product",
+    "contract",
+    "instrument_id",
+    "calendar_year",
+    "bar_type",
+    "bar_sequence",
+    "start_event_ns",
+    "end_event_ns",
+    "availability_ns",
+    "open",
+    "high",
+    "low",
+    "close",
+    "vwap",
+    "trade_count",
+    "total_volume",
+    "buy_aggressor_volume",
+    "sell_aggressor_volume",
+    "unknown_side_volume",
+    "signed_aggressor_volume",
+    "price_change_points",
+    "path_length_points"
+  ],
+  "invariants": {
+    "outcome_or_pnl_columns": [],
+    "closed_event_only": true,
+    "deterministic": true,
+    "data_role": "DEVELOPMENT_ONLY",
+    "q4_access_delta": 0,
+    "forward_gap_access_delta": 0,
+    "proof_burn_delta": 0,
+    "outbound_order_count": 0
+  },
+  "CONTRE": "Fixed event thresholds can make ES and MES bar counts differ and two August windows cannot establish seasonality; all representations still require a new-dataset tripwire before candidate use."
+}
