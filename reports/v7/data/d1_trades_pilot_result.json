@@ -1,0 +1,34 @@
+{
+  "CONTRE": "The acquired period contains only two development months; high event count cannot substitute for independent day and regime coverage.",
+  "actual_spend_usd": 40.401062786579,
+  "api_key_logged": false,
+  "authorization": {
+    "actual_spend_before_usd": 27.988065242766993,
+    "allowed": true,
+    "cache_hit": false,
+    "estimate": {
+      "billable_size_bytes": 1549296816,
+      "estimated_cost_usd": 40.401062786579,
+      "record_count": 32277017
+    },
+    "estimated_commitments_before_usd": 27.988065242766993,
+    "projected_actual_spend_usd": 68.38912802934598,
+    "projected_remaining_usd": 31.610871970654017,
+    "reason": "AUTHORIZED",
+    "request_id": "eac3898ca6ae8face4bf"
+  },
+  "data_role": "DEVELOPMENT_ONLY",
+  "forward_gap_access_count": 0,
+  "network_request_made": true,
+  "next_action": "build_explicit_contract_event_bar_manifest_then_preregister_grammar",
+  "outbound_order_count": 0,
+  "plan_path": "WORM/v7-d1-trades-pilot-2026-07-12.json",
+  "plan_sha256": "37022f048337f173db9e01997087b998051a4512aa444e46f0f5d31cc45b29f2",
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "raw_output_path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+  "raw_sha256": "a312d6df524205c2d1632c20f1033ecb74081c98d6608eacc1a9cdb08bcf9b63",
+  "raw_size_bytes": 592590685,
+  "request_id": "eac3898ca6ae8face4bf",
+  "schema": "hydra_v7_d1_trades_acquisition_result_v1"
+}
