@@ -1,0 +1,252 @@
+{
+  "schema": "hydra_v7_phase0_g0_preregistration_v1",
+  "experiment_id": "hydra_v7_phase0_sim_truth_0001",
+  "preregistered_at_utc": "2026-07-12T13:20:00Z",
+  "contract_commit": "1c990988da4f5d41d26b85c357517fc42cd134fd",
+  "contract_document_sha256": "0ecc13f8bf5f226dbc868e8643f0050429d617ca6d6e7861398ca56015d16b92",
+  "contract_tag": "WORM/hydra-v7-contract-v1",
+  "source_commit": "81f05ec9d7cd796ff91fd14d15760322c2924275",
+  "source_manifest_path": "config/v7/phase0_source_manifest.sha256",
+  "source_manifest_sha256": "aeac4d9f0ba6557d3d57c5078ca9d331091ec379457a668dafd631c7973f770d",
+  "generation_frozen": true,
+  "paid_data_allowed": false,
+  "outbound_orders_allowed": false,
+  "phase_budget_usd": 8.0,
+  "expected_phase_spend_usd": 0.0,
+  "mll_variants": {
+    "default": {
+      "id": "EOD_REALIZED_BALANCE",
+      "description": "The floor advances once after each completed trading day from the realized closing balance, never falls, locks at starting balance, and is monitored continuously against realized plus conservative unrealized PnL. Touch is breach."
+    },
+    "sensitivity": {
+      "id": "INTRADAY_LIVE_EQUITY_HWM_CONSERVATIVE_MFE_FIRST",
+      "description": "The floor advances from live-equity favorable excursion during every accepted event, never falls, locks at starting balance, then the adverse excursion is tested. When MFE/MAE order is unresolved inside the source bar, favorable-first is the preregistered conservative ordering and ambiguity is counted."
+    }
+  },
+  "dll_scenarios": [
+    {
+      "id": "NO_DLL",
+      "enabled": false,
+      "limit_usd": 3000.0
+    },
+    {
+      "id": "OPTIONAL_DLL_3000",
+      "enabled": true,
+      "limit_usd": 3000.0,
+      "terminal_effect": "FLATTEN_AND_BLOCK_SESSION_NOT_ACCOUNT_FAILURE"
+    }
+  ],
+  "historical_replay_scope": {
+    "basket_count": 55,
+    "xfa_policy_count": 6,
+    "selection_rule": "All unique development-only promotion.elite_policy_ids and all unique xfa_payout_elites from completed V6 generations 0000 through 0005; no post hoc filtering.",
+    "generations": {
+      "generation_0000": {
+        "basket_elite_ids": [
+          "basket_v6_6fa51fed3a3c9493e9",
+          "basket_v6_7b42a4ef48bd682a62",
+          "basket_v6_8514b08b9596c8dace",
+          "basket_v6_8bb05a943a5d24ec9c",
+          "basket_v6_d51f4e80d029bab56e",
+          "basket_v6_e4cf28188ea19cf9e7"
+        ],
+        "xfa_policy_ids": ["basket_v6_6fa51fed3a3c9493e9"]
+      },
+      "generation_0001": {
+        "basket_elite_ids": [
+          "basket_v6_057b7f015e7d1624b2",
+          "basket_v6_38f35c992a7a1bcc16",
+          "basket_v6_3aec401edfa7060061",
+          "basket_v6_3cb592de422c4e9179",
+          "basket_v6_45eaa8c8212f10b65a",
+          "basket_v6_9bb4c7096ca3faaeb7",
+          "basket_v6_9d278501abe82b374f",
+          "basket_v6_a9fd368634c56358e3",
+          "basket_v6_b1af6e5bfb0e178524",
+          "basket_v6_d6e503a122d872aad1",
+          "basket_v6_faf1fd3b7d88b0c4bd",
+          "basket_v6_fe34e5124e1330c639"
+        ],
+        "xfa_policy_ids": []
+      },
+      "generation_0002": {
+        "basket_elite_ids": [
+          "basket_v6_4a7c0f6e425bdfc913",
+          "basket_v6_5c070c82d95cc65942",
+          "basket_v6_5f0dc0425dd942809d",
+          "basket_v6_73de1b75288a1bf94e",
+          "basket_v6_8740cdc2f0aec3ffa5",
+          "basket_v6_a2238af26b485ae8d4",
+          "basket_v6_b041e58d167772cab6",
+          "basket_v6_b0e5c64171064de1ec",
+          "basket_v6_dfd4c3ba84880d1d7c",
+          "basket_v6_e53c6f01c25ba212a4"
+        ],
+        "xfa_policy_ids": ["basket_v6_b0e5c64171064de1ec"]
+      },
+      "generation_0003": {
+        "basket_elite_ids": [
+          "basket_v6_2f00aaa1264a9375d1",
+          "basket_v6_406135e008cb569921",
+          "basket_v6_61ab3d7f711438faf3",
+          "basket_v6_6c27609d686bfe4286",
+          "basket_v6_c262d5b843d9d9aa80"
+        ],
+        "xfa_policy_ids": []
+      },
+      "generation_0004": {
+        "basket_elite_ids": [
+          "basket_v6_0433fc2e2d03e6756c",
+          "basket_v6_303edcd98994d7ea1f",
+          "basket_v6_38cd162f9c795676dc",
+          "basket_v6_3f32d2e1c74125f160",
+          "basket_v6_68e648e0d8df45e83d",
+          "basket_v6_7742ba008a6ffdaba5",
+          "basket_v6_9fd3b13d79b67e0156",
+          "basket_v6_b31ab165b9c59bf783",
+          "basket_v6_b6bbe18517ec389da6",
+          "basket_v6_ed723c7f4d4256980f",
+          "basket_v6_f12c2f0dd8af501a63",
+          "basket_v6_f7bce3ad601b510b33"
+        ],
+        "xfa_policy_ids": [
+          "basket_v6_f12c2f0dd8af501a63",
+          "basket_v6_303edcd98994d7ea1f"
+        ]
+      },
+      "generation_0005": {
+        "basket_elite_ids": [
+          "basket_v6_0c12db4f3c7662b169",
+          "basket_v6_1ae402ddf314f65e3c",
+          "basket_v6_24e562bd1cb2dde894",
+          "basket_v6_2a19f37c62ed38f67b",
+          "basket_v6_4abd77301394bbf139",
+          "basket_v6_57321bb23955a08da9",
+          "basket_v6_59f4336bf5481a6df9",
+          "basket_v6_7bb3dee40ebfad4def",
+          "basket_v6_9eb6c155f98b089400",
+          "basket_v6_b5b9d8a1634add0433"
+        ],
+        "xfa_policy_ids": [
+          "basket_v6_2a19f37c62ed38f67b",
+          "basket_v6_c8d2d356a49f10620d"
+        ]
+      }
+    }
+  },
+  "historical_equivalence_gate": {
+    "comparison_variant": "EOD_REALIZED_BALANCE",
+    "required_exact_fields": [
+      "episode_start_days",
+      "terminal_distribution",
+      "pass_count",
+      "mll_breach_count",
+      "compliance_failure_count"
+    ],
+    "required_numeric_fields": [
+      "pass_rate",
+      "mll_breach_rate",
+      "target_progress_median",
+      "median_episode_net_pnl",
+      "minimum_mll_buffer"
+    ],
+    "absolute_numeric_tolerance": 1e-9,
+    "contamination_rule": "If any frozen historical object differs from its EOD_REALIZED_BALANCE replay beyond the frozen comparison policy, all historical pass-rate claims receive CONTAMINATED; prior artifacts remain unchanged."
+  },
+  "sensitivity_report": {
+    "metrics": [
+      "aggregate_pass_rate",
+      "aggregate_mll_breach_rate",
+      "per_object_pass_rate_delta",
+      "per_object_mll_breach_rate_delta",
+      "terminal_transition_count",
+      "mfe_mae_order_ambiguity_count",
+      "xfa_payout_probability_delta",
+      "xfa_expected_cycles_delta"
+    ],
+    "no_post_observation_threshold_changes": true
+  },
+  "cost_model_preregistration": {
+    "commission_source": "https://help.topstep.com/en/articles/8284213-topstepx-commissions-and-fees",
+    "commission_source_checked_utc": "2026-07-12",
+    "round_turn_commission_usd": {
+      "ES": 3.80,
+      "MES": 1.24,
+      "NQ": 3.80,
+      "MNQ": 1.24,
+      "RTY": 3.80,
+      "M2K": 1.24,
+      "YM": 3.80,
+      "MYM": 1.24,
+      "CL": 4.04,
+      "MCL": 1.54,
+      "GC": 4.24,
+      "MGC": 1.74
+    },
+    "tick_value_usd": {
+      "ES": 12.50,
+      "MES": 1.25,
+      "NQ": 5.00,
+      "MNQ": 0.50,
+      "RTY": 5.00,
+      "M2K": 0.50,
+      "YM": 5.00,
+      "MYM": 0.50,
+      "CL": 10.00,
+      "MCL": 1.00,
+      "GC": 10.00,
+      "MGC": 1.00
+    },
+    "base_slippage_ticks_per_side_by_horizon": {
+      "1m": 2.0,
+      "5m": 1.0,
+      "15m": 1.0,
+      "30m": 0.75,
+      "60m": 0.75,
+      "session": 0.75,
+      "daily": 1.0
+    },
+    "stress_profiles": {
+      "BASE": 1.0,
+      "STRESS_1_5X": 1.5,
+      "STRESS_2X": 2.0
+    },
+    "formula": "round_turn_commission + 2 * base_slippage_ticks_per_side * slippage_stress_multiplier * tick_value, per contract per round turn",
+    "sim_exploit_rule": "A candidate whose net edge is not strictly positive under STRESS_2X is SIM_EXPLOIT and killed."
+  },
+  "ruleset_sources": {
+    "R1_R4_R5_R6": "https://help.topstep.com/en/articles/8284197-trading-combine-parameters",
+    "R2_R8_R10": "https://help.topstep.com/en/articles/8284204-what-is-the-maximum-loss-limit",
+    "R3": "https://help.topstep.com/en/articles/10490293-daily-loss-limit-in-the-trading-combine-and-express-funded-account",
+    "R4_R11": "https://help.topstep.com/en/articles/8284208-consistency-at-topstep",
+    "R9_R10_R11_R12": "https://help.topstep.com/en/articles/8284233-topstep-payout-policy",
+    "R13": "https://help.topstep.com/en/articles/11187768-topstepx-api-access",
+    "R14": "https://help.topstep.com/en/articles/10305426-prohibited-trading-strategies-at-topstep",
+    "R15": "https://www.cmegroup.com/notices/market-regulation/2019/12/RA1914-5.pdf"
+  },
+  "deployment_ticket_blocking_rule_statuses": ["CONFLICT", "ASSUMED"],
+  "deployment_ticket_blockers_at_preregistration": ["R2", "R6", "R7", "R11"],
+  "gate_G0": {
+    "verdict_green_requires": [
+      "pytest_pass_count_at_least_543",
+      "all_ruleset_tests_green",
+      "R1_through_R15_machine_readable",
+      "both_R2_MLL_variants_executable",
+      "55_basket_and_6_xfa_divergence_report_published",
+      "costs_model_report_published",
+      "mission_and_registry_integrity_ok",
+      "q4_remains_burned",
+      "outbound_order_count_zero",
+      "phase_spend_not_above_8_usd"
+    ],
+    "generation_unlocks": false,
+    "service_resume_allowed_after_G0": true,
+    "phase1_required_before_generation": true
+  },
+  "report_paths": {
+    "divergence": "reports/v7/phase0/mll_divergence_report.md",
+    "costs": "reports/v7/phase0/costs_model.md",
+    "gate": "reports/v7/phase0/g0_report.md",
+    "machine_result": "reports/v7/phase0/phase0_result.json"
+  }
+}
