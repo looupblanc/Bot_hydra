@@ -12,6 +12,13 @@ from typing import Any, Iterable, Mapping
 SCHEMA_VERSION = "hydra_v7_class_graveyard_v2"
 LEGACY_PROTOTYPE_COUNT = 115_388
 PHASE2_BASKET_COUNT = 55
+ARB_INTRA_PRODUCT_CLASS = "ARB_INTRA_PRODUIT"
+ARB_INTRA_PRODUCT_DEATH_CAUSE = (
+    "SIM_EXPLOIT_ADJACENT_STALE_QUOTE_LATENCY"
+)
+_CLASS_ALIASES = {
+    "mini_micro_aggressor_participation_divergence": ARB_INTRA_PRODUCT_CLASS,
+}
 
 
 class GraveyardError(RuntimeError):
@@ -199,6 +206,11 @@ def class_feedback(path: str | Path) -> tuple[dict[str, Any], ...]:
         conn.close()
 
 
+def canonical_mechanism_class(mechanism_class: str) -> str:
+    normalized = str(mechanism_class).strip()
+    return _CLASS_ALIASES.get(normalized, normalized)
+
+
 def _registry_class_rows(path: Path) -> tuple[ClassTombstone, ...]:
     conn = sqlite3.connect(f"file:{path.resolve()}?mode=ro", uri=True)
     try:
@@ -231,30 +243,37 @@ def _grammar_class_rows(path: Path) -> tuple[ClassTombstone, ...]:
     if payload.get("selected_shadow_queue_candidate_ids"):
         raise GraveyardError("graveyard cannot tombstone a grammar with promotions")
     source_hash = _sha256(path)
-    grouped: dict[tuple[str, str], int] = {}
+    grouped: dict[tuple[str, str, str], int] = {}
     for result in candidate_results:
         if not isinstance(result, dict):
             raise GraveyardError("invalid grammar candidate result")
         specification = result.get("specification")
         if not isinstance(specification, dict):
             raise GraveyardError("grammar result lacks class specification")
-        mechanism_class = str(specification.get("mechanism_class", "")).strip()
+        mechanism_class = canonical_mechanism_class(
+            str(specification.get("mechanism_class", ""))
+        )
         if not mechanism_class:
             raise GraveyardError("grammar result has empty mechanism class")
-        cause = _contract_death_cause(result)
-        grouped[(mechanism_class, cause)] = (
-            grouped.get((mechanism_class, cause), 0) + 1
+        if mechanism_class == ARB_INTRA_PRODUCT_CLASS:
+            regime = "DEVELOPMENT_IS_TO_WF_COLLAPSE"
+            cause = ARB_INTRA_PRODUCT_DEATH_CAUSE
+        else:
+            regime = "DEVELOPMENT_2023_TO_2024Q3"
+            cause = _contract_death_cause(result)
+        grouped[(mechanism_class, regime, cause)] = (
+            grouped.get((mechanism_class, regime, cause), 0) + 1
         )
     return tuple(
         ClassTombstone(
             mechanism_class=mechanism_class,
-            regime="DEVELOPMENT_2023_TO_2024Q3",
+            regime=regime,
             death_cause=cause,
             candidate_count=count,
             source_scope=f"HYDRA_V7_GRAMMAR:{grammar_id}",
             evidence_sha256=source_hash,
         )
-        for (mechanism_class, cause), count in sorted(grouped.items())
+        for (mechanism_class, regime, cause), count in sorted(grouped.items())
     )
 
 
@@ -381,9 +400,12 @@ def _sha256(path: str | Path) -> str:
 
 
 __all__ = [
+    "ARB_INTRA_PRODUCT_CLASS",
+    "ARB_INTRA_PRODUCT_DEATH_CAUSE",
     "GraveyardError",
     "SCHEMA_VERSION",
     "audit_graveyard",
     "build_graveyard",
+    "canonical_mechanism_class",
     "class_feedback",
 ]

@@ -7,9 +7,12 @@ from pathlib import Path
 import pytest
 
 from hydra.research.v7_graveyard import (
+    ARB_INTRA_PRODUCT_CLASS,
+    ARB_INTRA_PRODUCT_DEATH_CAUSE,
     GraveyardError,
     audit_graveyard,
     build_graveyard,
+    canonical_mechanism_class,
     class_feedback,
 )
 
@@ -205,3 +208,64 @@ def test_graveyard_rejects_tombstoning_promoted_grammar(tmp_path: Path) -> None:
             grammar_result_paths=[grammar],
             output_path=tmp_path / "graveyard.db",
         )
+
+
+def test_intra_product_arbitrage_is_canonicalized_at_class_level(
+    tmp_path: Path,
+) -> None:
+    registry, phase2 = _sources(tmp_path)
+    grammar = tmp_path / "grammar.json"
+    grammar.write_text(
+        json.dumps(
+            {
+                "grammar_id": "hydra_v7_d1_microstructure_grammar_0002",
+                "selected_shadow_queue_candidate_ids": [],
+                "candidate_results": [
+                    {
+                        "candidate_id": "must_not_be_persisted",
+                        "specification": {
+                            "mechanism_class": (
+                                "mini_micro_aggressor_participation_divergence"
+                            )
+                        },
+                        "stage1_pass": True,
+                        "stage2_pass": True,
+                        "base": {"expectancy_per_trade": 35.09},
+                        "stress_2x": {"expectancy_per_trade": 10.09},
+                        "DSR": {"deflated_z": -4.43},
+                        "BH": {"rejected": False},
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    output = tmp_path / "graveyard.db"
+
+    build_graveyard(
+        registry_path=registry,
+        phase2_result_path=phase2,
+        grammar_result_paths=[grammar],
+        output_path=output,
+    )
+
+    feedback = class_feedback(output)
+    row = next(
+        item
+        for item in feedback
+        if item["mechanism_class"] == ARB_INTRA_PRODUCT_CLASS
+    )
+    assert row == {
+        "mechanism_class": ARB_INTRA_PRODUCT_CLASS,
+        "regime": "DEVELOPMENT_IS_TO_WF_COLLAPSE",
+        "death_cause": ARB_INTRA_PRODUCT_DEATH_CAUSE,
+        "candidate_count": 1,
+    }
+    assert canonical_mechanism_class(
+        "mini_micro_aggressor_participation_divergence"
+    ) == ARB_INTRA_PRODUCT_CLASS
+    assert all(
+        item["mechanism_class"]
+        != "mini_micro_aggressor_participation_divergence"
+        for item in feedback
+    )
