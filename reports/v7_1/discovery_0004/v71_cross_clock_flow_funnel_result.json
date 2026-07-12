@@ -1,0 +1,743 @@
+{
+  "CONTRE": "Cross-clock states can duplicate the same print information; a positive development funnel cannot advance without the permanent grammar tripwire and candidate-specific power audit.",
+  "DSR_BH_executed": false,
+  "candidate_count": 12,
+  "candidate_nulls_executed": false,
+  "candidate_results": [
+    {
+      "base_stress_1_5x": {
+        "event_count": 464,
+        "expectancy_per_trade": -87.50150862068968,
+        "net_pnl": -40600.70000000001,
+        "positive_event_fraction": 0.41810344827586204
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_continuation_h30",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 160,
+          "expectancy_per_trade": -64.503125,
+          "net_pnl": -10320.5,
+          "positive_event_fraction": 0.4
+        },
+        {
+          "event_count": 152,
+          "expectancy_per_trade": -70.57631578947371,
+          "net_pnl": -10727.600000000004,
+          "positive_event_fraction": 0.4605263157894737
+        },
+        {
+          "event_count": 152,
+          "expectancy_per_trade": -128.63552631578946,
+          "net_pnl": -19552.6,
+          "positive_event_fraction": 0.39473684210526316
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "CONTINUATION",
+      "signal_count": 464,
+      "signal_path_hash": "80b65d7b14a1ba5a6383c040cecef312f5b219857c7552c6324d515ac0315dac",
+      "single_day_absolute_pnl_share": 0.08436574395136466,
+      "specification_hash": "3b3a6ceae2f03235841cdd1b32b58755d869fc676b609e88baea4d42dfa94092",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 246,
+        "expectancy_per_trade": -81.31524390243906,
+        "net_pnl": -20003.55000000001,
+        "positive_event_fraction": 0.43089430894308944
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_continuation_h60",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 85,
+          "expectancy_per_trade": -156.04264705882352,
+          "net_pnl": -13263.625,
+          "positive_event_fraction": 0.4
+        },
+        {
+          "event_count": 81,
+          "expectancy_per_trade": 66.06882716049381,
+          "net_pnl": 5351.574999999999,
+          "positive_event_fraction": 0.48148148148148145
+        },
+        {
+          "event_count": 80,
+          "expectancy_per_trade": -151.14375,
+          "net_pnl": -12091.5,
+          "positive_event_fraction": 0.4125
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "CONTINUATION",
+      "signal_count": 246,
+      "signal_path_hash": "f2c63fc2a76ff5eb3c9b60f4fee71169c80ed70603a25e5941734893098689fa",
+      "single_day_absolute_pnl_share": 0.10299954140898751,
+      "specification_hash": "403f43b4ed7b01da1042101555fb699266e9d7bd32706d86b5dcf558205bc6cf",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 464,
+        "expectancy_per_trade": 23.65150862068965,
+        "net_pnl": 10974.299999999997,
+        "positive_event_fraction": 0.5431034482758621
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h30",
+      "classification": "WALK_FORWARD_POSITIVE_PENDING_POWER_AUDIT",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 160,
+          "expectancy_per_trade": 0.6531250000000153,
+          "net_pnl": 104.50000000000244,
+          "positive_event_fraction": 0.54375
+        },
+        {
+          "event_count": 152,
+          "expectancy_per_trade": 6.726315789473658,
+          "net_pnl": 1022.399999999996,
+          "positive_event_fraction": 0.5131578947368421
+        },
+        {
+          "event_count": 152,
+          "expectancy_per_trade": 64.78552631578948,
+          "net_pnl": 9847.400000000001,
+          "positive_event_fraction": 0.5723684210526315
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "REVERSAL",
+      "signal_count": 464,
+      "signal_path_hash": "cc6e26e62772f5ae69993ceae7aa61524123c260c22ac8a16be618e6baa70fab",
+      "single_day_absolute_pnl_share": 0.08776012131914251,
+      "specification_hash": "7835354b3c3206ccb07cd642e4e0926332941bf73dfee4e489c0baf4319a7f9c",
+      "stage0_valid_novel": true,
+      "stage1_pass": true,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [
+          {
+            "event_count": 119,
+            "expectancy_per_trade": 11.0371848739496,
+            "fold": 1,
+            "net_pnl": 1313.4250000000025,
+            "positive_event_fraction": 0.5630252100840336,
+            "retained_session_days": 11
+          },
+          {
+            "event_count": 65,
+            "expectancy_per_trade": -69.2326923076923,
+            "fold": 2,
+            "net_pnl": -4500.125,
+            "positive_event_fraction": 0.49230769230769234,
+            "retained_session_days": 6
+          },
+          {
+            "event_count": 66,
+            "expectancy_per_trade": 1.029545454545478,
+            "fold": 3,
+            "net_pnl": 67.95000000000155,
+            "positive_event_fraction": 0.4696969696969697,
+            "retained_session_days": 6
+          },
+          {
+            "event_count": 54,
+            "expectancy_per_trade": 84.51018518518516,
+            "fold": 4,
+            "net_pnl": 4563.549999999999,
+            "positive_event_fraction": 0.6111111111111112,
+            "retained_session_days": 5
+          }
+        ],
+        "pooled_expectancy_per_trade": 4.752631578947379,
+        "pooled_net_pnl": 1444.8000000000031,
+        "positive_fold_count": 3,
+        "purge": "nonoverlapping_signals_fixed_horizon",
+        "retained_event_count": 304
+      },
+      "walk_forward_positive": true
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 246,
+        "expectancy_per_trade": 17.465243902438992,
+        "net_pnl": 4296.449999999992,
+        "positive_event_fraction": 0.532520325203252
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+      "classification": "WALK_FORWARD_POSITIVE_PENDING_POWER_AUDIT",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 85,
+          "expectancy_per_trade": 92.19264705882352,
+          "net_pnl": 7836.374999999999,
+          "positive_event_fraction": 0.5647058823529412
+        },
+        {
+          "event_count": 81,
+          "expectancy_per_trade": -129.91882716049383,
+          "net_pnl": -10523.425000000001,
+          "positive_event_fraction": 0.49382716049382713
+        },
+        {
+          "event_count": 80,
+          "expectancy_per_trade": 87.29375,
+          "net_pnl": 6983.5,
+          "positive_event_fraction": 0.5375
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "REVERSAL",
+      "signal_count": 246,
+      "signal_path_hash": "f14fd905c30f02572cebc6c9aa8e450a1ece96a50ff757b3ad00e8a9a24dd146",
+      "single_day_absolute_pnl_share": 0.12203305641200192,
+      "specification_hash": "ee91025aaf7ab38bacb7540aff8282a5b28703e987eb1dd20e122106e2468b62",
+      "stage0_valid_novel": true,
+      "stage1_pass": true,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [
+          {
+            "event_count": 64,
+            "expectancy_per_trade": 122.56718749999999,
+            "fold": 1,
+            "net_pnl": 7844.299999999999,
+            "positive_event_fraction": 0.59375,
+            "retained_session_days": 11
+          },
+          {
+            "event_count": 33,
+            "expectancy_per_trade": -33.44015151515149,
+            "fold": 2,
+            "net_pnl": -1103.5249999999992,
+            "positive_event_fraction": 0.5454545454545454,
+            "retained_session_days": 6
+          },
+          {
+            "event_count": 35,
+            "expectancy_per_trade": 130.93214285714288,
+            "fold": 3,
+            "net_pnl": 4582.625000000001,
+            "positive_event_fraction": 0.6571428571428571,
+            "retained_session_days": 6
+          },
+          {
+            "event_count": 29,
+            "expectancy_per_trade": 15.91982758620691,
+            "fold": 4,
+            "net_pnl": 461.6750000000004,
+            "positive_event_fraction": 0.4827586206896552,
+            "retained_session_days": 5
+          }
+        ],
+        "pooled_expectancy_per_trade": 73.19922360248448,
+        "pooled_net_pnl": 11785.075,
+        "positive_fold_count": 3,
+        "purge": "nonoverlapping_signals_fixed_horizon",
+        "retained_event_count": 161
+      },
+      "walk_forward_positive": true
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 516,
+        "expectancy_per_trade": -66.73604651162792,
+        "net_pnl": -34435.8,
+        "positive_event_fraction": 0.46124031007751937
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_agreement_continuation_h30",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 180,
+          "expectancy_per_trade": -60.188888888888876,
+          "net_pnl": -10833.999999999998,
+          "positive_event_fraction": 0.4666666666666667
+        },
+        {
+          "event_count": 168,
+          "expectancy_per_trade": -99.26130952380953,
+          "net_pnl": -16675.9,
+          "positive_event_fraction": 0.42857142857142855
+        },
+        {
+          "event_count": 168,
+          "expectancy_per_trade": -41.225595238095224,
+          "net_pnl": -6925.899999999998,
+          "positive_event_fraction": 0.4880952380952381
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_SIGN_AGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "CONTINUATION",
+      "signal_count": 516,
+      "signal_path_hash": "34dd56dd25316435ddafcc11542f61afc842aea6287e87fa335c5897f8ba0d05",
+      "single_day_absolute_pnl_share": 0.16771126871773628,
+      "specification_hash": "2c8742339f4184473ccc692520414b7a577648b7e3b42569d2a457c76df051ec",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 258,
+        "expectancy_per_trade": -40.69437984496122,
+        "net_pnl": -10499.149999999994,
+        "positive_event_fraction": 0.4883720930232558
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_agreement_continuation_h60",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 90,
+          "expectancy_per_trade": 11.269444444444456,
+          "net_pnl": 1014.2500000000011,
+          "positive_event_fraction": 0.6
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": 42.62857142857142,
+          "net_pnl": 3580.7999999999993,
+          "positive_event_fraction": 0.44047619047619047
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": -179.69285714285712,
+          "net_pnl": -15094.199999999997,
+          "positive_event_fraction": 0.4166666666666667
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_SIGN_AGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "CONTINUATION",
+      "signal_count": 258,
+      "signal_path_hash": "92be2a2640ecee8d03a493021a5462783371e1429014730895bce96c0adac2bc",
+      "single_day_absolute_pnl_share": 0.07013604432118929,
+      "specification_hash": "ddbc245e5a2bfc953835161f99f78bc7abed7412e7cd0257842bbf7226773f84",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 516,
+        "expectancy_per_trade": 2.886046511627912,
+        "net_pnl": 1489.2000000000025,
+        "positive_event_fraction": 0.47674418604651164
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_agreement_reversal_h30",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 180,
+          "expectancy_per_trade": -3.6611111111111,
+          "net_pnl": -658.999999999998,
+          "positive_event_fraction": 0.45
+        },
+        {
+          "event_count": 168,
+          "expectancy_per_trade": 35.41130952380952,
+          "net_pnl": 5949.099999999999,
+          "positive_event_fraction": 0.5297619047619048
+        },
+        {
+          "event_count": 168,
+          "expectancy_per_trade": -22.624404761904753,
+          "net_pnl": -3800.8999999999987,
+          "positive_event_fraction": 0.4523809523809524
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_SIGN_AGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "REVERSAL",
+      "signal_count": 516,
+      "signal_path_hash": "c2c86b0739b157e00b615171e2356eec2f8b7171abefec8fd7cf48f340fa7470",
+      "single_day_absolute_pnl_share": 0.16892686413452823,
+      "specification_hash": "1e48073f21a8403e2305d7d4d4cbf5fb99226ccba5ef887340a806e7adc2733e",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 258,
+        "expectancy_per_trade": -23.155620155038754,
+        "net_pnl": -5974.149999999999,
+        "positive_event_fraction": 0.4728682170542636
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_agreement_reversal_h60",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 90,
+          "expectancy_per_trade": -75.11944444444443,
+          "net_pnl": -6760.749999999998,
+          "positive_event_fraction": 0.36666666666666664
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": -106.4785714285714,
+          "net_pnl": -8944.199999999997,
+          "positive_event_fraction": 0.5119047619047619
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": 115.84285714285718,
+          "net_pnl": 9730.800000000003,
+          "positive_event_fraction": 0.5476190476190477
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_SIGN_AGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "REVERSAL",
+      "signal_count": 258,
+      "signal_path_hash": "ce41f7a10c34959b8c8297ddd0323fd9536e76f2103a5934885d9a4ad3a331c5",
+      "single_day_absolute_pnl_share": 0.07467839467647434,
+      "specification_hash": "770cf78da58eca47badfc542d8155e772d1b69adb1e895479a928346aab4565e",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 515,
+        "expectancy_per_trade": -59.54635922330096,
+        "net_pnl": -30666.374999999996,
+        "positive_event_fraction": 0.4524271844660194
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_disagreement_continuation_h30",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 180,
+          "expectancy_per_trade": -1.4388888888888711,
+          "net_pnl": -258.9999999999968,
+          "positive_event_fraction": 0.4777777777777778
+        },
+        {
+          "event_count": 168,
+          "expectancy_per_trade": -137.95178571428573,
+          "net_pnl": -23175.9,
+          "positive_event_fraction": 0.4226190476190476
+        },
+        {
+          "event_count": 167,
+          "expectancy_per_trade": -43.30224550898202,
+          "net_pnl": -7231.474999999997,
+          "positive_event_fraction": 0.4550898203592814
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_SIGN_DISAGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "CONTINUATION",
+      "signal_count": 515,
+      "signal_path_hash": "879f25398691be4dd0d6dcc4f8a433852fbd9383935f458885d6488621aaf060",
+      "single_day_absolute_pnl_share": 0.09805535095585767,
+      "specification_hash": "3db29bd9860a46cce6fbe0a53da2b9d12e88ad48dd09aa01b718076bdf60e53b",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 258,
+        "expectancy_per_trade": -39.628488372093024,
+        "net_pnl": -10224.15,
+        "positive_event_fraction": 0.4883720930232558
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_disagreement_continuation_h60",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 90,
+          "expectancy_per_trade": 83.49166666666666,
+          "net_pnl": 7514.25,
+          "positive_event_fraction": 0.5555555555555556
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": -60.94285714285715,
+          "net_pnl": -5119.200000000001,
+          "positive_event_fraction": 0.4642857142857143
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": -150.2285714285714,
+          "net_pnl": -12619.199999999997,
+          "positive_event_fraction": 0.44047619047619047
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_SIGN_DISAGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "CONTINUATION",
+      "signal_count": 258,
+      "signal_path_hash": "07465e3dd6a7ac9bd581594b221096309ba0a5590f9621ec2ad3cb4a4a40d585",
+      "single_day_absolute_pnl_share": 0.06397684022639688,
+      "specification_hash": "7cf2f1f14a9cea28dbfb0fdbdfafe26227d89b6cc505216ebe5ef771419cd83e",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 515,
+        "expectancy_per_trade": -4.303640776699024,
+        "net_pnl": -2216.3749999999973,
+        "positive_event_fraction": 0.47378640776699027
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_disagreement_reversal_h30",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 180,
+          "expectancy_per_trade": -62.41111111111111,
+          "net_pnl": -11234.0,
+          "positive_event_fraction": 0.4166666666666667
+        },
+        {
+          "event_count": 168,
+          "expectancy_per_trade": 74.10178571428571,
+          "net_pnl": 12449.099999999999,
+          "positive_event_fraction": 0.5297619047619048
+        },
+        {
+          "event_count": 167,
+          "expectancy_per_trade": -20.54775449101795,
+          "net_pnl": -3431.4749999999976,
+          "positive_event_fraction": 0.47904191616766467
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_SIGN_DISAGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "REVERSAL",
+      "signal_count": 515,
+      "signal_path_hash": "b66eea7fe399dfda2e9a8f6ebd59cadaffcec4ee0214a2fd33046411dadb9317",
+      "single_day_absolute_pnl_share": 0.09139501277620131,
+      "specification_hash": "4ac71484aac5403481209bfca40356e32134de00bf48f16357eb1828fdca65fa",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 258,
+        "expectancy_per_trade": -24.221511627906995,
+        "net_pnl": -6249.150000000005,
+        "positive_event_fraction": 0.4806201550387597
+      },
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_disagreement_reversal_h60",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 90,
+          "expectancy_per_trade": -147.34166666666667,
+          "net_pnl": -13260.75,
+          "positive_event_fraction": 0.4111111111111111
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": -2.907142857142851,
+          "net_pnl": -244.19999999999948,
+          "positive_event_fraction": 0.5119047619047619
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": 86.37857142857143,
+          "net_pnl": 7255.8,
+          "positive_event_fraction": 0.5238095238095238
+        }
+      ],
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_SIGN_DISAGREEMENT",
+      "power_audit_executed": false,
+      "response_policy": "REVERSAL",
+      "signal_count": 258,
+      "signal_path_hash": "de5fcbdbbaa1290bdbc97a4353e8af7f4b734efb5b70f63270546dfec410ed2c",
+      "single_day_absolute_pnl_share": 0.05583438162919423,
+      "specification_hash": "3806ac4e88a76cb7e11fe7d273c7f55dadf694c805552bdcf8eca078a15214ad",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    }
+  ],
+  "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+  "classification_counts": {
+    "FORMULATION_FALSIFIED": 10,
+    "WALK_FORWARD_POSITIVE_PENDING_POWER_AUDIT": 2
+  },
+  "duplicate_rejection_count": 0,
+  "grammar_id": "hydra_v7_1_cross_clock_flow_grammar_0004",
+  "grammar_tripwire_executed": false,
+  "new_data_purchase_count": 0,
+  "next_action": "preregister_and_run_cross_clock_grammar_tripwire",
+  "outbound_order_count": 0,
+  "protected_holdout_access_count_delta": 0,
+  "raw_global_N_trials": 263616,
+  "rolling_combine_executed": false,
+  "schema": "hydra_v7_1_cross_clock_flow_funnel_result_v1",
+  "source_audit": {
+    "aligned_availability_minute_count": 16957,
+    "dollar_event_count": 489366,
+    "executable_pair_count_30m": 15636,
+    "executable_pair_count_60m": 14361,
+    "same_contract_session_pair_count": 16957,
+    "volume_event_count": 53206
+  },
+  "stage0_valid_novel_count": 12,
+  "stage1_pass_count": 2,
+  "stage1_policy": {
+    "early_fold_count": 3,
+    "maximum_single_day_absolute_pnl_share": 0.35,
+    "minimum_nonoverlapping_events": 40,
+    "minimum_positive_early_folds": 2,
+    "pooled_expectancy_min_exclusive": 0.0,
+    "stress_profile": "STRESS_1_5X"
+  },
+  "stage2_policy": {
+    "embargo_days": 5,
+    "fixed_structure_direction_horizon": true,
+    "mandatory_before_DSR_BH": true,
+    "minimum_positive_folds": 2,
+    "minimum_retained_events": 30,
+    "pooled_expectancy_min_exclusive": 0.0,
+    "purge": "candidate_holding_horizon",
+    "rolling_origin_fold_count": 4
+  },
+  "universal_raw_event_power_gate_used": false,
+  "walk_forward_positive_count": 2
+}
