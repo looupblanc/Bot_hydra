@@ -152,6 +152,9 @@ EQUITY_PRECLOSE_INVENTORY_DISPERSION_EXPERIMENT_ID = (
 MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID = (
     "mini_micro_participation_divergence_primary_v1"
 )
+TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX = "turbo_foundry_v2_epoch_"
+TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID = f"{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}0000"
+TURBO_PROMOTION_EXPERIMENT_PREFIX = "turbo_promotion_batch_"
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -255,6 +258,9 @@ EQUITY_PRECLOSE_INVENTORY_DISPERSION_TASK_SHA256 = (
 MINI_MICRO_PARTICIPATION_DIVERGENCE_TASK_SHA256 = (
     "75b40efb442b928074af36c9809aad075d56c7b21502b9e9105c3860d51f1bac"
 )
+TURBO_FOUNDRY_V2_TASK_SHA256 = (
+    "517307ff5c44c5fecbe96b6ecb1eb5ffc92e8bbbde3b221ddbff32dbcacb6d4d"
+)
 EQUITY_PRECLOSE_DATA_SHA256S = (
     "19be0a539802cd06fea20425ef14feca529fd60ece7e9eb5a88837e1d4e01862",
     "4540b7585caa2798998bd39a7d787c948f1f7c82f1d692e55118c4d4fffc5911",
@@ -314,6 +320,8 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "role_conditioned_structural_epoch",
     "equity_preclose_inventory_dispersion",
     "mini_micro_participation_divergence",
+    "turbo_foundry_v2_epoch",
+    "turbo_promotion_batch",
 }
 
 
@@ -701,6 +709,15 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "EQUITY_PRECLOSE_INVENTORY_DISPERSION_REQUIRED"
         )
+        turbo_foundry_v2_required = bool(
+            previous_phase
+            in {"SCHEDULER_STALLED", "ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
+            and str(previous_blocker or "")
+            in {
+                "DISTINCT_MECHANISM_OR_FORWARD_DATA_REQUIRED",
+                "TURBO_FOUNDRY_V2_CONTINUATION_REQUIRED",
+            }
+        )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
             recovered_missing_handler_rows = recover_resolved_missing_handler_experiments(
@@ -978,6 +995,15 @@ class AutonomousMissionController:
             and str(get_kv(conn, "current_blocker") or "")
             == "EQUITY_PRECLOSE_INVENTORY_DISPERSION_REQUIRED"
         )
+        turbo_foundry_v2_required = turbo_foundry_v2_required or bool(
+            str(get_kv(conn, "current_phase", ""))
+            in {"SCHEDULER_STALLED", "ENGINEERING_BLOCKED"}
+            and str(get_kv(conn, "current_blocker") or "")
+            in {
+                "DISTINCT_MECHANISM_OR_FORWARD_DATA_REQUIRED",
+                "TURBO_FOUNDRY_V2_CONTINUATION_REQUIRED",
+            }
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -1147,6 +1173,11 @@ class AutonomousMissionController:
             if equity_preclose_required
             else False
         )
+        turbo_foundry_v2_queued = (
+            self._reconcile_turbo_foundry_v2(conn, batch_index=0)
+            if turbo_foundry_v2_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -1196,6 +1227,7 @@ class AutonomousMissionController:
             and not post_mutation_child_activation_queued
             and not role_conditioned_epoch_queued
             and not equity_preclose_queued
+            and not turbo_foundry_v2_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -1255,6 +1287,7 @@ class AutonomousMissionController:
                 "post_mutation_child_activation_queued": post_mutation_child_activation_queued,
                 "role_conditioned_epoch_queued": role_conditioned_epoch_queued,
                 "equity_preclose_queued": equity_preclose_queued,
+                "turbo_foundry_v2_queued": turbo_foundry_v2_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -1415,6 +1448,10 @@ class AutonomousMissionController:
             (
                 MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID,
                 "mini_micro_participation_divergence_plan_written",
+            ),
+            (
+                TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID,
+                "turbo_foundry_v2_plan_written",
             ),
         ):
             record = experiment_record(conn, experiment_id)
@@ -1863,6 +1900,8 @@ class AutonomousMissionController:
                 self._route_equity_preclose_inventory_dispersion_result(conn, result)
             elif experiment_type == "mini_micro_participation_divergence":
                 self._route_mini_micro_participation_divergence_result(conn, result)
+            elif experiment_type == "turbo_foundry_v2_epoch":
+                self._route_turbo_foundry_v2_result(conn, result, experiment_id)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -1881,6 +1920,74 @@ class AutonomousMissionController:
                     "completed_experiment_reconciled",
                     {**compact, "reconciliation_id": reconciliation_id},
                 )
+        self._reconcile_completed_turbo_epochs(conn)
+        self._reconcile_completed_turbo_promotions(conn)
+
+    def _reconcile_completed_turbo_epochs(self, conn: Any) -> None:
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='turbo_foundry_v2_epoch' AND status='COMPLETED' "
+            "ORDER BY experiment_id"
+        ).fetchall()
+        accounted = set(get_kv(conn, "turbo_foundry_v2_accounted_epochs", []) or [])
+        for row in rows:
+            experiment_id = str(row[0])
+            if experiment_id in accounted:
+                continue
+            record = experiment_record(conn, experiment_id)
+            result = dict((record or {}).get("result") or {})
+            if not result:
+                continue
+            self._route_turbo_foundry_v2_result(conn, result, experiment_id)
+            accounted.add(experiment_id)
+            set_kv(conn, "turbo_foundry_v2_accounted_epochs", sorted(accounted))
+            reconciliation_id = (
+                f"completed:{experiment_id}:"
+                f"{(record or {}).get('specification_hash') or result.get('result_hash') or 'unknown'}"
+            )
+            if not self._evidence_reconciliation_exists(reconciliation_id):
+                record_evidence(
+                    self.paths,
+                    {
+                        "reconciliation_id": reconciliation_id,
+                        "scope": "EXPERIMENT",
+                        "experiment_id": experiment_id,
+                        "experiment_type": "turbo_foundry_v2_epoch",
+                        "status": "COMPLETED",
+                        "result": result,
+                    },
+                )
+            if not self._event_reconciliation_exists(conn, reconciliation_id):
+                append_event(
+                    conn,
+                    "completed_experiment_reconciled",
+                    {
+                        "experiment_id": experiment_id,
+                        "experiment_type": "turbo_foundry_v2_epoch",
+                        "scientific_conclusion": result.get("scientific_conclusion"),
+                        "report_path": result.get("report_path"),
+                        "reconciliation_id": reconciliation_id,
+                    },
+                )
+
+    def _reconcile_completed_turbo_promotions(self, conn: Any) -> None:
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='turbo_promotion_batch' AND status='COMPLETED' "
+            "ORDER BY experiment_id"
+        ).fetchall()
+        accounted = set(get_kv(conn, "turbo_promotion_accounted_batches", []) or [])
+        for row in rows:
+            experiment_id = str(row[0])
+            if experiment_id in accounted:
+                continue
+            record = experiment_record(conn, experiment_id)
+            result = dict((record or {}).get("result") or {})
+            if not result:
+                continue
+            self._route_turbo_promotion_result(conn, result, experiment_id)
+            accounted.add(experiment_id)
+            set_kv(conn, "turbo_promotion_accounted_batches", sorted(accounted))
 
     def _queue_post_retest_pilot(self, conn: Any, result: dict[str, Any]) -> None:
         pilot = result.get("pilot_experiment_specification")
@@ -4978,6 +5085,166 @@ class AutonomousMissionController:
             },
         )
         self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_turbo_foundry_v2(
+        self, conn: Any, *, batch_index: int
+    ) -> bool:
+        if batch_index < 0:
+            raise ValueError("Turbo batch index must be non-negative.")
+        experiment_id = f"{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}{batch_index:04d}"
+        existing = experiment_record(conn, experiment_id)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path(
+            "reports", "engineering", "hydra_turbo_foundry_v2_20260712.md"
+        )
+        if not task.is_file():
+            task = Path("/root/hydra-bot/reports/engineering/hydra_turbo_foundry_v2_20260712.md")
+        roll_map = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not roll_map.is_file():
+            roll_map = Path(
+                "/root/hydra-bot/data/cache/contract_maps/"
+                "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+            )
+        frozen = (
+            (task, TURBO_FOUNDRY_V2_TASK_SHA256, "engineering task"),
+            (roll_map, PATH_GEOMETRY_MAP_SHA256, "explicit-contract map"),
+        )
+        mismatches = [
+            label
+            for path, expected, label in frozen
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "TURBO_FOUNDRY_V2_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen Turbo V2 sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        enqueue_experiment(
+            conn,
+            experiment_id,
+            {
+                "experiment_type": "turbo_foundry_v2_epoch",
+                "priority": 200.0,
+                "max_attempts": 2,
+                "pipeline": "DISCOVERY",
+                # The epoch owns a bounded long-lived compute pool internally;
+                # the mission controller and SQLite writer remain singular.
+                "parallel_safe": False,
+                "writes_data_access_ledger": True,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": TURBO_FOUNDRY_V2_TASK_SHA256,
+                "contract_map_path": str(roll_map),
+                "contract_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+                "contract_map_hash": PATH_GEOMETRY_ROLL_HASH,
+                "batch_index": batch_index,
+                "worker_count": min(max(int(self.config.workers), 1), 3),
+                "code_commit": self._git_commit(),
+                "record_data_access": True,
+                "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+                "development_end_exclusive": "2024-10-01",
+                "q4_access_allowed": False,
+                "paid_data_allowed": False,
+                "network_allowed": False,
+                "live_or_broker_allowed": False,
+                "expected_decision_information_gain": 0.98,
+            },
+        )
+        set_kv(conn, "turbo_foundry_v2_plan_written", True)
+        set_kv(conn, "turbo_foundry_v2_current_batch", batch_index)
+        set_kv(conn, "discovery_pipeline_status", "TURBO_V2_QUEUED")
+        set_kv(conn, "foundry_current_engine", "HYDRA_TURBO_FOUNDRY_V2")
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": experiment_id,
+                "pipeline": "DISCOVERY",
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+                "data_cost_usd": 0.0,
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return True
+
+    def _reconcile_turbo_promotion(
+        self,
+        conn: Any,
+        *,
+        source_experiment_id: str,
+        source_result: dict[str, Any],
+    ) -> bool:
+        batch_index = int(source_result.get("batch_index") or 0)
+        experiment_id = f"{TURBO_PROMOTION_EXPERIMENT_PREFIX}{batch_index:04d}"
+        existing = experiment_record(conn, experiment_id)
+        if existing is not None:
+            return str(existing.get("status")) in {"QUEUED", "RUNNING", "COMPLETED"}
+        candidate_ids = list(source_result.get("promotion_candidate_ids") or [])
+        if not candidate_ids:
+            return False
+        artifacts = dict(source_result.get("artifacts") or {})
+        source_path = Path(str(artifacts.get("result_path") or ""))
+        exact_path = Path(str(artifacts.get("exact_results_path") or ""))
+        task = project_path(
+            "reports", "engineering", "hydra_turbo_foundry_v2_20260712.md"
+        )
+        if not task.is_file():
+            task = Path("/root/hydra-bot/reports/engineering/hydra_turbo_foundry_v2_20260712.md")
+        required = (
+            (task, TURBO_FOUNDRY_V2_TASK_SHA256, "engineering task"),
+            (source_path, None, "source result"),
+            (exact_path, None, "exact replay ledger"),
+        )
+        missing = [label for path, _expected, label in required if not path.is_file()]
+        if missing:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "TURBO_PROMOTION_SOURCE_MISSING")
+            set_kv(conn, "last_error", f"Turbo promotion sources missing: {missing}")
+            return False
+        enqueue_experiment(
+            conn,
+            experiment_id,
+            {
+                "experiment_type": "turbo_promotion_batch",
+                "priority": 210.0,
+                "max_attempts": 2,
+                "pipeline": "PROMOTION",
+                "parallel_safe": True,
+                "writes_data_access_ledger": False,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": TURBO_FOUNDRY_V2_TASK_SHA256,
+                "source_experiment_id": source_experiment_id,
+                "source_result_path": str(source_path),
+                "source_result_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+                "source_result_hash": str(source_result.get("result_hash") or ""),
+                "exact_results_path": str(exact_path),
+                "exact_results_sha256": hashlib.sha256(exact_path.read_bytes()).hexdigest(),
+                "candidate_ids": candidate_ids,
+                "code_commit": self._git_commit(),
+                "random_seed": 20260713 + batch_index,
+                "q4_access_allowed": False,
+                "paid_data_allowed": False,
+                "network_allowed": False,
+                "live_or_broker_allowed": False,
+                "expected_decision_information_gain": 0.96,
+            },
+        )
+        set_kv(conn, "promotion_pipeline_status", "TURBO_PROMOTION_QUEUED")
         return True
 
     @staticmethod
@@ -8165,6 +8432,133 @@ class AutonomousMissionController:
                 )
         self._tick_shadow_pipeline(conn)
 
+    def _route_turbo_foundry_v2_result(
+        self, conn: Any, result: dict[str, Any], experiment_id: str
+    ) -> None:
+        self._update_foundry_candidate_bank(conn, result, experiment_id)
+        try:
+            batch_index = int(result.get("batch_index") or experiment_id.rsplit("_", 1)[-1])
+        except ValueError:
+            batch_index = 0
+        metrics = {
+            "batch_index": batch_index,
+            "structural_prototypes": int(result.get("structural_prototypes") or 0),
+            "stage0_valid": int(result.get("stage0_valid") or 0),
+            "stage1_survivors": int(result.get("stage1_survivors") or 0),
+            "exact_replays": int(result.get("exact_replays") or 0),
+            "promotion_candidates_queued": int(
+                result.get("promotion_candidates_queued") or 0
+            ),
+            "promising_candidates": int(result.get("promising_candidates") or 0),
+            "performance": result.get("performance") or {},
+            "feature_store": result.get("feature_store") or {},
+            "meta_screen": result.get("meta_screen") or {},
+            "conclusion": result.get("scientific_conclusion"),
+            "q4_access_count_delta": int(
+                ((result.get("governance") or {}).get("q4_access_count_delta") or 0)
+            ),
+            "paper_shadow_ready": int(result.get("paper_shadow_ready") or 0),
+        }
+        set_kv(conn, "turbo_foundry_v2_latest_metrics", metrics)
+        set_kv(conn, "turbo_foundry_v2_latest_report", result.get("report_path"))
+        set_kv(conn, "turbo_foundry_v2_current_batch", batch_index)
+        set_kv(conn, "discovery_pipeline_status", "TURBO_V2_BATCH_COMPLETED")
+        promotion_queued = self._reconcile_turbo_promotion(
+            conn,
+            source_experiment_id=experiment_id,
+            source_result=result,
+        )
+        set_kv(
+            conn,
+            "promotion_pipeline_status",
+            "TURBO_PROMOTION_QUEUED"
+            if promotion_queued
+            else "TURBO_NO_PROMOTION_CANDIDATE_THIS_BATCH",
+        )
+        set_kv(conn, "foundry_current_engine", "HYDRA_TURBO_FOUNDRY_V2")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+        next_batch = batch_index + 1
+        queued = self._reconcile_turbo_foundry_v2(conn, batch_index=next_batch)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": f"{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}{next_batch:04d}",
+                "pipeline": "DISCOVERY",
+                "promotion_candidate_count": metrics["promotion_candidates_queued"],
+                "promotion_experiment_queued": promotion_queued,
+                "parallel_shadow": True,
+                "q4_access_authorized": False,
+                "queued": queued,
+            },
+        )
+        append_event(
+            conn,
+            "turbo_foundry_v2_epoch_routed",
+            {
+                "experiment_id": experiment_id,
+                **metrics,
+                "next_batch": next_batch,
+                "next_batch_queued": queued,
+                "promotion_experiment_queued": promotion_queued,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
+    def _route_turbo_promotion_result(
+        self, conn: Any, result: dict[str, Any], experiment_id: str
+    ) -> None:
+        self._update_foundry_candidate_bank(conn, result, experiment_id)
+        set_kv(
+            conn,
+            "turbo_promotion_latest_metrics",
+            {
+                "source_batch_index": int(result.get("source_batch_index") or 0),
+                "candidate_count": int(result.get("candidate_count") or 0),
+                "robust_research_candidates": int(
+                    result.get("robust_research_candidates") or 0
+                ),
+                "shadow_candidates": int(result.get("shadow_candidates") or 0),
+                "topstep_path_candidates": int(
+                    result.get("topstep_path_candidates") or 0
+                ),
+                "paper_shadow_ready": int(result.get("paper_shadow_ready") or 0),
+                "conclusion": result.get("scientific_conclusion"),
+                "report_path": result.get("report_path"),
+            },
+        )
+        shadow = int(result.get("shadow_candidates") or 0)
+        set_kv(conn, "promotion_pipeline_status", "TURBO_PROMOTION_COMPLETED")
+        set_kv(
+            conn,
+            "shadow_packaging_queue_status",
+            "IMMUTABLE_ZERO_ORDER_PACKAGING_REQUIRED"
+            if shadow
+            else "NO_NEW_TURBO_SHADOW_CANDIDATE",
+        )
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        if queue_size(conn) > 0:
+            set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+            set_kv(conn, "current_blocker", None)
+            set_kv(conn, "last_error", None)
+        append_event(
+            conn,
+            "turbo_promotion_batch_routed",
+            {
+                "experiment_id": experiment_id,
+                "shadow_candidates": shadow,
+                "topstep_path_candidates": int(
+                    result.get("topstep_path_candidates") or 0
+                ),
+                "paper_shadow_ready": 0,
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
     def _route_barrier_shadow_activation_result(
         self, conn: Any, result: dict[str, Any]
     ) -> None:
@@ -9061,6 +9455,16 @@ class AutonomousMissionController:
             conn,
             "shadow_active_candidates",
             int(status.get("shadow_research_active", 0)),
+        )
+        set_kv(
+            conn,
+            "shadow_waiting_for_feed_candidates",
+            int(status.get("shadow_waiting_for_feed", 0)),
+        )
+        set_kv(
+            conn,
+            "shadow_config_complete_candidates",
+            int(status.get("shadow_config_complete", 0)),
         )
         return status
 

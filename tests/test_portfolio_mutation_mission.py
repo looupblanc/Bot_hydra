@@ -17,6 +17,7 @@ from hydra.mission.controller import (
     PROMISING_LINEAGE_MUTATION_EXPERIMENT_ID,
     ROLE_CONDITIONED_STRUCTURAL_EPOCH_EXPERIMENT_ID,
     SHADOW_SHARED_ACCOUNT_BASKETS_EXPERIMENT_ID,
+    TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID,
 )
 from hydra.mission.experiment_queue import (
     claim_next_experiment,
@@ -585,5 +586,101 @@ def test_negative_mini_micro_result_freezes_family_idempotently(tmp_path: Path) 
         assert get_kv(conn, "foundry_frozen_lineage_ids") == [
             "MINI_MICRO_PARTICIPATION_DIVERGENCE_PRIMARY_V1"
         ]
+    finally:
+        conn.close()
+
+
+def test_turbo_v2_resolves_distinct_mechanism_block_and_queues_single_epoch(
+    tmp_path: Path,
+) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(conn, "current_blocker", "DISTINCT_MECHANISM_OR_FORWARD_DATA_REQUIRED")
+
+        assert controller._reconcile_turbo_foundry_v2(conn, batch_index=0)
+        assert controller._reconcile_turbo_foundry_v2(conn, batch_index=0)
+        record = experiment_record(conn, TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID)
+        assert record is not None and record["status"] == "QUEUED"
+        specification = record["specification"]
+        assert specification["experiment_type"] == "turbo_foundry_v2_epoch"
+        assert specification["pipeline"] == "DISCOVERY"
+        assert specification["parallel_safe"] is False
+        assert specification["worker_count"] == 3
+        assert specification["q4_access_allowed"] is False
+        assert specification["paid_data_allowed"] is False
+        assert specification["network_allowed"] is False
+        assert specification["live_or_broker_allowed"] is False
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+        assert get_kv(conn, "current_blocker") is None
+    finally:
+        conn.close()
+
+
+def test_completed_turbo_epoch_routes_candidates_and_queues_next_epoch(
+    tmp_path: Path,
+) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        source_result_path = tmp_path / "turbo_result.json"
+        exact_results_path = tmp_path / "turbo_exact_results.jsonl"
+        source_result_path.write_text("{}\n", encoding="utf-8")
+        exact_results_path.write_text("{}\n", encoding="utf-8")
+        assert controller._reconcile_turbo_foundry_v2(conn, batch_index=0)
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID,
+            {
+                "schema": "hydra_turbo_foundry_v2_epoch_v1",
+                "batch_index": 0,
+                "scientific_conclusion": "TURBO_V2_PROMOTION_CANDIDATES_FOUND",
+                "candidate_count": 5_990,
+                "structural_prototypes": 5_990,
+                "stage0_valid": 5_990,
+                "stage1_survivors": 100,
+                "exact_replays": 80,
+                "promotion_candidates_queued": 4,
+                "promising_candidates": 4,
+                "paper_shadow_ready": 0,
+                "candidates": [
+                    {
+                        "candidate_id": "turbo_promising_1",
+                        "status": "PROMISING_RESEARCH_CANDIDATE",
+                        "mechanism_family": "test_family",
+                        "primary_market": "ES",
+                        "execution_market": "MES",
+                        "role": "COMBINE_PASSER",
+                        "objective_pool": "COMBINE_PASSER_POOL",
+                        "net_pnl": 123.0,
+                    }
+                ],
+                "performance": {"stage1_candidates_per_second": 500.0},
+                "feature_store": {"cache_hits": 6},
+                "meta_screen": {"status": "TRAINED_REGISTRY_OOS_ALLOCATION_ONLY"},
+                "governance": {"q4_access_count_delta": 0},
+                "report_path": "turbo_report.md",
+                "promotion_candidate_ids": ["turbo_promising_1"],
+                "artifacts": {
+                    "result_path": str(source_result_path),
+                    "exact_results_path": str(exact_results_path),
+                },
+                "result_hash": "a" * 64,
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+
+        controller._reconcile_completed_turbo_epochs(conn)
+        next_record = experiment_record(conn, "turbo_foundry_v2_epoch_0001")
+        promotion_record = experiment_record(conn, "turbo_promotion_batch_0000")
+        assert next_record is not None and next_record["status"] == "QUEUED"
+        assert promotion_record is not None and promotion_record["status"] == "QUEUED"
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+        assert get_kv(conn, "current_blocker") is None
+        assert get_kv(conn, "promising_candidates") == 1
+        assert get_kv(conn, "turbo_foundry_v2_latest_metrics")[
+            "promotion_candidates_queued"
+        ] == 4
     finally:
         conn.close()

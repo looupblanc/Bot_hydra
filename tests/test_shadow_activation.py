@@ -101,7 +101,9 @@ def test_activation_and_pipeline_are_immutable_and_fail_closed(tmp_path: Path) -
     assert result["shadow_active"] == 1
     assert result["paper_shadow_ready"] == 0
     assert result["activation_manifest"]["outbound_orders_enabled"] is False
-    assert waiting["shadow_research_active"] == 1
+    assert waiting["shadow_research_active"] == 0
+    assert waiting["shadow_waiting_for_feed"] == 1
+    assert waiting["candidates"][result["candidate_id"]]["operational_classification"] == "SHADOW_WAITING_FOR_FEED"
     assert waiting["candidates"][result["candidate_id"]]["runtime_state"] == "WAITING_FOR_FRESH_FORWARD_DATA"
     assert waiting["outbound_orders"] == 0
 

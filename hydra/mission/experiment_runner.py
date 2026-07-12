@@ -1013,4 +1013,33 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             code_commit=str(experiment.get("code_commit") or "unknown"),
             record_data_access=bool(experiment.get("record_data_access", True)),
         )
+    if experiment_type == "turbo_foundry_v2_epoch":
+        from hydra.research.turbo_foundry_v2 import run_turbo_foundry_v2_epoch
+
+        return run_turbo_foundry_v2_epoch(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            contract_map_path=Path(str(experiment["contract_map_path"])),
+            contract_map_sha256=str(experiment["contract_map_sha256"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+            batch_index=int(experiment.get("batch_index") or 0),
+            worker_count=int(experiment.get("worker_count") or 3),
+            record_data_access=bool(experiment.get("record_data_access", True)),
+        )
+    if experiment_type == "turbo_promotion_batch":
+        from hydra.research.turbo_promotion import run_turbo_promotion_batch
+
+        return run_turbo_promotion_batch(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            source_result_path=Path(str(experiment["source_result_path"])),
+            source_result_sha256=str(experiment["source_result_sha256"]),
+            source_result_hash=str(experiment["source_result_hash"]),
+            exact_results_path=Path(str(experiment["exact_results_path"])),
+            exact_results_sha256=str(experiment["exact_results_sha256"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+            random_seed=int(experiment.get("random_seed") or 20260713),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")

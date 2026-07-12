@@ -40,12 +40,22 @@ def tick_shadow_pipeline(
         item["operational_classification"] == "SHADOW_RESEARCH_ACTIVE"
         for item in candidates.values()
     )
+    waiting = sum(
+        item["operational_classification"] == "SHADOW_WAITING_FOR_FEED"
+        for item in candidates.values()
+    )
+    complete = sum(
+        item["operational_classification"] == "SHADOW_CONFIG_COMPLETE"
+        for item in candidates.values()
+    )
     status = {
         "schema": "hydra_shadow_pipeline_status_v1",
         "pipeline": "SHADOW",
         "status": "STOPPED_FAIL_CLOSED" if stopped else "RUNNING_FAIL_CLOSED",
         "updated_at_utc": current.isoformat(),
         "registered_candidates": len(candidates),
+        "shadow_config_complete": complete,
+        "shadow_waiting_for_feed": waiting,
         "shadow_research_active": active,
         "candidates": candidates,
         "forward_signals": 0,
@@ -62,6 +72,7 @@ def tick_shadow_pipeline(
             "updated_at_utc": current.isoformat(),
             "status": status["status"],
             "shadow_research_active": active,
+            "shadow_waiting_for_feed": waiting,
             "outbound_orders": 0,
         },
     )
@@ -85,7 +96,7 @@ def registry_entry_from_activation(result: dict[str, Any]) -> dict[str, Any]:
         "configuration_sha256": manifest["configuration_sha256"],
         "configuration_hash": manifest["configuration_hash"],
         "stale_data_seconds": int(manifest["stale_data_seconds"]),
-        "operational_classification": "SHADOW_RESEARCH_ACTIVE",
+        "operational_classification": "SHADOW_CONFIG_COMPLETE",
         "outbound_orders_enabled": False,
     }
 
@@ -115,16 +126,18 @@ def _candidate_runtime_state(
     )
     if stopped:
         runtime_state = "KILL_SWITCH_ACTIVE"
-        active = False
+        classification = "SHADOW_STOPPED"
     elif not feed["fresh"]:
         runtime_state = "WAITING_FOR_FRESH_FORWARD_DATA"
-        active = True
+        classification = "SHADOW_WAITING_FOR_FEED"
     else:
         runtime_state = "READY_FOR_VIRTUAL_SIGNALS"
-        active = True
+        classification = "SHADOW_RESEARCH_ACTIVE"
     return {
-        "operational_classification": "SHADOW_RESEARCH_ACTIVE" if active else "SHADOW_STOPPED",
-        "registry_evidence_tier": "SHADOW_ACTIVE" if active else "SHADOW_REJECTED",
+        "operational_classification": classification,
+        # The historical admission tier is retained as provenance; it is not an
+        # operational liveness claim. Only a fresh feed earns ACTIVE above.
+        "registry_evidence_tier": "SHADOW_ACTIVE",
         "runtime_state": runtime_state,
         "configuration_hash": specification.configuration_hash,
         "feed": feed,
