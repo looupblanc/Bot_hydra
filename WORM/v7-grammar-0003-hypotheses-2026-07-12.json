@@ -1,0 +1,171 @@
+{
+  "schema": "hydra_v7_hypothesis_first_grammar_preregistration_v1",
+  "grammar_id": "hydra_v7_grammar_0003_multiday_calendar_transfer",
+  "preregistered_at_utc": "2026-07-12T16:24:00Z",
+  "contract": {
+    "path": "MISSION_CONTRACT.md",
+    "sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+    "tag": "worm/contract-2026-07-12-v2"
+  },
+  "required_gates": {
+    "G0": "GREEN",
+    "G1": "GREEN",
+    "G1_NULL_RATIO": 0.04954068241469816,
+    "phase2": "NULL",
+    "grammar0001": "BLOCKED",
+    "grammar0002": "NULL"
+  },
+  "data": {
+    "role": "DEVELOPMENT_ONLY",
+    "start_inclusive": "2023-01-01",
+    "end_exclusive": "2024-10-01",
+    "data_manifest_path": "data/manifest.json",
+    "data_manifest_hash": "cc8b6da2ea2c235f9871092ac4ddf3a97d4d5dc5c6ba589e30414a337f884371",
+    "markets": ["ES", "NQ", "RTY", "YM", "GC", "CL"],
+    "bar_schema": "explicit-contract OHLCV 1m",
+    "timezone": "America/Chicago",
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "D1_print_features_allowed": false,
+    "new_paid_data_allowed": false
+  },
+  "common_execution": {
+    "decision": "All price features use only prior completed Chicago trading sessions; calendar membership is known from the frozen CME session calendar.",
+    "entry_CT": "08:31 current Chicago trading day",
+    "exit_CT": "15:09 current Chicago trading day",
+    "quantity": 1,
+    "overlap": "One event per candidate per Chicago trading day.",
+    "roll": "Prior observations and current execution must each remain explicit-contract correct; no return is computed across a contract change.",
+    "costs": "Product/session V7 round-turn cost at multipliers 1.0, 1.5 and 2.0.",
+    "broker_or_order_capability": false
+  },
+  "hypotheses": [
+    {
+      "id": "H11_TURN_OF_MONTH_INDEX_FLOW",
+      "mechanism_class": "turn_of_month_index_allocation_flow",
+      "economic_hypothesis": "Regular pension, payroll and index-allocation cash flows create persistent buy demand around the last and first three eligible trading sessions of each month.",
+      "who_pays": "Benchmark-constrained allocators executing predictable calendar cash flows rather than optimizing intraday price.",
+      "markets": ["ES", "NQ", "RTY", "YM"],
+      "candidate_count": 4,
+      "activation": "Last eligible Chicago trading session of a calendar month or one of the first three eligible sessions of the next month, determined from the frozen exchange calendar.",
+      "side": "long"
+    },
+    {
+      "id": "H12_PRIOR_SESSION_UNDERREACTION",
+      "mechanism_class": "prior_session_information_underreaction",
+      "economic_hypothesis": "A large prior cash-session move reflects information and institutional parent orders that are only partially incorporated before the close and continue during the next cash session.",
+      "who_pays": "Slow institutional execution and participants anchoring to the prior close despite unfinished information incorporation.",
+      "markets": ["ES", "NQ", "RTY", "YM", "GC", "CL"],
+      "candidate_count": 6,
+      "feature": "prior RTH close_15:09 / open_08:30 - 1",
+      "activation_threshold": "median absolute prior-session return over the immediately preceding 60 eligible sessions; minimum 20 histories",
+      "side": "same as prior-session return"
+    },
+    {
+      "id": "H13_TWO_DAY_LIQUIDITY_REVERSAL",
+      "mechanism_class": "two_day_liquidity_shock_reversal",
+      "economic_hypothesis": "An extreme cumulative two-session move exhausts short-horizon liquidity demand and reverses when temporary inventory holders unwind on the third session.",
+      "who_pays": "Late trend followers and liquidity takers entering after a two-day inventory shock is substantially complete.",
+      "markets": ["ES", "NQ", "RTY", "YM", "GC", "CL"],
+      "candidate_count": 6,
+      "feature": "sum of the two immediately preceding explicit-contract RTH log returns",
+      "activation_threshold": "75th percentile of absolute two-session returns over the immediately preceding 60 eligible observations; minimum 30 histories",
+      "side": "opposite the two-session return"
+    },
+    {
+      "id": "H14_CL_TO_GC_INFLATION_TRANSFER",
+      "mechanism_class": "lagged_energy_to_gold_inflation_transfer",
+      "economic_hypothesis": "An extreme crude-oil repricing changes inflation expectations before gold allocators finish adjusting, leaving a same-direction next-session GC response.",
+      "who_pays": "Cross-asset allocators updating inflation hedges after rather than during the initial energy shock.",
+      "source_market": "CL",
+      "target_market": "GC",
+      "candidate_count": 1,
+      "source_feature": "prior CL RTH return",
+      "activation_threshold": "75th percentile of absolute source return over the immediately preceding 60 common eligible sessions",
+      "side": "same as CL return"
+    },
+    {
+      "id": "H15_ES_TO_CL_GROWTH_TRANSFER",
+      "mechanism_class": "lagged_equity_to_energy_growth_transfer",
+      "economic_hypothesis": "An extreme equity repricing changes expected growth demand before physical-energy hedgers fully adjust, leaving a same-direction next-session CL response.",
+      "who_pays": "Energy participants updating macro demand expectations after the initial equity-index shock.",
+      "source_market": "ES",
+      "target_market": "CL",
+      "candidate_count": 1,
+      "source_feature": "prior ES RTH return",
+      "activation_threshold": "75th percentile of absolute source return over the immediately preceding 60 common eligible sessions",
+      "side": "same as ES return"
+    },
+    {
+      "id": "H16_ES_TO_GC_RISK_OFF_TRANSFER",
+      "mechanism_class": "lagged_equity_to_gold_risk_transfer",
+      "economic_hypothesis": "An extreme equity repricing triggers safe-haven reallocation that reaches gold with a one-session lag, producing an opposite-direction next-session GC response.",
+      "who_pays": "Portfolio allocators sequencing equity de-risking before safe-haven completion.",
+      "source_market": "ES",
+      "target_market": "GC",
+      "candidate_count": 1,
+      "source_feature": "prior ES RTH return",
+      "activation_threshold": "75th percentile of absolute source return over the immediately preceding 60 common eligible sessions",
+      "side": "opposite ES return"
+    }
+  ],
+  "candidate_universe": {
+    "structural_candidate_count": 19,
+    "parameter_variants_per_cell": 1,
+    "threshold_neighbors_allowed": false,
+    "mini_micro_copies_count_as_same_mechanism": true
+  },
+  "funnel": {
+    "stage0": ["explicit_contract", "calendar_available", "closed_bars", "no_lookahead", "session", "duplicate", "graveyard_class_distance"],
+    "stage1": {
+      "minimum_events": 30,
+      "base_expectancy_per_trade_gt": 0.0
+    },
+    "stage2": {
+      "stress_1_5x_expectancy_gt": 0.0,
+      "stress_2x_expectancy_gt": 0.0,
+      "trajectory_compliance": 1.0
+    },
+    "stage3": {
+      "walk_forward_folds": 4,
+      "embargo_trading_days": 5,
+      "walk_forward_1_5x_expectancy_gt": 0.0,
+      "DSR_deflated_z_gt": 0.0,
+      "BH_FDR": 0.10,
+      "BH_family_size": 19,
+      "N_trials": 247366,
+      "candidate_nulls": ["SIGN_INVERSION", "FIVE_SESSION_SIGNAL_DELAY", "OPPORTUNITY_COUNT_MATCHED_NON_SIGNAL_DAY"]
+    },
+    "stage4": {
+      "shadow_queue_maximum": 5,
+      "maximum_one_candidate_per_mechanism_class": true,
+      "candidate_fiche_WORM_before_gap_ingestion": true
+    }
+  },
+  "multiplicity_reservation": {
+    "previous_N_trials": 247176,
+    "delta_trials": 190,
+    "cumulative_N_trials": 247366,
+    "components": {
+      "base": 19,
+      "cost_1_5x": 19,
+      "cost_2x": 19,
+      "four_walk_forward_folds": 76,
+      "three_candidate_nulls": 57
+    }
+  },
+  "permanent_tripwire": {
+    "required_exact_phase1_rerun": true,
+    "reference_full_evidence_sha256": "73bcc543b9fdcf373680b789d721bfa3663581164efda41c354a08f5c49d3042",
+    "reference_NULL_RATIO": 0.04954068241469816,
+    "threshold": 0.8,
+    "candidate_Combine_pass_rate_is_not_fitness_or_gate": true
+  },
+  "safety": {
+    "q4_access_count_delta": 0,
+    "forward_gap_access_count": 0,
+    "outbound_order_count": 0,
+    "strategy_and_validation_code_must_be_separate_commits": true
+  },
+  "CONTRE": "Calendar and lagged daily mechanisms have high event density but can reduce to generic long bias or autocorrelation; matched non-signal days, sign inversion, DSR/BH and the permanent null tripwire must distinguish that before any fresh proof."
+}

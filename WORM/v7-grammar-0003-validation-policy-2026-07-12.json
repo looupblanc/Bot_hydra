@@ -1,0 +1,41 @@
+{
+  "schema": "hydra_v7_grammar_validation_policy_v1",
+  "policy_id": "hydra_v7_grammar_0003_validation_policy_0001",
+  "preregistered_at_utc": "2026-07-12T16:24:00Z",
+  "grammar_path": "WORM/v7-grammar-0003-hypotheses-2026-07-12.json",
+  "grammar_sha256": "e2f28a415ebd3676df917df1c37a072ab2829a3df7ef33ad438ec0e4312a31e5",
+  "contract_sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+  "N_trials": 247366,
+  "FDR": 0.10,
+  "minimum_null_retention": 0.80,
+  "gates": {
+    "minimum_events": 30,
+    "base_expectancy_gt": 0.0,
+    "stress_1_5x_expectancy_gt": 0.0,
+    "stress_2x_expectancy_gt": 0.0,
+    "walk_forward_pooled_expectancy_gt": 0.0,
+    "DSR_deflated_z_gt": 0.0,
+    "BH_rejected": true,
+    "candidate_actual_1_5x_expectancy_gt_every_null": true,
+    "permanent_tripwire_GREEN": true
+  },
+  "candidate_nulls": {
+    "SIGN_INVERSION": "Same times, costs and path; side flipped.",
+    "FIVE_SESSION_SIGNAL_DELAY": "Same side and local clocks on the fifth later eligible session; invalid roll/gap windows skipped.",
+    "OPPORTUNITY_COUNT_MATCHED_NON_SIGNAL_DAY": "For each candidate, take the earliest chronologically available eligible non-signal session after each signal, without reuse, at the same local clocks and cycling the frozen signal sides; invalid roll/gap windows skipped."
+  },
+  "SIM_EXPLOIT_definition": "base expectancy strictly positive and stress-2x expectancy non-positive",
+  "candidate_Combine_pass_rate_used_as_fitness": false,
+  "candidate_Combine_pass_rate_used_as_gate": false,
+  "verdicts": {
+    "tripwire_failure": "BLOCKED_OR_ARTEFACT",
+    "promotion_exists": "GREEN",
+    "no_promotion": "NULL"
+  },
+  "safety": {
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "outbound_orders_allowed": false
+  },
+  "CONTRE": "The non-signal-day control matches opportunity count and clock but not necessarily volatility regime; beating it is necessary but not sufficient evidence."
+}
