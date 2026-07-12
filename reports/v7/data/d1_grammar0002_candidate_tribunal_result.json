@@ -1,0 +1,1505 @@
+{
+  "BH_rejection_count": 0,
+  "CONTRE": "Only two August year blocks are available. Even a selected candidate would require a WORM fiche before untouched gap ingestion.",
+  "DSR_positive_count": 0,
+  "N_trials": 247892,
+  "SIM_EXPLOIT_count": 2,
+  "candidate_count": 8,
+  "candidate_null_pass_count": 6,
+  "candidate_results": [
+    {
+      "BH": {
+        "adjusted_p_value": 1.0,
+        "critical_value": 0.037500000000000006,
+        "p_value": 1.0,
+        "rank": 3,
+        "rejected": false
+      },
+      "DSR": {
+        "DSR_probability": 0.0,
+        "deflated_z": -1000000000000.0,
+        "expected_max_sharpe_annualized": null,
+        "expected_max_sharpe_daily": null,
+        "not_run_reason": "killed_before_walk_forward",
+        "observations": 43,
+        "one_sided_p_value": 1.0,
+        "pearson_kurtosis": null,
+        "sample_sharpe_annualized": 0.0,
+        "sample_sharpe_daily": 0.0,
+        "skewness": null
+      },
+      "SIM_EXPLOIT": true,
+      "base": {
+        "event_count": 81,
+        "expectancy_per_trade": 0.6753086419753062,
+        "gross_pnl": 2387.5,
+        "maximum_drawdown": 2163.0,
+        "negative_day_count": 17,
+        "net_pnl": 54.6999999999998,
+        "positive_day_count": 18,
+        "same_bar_ambiguous_count": 0
+      },
+      "candidate_id": "v7d1g2_aggressor_regime_flip_ES",
+      "candidate_null_suite": {
+        "actual_minus_maximum_null": 58.95061728395062,
+        "actual_stress_1_5x_expectancy_per_trade": -11.824691358024694,
+        "controls": {
+          "FIVE_SESSION_SIGNAL_DELAY": {
+            "event_count": 59,
+            "expectancy_per_trade": -73.50338983050847,
+            "gross_pnl": -1900.0,
+            "maximum_drawdown": 4587.8,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.5,
+            "negative_day_count": 18,
+            "net_pnl": -4336.7,
+            "positive_day_count": 9,
+            "power_passed": true,
+            "real_event_count": 81,
+            "retention": 0.7283950617283951,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "FLOW_PRICE_DECOUPLING": {
+            "event_count": 82,
+            "expectancy_per_trade": -85.65975609756097,
+            "gross_pnl": -3637.5,
+            "maximum_drawdown": 7255.1,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.8,
+            "negative_day_count": 23,
+            "net_pnl": -7024.099999999999,
+            "positive_day_count": 11,
+            "power_passed": true,
+            "real_event_count": 81,
+            "retention": 1.0123456790123457,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "SIGN_INVERSION": {
+            "event_count": 81,
+            "expectancy_per_trade": -70.77530864197531,
+            "gross_pnl": -2387.5,
+            "maximum_drawdown": 7004.6,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 1.0,
+            "negative_day_count": 27,
+            "net_pnl": -5732.8,
+            "positive_day_count": 8,
+            "power_passed": true,
+            "real_event_count": 81,
+            "retention": 1.0,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          }
+        },
+        "maximum_null_expectancy_per_trade": -70.77530864197531,
+        "passed": true,
+        "power_all_passed": true
+      },
+      "combine_diagnostic": {
+        "status": "DEFERRED_UNTIL_CANDIDATE_PROMOTION",
+        "used_as_fitness": false,
+        "used_as_gate": false
+      },
+      "promotion_gates": {
+        "BH_FDR_10pct_rejected": false,
+        "DSR_deflated_z_gt_0": false,
+        "SIM_EXPLOIT_2x_survived": false,
+        "candidate_null_suite_passed": true,
+        "cost_1_5x_positive": false,
+        "minimum_events_and_base_expectancy": true,
+        "new_grammar_tripwire_GREEN": true,
+        "ruleset_trajectory_compliance": true,
+        "walk_forward_1_5x_positive": false
+      },
+      "shadow_queue_eligible": false,
+      "signal_count": 81,
+      "specification": {
+        "candidate_id": "v7d1g2_aggressor_regime_flip_ES",
+        "cost_horizon": "15m",
+        "holding_minutes": 15,
+        "hypothesis_id": "D1H7_AGGRESSOR_REGIME_FLIP",
+        "mechanism_class": "completed_flow_regime_transition",
+        "product": "ES"
+      },
+      "stage0_valid": true,
+      "stage1_pass": true,
+      "stage2_pass": false,
+      "stress_1_5x": {
+        "event_count": 81,
+        "expectancy_per_trade": -11.824691358024694,
+        "gross_pnl": 2387.5,
+        "maximum_drawdown": 2288.0,
+        "negative_day_count": 17,
+        "net_pnl": -957.8000000000002,
+        "positive_day_count": 18,
+        "same_bar_ambiguous_count": 0
+      },
+      "stress_2x": {
+        "event_count": 81,
+        "expectancy_per_trade": -24.324691358024694,
+        "gross_pnl": 2387.5,
+        "maximum_drawdown": 2413.4,
+        "negative_day_count": 17,
+        "net_pnl": -1970.3000000000002,
+        "positive_day_count": 18,
+        "same_bar_ambiguous_count": 0
+      },
+      "trajectory_compliance": true,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "not_run_reason": "killed_before_walk_forward",
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "purge": "not_run",
+        "retained_event_count": 0
+      },
+      "year_results_stress_1_5x": {
+        "2023": {
+          "event_count": 44,
+          "expectancy_per_trade": 5.290909090909086,
+          "gross_pnl": 2050.0,
+          "maximum_drawdown": 685.3000000000001,
+          "negative_day_count": 9,
+          "net_pnl": 232.79999999999978,
+          "positive_day_count": 10,
+          "same_bar_ambiguous_count": 0
+        },
+        "2024": {
+          "event_count": 37,
+          "expectancy_per_trade": -32.17837837837838,
+          "gross_pnl": 337.5,
+          "maximum_drawdown": 1742.9,
+          "negative_day_count": 8,
+          "net_pnl": -1190.6000000000001,
+          "positive_day_count": 8,
+          "same_bar_ambiguous_count": 0
+        }
+      }
+    },
+    {
+      "BH": {
+        "adjusted_p_value": 1.0,
+        "critical_value": 0.05,
+        "p_value": 1.0,
+        "rank": 4,
+        "rejected": false
+      },
+      "DSR": {
+        "DSR_probability": 0.0,
+        "deflated_z": -1000000000000.0,
+        "expected_max_sharpe_annualized": null,
+        "expected_max_sharpe_daily": null,
+        "not_run_reason": "killed_before_walk_forward",
+        "observations": 43,
+        "one_sided_p_value": 1.0,
+        "pearson_kurtosis": null,
+        "sample_sharpe_annualized": 0.0,
+        "sample_sharpe_daily": 0.0,
+        "skewness": null
+      },
+      "SIM_EXPLOIT": false,
+      "base": {
+        "event_count": 111,
+        "expectancy_per_trade": -0.40666666666666756,
+        "gross_pnl": 370.0,
+        "maximum_drawdown": 426.98000000000025,
+        "negative_day_count": 26,
+        "net_pnl": -45.1400000000001,
+        "positive_day_count": 14,
+        "same_bar_ambiguous_count": 0
+      },
+      "candidate_id": "v7d1g2_aggressor_regime_flip_MES",
+      "candidate_null_suite": {
+        "actual_minus_maximum_null": 4.327651515151516,
+        "actual_stress_1_5x_expectancy_per_trade": -1.6566666666666676,
+        "controls": {
+          "FIVE_SESSION_SIGNAL_DELAY": {
+            "event_count": 88,
+            "expectancy_per_trade": -5.984318181818183,
+            "gross_pnl": -87.5,
+            "maximum_drawdown": 664.4400000000002,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.5,
+            "negative_day_count": 20,
+            "net_pnl": -526.6200000000001,
+            "positive_day_count": 11,
+            "power_passed": true,
+            "real_event_count": 111,
+            "retention": 0.7927927927927928,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "FLOW_PRICE_DECOUPLING": {
+            "event_count": 107,
+            "expectancy_per_trade": -10.690934579439253,
+            "gross_pnl": -610.0,
+            "maximum_drawdown": 1143.9300000000007,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.8,
+            "negative_day_count": 27,
+            "net_pnl": -1143.93,
+            "positive_day_count": 11,
+            "power_passed": true,
+            "real_event_count": 111,
+            "retention": 0.963963963963964,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "SIGN_INVERSION": {
+            "event_count": 111,
+            "expectancy_per_trade": -8.323333333333334,
+            "gross_pnl": -370.0,
+            "maximum_drawdown": 1077.8600000000006,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 1.0,
+            "negative_day_count": 26,
+            "net_pnl": -923.8900000000001,
+            "positive_day_count": 14,
+            "power_passed": true,
+            "real_event_count": 111,
+            "retention": 1.0,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          }
+        },
+        "maximum_null_expectancy_per_trade": -5.984318181818183,
+        "passed": true,
+        "power_all_passed": true
+      },
+      "combine_diagnostic": {
+        "status": "DEFERRED_UNTIL_CANDIDATE_PROMOTION",
+        "used_as_fitness": false,
+        "used_as_gate": false
+      },
+      "promotion_gates": {
+        "BH_FDR_10pct_rejected": false,
+        "DSR_deflated_z_gt_0": false,
+        "SIM_EXPLOIT_2x_survived": true,
+        "candidate_null_suite_passed": true,
+        "cost_1_5x_positive": false,
+        "minimum_events_and_base_expectancy": false,
+        "new_grammar_tripwire_GREEN": true,
+        "ruleset_trajectory_compliance": true,
+        "walk_forward_1_5x_positive": false
+      },
+      "shadow_queue_eligible": false,
+      "signal_count": 111,
+      "specification": {
+        "candidate_id": "v7d1g2_aggressor_regime_flip_MES",
+        "cost_horizon": "15m",
+        "holding_minutes": 15,
+        "hypothesis_id": "D1H7_AGGRESSOR_REGIME_FLIP",
+        "mechanism_class": "completed_flow_regime_transition",
+        "product": "MES"
+      },
+      "stage0_valid": true,
+      "stage1_pass": false,
+      "stage2_pass": false,
+      "stress_1_5x": {
+        "event_count": 111,
+        "expectancy_per_trade": -1.6566666666666676,
+        "gross_pnl": 370.0,
+        "maximum_drawdown": 491.9800000000002,
+        "negative_day_count": 27,
+        "net_pnl": -183.8900000000001,
+        "positive_day_count": 13,
+        "same_bar_ambiguous_count": 0
+      },
+      "stress_2x": {
+        "event_count": 111,
+        "expectancy_per_trade": -2.9066666666666676,
+        "gross_pnl": 370.0,
+        "maximum_drawdown": 556.9800000000002,
+        "negative_day_count": 27,
+        "net_pnl": -322.6400000000001,
+        "positive_day_count": 13,
+        "same_bar_ambiguous_count": 0
+      },
+      "trajectory_compliance": true,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "not_run_reason": "killed_before_walk_forward",
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "purge": "not_run",
+        "retained_event_count": 0
+      },
+      "year_results_stress_1_5x": {
+        "2023": {
+          "event_count": 52,
+          "expectancy_per_trade": -9.461153846153847,
+          "gross_pnl": -232.5,
+          "maximum_drawdown": 491.9800000000002,
+          "negative_day_count": 15,
+          "net_pnl": -491.9800000000001,
+          "positive_day_count": 4,
+          "same_bar_ambiguous_count": 0
+        },
+        "2024": {
+          "event_count": 59,
+          "expectancy_per_trade": 5.22186440677966,
+          "gross_pnl": 602.5,
+          "maximum_drawdown": 289.6800000000002,
+          "negative_day_count": 12,
+          "net_pnl": 308.0899999999999,
+          "positive_day_count": 9,
+          "same_bar_ambiguous_count": 0
+        }
+      }
+    },
+    {
+      "BH": {
+        "adjusted_p_value": 1.0,
+        "critical_value": 0.025,
+        "p_value": 0.9999953357952037,
+        "rank": 2,
+        "rejected": false
+      },
+      "DSR": {
+        "DSR_probability": 4.664204796292335e-06,
+        "deflated_z": -4.432182295010678,
+        "expected_max_sharpe_annualized": 11.22939720005646,
+        "expected_max_sharpe_daily": 0.7073855324884386,
+        "observations": 43,
+        "one_sided_p_value": 0.9999953357952037,
+        "pearson_kurtosis": 10.262054374573413,
+        "sample_sharpe_annualized": 0.9263574190415594,
+        "sample_sharpe_daily": 0.05835503228437181,
+        "skewness": 1.838050038927756
+      },
+      "SIM_EXPLOIT": false,
+      "base": {
+        "event_count": 81,
+        "expectancy_per_trade": 35.088888888888896,
+        "gross_pnl": 5175.0,
+        "maximum_drawdown": 2891.2000000000007,
+        "negative_day_count": 16,
+        "net_pnl": 2842.2000000000003,
+        "positive_day_count": 20,
+        "same_bar_ambiguous_count": 0
+      },
+      "candidate_id": "v7d1g2_cross_contract_participation_divergence_ES",
+      "candidate_null_suite": {
+        "actual_minus_maximum_null": 0.972222222222225,
+        "actual_stress_1_5x_expectancy_per_trade": 22.588888888888892,
+        "controls": {
+          "FIVE_SESSION_SIGNAL_DELAY": {
+            "event_count": 60,
+            "expectancy_per_trade": 21.616666666666667,
+            "gross_pnl": 3775.0,
+            "maximum_drawdown": 1011.3000000000001,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.5,
+            "negative_day_count": 12,
+            "net_pnl": 1297.0,
+            "positive_day_count": 17,
+            "power_passed": true,
+            "real_event_count": 81,
+            "retention": 0.7407407407407407,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "FLOW_PRICE_DECOUPLING": {
+            "event_count": 78,
+            "expectancy_per_trade": -54.60128205128205,
+            "gross_pnl": -1037.5,
+            "maximum_drawdown": 4588.800000000001,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.8,
+            "negative_day_count": 19,
+            "net_pnl": -4258.9,
+            "positive_day_count": 15,
+            "power_passed": true,
+            "real_event_count": 81,
+            "retention": 0.9629629629629629,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "SIGN_INVERSION": {
+            "event_count": 81,
+            "expectancy_per_trade": -105.18888888888888,
+            "gross_pnl": -5175.0,
+            "maximum_drawdown": 9111.699999999999,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 1.0,
+            "negative_day_count": 25,
+            "net_pnl": -8520.3,
+            "positive_day_count": 11,
+            "power_passed": true,
+            "real_event_count": 81,
+            "retention": 1.0,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          }
+        },
+        "maximum_null_expectancy_per_trade": 21.616666666666667,
+        "passed": true,
+        "power_all_passed": true
+      },
+      "combine_diagnostic": {
+        "status": "DEFERRED_UNTIL_CANDIDATE_PROMOTION",
+        "used_as_fitness": false,
+        "used_as_gate": false
+      },
+      "promotion_gates": {
+        "BH_FDR_10pct_rejected": false,
+        "DSR_deflated_z_gt_0": false,
+        "SIM_EXPLOIT_2x_survived": true,
+        "candidate_null_suite_passed": true,
+        "cost_1_5x_positive": true,
+        "minimum_events_and_base_expectancy": true,
+        "new_grammar_tripwire_GREEN": true,
+        "ruleset_trajectory_compliance": true,
+        "walk_forward_1_5x_positive": false
+      },
+      "shadow_queue_eligible": false,
+      "signal_count": 81,
+      "specification": {
+        "candidate_id": "v7d1g2_cross_contract_participation_divergence_ES",
+        "cost_horizon": "15m",
+        "holding_minutes": 15,
+        "hypothesis_id": "D1H6_MINI_MICRO_PARTICIPATION_DIVERGENCE",
+        "mechanism_class": "mini_micro_aggressor_participation_divergence",
+        "product": "ES"
+      },
+      "stage0_valid": true,
+      "stage1_pass": true,
+      "stage2_pass": true,
+      "stress_1_5x": {
+        "event_count": 81,
+        "expectancy_per_trade": 22.588888888888892,
+        "gross_pnl": 5175.0,
+        "maximum_drawdown": 3191.2000000000007,
+        "negative_day_count": 17,
+        "net_pnl": 1829.7000000000003,
+        "positive_day_count": 19,
+        "same_bar_ambiguous_count": 0
+      },
+      "stress_2x": {
+        "event_count": 81,
+        "expectancy_per_trade": 10.088888888888892,
+        "gross_pnl": 5175.0,
+        "maximum_drawdown": 3491.2000000000007,
+        "negative_day_count": 19,
+        "net_pnl": 817.2000000000003,
+        "positive_day_count": 17,
+        "same_bar_ambiguous_count": 0
+      },
+      "trajectory_compliance": true,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [
+          {
+            "embargo_days": 0,
+            "event_count": 13,
+            "expectancy_per_trade": -119.1846153846154,
+            "fold": 1,
+            "net_pnl": -1549.4,
+            "raw_session_days": 11,
+            "retained_session_days": 11
+          },
+          {
+            "embargo_days": 5,
+            "event_count": 6,
+            "expectancy_per_trade": -182.96666666666667,
+            "fold": 2,
+            "net_pnl": -1097.8,
+            "raw_session_days": 11,
+            "retained_session_days": 6
+          },
+          {
+            "embargo_days": 5,
+            "event_count": 15,
+            "expectancy_per_trade": -0.4666666666666714,
+            "fold": 3,
+            "net_pnl": -7.000000000000071,
+            "raw_session_days": 11,
+            "retained_session_days": 6
+          },
+          {
+            "embargo_days": 5,
+            "event_count": 12,
+            "expectancy_per_trade": 34.74166666666667,
+            "fold": 4,
+            "net_pnl": 416.90000000000003,
+            "raw_session_days": 10,
+            "retained_session_days": 5
+          }
+        ],
+        "pooled_expectancy_per_trade": -48.63695652173912,
+        "pooled_net_pnl": -2237.2999999999997,
+        "purge": "exact_holding_horizon_no_cross_boundary_event_observed",
+        "retained_event_count": 46
+      },
+      "year_results_stress_1_5x": {
+        "2023": {
+          "event_count": 31,
+          "expectancy_per_trade": -93.31612903225808,
+          "gross_pnl": -1612.5,
+          "maximum_drawdown": 3191.2000000000007,
+          "negative_day_count": 11,
+          "net_pnl": -2892.8,
+          "positive_day_count": 5,
+          "same_bar_ambiguous_count": 0
+        },
+        "2024": {
+          "event_count": 50,
+          "expectancy_per_trade": 94.45,
+          "gross_pnl": 6787.5,
+          "maximum_drawdown": 1505.4,
+          "negative_day_count": 6,
+          "net_pnl": 4722.5,
+          "positive_day_count": 14,
+          "same_bar_ambiguous_count": 0
+        }
+      }
+    },
+    {
+      "BH": {
+        "adjusted_p_value": 1.0,
+        "critical_value": 0.0625,
+        "p_value": 1.0,
+        "rank": 5,
+        "rejected": false
+      },
+      "DSR": {
+        "DSR_probability": 0.0,
+        "deflated_z": -1000000000000.0,
+        "expected_max_sharpe_annualized": null,
+        "expected_max_sharpe_daily": null,
+        "not_run_reason": "killed_before_walk_forward",
+        "observations": 43,
+        "one_sided_p_value": 1.0,
+        "pearson_kurtosis": null,
+        "sample_sharpe_annualized": 0.0,
+        "sample_sharpe_daily": 0.0,
+        "skewness": null
+      },
+      "SIM_EXPLOIT": false,
+      "base": {
+        "event_count": 74,
+        "expectancy_per_trade": -2.608243243243244,
+        "gross_pnl": 83.75,
+        "maximum_drawdown": 353.43000000000006,
+        "negative_day_count": 19,
+        "net_pnl": -193.01000000000008,
+        "positive_day_count": 18,
+        "same_bar_ambiguous_count": 0
+      },
+      "candidate_id": "v7d1g2_cross_contract_participation_divergence_MES",
+      "candidate_null_suite": {
+        "actual_minus_maximum_null": 1.2474974974974975,
+        "actual_stress_1_5x_expectancy_per_trade": -3.858243243243244,
+        "controls": {
+          "FIVE_SESSION_SIGNAL_DELAY": {
+            "event_count": 54,
+            "expectancy_per_trade": -5.105740740740742,
+            "gross_pnl": -6.25,
+            "maximum_drawdown": 278.2300000000001,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.5,
+            "negative_day_count": 19,
+            "net_pnl": -275.71000000000004,
+            "positive_day_count": 9,
+            "power_passed": true,
+            "real_event_count": 74,
+            "retention": 0.7297297297297297,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "FLOW_PRICE_DECOUPLING": {
+            "event_count": 73,
+            "expectancy_per_trade": -7.60986301369863,
+            "gross_pnl": -191.25,
+            "maximum_drawdown": 555.5600000000001,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.8,
+            "negative_day_count": 28,
+            "net_pnl": -555.52,
+            "positive_day_count": 9,
+            "power_passed": true,
+            "real_event_count": 74,
+            "retention": 0.9864864864864865,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "SIGN_INVERSION": {
+            "event_count": 74,
+            "expectancy_per_trade": -6.121756756756758,
+            "gross_pnl": -83.75,
+            "maximum_drawdown": 625.6100000000002,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 1.0,
+            "negative_day_count": 24,
+            "net_pnl": -453.0100000000001,
+            "positive_day_count": 13,
+            "power_passed": true,
+            "real_event_count": 74,
+            "retention": 1.0,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          }
+        },
+        "maximum_null_expectancy_per_trade": -5.105740740740742,
+        "passed": true,
+        "power_all_passed": true
+      },
+      "combine_diagnostic": {
+        "status": "DEFERRED_UNTIL_CANDIDATE_PROMOTION",
+        "used_as_fitness": false,
+        "used_as_gate": false
+      },
+      "promotion_gates": {
+        "BH_FDR_10pct_rejected": false,
+        "DSR_deflated_z_gt_0": false,
+        "SIM_EXPLOIT_2x_survived": true,
+        "candidate_null_suite_passed": true,
+        "cost_1_5x_positive": false,
+        "minimum_events_and_base_expectancy": false,
+        "new_grammar_tripwire_GREEN": true,
+        "ruleset_trajectory_compliance": true,
+        "walk_forward_1_5x_positive": false
+      },
+      "shadow_queue_eligible": false,
+      "signal_count": 74,
+      "specification": {
+        "candidate_id": "v7d1g2_cross_contract_participation_divergence_MES",
+        "cost_horizon": "15m",
+        "holding_minutes": 15,
+        "hypothesis_id": "D1H6_MINI_MICRO_PARTICIPATION_DIVERGENCE",
+        "mechanism_class": "mini_micro_aggressor_participation_divergence",
+        "product": "MES"
+      },
+      "stage0_valid": true,
+      "stage1_pass": false,
+      "stage2_pass": false,
+      "stress_1_5x": {
+        "event_count": 74,
+        "expectancy_per_trade": -3.858243243243244,
+        "gross_pnl": 83.75,
+        "maximum_drawdown": 393.42999999999995,
+        "negative_day_count": 21,
+        "net_pnl": -285.51000000000005,
+        "positive_day_count": 16,
+        "same_bar_ambiguous_count": 0
+      },
+      "stress_2x": {
+        "event_count": 74,
+        "expectancy_per_trade": -5.108243243243245,
+        "gross_pnl": 83.75,
+        "maximum_drawdown": 433.43000000000006,
+        "negative_day_count": 21,
+        "net_pnl": -378.0100000000001,
+        "positive_day_count": 16,
+        "same_bar_ambiguous_count": 0
+      },
+      "trajectory_compliance": true,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "not_run_reason": "killed_before_walk_forward",
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "purge": "not_run",
+        "retained_event_count": 0
+      },
+      "year_results_stress_1_5x": {
+        "2023": {
+          "event_count": 32,
+          "expectancy_per_trade": 0.47874999999999873,
+          "gross_pnl": 175.0,
+          "maximum_drawdown": 119.96000000000001,
+          "negative_day_count": 9,
+          "net_pnl": 15.31999999999996,
+          "positive_day_count": 9,
+          "same_bar_ambiguous_count": 0
+        },
+        "2024": {
+          "event_count": 42,
+          "expectancy_per_trade": -7.1626190476190486,
+          "gross_pnl": -91.25,
+          "maximum_drawdown": 393.43000000000006,
+          "negative_day_count": 12,
+          "net_pnl": -300.83000000000004,
+          "positive_day_count": 7,
+          "same_bar_ambiguous_count": 0
+        }
+      }
+    },
+    {
+      "BH": {
+        "adjusted_p_value": 1.0,
+        "critical_value": 0.0125,
+        "p_value": 0.9999868764973768,
+        "rank": 1,
+        "rejected": false
+      },
+      "DSR": {
+        "DSR_probability": 1.3123502623200565e-05,
+        "deflated_z": -4.203800709995938,
+        "expected_max_sharpe_annualized": 11.22939720005646,
+        "expected_max_sharpe_daily": 0.7073855324884386,
+        "observations": 43,
+        "one_sided_p_value": 0.9999868764973768,
+        "pearson_kurtosis": 9.393722309699548,
+        "sample_sharpe_annualized": 2.1374571991441322,
+        "sample_sharpe_daily": 0.13464714730904845,
+        "skewness": 1.919341247429558
+      },
+      "SIM_EXPLOIT": false,
+      "base": {
+        "event_count": 70,
+        "expectancy_per_trade": 54.05714285714286,
+        "gross_pnl": 5800.0,
+        "maximum_drawdown": 1910.8000000000015,
+        "negative_day_count": 19,
+        "net_pnl": 3784.0,
+        "positive_day_count": 19,
+        "same_bar_ambiguous_count": 0
+      },
+      "candidate_id": "v7d1g2_delta_extreme_rejection_ES",
+      "candidate_null_suite": {
+        "actual_minus_maximum_null": 12.365339578454336,
+        "actual_stress_1_5x_expectancy_per_trade": 41.55714285714286,
+        "controls": {
+          "FIVE_SESSION_SIGNAL_DELAY": {
+            "event_count": 56,
+            "expectancy_per_trade": -1.567857142857143,
+            "gross_pnl": 2225.0,
+            "maximum_drawdown": 1515.2,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.5,
+            "negative_day_count": 16,
+            "net_pnl": -87.80000000000001,
+            "positive_day_count": 13,
+            "power_passed": true,
+            "real_event_count": 70,
+            "retention": 0.8,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "FLOW_PRICE_DECOUPLING": {
+            "event_count": 61,
+            "expectancy_per_trade": 29.19180327868852,
+            "gross_pnl": 4300.0,
+            "maximum_drawdown": 1067.9,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.8,
+            "negative_day_count": 14,
+            "net_pnl": 1780.6999999999998,
+            "positive_day_count": 18,
+            "power_passed": true,
+            "real_event_count": 70,
+            "retention": 0.8714285714285714,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "SIGN_INVERSION": {
+            "event_count": 70,
+            "expectancy_per_trade": -124.15714285714286,
+            "gross_pnl": -5800.0,
+            "maximum_drawdown": 9497.6,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 1.0,
+            "negative_day_count": 24,
+            "net_pnl": -8691.0,
+            "positive_day_count": 14,
+            "power_passed": true,
+            "real_event_count": 70,
+            "retention": 1.0,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          }
+        },
+        "maximum_null_expectancy_per_trade": 29.19180327868852,
+        "passed": true,
+        "power_all_passed": true
+      },
+      "combine_diagnostic": {
+        "status": "DEFERRED_UNTIL_CANDIDATE_PROMOTION",
+        "used_as_fitness": false,
+        "used_as_gate": false
+      },
+      "promotion_gates": {
+        "BH_FDR_10pct_rejected": false,
+        "DSR_deflated_z_gt_0": false,
+        "SIM_EXPLOIT_2x_survived": true,
+        "candidate_null_suite_passed": true,
+        "cost_1_5x_positive": true,
+        "minimum_events_and_base_expectancy": true,
+        "new_grammar_tripwire_GREEN": true,
+        "ruleset_trajectory_compliance": true,
+        "walk_forward_1_5x_positive": false
+      },
+      "shadow_queue_eligible": false,
+      "signal_count": 70,
+      "specification": {
+        "candidate_id": "v7d1g2_delta_extreme_rejection_ES",
+        "cost_horizon": "15m",
+        "holding_minutes": 15,
+        "hypothesis_id": "D1H5_DELTA_EXTREME_REJECTION",
+        "mechanism_class": "print_delta_rejection_at_past_extreme",
+        "product": "ES"
+      },
+      "stage0_valid": true,
+      "stage1_pass": true,
+      "stage2_pass": true,
+      "stress_1_5x": {
+        "event_count": 70,
+        "expectancy_per_trade": 41.55714285714286,
+        "gross_pnl": 5800.0,
+        "maximum_drawdown": 2110.8000000000006,
+        "negative_day_count": 20,
+        "net_pnl": 2909.0,
+        "positive_day_count": 18,
+        "same_bar_ambiguous_count": 0
+      },
+      "stress_2x": {
+        "event_count": 70,
+        "expectancy_per_trade": 29.05714285714286,
+        "gross_pnl": 5800.0,
+        "maximum_drawdown": 2310.7999999999997,
+        "negative_day_count": 21,
+        "net_pnl": 2034.0000000000002,
+        "positive_day_count": 17,
+        "same_bar_ambiguous_count": 0
+      },
+      "trajectory_compliance": true,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [
+          {
+            "embargo_days": 0,
+            "event_count": 17,
+            "expectancy_per_trade": -18.505882352941182,
+            "fold": 1,
+            "net_pnl": -314.6000000000001,
+            "raw_session_days": 11,
+            "retained_session_days": 11
+          },
+          {
+            "embargo_days": 5,
+            "event_count": 7,
+            "expectancy_per_trade": 35.4857142857143,
+            "fold": 2,
+            "net_pnl": 248.4000000000001,
+            "raw_session_days": 11,
+            "retained_session_days": 6
+          },
+          {
+            "embargo_days": 5,
+            "event_count": 11,
+            "expectancy_per_trade": 60.972727272727276,
+            "fold": 3,
+            "net_pnl": 670.7,
+            "raw_session_days": 11,
+            "retained_session_days": 6
+          },
+          {
+            "embargo_days": 5,
+            "event_count": 10,
+            "expectancy_per_trade": -70.05000000000001,
+            "fold": 4,
+            "net_pnl": -700.5000000000001,
+            "raw_session_days": 10,
+            "retained_session_days": 5
+          }
+        ],
+        "pooled_expectancy_per_trade": -2.133333333333336,
+        "pooled_net_pnl": -96.00000000000011,
+        "purge": "exact_holding_horizon_no_cross_boundary_event_observed",
+        "retained_event_count": 45
+      },
+      "year_results_stress_1_5x": {
+        "2023": {
+          "event_count": 29,
+          "expectancy_per_trade": 3.958620689655172,
+          "gross_pnl": 1312.5,
+          "maximum_drawdown": 932.5000000000002,
+          "negative_day_count": 8,
+          "net_pnl": 114.79999999999998,
+          "positive_day_count": 10,
+          "same_bar_ambiguous_count": 0
+        },
+        "2024": {
+          "event_count": 41,
+          "expectancy_per_trade": 68.15121951219513,
+          "gross_pnl": 4487.5,
+          "maximum_drawdown": 2110.8,
+          "negative_day_count": 12,
+          "net_pnl": 2794.2000000000003,
+          "positive_day_count": 8,
+          "same_bar_ambiguous_count": 0
+        }
+      }
+    },
+    {
+      "BH": {
+        "adjusted_p_value": 1.0,
+        "critical_value": 0.07500000000000001,
+        "p_value": 1.0,
+        "rank": 6,
+        "rejected": false
+      },
+      "DSR": {
+        "DSR_probability": 0.0,
+        "deflated_z": -1000000000000.0,
+        "expected_max_sharpe_annualized": null,
+        "expected_max_sharpe_daily": null,
+        "not_run_reason": "killed_before_walk_forward",
+        "observations": 43,
+        "one_sided_p_value": 1.0,
+        "pearson_kurtosis": null,
+        "sample_sharpe_annualized": 0.0,
+        "sample_sharpe_daily": 0.0,
+        "skewness": null
+      },
+      "SIM_EXPLOIT": true,
+      "base": {
+        "event_count": 76,
+        "expectancy_per_trade": 1.8849999999999991,
+        "gross_pnl": 427.5,
+        "maximum_drawdown": 104.86,
+        "negative_day_count": 18,
+        "net_pnl": 143.25999999999993,
+        "positive_day_count": 18,
+        "same_bar_ambiguous_count": 0
+      },
+      "candidate_id": "v7d1g2_delta_extreme_rejection_MES",
+      "candidate_null_suite": {
+        "actual_minus_maximum_null": 0.30303030303030276,
+        "actual_stress_1_5x_expectancy_per_trade": 0.6349999999999991,
+        "controls": {
+          "FIVE_SESSION_SIGNAL_DELAY": {
+            "event_count": 56,
+            "expectancy_per_trade": -11.106071428571429,
+            "gross_pnl": -342.5,
+            "maximum_drawdown": 621.9400000000003,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.5,
+            "negative_day_count": 16,
+            "net_pnl": -621.94,
+            "positive_day_count": 10,
+            "power_passed": true,
+            "real_event_count": 76,
+            "retention": 0.7368421052631579,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "FLOW_PRICE_DECOUPLING": {
+            "event_count": 66,
+            "expectancy_per_trade": 0.33196969696969636,
+            "gross_pnl": 351.25,
+            "maximum_drawdown": 98.59,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.8,
+            "negative_day_count": 12,
+            "net_pnl": 21.90999999999996,
+            "positive_day_count": 19,
+            "power_passed": true,
+            "real_event_count": 76,
+            "retention": 0.868421052631579,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "SIGN_INVERSION": {
+            "event_count": 76,
+            "expectancy_per_trade": -10.615000000000002,
+            "gross_pnl": -427.5,
+            "maximum_drawdown": 826.8000000000004,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 1.0,
+            "negative_day_count": 22,
+            "net_pnl": -806.7400000000001,
+            "positive_day_count": 14,
+            "power_passed": true,
+            "real_event_count": 76,
+            "retention": 1.0,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          }
+        },
+        "maximum_null_expectancy_per_trade": 0.33196969696969636,
+        "passed": true,
+        "power_all_passed": true
+      },
+      "combine_diagnostic": {
+        "status": "DEFERRED_UNTIL_CANDIDATE_PROMOTION",
+        "used_as_fitness": false,
+        "used_as_gate": false
+      },
+      "promotion_gates": {
+        "BH_FDR_10pct_rejected": false,
+        "DSR_deflated_z_gt_0": false,
+        "SIM_EXPLOIT_2x_survived": false,
+        "candidate_null_suite_passed": true,
+        "cost_1_5x_positive": true,
+        "minimum_events_and_base_expectancy": true,
+        "new_grammar_tripwire_GREEN": true,
+        "ruleset_trajectory_compliance": true,
+        "walk_forward_1_5x_positive": false
+      },
+      "shadow_queue_eligible": false,
+      "signal_count": 76,
+      "specification": {
+        "candidate_id": "v7d1g2_delta_extreme_rejection_MES",
+        "cost_horizon": "15m",
+        "holding_minutes": 15,
+        "hypothesis_id": "D1H5_DELTA_EXTREME_REJECTION",
+        "mechanism_class": "print_delta_rejection_at_past_extreme",
+        "product": "MES"
+      },
+      "stage0_valid": true,
+      "stage1_pass": true,
+      "stage2_pass": false,
+      "stress_1_5x": {
+        "event_count": 76,
+        "expectancy_per_trade": 0.6349999999999991,
+        "gross_pnl": 427.5,
+        "maximum_drawdown": 122.36000000000003,
+        "negative_day_count": 20,
+        "net_pnl": 48.259999999999934,
+        "positive_day_count": 16,
+        "same_bar_ambiguous_count": 0
+      },
+      "stress_2x": {
+        "event_count": 76,
+        "expectancy_per_trade": -0.6150000000000008,
+        "gross_pnl": 427.5,
+        "maximum_drawdown": 155.94000000000005,
+        "negative_day_count": 20,
+        "net_pnl": -46.74000000000006,
+        "positive_day_count": 16,
+        "same_bar_ambiguous_count": 0
+      },
+      "trajectory_compliance": true,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "not_run_reason": "killed_before_walk_forward",
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "purge": "not_run",
+        "retained_event_count": 0
+      },
+      "year_results_stress_1_5x": {
+        "2023": {
+          "event_count": 35,
+          "expectancy_per_trade": 0.759999999999999,
+          "gross_pnl": 201.25,
+          "maximum_drawdown": 103.66000000000003,
+          "negative_day_count": 10,
+          "net_pnl": 26.599999999999966,
+          "positive_day_count": 8,
+          "same_bar_ambiguous_count": 0
+        },
+        "2024": {
+          "event_count": 41,
+          "expectancy_per_trade": 0.5282926829268285,
+          "gross_pnl": 226.25,
+          "maximum_drawdown": 122.36000000000001,
+          "negative_day_count": 10,
+          "net_pnl": 21.659999999999968,
+          "positive_day_count": 8,
+          "same_bar_ambiguous_count": 0
+        }
+      }
+    },
+    {
+      "BH": {
+        "adjusted_p_value": 1.0,
+        "critical_value": 0.08750000000000001,
+        "p_value": 1.0,
+        "rank": 7,
+        "rejected": false
+      },
+      "DSR": {
+        "DSR_probability": 0.0,
+        "deflated_z": -1000000000000.0,
+        "expected_max_sharpe_annualized": null,
+        "expected_max_sharpe_daily": null,
+        "not_run_reason": "killed_before_walk_forward",
+        "observations": 43,
+        "one_sided_p_value": 1.0,
+        "pearson_kurtosis": null,
+        "sample_sharpe_annualized": 0.0,
+        "sample_sharpe_daily": 0.0,
+        "skewness": null
+      },
+      "SIM_EXPLOIT": false,
+      "base": {
+        "event_count": 397,
+        "expectancy_per_trade": -27.11549118387909,
+        "gross_pnl": -1812.5,
+        "maximum_drawdown": 19676.999999999996,
+        "negative_day_count": 25,
+        "net_pnl": -10764.849999999999,
+        "positive_day_count": 18,
+        "same_bar_ambiguous_count": 0
+      },
+      "candidate_id": "v7d1g2_vwap_acceptance_ES",
+      "candidate_null_suite": {
+        "actual_minus_maximum_null": -34.68114954686842,
+        "actual_stress_1_5x_expectancy_per_trade": -36.49049118387909,
+        "controls": {
+          "FIVE_SESSION_SIGNAL_DELAY": {
+            "event_count": 296,
+            "expectancy_per_trade": -20.818581081081078,
+            "gross_pnl": 3287.5,
+            "maximum_drawdown": 10652.774999999998,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.5,
+            "negative_day_count": 20,
+            "net_pnl": -6162.299999999999,
+            "positive_day_count": 13,
+            "power_passed": true,
+            "real_event_count": 397,
+            "retention": 0.7455919395465995,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "FLOW_PRICE_DECOUPLING": {
+            "event_count": 281,
+            "expectancy_per_trade": -1.8093416370106703,
+            "gross_pnl": 8462.5,
+            "maximum_drawdown": 4072.899999999998,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.8,
+            "negative_day_count": 22,
+            "net_pnl": -508.42499999999836,
+            "positive_day_count": 19,
+            "power_passed": false,
+            "real_event_count": 397,
+            "retention": 0.707808564231738,
+            "retention_passed": false,
+            "same_bar_ambiguous_count": 0
+          },
+          "SIGN_INVERSION": {
+            "event_count": 397,
+            "expectancy_per_trade": -27.359508816120904,
+            "gross_pnl": 1812.5,
+            "maximum_drawdown": 12525.724999999999,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 1.0,
+            "negative_day_count": 24,
+            "net_pnl": -10861.724999999999,
+            "positive_day_count": 19,
+            "power_passed": true,
+            "real_event_count": 397,
+            "retention": 1.0,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          }
+        },
+        "maximum_null_expectancy_per_trade": -1.8093416370106703,
+        "passed": false,
+        "power_all_passed": false
+      },
+      "combine_diagnostic": {
+        "status": "DEFERRED_UNTIL_CANDIDATE_PROMOTION",
+        "used_as_fitness": false,
+        "used_as_gate": false
+      },
+      "promotion_gates": {
+        "BH_FDR_10pct_rejected": false,
+        "DSR_deflated_z_gt_0": false,
+        "SIM_EXPLOIT_2x_survived": true,
+        "candidate_null_suite_passed": false,
+        "cost_1_5x_positive": false,
+        "minimum_events_and_base_expectancy": false,
+        "new_grammar_tripwire_GREEN": true,
+        "ruleset_trajectory_compliance": true,
+        "walk_forward_1_5x_positive": false
+      },
+      "shadow_queue_eligible": false,
+      "signal_count": 397,
+      "specification": {
+        "candidate_id": "v7d1g2_vwap_acceptance_ES",
+        "cost_horizon": "30m",
+        "holding_minutes": 30,
+        "hypothesis_id": "D1H8_VWAP_ACCEPTANCE_WITH_FLOW",
+        "mechanism_class": "session_value_migration_with_aggressor_confirmation",
+        "product": "ES"
+      },
+      "stage0_valid": true,
+      "stage1_pass": false,
+      "stage2_pass": false,
+      "stress_1_5x": {
+        "event_count": 397,
+        "expectancy_per_trade": -36.49049118387909,
+        "gross_pnl": -1812.5,
+        "maximum_drawdown": 22395.749999999996,
+        "negative_day_count": 26,
+        "net_pnl": -14486.724999999999,
+        "positive_day_count": 17,
+        "same_bar_ambiguous_count": 0
+      },
+      "stress_2x": {
+        "event_count": 397,
+        "expectancy_per_trade": -45.86549118387909,
+        "gross_pnl": -1812.5,
+        "maximum_drawdown": 25114.5,
+        "negative_day_count": 27,
+        "net_pnl": -18208.6,
+        "positive_day_count": 16,
+        "same_bar_ambiguous_count": 0
+      },
+      "trajectory_compliance": true,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "not_run_reason": "killed_before_walk_forward",
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "purge": "not_run",
+        "retained_event_count": 0
+      },
+      "year_results_stress_1_5x": {
+        "2023": {
+          "event_count": 204,
+          "expectancy_per_trade": -11.520588235294117,
+          "gross_pnl": 4162.5,
+          "maximum_drawdown": 6772.024999999997,
+          "negative_day_count": 11,
+          "net_pnl": -2350.2,
+          "positive_day_count": 11,
+          "same_bar_ambiguous_count": 0
+        },
+        "2024": {
+          "event_count": 193,
+          "expectancy_per_trade": -62.88354922279792,
+          "gross_pnl": -5975.0,
+          "maximum_drawdown": 15623.725,
+          "negative_day_count": 15,
+          "net_pnl": -12136.524999999998,
+          "positive_day_count": 6,
+          "same_bar_ambiguous_count": 0
+        }
+      }
+    },
+    {
+      "BH": {
+        "adjusted_p_value": 1.0,
+        "critical_value": 0.1,
+        "p_value": 1.0,
+        "rank": 8,
+        "rejected": false
+      },
+      "DSR": {
+        "DSR_probability": 0.0,
+        "deflated_z": -1000000000000.0,
+        "expected_max_sharpe_annualized": null,
+        "expected_max_sharpe_daily": null,
+        "not_run_reason": "killed_before_walk_forward",
+        "observations": 43,
+        "one_sided_p_value": 1.0,
+        "pearson_kurtosis": null,
+        "sample_sharpe_annualized": 0.0,
+        "sample_sharpe_daily": 0.0,
+        "skewness": null
+      },
+      "SIM_EXPLOIT": false,
+      "base": {
+        "event_count": 399,
+        "expectancy_per_trade": -0.7089849624060157,
+        "gross_pnl": 960.0,
+        "maximum_drawdown": 1110.2250000000004,
+        "negative_day_count": 24,
+        "net_pnl": -282.8850000000003,
+        "positive_day_count": 19,
+        "same_bar_ambiguous_count": 0
+      },
+      "candidate_id": "v7d1g2_vwap_acceptance_MES",
+      "candidate_null_suite": {
+        "actual_minus_maximum_null": 0.49524062681957415,
+        "actual_stress_1_5x_expectancy_per_trade": -1.6464849624060156,
+        "controls": {
+          "FIVE_SESSION_SIGNAL_DELAY": {
+            "event_count": 297,
+            "expectancy_per_trade": -2.1417255892255898,
+            "gross_pnl": 567.5,
+            "maximum_drawdown": 864.4225,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.5,
+            "negative_day_count": 17,
+            "net_pnl": -636.0925000000002,
+            "positive_day_count": 16,
+            "power_passed": true,
+            "real_event_count": 399,
+            "retention": 0.7443609022556391,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          },
+          "FLOW_PRICE_DECOUPLING": {
+            "event_count": 292,
+            "expectancy_per_trade": -3.0593493150684936,
+            "gross_pnl": 290.0,
+            "maximum_drawdown": 1346.8075000000001,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 0.8,
+            "negative_day_count": 25,
+            "net_pnl": -893.3300000000002,
+            "positive_day_count": 16,
+            "power_passed": false,
+            "real_event_count": 399,
+            "retention": 0.731829573934837,
+            "retention_passed": false,
+            "same_bar_ambiguous_count": 0
+          },
+          "SIGN_INVERSION": {
+            "event_count": 399,
+            "expectancy_per_trade": -6.458515037593986,
+            "gross_pnl": -960.0,
+            "maximum_drawdown": 2607.610000000001,
+            "minimum_events": 30,
+            "minimum_events_passed": true,
+            "minimum_retention": 1.0,
+            "negative_day_count": 30,
+            "net_pnl": -2576.9475,
+            "positive_day_count": 13,
+            "power_passed": true,
+            "real_event_count": 399,
+            "retention": 1.0,
+            "retention_passed": true,
+            "same_bar_ambiguous_count": 0
+          }
+        },
+        "maximum_null_expectancy_per_trade": -2.1417255892255898,
+        "passed": false,
+        "power_all_passed": false
+      },
+      "combine_diagnostic": {
+        "status": "DEFERRED_UNTIL_CANDIDATE_PROMOTION",
+        "used_as_fitness": false,
+        "used_as_gate": false
+      },
+      "promotion_gates": {
+        "BH_FDR_10pct_rejected": false,
+        "DSR_deflated_z_gt_0": false,
+        "SIM_EXPLOIT_2x_survived": true,
+        "candidate_null_suite_passed": false,
+        "cost_1_5x_positive": false,
+        "minimum_events_and_base_expectancy": false,
+        "new_grammar_tripwire_GREEN": true,
+        "ruleset_trajectory_compliance": true,
+        "walk_forward_1_5x_positive": false
+      },
+      "shadow_queue_eligible": false,
+      "signal_count": 399,
+      "specification": {
+        "candidate_id": "v7d1g2_vwap_acceptance_MES",
+        "cost_horizon": "30m",
+        "holding_minutes": 30,
+        "hypothesis_id": "D1H8_VWAP_ACCEPTANCE_WITH_FLOW",
+        "mechanism_class": "session_value_migration_with_aggressor_confirmation",
+        "product": "MES"
+      },
+      "stage0_valid": true,
+      "stage1_pass": false,
+      "stage2_pass": false,
+      "stress_1_5x": {
+        "event_count": 399,
+        "expectancy_per_trade": -1.6464849624060156,
+        "gross_pnl": 960.0,
+        "maximum_drawdown": 1377.325000000001,
+        "negative_day_count": 24,
+        "net_pnl": -656.9475000000002,
+        "positive_day_count": 19,
+        "same_bar_ambiguous_count": 0
+      },
+      "stress_2x": {
+        "event_count": 399,
+        "expectancy_per_trade": -2.5839849624060154,
+        "gross_pnl": 960.0,
+        "maximum_drawdown": 1686.7000000000005,
+        "negative_day_count": 24,
+        "net_pnl": -1031.0100000000002,
+        "positive_day_count": 19,
+        "same_bar_ambiguous_count": 0
+      },
+      "trajectory_compliance": true,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "not_run_reason": "killed_before_walk_forward",
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "purge": "not_run",
+        "retained_event_count": 0
+      },
+      "year_results_stress_1_5x": {
+        "2023": {
+          "event_count": 203,
+          "expectancy_per_trade": -3.8000369458128085,
+          "gross_pnl": 51.25,
+          "maximum_drawdown": 771.4075000000004,
+          "negative_day_count": 15,
+          "net_pnl": -771.4075000000001,
+          "positive_day_count": 7,
+          "same_bar_ambiguous_count": 0
+        },
+        "2024": {
+          "event_count": 196,
+          "expectancy_per_trade": 0.5839795918367341,
+          "gross_pnl": 908.75,
+          "maximum_drawdown": 826.9450000000002,
+          "negative_day_count": 9,
+          "net_pnl": 114.45999999999988,
+          "positive_day_count": 12,
+          "same_bar_ambiguous_count": 0
+        }
+      }
+    }
+  ],
+  "combine_pass_rate_used_as_fitness": false,
+  "combine_pass_rate_used_as_promotion_gate": false,
+  "diff_validation": [
+    "hydra/validation/v7_d1_grammar0002_candidate_tribunal.py",
+    "scripts/run_v7_d1_grammar0002_candidate_tribunal.py",
+    "tests/test_v7_d1_grammar0002_candidate_tribunal.py"
+  ],
+  "forward_gap_access_count": 0,
+  "grammar_id": "hydra_v7_d1_microstructure_grammar_0002",
+  "outbound_order_count": 0,
+  "prochaine_action": "tombstone_grammar0002_classes_and_preregister_next_hypothesis",
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "schema": "hydra_v7_d1_grammar0002_candidate_tribunal_result_v1",
+  "selected_shadow_queue_candidate_ids": [],
+  "signal_count": 1289,
+  "stage1_survivor_count": 4,
+  "stage2_survivor_count": 2,
+  "tripwire": {
+    "NULL_RATIO": 0.41666666666666663,
+    "result_sha256": "119b58e9fd27061bd53b59871e07764c28170e80696e0d90eb1990ab7146d154",
+    "verdict": "GREEN_NULL_ADJUSTED_BASELINE"
+  },
+  "verdict": "NULL"
+}
