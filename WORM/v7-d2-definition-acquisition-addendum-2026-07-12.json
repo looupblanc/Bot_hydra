@@ -1,0 +1,32 @@
+{
+  "schema": "hydra_v7_d2_definition_acquisition_addendum_v1",
+  "base_plan": "WORM/v7-d2-mbp10-acquisition-plan-2026-07-12.json",
+  "base_plan_sha256": "6cf55c6272859953903806811663b558ea93e3080d7042f2a53f5ad956e5b963",
+  "reason": "Explicit instrument IDs in mbp-10 require contemporaneous definitions before any replay or manifest can be valid.",
+  "official_api_queried_at_utc": "2026-07-12T20:38:00Z",
+  "request": {
+    "dataset": "GLBX.MDP3",
+    "schema": "definition",
+    "symbols": ["ES.c.0"],
+    "stype_in": "continuous",
+    "stype_out": "instrument_id",
+    "start": "2026-06-11T00:00:00Z",
+    "end": "2026-07-11T00:00:00Z",
+    "data_role": "DEVELOPMENT_ONLY"
+  },
+  "official_estimate": {
+    "record_count": 26,
+    "billable_size_bytes": 9360,
+    "estimated_cost_usd": 0.000014819205,
+    "aggregate_D2_estimated_cost_usd": 27.394923456014,
+    "D2_cap_usd": 28.0,
+    "projected_total_spend_usd": 115.24231184273998,
+    "projected_remaining_usd": 9.75768815726002,
+    "minimum_forward_reserve_usd": 9.0
+  },
+  "purchase_or_download_completed": false,
+  "q4_included": false,
+  "forward_gap_included": false,
+  "outbound_orders": 0,
+  "CONTRE": "Les definitions resolvent l'identite des contrats mais ne prouvent pas a elles seules la continuite correcte du roll; celle-ci doit etre auditee dans le manifest D2."
+}
