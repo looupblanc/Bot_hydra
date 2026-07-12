@@ -7,6 +7,7 @@ import signal
 import sqlite3
 import time
 from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -32,6 +33,7 @@ CONTRACT_SHA256 = (
 )
 CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v2"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
+CONTROLLER_CLAIM_TOKEN = "v7-falsification-single-writer"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
 G1_RELATIVE_PATH = Path("reports/v7/phase1/g1_result.json")
 D1_TRIBUNAL_RELATIVE_PATH = Path(
@@ -332,6 +334,17 @@ class V7FalsificationController:
                 now,
             ),
         )
+        lease_expires_at = self._lease_expires_at()
+        conn.execute(
+            "UPDATE experiments SET claim_token=?,claimed_by=?,lease_expires_at=? "
+            "WHERE experiment_id=?",
+            (
+                CONTROLLER_CLAIM_TOKEN,
+                "v7_falsification_controller",
+                lease_expires_at,
+                EXPERIMENT_ID,
+            ),
+        )
         conn.commit()
         set_kv(conn, "mission_id", EXPERIMENT_ID)
         set_kv(conn, "mission_contract", CONTROLLER_SCHEMA)
@@ -340,7 +353,13 @@ class V7FalsificationController:
         set_kv(conn, "last_shutdown", None)
         set_kv(conn, "live_trading_enabled", False)
         set_kv(conn, "broker_order_capability", False)
+        set_kv(conn, "governance_passed", True)
         set_kv(conn, "v7_controller_version", CONTROLLER_SCHEMA)
+        set_kv(
+            conn,
+            "current_experiment",
+            self._current_experiment(lease_expires_at),
+        )
         append_event(conn, "V7_CONTROLLER_INITIALIZED", payload)
         append_jsonl(
             self.paths.decision_ledger,
@@ -359,12 +378,27 @@ class V7FalsificationController:
         action = classify_v7_action(self.root)
         previous = get_kv(conn, "v7_current_action", {})
         step = int(get_kv(conn, "v7_step", 0)) + 1
+        progress_at = utc_now_iso()
+        lease_expires_at = self._lease_expires_at()
+        conn.execute(
+            "UPDATE experiments SET updated_at=?,lease_expires_at=? "
+            "WHERE experiment_id=? AND status='RUNNING' AND claim_token=?",
+            (progress_at, lease_expires_at, EXPERIMENT_ID, CONTROLLER_CLAIM_TOKEN),
+        )
+        conn.commit()
         set_kv(conn, "v7_step", step)
         set_kv(conn, "v7_current_action", action)
         set_kv(conn, "current_action", action)
         set_kv(conn, "current_phase", f"V7_PHASE_{action['phase']}")
         set_kv(conn, "current_blocker", None)
         set_kv(conn, "service_state", "RUNNING_V7_FALSIFICATION")
+        set_kv(conn, "last_progress_at_utc", progress_at)
+        set_kv(conn, "progress_sequence", int(get_kv(conn, "progress_sequence", 0)) + 1)
+        set_kv(
+            conn,
+            "current_experiment",
+            self._current_experiment(lease_expires_at),
+        )
         if _stable_json(previous) != _stable_json(action):
             append_event(
                 conn,
@@ -464,11 +498,29 @@ class V7FalsificationController:
             "step": int(get_kv(conn, "v7_step", 0)),
             "current_action": dict(action),
             "latest_checkpoint": get_kv(conn, "v7_latest_checkpoint", ""),
+            "last_progress_at_utc": get_kv(conn, "last_progress_at_utc", None),
+            "current_experiment": get_kv(conn, "current_experiment", {}),
             "process_lock": str(self.paths.lock_path),
             "single_writer": True,
             "broker_connections": 0,
             "outbound_orders": 0,
             "automatic_order_capability": False,
+        }
+
+    def _lease_expires_at(self) -> str:
+        seconds = max(90.0, self.config.sleep_seconds * 4.0 + 30.0)
+        return (
+            datetime.now(timezone.utc) + timedelta(seconds=seconds)
+        ).replace(microsecond=0).isoformat()
+
+    @staticmethod
+    def _current_experiment(lease_expires_at: str) -> dict[str, Any]:
+        return {
+            "experiment_id": EXPERIMENT_ID,
+            "experiment_type": "v7_falsification_perpetual",
+            "status": "RUNNING",
+            "claimed_by": "v7_falsification_controller",
+            "lease_expires_at": lease_expires_at,
         }
 
     def _stop_cleanly(self, conn: sqlite3.Connection, reason: str) -> None:
@@ -477,6 +529,7 @@ class V7FalsificationController:
         set_kv(conn, "current_phase", "STOPPED_CLEANLY")
         set_kv(conn, "last_shutdown", "clean")
         set_kv(conn, "last_stop_reason", reason)
+        set_kv(conn, "current_experiment", {})
         conn.execute(
             "UPDATE experiments SET status='COMPLETED',updated_at=?,completed_at=?,"
             "result=? WHERE experiment_id=?",

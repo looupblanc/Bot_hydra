@@ -5,7 +5,13 @@ from pathlib import Path
 
 import pytest
 
-from hydra.mission.mission_state import mission_paths
+from hydra.mission.experiment_queue import experiment_counts
+from hydra.mission.mission_state import (
+    connect_state_readonly,
+    mission_paths,
+    state_snapshot,
+)
+from hydra.mission.watchdog import heartbeat_status, scheduler_health
 from hydra.mission.v7_falsification_controller import (
     V7ControllerConfig,
     V7ControllerIntegrityError,
@@ -152,6 +158,50 @@ def test_controller_migrates_fresh_mission_schema_before_first_step(
     assert row == ("COMPLETED", "v7_falsification_perpetual")
     heartbeat = json.loads(paths.heartbeat_path.read_text(encoding="utf-8"))
     assert heartbeat["outbound_orders"] == 0
+
+
+def test_running_v7_controller_renews_watchdog_lease(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    controller = V7FalsificationController(
+        V7ControllerConfig(
+            project_root=str(tmp_path),
+            state_dir="mission/state",
+            sleep_seconds=0.0,
+            checkpoint_every_steps=25,
+        )
+    )
+    monkeypatch.setattr(controller, "_verify_constitution", lambda: "# MISSION HYDRA V7\n")
+    monkeypatch.setattr(
+        "hydra.mission.v7_falsification_controller.classify_v7_action",
+        lambda _root: {
+            "action_type": "V71_TEST_CONTINUATION",
+            "phase": "4",
+            "progressed": True,
+            "reason": "deterministic lease smoke",
+        },
+    )
+    from hydra.mission.mission_state import connect_state
+
+    conn = connect_state(controller.paths)
+    try:
+        controller._initialize(conn)
+        controller._step(conn)
+    finally:
+        conn.close()
+
+    readonly = connect_state_readonly(controller.paths)
+    try:
+        snapshot = state_snapshot(readonly)
+        counts = experiment_counts(readonly)
+    finally:
+        readonly.close()
+    health = scheduler_health(
+        heartbeat_status(controller.paths), snapshot, counts
+    )
+    assert health["classification"] == "HEALTHY_AND_PROGRESSING"
+    assert snapshot["current_experiment"]["claimed_by"] == "v7_falsification_controller"
+    assert snapshot["broker_order_capability"] is False
 
 
 def test_runner_uses_non_restarting_integrity_exit(monkeypatch: pytest.MonkeyPatch) -> None:
