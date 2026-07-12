@@ -1,0 +1,142 @@
+{
+  "schema": "hydra_v7_1_candidate_specific_power_policy_v1",
+  "policy_id": "hydra_v7_1_candidate_specific_power_policy_0001",
+  "principal_amendment_path": "MISSION_CONTRACT_AMENDMENT_002_POWER_AWARE.md",
+  "principal_amendment_sha256": "f41caaa9b4a1ad17c7436f4594ed669c3784321d4afac805dee0b87f79a02caf",
+  "candidate_freeze_path": "WORM/v7.1-power-aware-candidate-freeze-0001-2026-07-12.json",
+  "candidate_freeze_sha256": "b66e462989213356106f0cbcd88d31ba4547a61f9900eb1de3e6010cb3d35d83",
+  "candidate_count": 16,
+  "supersedes_for_new_power_decisions": "WORM/v7.1-powered-promotion-minimum-2026-07-12.json",
+  "historical_statuses_rejudged": false,
+  "universal_raw_event_gate_removed": true,
+  "minimum_useful_effect": {
+    "usd_net_per_trade": 12.5,
+    "economic_interpretation": "one_ES_tick_net_after_STRESS_1_5X_costs",
+    "candidate_power_effect": "max(12.5, 0.5 * observed_walk_forward_mean_net_usd)",
+    "selection_shrinkage_factor": 0.5
+  },
+  "walk_forward_ledger": {
+    "source": "regenerate_frozen_signals_and_exact_minute_open_execution",
+    "stress_for_primary_inference": "STRESS_1_5X",
+    "purge": "fixed_horizon_nonoverlapping_signals",
+    "embargo_trading_days": 5,
+    "fold_count": 4,
+    "chronology": "unchanged_from_frozen_stage2_funnel",
+    "candidate_parameters_may_change": false
+  },
+  "effective_sample_size": {
+    "ordered_unit": "walk_forward_trade_net_pnl",
+    "maximum_autocorrelation_lag": "min(10, floor(raw_event_count / 5))",
+    "serial_dependence_factor": "max(1, 1 + 2 * sum(max(rho_lag, 0)))",
+    "serial_effective_events": "raw_event_count / serial_dependence_factor",
+    "overlap_inflation": "max(1, sum_trade_exposure_nanoseconds / union_trade_exposure_nanoseconds)",
+    "overlap_effective_events": "raw_event_count / overlap_inflation",
+    "effective_independent_event_count": "min(raw_event_count, serial_effective_events, overlap_effective_events)",
+    "minimum_effective_events_for_POWERED_WF_POSITIVE": 20.0
+  },
+  "temporal_blocks": {
+    "definition": "calendar_year_x_Chicago_ISO_week",
+    "bootstrap_unit": "all candidate trades in one temporal block",
+    "resampling": "stratified_with_replacement_within_calendar_year",
+    "minimum_blocks_for_POWERED_WF_POSITIVE": 6,
+    "draws": 20000,
+    "seed": 971003,
+    "confidence_interval": 0.95,
+    "positive_probability_threshold": 0.975
+  },
+  "power_estimator": {
+    "method": "stratified_temporal_block_residual_bootstrap",
+    "residual_centering": "subtract_observed_candidate_mean_before_resampling",
+    "one_sided_alpha": 0.05,
+    "critical_z": 1.6448536269514722,
+    "standard_error": "standard_deviation_of_centered_block_bootstrap_means",
+    "power": "fraction_of_bootstrap_means_shifted_by_candidate_power_effect_whose_z_exceeds_critical_z",
+    "minimum_power_for_POWERED_WF_POSITIVE": 0.8,
+    "null_false_positive_rate_maximum": 0.1
+  },
+  "calibration_controls": {
+    "must_complete_before_candidate_classification": true,
+    "worlds": [
+      "SYNTHETIC_AR1_GAUSSIAN",
+      "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    ],
+    "event_counts": [
+      60,
+      120,
+      180,
+      240
+    ],
+    "net_effects_usd_per_trade": [
+      0.0,
+      12.5,
+      25.0,
+      50.0
+    ],
+    "replications_per_cell": 200,
+    "seeds": {
+      "SYNTHETIC_AR1_GAUSSIAN": 971101,
+      "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL": 971201
+    },
+    "acceptance": {
+      "maximum_null_false_positive_rate": 0.1,
+      "minimum_power_at_50_usd_and_120_events": 0.75,
+      "minimum_power_at_25_usd_and_240_events": 0.6,
+      "failure_action": "BLOCK_CANDIDATE_CLASSIFICATION_AND_REPAIR_ESTIMATOR_WITHOUT_READING_CANDIDATE_DIAGNOSTICS"
+    }
+  },
+  "stability_and_fragility": {
+    "report_month_stability": true,
+    "report_quarter_stability": true,
+    "report_contract_stability": true,
+    "top_event_concentration": "maximum_absolute_trade_net_pnl / sum_absolute_trade_net_pnl",
+    "maximum_top_event_concentration_for_powered": 0.15,
+    "maximum_top_event_concentration_before_fragile": 0.2,
+    "stress_profiles": [
+      "BASE",
+      "STRESS_1_5X",
+      "STRESS_2X"
+    ],
+    "minimum_positive_calendar_year_fraction_for_powered": 1.0,
+    "minimum_positive_contract_fraction_for_powered": 0.5,
+    "stress_2x_mean_must_be_positive_for_powered": true,
+    "best_event_removed_net_must_be_positive_for_powered": true
+  },
+  "status_policy": {
+    "WF_FALSE_POSITIVE": "primary_STRESS_1_5X_mean_not_positive_or_bootstrap_probability_positive_at_or_below_0.5_or_95pct_CI_upper_at_or_below_zero",
+    "WF_POSITIVE_BUT_FRAGILE": "primary_mean_positive_but_STRESS_2X_mean_not_positive_or_top_event_concentration_above_0.2_or_best_event_removed_net_not_positive_or_less_than_half_contracts_positive",
+    "POWERED_WF_POSITIVE": "primary_mean_positive_and_effective_events_at_least_20_and_at_least_6_temporal_blocks_and_95pct_CI_lower_above_zero_and_probability_positive_at_least_0.975_and_power_at_least_0.8_and_all_powered_stability_rules_pass",
+    "PROMISING_UNDERPOWERED": "primary_mean_positive_without_false_positive_or_fragility_but_one_or_more_power_requirements_not_met",
+    "precedence": [
+      "WF_FALSE_POSITIVE",
+      "WF_POSITIVE_BUT_FRAGILE",
+      "POWERED_WF_POSITIVE",
+      "PROMISING_UNDERPOWERED"
+    ]
+  },
+  "rolling_combine_policy": {
+    "promotion_eligibility": "POWERED_WF_POSITIVE_only",
+    "principal_named_diagnostic_candidates": [
+      "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+      "v71g3_signed_flow_rate_high_rate_low_progress_continuation_h60"
+    ],
+    "principal_named_candidates_if_not_powered": "bounded_diagnostic_only_no_promotion",
+    "event_time_tripwire_status": "ARTEFACT_GEOMETRY_ONLY",
+    "pass_rate_interpretation": "must_report_null_baseline_and_may_not_be_used_as_edge_fitness",
+    "candidate_specific_nulls_DSR_BH_required_before_shadow": true
+  },
+  "multiplicity": {
+    "campaign_DSR_N_trials": {
+      "hydra_v7_1_event_mechanism_grammar_0001": 384,
+      "hydra_v7_1_opportunity_density_grammar_0002": 192,
+      "hydra_v7_1_event_time_grammar_0003": 192
+    },
+    "BH_FDR": 0.1,
+    "global_registry_increment_reserved_before_run": 96,
+    "global_registry_increment_method": "32_control_cells_plus_16_candidates_times_4_inferential_diagnostics"
+  },
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "candidate_status_inheritance": false,
+  "outbound_orders": 0,
+  "CONTRE": "Post-selection power and bootstrap intervals remain optimistic because the same D1 walk-forward results selected these sixteen candidates; POWERED_WF_POSITIVE authorizes bounded diagnostics, not shadow or edge confirmation."
+}
