@@ -29,13 +29,37 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_falsification_controller_v1"
-EXPERIMENT_ID = "hydra_v7_falsification_20260712_0001"
+CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v2"
+EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
 G1_RELATIVE_PATH = Path("reports/v7/phase1/g1_result.json")
 D1_TRIBUNAL_RELATIVE_PATH = Path(
     "reports/v7/data/d1_candidate_tribunal_result.json"
 )
+V71_POLICY_RELATIVE_PATH = Path(
+    "WORM/v7.1-hierarchical-validation-policy-2026-07-12.json"
+)
+V71_POWER_RELATIVE_PATH = Path(
+    "reports/v7_1/calibration/v71_power_audit_result.json"
+)
+V71_POWER_EXTENSION_RELATIVE_PATH = Path(
+    "reports/v7_1/calibration/v71_power_sample_extension_result.json"
+)
+V71_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery/v71_signal_manifest.json"
+)
+V71_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery/v71_development_funnel_result.json"
+)
+V71_FORENSICS_RELATIVE_PATH = Path(
+    "reports/v7_1/forensics/v71_mechanism_forensics_result.json"
+)
+V71_FROZEN_HASHES = {
+    "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
+    str(V71_POLICY_RELATIVE_PATH): "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
+    "WORM/v7.1-event-mechanism-grammar-0001-2026-07-12.json": "e1c8de955302da2be836bbcebf2bfedc07768b2d9b987ea32258a85a2b0caf8a",
+    "WORM/v7.1-powered-promotion-minimum-2026-07-12.json": "3e0211c6a5acea81713431802fc1576da4d5be2a0cc37bf900cd02eabd68c6fa",
+}
 
 
 class V7ControllerIntegrityError(RuntimeError):
@@ -58,6 +82,8 @@ class V7ControllerConfig:
 
 def classify_v7_action(project_root: str | Path) -> dict[str, Any]:
     root = Path(project_root).resolve()
+    if (root / V71_POLICY_RELATIVE_PATH).is_file():
+        return _classify_v71_action(root)
     tribunal_path = root / D1_TRIBUNAL_RELATIVE_PATH
     if not tribunal_path.is_file():
         return {
@@ -139,6 +165,63 @@ def classify_v7_action(project_root: str | Path) -> dict[str, Any]:
     raise V7ControllerIntegrityError(
         "D1 tribunal has an unsupported or internally inconsistent verdict"
     )
+
+
+def _classify_v71_action(root: Path) -> dict[str, Any]:
+    required = (
+        (V71_POWER_RELATIVE_PATH, "V71_POWER_AUDIT_REQUIRED"),
+        (V71_POWER_EXTENSION_RELATIVE_PATH, "V71_POWER_EXTENSION_REQUIRED"),
+        (V71_SIGNAL_RELATIVE_PATH, "V71_SIGNAL_MANIFEST_REQUIRED"),
+        (V71_FUNNEL_RELATIVE_PATH, "V71_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V71_FORENSICS_RELATIVE_PATH, "V71_FORENSICS_REQUIRED"),
+    )
+    for path, action in required:
+        if not (root / path).is_file():
+            return {
+                "action_type": action,
+                "phase": "4",
+                "progressed": False,
+                "required_path": str(path),
+                "reason": "The preregistered V7.1 evidence sequence is incomplete.",
+            }
+    power = _load_json(root / V71_POWER_RELATIVE_PATH)
+    extension = _load_json(root / V71_POWER_EXTENSION_RELATIVE_PATH)
+    signal = _load_json(root / V71_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V71_FUNNEL_RELATIVE_PATH)
+    forensics = _load_json(root / V71_FORENSICS_RELATIVE_PATH)
+    if power.get("verdict") != "RED" or extension.get("verdict") != "GREEN":
+        raise V7ControllerIntegrityError("V7.1 power evidence sequence is inconsistent")
+    if int(signal.get("candidate_count") or 0) != 256:
+        raise V7ControllerIntegrityError("V7.1 signal manifest candidate count drift")
+    powered = int(funnel.get("powered_walk_forward_candidate_count") or 0)
+    positive = int(funnel.get("walk_forward_positive_count") or 0)
+    if powered > 0:
+        return {
+            "action_type": "V71_STAGE3_COHORT_FREEZE_REQUIRED",
+            "phase": "4",
+            "progressed": True,
+            "powered_candidate_count": powered,
+            "walk_forward_positive_count": positive,
+            "reason": "Powered walk-forward candidates must be frozen before nulls and DSR/BH.",
+        }
+    if forensics.get("MINI_MICRO_DIVERGENCE", {}).get("mechanism") != "MECHANISM_CONFIRMED_DEAD":
+        raise V7ControllerIntegrityError("V7.1 intra-product artifact status drift")
+    return {
+        "action_type": "V71_OPPORTUNITY_DENSITY_GRAMMAR_REQUIRED",
+        "phase": "4",
+        "progressed": True,
+        "walk_forward_positive_count": positive,
+        "powered_candidate_count": powered,
+        "minimum_powered_events": int(extension["minimum_required_event_count"]),
+        "next_experiment_id": "hydra_v7_1_opportunity_density_grammar_0002",
+        "next_experiment_state": "PREREGISTRATION_REQUIRED",
+        "new_data_purchase_authorized": False,
+        "reason": (
+            "Eleven distinct formulations are walk-forward positive but below "
+            "the frozen 320-event power minimum; expand opportunity coverage "
+            "structurally without parameter tuning or new data."
+        ),
+    }
 
 
 class V7FalsificationController:
@@ -313,6 +396,15 @@ class V7FalsificationController:
         g1 = _load_json(self.root / G1_RELATIVE_PATH)
         if g0.get("verdict") != "GREEN" or g1.get("verdict") != "GREEN":
             raise V7ControllerIntegrityError("G0 and G1 must both be frozen GREEN")
+        drift = [
+            path
+            for path, expected in V71_FROZEN_HASHES.items()
+            if _sha256(self.root / path) != expected
+        ]
+        if drift:
+            raise V7ControllerIntegrityError(
+                "V7.1 frozen constitutional input drift: " + ",".join(drift)
+            )
         proof = load_and_verify(self.root / "mission/state/proof_registry.json")
         if burned_window_ids(proof) != ("Q4_2024",):
             raise V7ControllerIntegrityError("unexpected proof-window state")

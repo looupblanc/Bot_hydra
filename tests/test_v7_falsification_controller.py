@@ -71,6 +71,38 @@ def test_inconsistent_tribunal_fails_closed(tmp_path: Path) -> None:
         classify_v7_action(tmp_path)
 
 
+def test_v71_controller_selects_next_power_aware_grammar(tmp_path: Path) -> None:
+    policy = tmp_path / "WORM/v7.1-hierarchical-validation-policy-2026-07-12.json"
+    policy.parent.mkdir(parents=True)
+    policy.write_text("{}", encoding="utf-8")
+    artifacts = {
+        "reports/v7_1/calibration/v71_power_audit_result.json": {"verdict": "RED"},
+        "reports/v7_1/calibration/v71_power_sample_extension_result.json": {
+            "verdict": "GREEN",
+            "minimum_required_event_count": 320,
+        },
+        "reports/v7_1/discovery/v71_signal_manifest.json": {"candidate_count": 256},
+        "reports/v7_1/discovery/v71_development_funnel_result.json": {
+            "walk_forward_positive_count": 11,
+            "powered_walk_forward_candidate_count": 0,
+        },
+        "reports/v7_1/forensics/v71_mechanism_forensics_result.json": {
+            "MINI_MICRO_DIVERGENCE": {"mechanism": "MECHANISM_CONFIRMED_DEAD"}
+        },
+    }
+    for relative, payload in artifacts.items():
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload), encoding="utf-8")
+
+    result = classify_v7_action(tmp_path)
+
+    assert result["action_type"] == "V71_OPPORTUNITY_DENSITY_GRAMMAR_REQUIRED"
+    assert result["walk_forward_positive_count"] == 11
+    assert result["minimum_powered_events"] == 320
+    assert result["new_data_purchase_authorized"] is False
+
+
 def test_controller_rejects_live_trading() -> None:
     with pytest.raises(V7ControllerIntegrityError):
         V7FalsificationController(V7ControllerConfig(no_live_trading=False))
