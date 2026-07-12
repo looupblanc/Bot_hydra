@@ -1,0 +1,49 @@
+{
+  "schema": "hydra_v7_permanent_tripwire_attestation_v1",
+  "grammar_id": "hydra_v7_grammar_0004_cross_sectional_scheduled_flow",
+  "executed_at_utc": "2026-07-12T17:10:32Z",
+  "validation_policy_path": "WORM/v7-grammar-0004-validation-policy-2026-07-12.json",
+  "validation_policy_sha256": "595ea2968f6b0a870735063e5af007d7fcc64af778a978743f923fbd7bc8e28b",
+  "phase1_preregistration_sha256": "4ca94dd368ed2aca1eaf92674ba7ba8778ff2e9e11f9ad402841c515e0deea0f",
+  "reference_summary_sha256": "ea90964588a22546aeb7ea14df7d418e06936d37145fa444358769cfad8abf72",
+  "reference_full_evidence_sha256": "73bcc543b9fdcf373680b789d721bfa3663581164efda41c354a08f5c49d3042",
+  "rerun_result_sha256": "3ed4e3462756a20b270ba7d60cad676b90e2222ac8082f3567d344e8d7c07dbb",
+  "rerun_full_evidence_sha256": "73bcc543b9fdcf373680b789d721bfa3663581164efda41c354a08f5c49d3042",
+  "full_evidence_byte_identical": true,
+  "verdict": "GREEN",
+  "threshold": 0.8,
+  "NULL_RATIO": 0.04954068241469816,
+  "real": {
+    "object_count": 1015,
+    "episode_count": 25680,
+    "pass_count": 9144,
+    "pass_rate": 0.3560747663551402
+  },
+  "pooled_null": {
+    "episode_count": 77040,
+    "pass_count": 1359,
+    "pass_rate": 0.01764018691588785
+  },
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "episode_count": 25680,
+      "pass_count": 479,
+      "NULL_RATIO": 0.0523840769903762
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "episode_count": 25680,
+      "pass_count": 395,
+      "NULL_RATIO": 0.04319772528433946
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "episode_count": 25680,
+      "pass_count": 485,
+      "NULL_RATIO": 0.05304024496937883
+    }
+  },
+  "q4_access_count_delta": 0,
+  "forward_gap_access_count": 0,
+  "outbound_order_count": 0,
+  "combine_pass_rate_used_as_candidate_fitness": false,
+  "CONTRE": "The byte-identical tripwire validates only the inherited simulator calibration. It says nothing about whether the 11 grammar 0004 structures beat their own matched controls or multiplicity burden."
+}
