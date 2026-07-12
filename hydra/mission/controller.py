@@ -176,7 +176,7 @@ TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX = "turbo_foundry_v2_epoch_"
 TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID = f"{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}0000"
 TURBO_PROMOTION_EXPERIMENT_PREFIX = "turbo_promotion_batch_"
 EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX = "evidence_conversion_v3_cohort_"
-DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0001"
+DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0002"
 DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID = "q4_atomic_one_shot_0001"
 DECISION_BRIDGE_V4_TASK_SHA256 = (
     "e80a099f2fca2a67fedbde860cf0409d7298798d6681866eb05117aeec9ac942"
@@ -1909,6 +1909,16 @@ class AutonomousMissionController:
                 "mini_micro_participation_divergence",
                 "mini_micro_participation_divergence_completed",
             ),
+            (
+                DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID,
+                "decision_bridge_v4_prepare",
+                "decision_bridge_v4_preparation_completed",
+            ),
+            (
+                DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
+                "q4_atomic_one_shot",
+                "decision_bridge_v4_q4_completed",
+            ),
         ):
             record = experiment_record(conn, experiment_id)
             if record is None or record.get("status") != "COMPLETED":
@@ -1997,6 +2007,8 @@ class AutonomousMissionController:
                 "role_conditioned_structural_epoch": "role_conditioned_structural_epoch_result",
                 "equity_preclose_inventory_dispersion": "equity_preclose_inventory_dispersion_result",
                 "mini_micro_participation_divergence": "mini_micro_participation_divergence_result",
+                "decision_bridge_v4_prepare": "decision_bridge_v4_preparation_result",
+                "q4_atomic_one_shot": "decision_bridge_v4_q4_result",
             }[experiment_type]
             if experiment_id == POST_MUTATION_CHILD_SHADOW_ACTIVATION_EXPERIMENT_ID:
                 result_key = "post_mutation_child_shadow_activation_result"
@@ -9640,7 +9652,26 @@ class AutonomousMissionController:
     ) -> None:
         validate_decision_bridge_preparation_result(result)
         if str(result.get("source_commit") or "") != self._git_commit():
-            raise RuntimeError("Decision Bridge preparation commit drifted.")
+            set_kv(
+                conn,
+                "decision_bridge_v4_superseded_preparation",
+                {
+                    "source_commit": result.get("source_commit"),
+                    "current_commit": self._git_commit(),
+                    "cohort_manifest_hash": result.get("cohort_manifest_hash"),
+                    "q4_access_count": 0,
+                    "reason": "controller_routing_commit_changed_before_q4_authorization",
+                },
+            )
+            queued = self._reconcile_decision_bridge_v4_preparation(conn)
+            set_kv(
+                conn,
+                "decision_bridge_v4_status",
+                "SUPERSEDED_PREPARATION_REPLACEMENT_QUEUED"
+                if queued
+                else "SUPERSEDED_PREPARATION_REPLACEMENT_BLOCKED",
+            )
+            return
         set_kv(conn, "decision_bridge_v4_preparation_result", result)
         set_kv(conn, "decision_bridge_v4_status", "FINAL_COHORT_FROZEN_Q4_CLOSED")
         try:

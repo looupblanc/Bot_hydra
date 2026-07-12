@@ -10,9 +10,15 @@ from hydra.governance.cohort_authorization import issue_cohort_authorization
 from hydra.mission.controller import (
     AutonomousMissionController,
     DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID,
+    DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
     MissionControllerConfig,
 )
-from hydra.mission.experiment_queue import experiment_record
+from hydra.mission.experiment_queue import (
+    claim_next_experiment,
+    complete_experiment,
+    enqueue_experiment,
+    experiment_record,
+)
 from hydra.mission.mission_state import connect_state, mission_paths, set_kv
 from hydra.promotion.final_cohort import stable_hash
 
@@ -121,5 +127,54 @@ def test_experiment_guard_allows_only_validated_exact_q4_capability(
                     "data_cost": 0.0,
                 },
             )
+    finally:
+        conn.close()
+
+
+@pytest.mark.parametrize(
+    ("experiment_id", "experiment_type", "route_name"),
+    [
+        (
+            DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID,
+            "decision_bridge_v4_prepare",
+            "_route_decision_bridge_v4_preparation_result",
+        ),
+        (
+            DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
+            "q4_atomic_one_shot",
+            "_route_decision_bridge_v4_q4_result",
+        ),
+    ],
+)
+def test_completed_bridge_types_have_metadata_and_scientific_routes(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    experiment_id: str,
+    experiment_type: str,
+    route_name: str,
+) -> None:
+    controller, conn = _controller(tmp_path)
+    try:
+        enqueue_experiment(
+            conn,
+            experiment_id,
+            {"experiment_type": experiment_type, "priority": 1.0},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            experiment_id,
+            {"scientific_conclusion": "TEST_ROUTE", "result_hash": "a" * 64},
+            claim_token=str(claimed["claim_token"]),
+        )
+        routed: list[str] = []
+        monkeypatch.setattr(
+            controller,
+            route_name,
+            lambda _conn, _result: routed.append(experiment_type),
+        )
+        controller._reconcile_completed_experiments(conn)
+        assert routed == [experiment_type]
     finally:
         conn.close()
