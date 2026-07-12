@@ -485,6 +485,10 @@ def _risk_transfer_signals(
             continue
         source_start, source_end = source_window
         target_start, target_end = target_window
+        if not _same_segment(source, source_start, source_end) or not _same_segment(
+            target, target_start, int(target_exit)
+        ):
+            continue
         source_move = float(source.close[source_end] / source.open[source_start] - 1.0)
         target_move = float(target.close[target_end] / target.open[target_start] - 1.0)
         source_threshold = float(np.quantile(source_history[-60:], 0.80)) if len(source_history) >= 60 else None

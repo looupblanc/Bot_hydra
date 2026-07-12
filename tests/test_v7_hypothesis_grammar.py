@@ -49,6 +49,17 @@ def test_population_generation_is_deterministic_and_past_only() -> None:
         assert all(signal.decision_ns <= signal.entry_ns < signal.exit_ns for signal in signals)
 
 
+def test_cross_market_signal_cannot_cross_target_segment() -> None:
+    bars = {market: _synthetic_bars(market) for market in MARKETS}
+    target = bars["CL"]
+    # Force every possible 09:01-to-10:00 target interval to cross a segment.
+    target.segment_code[target.local_minute >= 9 * 60 + 30] = 2
+
+    population = generate_signal_population(bars, graveyard_path=None)
+
+    assert population["v7g1_risk_transfer_ES_CL"] == ()
+
+
 def _synthetic_bars(market: str) -> V7MarketBars:
     # Seventy complete Chicago trading sessions provide the fixed rolling
     # histories without embedding any candidate outcome in the generator.
