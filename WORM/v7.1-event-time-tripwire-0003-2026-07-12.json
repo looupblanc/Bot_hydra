@@ -1,0 +1,63 @@
+{
+  "schema": "hydra_v7_1_event_time_tripwire_policy_v1",
+  "tripwire_id": "hydra_v7_1_event_time_tripwire_0003",
+  "grammar_id": "hydra_v7_1_event_time_grammar_0003",
+  "grammar_path": "WORM/v7.1-event-time-grammar-0003-2026-07-12.json",
+  "grammar_sha256": "df9ffd7c6c87707838f53c30e474d7477bf17532ba29bffc1baa2b2a5bd0903f",
+  "signal_manifest_path": "reports/v7_1/discovery_0003/v71_event_time_signal_manifest.json",
+  "signal_manifest_sha256": "e515a0ab84600edfd8552c46b3471f77d0ba17ad3b761cf7757d5fdaa89c736d",
+  "stage0_stage2_result_path": "reports/v7_1/discovery_0003/v71_event_time_funnel_result.json",
+  "stage0_stage2_result_sha256": "22f9816aeb2bae8734571dcd84485f0ccbfdb21b4735cbe0ed11356dcbc0358b",
+  "purpose": "Permanent grammar-level geometry tripwire for event-time states. Combine passage is diagnostic only and is not candidate fitness or promotion evidence.",
+  "real_world": "unchanged_D1_ES_minute_and_event_time_features",
+  "null_worlds": [
+    "DAILY_BLOCK_SHUFFLE",
+    "VOLATILITY_MATCHED_RANDOM_WALK",
+    "YEAR_BLOCK_PERMUTATION"
+  ],
+  "seeds": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "2023_ES": 930301,
+      "2024_ES": 930401
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "2023_ES": 940301,
+      "2024_ES": 940401
+    },
+    "YEAR_BLOCK_PERMUTATION": "deterministic_year_swap"
+  },
+  "pipeline": {
+    "event_time_state_recomputation_per_world": true,
+    "feature_and_signal_recomputation_per_world": true,
+    "real_and_null_pipeline_identical": true,
+    "event_duration_and_aggressor_flow_preserved_in_price_nulls": true,
+    "cost_stress": "BASE",
+    "diagnostic_quantities": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "combine_horizon_trading_days": 20,
+    "mll_mode": "eod_level_rt_breach",
+    "maximum_mini_equivalent": 15.0,
+    "explicit_contracts": true,
+    "session_flatten": true
+  },
+  "decision": {
+    "NULL_RATIO": "pooled_null_pass_rate / real_pass_rate",
+    "artefact_threshold_inclusive": 0.8,
+    "zero_real_passes": "BLOCKED_UNDERPOWERED",
+    "ratio_at_or_above_threshold": "ARTEFACT_GEOMETRY_ONLY",
+    "ratio_below_threshold": "GREEN_NULL_ADJUSTED_BASELINE",
+    "exact_one_sided_binomial_p_value_required": true,
+    "raw_counts_required": true,
+    "evidence_strength_required": true
+  },
+  "candidate_promotion_authorized": false,
+  "candidate_status_inheritance": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "Event durations and aggressor flow are intentionally preserved while price paths are nullified; this tests whether their directional relation beats account geometry, but two D1 calendar blocks still limit stability inference."
+}
