@@ -333,6 +333,11 @@ def _vwap_acceptance_signals(
                     np.sum(close[window] * volume[window]) / denominator
                 )
         for position in range(7, len(rows)):
+            if not (
+                np.isfinite(prior_vwap[position - 1])
+                and np.isfinite(prior_vwap[position])
+            ):
+                continue
             previous_side = int(np.sign(close[position - 1] - prior_vwap[position - 1]))
             current_side = int(np.sign(close[position] - prior_vwap[position]))
             if (
