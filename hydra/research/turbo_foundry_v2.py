@@ -63,8 +63,8 @@ from hydra.validation.data_roles import DataRole
 from hydra.validation.lockbox_guard import enforce_data_access
 
 
-VERSION = "hydra_turbo_foundry_v2_epoch_v1"
-POPULATION_VERSION = "hydra_turbo_population_v2"
+VERSION = "hydra_turbo_foundry_v2_epoch_v2"
+POPULATION_VERSION = "hydra_turbo_population_v3"
 PROPOSAL_TARGET = 6_000
 EXACT_REPLAY_LIMIT = 180
 PROMOTION_QUEUE_LIMIT = 60
@@ -81,13 +81,56 @@ CONTEXTS: tuple[tuple[str | None, ComparisonOperator | None, float | None, str],
     ("ctx_15m_return", ComparisonOperator.GREATER_THAN, 0.0, "1m|15m"),
     ("ctx_15m_return", ComparisonOperator.LESS_THAN, 0.0, "1m|15m"),
     ("ctx_30m_return", ComparisonOperator.GREATER_THAN, 0.0, "1m|30m"),
+    ("ctx_30m_return", ComparisonOperator.LESS_THAN, 0.0, "1m|30m"),
     ("ctx_60m_return", ComparisonOperator.GREATER_THAN, 0.0, "1m|60m"),
     ("ctx_60m_return", ComparisonOperator.LESS_THAN, 0.0, "1m|60m"),
+    (
+        "ctx_5m_volatility_expansion",
+        ComparisonOperator.GREATER_EQUAL,
+        0.5,
+        "1m|5m",
+    ),
+    (
+        "ctx_5m_volatility_expansion",
+        ComparisonOperator.LESS_THAN,
+        0.5,
+        "1m|5m",
+    ),
     (
         "ctx_15m_volatility_expansion",
         ComparisonOperator.GREATER_EQUAL,
         0.5,
         "1m|15m",
+    ),
+    (
+        "ctx_15m_volatility_expansion",
+        ComparisonOperator.LESS_THAN,
+        0.5,
+        "1m|15m",
+    ),
+    (
+        "ctx_30m_volatility_expansion",
+        ComparisonOperator.GREATER_EQUAL,
+        0.5,
+        "1m|30m",
+    ),
+    (
+        "ctx_30m_volatility_expansion",
+        ComparisonOperator.LESS_THAN,
+        0.5,
+        "1m|30m",
+    ),
+    (
+        "ctx_60m_volatility_expansion",
+        ComparisonOperator.GREATER_EQUAL,
+        0.5,
+        "1m|60m",
+    ),
+    (
+        "ctx_60m_volatility_expansion",
+        ComparisonOperator.LESS_THAN,
+        0.5,
+        "1m|60m",
     ),
 )
 META_FEATURES = (
@@ -619,12 +662,49 @@ def _quality_diversity_cap(
             ecology: base + int(index < remainder)
             for index, ecology in enumerate(available_ecologies)
         }
-    family_cap = max(1, math.floor(count * 0.25))
+    available_families = sorted({spec.family for spec in specs})
+    hard_family_cap = max(1, math.floor(count * 0.25))
     lineage_cap = max(1, math.floor(count * 0.02))
+    _maximum_allocation, maximum_total = _strict_cell_allocation(
+        specs,
+        ecology_caps={ecology: count for ecology in available_ecologies},
+        family_caps={family: hard_family_cap for family in available_families},
+        lineage_cap=lineage_cap,
+        target=count,
+    )
+    if maximum_total < count:
+        raise TurboFoundryError(
+            "INSUFFICIENT_STRUCTURAL_DIVERSITY: family/lineage caps permit only "
+            f"{maximum_total} of {count} requested structures after ecology relaxation."
+        )
+
+    # Prefer the smallest common family ceiling that can fill the batch. With
+    # five healthy families this forces an even archive instead of allowing
+    # four families to consume 25% each and leave only a token fifth family.
+    family_lower = math.ceil(count / len(available_families))
+    family_upper = hard_family_cap
+    while family_lower < family_upper:
+        candidate_family_cap = (family_lower + family_upper) // 2
+        _candidate_allocation, candidate_total = _strict_cell_allocation(
+            specs,
+            ecology_caps={ecology: count for ecology in available_ecologies},
+            family_caps={
+                family: candidate_family_cap for family in available_families
+            },
+            lineage_cap=lineage_cap,
+            target=count,
+        )
+        if candidate_total >= count:
+            family_upper = candidate_family_cap
+        else:
+            family_lower = candidate_family_cap + 1
+    family_caps = {
+        family: family_lower for family in available_families
+    }
     allocation, strict_total = _strict_cell_allocation(
         specs,
         ecology_caps=ecology_caps,
-        family_cap=family_cap,
+        family_caps=family_caps,
         lineage_cap=lineage_cap,
         target=count,
     )
@@ -641,7 +721,7 @@ def _quality_diversity_cap(
                 ecology_caps={
                     ecology: candidate_cap for ecology in available_ecologies
                 },
-                family_cap=family_cap,
+                family_caps=family_caps,
                 lineage_cap=lineage_cap,
                 target=count,
             )
@@ -652,7 +732,7 @@ def _quality_diversity_cap(
         allocation, feasible_total = _strict_cell_allocation(
             specs,
             ecology_caps={ecology: lower for ecology in available_ecologies},
-            family_cap=family_cap,
+            family_caps=family_caps,
             lineage_cap=lineage_cap,
             target=count,
         )
@@ -688,7 +768,7 @@ def _strict_cell_allocation(
     specs: Sequence[StrategySpec],
     *,
     ecology_caps: Mapping[str, int],
-    family_cap: int,
+    family_caps: Mapping[str, int],
     lineage_cap: int,
     target: int,
 ) -> tuple[dict[tuple[str, str], int], int]:
@@ -716,7 +796,7 @@ def _strict_cell_allocation(
         for cell, lineage_counts in cell_lineages.items()
     }
     ecologies = sorted(ecology_caps)
-    families = sorted({family for _, family in cell_capacity})
+    families = sorted(family_caps)
     source = "source"
     sink = "sink"
     residual: dict[tuple[str, str], int] = {}
@@ -739,7 +819,7 @@ def _strict_cell_allocation(
                 edge_capacity[cell] = capacity
                 add_edge(f"ecology:{ecology}", f"family:{family}", capacity)
     for family in families:
-        add_edge(f"family:{family}", sink, family_cap)
+        add_edge(f"family:{family}", sink, family_caps[family])
 
     total = 0
     while total < target:

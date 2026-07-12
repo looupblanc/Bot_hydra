@@ -9,6 +9,7 @@ from hydra.features.feature_matrix import FeatureMatrix
 from hydra.research.qd_economic_tournament import FEATURES, MARKET_PAIRS
 from hydra.research.turbo_feature_builder import CONTEXT_MINUTES, HORIZONS
 from hydra.research.turbo_foundry_v2 import (
+    CONTEXTS,
     TurboFoundryError,
     _population_coverage,
     _quality_diversity_cap,
@@ -63,6 +64,7 @@ def test_turbo_population_is_deterministic_unique_and_respects_caps():
     assert len({row.candidate_id for row in left}) == 500
     coverage = _population_coverage(left)
     assert coverage["maximum_family_share"] <= 0.25
+    assert set(coverage["mechanism_families"].values()) == {100}
     assert coverage["maximum_ecology_share"] <= 0.40
     assert coverage["maximum_lineage_share"] <= 0.02
     assert set(coverage["market_ecologies"]) == {"equity_indices", "metals", "energy"}
@@ -74,6 +76,35 @@ def test_stage1_matrix_contains_only_closed_development_rows():
     assert stage1.event_count > 0
     assert (stage1.availability_ns <= stage1.decision_ns).all()
     assert set(np.unique(stage1.session_codes)) <= {0, 1, 2}
+
+
+def test_expanded_mtf_grammar_covers_direction_and_volatility_states():
+    context_states = {
+        (feature, operator, timeframe)
+        for feature, operator, _threshold, timeframe in CONTEXTS
+        if feature is not None
+    }
+    for minutes in (5, 15, 30, 60):
+        assert (
+            f"ctx_{minutes}m_return",
+            ComparisonOperator.GREATER_THAN,
+            f"1m|{minutes}m",
+        ) in context_states
+        assert (
+            f"ctx_{minutes}m_return",
+            ComparisonOperator.LESS_THAN,
+            f"1m|{minutes}m",
+        ) in context_states
+        assert (
+            f"ctx_{minutes}m_volatility_expansion",
+            ComparisonOperator.GREATER_EQUAL,
+            f"1m|{minutes}m",
+        ) in context_states
+        assert (
+            f"ctx_{minutes}m_volatility_expansion",
+            ComparisonOperator.LESS_THAN,
+            f"1m|{minutes}m",
+        ) in context_states
 
 
 def test_missing_metal_ecology_redistributes_quota_before_stage1():
