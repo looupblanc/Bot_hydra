@@ -1,0 +1,85 @@
+{
+  "schema": "hydra_v7_hypothesis_grammar_v1",
+  "grammar_id": "hydra_v7_grammar_0004_cross_sectional_scheduled_flow",
+  "preregistered_at_utc": "2026-07-12T16:58:00Z",
+  "contract_sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+  "source_snapshot": "mission/state/snapshots/v7_pre_grammar0004_20260712T165705Z.tar.gz",
+  "source_snapshot_sha256": "a4edd1ba7f9c856e2ed718dd06db724cfae8effc6a715043fe9536776c930382",
+  "data_scope": {
+    "role": "DEVELOPMENT_ONLY",
+    "markets": ["ES", "NQ", "RTY", "YM", "CL", "GC"],
+    "end_exclusive": "2024-10-01",
+    "explicit_contracts": true,
+    "forward_gap_allowed": false,
+    "q4_allowed": false
+  },
+  "mechanisms": [
+    {
+      "hypothesis_id": "H17_INDEX_BREADTH_CATCHUP",
+      "mechanism_class": "intraday_index_breadth_catchup",
+      "economic_hypothesis": "Index-arbitrage desks and broad ETF hedgers transmit a strong majority move from three equity futures into the lagging fourth future after the opening hour.",
+      "who_pays": "Slow benchmark rebalancers and sector-concentrated participants whose hedges reach the lagging index after the broad move is established.",
+      "candidates": ["ES", "NQ", "RTY", "YM"],
+      "signal": "At 09:30 CT, at least two peers share a sign, peer median absolute 08:30-09:30 return exceeds its past-only 60-session median, and target absolute return is below peer median; trade target in consensus direction.",
+      "entry_exit": "Enter 09:31 CT after the completed decision bar; exit 14:30 CT."
+    },
+    {
+      "hypothesis_id": "H18_INDEX_LEADERSHIP_SPREAD_REVERSION",
+      "mechanism_class": "extreme_index_leadership_spread_reversion",
+      "economic_hypothesis": "An extreme opening NQ-minus-RTY leadership spread is partly inventory-driven and compresses as cross-index hedgers rebalance before the close.",
+      "who_pays": "Opening momentum chasers and temporarily unbalanced relative-index hedges.",
+      "candidates": ["NQ", "RTY"],
+      "signal": "At 10:00 CT, absolute NQ-minus-RTY 08:30-10:00 return spread exceeds its past-only 60-session q75; short the relative leader through the target leg and buy the relative laggard through the target leg.",
+      "entry_exit": "Enter 10:01 CT after the completed decision bar; exit 14:30 CT."
+    },
+    {
+      "hypothesis_id": "H19_WEEKLY_OPTION_GAMMA_REVERSION",
+      "mechanism_class": "weekly_option_gamma_hedge_reversion",
+      "economic_hypothesis": "Friday weekly-option gamma hedging counteracts an unusually large first-hour ES or NQ move during the remaining cash session.",
+      "who_pays": "First-hour directional traders crossing against dealer hedge rebalancing into weekly option expiry.",
+      "candidates": ["ES", "NQ"],
+      "signal": "On Friday at 09:30 CT, absolute 08:30-09:30 return exceeds the median of the prior 20 Fridays; trade opposite the first-hour move.",
+      "entry_exit": "Enter 09:31 CT after the completed decision bar; exit 14:30 CT."
+    },
+    {
+      "hypothesis_id": "H20_SYNCHRONOUS_MACRO_CONFIRMATION",
+      "mechanism_class": "synchronous_cross_ecology_macro_completion",
+      "economic_hypothesis": "When related ecologies confirm a large pre-open macro repricing synchronously, commercial and allocation hedges continue the target-market move after the equity cash open.",
+      "who_pays": "Participants completing energy-demand or safe-haven allocation after the common macro state is already observable.",
+      "candidates": ["ES_CL_TO_CL", "ES_GC_RISK_OFF_TO_GC"],
+      "signal": "At 08:30 CT, ES and CL same-sign 07:30-08:30 moves above their past-only 60-session medians continue in CL; opposite-sign ES and GC moves above medians continue in GC's observed direction.",
+      "entry_exit": "Enter 08:31 CT after the completed decision bar; exit 12:00 CT."
+    },
+    {
+      "hypothesis_id": "H21_EIA_INVENTORY_DRIFT",
+      "mechanism_class": "scheduled_energy_inventory_information_drift",
+      "economic_hypothesis": "Large Wednesday crude repricing around the nominal EIA inventory release continues while physical and macro hedgers digest the inventory surprise.",
+      "who_pays": "Slower commercial hedgers and participants waiting for post-release confirmation.",
+      "candidates": ["CL"],
+      "signal": "On Wednesday at 09:35 CT, absolute CL 09:30-09:35 return exceeds the median of the prior 20 Wednesdays; trade in the release-window direction. Holiday-shift weeks remain noise by preregistration.",
+      "entry_exit": "Enter 09:36 CT after the completed decision bar; exit 12:00 CT."
+    }
+  ],
+  "candidate_count": 11,
+  "hard_constraints": {
+    "minimum_events": 30,
+    "past_only_thresholds": true,
+    "closed_bar_only": true,
+    "explicit_contract_segment_only": true,
+    "fixed_quantity": 1,
+    "same_session_exit": true,
+    "combine_pass_rate_as_fitness": false,
+    "combine_pass_rate_as_gate": false
+  },
+  "novelty": {
+    "graveyard_feedback_scope": "mechanism_class_x_regime_x_death_cause_only",
+    "parameter_feedback_used": false,
+    "new_mechanism_classes": 5
+  },
+  "safety": {
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "outbound_orders_allowed": false
+  },
+  "CONTRE": "Calendar labels and cross-market consensus may still proxy generic intraday drift rather than the stated counterparties; matched-day and delay controls are therefore mandatory before any promotion."
+}
