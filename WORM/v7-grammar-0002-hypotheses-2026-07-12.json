@@ -1,0 +1,222 @@
+{
+  "schema": "hydra_v7_hypothesis_first_grammar_preregistration_v1",
+  "grammar_id": "hydra_v7_grammar_0002_session_inventory_risk_premia",
+  "preregistered_at_utc": "2026-07-12T16:08:00Z",
+  "contract": {
+    "path": "MISSION_CONTRACT.md",
+    "sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+    "tag": "worm/contract-2026-07-12-v2"
+  },
+  "required_gates": {
+    "G0": "GREEN",
+    "G1": "GREEN",
+    "G1_NULL_RATIO": 0.04954068241469816,
+    "phase2_inherited_track": "NULL",
+    "grammar0001": "BLOCKED"
+  },
+  "data": {
+    "role": "DEVELOPMENT_ONLY",
+    "start_inclusive": "2023-01-01",
+    "end_exclusive": "2024-10-01",
+    "data_manifest_path": "data/manifest.json",
+    "data_manifest_hash": "cc8b6da2ea2c235f9871092ac4ddf3a97d4d5dc5c6ba589e30414a337f884371",
+    "markets": ["ES", "NQ", "RTY", "YM", "GC", "CL"],
+    "bar_schema": "explicit-contract OHLCV 1m",
+    "timezone": "America/Chicago",
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "D1_print_features_allowed": false,
+    "new_paid_data_allowed": false
+  },
+  "common_execution": {
+    "decision": "At the close of the final completed observation bar.",
+    "entry": "Open of the next preregistered contiguous one-minute bar in the same explicit contract and segment.",
+    "quantity": 1,
+    "overlap": "At most one open trade per candidate; later signals are skipped until exit.",
+    "roll": "Observation, entry and exit must remain in one explicit contract and contiguous segment.",
+    "costs": "Product and horizon-specific V7 round-turn cost model at multipliers 1.0, 1.5 and 2.0.",
+    "session_flatten": "No position remains open at or after 15:10 CT; overnight positions open only after 17:00 CT and close before the following cash session.",
+    "broker_or_order_capability": false
+  },
+  "hypotheses": [
+    {
+      "id": "H6_OVERNIGHT_EQUITY_RISK_PREMIUM",
+      "mechanism_class": "overnight_equity_inventory_risk_premium",
+      "economic_hypothesis": "Equity-index holders require intermediaries to warehouse macro and geopolitical risk while cash markets are closed, so the long side earns a positive overnight inventory premium net of execution costs.",
+      "who_pays": "Participants demanding overnight downside insurance and intermediaries transferring unhedged cash-market inventory.",
+      "markets": ["ES", "NQ", "RTY", "YM"],
+      "candidate_count": 4,
+      "activation": "Every eligible Monday-through-Thursday Globex session with a contiguous explicit contract; Sunday evening is excluded to avoid weekend-gap mixing.",
+      "side": "long",
+      "decision_CT": "17:00",
+      "entry_CT": "17:01",
+      "exit_CT": "08:29 on the next Chicago trading day"
+    },
+    {
+      "id": "H7_OVERNIGHT_INVENTORY_PARTIAL_UNWIND",
+      "mechanism_class": "overnight_inventory_partial_unwind",
+      "economic_hypothesis": "An overnight displacement larger than its past-only median embeds thin-liquidity inventory that cash-session liquidity providers partially unwind during the first ninety minutes.",
+      "who_pays": "Urgent overnight hedgers crossing thinner liquidity before the cash-session participant base arrives.",
+      "markets": ["ES", "NQ", "RTY", "YM", "GC", "CL"],
+      "candidate_count": 6,
+      "observation_window_CT": "17:00 previous session inclusive to 08:29 current trading day inclusive",
+      "features": {
+        "overnight_displacement": "close_08:29 / open_17:00 - 1",
+        "activation_threshold": "median absolute overnight displacement over the immediately preceding 20 eligible sessions only",
+        "minimum_history_sessions": 20
+      },
+      "activation": "Absolute overnight displacement is at least the frozen past-only median.",
+      "side": "opposite overnight displacement",
+      "decision_CT": "08:30",
+      "entry_CT": "08:31",
+      "exit_CT": "10:00"
+    },
+    {
+      "id": "H8_MIDDAY_LIQUIDITY_REPLENISHMENT",
+      "mechanism_class": "midday_liquidity_replenishment_reversion",
+      "economic_hypothesis": "Urgent morning orders temporarily displace price; once their participation decays before lunch, replenished passive liquidity earns compensation by reverting the efficient morning displacement.",
+      "who_pays": "Morning liquidity takers that complete urgent execution before midday depth replenishes.",
+      "markets": ["ES", "NQ", "RTY", "YM", "GC", "CL"],
+      "candidate_count": 6,
+      "observation_window_CT": "08:30 inclusive to 11:00 exclusive",
+      "features": {
+        "morning_displacement": "close_10:59 / open_08:30 - 1",
+        "path_efficiency": "absolute displacement divided by signed path length",
+        "activation_threshold": "median absolute morning displacement over the immediately preceding 20 eligible sessions only",
+        "minimum_efficiency": 0.35,
+        "minimum_history_sessions": 20
+      },
+      "activation": "Absolute morning displacement is at least the past-only median and path efficiency is at least 0.35.",
+      "side": "opposite morning displacement",
+      "decision_CT": "11:00",
+      "entry_CT": "11:01",
+      "exit_CT": "12:30"
+    },
+    {
+      "id": "H9_AFTERNOON_INVENTORY_REACCELERATION",
+      "mechanism_class": "afternoon_inventory_reacceleration_after_compression",
+      "economic_hypothesis": "A directional morning parent order that survives a low-range midday pause resumes when afternoon liquidity returns because the underlying inventory transfer remains unfinished.",
+      "who_pays": "Large parent orders split across session phases and counterparties delaying execution until afternoon liquidity returns.",
+      "markets": ["ES", "NQ", "RTY", "YM", "GC", "CL"],
+      "candidate_count": 6,
+      "morning_window_CT": "08:30 inclusive to 10:30 exclusive",
+      "midday_window_CT": "10:30 inclusive to 12:30 exclusive",
+      "features": {
+        "morning_threshold": "median absolute morning displacement over the immediately preceding 20 eligible sessions only",
+        "compression_threshold": "median midday high-low range over the immediately preceding 20 eligible sessions only",
+        "retention": "midday close retains at least 50 percent of the signed morning displacement from the 08:30 open",
+        "minimum_history_sessions": 20
+      },
+      "activation": "Morning displacement exceeds its past median, midday range is no greater than its past median, and at least half the signed morning move is retained.",
+      "side": "same as morning displacement",
+      "decision_CT": "12:30",
+      "entry_CT": "12:31",
+      "exit_CT": "14:30"
+    },
+    {
+      "id": "H10_WEEKLY_ENERGY_INVENTORY_FLOW",
+      "mechanism_class": "weekly_energy_inventory_flow_continuation",
+      "economic_hypothesis": "The scheduled US petroleum inventory release forces physical hedgers and discretionary traders to adjust CL exposure over several minutes, so a high-efficiency initial shock continues while those inventory transfers complete.",
+      "who_pays": "Physical-market hedgers and discretionary participants reacting sequentially to inventory information.",
+      "markets": ["CL"],
+      "candidate_count": 1,
+      "eligible_days": "Wednesday Chicago trading days only; no holiday rescheduling inference is allowed.",
+      "observation_window_CT": "09:30 inclusive to 09:35 exclusive",
+      "features": {
+        "shock_displacement": "close_09:34 / open_09:30 - 1",
+        "path_efficiency": "absolute displacement divided by signed path length",
+        "activation_threshold": "median absolute shock displacement over the immediately preceding 12 eligible Wednesdays only",
+        "minimum_efficiency": 0.50,
+        "minimum_history_events": 12
+      },
+      "activation": "Absolute shock displacement is at least the past-only Wednesday median and efficiency is at least 0.50.",
+      "side": "same as shock displacement",
+      "decision_CT": "09:35",
+      "entry_CT": "09:36",
+      "exit_CT": "10:30"
+    }
+  ],
+  "candidate_universe": {
+    "structural_candidate_count": 23,
+    "parameter_variants_per_market_hypothesis": 1,
+    "threshold_neighbors_allowed": false,
+    "market_transfer_is_preregistered_only_where_listed": true,
+    "mini_micro_copies_count_as_same_mechanism": true
+  },
+  "funnel": {
+    "stage0": {
+      "hard_checks": ["syntax", "explicit_contract", "closed_bars", "availability", "no_lookahead", "session", "sizing", "duplicate", "graveyard_class_distance"]
+    },
+    "stage1": {
+      "minimum_events": 30,
+      "base_cost_net_expectancy_per_trade_gt": 0.0,
+      "no_account_combine_fitness": true
+    },
+    "stage2": {
+      "cost_1_5x_net_expectancy_per_trade_gt": 0.0,
+      "ruleset_research_trajectory_compliance": 1.0,
+      "SIM_EXPLOIT_cost_2x_expectancy_per_trade_gt": 0.0
+    },
+    "stage3": {
+      "walk_forward_folds": 4,
+      "folds": "four contiguous numpy.array_split blocks of Chicago trading days",
+      "purge": "exact maximum holding horizon at every boundary",
+      "embargo_trading_days": 5,
+      "pooled_cost_1_5x_expectancy_per_trade_gt": 0.0,
+      "candidate_nulls": ["SIGN_INVERSION", "FIVE_SESSION_SIGNAL_DELAY", "OPPORTUNITY_COUNT_MATCHED_CLOCK"],
+      "DSR_deflated_z_gt": 0.0,
+      "BH_FDR": 0.10,
+      "BH_family_size": 23,
+      "N_trials": 247176
+    },
+    "stage4": {
+      "shadow_queue_maximum": 5,
+      "maximum_one_candidate_per_mechanism_class": true,
+      "candidate_fiche_WORM_before_gap_ingestion": true
+    },
+    "kill_before_walk_forward_target": 0.95
+  },
+  "multiplicity_reservation": {
+    "previous_N_trials": 246946,
+    "new_tests": {
+      "base_expectancy": 23,
+      "cost_1_5x": 23,
+      "cost_2x_SIM_EXPLOIT": 23,
+      "four_walk_forward_folds": 92,
+      "three_candidate_nulls": 69
+    },
+    "delta_trials": 230,
+    "cumulative_N_trials": 247176
+  },
+  "permanent_tripwire": {
+    "required_before_shadow_queue": true,
+    "scope": "Exact deterministic rerun of the frozen Phase 1 full account pipeline because grammar 0002 changes neither the simulator nor its OHLC source data.",
+    "preregistration_path": "WORM/phase1-null-tripwire-2026-07-12.json",
+    "preregistration_sha256": "4ca94dd368ed2aca1eaf92674ba7ba8778ff2e9e11f9ad402841c515e0deea0f",
+    "reference_result_path": "reports/v7/phase1/null_tripwire_result.json",
+    "reference_result_sha256": "ea90964588a22546aeb7ea14df7d418e06936d37145fa444358769cfad8abf72",
+    "reference_NULL_RATIO": 0.04954068241469816,
+    "threshold": 0.8,
+    "required_verdict": "GREEN",
+    "candidate_Combine_pass_rate_is_not_a_gate_or_fitness": true,
+    "candidate_specific_controls_are_expectancy_and_DSR_based": true
+  },
+  "selection": {
+    "ranking_only_after_all_gates": ["higher deflated_z", "higher 1.5x walk-forward expectancy", "lower 2x maximum drawdown", "candidate_id"],
+    "no_parameter_feedback_from_null_or_future": true,
+    "no_Combine_pass_rate_optimization": true,
+    "graveyard_feedback_level": "mechanism_class x regime x death_cause only"
+  },
+  "safety": {
+    "generation_commit_must_not_modify_validation_or_ruleset": true,
+    "validation_commit_must_not_modify_strategy_or_generation": true,
+    "q4_access_count_delta": 0,
+    "forward_gap_access_count": 0,
+    "outbound_order_count": 0
+  },
+  "budget": {
+    "LLM_phase4": "remaining balance",
+    "data_spend_authorized_for_this_grammar": 0.0
+  },
+  "CONTRE": "The hypotheses are economically stated but several remain exposed to generic intraday seasonality, the fixed Wednesday CL clock ignores holiday rescheduling, and one-contract research paths may be too slow for a diagnostic Combine pass even when expectancy is positive; promotion therefore depends on DSR/BH and fresh proof, not pass-rate."
+}
