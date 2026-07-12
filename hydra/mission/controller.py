@@ -177,8 +177,8 @@ TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX = "turbo_foundry_v2_epoch_"
 TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID = f"{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}0000"
 TURBO_PROMOTION_EXPERIMENT_PREFIX = "turbo_promotion_batch_"
 EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX = "evidence_conversion_v3_cohort_"
-DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0003"
-DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID = "q4_atomic_one_shot_0001"
+DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0004"
+DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID = "q4_atomic_one_shot_0002"
 DECISION_BRIDGE_V4_TASK_SHA256 = (
     "e80a099f2fca2a67fedbde860cf0409d7298798d6681866eb05117aeec9ac942"
 )
@@ -10420,7 +10420,19 @@ class AutonomousMissionController:
             set_kv(conn, "current_blocker", "EXPERIMENT_GOVERNANCE_GUARD_FAILED")
             set_kv(conn, "last_error", str(exc)[:4000])
             return
-        if experiment.get("q4_access_allowed") or experiment.get("paid_data_allowed") or "live" in experiment_type.lower():
+        # The dedicated manifest-bound Q4 capability was fully validated by
+        # ``_check_experiment_allowed`` above.  Keep the legacy blanket guard
+        # for every other experiment, but do not reject the exact atomic
+        # one-shot a second time solely because its required scope flags are
+        # true.
+        if (
+            experiment_type != "q4_atomic_one_shot"
+            and (
+                experiment.get("q4_access_allowed")
+                or experiment.get("paid_data_allowed")
+                or "live" in experiment_type.lower()
+            )
+        ):
             reason = "Experiment specification requests a prohibited Q4, paid-data, or live path."
             block_experiment(conn, experiment_id, reason, claim_token=str(experiment["claim_token"]))
             set_kv(conn, "current_experiment", None)

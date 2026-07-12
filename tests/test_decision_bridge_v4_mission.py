@@ -132,6 +132,48 @@ def test_experiment_guard_allows_only_validated_exact_q4_capability(
         conn.close()
 
 
+def test_serial_executor_does_not_reject_validated_atomic_q4_twice(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    controller, conn = _controller(tmp_path)
+    try:
+        enqueue_experiment(
+            conn,
+            "q4_serial_guard_regression",
+            {
+                "experiment_type": "q4_atomic_one_shot",
+                "priority": 100.0,
+                "max_attempts": 1,
+                "q4_access_allowed": True,
+                "paid_data_allowed": True,
+                "live_or_broker_allowed": False,
+            },
+        )
+        monkeypatch.setattr(
+            controller, "_check_experiment_allowed", lambda _conn, _row: None
+        )
+        monkeypatch.setattr(
+            controller,
+            "_run_experiment_with_heartbeat",
+            lambda _conn, _row: {
+                "scientific_conclusion": "Q4_SERIAL_GUARD_REGRESSION_PASSED",
+                "result_hash": "a" * 64,
+            },
+        )
+        monkeypatch.setattr(
+            controller, "_reconcile_completed_experiments", lambda _conn: None
+        )
+
+        controller._execute_queued_experiment(conn)
+
+        record = experiment_record(conn, "q4_serial_guard_regression")
+        assert record is not None
+        assert record["status"] == "COMPLETED"
+        assert record["last_error"] is None
+    finally:
+        conn.close()
+
+
 @pytest.mark.parametrize(
     ("experiment_id", "experiment_type", "route_name"),
     [
