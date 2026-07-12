@@ -1,0 +1,65 @@
+{
+  "schema": "hydra_v7_graveyard_grammar_update_v1",
+  "built_at_utc": "2026-07-12T16:53:28Z",
+  "graveyard_path": "mission/state/graveyard.db",
+  "graveyard_sha256": "d460b209fa4c426a593b498bb6e847e3fd7ee4ae229d15fcd58c1082c61935c7",
+  "integrity": "ok",
+  "class_signature_count": 72,
+  "indexed_object_count": 115509,
+  "new_grammar_tombstone_count_total": 66,
+  "grammar0003_tombstone_count": 19,
+  "grammar_result_path": "reports/v7/phase4/grammar0003_validation_result.json",
+  "grammar_result_sha256": "258fb46b4d0c9c57bf7d194e0c850a1def13a74eb093563e359d842a57ad91f4",
+  "grammar0003_contract_death_causes": {
+    "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 10,
+    "CANDIDATE_NULL_FAILURE": 5,
+    "MULTIPLICITY_DEFLATION_FAILURE": 2,
+    "SIM_EXPLOIT": 2
+  },
+  "class_rows": [
+    {
+      "mechanism_class": "lagged_energy_to_gold_inflation_transfer",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 1
+      }
+    },
+    {
+      "mechanism_class": "lagged_equity_to_energy_growth_transfer",
+      "causes": {
+        "SIM_EXPLOIT": 1
+      }
+    },
+    {
+      "mechanism_class": "lagged_equity_to_gold_risk_transfer",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 1
+      }
+    },
+    {
+      "mechanism_class": "prior_session_information_underreaction",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 4,
+        "CANDIDATE_NULL_FAILURE": 2
+      }
+    },
+    {
+      "mechanism_class": "turn_of_month_index_allocation_flow",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 1,
+        "CANDIDATE_NULL_FAILURE": 2,
+        "SIM_EXPLOIT": 1
+      }
+    },
+    {
+      "mechanism_class": "two_day_liquidity_shock_reversal",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 3,
+        "CANDIDATE_NULL_FAILURE": 1,
+        "MULTIPLICITY_DEFLATION_FAILURE": 2
+      }
+    }
+  ],
+  "parameter_level_feedback": false,
+  "outbound_order_count": 0,
+  "CONTRE": "Class-level aggregation correctly prevents parameter leakage, but two multiday reversal candidates beating their candidate nulls were still rejected by the severe inherited multiplicity burden; only genuinely fresh proof or a new economic class can resolve that limitation."
+}
