@@ -1,0 +1,52 @@
+{
+  "schema": "hydra_v7_graveyard_grammar_update_v1",
+  "built_at_utc": "2026-07-12T15:42:00Z",
+  "graveyard_path": "mission/state/graveyard.db",
+  "graveyard_sha256": "31e8621b07cf10bc297c23d9a015893845473375927c6b51eba221516fad1721",
+  "integrity": "ok",
+  "class_signature_count": 52,
+  "indexed_object_count": 115467,
+  "new_grammar_tombstone_count": 24,
+  "grammar_result_path": "reports/v7/phase4/grammar0001_validation_result.json",
+  "grammar_result_sha256": "9aa39f5dfd3b88f0504fe1b144e91f1aeac1e8077fbac057d6b149121d20aff9",
+  "contract_death_causes": {
+    "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 22,
+    "MULTIPLICITY_DEFLATION_FAILURE": 2,
+    "SIM_EXPLOIT": 0
+  },
+  "class_rows": [
+    {
+      "mechanism_class": "cross_ecology_delayed_risk_transfer",
+      "death_cause": "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS",
+      "candidate_count": 2
+    },
+    {
+      "mechanism_class": "range_age_stop_cascade",
+      "death_cause": "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS",
+      "candidate_count": 6
+    },
+    {
+      "mechanism_class": "regional_handoff_inventory_release",
+      "death_cause": "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS",
+      "candidate_count": 6
+    },
+    {
+      "mechanism_class": "scheduled_settlement_rebalance_continuation",
+      "death_cause": "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS",
+      "candidate_count": 4
+    },
+    {
+      "mechanism_class": "weekend_inventory_reset",
+      "death_cause": "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS",
+      "candidate_count": 4
+    },
+    {
+      "mechanism_class": "weekend_inventory_reset",
+      "death_cause": "MULTIPLICITY_DEFLATION_FAILURE",
+      "candidate_count": 2
+    }
+  ],
+  "parameter_level_feedback": false,
+  "outbound_order_count": 0,
+  "CONTRE": "The combined early-stage cause deliberately avoids parameter detail but also merges low event density with negative base economics, reducing the precision of class-distance guidance."
+}
