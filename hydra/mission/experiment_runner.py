@@ -1050,6 +1050,36 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             ),
             record_data_access=bool(experiment.get("record_data_access", True)),
         )
+    if experiment_type == "account_level_evolution_v6":
+        from hydra.research.account_level_evolution_v6 import (
+            run_account_level_evolution_v6,
+        )
+
+        return run_account_level_evolution_v6(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            contract_map_path=Path(str(experiment["contract_map_path"])),
+            contract_map_sha256=str(experiment["contract_map_sha256"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+            source_report_root=Path(str(experiment["source_report_root"])),
+            generation_index=int(experiment.get("generation_index") or 0),
+            worker_count=int(experiment.get("worker_count") or 3),
+            grammar_count=int(experiment.get("grammar_count") or 480),
+            grammar_exact_limit=int(
+                experiment.get("grammar_exact_limit") or 72
+            ),
+            basket_count=int(experiment.get("basket_count") or 600),
+            controller_basket_limit=int(
+                experiment.get("controller_basket_limit") or 40
+            ),
+            target_velocity_mutation_limit=int(
+                experiment.get("target_velocity_mutation_limit") or 24
+            ),
+            screening_starts=int(experiment.get("screening_starts") or 24),
+            promotion_starts=int(experiment.get("promotion_starts") or 48),
+            record_data_access=bool(experiment.get("record_data_access", True)),
+        )
     if experiment_type == "turbo_promotion_batch":
         from hydra.research.turbo_promotion import run_turbo_promotion_batch
 

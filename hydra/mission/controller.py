@@ -184,8 +184,15 @@ COMBINE_FIRST_V5_EXPERIMENT_PREFIX = "combine_first_evolution_v5_epoch_"
 COMBINE_FIRST_V5_INITIAL_EXPERIMENT_ID = (
     f"{COMBINE_FIRST_V5_EXPERIMENT_PREFIX}0000"
 )
+ACCOUNT_LEVEL_V6_EXPERIMENT_PREFIX = "account_level_evolution_v6_generation_"
+ACCOUNT_LEVEL_V6_INITIAL_EXPERIMENT_ID = (
+    f"{ACCOUNT_LEVEL_V6_EXPERIMENT_PREFIX}0000"
+)
 COMBINE_FIRST_V5_TASK_SHA256 = (
     "2a78971ff78292670261dcbdcb5eda3dfb1593b481be118aac322883f3386937"
+)
+ACCOUNT_LEVEL_V6_TASK_SHA256 = (
+    "883da9ac903a471cd7945dd9c1c4f8dd13dd0bc7a490bb88402a53d4a7af611e"
 )
 DELAYED_FORWARD_FEED_TASK_SHA256 = (
     "b0d42b5720272403d7b054ffc95be7a063f19726c83039fcca827da8427a3419"
@@ -374,6 +381,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "q4_atomic_one_shot",
     "forward_shadow_append_update",
     "combine_first_evolution_v5",
+    "account_level_evolution_v6",
 }
 
 
@@ -1500,6 +1508,15 @@ class AutonomousMissionController:
                 f"{conversion_stop_reason}. Final cohort selection and immutable "
                 "shadow packaging must complete before any Q4 authorization.",
             )
+        account_level_v6_queued = False
+        if self._account_level_v6_should_run(conn):
+            self._freeze_saturated_v5_grammar(conn)
+            account_level_v6_queued = self._reconcile_account_level_v6(
+                conn,
+                generation_index=self._pending_or_next_account_level_v6_generation(
+                    conn
+                ),
+            )
         combine_first_v5_queued = False
         if self._combine_first_v5_should_run(conn):
             combine_first_v5_queued = self._reconcile_combine_first_v5(
@@ -1561,6 +1578,7 @@ class AutonomousMissionController:
                 "evidence_conversion_v3_queued": evidence_conversion_v3_queued,
                 "decision_bridge_v4_queued": decision_bridge_v4_queued,
                 "combine_first_v5_queued": combine_first_v5_queued,
+                "account_level_v6_queued": account_level_v6_queued,
                 "decision_bridge_v4_conversion_stop_reason": conversion_stop_reason,
                 "decision_bridge_v4_retired_cohort_ids": retired_v4_cohorts,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
@@ -2238,6 +2256,7 @@ class AutonomousMissionController:
         self._reconcile_completed_evidence_conversion_cohorts(conn)
         self._reconcile_completed_forward_shadow_updates(conn)
         self._reconcile_completed_combine_first_v5_epochs(conn)
+        self._reconcile_completed_account_level_v6_generations(conn)
 
     def _reconcile_completed_combine_first_v5_epochs(self, conn: Any) -> None:
         rows = conn.execute(
@@ -2289,6 +2308,64 @@ class AutonomousMissionController:
                     {
                         "experiment_id": experiment_id,
                         "experiment_type": "combine_first_evolution_v5",
+                        "scientific_conclusion": result.get(
+                            "scientific_conclusion"
+                        ),
+                        "report_path": result.get("report_path"),
+                        "reconciliation_id": reconciliation_id,
+                    },
+                )
+
+    def _reconcile_completed_account_level_v6_generations(self, conn: Any) -> None:
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='account_level_evolution_v6' AND status='COMPLETED' "
+            "ORDER BY experiment_id"
+        ).fetchall()
+        accounted = set(
+            get_kv(conn, "account_level_v6_accounted_generations", []) or []
+        )
+        for row in rows:
+            experiment_id = str(row[0])
+            if experiment_id in accounted:
+                continue
+            record = experiment_record(conn, experiment_id)
+            result = dict((record or {}).get("result") or {})
+            if not result:
+                continue
+            self._route_account_level_v6_result(conn, result, experiment_id)
+            accounted.add(experiment_id)
+            set_kv(
+                conn,
+                "account_level_v6_accounted_generations",
+                sorted(accounted),
+            )
+            reconciliation_id = (
+                f"completed:{experiment_id}:"
+                f"{(record or {}).get('specification_hash') or result.get('result_hash') or 'unknown'}"
+            )
+            if not self._evidence_reconciliation_exists(reconciliation_id):
+                record_evidence(
+                    self.paths,
+                    {
+                        "reconciliation_id": reconciliation_id,
+                        "scope": "ACCOUNT_LEVEL_EVOLUTION_V6",
+                        "experiment_id": experiment_id,
+                        "experiment_type": "account_level_evolution_v6",
+                        "status": "COMPLETED",
+                        "interpretation_boundary": result.get(
+                            "interpretation_boundary"
+                        ),
+                        "result": result,
+                    },
+                )
+            if not self._event_reconciliation_exists(conn, reconciliation_id):
+                append_event(
+                    conn,
+                    "completed_experiment_reconciled",
+                    {
+                        "experiment_id": experiment_id,
+                        "experiment_type": "account_level_evolution_v6",
                         "scientific_conclusion": result.get(
                             "scientific_conclusion"
                         ),
@@ -5730,6 +5807,240 @@ class AutonomousMissionController:
         return True
 
     @staticmethod
+    def _pending_or_next_account_level_v6_generation(conn: Any) -> int:
+        active = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='account_level_evolution_v6' "
+            "AND status IN ('QUEUED','RUNNING') ORDER BY experiment_id LIMIT 1"
+        ).fetchone()
+        if active is not None:
+            try:
+                return int(
+                    str(active[0]).removeprefix(
+                        ACCOUNT_LEVEL_V6_EXPERIMENT_PREFIX
+                    )
+                )
+            except ValueError:
+                return 0
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='account_level_evolution_v6'"
+        ).fetchall()
+        indices: list[int] = []
+        for (experiment_id,) in rows:
+            try:
+                indices.append(
+                    int(
+                        str(experiment_id).removeprefix(
+                            ACCOUNT_LEVEL_V6_EXPERIMENT_PREFIX
+                        )
+                    )
+                )
+            except ValueError:
+                continue
+        return max(indices, default=-1) + 1
+
+    @staticmethod
+    def _account_level_v6_should_run(conn: Any) -> bool:
+        if str(get_kv(conn, "decision_bridge_v4_status", "")) != (
+            "Q4_ONE_SHOT_COMMITTED"
+        ):
+            return False
+        if int(get_kv(conn, "q4_access_count", 0) or 0) != 1:
+            return False
+        if int(get_kv(conn, "combine_first_v5_completed_generations", 0) or 0) < 3:
+            return False
+        if str(get_kv(conn, "current_phase", "")) in {
+            "INTEGRITY_BLOCKED",
+            "ENGINEERING_BLOCKED",
+            "EXPERIMENT_BLOCKED",
+        }:
+            return False
+        unresolved = conn.execute(
+            "SELECT 1 FROM experiments WHERE "
+            "experiment_type='account_level_evolution_v6' "
+            "AND status IN ('FAILED','BLOCKED') LIMIT 1"
+        ).fetchone()
+        return unresolved is None
+
+    def _freeze_saturated_v5_grammar(self, conn: Any) -> None:
+        if str(get_kv(conn, "combine_first_v5_grammar_status", "")) == (
+            "V5_GRAMMAR_SATURATED_KEEP_ELITES_ONLY"
+        ):
+            return
+        retired = block_queued_experiments_by_type(
+            conn,
+            "combine_first_evolution_v5",
+            "superseded_by_account_level_v6_v5_grammar_saturated",
+        )
+        set_kv(
+            conn,
+            "combine_first_v5_grammar_status",
+            "V5_GRAMMAR_SATURATED_KEEP_ELITES_ONLY",
+        )
+        set_kv(conn, "combine_first_v5_retired_experiment_ids", retired)
+        set_kv(
+            conn,
+            "account_level_v6_migration",
+            {
+                "decision": "V5_GRAMMAR_SATURATED_KEEP_ELITES_ONLY",
+                "completed_v5_generations": int(
+                    get_kv(conn, "combine_first_v5_completed_generations", 0) or 0
+                ),
+                "retired_queued_v5_experiments": retired,
+                "v5_components_preserved": True,
+                "q4_reuse_authorized": False,
+            },
+        )
+        append_event(
+            conn,
+            "combine_first_v5_grammar_frozen_for_v6",
+            {
+                "status": "V5_GRAMMAR_SATURATED_KEEP_ELITES_ONLY",
+                "retired_experiment_ids": retired,
+                "broad_generation_frozen": True,
+                "elites_preserved_as_components": True,
+            },
+        )
+
+    def _reconcile_account_level_v6(
+        self, conn: Any, *, generation_index: int
+    ) -> bool:
+        if generation_index < 0:
+            raise ValueError("Account-Level V6 generation must be non-negative")
+        if q4_access_count() > 1:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "Q4_ACCESS_COUNT_EXCEEDS_ONE_SHOT")
+            return False
+        experiment_id = (
+            f"{ACCOUNT_LEVEL_V6_EXPERIMENT_PREFIX}{generation_index:04d}"
+        )
+        existing = experiment_record(conn, experiment_id)
+        if existing is not None:
+            return str(existing.get("status")) in {
+                "QUEUED",
+                "RUNNING",
+                "COMPLETED",
+            }
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_account_level_evolution_v6_20260712.md",
+        )
+        if not task.is_file():
+            task = Path(
+                "/root/hydra-bot/reports/engineering/"
+                "hydra_account_level_evolution_v6_20260712.md"
+            )
+        roll_map = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not roll_map.is_file():
+            roll_map = Path(
+                "/root/hydra-bot/data/cache/contract_maps/"
+                "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+            )
+        source_root = project_path("reports", "mission_experiments")
+        if not source_root.is_dir():
+            source_root = Path("/root/hydra-bot/reports/mission_experiments")
+        mismatches = [
+            label
+            for path, expected, label in (
+                (task, ACCOUNT_LEVEL_V6_TASK_SHA256, "engineering task"),
+                (roll_map, PATH_GEOMETRY_MAP_SHA256, "explicit-contract map"),
+            )
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if not source_root.is_dir():
+            mismatches.append("V5 component reports")
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "ACCOUNT_LEVEL_V6_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen Account-Level V6 sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        created = enqueue_experiment(
+            conn,
+            experiment_id,
+            {
+                "experiment_type": "account_level_evolution_v6",
+                "priority": 300.0,
+                "max_attempts": 2,
+                "pipeline": "ACCOUNT_LEVEL_EVOLUTION",
+                "parallel_safe": False,
+                "writes_data_access_ledger": True,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": ACCOUNT_LEVEL_V6_TASK_SHA256,
+                "contract_map_path": str(roll_map),
+                "contract_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+                "contract_map_hash": PATH_GEOMETRY_ROLL_HASH,
+                "source_report_root": str(source_root),
+                "generation_index": generation_index,
+                "worker_count": min(max(int(self.config.workers), 1), 3),
+                "grammar_count": 480,
+                "grammar_exact_limit": 72,
+                "basket_count": 600,
+                "controller_basket_limit": 40,
+                "target_velocity_mutation_limit": 24,
+                "screening_starts": 24,
+                "promotion_starts": 48,
+                "code_commit": self._git_commit(),
+                "record_data_access": True,
+                "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+                "development_end_exclusive": "2024-10-01",
+                "q4_access_allowed": False,
+                "q4_reuse_prohibited": True,
+                "paid_data_allowed": False,
+                "network_allowed": False,
+                "live_or_broker_allowed": False,
+                "outbound_order_capability": False,
+                "expected_decision_information_gain": 0.995,
+            },
+        )
+        queue_state = {
+            "individual_evolution_queue": "QUEUED",
+            "basket_evolution_queue": "QUEUED",
+            "controller_evolution_queue": "QUEUED",
+            "new_grammar_queue": "QUEUED",
+            "xfa_queue": "QUEUED",
+            "shadow_queue": "WAITING_FOR_FRESH_FORWARD_DATA",
+        }
+        set_kv(conn, "account_level_v6_queues", queue_state)
+        set_kv(conn, "account_level_v6_current_generation", generation_index)
+        set_kv(conn, "account_level_v6_phase", "ACCOUNT_LEVEL_EVOLUTION")
+        set_kv(conn, "foundry_current_engine", "HYDRA_ACCOUNT_LEVEL_EVOLUTION_V6")
+        set_kv(conn, "discovery_pipeline_status", "ACCOUNT_LEVEL_V6_QUEUED")
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": experiment_id,
+                "pipeline": "ACCOUNT_LEVEL_EVOLUTION",
+                "compute_allocation": {
+                    "account_basket_and_controller": 0.50,
+                    "new_mechanism_grammar": 0.30,
+                    "target_velocity_mutation": 0.15,
+                    "xfa_defensive": 0.05,
+                },
+                "persistent_queues": queue_state,
+                "q4_access_authorized": False,
+                "forward_feed_preserved": True,
+            },
+        )
+        if created:
+            set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+            set_kv(conn, "current_blocker", None)
+            set_kv(conn, "last_error", None)
+        return created
+
+    @staticmethod
     def _pending_or_next_combine_v5_epoch(conn: Any) -> int:
         active = conn.execute(
             "SELECT experiment_id FROM experiments WHERE "
@@ -5771,6 +6082,10 @@ class AutonomousMissionController:
         silently advancing to a new epoch.
         """
 
+        if str(get_kv(conn, "combine_first_v5_grammar_status", "")) == (
+            "V5_GRAMMAR_SATURATED_KEEP_ELITES_ONLY"
+        ):
+            return False
         if str(get_kv(conn, "decision_bridge_v4_status", "")) != (
             "Q4_ONE_SHOT_COMMITTED"
         ):
@@ -9793,6 +10108,7 @@ class AutonomousMissionController:
             "scientific_conclusion": result.get("scientific_conclusion"),
             "report_path": result.get("report_path"),
             "result_hash": result.get("result_hash"),
+            "artifacts": result.get("artifacts") or {},
         }
         set_kv(conn, "combine_first_v5_latest_metrics", metrics)
         set_kv(conn, "combine_first_v5_latest_report", result.get("report_path"))
@@ -9860,6 +10176,223 @@ class AutonomousMissionController:
                 **metrics,
                 "next_epoch": next_epoch,
                 "next_epoch_queued": next_queued,
+                "q4_access_count_delta": 0,
+                "outbound_order_capability": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
+    def _route_account_level_v6_result(
+        self, conn: Any, result: dict[str, Any], experiment_id: str
+    ) -> None:
+        governance = dict(result.get("governance") or {})
+        forbidden = {
+            "q4_access_count_delta": int(
+                governance.get("q4_access_count_delta") or 0
+            ),
+            "network_requests": int(governance.get("network_requests") or 0),
+            "incremental_databento_spend_usd": float(
+                governance.get("incremental_databento_spend_usd") or 0.0
+            ),
+            "outbound_order_capability": bool(
+                governance.get("outbound_order_capability")
+            ),
+            "paper_shadow_ready": int(result.get("paper_shadow_ready") or 0),
+        }
+        if any(value != 0 and value is not False for value in forbidden.values()):
+            raise RuntimeError(
+                f"Account-Level V6 result crossed a protected boundary: {forbidden}"
+            )
+        if str(result.get("schema") or "") != (
+            "hydra_account_level_evolution_v6_epoch_v1"
+        ):
+            raise RuntimeError("Account-Level V6 result schema is not recognized.")
+        try:
+            generation_index = int(result.get("generation_index"))
+        except (TypeError, ValueError) as exc:
+            raise RuntimeError(
+                "Account-Level V6 result has no valid generation index."
+            ) from exc
+        populations = dict(result.get("populations") or {})
+        component_bank = dict(result.get("component_bank") or {})
+        grammar = dict(result.get("new_mechanism_grammar") or {})
+        target_velocity = dict(result.get("target_velocity_mutations") or {})
+        metrics = {
+            "generation_index": generation_index,
+            "component_bank_size": int(component_bank.get("total_components") or 0),
+            "behavioral_clusters": int(
+                component_bank.get("behavioral_clusters") or 0
+            ),
+            "individuals_evaluated": int(
+                populations.get("individuals_evaluated") or 0
+            ),
+            "baskets_evaluated": int(populations.get("baskets_evaluated") or 0),
+            "controllers_evaluated": int(
+                populations.get("controllers_evaluated") or 0
+            ),
+            "promotion_objects_evaluated": int(
+                populations.get("promotion_objects_evaluated") or 0
+            ),
+            "total_rolling_combine_episodes": int(
+                populations.get("total_rolling_combine_episodes") or 0
+            ),
+            "new_grammar_structures": int(
+                grammar.get("structures_generated") or 0
+            ),
+            "new_grammar_components": int(
+                grammar.get("accepted_components") or 0
+            ),
+            "target_velocity_mutations": int(
+                target_velocity.get("proposals") or 0
+            ),
+            "target_velocity_improved_children": int(
+                target_velocity.get("improved_children") or 0
+            ),
+            "target_velocity_components": int(
+                target_velocity.get("accepted_components") or 0
+            ),
+            "novelty_yield": float(grammar.get("novelty_yield") or 0.0),
+            "individual_elite_count": len(
+                result.get("individual_combine_elites") or []
+            ),
+            "basket_elite_count": len(result.get("account_basket_elites") or []),
+            "controller_elite_count": len(
+                result.get("account_controller_elites") or []
+            ),
+            "xfa_elite_count": len(result.get("xfa_payout_elites") or []),
+            "xfa": result.get("xfa") or {},
+            "individuals": result.get("individuals") or {},
+            "baskets": result.get("baskets") or {},
+            "controllers": result.get("controllers") or {},
+            "promotion": result.get("promotion") or {},
+            "policy_improvements": result.get("policy_improvements") or {},
+            "archive": result.get("archive") or {},
+            "performance": result.get("performance") or {},
+            "scientific_conclusion": result.get("scientific_conclusion"),
+            "report_path": result.get("report_path"),
+            "result_hash": result.get("result_hash"),
+        }
+        set_kv(conn, "account_level_v6_latest_metrics", metrics)
+        set_kv(conn, "account_level_v6_latest_report", result.get("report_path"))
+        history = list(get_kv(conn, "account_level_v6_generation_history", []) or [])
+        history = [
+            row
+            for row in history
+            if int(row.get("generation_index", -1)) != generation_index
+        ]
+        history.append(metrics)
+        history.sort(key=lambda row: int(row.get("generation_index", -1)))
+        set_kv(conn, "account_level_v6_generation_history", history)
+        set_kv(conn, "account_level_v6_completed_generations", len(history))
+        set_kv(
+            conn,
+            "account_level_v6_total_rolling_episodes",
+            sum(
+                int(row.get("total_rolling_combine_episodes") or 0)
+                for row in history
+            ),
+        )
+        set_kv(
+            conn,
+            "account_level_v6_population_registry",
+            {
+                "generation_index": generation_index,
+                "component_bank": component_bank,
+                "individual_combine_elites": result.get(
+                    "individual_combine_elites"
+                )
+                or [],
+                "account_basket_elites": result.get("account_basket_elites")
+                or [],
+                "account_controller_elites": result.get(
+                    "account_controller_elites"
+                )
+                or [],
+                "xfa_payout_elites": result.get("xfa_payout_elites") or [],
+                "archive": result.get("archive") or {},
+                "artifacts": result.get("artifacts") or {},
+                "status_inherited": False,
+                "paper_shadow_ready": 0,
+            },
+        )
+        elite_archive = dict(get_kv(conn, "account_level_v6_elite_archive", {}) or {})
+        for role, identifiers in (
+            ("INDIVIDUAL_COMBINE_ELITE", result.get("individual_combine_elites") or []),
+            ("ACCOUNT_BASKET_ELITE", result.get("account_basket_elites") or []),
+            ("ACCOUNT_CONTROLLER_ELITE", result.get("account_controller_elites") or []),
+            ("XFA_PAYOUT_ELITE", result.get("xfa_payout_elites") or []),
+        ):
+            for identifier in identifiers:
+                elite_archive[str(identifier)] = {
+                    "policy_id": str(identifier),
+                    "role": role,
+                    "generation_index": generation_index,
+                    "result_hash": result.get("result_hash"),
+                    "report_path": result.get("report_path"),
+                    "artifacts": result.get("artifacts") or {},
+                    "development_only": True,
+                    "status_inherited": False,
+                }
+        set_kv(conn, "account_level_v6_elite_archive", elite_archive)
+        set_kv(conn, "account_level_v6_elite_archive_count", len(elite_archive))
+        set_kv(
+            conn,
+            "account_policy_elite_count",
+            metrics["basket_elite_count"] + metrics["controller_elite_count"],
+        )
+        queue_state = dict(result.get("persistent_queues") or {})
+        set_kv(conn, "account_level_v6_queues", queue_state)
+        set_kv(
+            conn,
+            "latest_completed_experiment",
+            {
+                "experiment_id": experiment_id,
+                "experiment_type": "account_level_evolution_v6",
+                "scientific_conclusion": result.get("scientific_conclusion"),
+                "report_path": result.get("report_path"),
+                "result_hash": result.get("result_hash"),
+            },
+        )
+        set_kv(conn, "latest_scientific_finding", result.get("scientific_conclusion"))
+        set_kv(conn, "foundry_current_engine", "HYDRA_ACCOUNT_LEVEL_EVOLUTION_V6")
+        set_kv(conn, "account_level_v6_phase", "ACCOUNT_LEVEL_EVOLUTION")
+        set_kv(conn, "discovery_pipeline_status", "ACCOUNT_LEVEL_V6_GENERATION_COMPLETED")
+        set_kv(conn, "promotion_pipeline_status", "ACCOUNT_POLICY_ROLLING_EVIDENCE")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+
+        next_generation = generation_index + 1
+        next_queued = self._reconcile_account_level_v6(
+            conn, generation_index=next_generation
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": f"{ACCOUNT_LEVEL_V6_EXPERIMENT_PREFIX}{next_generation:04d}",
+                "pipeline": "ACCOUNT_LEVEL_EVOLUTION",
+                "prior_generation": generation_index,
+                "basket_elite_count": metrics["basket_elite_count"],
+                "controller_elite_count": metrics["controller_elite_count"],
+                "novelty_yield": metrics["novelty_yield"],
+                "queued": next_queued,
+                "persistent_queues": get_kv(
+                    conn, "account_level_v6_queues", {}
+                ),
+                "q4_access_authorized": False,
+                "forward_feed_preserved": True,
+            },
+        )
+        append_event(
+            conn,
+            "account_level_v6_generation_routed",
+            {
+                "experiment_id": experiment_id,
+                **metrics,
+                "next_generation": next_generation,
+                "next_generation_queued": next_queued,
                 "q4_access_count_delta": 0,
                 "outbound_order_capability": False,
             },
@@ -11911,6 +12444,29 @@ class AutonomousMissionController:
                 raise RuntimeError(
                     "Combine V5 experiment crossed its development-only scope."
                 )
+        if experiment_type == "account_level_evolution_v6":
+            if not (
+                str(experiment.get("data_role"))
+                == "DEVELOPMENT_AND_FALSIFICATION_ONLY"
+                and str(experiment.get("development_end_exclusive"))
+                == "2024-10-01"
+                and not bool(experiment.get("q4_access_allowed"))
+                and bool(experiment.get("q4_reuse_prohibited"))
+                and not bool(experiment.get("paid_data_allowed"))
+                and not bool(experiment.get("network_allowed"))
+                and not bool(experiment.get("live_or_broker_allowed"))
+                and not bool(experiment.get("outbound_order_capability"))
+                and int(experiment.get("max_attempts") or 0) == 2
+                and int(experiment.get("screening_starts") or 0) >= 24
+                and int(experiment.get("promotion_starts") or 0) >= 48
+                and int(experiment.get("basket_count") or 0) >= 200
+                and int(experiment.get("target_velocity_mutation_limit") or 0)
+                >= 8
+            ):
+                raise RuntimeError(
+                    "Account-Level V6 experiment crossed its development-only "
+                    "or minimum-power scope."
+                )
         check_action_allowed(
             {
                 "action_type": "Q4_ACCESS"
@@ -12137,6 +12693,25 @@ class AutonomousMissionController:
             "validated_strategies": snapshot.get("validated_strategies", 0),
             "executable_baskets": snapshot.get("executable_baskets", 0),
             "foundry_current_engine": snapshot.get("foundry_current_engine"),
+            "account_level_v6_phase": snapshot.get("account_level_v6_phase"),
+            "account_level_v6_completed_generations": snapshot.get(
+                "account_level_v6_completed_generations", 0
+            ),
+            "account_level_v6_current_generation": snapshot.get(
+                "account_level_v6_current_generation"
+            ),
+            "account_level_v6_queues": snapshot.get(
+                "account_level_v6_queues", {}
+            ),
+            "account_level_v6_latest_metrics": snapshot.get(
+                "account_level_v6_latest_metrics", {}
+            ),
+            "account_policy_elite_count": snapshot.get(
+                "account_policy_elite_count", 0
+            ),
+            "combine_first_v5_grammar_status": snapshot.get(
+                "combine_first_v5_grammar_status"
+            ),
             "strategy_prototypes_generated": snapshot.get("strategy_prototypes_generated", 0),
             "strategies_screened": snapshot.get("strategies_screened", 0),
             "promising_candidates": snapshot.get("promising_candidates", 0),
