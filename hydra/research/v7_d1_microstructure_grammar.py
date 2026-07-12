@@ -213,9 +213,15 @@ def _event_signals(
     output: list[D1Signal] = []
     for year, raw in source.groupby("calendar_year", sort=True):
         frame = raw.reset_index(drop=True)
-        signed_fraction = (
-            frame["signed_aggressor_volume"].to_numpy(dtype=np.float64)
-            / frame["total_volume"].to_numpy(dtype=np.float64)
+        signed_volume = frame["signed_aggressor_volume"].to_numpy(
+            dtype=np.float64
+        )
+        total_volume = frame["total_volume"].to_numpy(dtype=np.float64)
+        signed_fraction = np.divide(
+            signed_volume,
+            total_volume,
+            out=np.zeros_like(signed_volume),
+            where=total_volume > 0.0,
         )
         price_change = frame["price_change_points"].to_numpy(dtype=np.float64)
         path = frame["path_length_points"].to_numpy(dtype=np.float64)
