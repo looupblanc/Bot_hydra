@@ -493,7 +493,10 @@ def _risk_transfer_signals(
         target_move = float(target.close[target_end] / target.open[target_start] - 1.0)
         source_threshold = float(np.quantile(source_history[-60:], 0.80)) if len(source_history) >= 60 else None
         target_threshold = float(np.quantile(target_history[-60:], 0.80)) if len(target_history) >= 60 else None
-        executable = _same_segment(target, int(target_entry), int(target_exit))
+        # The WORM contract prohibits the signal itself from crossing a roll,
+        # not merely the eventual position.  The observation can still update
+        # future past-only thresholds even when this exact trade is excluded.
+        executable = _same_segment(target, target_start, int(target_exit))
         if source_threshold is not None and target_threshold is not None and abs(source_move) >= source_threshold and abs(target_move) < 0.50 * target_threshold and source_move != 0.0 and executable:
             side = int(math.copysign(1, source_move))
             if relation == "opposite":
