@@ -1,0 +1,22 @@
+{
+  "schema": "hydra_v7_1_powered_promotion_minimum_v1",
+  "calibration_result_path": "reports/v7_1/calibration/v71_power_sample_extension_result.json",
+  "calibration_result_sha256": "15039df4a9e8d97acc21d4b46731164af44fc6b6f88904aec2e3193c14cc70db",
+  "calibration_verdict": "GREEN",
+  "null_false_positive_rate_max_observed": 0.0,
+  "semi_synthetic_required_events": 240,
+  "synthetic_required_events": 320,
+  "conservative_minimum_walk_forward_events_for_DSR_BH": 320,
+  "DSR_threshold_changed": false,
+  "BH_FDR_changed": false,
+  "stage2_transfer_minimum_changed": false,
+  "classification_below_power_minimum": "INSUFFICIENT_POWER",
+  "positive_walk_forward_below_power_minimum": "MECHANISM_UNDERPOWERED_REQUIRES_INDEPENDENT_CONFIRMATION",
+  "negative_walk_forward_below_power_minimum": "FORMULATION_FALSIFIED_WITHOUT_MECHANISM_DEATH",
+  "applies_to": "hydra_v7_1_event_mechanism_grammar_0001_and_later_campaigns_referencing_this_file",
+  "real_D1_candidate_results_read_before_freeze": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "Le minimum de 320 protege contre les faux negatifs statistiques mais rend les mecanismes rares non decidables sur D1; une esperance walk-forward positive sous ce seuil ne vaut qu'une demande de confirmation independante."
+}
