@@ -1,0 +1,71 @@
+{
+  "schema": "hydra_v7_1_cross_clock_flow_tripwire_policy_v1",
+  "tripwire_id": "hydra_v7_1_cross_clock_flow_tripwire_0004",
+  "grammar_id": "hydra_v7_1_cross_clock_flow_grammar_0004",
+  "grammar_path": "WORM/v7.1-cross-clock-flow-grammar-0004-2026-07-12.json",
+  "grammar_sha256": "9341e576b4090f2626079f1678170ad738b523ca10394b89261292a3ee1b2c0e",
+  "signal_manifest_path": "reports/v7_1/discovery_0004/v71_cross_clock_flow_signal_manifest.json",
+  "signal_manifest_sha256": "35393b8bee755da085b9214fde3a89975221f1f4ac7915251ed3e8f596f758b8",
+  "stage0_stage2_result_path": "reports/v7_1/discovery_0004/v71_cross_clock_flow_funnel_result.json",
+  "stage0_stage2_result_sha256": "737e484c7fc51380ccaf588b7dc4bc76f3183530254219a2e621494d025cd828",
+  "world_builder_commit": "790f787",
+  "purpose": "Permanent grammar-level geometry tripwire for cross-clock flow states. Combine passage is diagnostic only and is never candidate fitness or promotion evidence.",
+  "real_world": "unchanged_D1_ES_minute_and_cross_clock_event_features",
+  "null_worlds": [
+    "DAILY_BLOCK_SHUFFLE",
+    "VOLATILITY_MATCHED_RANDOM_WALK",
+    "YEAR_BLOCK_PERMUTATION"
+  ],
+  "seeds": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "2023_ES": 950301,
+      "2024_ES": 950401
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "2023_ES": 960301,
+      "2024_ES": 960401
+    },
+    "YEAR_BLOCK_PERMUTATION": "deterministic_year_swap"
+  },
+  "pipeline": {
+    "cross_clock_pairs_recomputed_per_world": true,
+    "feature_and_signal_recomputation_per_world": true,
+    "real_and_null_pipeline_identical": true,
+    "event_availability_duration_and_aggressor_flow_preserved_in_price_nulls": true,
+    "cost_stress": "BASE",
+    "diagnostic_quantities": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "combine_horizon_trading_days": 20,
+    "mll_mode": "eod_level_rt_breach",
+    "maximum_mini_equivalent": 15.0,
+    "explicit_contracts": true,
+    "session_flatten": true
+  },
+  "decision": {
+    "NULL_RATIO": "pooled_null_pass_rate / real_pass_rate",
+    "artefact_threshold_inclusive": 0.8,
+    "zero_real_passes": "BLOCKED_UNDERPOWERED",
+    "ratio_at_or_above_threshold": "ARTEFACT_GEOMETRY_ONLY",
+    "ratio_below_threshold": "GREEN_NULL_ADJUSTED_BASELINE",
+    "exact_one_sided_binomial_p_value_required": true,
+    "raw_counts_required": true,
+    "evidence_strength_required": true
+  },
+  "multiplicity_reservation": {
+    "candidate_paths": 12,
+    "world_count": 4,
+    "delta_trials": 48,
+    "expected_prior_global_N_trials": 263616,
+    "expected_post_reservation_global_N_trials": 263664
+  },
+  "candidate_promotion_authorized": false,
+  "candidate_status_inheritance": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "Both clocks derive from identical prints, so even a GREEN result can reflect unstable cross-representation timing; two D1 calendar blocks cannot establish forward persistence."
+}
