@@ -1,0 +1,53 @@
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from hydra.validation.v7_d1_grammar0002_candidate_tribunal import (
+    run_d1_grammar0002_candidate_tribunal,
+)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Run the frozen D1 grammar 0002 candidate tribunal.")
+    parser.add_argument("--project-root", default=".")
+    parser.add_argument("--grammar", default="WORM/v7-d1-microstructure-grammar-0002-2026-07-12.json")
+    parser.add_argument("--tripwire-policy", default="WORM/v7-d1-microstructure-tripwire-0002-2026-07-12.json")
+    parser.add_argument("--validation-policy", default="WORM/v7-d1-microstructure-validation-policy-0002-2026-07-12.json")
+    parser.add_argument("--null-power-addendum", default="WORM/v7-d1-microstructure-null-power-addendum-0002-2026-07-12.json")
+    parser.add_argument("--signal-manifest", default="reports/v7/data/d1_microstructure_grammar0002_signal_manifest.json")
+    parser.add_argument("--tripwire-result", default="reports/v7/data/d1_grammar0002_tripwire_result.json")
+    parser.add_argument("--proof-registry", default="mission/state/proof_registry.json")
+    parser.add_argument("--output-dir", default="reports/v7/data")
+    args = parser.parse_args()
+    result = run_d1_grammar0002_candidate_tribunal(
+        project_root=args.project_root,
+        grammar_path=args.grammar,
+        tripwire_policy_path=args.tripwire_policy,
+        validation_policy_path=args.validation_policy,
+        null_power_addendum_path=args.null_power_addendum,
+        signal_manifest_path=args.signal_manifest,
+        tripwire_result_path=args.tripwire_result,
+        proof_registry_path=args.proof_registry,
+        output_dir=args.output_dir,
+    )
+    print(json.dumps({
+        "verdict": result["verdict"],
+        "stage1_survivor_count": result["stage1_survivor_count"],
+        "stage2_survivor_count": result["stage2_survivor_count"],
+        "candidate_null_pass_count": result["candidate_null_pass_count"],
+        "DSR_positive_count": result["DSR_positive_count"],
+        "BH_rejection_count": result["BH_rejection_count"],
+        "selected_shadow_queue_candidate_ids": result["selected_shadow_queue_candidate_ids"],
+        "result_path": result["result_path"],
+        "result_sha256": result["result_sha256"],
+    }, indent=2, sort_keys=True))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
