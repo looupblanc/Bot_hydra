@@ -24,6 +24,7 @@ from hydra.mission.experiment_queue import (
     complete_experiment,
     enqueue_experiment,
     experiment_record,
+    fail_experiment,
 )
 from hydra.mission.mission_state import connect_state, get_kv, mission_paths, set_kv
 
@@ -720,5 +721,59 @@ def test_completed_historical_route_is_not_replayed_after_reconciliation_event(
         controller._reconcile_completed_experiments(conn)
         assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
         assert get_kv(conn, "current_blocker") is None
+    finally:
+        conn.close()
+
+
+def test_turbo_commit_drift_recovery_advances_to_fresh_batch_id(tmp_path: Path) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        for index in range(2):
+            experiment_id = f"turbo_foundry_v2_epoch_{index:04d}"
+            enqueue_experiment(
+                conn,
+                experiment_id,
+                {"experiment_type": "turbo_foundry_v2_epoch", "batch_index": index},
+            )
+            claimed = claim_next_experiment(conn)
+            assert claimed is not None
+            complete_experiment(
+                conn,
+                experiment_id,
+                {
+                    "batch_index": index,
+                    "scientific_conclusion": f"TURBO_{index}_COMPLETE",
+                    "result_hash": str(index) * 64,
+                },
+                claim_token=str(claimed["claim_token"]),
+            )
+        failed_id = "turbo_foundry_v2_epoch_0002"
+        enqueue_experiment(
+            conn,
+            failed_id,
+            {
+                "experiment_type": "turbo_foundry_v2_epoch",
+                "batch_index": 2,
+                "max_attempts": 1,
+            },
+        )
+        failed_claim = claim_next_experiment(conn)
+        assert failed_claim is not None
+        assert (
+            fail_experiment(
+                conn,
+                failed_id,
+                "worker commit differs",
+                retryable=True,
+                claim_token=str(failed_claim["claim_token"]),
+            )
+            == "FAILED"
+        )
+
+        assert controller._next_turbo_batch_index(conn) == 3
+        controller._refresh_latest_completed_experiment_metadata(conn)
+        assert get_kv(conn, "latest_completed_experiment")["experiment_id"] == (
+            "turbo_foundry_v2_epoch_0001"
+        )
     finally:
         conn.close()

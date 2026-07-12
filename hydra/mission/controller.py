@@ -711,12 +711,27 @@ class AutonomousMissionController:
         )
         turbo_foundry_v2_required = bool(
             previous_phase
-            in {"SCHEDULER_STALLED", "ENGINEERING_BLOCKED", "STOPPED_CLEANLY"}
-            and str(previous_blocker or "")
             in {
-                "DISTINCT_MECHANISM_OR_FORWARD_DATA_REQUIRED",
-                "TURBO_FOUNDRY_V2_CONTINUATION_REQUIRED",
+                "SCHEDULER_STALLED",
+                "ENGINEERING_BLOCKED",
+                "EXPERIMENT_BLOCKED",
+                "STOPPED_CLEANLY",
             }
+            and (
+                str(previous_blocker or "")
+                in {
+                    "DISTINCT_MECHANISM_OR_FORWARD_DATA_REQUIRED",
+                    "TURBO_FOUNDRY_V2_CONTINUATION_REQUIRED",
+                }
+                or str(previous_blocker or "").startswith(
+                    f"EXPERIMENT_FAILED:{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}"
+                )
+            )
+        )
+        turbo_resume_after_failed_commit = bool(
+            str(previous_blocker or "").startswith(
+                f"EXPERIMENT_FAILED:{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}"
+            )
         )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
@@ -768,6 +783,7 @@ class AutonomousMissionController:
             set_kv(conn, "current_experiment", None)
         self._reconcile_planned_experiment_flags(conn)
         self._reconcile_completed_experiments(conn)
+        self._refresh_latest_completed_experiment_metadata(conn)
         self._refresh_foundry_candidate_counts(conn)
         contract_map_repair_required = contract_map_repair_required or bool(
             str(get_kv(conn, "current_phase", "")) == "INTEGRITY_BLOCKED"
@@ -1174,7 +1190,14 @@ class AutonomousMissionController:
             else False
         )
         turbo_foundry_v2_queued = (
-            self._reconcile_turbo_foundry_v2(conn, batch_index=0)
+            self._reconcile_turbo_foundry_v2(
+                conn,
+                batch_index=(
+                    self._next_turbo_batch_index(conn)
+                    if turbo_resume_after_failed_commit
+                    else 0
+                ),
+            )
             if turbo_foundry_v2_required
             else False
         )
@@ -2006,6 +2029,47 @@ class AutonomousMissionController:
             self._route_turbo_promotion_result(conn, result, experiment_id)
             accounted.add(experiment_id)
             set_kv(conn, "turbo_promotion_accounted_batches", sorted(accounted))
+
+    @staticmethod
+    def _next_turbo_batch_index(conn: Any) -> int:
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='turbo_foundry_v2_epoch'"
+        ).fetchall()
+        indices: list[int] = []
+        for row in rows:
+            suffix = str(row[0]).removeprefix(TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX)
+            token = suffix.split("_", 1)[0]
+            if token.isdigit():
+                indices.append(int(token))
+        return max(indices, default=-1) + 1
+
+    @staticmethod
+    def _refresh_latest_completed_experiment_metadata(conn: Any) -> None:
+        row = conn.execute(
+            "SELECT experiment_id,experiment_type,completed_at,result,specification_hash "
+            "FROM experiments WHERE status='COMPLETED' AND completed_at IS NOT NULL "
+            "ORDER BY completed_at DESC,experiment_id DESC LIMIT 1"
+        ).fetchone()
+        if row is None:
+            return
+        try:
+            result = json.loads(row[3] or "{}")
+        except (TypeError, json.JSONDecodeError):
+            result = {}
+        compact = {
+            "experiment_id": str(row[0]),
+            "experiment_type": str(row[1]),
+            "completed_at": str(row[2]),
+            "specification_hash": str(row[4] or ""),
+            "scientific_conclusion": result.get("scientific_conclusion")
+            or "completed_result_recovered_without_claimed_validation",
+            "report_path": result.get("report_path")
+            or (result.get("artifacts") or {}).get("report_path"),
+            "result_hash": result.get("result_hash"),
+        }
+        set_kv(conn, "latest_completed_experiment", compact)
+        set_kv(conn, "latest_scientific_finding", compact["scientific_conclusion"])
 
     def _queue_post_retest_pilot(self, conn: Any, result: dict[str, Any]) -> None:
         pilot = result.get("pilot_experiment_specification")
@@ -9055,6 +9119,28 @@ class AutonomousMissionController:
                 self.paths,
                 {"scope": "EXPERIMENT", "experiment_id": experiment_id, "status": status, "reason": str(exc)},
             )
+            if (
+                status != "QUEUED"
+                and experiment_type == "turbo_foundry_v2_epoch"
+                and "worker commit differs" in str(exc).lower()
+            ):
+                replacement_index = self._next_turbo_batch_index(conn)
+                replacement_queued = self._reconcile_turbo_foundry_v2(
+                    conn, batch_index=replacement_index
+                )
+                if replacement_queued:
+                    set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+                    set_kv(conn, "current_blocker", None)
+                    set_kv(conn, "last_error", None)
+                    append_event(
+                        conn,
+                        "turbo_commit_drift_recovered",
+                        {
+                            "failed_experiment_id": experiment_id,
+                            "replacement_batch_index": replacement_index,
+                            "replacement_code_commit": self._git_commit(),
+                        },
+                    )
             return
 
         complete_experiment(conn, experiment_id, result, claim_token=str(experiment["claim_token"]))
@@ -9574,6 +9660,12 @@ class AutonomousMissionController:
                 "paper_shadow_ready_candidates", 0
             ),
             "shadow_active_candidates": snapshot.get("shadow_active_candidates", 0),
+            "shadow_waiting_for_feed_candidates": snapshot.get(
+                "shadow_waiting_for_feed_candidates", 0
+            ),
+            "shadow_config_complete_candidates": snapshot.get(
+                "shadow_config_complete_candidates", 0
+            ),
             "discovery_pipeline_status": snapshot.get(
                 "discovery_pipeline_status", "NOT_INITIALIZED"
             ),
