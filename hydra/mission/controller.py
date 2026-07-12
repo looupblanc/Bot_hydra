@@ -561,7 +561,7 @@ class AutonomousMissionController:
                     set_kv(conn, "current_blocker", None)
                     set_kv(conn, "last_error", None)
                     set_kv(conn, "next_wake_at_utc", deadline.isoformat())
-                    return {
+                    wait_action = {
                         **action,
                         "action_id": "waiting_for_bounded_forward_update",
                         "action_type": "WAIT",
@@ -570,11 +570,19 @@ class AutonomousMissionController:
                             "a legitimate future scheduler deadline."
                         ),
                         "next_wake_at_utc": deadline.isoformat(),
-                    }, False
+                    }
+                    # Keep the durable snapshot and the heartbeat on the same
+                    # scheduler contract.  The watchdog reads both sources and
+                    # must not see the prior experiment action while a bounded
+                    # future wake is the actual selected action.
+                    set_kv(conn, "current_action", wait_action)
+                    set_kv(conn, "planned_action_id", wait_action["action_id"])
+                    return wait_action, False
             first_stall = get_kv(conn, "current_phase") != "SCHEDULER_STALLED"
             set_kv(conn, "current_phase", "SCHEDULER_STALLED")
             set_kv(conn, "current_blocker", "NO_EXECUTABLE_ACTION_OR_SCHEDULER_DEADLINE")
             set_kv(conn, "next_wake_at_utc", None)
+            set_kv(conn, "planned_action_id", None)
             if first_stall:
                 append_event(conn, "scheduler_stalled", {"reason": action.get("rationale"), "queue": experiment_counts(conn)})
             return {

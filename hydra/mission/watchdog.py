@@ -123,9 +123,27 @@ def scheduler_health(
             "reason": "recent_transitional_progress",
             "progress_age_seconds": progress_age,
         }
-    next_wake = snapshot.get("next_wake_at_utc") or heartbeat.payload.get("next_wake_at_utc")
-    planned_action = snapshot.get("planned_action_id") or heartbeat.payload.get("planned_action_id")
-    if phase == "IDLE_SCHEDULED" and next_wake and planned_action:
+    # The heartbeat is the freshest view of a just-selected wait action.  A
+    # durable snapshot from an older controller can still contain the prior
+    # experiment action until the next state commit, so prefer heartbeat data.
+    current_action = heartbeat.payload.get("current_action") or snapshot.get("current_action") or {}
+    if not isinstance(current_action, dict):
+        current_action = {}
+    next_wake = (
+        snapshot.get("next_wake_at_utc")
+        or heartbeat.payload.get("next_wake_at_utc")
+        or current_action.get("next_wake_at_utc")
+    )
+    planned_action = (
+        snapshot.get("planned_action_id")
+        or heartbeat.payload.get("planned_action_id")
+        or current_action.get("action_id")
+    )
+    bounded_wait = (
+        phase == "WAITING_FOR_NEXT_ACTION"
+        and current_action.get("action_type") == "WAIT"
+    )
+    if (phase == "IDLE_SCHEDULED" or bounded_wait) and next_wake and planned_action:
         try:
             deadline = datetime.fromisoformat(str(next_wake))
         except ValueError:

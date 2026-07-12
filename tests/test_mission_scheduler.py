@@ -270,6 +270,58 @@ def test_scheduler_health_distinguishes_progress_wait_and_stall() -> None:
     )
     assert waiting["classification"] == "HEALTHY_BUT_WAITING_NORMALLY"
 
+    bounded_wait_heartbeat = HeartbeatStatus(
+        "heartbeat",
+        True,
+        True,
+        1.0,
+        {
+            "current_phase": "WAITING_FOR_NEXT_ACTION",
+            "current_action": {
+                "action_id": "waiting_for_bounded_forward_update",
+                "action_type": "WAIT",
+                "next_wake_at_utc": (now + timedelta(hours=2)).isoformat(),
+            },
+            "next_wake_at_utc": (now + timedelta(hours=2)).isoformat(),
+        },
+    )
+    bounded_wait = scheduler_health(
+        bounded_wait_heartbeat,
+        {
+            "governance_passed": True,
+            "current_phase": "WAITING_FOR_NEXT_ACTION",
+            "last_progress_at_utc": (now - timedelta(hours=1)).isoformat(),
+        },
+        {"RUNNING": 0, "QUEUED": 0},
+        now=now,
+    )
+    assert bounded_wait["classification"] == "HEALTHY_BUT_WAITING_NORMALLY"
+
+    expired_wait = scheduler_health(
+        HeartbeatStatus(
+            "heartbeat",
+            True,
+            True,
+            1.0,
+            {
+                "current_phase": "WAITING_FOR_NEXT_ACTION",
+                "current_action": {
+                    "action_id": "waiting_for_bounded_forward_update",
+                    "action_type": "WAIT",
+                    "next_wake_at_utc": (now - timedelta(seconds=1)).isoformat(),
+                },
+            },
+        ),
+        {
+            "governance_passed": True,
+            "current_phase": "WAITING_FOR_NEXT_ACTION",
+            "last_progress_at_utc": (now - timedelta(hours=1)).isoformat(),
+        },
+        {"RUNNING": 0, "QUEUED": 0},
+        now=now,
+    )
+    assert expired_wait["classification"] == "ALIVE_BUT_SCHEDULER_STALLED"
+
     stalled = scheduler_health(
         heartbeat,
         {"governance_passed": True, "current_phase": "SCHEDULER_STALLED"},
@@ -302,6 +354,42 @@ def test_scheduler_health_distinguishes_progress_wait_and_stall() -> None:
     )
     assert recent_queue["classification"] == "HEALTHY_AND_PROGRESSING"
     assert stale_queue["classification"] == "ALIVE_BUT_SCHEDULER_STALLED"
+
+
+def test_bounded_forward_wait_persists_scheduler_contract(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    conn, paths = _connection(tmp_path)
+    controller = AutonomousMissionController(_config(str(paths.state_dir)))
+    deadline = datetime.now(timezone.utc) + timedelta(hours=2)
+    set_kv(conn, "forward_feed_next_check_at_utc", deadline.isoformat())
+    monkeypatch.setattr(controller, "_tick_shadow_pipeline", lambda _conn: None)
+    monkeypatch.setattr(
+        controller, "_reconcile_due_forward_shadow_update", lambda _conn: None
+    )
+    monkeypatch.setattr(
+        "hydra.mission.controller.plan_next_action",
+        lambda _snapshot: {
+            "action_id": "generic_wait",
+            "action_type": "WAIT",
+            "rationale": "no immediate experiment",
+        },
+    )
+    monkeypatch.setattr(
+        "hydra.mission.controller.check_action_allowed", lambda *_args, **_kwargs: None
+    )
+
+    try:
+        action, progressed = controller.step(conn)
+        assert not progressed
+        assert action["action_id"] == "waiting_for_bounded_forward_update"
+        assert action["action_type"] == "WAIT"
+        assert get_kv(conn, "current_phase") == "WAITING_FOR_NEXT_ACTION"
+        assert get_kv(conn, "next_wake_at_utc") == deadline.isoformat()
+        assert get_kv(conn, "planned_action_id") == action["action_id"]
+        assert get_kv(conn, "current_action") == action
+    finally:
+        conn.close()
 
 
 def test_queued_experiment_cannot_bypass_governance_guard(
