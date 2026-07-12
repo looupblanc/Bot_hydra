@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass
 from enum import StrEnum
 from typing import Iterable
@@ -39,6 +40,17 @@ FATAL_INVALIDATIONS = frozenset(
 )
 
 
+COMBINE_PASSER_POOL = "COMBINE_PASSER_POOL"
+XFA_PAYOUT_POOL = "XFA_PAYOUT_POOL"
+DEFENSIVE_ACCOUNT_POOL = "DEFENSIVE_ACCOUNT_POOL"
+OBJECTIVE_POOLS = frozenset(
+    {COMBINE_PASSER_POOL, XFA_PAYOUT_POOL, DEFENSIVE_ACCOUNT_POOL}
+)
+ACCOUNT_UTILITY_ROLES = frozenset(
+    {"DEFENSIVE", "PORTFOLIO_ONLY", "HAZARD"}
+)
+
+
 @dataclass(frozen=True)
 class ShadowEvidence:
     candidate_id: str
@@ -61,6 +73,9 @@ class ShadowEvidence:
     untouched_holdout_passed: bool = False
     sample_size: int = 0
     uncertainty: str = "unquantified"
+    strategy_role: str = "ALPHA"
+    objective_pool: str = COMBINE_PASSER_POOL
+    account_utility_delta: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -84,6 +99,16 @@ def decide_shadow_admission(evidence: ShadowEvidence) -> ShadowAdmissionDecision
         return ShadowAdmissionDecision(
             EvidenceTier.SHADOW_REJECTED, fatal, (), evidence.uncertainty, False
         )
+    objective_pool = str(evidence.objective_pool or "").strip().upper()
+    strategy_role = str(evidence.strategy_role or "").strip().upper()
+    if objective_pool not in OBJECTIVE_POOLS:
+        return ShadowAdmissionDecision(
+            EvidenceTier.RESEARCH_PROTOTYPE,
+            (),
+            ("recognized_objective_pool",),
+            evidence.uncertainty,
+            False,
+        )
     validity = {
         "data_integrity": evidence.data_integrity,
         "no_lookahead": evidence.no_lookahead,
@@ -99,7 +124,31 @@ def decide_shadow_admission(evidence: ShadowEvidence) -> ShadowAdmissionDecision
             evidence.uncertainty,
             False,
         )
-    if evidence.net_after_costs <= 0:
+    account_utility_objective = bool(
+        objective_pool in {XFA_PAYOUT_POOL, DEFENSIVE_ACCOUNT_POOL}
+        or strategy_role in ACCOUNT_UTILITY_ROLES
+    )
+    finite_economics = bool(
+        math.isfinite(float(evidence.net_after_costs))
+        and math.isfinite(float(evidence.account_utility_delta))
+    )
+    if not finite_economics:
+        return ShadowAdmissionDecision(
+            EvidenceTier.RESEARCH_PROTOTYPE,
+            (),
+            ("finite_role_specific_economics",),
+            evidence.uncertainty,
+            False,
+        )
+    if account_utility_objective and evidence.account_utility_delta <= 0:
+        return ShadowAdmissionDecision(
+            EvidenceTier.RESEARCH_PROTOTYPE,
+            (),
+            ("positive_objective_account_utility",),
+            evidence.uncertainty,
+            False,
+        )
+    if not account_utility_objective and evidence.net_after_costs <= 0:
         return ShadowAdmissionDecision(
             EvidenceTier.RESEARCH_PROTOTYPE,
             (),
@@ -115,31 +164,18 @@ def decide_shadow_admission(evidence: ShadowEvidence) -> ShadowAdmissionDecision
             evidence.uncertainty,
             False,
         )
-    candidate_support = evidence.candidate_null_pass and evidence.null_probability <= 0.20
-    if not candidate_support:
-        return ShadowAdmissionDecision(
-            EvidenceTier.PROMISING_RESEARCH_CANDIDATE,
-            (),
-            ("candidate_level_null_evidence",),
-            evidence.uncertainty,
-            False,
-        )
-    robust = evidence.parameter_stable and evidence.contract_evidence
-    if not robust:
-        return ShadowAdmissionDecision(
-            EvidenceTier.PROMISING_RESEARCH_CANDIDATE,
-            (),
-            tuple(
-                name
-                for name, passed in {
-                    "parameter_stability": evidence.parameter_stable,
-                    "contract_evidence": evidence.contract_evidence,
-                }.items()
-                if not passed
+    diagnostic_uncertainty = tuple(
+        name
+        for name, passed in {
+            "candidate_level_null_diagnostic_unresolved": (
+                evidence.candidate_null_pass and evidence.null_probability <= 0.20
             ),
-            evidence.uncertainty,
-            False,
-        )
+            "parameter_stability_diagnostic_unresolved": evidence.parameter_stable,
+            "contract_transfer_diagnostic_unresolved": evidence.contract_evidence,
+        }.items()
+        if not passed
+    )
+    uncertainty = _merge_uncertainty(evidence.uncertainty, diagnostic_uncertainty)
     safe_package = {
         "account_mll_safe": evidence.account_mll_safe,
         "realtime_features_available": evidence.realtime_features_available,
@@ -149,10 +185,14 @@ def decide_shadow_admission(evidence: ShadowEvidence) -> ShadowAdmissionDecision
     missing_package = tuple(name for name, passed in safe_package.items() if not passed)
     if missing_package:
         return ShadowAdmissionDecision(
-            EvidenceTier.ROBUST_RESEARCH_CANDIDATE,
+            (
+                EvidenceTier.ROBUST_RESEARCH_CANDIDATE
+                if not diagnostic_uncertainty
+                else EvidenceTier.PROMISING_RESEARCH_CANDIDATE
+            ),
             (),
             missing_package,
-            evidence.uncertainty,
+            uncertainty,
             False,
         )
     # A safe, fully specified candidate may collect forward evidence even when
@@ -161,12 +201,21 @@ def decide_shadow_admission(evidence: ShadowEvidence) -> ShadowAdmissionDecision
     tier = (
         EvidenceTier.PAPER_SHADOW_READY
         if evidence.supportive_temporal_folds >= 2
+        and evidence.candidate_null_pass
         and evidence.null_probability <= 0.05
         and evidence.sample_size >= 30
         and evidence.untouched_holdout_passed
+        and evidence.parameter_stable
+        and evidence.contract_evidence
         else EvidenceTier.SHADOW_RESEARCH_CANDIDATE
     )
-    return ShadowAdmissionDecision(tier, (), (), evidence.uncertainty, True)
+    return ShadowAdmissionDecision(tier, (), (), uncertainty, True)
+
+
+def _merge_uncertainty(base: str, diagnostics: tuple[str, ...]) -> str:
+    values = [] if not base or base == "unquantified" else [base]
+    values.extend(diagnostics)
+    return ";".join(dict.fromkeys(values)) or "unquantified"
 
 
 def calibrate_shadow_policy(

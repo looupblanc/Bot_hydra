@@ -3,11 +3,18 @@ from __future__ import annotations
 import ast
 import hashlib
 import json
+import math
 import subprocess
 from pathlib import Path
 from typing import Any, Iterable
 
 from hydra.mission.calibration_retest_execution import _stable_hash, _strict_json_value
+from hydra.foundry.status import (
+    COMBINE_PASSER_POOL,
+    DEFENSIVE_ACCOUNT_POOL,
+    OBJECTIVE_POOLS,
+    XFA_PAYOUT_POOL,
+)
 from hydra.research.equity_open_gap_reversal import _write_immutable
 from hydra.shadow.prior_trade_guard import (
     PriorTradeGuardError,
@@ -22,6 +29,7 @@ PROHIBITED_CALL_NAMES = frozenset(
     {"submit_order", "place_order", "send_order", "transmit_order", "execute_order"}
 )
 PROHIBITED_IMPORT_TOKENS = ("broker", "ibapi", "interactive_brokers", "ccxt")
+ACCOUNT_UTILITY_ROLES = frozenset({"DEFENSIVE", "PORTFOLIO_ONLY", "HAZARD"})
 
 
 class ShadowActivationError(RuntimeError):
@@ -75,8 +83,7 @@ def run_immutable_shadow_activation(
         candidate.get("status") != "SHADOW_RESEARCH_CANDIDATE"
         or not bool(admission.get("permits_zero_risk_shadow"))
         or hard
-        or float(candidate.get("net_pnl") or 0.0) <= 0
-        or float(candidate.get("micro_net_pnl") or 0.0) <= 0
+        or not role_specific_activation_economics(candidate, shadow_evidence)
         or not bool(shadow_evidence.get("account_mll_safe"))
         or not bool(shadow_evidence.get("deterministic_signals"))
         or not bool(shadow_evidence.get("realtime_features_available"))
@@ -121,6 +128,17 @@ def run_immutable_shadow_activation(
     manifest: dict[str, Any] = {
         "schema": "hydra_shadow_activation_manifest_v1",
         "candidate_id": candidate_id,
+        "strategy_role": str(
+            candidate.get("strategy_role")
+            or candidate.get("role")
+            or shadow_evidence.get("strategy_role")
+            or "ALPHA"
+        ).upper(),
+        "objective_pool": str(
+            candidate.get("objective_pool")
+            or shadow_evidence.get("objective_pool")
+            or COMBINE_PASSER_POOL
+        ).upper(),
         "registry_evidence_tier": "SHADOW_ACTIVE",
         "operational_classification": "SHADOW_RESEARCH_ACTIVE",
         "source_result_hash": source_result_hash,
@@ -210,6 +228,47 @@ def run_immutable_shadow_activation(
         },
         "report_path": str(report_path),
     }
+
+
+def role_specific_activation_economics(
+    candidate: dict[str, Any], shadow_evidence: dict[str, Any]
+) -> bool:
+    """Recheck the upstream role objective without re-running promotion.
+
+    Activation continues to trust only an official zero-risk admission for
+    statistical evidence.  This local check prevents the legacy alpha-PnL
+    contract from blocking XFA/defensive account-utility candidates while
+    failing closed on unknown pools or non-finite evidence.
+    """
+
+    objective_pool = str(
+        candidate.get("objective_pool")
+        or shadow_evidence.get("objective_pool")
+        or COMBINE_PASSER_POOL
+    ).strip().upper()
+    strategy_role = str(
+        candidate.get("strategy_role")
+        or candidate.get("role")
+        or shadow_evidence.get("strategy_role")
+        or "ALPHA"
+    ).strip().upper()
+    if objective_pool not in OBJECTIVE_POOLS:
+        return False
+    try:
+        net_pnl = float(candidate.get("net_pnl") or 0.0)
+        micro_net_pnl = float(candidate.get("micro_net_pnl") or 0.0)
+        account_utility = float(
+            candidate.get("account_utility_delta")
+            if candidate.get("account_utility_delta") is not None
+            else shadow_evidence.get("account_utility_delta") or 0.0
+        )
+    except (TypeError, ValueError):
+        return False
+    if not all(math.isfinite(value) for value in (net_pnl, micro_net_pnl, account_utility)):
+        return False
+    if objective_pool in {XFA_PAYOUT_POOL, DEFENSIVE_ACCOUNT_POOL} or strategy_role in ACCOUNT_UTILITY_ROLES:
+        return account_utility > 0.0
+    return net_pnl > 0.0 and micro_net_pnl > 0.0
 
 
 def run_ym_shadow_activation(

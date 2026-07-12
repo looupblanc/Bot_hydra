@@ -11,6 +11,7 @@ import pytest
 from hydra.factory.post_mutation_successive_halving import (
     PREREGISTRATION_SHA256,
     PostMutationIntegrityError,
+    _bootstrap,
     _canonical_hash,
     run_post_mutation_successive_halving,
 )
@@ -215,6 +216,12 @@ def test_phase_specific_pools_and_maximum_feasible_archive(tmp_path: Path) -> No
 
     assert by_id["combine_path"]["block_bootstrap"]["target_before_mll_probability"] > 0.0
     assert by_id["xfa_path"]["block_bootstrap"]["expected_payout_cycles_before_ruin"] >= 1.0
+    assert (
+        by_id["xfa_path"]["block_bootstrap"]["xfa_replay_method"]
+        == "daily_block_bootstrap_simulate_funded_xfa"
+    )
+    assert by_id["xfa_path"]["block_bootstrap"]["qualifying_day_frequency"] == 1.0
+    assert by_id["xfa_path"]["block_bootstrap"]["median_days_to_payout"] == 5.0
     assert by_id["defensive_path"]["status"] == "PROMISING_RESEARCH_CANDIDATE"
     assert by_id["defensive_path"]["pooled_net_pnl"] == 0.0
     assert set(output["objective_pool_counts"]) == {
@@ -225,6 +232,35 @@ def test_phase_specific_pools_and_maximum_feasible_archive(tmp_path: Path) -> No
     assert output["selected_elite_count"] == 3
     assert output["selection_audit"]["maximum_feasible_achieved"] is True
     assert set(output["selection_audit"]["pool_counts"]) == set(output["objective_pool_counts"])
+
+
+def test_xfa_bootstrap_does_not_turn_four_winning_days_into_a_payout() -> None:
+    """A profit quotient would report one cycle; funded rules require five days."""
+
+    candidate = _candidate("xfa_four_days", pool="XFA_PAYOUT_POOL")
+    rows = _rows(
+        candidate,
+        [2_000.0] * 4,
+        timestamps=[
+            (
+                pd.Timestamp("2023-06-01", tz="UTC")
+                + pd.Timedelta(days=index)
+            ).isoformat()
+            for index in range(4)
+        ],
+    )
+    frame = pd.DataFrame(rows)
+    frame["timestamp"] = pd.to_datetime(frame["timestamp"], utc=True)
+
+    replay = _bootstrap(candidate["candidate_id"], frame, "XFA_PAYOUT_POOL")
+
+    assert replay["xfa_replay_method"] == "daily_block_bootstrap_simulate_funded_xfa"
+    assert replay["xfa_daily_path_length"] == 4
+    assert replay["qualifying_day_frequency"] == 1.0
+    assert replay["expected_payout_cycles_before_ruin"] == 0.0
+    assert replay["payout_eligibility_probability"] == 0.0
+    assert replay["median_days_to_payout"] is None
+    assert replay["mll_survival_probability"] == 1.0
 
 
 def test_behavioral_clone_is_rejected_and_lineage_cannot_inflate_elites(tmp_path: Path) -> None:

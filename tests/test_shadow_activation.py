@@ -18,6 +18,7 @@ from hydra.shadow.activation import (
     audit_zero_order_surface,
     run_immutable_shadow_activation,
     run_ym_shadow_activation,
+    role_specific_activation_economics,
 )
 from hydra.shadow.specification import ShadowSpecification
 
@@ -132,6 +133,42 @@ def test_order_surface_audit_detects_submission_capability(tmp_path: Path) -> No
     assert audit["violations"][0]["reason"] == "prohibited_function:submit_order"
 
 
+def test_activation_economics_are_objective_pool_specific_and_fail_closed() -> None:
+    assert role_specific_activation_economics(
+        {"net_pnl": 100.0, "micro_net_pnl": 10.0}, {}
+    )
+    assert role_specific_activation_economics(
+        {
+            "objective_pool": "XFA_PAYOUT_POOL",
+            "net_pnl": 0.0,
+            "micro_net_pnl": 0.0,
+            "account_utility_delta": 0.2,
+        },
+        {},
+    )
+    assert role_specific_activation_economics(
+        {
+            "objective_pool": "DEFENSIVE_ACCOUNT_POOL",
+            "strategy_role": "DEFENSIVE",
+            "net_pnl": -25.0,
+            "micro_net_pnl": 0.0,
+            "account_utility_delta": 0.4,
+        },
+        {},
+    )
+    assert not role_specific_activation_economics(
+        {"objective_pool": "UNREGISTERED", "account_utility_delta": 10.0}, {}
+    )
+    assert not role_specific_activation_economics(
+        {
+            "objective_pool": "DEFENSIVE_ACCOUNT_POOL",
+            "strategy_role": "DEFENSIVE",
+            "account_utility_delta": 0.0,
+        },
+        {},
+    )
+
+
 def test_generic_activation_requires_official_shadow_candidate_and_hashes(
     tmp_path: Path,
 ) -> None:
@@ -217,6 +254,36 @@ def test_generic_activation_requires_official_shadow_candidate_and_hashes(
     assert result["candidates"][0]["status"] == "SHADOW_ACTIVE"
     assert result["activation_manifest"]["outbound_orders_enabled"] is False
     assert registry_entry_from_activation(result)["candidate_id"] == candidate_id
+
+    source["candidates"][0].update(
+        {
+            "objective_pool": "DEFENSIVE_ACCOUNT_POOL",
+            "strategy_role": "DEFENSIVE",
+            "net_pnl": 0.0,
+            "micro_net_pnl": 0.0,
+            "account_utility_delta": 0.25,
+        }
+    )
+    source["result_hash"] = _stable_hash(
+        {key: value for key, value in source.items() if key != "result_hash"}
+    )
+    source_path.write_text(json.dumps(source, sort_keys=True) + "\n", encoding="utf-8")
+    defensive = run_immutable_shadow_activation(
+        tmp_path / "defensive_output",
+        engineering_task_path=task,
+        engineering_task_sha256=_sha(task),
+        source_result_path=source_path,
+        source_result_sha256=_sha(source_path),
+        source_result_hash=source["result_hash"],
+        candidate_id=candidate_id,
+        shadow_configuration_path=configuration_path,
+        shadow_configuration_sha256=_sha(configuration_path),
+        shadow_configuration_hash=specification.configuration_hash,
+        code_commit="test",
+        code_surface_paths=[surface],
+    )
+    assert defensive["activation_manifest"]["objective_pool"] == "DEFENSIVE_ACCOUNT_POOL"
+    assert defensive["activation_manifest"]["strategy_role"] == "DEFENSIVE"
 
     source["candidates"][0]["status"] = "PROMISING_RESEARCH_CANDIDATE"
     source["result_hash"] = _stable_hash(

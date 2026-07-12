@@ -17,7 +17,11 @@ from typing import Any, Iterable
 import numpy as np
 import pandas as pd
 
-from hydra.portfolio.account_contribution import replay_shared_account
+from hydra.portfolio.account_contribution import (
+    build_shared_daily_path,
+    replay_shared_account,
+)
+from hydra.propfirm.topstep_150k import Topstep150KConfig, simulate_funded_xfa
 
 
 POLICY_VERSION = "post_mutation_successive_halving_v1"
@@ -318,9 +322,9 @@ def _mechanism_family(candidate: dict[str, Any]) -> str:
     return str((candidate.get("hypothesis") or {}).get("mutation_class") or "unknown").lower()
 
 
-def _account_metrics(candidate_id: str, frame: pd.DataFrame) -> dict[str, Any]:
+def _account_trade_frame(candidate_id: str, frame: pd.DataFrame) -> pd.DataFrame:
     entries = frame.sort_values("timestamp", kind="mergesort").reset_index(drop=True).copy()
-    replay = pd.DataFrame(
+    return pd.DataFrame(
         {
             "strategy_id": candidate_id,
             "trade_id": [f"{candidate_id}:{index}" for index in range(len(entries))],
@@ -335,7 +339,105 @@ def _account_metrics(candidate_id: str, frame: pd.DataFrame) -> dict[str, Any]:
             "side": 0.0,
         }
     )
+
+
+def _account_metrics(candidate_id: str, frame: pd.DataFrame) -> dict[str, Any]:
+    replay = _account_trade_frame(candidate_id, frame)
     return replay_shared_account({candidate_id: replay}).to_dict()
+
+
+def _funded_xfa_bootstrap(
+    candidate_id: str,
+    frame: pd.DataFrame,
+    *,
+    seed: int,
+) -> dict[str, Any]:
+    """Replay block-resampled *daily* paths through the funded XFA rules.
+
+    XFA qualification and payouts are daily-account state transitions.  A
+    cumulative-profit quotient cannot represent qualifying days, consistency,
+    payout withdrawals, the locked MLL floor, or failure after a payout.  The
+    bootstrap therefore resamples complete session blocks and sends every
+    resulting path through the canonical funded replay.
+    """
+
+    daily = build_shared_daily_path(_account_trade_frame(candidate_id, frame))
+    if daily.empty:
+        raise PostMutationIntegrityError(f"{candidate_id}: empty funded XFA daily path")
+    daily_count = int(len(daily))
+    block_length = max(2, int(round(math.sqrt(daily_count))))
+    block_count = int(math.ceil(daily_count / block_length))
+    xfa_seed = (int(seed) + 0x584641) % (2**32)
+    rng = np.random.default_rng(xfa_seed)
+    starts = rng.integers(
+        0,
+        daily_count,
+        size=(BOOTSTRAP_REPLICATES, block_count),
+    )
+    offsets = np.arange(block_length, dtype=int)
+    indices = (
+        (starts[:, :, None] + offsets) % daily_count
+    ).reshape(BOOTSTRAP_REPLICATES, -1)[:, :daily_count]
+
+    config = Topstep150KConfig()
+    sampled_pnl = daily["pnl"].to_numpy(dtype=float)[indices]
+    sampled_worst = daily["worst_intraday_pnl"].to_numpy(dtype=float)[indices]
+    qualifying_frequency = np.mean(
+        sampled_pnl >= config.payout_winning_day_min_profit,
+        axis=1,
+    )
+    cycles = np.zeros(BOOTSTRAP_REPLICATES, dtype=float)
+    survived = np.zeros(BOOTSTRAP_REPLICATES, dtype=bool)
+    post_payout_breach = np.zeros(BOOTSTRAP_REPLICATES, dtype=bool)
+    payout_eligible = np.zeros(BOOTSTRAP_REPLICATES, dtype=bool)
+    payout_days = np.full(BOOTSTRAP_REPLICATES, np.nan, dtype=float)
+    # Identical economic paths have exactly the same deterministic funded
+    # state transitions.  Replay each unique path once, then expand it back to
+    # the full preregistered draw count; this is a cache, not a draw reduction.
+    unique_paths, inverse = np.unique(
+        np.concatenate([sampled_pnl, sampled_worst], axis=1),
+        axis=0,
+        return_inverse=True,
+    )
+    for path_index, economic_path in enumerate(unique_paths):
+        path = pd.DataFrame(
+            {
+                "pnl": economic_path[:daily_count],
+                "worst_intraday_pnl": economic_path[daily_count:],
+            }
+        )
+        replay = simulate_funded_xfa(path, config)
+        draw_mask = inverse == path_index
+        cycles[draw_mask] = float(replay["payout_cycles_survived"])
+        survived[draw_mask] = bool(replay["survived"])
+        post_payout_breach[draw_mask] = bool(replay["post_payout_mll_breach"])
+        payout_eligible[draw_mask] = bool(replay["payout_eligible"])
+        if replay["payout_days_to_eligibility"] is not None:
+            payout_days[draw_mask] = float(replay["payout_days_to_eligibility"])
+
+    post_payout_survived = (
+        (cycles > 0.0) & survived & ~post_payout_breach
+    )
+    utility = (
+        np.clip(cycles, 0.0, 3.0)
+        + qualifying_frequency
+        + survived.astype(float)
+        + post_payout_survived.astype(float)
+    )
+    return {
+        "method": "daily_block_bootstrap_simulate_funded_xfa",
+        "seed": xfa_seed,
+        "block_length": block_length,
+        "daily_path_length": daily_count,
+        "unique_replayed_paths": int(len(unique_paths)),
+        "cycles": cycles,
+        "qualifying_frequency": qualifying_frequency,
+        "survived": survived,
+        "post_payout_survived": post_payout_survived,
+        "payout_eligible": payout_eligible,
+        "payout_days": payout_days,
+        "utility": utility,
+    }
 
 
 def _sequence_metrics(frame: pd.DataFrame) -> dict[str, Any]:
@@ -388,13 +490,15 @@ def _bootstrap(candidate_id: str, frame: pd.DataFrame, pool: str) -> dict[str, A
     target_before_mll = np.any(target & ~breach_prefix, axis=1)
     target_index = np.argmax(target & ~breach_prefix, axis=1) + 1
     target_index = np.where(target_before_mll, target_index, np.nan)
-    payout = cumulative >= 5_000.0
-    payout_hit = np.any(payout & ~breach_prefix, axis=1)
-    payout_index = np.argmax(payout & ~breach_prefix, axis=1) + 1
-    payout_index = np.where(payout_hit, payout_index, np.nan)
-    payout_cycles = np.floor(np.maximum(cumulative.max(axis=1), 0.0) / 5_000.0)
-    qualifying_frequency = np.mean(sampled >= 200.0, axis=1)
     total = sampled.sum(axis=1)
+    # Funded replay is materially more expensive than the vectorized Combine
+    # path.  Run it only for the pool whose decision can change; cross-pool
+    # perfection would reduce foundry throughput without adding information.
+    xfa_replay = (
+        _funded_xfa_bootstrap(candidate_id, frame, seed=seed)
+        if pool == "XFA_PAYOUT_POOL"
+        else None
+    )
     if pool == "COMBINE_PASSER_POOL":
         utility = (
             2.0 * target_before_mll.astype(float)
@@ -402,13 +506,38 @@ def _bootstrap(candidate_id: str, frame: pd.DataFrame, pool: str) -> dict[str, A
             - np.clip(drawdown / 4_500.0, 0.0, 2.0)
         )
     elif pool == "XFA_PAYOUT_POOL":
-        utility = (
-            np.clip(payout_cycles, 0.0, 3.0)
-            + qualifying_frequency
-            + (~np.any(breach, axis=1)).astype(float)
-        )
+        assert xfa_replay is not None
+        utility = np.asarray(xfa_replay["utility"], dtype=float)
     else:
         utility = -np.clip(drawdown / 4_500.0, 0.0, 3.0)
+    if xfa_replay is None:
+        payout_cycles = np.zeros(BOOTSTRAP_REPLICATES, dtype=float)
+        qualifying_frequency = np.zeros(BOOTSTRAP_REPLICATES, dtype=float)
+        xfa_survived = np.zeros(BOOTSTRAP_REPLICATES, dtype=bool)
+        post_payout_survived = np.zeros(BOOTSTRAP_REPLICATES, dtype=bool)
+        payout_eligible = np.zeros(BOOTSTRAP_REPLICATES, dtype=bool)
+        payout_days = np.full(BOOTSTRAP_REPLICATES, np.nan, dtype=float)
+        xfa_method = "not_run_non_xfa_objective"
+        xfa_block_length = 0
+        xfa_seed = 0
+        xfa_daily_path_length = 0
+        xfa_unique_replayed_paths = 0
+    else:
+        payout_cycles = np.asarray(xfa_replay["cycles"], dtype=float)
+        qualifying_frequency = np.asarray(
+            xfa_replay["qualifying_frequency"], dtype=float
+        )
+        xfa_survived = np.asarray(xfa_replay["survived"], dtype=bool)
+        post_payout_survived = np.asarray(
+            xfa_replay["post_payout_survived"], dtype=bool
+        )
+        payout_eligible = np.asarray(xfa_replay["payout_eligible"], dtype=bool)
+        payout_days = np.asarray(xfa_replay["payout_days"], dtype=float)
+        xfa_method = str(xfa_replay["method"])
+        xfa_block_length = int(xfa_replay["block_length"])
+        xfa_seed = int(xfa_replay["seed"])
+        xfa_daily_path_length = int(xfa_replay["daily_path_length"])
+        xfa_unique_replayed_paths = int(xfa_replay["unique_replayed_paths"])
     quantiles = (0.05, 0.50, 0.95)
     return {
         "replicates": BOOTSTRAP_REPLICATES,
@@ -426,12 +555,30 @@ def _bootstrap(candidate_id: str, frame: pd.DataFrame, pool: str) -> dict[str, A
         "median_events_to_target": (
             float(np.nanmedian(target_index)) if bool(target_before_mll.any()) else None
         ),
-        "expected_payout_cycles_before_ruin": float(np.mean(payout_cycles * ~np.any(breach, axis=1))),
+        "xfa_replay_method": xfa_method,
+        "xfa_bootstrap_seed": xfa_seed,
+        "xfa_bootstrap_block_length": xfa_block_length,
+        "xfa_daily_path_length": xfa_daily_path_length,
+        "xfa_unique_replayed_paths": xfa_unique_replayed_paths,
+        "expected_payout_cycles_before_ruin": float(np.mean(payout_cycles)),
+        "payout_eligibility_probability": float(np.mean(payout_eligible)),
+        "qualifying_day_frequency": float(np.mean(qualifying_frequency)),
+        # Compatibility alias retained for existing evidence consumers.  The
+        # value is now explicitly daily, not an event-level approximation.
         "qualifying_event_frequency": float(np.mean(qualifying_frequency)),
-        "mll_survival_probability": float(np.mean(~np.any(breach, axis=1))),
-        "post_payout_survival_probability": float(np.mean(payout_hit & ~np.any(breach, axis=1))),
+        "mll_survival_probability": float(np.mean(xfa_survived)),
+        "post_payout_survival_probability": float(
+            np.mean(post_payout_survived)
+        ),
+        "median_days_to_payout": (
+            float(np.nanmedian(payout_days))
+            if bool(np.isfinite(payout_days).any())
+            else None
+        ),
         "median_events_to_payout": (
-            float(np.nanmedian(payout_index)) if bool(payout_hit.any()) else None
+            float(np.nanmedian(payout_days))
+            if bool(np.isfinite(payout_days).any())
+            else None
         ),
     }
 
