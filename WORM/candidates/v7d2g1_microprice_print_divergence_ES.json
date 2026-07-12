@@ -1,0 +1,14 @@
+{
+  "schema": "hydra_v7_candidate_fiche_v1",
+  "candidate_id": "v7d2g1_microprice_print_divergence_ES",
+  "campaign_id": "hydra_v7_d2_depth_grammar_0001",
+  "primary_role": "ALPHA_COMPONENT",
+  "economic_hypothesis": "Les ordres de marche lents paient le reajustement lorsque la profondeur deplace le microprice avant le dernier print; une divergence persistante doit se resorber par un drift du prix traite vers le microprice.",
+  "universe": {"feature_market": "ES", "execution_market": "ES", "contracts": 1, "dataset": "GLBX.MDP3", "schema": "mbp-10"},
+  "representation": {"snapshot": "last_complete_book_state_per_1s_plus_last_trade", "availability": "next_1s_boundary", "rth_ct": "08:30:00-15:10:00", "entry_window_ct": "08:35:00-15:00:00"},
+  "signal": {"microprice_formula": "(best_ask*best_bid_size+best_bid*best_ask_size)/(best_bid_size+best_ask_size)", "absolute_microprice_mid_divergence_ticks_min": 0.25, "persistence_closed_seconds": 5, "minimum_top1_total_depth": 10, "maximum_spread_ticks": 2, "last_print_must_lag_mid": true, "direction": "toward_microprice"},
+  "execution": {"entry": "next_1s_boundary_marketable_proxy", "exit": "fixed_120_closed_seconds", "overlap": "one_open_position_per_candidate", "same_bar_policy": "conservative_fail_closed", "cost_policy": "v7_d2_observed_spread_cost_model_v1"},
+  "promotion": {"stratified_DSR_N_trials": 6, "DSR_deflated_z_min_exclusive": 0.0, "BH_FDR": 0.10, "stress_1_5x_expectancy_min_exclusive": 0.0, "walk_forward_purge_seconds": 120, "walk_forward_embargo_days": 5, "ruleset_compliance_required": 1.0, "stress_2x_expectancy_min_exclusive": 0.0},
+  "shadow": {"horizon_trading_days": 20, "orders": 0, "append_only": true},
+  "forbidden_feedback": "No D2 observation or forward result may alter this exact version."
+}

@@ -1,0 +1,37 @@
+{
+  "schema": "hydra_v7_d2_depth_grammar_preregistration_v1",
+  "campaign_id": "hydra_v7_d2_depth_grammar_0001",
+  "amendment_commit": "223d373be244a048d5669a92d2989789ce3097c0",
+  "acquisition_plan": "WORM/v7-d2-mbp10-acquisition-plan-2026-07-12.json",
+  "data_seen_before_freeze": false,
+  "candidate_fiches": [
+    "WORM/candidates/v7d2g1_persistent_book_imbalance_ES.json",
+    "WORM/candidates/v7d2g1_swept_level_absorption_ES.json",
+    "WORM/candidates/v7d2g1_liquidity_vacuum_ES.json",
+    "WORM/candidates/v7d2g1_microprice_print_divergence_ES.json"
+  ],
+  "candidate_fiche_sha256": {
+    "v7d2g1_persistent_book_imbalance_ES": "56b057d1ca9f5c5104a373c4bd9a908a5b6cb2146f317bb623a8d02e5f7cdc5e",
+    "v7d2g1_swept_level_absorption_ES": "c3a72ec0fb1d7fce2e8791976afeb1a5dbf2e9d5cd97f2946f2a615f31a42cdd",
+    "v7d2g1_liquidity_vacuum_ES": "8d3fd2feaed403da2b78b1795b1be352e60528873639fe4d9d334be0494c05f6",
+    "v7d2g1_microprice_print_divergence_ES": "5ecc133d359689ffc447e31ec7433feb8c6494cdf8374a19359329829f4ca297"
+  },
+  "selection_multiplicity": {
+    "unique_candidate_configurations": 4,
+    "inter_campaign_information_inflation": 1.5,
+    "stratified_DSR_N_trials": 6,
+    "BH_family_size": 4,
+    "BH_FDR": 0.10,
+    "global_audit_N_trials_before": 247892,
+    "global_audit_statistical_tests_reserved": 17,
+    "global_audit_N_trials_after_reservation": 247909,
+    "reservation_breakdown": {"dataset_tripwire": 1, "candidate_primary_p_values": 4, "candidate_mandatory_nulls": 12}
+  },
+  "tripwire": {"NULL_RATIO_threshold": 0.8, "raw_counts_required": true, "exact_binomial_one_sided_required": true, "evidence_label_required": true, "rerun_on_new_dataset_and_grammar": true},
+  "mandatory_candidate_nulls": ["FIVE_SESSION_SIGNAL_DELAY", "SIGN_INVERSION", "WITHIN_SESSION_TIME_SHIFT"],
+  "funnel": ["sanity", "observed_cost_stress", "ruleset", "SIM_EXPLOIT", "purged_walk_forward_and_BH", "shadow_queue"],
+  "minimum_early_kill_fraction": 0.95,
+  "historical_D1_campaigns_rejudged": false,
+  "outbound_orders": 0,
+  "CONTRE": "Quatre structures et vingt-deux sessions limitent la puissance; les seuils sont geles avant donnees et un verdict insuffisant devra rester explicite plutot que devenir artificiellement vert ou rouge."
+}

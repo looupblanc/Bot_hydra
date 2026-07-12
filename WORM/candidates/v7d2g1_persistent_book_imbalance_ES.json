@@ -1,0 +1,14 @@
+{
+  "schema": "hydra_v7_candidate_fiche_v1",
+  "candidate_id": "v7d2g1_persistent_book_imbalance_ES",
+  "campaign_id": "hydra_v7_d2_depth_grammar_0001",
+  "primary_role": "ALPHA_COMPONENT",
+  "economic_hypothesis": "Les hedgers et preneurs urgents paient la continuation lorsqu'ils consomment le cote mince du carnet plus vite que la liquidite passive ne se reconstitue; un desequilibre top-5 persistant doit donc preceder un drift dans son sens.",
+  "universe": {"feature_market": "ES", "execution_market": "ES", "contracts": 1, "dataset": "GLBX.MDP3", "schema": "mbp-10"},
+  "representation": {"snapshot": "last_complete_book_state_per_1s", "availability": "next_1s_boundary", "rth_ct": "08:30:00-15:10:00", "entry_window_ct": "08:35:00-15:00:00"},
+  "signal": {"top_k": 5, "imbalance_formula": "(sum_bid_size_top5-sum_ask_size_top5)/(sum_bid_size_top5+sum_ask_size_top5)", "absolute_threshold": 0.35, "persistence_closed_seconds": 3, "minimum_total_top5_depth": 20, "maximum_spread_ticks": 1, "direction": "sign_of_imbalance"},
+  "execution": {"entry": "next_1s_boundary_marketable_proxy", "exit": "fixed_60_closed_seconds", "overlap": "one_open_position_per_candidate", "same_bar_policy": "conservative_fail_closed", "cost_policy": "v7_d2_observed_spread_cost_model_v1"},
+  "promotion": {"stratified_DSR_N_trials": 6, "DSR_deflated_z_min_exclusive": 0.0, "BH_FDR": 0.10, "stress_1_5x_expectancy_min_exclusive": 0.0, "walk_forward_purge_seconds": 60, "walk_forward_embargo_days": 5, "ruleset_compliance_required": 1.0, "stress_2x_expectancy_min_exclusive": 0.0},
+  "shadow": {"horizon_trading_days": 20, "orders": 0, "append_only": true},
+  "forbidden_feedback": "No D2 observation or forward result may alter this exact version."
+}
