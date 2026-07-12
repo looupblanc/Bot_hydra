@@ -1,0 +1,18 @@
+{
+  "schema": "hydra_v7_1_power_control_semisynthetic_addendum_v1",
+  "base_design_path": "WORM/v7.1-power-control-design-2026-07-12.json",
+  "base_design_sha256": "08c632f7058549f11f93fa71c0f2f866b2665996567565e1161ce2355a036a8e",
+  "control_worlds": ["SYNTHETIC_GAUSSIAN", "SEMI_SYNTHETIC_D1_ES_RESIDUAL_BOOTSTRAP"],
+  "semi_synthetic_source": "ES one-minute close-to-close point changes from the frozen D1 minute feature store, centered and rescaled to 150 USD standard deviation; candidate signals and candidate PnL are never read",
+  "semi_synthetic_block": "Chicago session day",
+  "shared_daily_shock_sd_usd": 75.0,
+  "injected_effects_and_event_counts": "identical_to_base_design",
+  "additional_statistical_test_count": 5120,
+  "total_statistical_test_count": 10240,
+  "acceptance": "Each control world independently must have null FPR <= 0.10 and meaningful-effect power >= 0.60.",
+  "threshold_tuning_after_run": false,
+  "real_candidate_signal_input": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "Le recentrage et la remise a l'echelle conservent la forme empirique mais pas le niveau absolu de volatilite conditionnelle; le resultat calibre le validateur et non une strategie."
+}
