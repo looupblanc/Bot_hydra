@@ -1,0 +1,48 @@
+{
+  "schema": "hydra_v7_permanent_tripwire_attestation_v1",
+  "grammar_id": "hydra_v7_grammar_0002_session_inventory_risk_premia",
+  "executed_at_utc": "2026-07-12T16:13:00Z",
+  "validation_policy_path": "WORM/v7-grammar-0002-validation-policy-2026-07-12.json",
+  "validation_policy_sha256": "f2a795d96db1668fcd7e1a154f817a04588c8ed36f57c5b820e476ab01606636",
+  "phase1_preregistration_sha256": "4ca94dd368ed2aca1eaf92674ba7ba8778ff2e9e11f9ad402841c515e0deea0f",
+  "reference_summary_sha256": "ea90964588a22546aeb7ea14df7d418e06936d37145fa444358769cfad8abf72",
+  "reference_full_evidence_sha256": "73bcc543b9fdcf373680b789d721bfa3663581164efda41c354a08f5c49d3042",
+  "rerun_result_sha256": "151eef99dc8e9841d17baf462483c2bb00979021bbfdcac83445eebc3ed6ff2c",
+  "rerun_full_evidence_sha256": "73bcc543b9fdcf373680b789d721bfa3663581164efda41c354a08f5c49d3042",
+  "full_evidence_byte_identical": true,
+  "verdict": "GREEN",
+  "threshold": 0.8,
+  "NULL_RATIO": 0.04954068241469816,
+  "real": {
+    "episode_count": 25680,
+    "pass_count": 9144,
+    "pass_rate": 0.3560747663551402
+  },
+  "pooled_null": {
+    "episode_count": 77040,
+    "pass_count": 1359,
+    "pass_rate": 0.01764018691588785
+  },
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "episode_count": 25680,
+      "pass_count": 479,
+      "NULL_RATIO": 0.0523840769903762
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "episode_count": 25680,
+      "pass_count": 395,
+      "NULL_RATIO": 0.04319772528433946
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "episode_count": 25680,
+      "pass_count": 485,
+      "NULL_RATIO": 0.05304024496937883
+    }
+  },
+  "q4_access_count_delta": 0,
+  "forward_gap_access_count": 0,
+  "outbound_order_count": 0,
+  "combine_pass_rate_used_as_candidate_fitness": false,
+  "CONTRE": "The permanent tripwire proves deterministic calibration of the inherited account simulator, not that any grammar 0002 signal has edge; every candidate still faces its own cost, DSR, BH and matched-null tribunal."
+}
