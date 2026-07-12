@@ -1028,6 +1028,28 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             worker_count=int(experiment.get("worker_count") or 3),
             record_data_access=bool(experiment.get("record_data_access", True)),
         )
+    if experiment_type == "combine_first_evolution_v5":
+        from hydra.research.combine_first_evolution_v5 import (
+            run_combine_first_evolution_v5,
+        )
+
+        return run_combine_first_evolution_v5(
+            output_dir,
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            contract_map_path=Path(str(experiment["contract_map_path"])),
+            contract_map_sha256=str(experiment["contract_map_sha256"]),
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+            epoch_index=int(experiment.get("epoch_index") or 0),
+            worker_count=int(experiment.get("worker_count") or 3),
+            proposal_count=int(experiment.get("proposal_count") or 10_000),
+            exact_limit=int(experiment.get("exact_limit") or 200),
+            mutation_limit=int(experiment.get("mutation_limit") or 60),
+            maximum_episode_starts=int(
+                experiment.get("maximum_episode_starts") or 24
+            ),
+            record_data_access=bool(experiment.get("record_data_access", True)),
+        )
     if experiment_type == "turbo_promotion_batch":
         from hydra.research.turbo_promotion import run_turbo_promotion_batch
 

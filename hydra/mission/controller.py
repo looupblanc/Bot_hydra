@@ -180,6 +180,13 @@ EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX = "evidence_conversion_v3_cohort_"
 DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0005"
 DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID = "q4_atomic_one_shot_0003"
 FORWARD_SHADOW_APPEND_UPDATE_PREFIX = "forward_shadow_append_update_"
+COMBINE_FIRST_V5_EXPERIMENT_PREFIX = "combine_first_evolution_v5_epoch_"
+COMBINE_FIRST_V5_INITIAL_EXPERIMENT_ID = (
+    f"{COMBINE_FIRST_V5_EXPERIMENT_PREFIX}0000"
+)
+COMBINE_FIRST_V5_TASK_SHA256 = (
+    "2a78971ff78292670261dcbdcb5eda3dfb1593b481be118aac322883f3386937"
+)
 DELAYED_FORWARD_FEED_TASK_SHA256 = (
     "b0d42b5720272403d7b054ffc95be7a063f19726c83039fcca827da8427a3419"
 )
@@ -366,6 +373,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "decision_bridge_v4_prepare",
     "q4_atomic_one_shot",
     "forward_shadow_append_update",
+    "combine_first_evolution_v5",
 }
 
 
@@ -1492,6 +1500,12 @@ class AutonomousMissionController:
                 f"{conversion_stop_reason}. Final cohort selection and immutable "
                 "shadow packaging must complete before any Q4 authorization.",
             )
+        combine_first_v5_queued = False
+        if self._combine_first_v5_should_run(conn):
+            combine_first_v5_queued = self._reconcile_combine_first_v5(
+                conn,
+                epoch_index=self._pending_or_next_combine_v5_epoch(conn),
+            )
         append_event(
             conn,
             "controller_initialized",
@@ -1546,6 +1560,7 @@ class AutonomousMissionController:
                 "turbo_foundry_v2_queued": turbo_foundry_v2_queued,
                 "evidence_conversion_v3_queued": evidence_conversion_v3_queued,
                 "decision_bridge_v4_queued": decision_bridge_v4_queued,
+                "combine_first_v5_queued": combine_first_v5_queued,
                 "decision_bridge_v4_conversion_stop_reason": conversion_stop_reason,
                 "decision_bridge_v4_retired_cohort_ids": retired_v4_cohorts,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
@@ -2222,6 +2237,65 @@ class AutonomousMissionController:
         self._reconcile_completed_turbo_promotions(conn)
         self._reconcile_completed_evidence_conversion_cohorts(conn)
         self._reconcile_completed_forward_shadow_updates(conn)
+        self._reconcile_completed_combine_first_v5_epochs(conn)
+
+    def _reconcile_completed_combine_first_v5_epochs(self, conn: Any) -> None:
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='combine_first_evolution_v5' AND status='COMPLETED' "
+            "ORDER BY experiment_id"
+        ).fetchall()
+        accounted = set(
+            get_kv(conn, "combine_first_v5_accounted_epochs", []) or []
+        )
+        for row in rows:
+            experiment_id = str(row[0])
+            if experiment_id in accounted:
+                continue
+            record = experiment_record(conn, experiment_id)
+            result = dict((record or {}).get("result") or {})
+            if not result:
+                continue
+            self._route_combine_first_v5_result(conn, result, experiment_id)
+            accounted.add(experiment_id)
+            set_kv(
+                conn,
+                "combine_first_v5_accounted_epochs",
+                sorted(accounted),
+            )
+            reconciliation_id = (
+                f"completed:{experiment_id}:"
+                f"{(record or {}).get('specification_hash') or result.get('result_hash') or 'unknown'}"
+            )
+            if not self._evidence_reconciliation_exists(reconciliation_id):
+                record_evidence(
+                    self.paths,
+                    {
+                        "reconciliation_id": reconciliation_id,
+                        "scope": "COMBINE_FIRST_EVOLUTION",
+                        "experiment_id": experiment_id,
+                        "experiment_type": "combine_first_evolution_v5",
+                        "status": "COMPLETED",
+                        "interpretation_boundary": result.get(
+                            "interpretation_boundary"
+                        ),
+                        "result": result,
+                    },
+                )
+            if not self._event_reconciliation_exists(conn, reconciliation_id):
+                append_event(
+                    conn,
+                    "completed_experiment_reconciled",
+                    {
+                        "experiment_id": experiment_id,
+                        "experiment_type": "combine_first_evolution_v5",
+                        "scientific_conclusion": result.get(
+                            "scientific_conclusion"
+                        ),
+                        "report_path": result.get("report_path"),
+                        "reconciliation_id": reconciliation_id,
+                    },
+                )
 
     def _reconcile_completed_forward_shadow_updates(self, conn: Any) -> None:
         rows = conn.execute(
@@ -5654,6 +5728,182 @@ class AutonomousMissionController:
         )
         self._clear_resolved_resume_block(conn)
         return True
+
+    @staticmethod
+    def _pending_or_next_combine_v5_epoch(conn: Any) -> int:
+        active = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='combine_first_evolution_v5' "
+            "AND status IN ('QUEUED','RUNNING') ORDER BY experiment_id LIMIT 1"
+        ).fetchone()
+        if active is not None:
+            try:
+                return int(
+                    str(active[0]).removeprefix(COMBINE_FIRST_V5_EXPERIMENT_PREFIX)
+                )
+            except ValueError:
+                return 0
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='combine_first_evolution_v5'"
+        ).fetchall()
+        indices: list[int] = []
+        for (experiment_id,) in rows:
+            try:
+                indices.append(
+                    int(
+                        str(experiment_id).removeprefix(
+                            COMBINE_FIRST_V5_EXPERIMENT_PREFIX
+                        )
+                    )
+                )
+            except ValueError:
+                continue
+        return max(indices, default=-1) + 1
+
+    @staticmethod
+    def _combine_first_v5_should_run(conn: Any) -> bool:
+        """Gate the policy migration without weakening an existing block.
+
+        V5 is a post-Q4 development/falsification engine.  The engineering
+        task and code are not permission to bypass a scientific or integrity
+        failure, so an exhausted retry remains blocked for review instead of
+        silently advancing to a new epoch.
+        """
+
+        if str(get_kv(conn, "decision_bridge_v4_status", "")) != (
+            "Q4_ONE_SHOT_COMMITTED"
+        ):
+            return False
+        if int(get_kv(conn, "q4_access_count", 0) or 0) != 1:
+            return False
+        if str(get_kv(conn, "current_phase", "")) in {
+            "INTEGRITY_BLOCKED",
+            "ENGINEERING_BLOCKED",
+            "EXPERIMENT_BLOCKED",
+        }:
+            return False
+        unresolved = conn.execute(
+            "SELECT 1 FROM experiments WHERE "
+            "experiment_type='combine_first_evolution_v5' "
+            "AND status IN ('FAILED','BLOCKED') LIMIT 1"
+        ).fetchone()
+        return unresolved is None
+
+    def _reconcile_combine_first_v5(
+        self, conn: Any, *, epoch_index: int
+    ) -> bool:
+        if epoch_index < 0:
+            raise ValueError("Combine V5 epoch must be non-negative")
+        if q4_access_count() > 1:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "Q4_ACCESS_COUNT_EXCEEDS_ONE_SHOT")
+            return False
+        experiment_id = f"{COMBINE_FIRST_V5_EXPERIMENT_PREFIX}{epoch_index:04d}"
+        existing = experiment_record(conn, experiment_id)
+        if existing is not None:
+            return str(existing.get("status")) in {"QUEUED", "RUNNING", "COMPLETED"}
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_combine_first_evolution_v5_20260712.md",
+        )
+        if not task.is_file():
+            task = Path(
+                "/root/hydra-bot/reports/engineering/"
+                "hydra_combine_first_evolution_v5_20260712.md"
+            )
+        roll_map = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not roll_map.is_file():
+            roll_map = Path(
+                "/root/hydra-bot/data/cache/contract_maps/"
+                "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+            )
+        mismatches = [
+            label
+            for path, expected, label in (
+                (task, COMBINE_FIRST_V5_TASK_SHA256, "engineering task"),
+                (roll_map, PATH_GEOMETRY_MAP_SHA256, "explicit-contract map"),
+            )
+            if not path.is_file()
+            or hashlib.sha256(path.read_bytes()).hexdigest() != expected
+        ]
+        if mismatches:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "COMBINE_FIRST_V5_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Frozen Combine V5 sources changed: {', '.join(mismatches)}.",
+            )
+            return False
+        created = enqueue_experiment(
+            conn,
+            experiment_id,
+            {
+                "experiment_type": "combine_first_evolution_v5",
+                "priority": 250.0,
+                "max_attempts": 2,
+                "pipeline": "COMBINE_EVOLUTION",
+                "parallel_safe": False,
+                "writes_data_access_ledger": True,
+                "engineering_task_path": str(task),
+                "engineering_task_sha256": COMBINE_FIRST_V5_TASK_SHA256,
+                "contract_map_path": str(roll_map),
+                "contract_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+                "contract_map_hash": PATH_GEOMETRY_ROLL_HASH,
+                "epoch_index": epoch_index,
+                "proposal_count": 5_000,
+                "exact_limit": 200,
+                "mutation_limit": 60,
+                "maximum_episode_starts": 24,
+                "worker_count": min(max(int(self.config.workers), 1), 3),
+                "code_commit": self._git_commit(),
+                "record_data_access": True,
+                "data_role": "DEVELOPMENT_AND_FALSIFICATION_ONLY",
+                "development_end_exclusive": "2024-10-01",
+                "q4_access_allowed": False,
+                "q4_reuse_prohibited": True,
+                "paid_data_allowed": False,
+                "network_allowed": False,
+                "live_or_broker_allowed": False,
+                "outbound_order_capability": False,
+                "expected_decision_information_gain": 0.99,
+                "batch_capacity_policy": (
+                    "FOUR_VCPU_SAFE_INITIAL_BATCH_THEN_RESULT_DRIVEN_REALLOCATION"
+                ),
+            },
+        )
+        set_kv(conn, "combine_first_v5_plan_written", True)
+        set_kv(conn, "combine_first_v5_current_epoch", epoch_index)
+        set_kv(conn, "foundry_current_engine", "HYDRA_COMBINE_FIRST_EVOLUTION_V5")
+        set_kv(conn, "discovery_pipeline_status", "COMBINE_V5_QUEUED")
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": experiment_id,
+                "pipeline": "COMBINE_EVOLUTION",
+                "compute_allocation": {
+                    "generation_fast_screen": 0.45,
+                    "targeted_mutation": 0.30,
+                    "rolling_validation": 0.15,
+                    "xfa_portfolio_shadow": 0.10,
+                },
+                "q4_access_authorized": False,
+                "forward_feed_preserved": True,
+            },
+        )
+        if created:
+            set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+            set_kv(conn, "current_blocker", None)
+            set_kv(conn, "last_error", None)
+        return created
 
     def _reconcile_turbo_promotion(
         self,
@@ -9462,6 +9712,160 @@ class AutonomousMissionController:
         )
         self._tick_shadow_pipeline(conn)
 
+    def _route_combine_first_v5_result(
+        self, conn: Any, result: dict[str, Any], experiment_id: str
+    ) -> None:
+        governance = dict(result.get("governance") or {})
+        forbidden = {
+            "q4_access_count_delta": int(
+                governance.get("q4_access_count_delta") or 0
+            ),
+            "network_requests": int(governance.get("network_requests") or 0),
+            "incremental_databento_spend_usd": float(
+                governance.get("incremental_databento_spend_usd") or 0.0
+            ),
+            "outbound_order_capability": bool(
+                governance.get("outbound_order_capability")
+            ),
+            "paper_shadow_ready": int(result.get("paper_shadow_ready") or 0),
+        }
+        if any(value != 0 and value is not False for value in forbidden.values()):
+            raise RuntimeError(
+                f"Combine V5 result crossed a protected boundary: {forbidden}"
+            )
+        if str(result.get("schema") or "") != (
+            "hydra_combine_first_evolution_v5_epoch_v1"
+        ):
+            raise RuntimeError("Combine V5 result schema is not recognized.")
+        try:
+            epoch_index = int(result.get("epoch_index"))
+        except (TypeError, ValueError) as exc:
+            raise RuntimeError("Combine V5 result has no valid epoch index.") from exc
+
+        self._update_foundry_candidate_bank(conn, result, experiment_id)
+        metrics = {
+            "epoch_index": epoch_index,
+            "structural_proposals": int(result.get("structural_proposals") or 0),
+            "fast_screens": int(result.get("fast_screens") or 0),
+            "fast_screen_survivors": int(
+                result.get("fast_screen_survivors") or 0
+            ),
+            "rolling_candidates_evaluated": int(
+                result.get("rolling_candidates_evaluated") or 0
+            ),
+            "mutation_children_evaluated": int(
+                result.get("mutation_children_evaluated") or 0
+            ),
+            "rolling_episode_count": int(
+                result.get("rolling_episode_count") or 0
+            ),
+            "rolling_effective_block_count": int(
+                result.get("rolling_effective_block_count") or 0
+            ),
+            "factory_survivor_count": int(
+                result.get("factory_survivor_count") or 0
+            ),
+            "combine_elite_count": int(result.get("combine_elite_count") or 0),
+            "xfa_candidate_count": int(result.get("xfa_candidate_count") or 0),
+            "defensive_candidate_count": int(
+                result.get("defensive_candidate_count") or 0
+            ),
+            "mutation_success_count": int(
+                result.get("mutation_success_count") or 0
+            ),
+            "mutation_success_rate": float(
+                result.get("mutation_success_rate") or 0.0
+            ),
+            "pass_rate_distribution": result.get(
+                "combine_pass_rate_distribution"
+            )
+            or {},
+            "mll_breach_rate_distribution": result.get(
+                "mll_breach_rate_distribution"
+            )
+            or {},
+            "payout_cycle_distribution": result.get(
+                "payout_cycle_distribution"
+            )
+            or {},
+            "performance": result.get("performance") or {},
+            "archive": result.get("archive") or {},
+            "scientific_conclusion": result.get("scientific_conclusion"),
+            "report_path": result.get("report_path"),
+            "result_hash": result.get("result_hash"),
+        }
+        set_kv(conn, "combine_first_v5_latest_metrics", metrics)
+        set_kv(conn, "combine_first_v5_latest_report", result.get("report_path"))
+        history = list(get_kv(conn, "combine_first_v5_generation_history", []) or [])
+        history = [
+            row for row in history if int(row.get("epoch_index", -1)) != epoch_index
+        ]
+        history.append(metrics)
+        history.sort(key=lambda row: int(row.get("epoch_index", -1)))
+        set_kv(conn, "combine_first_v5_generation_history", history)
+        set_kv(
+            conn,
+            "combine_first_v5_completed_generations",
+            len(history),
+        )
+        set_kv(
+            conn,
+            "combine_first_v5_total_rolling_episodes",
+            sum(int(row.get("rolling_episode_count") or 0) for row in history),
+        )
+        set_kv(
+            conn,
+            "latest_completed_experiment",
+            {
+                "experiment_id": experiment_id,
+                "experiment_type": "combine_first_evolution_v5",
+                "scientific_conclusion": result.get("scientific_conclusion"),
+                "report_path": result.get("report_path"),
+                "result_hash": result.get("result_hash"),
+            },
+        )
+        set_kv(conn, "latest_scientific_finding", result.get("scientific_conclusion"))
+        set_kv(conn, "foundry_current_engine", "HYDRA_COMBINE_FIRST_EVOLUTION_V5")
+        set_kv(conn, "discovery_pipeline_status", "COMBINE_V5_EPOCH_COMPLETED")
+        set_kv(conn, "promotion_pipeline_status", "COMBINE_V5_ROLLING_EVIDENCE")
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+
+        next_epoch = epoch_index + 1
+        next_queued = self._reconcile_combine_first_v5(
+            conn, epoch_index=next_epoch
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": f"{COMBINE_FIRST_V5_EXPERIMENT_PREFIX}{next_epoch:04d}",
+                "pipeline": "COMBINE_EVOLUTION",
+                "prior_epoch": epoch_index,
+                "combine_elite_count": metrics["combine_elite_count"],
+                "xfa_candidate_count": metrics["xfa_candidate_count"],
+                "mutation_success_rate": metrics["mutation_success_rate"],
+                "queued": next_queued,
+                "q4_access_authorized": False,
+                "forward_feed_preserved": True,
+            },
+        )
+        append_event(
+            conn,
+            "combine_first_v5_epoch_routed",
+            {
+                "experiment_id": experiment_id,
+                **metrics,
+                "next_epoch": next_epoch,
+                "next_epoch_queued": next_queued,
+                "q4_access_count_delta": 0,
+                "outbound_order_capability": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
     def _route_turbo_promotion_result(
         self, conn: Any, result: dict[str, Any], experiment_id: str
     ) -> None:
@@ -10597,7 +11001,12 @@ class AutonomousMissionController:
                     (row.get("topstep") or {}).get("path_candidate")
                 )
                 if "topstep" in row
-                else bool(previous.get("topstep_path_candidate")),
+                else bool(
+                    row.get(
+                        "topstep_path_candidate",
+                        previous.get("topstep_path_candidate"),
+                    )
+                ),
                 "source_experiment": experiment_id,
             }
         set_kv(conn, "foundry_candidate_bank", bank)
@@ -11485,6 +11894,23 @@ class AutonomousMissionController:
             validate_forward_boundary_manifest(
                 json.loads(boundary_path.read_text(encoding="utf-8"))
             )
+        if experiment_type == "combine_first_evolution_v5":
+            if not (
+                str(experiment.get("data_role"))
+                == "DEVELOPMENT_AND_FALSIFICATION_ONLY"
+                and str(experiment.get("development_end_exclusive"))
+                == "2024-10-01"
+                and not bool(experiment.get("q4_access_allowed"))
+                and bool(experiment.get("q4_reuse_prohibited"))
+                and not bool(experiment.get("paid_data_allowed"))
+                and not bool(experiment.get("network_allowed"))
+                and not bool(experiment.get("live_or_broker_allowed"))
+                and not bool(experiment.get("outbound_order_capability"))
+                and int(experiment.get("max_attempts") or 0) == 2
+            ):
+                raise RuntimeError(
+                    "Combine V5 experiment crossed its development-only scope."
+                )
         check_action_allowed(
             {
                 "action_type": "Q4_ACCESS"

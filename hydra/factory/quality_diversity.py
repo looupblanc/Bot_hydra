@@ -123,6 +123,12 @@ def _cap(size: int, share: float) -> int:
 
 def _quality_vector(candidate: ArchiveCandidate) -> tuple[float, ...]:
     ordered = (
+        "combine_pass_rate",
+        "combine_fitness",
+        "mll_survival",
+        "target_velocity",
+        "xfa_payout_utility",
+        "defensive_utility",
         "net_economics",
         "temporal_transfer",
         "cost_resilience",
