@@ -1,0 +1,325 @@
+{
+  "CONTRE": "Controls validate the decision rule at fixed synthetic dependence and D1 residual scale, but candidate post-selection remains a separate source of optimism addressed by shrinkage and multiplicity.",
+  "candidate_diagnostics_read": false,
+  "candidate_freeze_path": "WORM/v7.1-power-aware-candidate-freeze-0001-2026-07-12.json",
+  "candidate_freeze_sha256": "b66e462989213356106f0cbcd88d31ba4547a61f9900eb1de3e6010cb3d35d83",
+  "cell_results": [
+    {
+      "effect_usd_per_trade": 0.0,
+      "event_count": 60,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "rejection_count": 0,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 12.5,
+      "event_count": 60,
+      "false_positive_rate": null,
+      "power": 0.01,
+      "rejection_count": 2,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 25.0,
+      "event_count": 60,
+      "false_positive_rate": null,
+      "power": 0.125,
+      "rejection_count": 25,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 50.0,
+      "event_count": 60,
+      "false_positive_rate": null,
+      "power": 0.875,
+      "rejection_count": 175,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 0.0,
+      "event_count": 120,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "rejection_count": 0,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 12.5,
+      "event_count": 120,
+      "false_positive_rate": null,
+      "power": 0.0,
+      "rejection_count": 0,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 25.0,
+      "event_count": 120,
+      "false_positive_rate": null,
+      "power": 0.355,
+      "rejection_count": 71,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 50.0,
+      "event_count": 120,
+      "false_positive_rate": null,
+      "power": 1.0,
+      "rejection_count": 200,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 0.0,
+      "event_count": 180,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "rejection_count": 0,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 12.5,
+      "event_count": 180,
+      "false_positive_rate": null,
+      "power": 0.0,
+      "rejection_count": 0,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 25.0,
+      "event_count": 180,
+      "false_positive_rate": null,
+      "power": 0.8,
+      "rejection_count": 160,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 50.0,
+      "event_count": 180,
+      "false_positive_rate": null,
+      "power": 1.0,
+      "rejection_count": 200,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 0.0,
+      "event_count": 240,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "rejection_count": 0,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 12.5,
+      "event_count": 240,
+      "false_positive_rate": null,
+      "power": 0.005,
+      "rejection_count": 1,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 25.0,
+      "event_count": 240,
+      "false_positive_rate": null,
+      "power": 0.96,
+      "rejection_count": 192,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 50.0,
+      "event_count": 240,
+      "false_positive_rate": null,
+      "power": 1.0,
+      "rejection_count": 200,
+      "replications": 200,
+      "world": "SYNTHETIC_AR1_GAUSSIAN"
+    },
+    {
+      "effect_usd_per_trade": 0.0,
+      "event_count": 60,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "rejection_count": 0,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 12.5,
+      "event_count": 60,
+      "false_positive_rate": null,
+      "power": 0.4,
+      "rejection_count": 80,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 25.0,
+      "event_count": 60,
+      "false_positive_rate": null,
+      "power": 0.74,
+      "rejection_count": 148,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 50.0,
+      "event_count": 60,
+      "false_positive_rate": null,
+      "power": 0.97,
+      "rejection_count": 194,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 0.0,
+      "event_count": 120,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "rejection_count": 0,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 12.5,
+      "event_count": 120,
+      "false_positive_rate": null,
+      "power": 0.535,
+      "rejection_count": 107,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 25.0,
+      "event_count": 120,
+      "false_positive_rate": null,
+      "power": 0.87,
+      "rejection_count": 174,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 50.0,
+      "event_count": 120,
+      "false_positive_rate": null,
+      "power": 0.965,
+      "rejection_count": 193,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 0.0,
+      "event_count": 180,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "rejection_count": 0,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 12.5,
+      "event_count": 180,
+      "false_positive_rate": null,
+      "power": 0.545,
+      "rejection_count": 109,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 25.0,
+      "event_count": 180,
+      "false_positive_rate": null,
+      "power": 0.9,
+      "rejection_count": 180,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 50.0,
+      "event_count": 180,
+      "false_positive_rate": null,
+      "power": 0.985,
+      "rejection_count": 197,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 0.0,
+      "event_count": 240,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "rejection_count": 0,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 12.5,
+      "event_count": 240,
+      "false_positive_rate": null,
+      "power": 0.68,
+      "rejection_count": 136,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 25.0,
+      "event_count": 240,
+      "false_positive_rate": null,
+      "power": 0.965,
+      "rejection_count": 193,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    },
+    {
+      "effect_usd_per_trade": 50.0,
+      "event_count": 240,
+      "false_positive_rate": null,
+      "power": 1.0,
+      "rejection_count": 200,
+      "replications": 200,
+      "world": "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL"
+    }
+  ],
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+  "policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673",
+  "prochaine_action": "run_frozen_16_candidate_power_audit",
+  "protected_holdout_access_count_delta": 0,
+  "raw_global_N_trials": 263604,
+  "schema": "hydra_v7_1_candidate_specific_power_calibration_result_v1",
+  "verdict": "GREEN",
+  "world_parameters": {
+    "critical_z": 1.6448536269514722,
+    "synthetic_AR1_rho": 0.25,
+    "synthetic_stationary_sigma_usd": 150.0,
+    "test_block_events": 10
+  },
+  "world_summaries": {
+    "SEMI_SYNTHETIC_D1_DAILY_BLOCK_RESIDUAL": {
+      "maximum_null_false_positive_rate": 0.0,
+      "passed": true,
+      "power_at_25_usd_240_events": 0.965,
+      "power_at_50_usd_120_events": 0.965
+    },
+    "SYNTHETIC_AR1_GAUSSIAN": {
+      "maximum_null_false_positive_rate": 0.0,
+      "passed": true,
+      "power_at_25_usd_240_events": 0.96,
+      "power_at_50_usd_120_events": 1.0
+    }
+  }
+}
