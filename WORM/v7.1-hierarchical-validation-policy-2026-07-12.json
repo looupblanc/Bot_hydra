@@ -1,0 +1,62 @@
+{
+  "schema": "hydra_v7_1_hierarchical_validation_policy_v1",
+  "policy_id": "hydra_v7_1_hierarchical_validation_0001",
+  "effective_from": "campaigns_preregistered_after_this_file_only",
+  "historical_campaigns_rejudged": false,
+  "raw_global_N_trials_at_freeze": 247892,
+  "hierarchy": [
+    "mechanism_family",
+    "preregistered_grammar_version",
+    "structurally_distinct_candidate",
+    "bounded_parameter_alternative"
+  ],
+  "effective_independent_trials": {
+    "input": "outcome_free_signed_signal_path_matrix_for_all_candidates_in_family",
+    "estimator": "participation_ratio_of_nonnegative_correlation_eigenvalues",
+    "formula": "N_eff_signal=(sum(lambda))^2/sum(lambda^2)",
+    "campaign_information_inflation": 1.5,
+    "global_search_history_penalty": "ceil(log2(1+raw_global_N_trials))",
+    "global_search_history_penalty_at_freeze": 18,
+    "family_prior_grammar_penalty": "count_prior_preregistered_grammar_versions_in_same_mechanism_family",
+    "DSR_N_trials": "max(2,ceil(1.5*N_eff_signal)+ceil(log2(1+raw_global_N_trials))+family_prior_grammar_penalty)",
+    "raw_global_counter_retained_for_audit": true
+  },
+  "BH": {
+    "FDR": 0.10,
+    "scope": "one_preregistered_mechanism_family",
+    "family_size": 32,
+    "non_survivor_p_value": 1.0,
+    "candidate_status_inheritance": false
+  },
+  "funnel": {
+    "stage0": {"requires_no_lookahead": true, "requires_explicit_contract": true, "requires_determinism": true, "reject_exact_duplicate": true, "reject_cemetery_class_collision": true},
+    "stage1": {"minimum_nonoverlapping_events": 40, "stress_profile": "STRESS_1_5X", "pooled_expectancy_min_exclusive": 0.0, "minimum_positive_early_folds": 2, "early_fold_count": 3, "maximum_single_day_absolute_pnl_share": 0.35},
+    "stage2": {"mandatory_before_DSR_BH": true, "rolling_origin_fold_count": 4, "purge": "candidate_holding_horizon", "embargo_days": 5, "minimum_retained_events": 30, "pooled_expectancy_min_exclusive": 0.0, "minimum_positive_folds": 2, "fixed_structure_direction_horizon": true},
+    "stage3": {"only_after_positive_walk_forward": true, "mandatory_nulls": ["FIVE_SESSION_SIGNAL_DELAY", "SIGN_INVERSION", "WITHIN_SESSION_TIME_SHIFT"], "minimum_null_events": 20, "minimum_null_event_retention": 0.50, "actual_expectancy_must_exceed_maximum_null": true},
+    "stage4": {"DSR_deflated_z_min_exclusive": 0.0, "BH_FDR": 0.10, "report_raw_and_adjusted": true},
+    "stage5": {"rolling_combine_only_after_stage4": true, "combine_not_fitness": true}
+  },
+  "power_calibration": {
+    "controls_only_before_real_campaign": true,
+    "seeds": [71001, 71002, 71003, 71004, 71005, 71006, 71007, 71008, 71009, 71010],
+    "family_size": 32,
+    "event_counts": [30, 60, 100, 160],
+    "injected_net_effect_usd_per_trade": [0.0, 25.0, 50.0, 75.0],
+    "trade_noise_sd_usd": 150.0,
+    "daily_block_shock_sd_usd": 75.0,
+    "null_false_positive_rate_max": 0.10,
+    "meaningful_power_target_min": 0.60,
+    "meaningful_control_definition": "event_count_at_least_100_and_injected_net_effect_at_least_50_USD_per_trade",
+    "statistical_tests_reserved_before_calibration": 5120,
+    "threshold_tuning_after_real_results": false
+  },
+  "power_aware_decisions": {
+    "minimum_detectable_effect_reported": true,
+    "underpowered_status": "INSUFFICIENT_POWER",
+    "underpowered_is_not_NULL": true,
+    "overlapping_events_are_not_independent": true
+  },
+  "data_policy": {"new_purchase_count": 0, "protected_holdout_access_count": 0, "D1_only": true},
+  "outbound_orders": 0,
+  "CONTRE": "La participation-ratio mesure la redondance des chemins de signaux mais peut sous-estimer une dependance de selection non lineaire; la penalite globale logarithmique reste donc explicite et les compteurs bruts ne sont jamais effaces."
+}
