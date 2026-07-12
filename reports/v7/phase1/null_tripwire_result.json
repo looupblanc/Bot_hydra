@@ -1,0 +1,165 @@
+{
+  "CONTRE": "This conditional-outcome null freezes the selected signal schedule rather than rerunning feature selection on each synthetic raw path; it is decisive for account-path geometry but not every possible selection-stage artefact.",
+  "NULL_RATIO": 0.04954068241469816,
+  "controller_count": 960,
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "NULL_RATIO": 0.0523840769903762,
+      "compliance_failure_count": 0,
+      "episode_count": 25680,
+      "intraday_hwm": {
+        "compliance_failure_count": 0,
+        "episode_count": 25680,
+        "mean_target_progress": 0.023881929874745224,
+        "minimum_mll_buffer": -388097.0,
+        "mll_breach_count": 19556,
+        "mll_breach_rate": 0.7615264797507788,
+        "net_expectancy_per_episode": 3112.3050178484523,
+        "object_count": 1015,
+        "pass_count": 243,
+        "pass_rate": 0.009462616822429907
+      },
+      "mean_target_progress": 0.045235435048818294,
+      "minimum_mll_buffer": -388024.0,
+      "mll_breach_count": 19874,
+      "mll_breach_rate": 0.7739096573208722,
+      "net_expectancy_per_episode": 7563.520948628612,
+      "object_count": 1015,
+      "pass_count": 479,
+      "pass_rate": 0.01865264797507788
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "NULL_RATIO": 0.04319772528433946,
+      "compliance_failure_count": 0,
+      "episode_count": 25680,
+      "intraday_hwm": {
+        "compliance_failure_count": 0,
+        "episode_count": 25680,
+        "mean_target_progress": -0.029265378003389148,
+        "minimum_mll_buffer": -391682.72327006963,
+        "mll_breach_count": 18230,
+        "mll_breach_rate": 0.7098909657320872,
+        "net_expectancy_per_episode": 2140.617728478917,
+        "object_count": 1015,
+        "pass_count": 132,
+        "pass_rate": 0.0051401869158878505
+      },
+      "mean_target_progress": -0.008751332883514424,
+      "minimum_mll_buffer": -392009.09362367034,
+      "mll_breach_count": 19012,
+      "mll_breach_rate": 0.7403426791277259,
+      "net_expectancy_per_episode": 6445.566317319587,
+      "object_count": 1015,
+      "pass_count": 395,
+      "pass_rate": 0.015381619937694704
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "NULL_RATIO": 0.05304024496937883,
+      "compliance_failure_count": 0,
+      "episode_count": 25680,
+      "intraday_hwm": {
+        "compliance_failure_count": 0,
+        "episode_count": 25680,
+        "mean_target_progress": 0.015596604982685666,
+        "minimum_mll_buffer": -391229.5,
+        "mll_breach_count": 19306,
+        "mll_breach_rate": 0.751791277258567,
+        "net_expectancy_per_episode": 2938.7217893767806,
+        "object_count": 1015,
+        "pass_count": 240,
+        "pass_rate": 0.009345794392523364
+      },
+      "mean_target_progress": 0.03566700678680435,
+      "minimum_mll_buffer": -391229.5,
+      "mll_breach_count": 19874,
+      "mll_breach_rate": 0.7739096573208722,
+      "net_expectancy_per_episode": 7332.7746671313225,
+      "object_count": 1015,
+      "pass_count": 485,
+      "pass_rate": 0.018886292834890964
+    }
+  },
+  "data_manifest_file_sha256": "e471cc472a46e68d7164d73ef95c16e995bbded6bad9fcb8537cb89657274b38",
+  "diff_validation": [
+    "hydra/validation/v7_null_tripwire.py",
+    "scripts/run_v7_null_tripwire.py",
+    "tests/ruleset/test_v7_null_tripwire.py"
+  ],
+  "experiment_id": "hydra_v7_null_tripwire_0001",
+  "full_detail_evidence": {
+    "compressed_sha256": "73bcc543b9fdcf373680b789d721bfa3663581164efda41c354a08f5c49d3042",
+    "compression": "gzip-mtime-0",
+    "object_result_count": 1015,
+    "path": "reports/v7/phase1/null_tripwire_full_evidence.json.gz",
+    "uncompressed_bytes": 3582255,
+    "uncompressed_sha256": "cc4d3e48d2675984172c5db605f3794f3f17a68df16703ad7aed82fab770f1a6"
+  },
+  "gap_access_count": 0,
+  "generation_count": 0,
+  "object_count": 1015,
+  "outbound_order_count": 0,
+  "phase_data_spend_usd": 0.0,
+  "pooled_null": {
+    "episode_count": 77040,
+    "pass_count": 1359,
+    "pass_rate": 0.01764018691588785
+  },
+  "preregistration_sha256": "4ca94dd368ed2aca1eaf92674ba7ba8778ff2e9e11f9ad402841c515e0deea0f",
+  "q4_access_count_delta": 0,
+  "real": {
+    "compliance_failure_count": 0,
+    "episode_count": 25680,
+    "mean_target_progress": 0.5904789408162576,
+    "minimum_mll_buffer": -3671.0,
+    "mll_breach_count": 1276,
+    "mll_breach_rate": 0.04968847352024922,
+    "net_expectancy_per_episode": 5363.040303738318,
+    "object_count": 1015,
+    "pass_count": 9144,
+    "pass_rate": 0.3560747663551402
+  },
+  "real_equivalence_mismatch_count": 0,
+  "real_intraday_hwm": {
+    "compliance_failure_count": 0,
+    "episode_count": 25680,
+    "mean_target_progress": 0.5157243358782442,
+    "minimum_mll_buffer": -3582.5,
+    "mll_breach_count": 2436,
+    "mll_breach_rate": 0.09485981308411215,
+    "net_expectancy_per_episode": 4675.464485981309,
+    "object_count": 1015,
+    "pass_count": 8014,
+    "pass_rate": 0.3120716510903427
+  },
+  "schema": "hydra_v7_null_tripwire_result_v1",
+  "source_manifest_sha256": "3065520036b6516c1542fd19d5f7e816266960d2e9349fa2d85f89befee4f07b",
+  "static_basket_count": 55,
+  "synthetic_path_hashes": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "CL": "02d6d7bdcac3ea0895da19c61689d35640d4bc5f7759ee33d569f15560b82e2f",
+      "ES": "54168baf2216f2ab045ca65b3345603b8057d1e73210e3d6fabc33b4c1d0e12b",
+      "GC": "9f55c79b68fde9e7ef418bb3b1df41849ab43110a650238972dc306de50a35c8",
+      "NQ": "d6593c907cb1af694ab8dfc0fd8b47989baed0d57a89700e560e71413164e85e",
+      "RTY": "44d5f7f67cbea873c8937dc019aaf23ee5edf83f58806be9741a2d4a3fd490f1",
+      "YM": "8f5105bc978d98d29572b48ea5f68c5bf9de0a26017b31d0fec37ed3072c248a"
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "CL": "080b9c8d5b0e1d505357072ff8378870e0315ea7525a4b35dd7618133c8455d2",
+      "ES": "6fb24aaa6c7c73e5fddd7a83aa1017a97b45a4f37e2860bd32b56690fe9046c9",
+      "GC": "7585d92b2dea06304509d59f22129a700a08a309dbdf7d4463c6104cea2bac0b",
+      "NQ": "38833ba4a4568fd6cd4f8da6c9ac93ed5c7d9defec4221c77886f519fdde94f7",
+      "RTY": "c7fae9270362a29952bdbf421978a6a9fca6736017400704b809639907ba7c48",
+      "YM": "701d8f12cec840cdf44871960b45b0f53869e0beacd73013e3ad0b64b99ee472"
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "CL": "0d0fb31460e6eb3bd29354a81a306a399374470ab5182dc288486ba549f52b78",
+      "ES": "5122060130073b44f033541577df6ffe810c91398ea7e8cdc17e82f6597e8eb8",
+      "GC": "7219ce2b6f332b556a9b1e335b50ad8abcd14fc92dad505bd0d7896b1ecc125c",
+      "NQ": "c203801995251eb0c6c05c0d47a7a0d152bd819200579a46a4af01329248a0ac",
+      "RTY": "bfbc142e7babd063be34c6471bc453462b53e91a5e1a2aca59204133ce564718",
+      "YM": "07dcf986e0940a0bde012660c0c74df8bde9ae81f927754a60ba6a75f3adebf4"
+    }
+  },
+  "threshold": 0.8,
+  "verdict": "GREEN"
+}

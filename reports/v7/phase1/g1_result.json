@@ -1,0 +1,100 @@
+{
+  "schema": "hydra_v7_gate_result_v1",
+  "gate": "G1",
+  "verdict": "GREEN",
+  "evaluated_at_utc": "2026-07-12T14:31:00Z",
+  "experiment_id": "hydra_v7_null_tripwire_0001",
+  "source_commit_scientific_run": "bb067a64e46d8349c722d1c28e1b993695e8f835",
+  "source_commit_evidence_serialization": "09d334e500f65bfdf829a3c437237b67959575c4",
+  "preregistration": {
+    "path": "WORM/phase1-null-tripwire-2026-07-12.json",
+    "sha256": "4ca94dd368ed2aca1eaf92674ba7ba8778ff2e9e11f9ad402841c515e0deea0f",
+    "tag": "worm/v7-phase1-null-tripwire-2026-07-12"
+  },
+  "evidence": {
+    "summary_path": "reports/v7/phase1/null_tripwire_result.json",
+    "summary_sha256": "ea90964588a22546aeb7ea14df7d418e06936d37145fa444358769cfad8abf72",
+    "full_compressed_path": "reports/v7/phase1/null_tripwire_full_evidence.json.gz",
+    "full_compressed_sha256": "73bcc543b9fdcf373680b789d721bfa3663581164efda41c354a08f5c49d3042",
+    "full_uncompressed_sha256": "cc4d3e48d2675984172c5db605f3794f3f17a68df16703ad7aed82fab770f1a6",
+    "report_path": "reports/v7/phase1/null_tripwire_report.md",
+    "report_sha256": "715dd558055e2f5cc4b8b972ba0d11c4e71d6fdf2c0ce9b0483885fe6ff0f3fe"
+  },
+  "scope": {
+    "static_baskets": 55,
+    "adaptive_controllers": 960,
+    "objects": 1015,
+    "real_episodes": 25680,
+    "null_episodes": 77040,
+    "real_equivalence_mismatches": 0,
+    "synthetic_product_paths": 18
+  },
+  "primary_result": {
+    "real_pass_rate": 0.3560747663551402,
+    "pooled_null_pass_rate": 0.01764018691588785,
+    "NULL_RATIO": 0.04954068241469816,
+    "WORM_threshold": 0.8,
+    "distance_below_threshold": 0.7504593175853018,
+    "classification": "NULL_ADJUSTED_BASELINE_AVAILABLE"
+  },
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "pass_rate": 0.01865264797507788,
+      "NULL_RATIO": 0.0523840769903762,
+      "mll_breach_rate": 0.7739096573208722
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "pass_rate": 0.015381619937694704,
+      "NULL_RATIO": 0.04319772528433946,
+      "mll_breach_rate": 0.7403426791277259
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "pass_rate": 0.018886292834890964,
+      "NULL_RATIO": 0.05304024496937883,
+      "mll_breach_rate": 0.7739096573208722
+    }
+  },
+  "role_diagnostics": {
+    "static_baskets": {
+      "real_pass_rate": 0.4518939393939394,
+      "pooled_null_pass_rate": 0.0006313131313131314,
+      "NULL_RATIO": 0.0013970382788488405
+    },
+    "adaptive_controllers": {
+      "real_pass_rate": 0.3450954861111111,
+      "pooled_null_pass_rate": 0.01958912037037037,
+      "NULL_RATIO": 0.056764348300004194
+    }
+  },
+  "acceptance": {
+    "pytest_passed": 571,
+    "pytest_failed": 0,
+    "focused_no_lookahead_q4_budget_null_passed": 23,
+    "compileall_passed": true,
+    "mission_db_integrity": "ok",
+    "registry_db_integrity": "ok",
+    "strategy_registry_db_integrity": "ok",
+    "governance_passed": true,
+    "governance_semantic_hash": "05810bc193e51e3c40722163a1ee3ae82fd3a8d7762c48eafa25c3a4cba1102b",
+    "q4_access_count": 1,
+    "q4_status": "BURNED",
+    "gap_access_count": 0,
+    "outbound_order_count": 0,
+    "secret_scan_passed": true,
+    "forbidden_artifact_scan_passed": true
+  },
+  "budget": {
+    "phase_llm_mission_external_spend_usd": 0.0,
+    "phase_llm_limit_usd": 12.0,
+    "phase_data_spend_usd": 0.0
+  },
+  "generation_gate": {
+    "G0_green": true,
+    "G1_green": true,
+    "artefact_unresolved": false,
+    "P4_contractually_eligible_after_hypothesis_WORM_and_queue_check": true,
+    "persistent_service_started": false
+  },
+  "invalid_diagnostic": "Null episode net expectancy is not admissible evidence because an unrealized MLL breach terminates before forced-loss realization in the inherited account result field; pass/breach/target classifications remain valid.",
+  "CONTRE": "The tripwire freezes the selected signal schedule and replaces only future market paths; it does not rerun the original feature-selection search on synthetic raw datasets, and the 115,388-trial multiplicity penalty is still pending Phase 2."
+}
