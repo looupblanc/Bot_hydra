@@ -1,0 +1,156 @@
+{
+  "CONTRE": "The artifact and fold diagnostics use only frozen development evidence; they cannot tell whether an economically distinct future mechanism will survive fresh confirmation.",
+  "D1_0001": {
+    "exact_formulation_classification": "FORMULATION_FALSIFIED",
+    "historical_verdict": "NULL",
+    "mechanism_classification": "MECHANISM_REFORMULATION_ALLOWED",
+    "reason": "One Stage-1 survivor and zero Stage-2 survivors under frozen costs; no mechanism-level transfer was established.",
+    "status_resurrected": false
+  },
+  "D1_0002": {
+    "exact_formulation_classification": "FORMULATION_FALSIFIED",
+    "historical_verdict": "NULL",
+    "mechanism_classification": "MECHANISM_WEAK_SIGNAL",
+    "reason": "The two best exact candidates failed walk-forward before DSR/BH, so the historical global-trial defect did not cause their rejection.",
+    "status_resurrected": false,
+    "validator_calibration_affected": false
+  },
+  "ES_EXTREME_REJECTION": {
+    "bounded_future_reformulations": [
+      {
+        "new_mechanism": "event_extreme_rejection_with_participation_acceleration",
+        "structural_change": "Require a past-only acceleration state before the rejection geometry, not a new threshold grid.",
+        "transfer_hypothesis": "Acceleration separates urgent tests from passive low-information touches."
+      },
+      {
+        "new_mechanism": "event_extreme_recovery_speed_reversal",
+        "structural_change": "Replace the static extreme flag with completed recovery-speed geometry.",
+        "transfer_hypothesis": "Fast recovery identifies exhaustion more invariantly than the raw extreme level."
+      },
+      {
+        "new_mechanism": "event_extreme_acceptance_delayed_continuation",
+        "structural_change": "Require dwell and value migration beyond the extreme before delayed continuation.",
+        "transfer_hypothesis": "Acceptance and rejection are distinct mechanisms and should not share one immediate response rule."
+      }
+    ],
+    "bounded_future_reformulations_maximum": 3,
+    "candidate_id": "v7d1g2_delta_extreme_rejection_ES",
+    "exact_formulation": "FORMULATION_FALSIFIED",
+    "folds": [
+      {
+        "embargo_days": 0,
+        "event_count": 17,
+        "expectancy_per_trade": -18.505882352941182,
+        "fold": 1,
+        "net_pnl": -314.6000000000001,
+        "raw_session_days": 11,
+        "retained_session_days": 11
+      },
+      {
+        "embargo_days": 5,
+        "event_count": 7,
+        "expectancy_per_trade": 35.4857142857143,
+        "fold": 2,
+        "net_pnl": 248.4000000000001,
+        "raw_session_days": 11,
+        "retained_session_days": 6
+      },
+      {
+        "embargo_days": 5,
+        "event_count": 11,
+        "expectancy_per_trade": 60.972727272727276,
+        "fold": 3,
+        "net_pnl": 670.7,
+        "raw_session_days": 11,
+        "retained_session_days": 6
+      },
+      {
+        "embargo_days": 5,
+        "event_count": 10,
+        "expectancy_per_trade": -70.05000000000001,
+        "fold": 4,
+        "net_pnl": -700.5000000000001,
+        "raw_session_days": 10,
+        "retained_session_days": 5
+      }
+    ],
+    "mechanism": "MECHANISM_REFORMULATION_ALLOWED",
+    "positive_fold_count": 2,
+    "raw_stress_1_5x_expectancy_per_trade": 41.55714285714286,
+    "reformulations_executed_in_this_audit": 0,
+    "v71_extreme_family_candidate_count": 32,
+    "v71_extreme_family_stage1_pass_count": 1,
+    "v71_extreme_family_walk_forward_positive_count": 0,
+    "validator_calibration_affected": false,
+    "walk_forward_event_count": 45,
+    "walk_forward_expectancy_per_trade": -2.133333333333336,
+    "year_results_stress_1_5x": {
+      "2023": {
+        "event_count": 29,
+        "expectancy_per_trade": 3.958620689655172,
+        "gross_pnl": 1312.5,
+        "maximum_drawdown": 932.5000000000002,
+        "negative_day_count": 8,
+        "net_pnl": 114.79999999999998,
+        "positive_day_count": 10,
+        "same_bar_ambiguous_count": 0
+      },
+      "2024": {
+        "event_count": 41,
+        "expectancy_per_trade": 68.15121951219513,
+        "gross_pnl": 4487.5,
+        "maximum_drawdown": 2110.8,
+        "negative_day_count": 12,
+        "net_pnl": 2794.2000000000003,
+        "positive_day_count": 8,
+        "same_bar_ambiguous_count": 0
+      }
+    }
+  },
+  "MINI_MICRO_DIVERGENCE": {
+    "ES_to_MES_volume_ratio_median": 1.449857212644263,
+    "candidate_id": "v7d1g2_cross_contract_participation_divergence_ES",
+    "contract_expiry_suffix_match_fraction": 1.0,
+    "death_reason": "Strong year sign reversal plus non-capturable intra-product latency/stale-information risk under R14.",
+    "exact_formulation": "FORMULATION_FALSIFIED",
+    "first_trade_absolute_lag_ms_median": 32.234769,
+    "last_trade_absolute_lag_ms_median": 95.810193,
+    "liquidity_normalization_used_by_original": "signed_aggressor_fraction",
+    "mechanism": "MECHANISM_CONFIRMED_DEAD",
+    "operational_class": "ARB_INTRA_PRODUIT",
+    "raw_stress_1_5x_expectancy_per_trade": 22.588888888888892,
+    "reformulation_allowed": false,
+    "reporting_latency_directly_observable": false,
+    "timestamp_intersection_fraction": 1.0,
+    "walk_forward_expectancy_per_trade": -48.63695652173912,
+    "year_results_stress_1_5x": {
+      "2023": {
+        "event_count": 31,
+        "expectancy_per_trade": -93.31612903225808,
+        "gross_pnl": -1612.5,
+        "maximum_drawdown": 3191.2000000000007,
+        "negative_day_count": 11,
+        "net_pnl": -2892.8,
+        "positive_day_count": 5,
+        "same_bar_ambiguous_count": 0
+      },
+      "2024": {
+        "event_count": 50,
+        "expectancy_per_trade": 94.45,
+        "gross_pnl": 6787.5,
+        "maximum_drawdown": 1505.4,
+        "negative_day_count": 6,
+        "net_pnl": 4722.5,
+        "positive_day_count": 14,
+        "same_bar_ambiguous_count": 0
+      }
+    }
+  },
+  "new_data_purchase_count": 0,
+  "next_action": "preserve_11_underpowered_mechanisms_and_expand_opportunity_density_without_parameter_tuning",
+  "outbound_order_count": 0,
+  "protected_holdout_access_count_delta": 0,
+  "schema": "hydra_v7_1_mechanism_forensics_result_v1",
+  "v71_powered_positive_count": 0,
+  "v71_underpowered_positive_count": 11
+}
