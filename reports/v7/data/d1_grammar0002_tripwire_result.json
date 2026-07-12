@@ -1,0 +1,1295 @@
+{
+  "CONTRE": "Only two August blocks are available. A GREEN tripwire rejects gross account geometry but does not validate any candidate edge.",
+  "NULL_RATIO": 0.41666666666666663,
+  "N_trials": 247892,
+  "candidate_count": 8,
+  "candidate_validation_executed": false,
+  "combine_pass_rate_is_diagnostic_not_fitness": true,
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "candidate_quantity_results": {
+        "v7d1g2_aggressor_regime_flip_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.38341073382164015,
+            "minimum_mll_buffer": -254.9169099625724,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.4318137237695919,
+            "minimum_mll_buffer": -662.9294402652304,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.18442068499213524,
+            "minimum_mll_buffer": -1849.8710773426574,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6153.213650009246,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_aggressor_regime_flip_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.030956483687461716,
+            "minimum_mll_buffer": 4016.803172138374,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.061912967374959,
+            "minimum_mll_buffer": 3533.6063442766026,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.12382593474990183,
+            "minimum_mll_buffer": 2567.212688553147,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.24765186949981338,
+            "minimum_mll_buffer": 634.4253771063813,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          }
+        },
+        "v7d1g2_cross_contract_participation_divergence_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.30495562182163444,
+            "minimum_mll_buffer": -84.42448472592514,
+            "mll_breach_count": 1,
+            "pass_count": 0,
+            "timeout_count": 4
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.40449292120874936,
+            "minimum_mll_buffer": -738.1216726963758,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3945935923322395,
+            "minimum_mll_buffer": -3020.5817436231882,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.13167168026423637,
+            "minimum_mll_buffer": -2161.4718408665794,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_cross_contract_participation_divergence_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.006814059625583468,
+            "minimum_mll_buffer": 3941.4434145676787,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.013628119251166936,
+            "minimum_mll_buffer": 3382.8868291351537,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.027256238502340338,
+            "minimum_mll_buffer": 2265.7736582704238,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.05451247700467744,
+            "minimum_mll_buffer": 31.547316540847532,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          }
+        },
+        "v7d1g2_delta_extreme_rejection_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.037874237726064165,
+            "minimum_mll_buffer": 1375.6528235126461,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.061211496094658896,
+            "minimum_mll_buffer": -1059.6568617525918,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.33595841559336986,
+            "minimum_mll_buffer": -595.7869670359069,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.06628001557489753,
+            "minimum_mll_buffer": -3697.2501909243874,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_delta_extreme_rejection_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.014411657518209216,
+            "minimum_mll_buffer": 4265.763382245554,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.028823315036437838,
+            "minimum_mll_buffer": 4031.526764490991,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.05764663007285951,
+            "minimum_mll_buffer": 3563.053528981982,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.11529326014571577,
+            "minimum_mll_buffer": 2626.107057964022,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          }
+        },
+        "v7d1g2_vwap_acceptance_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.04641101258995089,
+            "minimum_mll_buffer": -1001.6207010356593,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.08513443307484138,
+            "minimum_mll_buffer": -1141.190719094593,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.26519407390981925,
+            "minimum_mll_buffer": -2282.3814381889824,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.06607258261760436,
+            "minimum_mll_buffer": -4564.76287637811,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_vwap_acceptance_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.03902256666190806,
+            "minimum_mll_buffer": 3812.814351334964,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.07804513332380641,
+            "minimum_mll_buffer": 3125.628702669812,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1560902666475643,
+            "minimum_mll_buffer": 1751.257405339973,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.39043018429771637,
+            "minimum_mll_buffer": -107.34463983165915,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 160,
+      "mll_breach_count": 68,
+      "mll_breach_rate": 0.425,
+      "pass_count": 0,
+      "pass_rate": 0.0,
+      "signal_count": 1079,
+      "timeout_count": 92
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "candidate_quantity_results": {
+        "v7d1g2_aggressor_regime_flip_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.23516097155281912,
+            "minimum_mll_buffer": 1548.932477596536,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3984466872233865,
+            "minimum_mll_buffer": -186.24846800565138,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.25093227133907364,
+            "minimum_mll_buffer": -1611.056534135947,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -5273.072105896048,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_aggressor_regime_flip_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.018138055440678726,
+            "minimum_mll_buffer": 4183.405073732603,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.03627611088138009,
+            "minimum_mll_buffer": 3866.810147465265,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.07255222176276664,
+            "minimum_mll_buffer": 3233.6202949304716,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.14510444352550741,
+            "minimum_mll_buffer": 1967.2405898609722,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          }
+        },
+        "v7d1g2_cross_contract_participation_divergence_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.11511202828385285,
+            "minimum_mll_buffer": -253.45993718708633,
+            "mll_breach_count": 1,
+            "pass_count": 0,
+            "timeout_count": 4
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.4224442785774073,
+            "minimum_mll_buffer": -1304.968947462301,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3078543002565695,
+            "minimum_mll_buffer": -2098.139909265039,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.09172681872797613,
+            "minimum_mll_buffer": -8696.279818530078,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_cross_contract_participation_divergence_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.006623786718102767,
+            "minimum_mll_buffer": 3582.6047786876443,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.013247573436205534,
+            "minimum_mll_buffer": 2665.209557375347,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.026495146872417535,
+            "minimum_mll_buffer": 830.4191147506644,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.05299029374480597,
+            "minimum_mll_buffer": -309.82093602322857,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          }
+        },
+        "v7d1g2_delta_extreme_rejection_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.16297365395000088,
+            "minimum_mll_buffer": 2292.2784866001166,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.3259473079000179,
+            "minimum_mll_buffer": 84.55697320026229,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0768554888958493,
+            "minimum_mll_buffer": -1013.1684741303325,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.13456087805679812,
+            "minimum_mll_buffer": -2643.1475538796803,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_delta_extreme_rejection_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.009393336750935607,
+            "minimum_mll_buffer": 4276.068496540509,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.018786673501851814,
+            "minimum_mll_buffer": 4052.136993081105,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.03757334700370686,
+            "minimum_mll_buffer": 3604.2739861622977,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.07514669400742342,
+            "minimum_mll_buffer": 2708.5479723243916,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          }
+        },
+        "v7d1g2_vwap_acceptance_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.36906568598115375,
+            "minimum_mll_buffer": -801.8171905650815,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.2525356620612567,
+            "minimum_mll_buffer": -711.990054925991,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -5923.980109851982,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -16347.960219703964,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_vwap_acceptance_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.019738249208962468,
+            "minimum_mll_buffer": 3403.4820307632326,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.03947649841798961,
+            "minimum_mll_buffer": 2306.9640615265816,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.07895299683594365,
+            "minimum_mll_buffer": 113.92812305293046,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.15790599367188082,
+            "minimum_mll_buffer": -322.2127713218506,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 160,
+      "mll_breach_count": 61,
+      "mll_breach_rate": 0.38125,
+      "pass_count": 2,
+      "pass_rate": 0.0125,
+      "signal_count": 1119,
+      "timeout_count": 97
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "candidate_quantity_results": {
+        "v7d1g2_aggressor_regime_flip_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1465592892646964,
+            "minimum_mll_buffer": 698.3300801395962,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.17228048260490567,
+            "minimum_mll_buffer": -1720.5231571137847,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.0033777777777577287,
+            "minimum_mll_buffer": -5651.543085436773,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.006755555555515457,
+            "minimum_mll_buffer": -13891.199999999633,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_aggressor_regime_flip_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.01723861799364224,
+            "minimum_mll_buffer": 4062.2552842968435,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.03447723598728448,
+            "minimum_mll_buffer": 3624.510568593745,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.06895447197460129,
+            "minimum_mll_buffer": 2749.021137187141,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.13790894394918643,
+            "minimum_mll_buffer": 998.0422743744275,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          }
+        },
+        "v7d1g2_cross_contract_participation_divergence_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.16063165157643056,
+            "minimum_mll_buffer": -250.3650256175024,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.4092941452848544,
+            "minimum_mll_buffer": -622.5014316947781,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.2044755029245312,
+            "minimum_mll_buffer": -1691.3682883899892,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.4089510058490624,
+            "minimum_mll_buffer": -7882.736576779978,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          }
+        },
+        "v7d1g2_cross_contract_participation_divergence_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.027592222222181995,
+            "minimum_mll_buffer": 4061.720343706693,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.05518444444446747,
+            "minimum_mll_buffer": 3623.440687413473,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1103688888888929,
+            "minimum_mll_buffer": 2746.881374826975,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.22073777777782783,
+            "minimum_mll_buffer": 993.7627496538626,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          }
+        },
+        "v7d1g2_delta_extreme_rejection_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1626290936350512,
+            "minimum_mll_buffer": 1150.8017709217384,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.22182048690938327,
+            "minimum_mll_buffer": -134.10154828379746,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.1349035318985439,
+            "minimum_mll_buffer": -4084.2206221533997,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.20479260770631602,
+            "minimum_mll_buffer": -12668.4412443068,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_delta_extreme_rejection_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.007236107733850885,
+            "minimum_mll_buffer": 4332.006967634748,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.01447221546771147,
+            "minimum_mll_buffer": 4164.01393526938,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.028944430935410007,
+            "minimum_mll_buffer": 3828.0278705389064,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.05788886187082325,
+            "minimum_mll_buffer": 3156.055741077813,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          }
+        },
+        "v7d1g2_vwap_acceptance_ES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.17974652524370727,
+            "minimum_mll_buffer": -1020.3500000000058,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.18769542025967773,
+            "minimum_mll_buffer": -1460.3000000000175,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.03997777777777648,
+            "minimum_mll_buffer": -3596.8478147107817,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -11693.695629421534,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v7d1g2_vwap_acceptance_MES": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.032832764291149535,
+            "minimum_mll_buffer": 3607.5909857987135,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.06566552858229584,
+            "minimum_mll_buffer": 2715.1819715972815,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1313310571646014,
+            "minimum_mll_buffer": 930.363943194563,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.37421333333338974,
+            "minimum_mll_buffer": -215.80286624113796,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 160,
+      "mll_breach_count": 54,
+      "mll_breach_rate": 0.3375,
+      "pass_count": 8,
+      "pass_rate": 0.05,
+      "signal_count": 1160,
+      "timeout_count": 98
+    }
+  },
+  "diff_validation": [
+    "hydra/validation/v7_d1_grammar0002_tripwire.py",
+    "scripts/run_v7_d1_grammar0002_tripwire.py",
+    "tests/test_v7_d1_grammar0002_tripwire.py"
+  ],
+  "feature_and_signal_recomputation": true,
+  "forward_gap_access_count": 0,
+  "grammar_id": "hydra_v7_d1_microstructure_grammar_0002",
+  "outbound_order_count": 0,
+  "pooled_null": {
+    "episode_count": 480,
+    "pass_count": 10,
+    "pass_rate": 0.020833333333333332
+  },
+  "prochaine_action": "run_separately_committed_grammar0002_candidate_tribunal",
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "real": {
+    "candidate_quantity_results": {
+      "v7d1g2_aggressor_regime_flip_ES": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.094766666666721,
+          "minimum_mll_buffer": 2201.100000000035,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.18953333333330616,
+          "minimum_mll_buffer": -97.80000000001746,
+          "mll_breach_count": 1,
+          "pass_count": 0,
+          "timeout_count": 4
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.4140888888888359,
+          "minimum_mll_buffer": -4695.600000000035,
+          "mll_breach_count": 1,
+          "pass_count": 1,
+          "timeout_count": 3
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.16231111111110982,
+          "minimum_mll_buffer": -13891.199999999983,
+          "mll_breach_count": 4,
+          "pass_count": 1,
+          "timeout_count": 0
+        }
+      },
+      "v7d1g2_aggressor_regime_flip_MES": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.0380033333332847,
+          "minimum_mll_buffer": 4087.8400000003166,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.07600666666672139,
+          "minimum_mll_buffer": 3675.6799999996438,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.15201333333329078,
+          "minimum_mll_buffer": 2851.360000000277,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.30402666666673356,
+          "minimum_mll_buffer": 1202.7199999995646,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        }
+      },
+      "v7d1g2_cross_contract_participation_divergence_ES": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.2558444444444095,
+          "minimum_mll_buffer": 1525.1000000002678,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.36822222222223194,
+          "minimum_mll_buffer": -241.20000000006985,
+          "mll_breach_count": 3,
+          "pass_count": 0,
+          "timeout_count": 2
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.18742222222223387,
+          "minimum_mll_buffer": -2841.20000000007,
+          "mll_breach_count": 3,
+          "pass_count": 0,
+          "timeout_count": 2
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.07635555555556009,
+          "minimum_mll_buffer": -2121.5999999999767,
+          "mll_breach_count": 3,
+          "pass_count": 0,
+          "timeout_count": 2
+        }
+      },
+      "v7d1g2_cross_contract_participation_divergence_MES": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.00767111111114112,
+          "minimum_mll_buffer": 4130.320000000298,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.015342222222188461,
+          "minimum_mll_buffer": 3760.6399999996647,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0306844444444707,
+          "minimum_mll_buffer": 3021.2800000002608,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.061368888888847624,
+          "minimum_mll_buffer": 1542.5599999995902,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        }
+      },
+      "v7d1g2_delta_extreme_rejection_ES": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.05623333333336955,
+          "minimum_mll_buffer": 2334.9000000003143,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.11246666666664856,
+          "minimum_mll_buffer": 2461.999999999971,
+          "mll_breach_count": 0,
+          "pass_count": 2,
+          "timeout_count": 3
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.22493333333329713,
+          "minimum_mll_buffer": 423.9999999999418,
+          "mll_breach_count": 0,
+          "pass_count": 2,
+          "timeout_count": 3
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.2574222222222112,
+          "minimum_mll_buffer": -1121.5999999999767,
+          "mll_breach_count": 3,
+          "pass_count": 2,
+          "timeout_count": 0
+        }
+      },
+      "v7d1g2_delta_extreme_rejection_MES": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.006703333333367482,
+          "minimum_mll_buffer": 4341.410000000149,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.01340666666662825,
+          "minimum_mll_buffer": 4182.819999999832,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.026813333333363214,
+          "minimum_mll_buffer": 3865.6400000001304,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.053626666666619714,
+          "minimum_mll_buffer": 3231.279999999795,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        }
+      },
+      "v7d1g2_vwap_acceptance_ES": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.04701111111135429,
+          "minimum_mll_buffer": -1020.3499999999185,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.05407719836393825,
+          "minimum_mll_buffer": -1460.3000000000175,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.03997777777777648,
+          "minimum_mll_buffer": -1421.6000000000931,
+          "mll_breach_count": 3,
+          "pass_count": 0,
+          "timeout_count": 2
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.054077198364025664,
+          "minimum_mll_buffer": -4860.799999999988,
+          "mll_breach_count": 3,
+          "pass_count": 0,
+          "timeout_count": 2
+        }
+      },
+      "v7d1g2_vwap_acceptance_MES": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.032712222222031816,
+          "minimum_mll_buffer": 3714.870000001043,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.06542444444465866,
+          "minimum_mll_buffer": 2929.7399999988265,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.1308488888887223,
+          "minimum_mll_buffer": 1359.4800000009127,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.32226222222248263,
+          "minimum_mll_buffer": -294.0800000009476,
+          "mll_breach_count": 3,
+          "pass_count": 0,
+          "timeout_count": 2
+        }
+      }
+    },
+    "compliance_failure_count": 0,
+    "episode_count": 160,
+    "mll_breach_count": 31,
+    "mll_breach_rate": 0.19375,
+    "pass_count": 8,
+    "pass_rate": 0.05,
+    "signal_count": 1289,
+    "timeout_count": 121
+  },
+  "schema": "hydra_v7_d1_grammar0002_tripwire_result_v1",
+  "threshold": 0.8,
+  "tripwire_id": "hydra_v7_d1_new_grammar_tripwire_0002",
+  "verdict": "GREEN_NULL_ADJUSTED_BASELINE"
+}
