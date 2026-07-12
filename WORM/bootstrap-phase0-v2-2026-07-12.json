@@ -1,0 +1,104 @@
+{
+  "schema": "hydra_v7_bootstrap_phase0_overlay_v2",
+  "preregistered_at_utc": "2026-07-12T13:49:17Z",
+  "experiment_id": "hydra_v7_phase0_sim_truth_0002",
+  "active_contract": {
+    "path": "MISSION_CONTRACT.md",
+    "commit": "21838fd25ac099fb989b24ca45e24484b899040e",
+    "tag": "worm/contract-2026-07-12-v2",
+    "sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
+  },
+  "base_preregistration": {
+    "path": "config/v7/phase0_g0_preregistration.json",
+    "commit": "c3762b0",
+    "tag": "WORM/hydra-v7-phase0-g0-v1",
+    "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6"
+  },
+  "observed_preliminary_run": {
+    "status": "PRELIMINARY_NOT_G0",
+    "reason": "The v1 run preceded the complete constitution and therefore lacks R16 and data/manifest.json acceptance evidence.",
+    "result_path": "reports/v7/phase0/phase0_result.json",
+    "result_sha256": "a5aef637f83115ac916cb583257b1324991630926bc09c98232c9872e2ba6822",
+    "threshold_feedback_prohibited": true
+  },
+  "frozen_scope": {
+    "inherit_base_historical_replay_scope_exactly": true,
+    "basket_count": 55,
+    "xfa_policy_count": 6,
+    "generation_frozen": true,
+    "paid_data_allowed": false,
+    "outbound_orders_allowed": false
+  },
+  "additive_requirements": {
+    "data_manifest": {
+      "path": "data/manifest.json",
+      "must_precede_any_gap_ingestion": true,
+      "must_inventory_raw_market_sources": true,
+      "must_record_sha256_size_range_and_cutoff": true,
+      "must_record_product_cutoffs": true,
+      "must_identify_unclassified_market_data_files": true,
+      "q4_role": "BURNED"
+    },
+    "R16": {
+      "timezone": "America/Chicago",
+      "trading_day_start_local": "17:00:00",
+      "winning_day_lock_local": "16:00:00",
+      "dst_aware": true,
+      "utc_calendar_day_grouping_prohibited": true
+    },
+    "mll_mode": {
+      "default_public_id": "eod_level_rt_breach",
+      "sensitivity_public_id": "intraday_hwm",
+      "legacy_internal_default_alias": "EOD_REALIZED_BALANCE",
+      "legacy_internal_sensitivity_alias": "INTRADAY_LIVE_EQUITY_HWM_CONSERVATIVE_MFE_FIRST",
+      "behavior_must_remain_backward_compatible": true
+    },
+    "reproducibility": {
+      "phase0_seed": null,
+      "seed_status": "NOT_APPLICABLE_DETERMINISTIC_REPLAY",
+      "source_artifact_hashes_required": true
+    },
+    "reporting": {
+      "nonempty_contre_required": true,
+      "fixed_schema_required": true,
+      "validation_diff_must_be_listed": true
+    }
+  },
+  "doctor_bootstrap_semantics": {
+    "intentionally_stopped_phase": "STOPPED_CLEANLY",
+    "allowed_as_healthy_only_during_bootstrap": true,
+    "requires_service_main_pid_zero": true,
+    "requires_no_process_lock_owner": true,
+    "requires_zero_registry_writers": true,
+    "requires_governance_and_integrity_green": true,
+    "must_not_be_reported_as_autonomous_runtime_health": true
+  },
+  "gate_G0_v2": {
+    "phase_budget_llm_max_usd": 8.0,
+    "verdict_green_requires": [
+      "pytest_pass_count_at_least_543",
+      "all_R1_through_R16_ruleset_tests_green",
+      "data_manifest_published_and_verified",
+      "both_public_mll_mode_values_executable",
+      "55_basket_and_6_xfa_divergence_report_published_after_R16",
+      "costs_model_report_published",
+      "mission_and_registry_integrity_ok",
+      "q4_remains_burned",
+      "outbound_order_count_zero",
+      "phase_spend_not_above_8_usd",
+      "report_contains_nonempty_CONTRE"
+    ],
+    "preliminary_v1_result_cannot_satisfy_G0": true,
+    "generation_unlocks": false,
+    "phase1_required_before_generation": true,
+    "no_criterion_is_weaker_than_v1": true
+  },
+  "output": {
+    "directory": "reports/v7/phase0_v2",
+    "machine_result": "reports/v7/phase0_v2/phase0_result.json",
+    "divergence_report": "reports/v7/phase0_v2/mll_divergence_report.md",
+    "cost_report": "reports/v7/phase0_v2/costs_model.md",
+    "gate_report": "reports/v7/phase0_v2/g0_report.md"
+  },
+  "honest_green_statement": "No observed Phase 0 result was used to weaken, tune, remove, or reinterpret any criterion in this overlay."
+}
