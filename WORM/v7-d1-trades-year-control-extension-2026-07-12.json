@@ -1,0 +1,73 @@
+{
+  "schema": "hydra_v7_d1_trades_acquisition_preregistration_v2",
+  "plan_id": "v7_d1_es_mes_trades_year_control_extension_0002",
+  "preregistered_at_utc": "2026-07-12T17:25:00Z",
+  "contract": {
+    "path": "MISSION_CONTRACT.md",
+    "sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+    "tag": "worm/contract-2026-07-12-v2",
+    "clauses": [1, 2, 5, 6, 8]
+  },
+  "supersedes_for_this_request_only": {
+    "path": "WORM/v7-d1-trades-pilot-2026-07-12.json",
+    "sha256": "37022f048337f173db9e01997087b998051a4512aa444e46f0f5d31cc45b29f2",
+    "unchanged_original": true,
+    "reason": "The immutable constitution records approximately USD 125 of separate Databento registration credits; this extension preserves the original USD 30 reserve and the USD 60 D1 phase cap."
+  },
+  "authorization": {
+    "phase": "D1",
+    "phase_cap_usd": 60.0,
+    "constitution_data_budget_usd": 125.0,
+    "persistent_actual_spend_before_usd": 68.38912802934598,
+    "d1_actual_spend_before_usd": 40.401062786579,
+    "official_estimate_usd": 19.45826035738,
+    "projected_d1_spend_usd": 59.859323143959,
+    "projected_total_spend_usd": 87.84738838672598,
+    "projected_constitution_budget_remaining_usd": 37.15261161327402,
+    "minimum_remaining_usd": 30.0,
+    "authorized_maximum_request_cost_usd": 19.46,
+    "estimate_record_count": 15545497,
+    "estimate_billable_size_bytes": 746183856
+  },
+  "request": {
+    "dataset": "GLBX.MDP3",
+    "schema": "trades",
+    "symbols": ["ES.c.0", "MES.c.0"],
+    "stype_in": "continuous",
+    "stype_out": "instrument_id",
+    "start_inclusive": "2023-08-02T00:00:00Z",
+    "end_exclusive": "2023-09-01T00:00:00Z",
+    "data_role": "DEVELOPMENT_ONLY",
+    "q4_included": false,
+    "forward_gap_included": false,
+    "raw_output_path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2023-08-02_2023-09-01.dbn.zst",
+    "cache_audit": "MISS"
+  },
+  "decision_information": {
+    "purpose": "Add a second calendar year so the D1 pipeline can execute its mandatory year-block permutation control on date-matched August windows.",
+    "matched_tripwire_windows": [
+      "2023-08-02T00:00:00Z/2023-09-01T00:00:00Z",
+      "2024-08-02T00:00:00Z/2024-09-01T00:00:00Z"
+    ],
+    "existing_2024_data_reused_without_new_cost": true,
+    "september_2024_excluded_from_year_matched_tripwire": true,
+    "expected_decision_change": "Resolve whether print-level pass or expectancy structure survives daily block shuffle, volatility-matched random walk and a two-year block permutation before any D1 candidate promotion."
+  },
+  "economic_hypothesis_classes": [
+    "D1H1_AGGRESSOR_IMBALANCE_PERSISTENCE",
+    "D1H2_PRINT_ABSORPTION_REVERSAL",
+    "D1H3_SWEEP_QUALITY_CONTINUATION",
+    "D1H4_SESSION_AGGRESSION_STATE_TRANSITION"
+  ],
+  "post_download_invariants": {
+    "no_candidate_result_before_separate_WORM_grammar": true,
+    "new_dataset_requires_null_tripwire": true,
+    "proof_window_consumed": false,
+    "proof_registry_burn_delta": 0,
+    "q4_access_delta": 0,
+    "outbound_order_count": 0,
+    "api_key_must_not_be_logged_or_committed": true,
+    "raw_data_must_not_be_committed": true
+  },
+  "CONTRE": "Two matched August windows provide a year-permutation control but only two independent year blocks; any positive result remains development evidence and still requires multiplicity-adjusted forward proof."
+}
