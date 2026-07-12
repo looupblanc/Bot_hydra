@@ -1,0 +1,38 @@
+{
+  "schema": "hydra_v7_d1_candidate_null_power_addendum_v1",
+  "addendum_id": "hydra_v7_d1_candidate_null_power_0002",
+  "preregistered_at_utc": "2026-07-12T19:36:00Z",
+  "validation_policy_path": "WORM/v7-d1-microstructure-validation-policy-0002-2026-07-12.json",
+  "validation_policy_sha256": "14fd8c2df5a4fd33816236d9cdc72af3a2c7595f52d6b62fd7de730c60f0e525",
+  "calibration_source": {
+    "scope": "grammar0001 delayed-null engineering failure before any atomic candidate result",
+    "observed_issue": "A five-session forward displacement on two approximately one-month year blocks necessarily loses the last five sessions; event-density compression can remove additional overlapping paths.",
+    "parameter_feedback_used": false,
+    "pnl_or_outcome_feedback_used": false
+  },
+  "null_power_requirements": {
+    "SIGN_INVERSION": {
+      "minimum_retention_fraction": 1.0,
+      "minimum_events": 30
+    },
+    "FIVE_SESSION_SIGNAL_DELAY": {
+      "minimum_retention_fraction": 0.5,
+      "minimum_events": 30,
+      "collision_policy": "retain earliest mapped signal and drop later overlapping or contract-invalid paths deterministically"
+    },
+    "FLOW_PRICE_DECOUPLING": {
+      "minimum_retention_fraction": 0.8,
+      "minimum_events": 30
+    }
+  },
+  "derivation": "The absolute floor of 30 matches the frozen candidate minimum. The additional 50% fraction prevents a sparse null while remaining feasible after the structural five-of-approximately-twenty-session boundary loss. It is fixed before any grammar0002 PnL, null expectancy, DSR or BH result.",
+  "promotion_rule_unchanged": "Candidate stress-1.5x expectancy must remain strictly greater than every retained hypothesis-specific null, with all original cost, DSR, BH and ruleset gates unchanged.",
+  "safety": {
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "outbound_orders_allowed": false,
+    "combine_pass_rate_as_fitness": false,
+    "combine_pass_rate_as_gate": false
+  },
+  "CONTRE": "Fifty percent can still leave a null less representative than the real opportunity path; the absolute 30-event floor and two other controls reduce but do not eliminate that limitation."
+}
