@@ -1,0 +1,16 @@
+{
+  "schema": "hydra_worm_contract_lineage_v1",
+  "active_contract_path": "MISSION_CONTRACT.md",
+  "active_contract_sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+  "active_version": 2,
+  "authorized_by": "USER",
+  "effective_date": "2026-07-12",
+  "predecessor": {
+    "archived_path": "WORM/contract-2026-07-12-v1.md",
+    "commit": "1c990988da4f5d41d26b85c357517fc42cd134fd",
+    "sha256": "0ecc13f8bf5f226dbc868e8643f0050429d617ca6d6e7861398ca56015d16b92",
+    "tag": "WORM/hydra-v7-contract-v1"
+  },
+  "supersession_reason": "User supplied the complete V7 constitution with R16, data-manifest, CONTRE, data-budget and perpetual-factory requirements.",
+  "worm_rule": "Neither archived predecessor nor active v2 content may be modified; any later change requires a new versioned file and tag."
+}
