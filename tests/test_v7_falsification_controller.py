@@ -110,6 +110,81 @@ def test_v71_controller_selects_next_power_aware_grammar(tmp_path: Path) -> None
     assert result["new_data_purchase_authorized"] is False
 
 
+def test_v71_controller_recognizes_frozen_g2_confirmation_queue(
+    tmp_path: Path,
+) -> None:
+    policy = tmp_path / "WORM/v7.1-hierarchical-validation-policy-2026-07-12.json"
+    policy.parent.mkdir(parents=True)
+    policy.write_text("{}", encoding="utf-8")
+    artifacts = {
+        "reports/v7_1/calibration/v71_power_audit_result.json": {"verdict": "RED"},
+        "reports/v7_1/calibration/v71_power_sample_extension_result.json": {
+            "verdict": "GREEN",
+            "minimum_required_event_count": 320,
+        },
+        "reports/v7_1/discovery/v71_signal_manifest.json": {"candidate_count": 256},
+        "reports/v7_1/discovery/v71_development_funnel_result.json": {
+            "walk_forward_positive_count": 11,
+            "powered_walk_forward_candidate_count": 0,
+        },
+        "reports/v7_1/forensics/v71_mechanism_forensics_result.json": {
+            "MINI_MICRO_DIVERGENCE": {"mechanism": "MECHANISM_CONFIRMED_DEAD"}
+        },
+        "WORM/v7.1-opportunity-density-grammar-0002-2026-07-12.json": {},
+        "reports/v7_1/discovery_0002/v71_opportunity_density_signal_manifest.json": {
+            "candidate_count": 128
+        },
+        "reports/v7_1/discovery_0002/v71_opportunity_density_funnel_result.json": {
+            "raw_global_N_trials": 262356,
+            "walk_forward_positive_count": 3,
+            "powered_walk_forward_candidate_count": 0,
+        },
+        "reports/v7_1/discovery_0002/v71_opportunity_density_tripwire_result.json": {
+            "verdict": "GREEN_NULL_ADJUSTED_BASELINE",
+            "NULL_RATIO": 0.75,
+            "evidence_strength": "VERT_NET",
+        },
+        "WORM/v7.1-independent-confirmation-queue-0001-2026-07-12.json": {
+            "queue_status": "QUEUED_NO_DATA_PURCHASE_AUTHORIZED_IN_V7_1",
+            "candidates": [
+                {"candidate_id": "a"},
+                {"candidate_id": "b"},
+                {"candidate_id": "c"},
+            ],
+        },
+    }
+    for relative, payload in artifacts.items():
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload), encoding="utf-8")
+    hashes = {
+        "reports/v7_1/discovery_0002/v71_opportunity_density_signal_manifest.json": "c90a2321fc66e114d65dd533d077ec04308ae714369e28b82f5d9e996dd7fa24",
+        "reports/v7_1/discovery_0002/v71_opportunity_density_funnel_result.json": "2a45c4da55875f90438cd6cb19f1ce79ec8de7d934f7a442e78000364aff5897",
+        "reports/v7_1/discovery_0002/v71_opportunity_density_tripwire_result.json": "dddabdad7e828e84bbee974dc47432a1a90b2a1989d26a44d48bf88cef91cbb2",
+    }
+    original_sha = __import__(
+        "hydra.mission.v7_falsification_controller",
+        fromlist=["_sha256"],
+    )._sha256
+
+    def fake_sha(path: Path) -> str:
+        relative = str(path.relative_to(tmp_path))
+        return hashes.get(relative, original_sha(path))
+
+    from unittest.mock import patch
+
+    with patch(
+        "hydra.mission.v7_falsification_controller._sha256",
+        side_effect=fake_sha,
+    ):
+        result = classify_v7_action(tmp_path)
+
+    assert result["action_type"] == "V71_CONFIRMATION_QUEUE_FROZEN_DISCOVERY_CONTINUES"
+    assert result["confirmation_candidate_count"] == 3
+    assert result["new_data_purchase_authorized"] is False
+    assert result["shadow_admission_authorized"] is False
+
+
 def test_controller_rejects_live_trading() -> None:
     with pytest.raises(V7ControllerIntegrityError):
         V7FalsificationController(V7ControllerConfig(no_live_trading=False))

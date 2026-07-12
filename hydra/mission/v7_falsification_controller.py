@@ -33,7 +33,7 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v2"
+CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v3"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-falsification-single-writer"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
@@ -59,11 +59,29 @@ V71_FUNNEL_RELATIVE_PATH = Path(
 V71_FORENSICS_RELATIVE_PATH = Path(
     "reports/v7_1/forensics/v71_mechanism_forensics_result.json"
 )
+V71_G2_GRAMMAR_RELATIVE_PATH = Path(
+    "WORM/v7.1-opportunity-density-grammar-0002-2026-07-12.json"
+)
+V71_G2_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0002/v71_opportunity_density_signal_manifest.json"
+)
+V71_G2_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0002/v71_opportunity_density_funnel_result.json"
+)
+V71_G2_TRIPWIRE_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0002/v71_opportunity_density_tripwire_result.json"
+)
+V71_CONFIRMATION_QUEUE_RELATIVE_PATH = Path(
+    "WORM/v7.1-independent-confirmation-queue-0001-2026-07-12.json"
+)
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
     str(V71_POLICY_RELATIVE_PATH): "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
     "WORM/v7.1-event-mechanism-grammar-0001-2026-07-12.json": "e1c8de955302da2be836bbcebf2bfedc07768b2d9b987ea32258a85a2b0caf8a",
     "WORM/v7.1-powered-promotion-minimum-2026-07-12.json": "3e0211c6a5acea81713431802fc1576da4d5be2a0cc37bf900cd02eabd68c6fa",
+    str(V71_G2_GRAMMAR_RELATIVE_PATH): "ef44e6e72c42b2ed4b7228f3addbd2f182e3e51bcfb619aa4c0a2102db6d3566",
+    "WORM/v7.1-opportunity-density-tripwire-0002-2026-07-12.json": "8e1b7e511f99e1f108a113bb80a69d4985d498ed9d78d2d049e9468a6afdcacf",
+    str(V71_CONFIRMATION_QUEUE_RELATIVE_PATH): "23c2925253887a9b86699aac9fa71072fc28848087cb38cc9624bb78751ee0b1",
 }
 
 
@@ -211,6 +229,8 @@ def _classify_v71_action(root: Path) -> dict[str, Any]:
         }
     if forensics.get("MINI_MICRO_DIVERGENCE", {}).get("mechanism") != "MECHANISM_CONFIRMED_DEAD":
         raise V7ControllerIntegrityError("V7.1 intra-product artifact status drift")
+    if (root / V71_G2_GRAMMAR_RELATIVE_PATH).is_file():
+        return _classify_v71_g2_action(root, positive)
     return {
         "action_type": "V71_OPPORTUNITY_DENSITY_GRAMMAR_REQUIRED",
         "phase": "4",
@@ -225,6 +245,96 @@ def _classify_v71_action(root: Path) -> dict[str, Any]:
             "Eleven distinct formulations are walk-forward positive but below "
             "the frozen 320-event power minimum; expand opportunity coverage "
             "structurally without parameter tuning or new data."
+        ),
+    }
+
+
+def _classify_v71_g2_action(root: Path, prior_positive: int) -> dict[str, Any]:
+    required = (
+        (V71_G2_SIGNAL_RELATIVE_PATH, "V71_G2_SIGNAL_MANIFEST_REQUIRED"),
+        (V71_G2_FUNNEL_RELATIVE_PATH, "V71_G2_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V71_G2_TRIPWIRE_RELATIVE_PATH, "V71_G2_TRIPWIRE_REQUIRED"),
+        (V71_CONFIRMATION_QUEUE_RELATIVE_PATH, "V71_G2_CONFIRMATION_QUEUE_REQUIRED"),
+    )
+    for path, action in required:
+        if not (root / path).is_file():
+            return {
+                "action_type": action,
+                "phase": "4",
+                "progressed": False,
+                "required_path": str(path),
+                "new_data_purchase_authorized": False,
+                "reason": "The preregistered opportunity-density evidence sequence is incomplete.",
+            }
+    hashes = {
+        V71_G2_SIGNAL_RELATIVE_PATH: "c90a2321fc66e114d65dd533d077ec04308ae714369e28b82f5d9e996dd7fa24",
+        V71_G2_FUNNEL_RELATIVE_PATH: "2a45c4da55875f90438cd6cb19f1ce79ec8de7d934f7a442e78000364aff5897",
+        V71_G2_TRIPWIRE_RELATIVE_PATH: "dddabdad7e828e84bbee974dc47432a1a90b2a1989d26a44d48bf88cef91cbb2",
+    }
+    drift = [str(path) for path, expected in hashes.items() if _sha256(root / path) != expected]
+    if drift:
+        raise V7ControllerIntegrityError(
+            "V7.1 opportunity-density evidence drift: " + ",".join(drift)
+        )
+    signal = _load_json(root / V71_G2_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V71_G2_FUNNEL_RELATIVE_PATH)
+    tripwire = _load_json(root / V71_G2_TRIPWIRE_RELATIVE_PATH)
+    queue = _load_json(root / V71_CONFIRMATION_QUEUE_RELATIVE_PATH)
+    if int(signal.get("candidate_count") or 0) != 128:
+        raise V7ControllerIntegrityError("V7.1 G2 candidate count drift")
+    if int(funnel.get("raw_global_N_trials") or 0) != 262_356:
+        raise V7ControllerIntegrityError("V7.1 G2 funnel multiplicity drift")
+    if tripwire.get("verdict") not in {
+        "GREEN_NULL_ADJUSTED_BASELINE",
+        "ARTEFACT_GEOMETRY_ONLY",
+        "BLOCKED_UNDERPOWERED",
+    }:
+        raise V7ControllerIntegrityError("V7.1 G2 tripwire verdict drift")
+    if tripwire.get("verdict") != "GREEN_NULL_ADJUSTED_BASELINE":
+        return {
+            "action_type": "V71_G2_GEOMETRY_OR_POWER_BLOCKED",
+            "phase": "4",
+            "progressed": True,
+            "tripwire_verdict": tripwire.get("verdict"),
+            "new_data_purchase_authorized": False,
+            "reason": "The opportunity-density grammar cannot advance beyond its permanent tripwire.",
+        }
+    powered = int(funnel.get("powered_walk_forward_candidate_count") or 0)
+    if powered:
+        return {
+            "action_type": "V71_G2_POWERED_COHORT_FREEZE_REQUIRED",
+            "phase": "4",
+            "progressed": True,
+            "powered_candidate_count": powered,
+            "tripwire_verdict": tripwire["verdict"],
+            "new_data_purchase_authorized": False,
+            "reason": "Powered G2 candidates may proceed to preregistered relevant nulls.",
+        }
+    candidates = list(queue.get("candidates") or [])
+    if len(candidates) != 3 or queue.get("queue_status") != "QUEUED_NO_DATA_PURCHASE_AUTHORIZED_IN_V7_1":
+        raise V7ControllerIntegrityError("V7.1 independent confirmation queue drift")
+    return {
+        "action_type": "V71_CONFIRMATION_QUEUE_FROZEN_DISCOVERY_CONTINUES",
+        "phase": "4",
+        "progressed": True,
+        "prior_walk_forward_positive_count": prior_positive,
+        "g2_walk_forward_positive_count": int(
+            funnel.get("walk_forward_positive_count") or 0
+        ),
+        "g2_powered_candidate_count": 0,
+        "confirmation_candidate_count": len(candidates),
+        "confirmation_candidate_ids": [str(row["candidate_id"]) for row in candidates],
+        "tripwire_verdict": tripwire["verdict"],
+        "tripwire_NULL_RATIO": float(tripwire["NULL_RATIO"]),
+        "tripwire_evidence_strength": tripwire["evidence_strength"],
+        "next_experiment_id": "hydra_v7_1_distinct_event_time_grammar_0003",
+        "next_experiment_state": "PREREGISTRATION_REQUIRED",
+        "new_data_purchase_authorized": False,
+        "shadow_admission_authorized": False,
+        "reason": (
+            "Three G2 mechanisms remain underpowered and are frozen for future "
+            "independent confirmation; controlled discovery must move to a "
+            "distinct event-time class without buying data."
         ),
     }
 
