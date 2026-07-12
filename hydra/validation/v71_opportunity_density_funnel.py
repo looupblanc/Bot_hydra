@@ -320,12 +320,17 @@ def _write_result(
     os.replace(temporary, result_path)
     result_hash = _sha256(result_path)
     report_path = destination / "v71_opportunity_density_funnel_report.md"
+    displayed_result_path = (
+        result_path.relative_to(root)
+        if result_path.is_relative_to(root)
+        else result_path
+    )
     report = "\n".join(
         [
             "# HYDRA V7.1 — Opportunity-density Stage 0–2",
             "",
             "[HYDRA-V7] phase=4 step=131 verdict=GREEN",
-            f"gate=V71_G2_STAGE0_STAGE2 preuve={result_path.relative_to(root)}#{result_hash[:8]} tests=128_structures",
+            f"gate=V71_G2_STAGE0_STAGE2 preuve={displayed_result_path}#{result_hash[:8]} tests=128_structures",
             f"budget_llm=usage_API_non_exposee/solde budget_data=87.847388/125.00_achat_phase=0 N_trials={EXPECTED_GLOBAL_N_TRIALS} burned=1",
             "diff_validation=hydra/validation/v71_opportunity_density_funnel.py CONTRE=la_couverture_structurelle_peut_seulement_ajouter_des_trades_faibles",
             f"prochaine_action={result['next_action']}",
