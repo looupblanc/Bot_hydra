@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from hydra.mission.v7_falsification_controller import (
     V7ControllerConfig,
+    V7ControllerIntegrityError,
     run_v7_controller,
 )
 
@@ -34,17 +35,21 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    return run_v7_controller(
-        V7ControllerConfig(
-            project_root=args.project_root,
-            state_dir=args.state_dir,
-            sleep_seconds=args.sleep_seconds,
-            checkpoint_every_steps=args.checkpoint_every_steps,
-            persistent=args.persistent,
-            maximum_steps=args.maximum_steps,
-            no_live_trading=args.no_live_trading,
+    try:
+        return run_v7_controller(
+            V7ControllerConfig(
+                project_root=args.project_root,
+                state_dir=args.state_dir,
+                sleep_seconds=args.sleep_seconds,
+                checkpoint_every_steps=args.checkpoint_every_steps,
+                persistent=args.persistent,
+                maximum_steps=args.maximum_steps,
+                no_live_trading=args.no_live_trading,
+            )
         )
-    )
+    except V7ControllerIntegrityError as exc:
+        print(f"V7_INTEGRITY_BLOCKED: {exc}", file=sys.stderr)
+        return 78
 
 
 if __name__ == "__main__":

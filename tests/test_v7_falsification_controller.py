@@ -11,6 +11,7 @@ from hydra.mission.v7_falsification_controller import (
     V7FalsificationController,
     classify_v7_action,
 )
+from scripts.run_v7_falsification_mission import main
 
 
 def _write_tribunal(root: Path, *, verdict: str, selected: list[str]) -> None:
@@ -73,3 +74,28 @@ def test_inconsistent_tribunal_fails_closed(tmp_path: Path) -> None:
 def test_controller_rejects_live_trading() -> None:
     with pytest.raises(V7ControllerIntegrityError):
         V7FalsificationController(V7ControllerConfig(no_live_trading=False))
+
+
+def test_runner_uses_non_restarting_integrity_exit(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "scripts.run_v7_falsification_mission.parse_args",
+        lambda: type(
+            "Args",
+            (),
+            {
+                "project_root": ".",
+                "state_dir": "mission/state",
+                "sleep_seconds": 0.0,
+                "checkpoint_every_steps": 25,
+                "persistent": True,
+                "maximum_steps": 1,
+                "no_live_trading": True,
+            },
+        )(),
+    )
+    monkeypatch.setattr(
+        "scripts.run_v7_falsification_mission.run_v7_controller",
+        lambda _config: (_ for _ in ()).throw(V7ControllerIntegrityError("drift")),
+    )
+
+    assert main() == 78

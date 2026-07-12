@@ -10,6 +10,7 @@ Environment=PYTHONUNBUFFERED=1
 EnvironmentFile=-/root/hydra-bot/.env
 ExecStart=/root/hydra-bot/.venv/bin/python /root/hydra-bot/scripts/run_v7_falsification_mission.py --project-root /root/hydra-bot --state-dir mission/state --sleep-seconds 15 --checkpoint-every-steps 25 --persistent --single-writer --no-live-trading
 Restart=on-failure
+RestartPreventExitStatus=78
 RestartSec=30
 KillSignal=SIGTERM
 TimeoutStopSec=60
