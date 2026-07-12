@@ -1334,6 +1334,59 @@ class AutonomousMissionController:
             set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
             set_kv(conn, "current_blocker", None)
             set_kv(conn, "last_error", None)
+        # Recovery may have requeued an old cohort before V4 was deployed.
+        # Re-evaluate the development-only stopping rule on every startup before
+        # the scheduler is allowed to claim queued work.
+        conversion_history = self._evidence_conversion_pre_holdout_history(conn)
+        conversion_stop_reason = self._evidence_conversion_finalization_reason(
+            conversion_history,
+            accumulated_pre_holdout_count=int(
+                get_kv(conn, "pre_holdout_candidate_count", 0) or 0
+            ),
+            remaining_evidence_debt=(
+                int(
+                    dict(
+                        get_kv(conn, "evidence_conversion_v3_latest_metrics", {})
+                        or {}
+                    ).get("evidence_debt_queue_count")
+                    or 0
+                )
+                if get_kv(conn, "evidence_conversion_v3_latest_metrics", None)
+                is not None
+                else None
+            ),
+        )
+        retired_v4_cohorts: list[str] = []
+        if conversion_stop_reason is not None:
+            retired_v4_cohorts = block_queued_experiments_by_type(
+                conn,
+                "evidence_conversion_v3_cohort",
+                f"superseded_by_decision_bridge_v4:{conversion_stop_reason}",
+            )
+            set_kv(conn, "decision_bridge_v4_finalization_required", True)
+            set_kv(
+                conn,
+                "decision_bridge_v4_conversion_stop_reason",
+                conversion_stop_reason,
+            )
+            set_kv(
+                conn,
+                "decision_bridge_v4_retired_cohort_ids",
+                retired_v4_cohorts,
+            )
+            set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+            set_kv(
+                conn,
+                "current_blocker",
+                "FINAL_Q4_COHORT_AND_SHADOW_PACKAGES_REQUIRED",
+            )
+            set_kv(
+                conn,
+                "last_error",
+                "Evidence conversion reached its preregistered earliest stop: "
+                f"{conversion_stop_reason}. Final cohort selection and immutable "
+                "shadow packaging must complete before any Q4 authorization.",
+            )
         append_event(
             conn,
             "controller_initialized",
@@ -1387,6 +1440,8 @@ class AutonomousMissionController:
                 "equity_preclose_queued": equity_preclose_queued,
                 "turbo_foundry_v2_queued": turbo_foundry_v2_queued,
                 "evidence_conversion_v3_queued": evidence_conversion_v3_queued,
+                "decision_bridge_v4_conversion_stop_reason": conversion_stop_reason,
+                "decision_bridge_v4_retired_cohort_ids": retired_v4_cohorts,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
