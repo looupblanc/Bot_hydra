@@ -654,7 +654,7 @@ def _ct_date(timestamp_ns: int) -> str:
 
 
 def _day_id(date_value: str) -> int:
-    return int(pd.Timestamp(date_value, tz="UTC").value // DAY_NS)
+    return int(pd.Timestamp(str(date_value), tz="UTC").value // DAY_NS)
 
 
 def _verify_inputs(

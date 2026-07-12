@@ -11,6 +11,7 @@ from hydra.research.v7_d1_microstructure_grammar import (
 )
 from hydra.validation.v7_d1_new_dataset_tripwire import (
     D1NullControl,
+    _day_id,
     build_candidate_events,
     build_null_feature_world,
 )
@@ -81,3 +82,7 @@ def test_random_walk_reconstructs_valid_ohlc() -> None:
         assert np.all(frame["high"] >= frame[["open", "close"]].max(axis=1))
         assert np.all(frame["low"] <= frame[["open", "close"]].min(axis=1))
         assert np.all(frame["low"] > 0.0)
+
+
+def test_numpy_date_strings_are_normalized() -> None:
+    assert _day_id(np.str_("2024-08-02")) == _day_id("2024-08-02")
