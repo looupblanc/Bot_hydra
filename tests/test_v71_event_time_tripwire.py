@@ -28,7 +28,7 @@ def test_event_time_null_observables_must_be_identical() -> None:
             "availability_ns": [2],
             "duration_seconds": [1.0e-9],
             "signed_aggressor_volume": [3.0],
-            "volume": [4.0],
+            "total_volume": [4.0],
             "contract": ["ESH6"],
             "bar_type": ["VOLUME_BAR"],
         }

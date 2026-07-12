@@ -211,7 +211,7 @@ def _verify_preserved_event_observables(
         "availability_ns",
         "duration_seconds",
         "signed_aggressor_volume",
-        "volume",
+        "total_volume",
         "contract",
         "bar_type",
     )
