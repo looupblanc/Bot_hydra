@@ -307,11 +307,25 @@ def _delay_signals_five_sessions(
     event: pd.DataFrame,
 ) -> dict[str, tuple[D1Signal, ...]]:
     minute_days = _minute_decision_rows(minute)
+    minute_day_lists = {
+        (product, year): tuple(
+            sorted(
+                date
+                for candidate_product, candidate_year, date in minute_days
+                if candidate_product == product and candidate_year == year
+            )
+        )
+        for product, year, _date in minute_days
+    }
     event_groups = {
         (str(product), str(bar_type), int(year)): _event_with_clock(frame)
         for (product, bar_type, year), frame in event.groupby(
             ["product", "bar_type", "calendar_year"], sort=True
         )
+    }
+    event_day_lists = {
+        key: tuple(sorted(set(frame["_local_date"].astype(str))))
+        for key, frame in event_groups.items()
     }
     output: dict[str, tuple[D1Signal, ...]] = {}
     for candidate_id, rows in signals.items():
@@ -320,11 +334,7 @@ def _delay_signals_five_sessions(
             source_date = _ct_date(signal.decision_ns)
             source_minute = _ct_minute(signal.decision_ns)
             if signal.source_bar_type == "MINUTE_PRINT_FEATURES":
-                days = sorted(
-                    date
-                    for product, year, date in minute_days
-                    if product == signal.product and year == signal.calendar_year
-                )
+                days = minute_day_lists[(signal.product, signal.calendar_year)]
                 target = _fifth_later(days, source_date)
                 if target is None:
                     continue
@@ -346,7 +356,7 @@ def _delay_signals_five_sessions(
             else:
                 key = (signal.product, signal.source_bar_type, signal.calendar_year)
                 frame = event_groups[key]
-                days = sorted(set(frame["_local_date"].astype(str)))
+                days = event_day_lists[key]
                 target = _fifth_later(days, source_date)
                 if target is None:
                     continue
@@ -374,8 +384,63 @@ def _delay_signals_five_sessions(
                         ),
                     )
                 )
-        output[candidate_id] = tuple(delayed)
+        output[candidate_id] = _drop_overlapping_delayed_signals(
+            delayed, event_groups
+        )
     return output
+
+
+def _drop_overlapping_delayed_signals(
+    signals: Sequence[D1Signal],
+    event_groups: Mapping[tuple[str, str, int], pd.DataFrame],
+) -> tuple[D1Signal, ...]:
+    """Preserve the earliest mapped null signal when target-session paths collide.
+
+    Event density differs across sessions.  Mapping two non-overlapping source
+    signals to the same local clocks five sessions later can therefore compress
+    their conservative holding paths.  The frozen null requires valid,
+    non-overlapping execution and separately enforces at least 80% retention;
+    deterministically dropping the later collision preserves both constraints.
+    """
+
+    retained: list[D1Signal] = []
+    last_exit_by_day: dict[str, int] = {}
+    for signal in sorted(
+        signals,
+        key=lambda row: (row.decision_ns, row.candidate_id, row.source_position),
+    ):
+        day = _ct_date(signal.decision_ns)
+        if signal.source_bar_type == "MINUTE_PRINT_FEATURES":
+            # There is at most one frozen cash-open signal per candidate/day.
+            exit_ns = signal.decision_ns + 61 * 60 * 1_000_000_000
+        else:
+            key = (
+                signal.product,
+                signal.source_bar_type,
+                signal.calendar_year,
+            )
+            frame = event_groups[key]
+            position = int(signal.source_position)
+            starts = frame["start_event_ns"].to_numpy(dtype=np.int64)
+            entry = max(
+                position + 1,
+                int(np.searchsorted(starts, signal.availability_ns, side="left")),
+            )
+            exit_position = entry + int(signal.holding_units)
+            if exit_position >= len(frame):
+                continue
+            contracts = frame["contract"].astype(str).to_numpy()
+            if (
+                len(set(contracts[position : exit_position + 1])) != 1
+                or contracts[entry] != signal.contract
+            ):
+                continue
+            exit_ns = int(frame.iloc[exit_position]["start_event_ns"])
+        if signal.decision_ns < last_exit_by_day.get(day, -1):
+            continue
+        retained.append(signal)
+        last_exit_by_day[day] = exit_ns
+    return tuple(retained)
 
 
 def _shift_flow_one_prior_session(
@@ -572,7 +637,21 @@ def _verify_inputs(
     ):
         raise D1CandidateTribunalError("D1 tripwire is not frozen GREEN")
     proof = load_and_verify(proof_registry_path)
-    if multiplicity_trial_count(proof) != N_TRIALS:
+    reservation = next(
+        (
+            entry
+            for entry in proof.get("entries", ())
+            if entry.get("event_id")
+            == "v7_d1_microstructure_grammar_0001_multiplicity_reservation"
+        ),
+        None,
+    )
+    reserved = (
+        int(reservation.get("multiplicity", {}).get("cumulative_N_trials", -1))
+        if isinstance(reservation, Mapping)
+        else -1
+    )
+    if reserved != N_TRIALS or multiplicity_trial_count(proof) < N_TRIALS:
         raise D1CandidateTribunalError("D1 multiplicity reservation mismatch")
     if burned_window_ids(proof) != ("Q4_2024",):
         raise D1CandidateTribunalError("unexpected D1 proof-window state")
