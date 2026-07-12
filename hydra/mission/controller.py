@@ -177,8 +177,8 @@ TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX = "turbo_foundry_v2_epoch_"
 TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID = f"{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}0000"
 TURBO_PROMOTION_EXPERIMENT_PREFIX = "turbo_promotion_batch_"
 EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX = "evidence_conversion_v3_cohort_"
-DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0004"
-DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID = "q4_atomic_one_shot_0002"
+DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0005"
+DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID = "q4_atomic_one_shot_0003"
 DECISION_BRIDGE_V4_TASK_SHA256 = (
     "e80a099f2fca2a67fedbde860cf0409d7298798d6681866eb05117aeec9ac942"
 )
@@ -9717,8 +9717,6 @@ class AutonomousMissionController:
             authorization_root = self.paths.state_dir / "q4_one_shot"
             if authorization_root.exists():
                 for prior in sorted(authorization_root.glob("*/authorization.json")):
-                    if prior.parent.name == str(manifest["cohort_id"]):
-                        continue
                     if any(
                         (prior.parent / name).exists()
                         for name in (
@@ -9729,6 +9727,17 @@ class AutonomousMissionController:
                         )
                     ):
                         continue
+                    prior_payload = json.loads(prior.read_text(encoding="utf-8"))
+                    if (
+                        str(prior_payload.get("cohort_manifest_hash"))
+                        == str(result["cohort_manifest_hash"])
+                        and str(prior_payload.get("source_commit"))
+                        == self._git_commit()
+                    ):
+                        raise RuntimeError(
+                            "An identical unconsumed Q4 capability already exists; "
+                            "refusing silent token rotation."
+                        )
                     revoke_unconsumed_authorization(
                         prior,
                         reason=(

@@ -90,7 +90,15 @@ def issue_cohort_authorization(
         raise CohortAuthorizationError("Authorization commit differs from frozen cohort.")
     if q4_access_count(str(access_ledger_path)) != 0:
         raise CohortAuthorizationError("Q4 authoritative access count must be zero.")
-    root = Path(authorization_root) / str(manifest["cohort_id"])
+    # A scientific cohort can be re-frozen before Q4 is opened (for example
+    # after a pre-access engineering correction).  Namespace the capability
+    # by the immutable manifest as well as the human cohort identifier so a
+    # revoked, unconsumed capability remains auditable without blocking the
+    # corrected manifest.  Consumed/opened transactions are still globally
+    # forbidden by the authoritative access-count check above.
+    root = Path(authorization_root) / (
+        f"{manifest['cohort_id']}__{cohort_manifest_hash[:16]}"
+    )
     root.mkdir(parents=True, exist_ok=True)
     authorization_path = root / "authorization.json"
     consumption_path = root / "consumption.json"

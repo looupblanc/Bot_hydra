@@ -164,3 +164,50 @@ def test_unconsumed_orphan_can_be_revoked_without_q4_access(tmp_path: Path) -> N
             authorization_root=tmp_path / "q4",
             access_ledger_path=ledger,
         )
+
+
+def test_revoked_manifest_revision_uses_isolated_capability_path(
+    tmp_path: Path,
+) -> None:
+    manifest_path, first_manifest = _manifest(tmp_path)
+    ledger = tmp_path / "access.jsonl"
+    root = tmp_path / "q4"
+    first = issue_cohort_authorization(
+        cohort_manifest_path=manifest_path,
+        cohort_manifest_sha256=hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        cohort_manifest_hash=str(first_manifest["manifest_hash"]),
+        source_commit="a" * 40,
+        governance_semantic_hash="b" * 64,
+        governance_yaml_sha256="c" * 64,
+        authorization_root=root,
+        access_ledger_path=ledger,
+    )
+    revoke_unconsumed_authorization(
+        first.authorization_path,
+        reason="pre-access code correction",
+        access_ledger_path=ledger,
+    )
+
+    second_manifest = dict(first_manifest)
+    second_manifest["source_commit"] = "d" * 40
+    second_manifest.pop("manifest_hash")
+    second_manifest["manifest_hash"] = stable_hash(second_manifest)
+    second_path = tmp_path / "manifest_revision.json"
+    second_path.write_text(
+        json.dumps(second_manifest, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    second = issue_cohort_authorization(
+        cohort_manifest_path=second_path,
+        cohort_manifest_sha256=hashlib.sha256(second_path.read_bytes()).hexdigest(),
+        cohort_manifest_hash=str(second_manifest["manifest_hash"]),
+        source_commit="d" * 40,
+        governance_semantic_hash="b" * 64,
+        governance_yaml_sha256="c" * 64,
+        authorization_root=root,
+        access_ledger_path=ledger,
+    )
+
+    assert Path(first.authorization_path).parent != Path(second.authorization_path).parent
+    assert Path(first.authorization_path).is_file()
+    assert Path(second.authorization_path).is_file()
+    assert not ledger.exists()
