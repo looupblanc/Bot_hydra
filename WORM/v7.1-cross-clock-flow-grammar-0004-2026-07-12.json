@@ -1,0 +1,101 @@
+{
+  "schema": "hydra_v7_1_limited_cross_clock_flow_grammar_v1",
+  "grammar_id": "hydra_v7_1_cross_clock_flow_grammar_0004",
+  "allocation_role": "LIMITED_STRUCTURAL_DISCOVERY_5_PERCENT",
+  "broad_D1_batch": false,
+  "economic_hypothesis": "When independently constructed ES volume and dollar event clocks close in the same availability minute, agreement in aggressive-flow direction can reveal inventory pressure that liquidity providers have not yet fully repriced; disagreement can reveal absorbed or exhausted pressure.",
+  "who_pays": "Short-horizon liquidity suppliers and late aggressive followers whose inventory adjustment lags cross-clock confirmation.",
+  "persistence_rationale": "Volume and dollar clocks partition the same prints by different stopping rules, so agreement is a cross-representation confirmation rather than a threshold neighbor; execution remains slower than HFT and uses the following minute open.",
+  "source": {
+    "product": "ES",
+    "event_store_path": "data/cache/v7_d1/date_matched_event_bars_v1.parquet",
+    "event_store_sha256": "ea0208fc3666f912b39e9b21b302a466bd7ee00c802140d6a6beed73098aa4a3",
+    "minute_store_path": "data/cache/v7_d1/date_matched_minute_print_features_v2.parquet",
+    "minute_store_sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb",
+    "required_bar_types": [
+      "VOLUME_BAR",
+      "DOLLAR_BAR"
+    ],
+    "availability_alignment": "floor(availability_ns / 60_seconds) equal for the last completed bar of each required type",
+    "completed_events_only": true,
+    "explicit_contract_must_match": true
+  },
+  "mechanism_class": "V71_CROSS_CLOCK_FLOW_CONFIRMATION",
+  "motifs": [
+    {
+      "motif": "FLOW_SIGN_AGREEMENT",
+      "definition": "nonzero signed_aggressor_volume has the same sign on the last completed VOLUME_BAR and DOLLAR_BAR in the availability minute"
+    },
+    {
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "definition": "flow signs agree and each bar's price_change_points has the same nonzero sign as its own aggressive flow"
+    },
+    {
+      "motif": "FLOW_SIGN_DISAGREEMENT",
+      "definition": "nonzero signed_aggressor_volume signs are opposite across the last completed VOLUME_BAR and DOLLAR_BAR"
+    }
+  ],
+  "response_policies": [
+    "CONTINUATION",
+    "REVERSAL"
+  ],
+  "holding_minutes": [
+    30,
+    60
+  ],
+  "candidate_count": 12,
+  "bounded_parameter_alternatives_per_structure": 1,
+  "signal_policy": {
+    "decision_timestamp": "maximum availability_ns of the aligned completed pair",
+    "entry": "first explicit-contract 1m open at or after decision timestamp",
+    "exit": "explicit-contract 1m open at entry plus frozen holding_minutes",
+    "side_for_agreement": "common aggressive-flow sign",
+    "side_for_disagreement": "VOLUME_BAR aggressive-flow sign",
+    "response_policy_applied_after_motif_direction": true,
+    "overlapping_signals_per_candidate": false,
+    "session_crossing": false,
+    "contract_crossing": false
+  },
+  "cost_policy": {
+    "path": "config/v7/phase0_g0_preregistration.json",
+    "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "primary_walk_forward_stress": "STRESS_1_5X",
+    "SIM_EXPLOIT_stress": "STRESS_2X"
+  },
+  "funnel": {
+    "stage0": "validity_novelty_and_nonoverlap",
+    "stage1": "frozen_existing_cheap_economic_policy",
+    "stage2": "four_fold_walk_forward_with_five_day_embargo",
+    "stage3": "hypothesis_specific_nulls_only_if_powered",
+    "stage4": "campaign_DSR_BH_only_if_powered",
+    "stage5": "rolling_Combine_diagnostic_only_after_statistical_survival",
+    "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+    "candidate_specific_power_policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673"
+  },
+  "mandatory_grammar_tripwire": {
+    "worlds": [
+      "DAILY_BLOCK_SHUFFLE",
+      "VOLATILITY_MATCHED_RANDOM_WALK",
+      "YEAR_BLOCK_PERMUTATION"
+    ],
+    "NULL_RATIO_artefact_threshold_inclusive": 0.8,
+    "raw_counts_and_exact_binomial_test_required": true,
+    "combine_pass_rate_is_fitness": false
+  },
+  "cemetery_firewall": {
+    "feedback_scope": "mechanism_class_x_regime_x_death_cause_only",
+    "parameter_feedback_used": false,
+    "candidate_outcome_feedback_used": false,
+    "excluded_classes": [
+      "ARB_INTRA_PRODUIT",
+      "V71_EVENT_TIME_CLOCK_STATES"
+    ]
+  },
+  "candidate_status_inheritance": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "shadow_admission_authorized": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "Both clocks are derived from the same underlying prints, so apparent confirmation can still be duplicated information or account geometry; novelty deduplication and the permanent tripwire are mandatory."
+}
