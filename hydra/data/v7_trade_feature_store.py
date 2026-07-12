@@ -226,15 +226,22 @@ def aggregate_trade_chunks(
     excluded_session_count = 0
     excluded_instrument_count = 0
     invalid_action_count = 0
-    last_global_ts = -1
+    last_global_receive_ts = -1
+    retained_chunks: list[np.ndarray] = []
     for chunk in chunks:
         if len(chunk) == 0:
             continue
         source_count += len(chunk)
         ts = np.asarray(chunk["ts_event"], dtype=np.int64)
-        if int(ts[0]) < last_global_ts or np.any(np.diff(ts) < 0):
-            raise TradeFeatureStoreError("source trade stream is not chronological")
-        last_global_ts = int(ts[-1])
+        receive_field = "ts_recv" if "ts_recv" in chunk.dtype.names else "ts_event"
+        receive_ts = np.asarray(chunk[receive_field], dtype=np.int64)
+        if int(receive_ts[0]) < last_global_receive_ts or np.any(
+            np.diff(receive_ts) < 0
+        ):
+            raise TradeFeatureStoreError(
+                "source trade stream is not receive-time chronological"
+            )
+        last_global_receive_ts = int(receive_ts[-1])
         actions = np.asarray(chunk["action"])
         valid_action = actions == b"T"
         invalid_action_count += int(np.count_nonzero(~valid_action))
@@ -262,9 +269,16 @@ def aggregate_trade_chunks(
         if not np.any(keep):
             continue
         retained_count += int(np.count_nonzero(keep))
-        _merge_chunk_groups(accumulators, chunk[keep])
+        retained_chunks.append(np.array(chunk[keep], copy=True))
     if source_count <= 0 or retained_count <= 0:
         raise TradeFeatureStoreError("trade aggregation retained no observations")
+    # GLBX records are delivered in receive-time order. Exchange event timestamps
+    # may move backward by a small amount, including across DBN chunk boundaries.
+    # Concatenating the already-filtered RTH subset before one event-time sort keeps
+    # open/close/path features exact without assuming receive order equals event order.
+    retained = np.concatenate(retained_chunks)
+    _merge_chunk_groups(accumulators, retained)
+    del retained, retained_chunks
     audit = {
         "source_record_count": source_count,
         "retained_rth_record_count": retained_count,
