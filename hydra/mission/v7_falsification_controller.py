@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from hydra.governance.proof_registry import burned_window_ids, load_and_verify
+from hydra.mission.experiment_queue import ensure_experiment_schema
 from hydra.mission.mission_state import (
     append_event,
     append_jsonl,
@@ -286,6 +287,11 @@ class V7FalsificationController:
     def _initialize(self, conn: sqlite3.Connection) -> None:
         self._verify_constitution()
         _verify_database_integrity(conn)
+        # A clean restore starts with the v1 mission table.  Reuse the
+        # additive, non-destructive lifecycle migration before any V7 query or
+        # write so crash recovery does not depend on a legacy controller having
+        # touched the database first.
+        ensure_experiment_schema(conn)
         legacy_active = conn.execute(
             "SELECT experiment_id FROM experiments WHERE status IN ('QUEUED','RUNNING')"
         ).fetchall()

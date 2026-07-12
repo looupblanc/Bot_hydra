@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from hydra.mission.mission_state import mission_paths
 from hydra.mission.v7_falsification_controller import (
     V7ControllerConfig,
     V7ControllerIntegrityError,
@@ -106,6 +107,51 @@ def test_v71_controller_selects_next_power_aware_grammar(tmp_path: Path) -> None
 def test_controller_rejects_live_trading() -> None:
     with pytest.raises(V7ControllerIntegrityError):
         V7FalsificationController(V7ControllerConfig(no_live_trading=False))
+
+
+def test_controller_migrates_fresh_mission_schema_before_first_step(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    controller = V7FalsificationController(
+        V7ControllerConfig(
+            project_root=str(tmp_path),
+            state_dir="mission/state",
+            sleep_seconds=0.0,
+            checkpoint_every_steps=25,
+            persistent=True,
+            maximum_steps=1,
+        )
+    )
+    monkeypatch.setattr(controller, "_verify_constitution", lambda: "# MISSION HYDRA V7\n")
+    monkeypatch.setattr(
+        "hydra.mission.v7_falsification_controller.classify_v7_action",
+        lambda _root: {
+            "action_type": "V71_TEST_CONTINUATION",
+            "phase": "4",
+            "progressed": True,
+            "reason": "deterministic fresh-state smoke",
+        },
+    )
+
+    assert controller.run() == 0
+
+    paths = mission_paths(str(tmp_path / "mission/state"))
+    import sqlite3
+
+    conn = sqlite3.connect(paths.db_path)
+    try:
+        columns = {
+            str(row[1]) for row in conn.execute("PRAGMA table_info(experiments)")
+        }
+        row = conn.execute(
+            "SELECT status,experiment_type FROM experiments"
+        ).fetchone()
+    finally:
+        conn.close()
+    assert {"experiment_type", "completed_at", "claim_token"} <= columns
+    assert row == ("COMPLETED", "v7_falsification_perpetual")
+    heartbeat = json.loads(paths.heartbeat_path.read_text(encoding="utf-8"))
+    assert heartbeat["outbound_orders"] == 0
 
 
 def test_runner_uses_non_restarting_integrity_exit(monkeypatch: pytest.MonkeyPatch) -> None:
