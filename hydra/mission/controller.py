@@ -769,15 +769,26 @@ class AutonomousMissionController:
             )
         )
         decision_bridge_v4_required = bool(
-            previous_phase
-            in {
-                "ENGINEERING_BLOCKED",
-                "EXPERIMENT_BLOCKED",
-                "STOPPED_CLEANLY",
-            }
-            and str(previous_blocker or "")
-            == "FINAL_Q4_COHORT_AND_SHADOW_PACKAGES_REQUIRED"
+            (
+                (
+                    previous_phase
+                    in {
+                        "ENGINEERING_BLOCKED",
+                        "EXPERIMENT_BLOCKED",
+                        "SCHEDULER_STALLED",
+                        "STOPPED_CLEANLY",
+                    }
+                    and str(previous_blocker or "")
+                    in {
+                        "FINAL_Q4_COHORT_AND_SHADOW_PACKAGES_REQUIRED",
+                        "NO_EXECUTABLE_ACTION_OR_SCHEDULER_DEADLINE",
+                    }
+                )
+                or bool(get_kv(conn, "decision_bridge_v4_finalization_required", False))
+            )
             and experiment_record(conn, DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID)
+            is None
+            and experiment_record(conn, DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID)
             is None
         )
         turbo_foundry_v2_required = bool(
