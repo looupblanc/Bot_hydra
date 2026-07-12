@@ -273,6 +273,22 @@ def verify_v7_data_manifest(
                 raise DataManifestError(
                     f"manifest artifact hash mismatch: {artifact['path']}"
                 )
+        for audit_key in ("access_audit", "proof_registry_audit"):
+            if audit_key not in payload:
+                continue
+            audit = payload[audit_key]
+            audit_path = root / audit["path"]
+            if not audit_path.is_file() or sha256_file(audit_path) != audit["sha256"]:
+                raise DataManifestError(f"{audit_key} hash mismatch")
+        for row in payload.get("forward_data_audit", {}).get(
+            "authorization_manifest_hashes", []
+        ):
+            audit_path = root / row["path"]
+            if not audit_path.is_file() or sha256_file(audit_path) != row["sha256"]:
+                raise DataManifestError(
+                    "forward authorization manifest hash mismatch: "
+                    f"{row['path']}"
+                )
     return {
         "valid": True,
         "manifest_hash": expected,
