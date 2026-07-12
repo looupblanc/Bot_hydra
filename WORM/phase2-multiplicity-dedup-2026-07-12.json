@@ -1,0 +1,159 @@
+{
+  "schema": "hydra_v7_phase2_multiplicity_dedup_preregistration_v1",
+  "experiment_id": "hydra_v7_multiplicity_dedup_0001",
+  "preregistered_at_utc": "2026-07-12T14:38:52Z",
+  "contract": {
+    "path": "MISSION_CONTRACT.md",
+    "sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+    "tag": "worm/contract-2026-07-12-v2"
+  },
+  "required_prior_gates": {
+    "G0": {
+      "verdict": "GREEN",
+      "path": "reports/v7/phase0_v2/g0_result.json",
+      "sha256": "cc6f24342dd6a99a19bfb19c96ca02154c4ef4500e61ef74aa205106c9285aee"
+    },
+    "G1": {
+      "verdict": "GREEN",
+      "path": "reports/v7/phase1/g1_result.json",
+      "sha256": "4240716947c14d7b66a67d8a39efe986fdb17fd405b03fe852fdb71d6a3e8d62"
+    },
+    "NULL_RATIO": 0.04954068241469816
+  },
+  "frozen_scope": {
+    "source": "The exact 55 static basket elites replayed in Phase 0 and Phase 1.",
+    "candidate_count": 55,
+    "generations": [0, 1, 2, 3, 4, 5],
+    "parameters_frozen": true,
+    "components_frozen": true,
+    "trade_paths_frozen": true,
+    "development_data_only": true,
+    "q4_allowed": false,
+    "forward_gap_allowed": false
+  },
+  "multiplicity_retro_estimate": {
+    "method": "Conservative upper-bound reconstruction from persistent counters and immutable V6 artifacts; overlapping layers are intentionally counted again, then the subtotal is multiplied by two for incompletely atomized historical tests.",
+    "components": {
+      "all_strategy_prototypes_screened": 115388,
+      "V6_static_basket_evaluations": 3600,
+      "V6_controller_and_matched_control_evaluations": 1200,
+      "V6_individual_evaluations": 220,
+      "V6_exact_new_grammar_evaluations": 51,
+      "historical_candidate_dossiers_290_times_9_distinct_gates": 2610,
+      "phase0_object_comparisons": 61,
+      "phase1_primary_control_comparisons": 3
+    },
+    "subtotal_before_uncertainty_factor": 123133,
+    "uncertainty_factor": 2,
+    "historical_N_trials": 246266,
+    "phase2_preregistered_new_tests": {
+      "candidate_DSR_tests": 55,
+      "candidate_base_expectancy_tests": 55,
+      "candidate_cost_1_5x_expectancy_tests": 55,
+      "candidate_cost_2x_SIM_EXPLOIT_tests": 55,
+      "four_walk_forward_fold_expectancy_tests_per_candidate": 220,
+      "total": 440
+    },
+    "N_trials_used_for_phase2_DSR": 246706,
+    "anti_under_count_rule": "The counter may increase after this run when additional forgotten historical tests are proven, but may never decrease. Any increase invalidates no rejection; it can only make future promotion harder.",
+    "CONTRE": "The historical pipeline did not atomically count every statistical comparison, so 246,706 is a conservative reconstruction rather than an exact census; the factor two limits but cannot prove absence of under-counting."
+  },
+  "daily_account_path": {
+    "construction": "Replay each frozen static basket once over the full ordered development session-day range as one merged shared account, with target and MLL terminal barriers disabled only for return-vector construction; preserve actual component conflicts, fixed quantities, costs and chronological event paths.",
+    "calendar": "America/Chicago Topstep session day (17:00 CT open, 16:00 CT winning-day lock).",
+    "missing_activity_day": "Zero daily PnL on an eligible common session day with no accepted event.",
+    "no_standalone_summation": true
+  },
+  "behavioral_clustering": {
+    "input": "Aligned full-development daily net PnL vectors under frozen base costs.",
+    "correlation": "Pearson correlation with pairwise complete observations; two zero-variance vectors receive rho=1 only if exactly equal, otherwise rho=0.",
+    "distance": "clip(1-rho,0,2)",
+    "linkage": "average",
+    "cut_distance": 0.3,
+    "deterministic_cluster_ids": "Sort clusters by the lexicographically smallest policy_id; members sorted lexicographically.",
+    "selection_cap": "At most one headline representative per cluster."
+  },
+  "cost_and_sim_exploit_policy": {
+    "base": "Frozen V7 product/horizon cost model.",
+    "stress_1_5x": "Multiply the complete frozen round-turn cost of every trade by 1.5 without changing signals or fills.",
+    "stress_2x": "Multiply the complete frozen round-turn cost of every trade by 2.0 without changing signals or fills.",
+    "SIM_EXPLOIT": "If pooled full-development net expectancy per accepted trade is <= 0 under 2x cost, assign irreversible SIM_EXPLOIT and kill the exact candidate.",
+    "promotion_cost_gate": "Pooled purged walk-forward net expectancy per accepted trade must be > 0 under 1.5x cost."
+  },
+  "walk_forward": {
+    "folds": 4,
+    "fold_definition": "Split the ordered common Chicago session days into four contiguous arrays using numpy.array_split; no data-dependent boundary changes.",
+    "strategy_retraining": "None. Frozen strategies and baskets are replayed unchanged.",
+    "purge": "For each candidate, remove from each fold any event whose entry precedes the fold but whose frozen exit reaches into it; purge length therefore equals the exact label/holding horizon.",
+    "embargo": "Remove the first five eligible Chicago session days of every fold after the first.",
+    "primary_expectancy": "Sum net PnL under 1.5x cost over all retained fold events divided by their total count.",
+    "weak_fold_policy": "A weak fold is diagnostic, not fatal, provided pooled expectancy remains positive; every fold result is published.",
+    "minimum_retained_events": 20
+  },
+  "deflated_sharpe": {
+    "observation_unit": "Aligned Chicago session-day net PnL.",
+    "annualization": 252,
+    "sample_sharpe": "sqrt(252)*mean(daily_pnl)/std(daily_pnl,ddof=1).",
+    "expected_max_sharpe": "E[max SR] = std_SR*((1-gamma)*Phi^-1(1-1/N_trials)+gamma*Phi^-1(1-1/(N_trials*e))) with gamma=0.5772156649015329, mean null Sharpe 0, and std_SR=1/sqrt(n-1).",
+    "deflated_z": "(SR_unannualized-SR0_unannualized)*sqrt(n-1)/sqrt(max(1-skew*SR_unannualized+((kurtosis-1)/4)*SR_unannualized^2,1e-12)).",
+    "DSR_probability": "Phi(deflated_z).",
+    "promotion_gate": "deflated_z > 0 (equivalently DSR_probability > 0.5).",
+    "N_trials": 246706,
+    "minimum_daily_observations": 60
+  },
+  "multiple_testing": {
+    "procedure": "Benjamini-Hochberg",
+    "FDR": 0.1,
+    "family": "All 55 frozen basket candidates together.",
+    "p_value": "One-sided p=1-Phi(deflated_z), using the same deflated-z statistic frozen above.",
+    "ties": "Stable sort by p_value then policy_id.",
+    "promotion_gate": "Candidate must be rejected by BH at q=0.10 in addition to deflated_z>0.",
+    "no_family_inheritance": true
+  },
+  "compliance": {
+    "trajectory_gate": "100% deterministic compliance with every executable R1-R16 trajectory constraint under the frozen implementation, including both R2 modes as reported sensitivity, R3 on/off diagnostics, R4, R5 and R16.",
+    "ticket_boundary": "R2, R6 and R11 provenance remain CONFLICT/ASSUMED and block deployment tickets, but do not prevent research classification.",
+    "outbound_orders": 0
+  },
+  "promotion": {
+    "all_required": [
+      "deflated_z_gt_0",
+      "BH_FDR_10pct_rejected",
+      "purged_walk_forward_1_5x_expectancy_per_trade_gt_0",
+      "trajectory_compliance_100pct",
+      "SIM_EXPLOIT_2x_survived",
+      "no_hard_integrity_failure"
+    ],
+    "maximum_representatives": 3,
+    "maximum_per_behavioral_cluster": 1,
+    "ranking": [
+      "BH_rejected first",
+      "higher deflated_z",
+      "higher 1.5x pooled walk-forward expectancy per trade",
+      "lower 2x cost drawdown",
+      "lexicographically smaller policy_id"
+    ],
+    "if_none_survive": "Return a clean null and reserve all five shadow slots for Track B after Gate G1 remains green.",
+    "candidate_fiches": "Representative candidate fiches are separate WORM commits created only after selection and before any gap ingestion."
+  },
+  "budget": {
+    "phase_llm_limit_usd": 8.0,
+    "paid_data_allowed": false,
+    "expected_data_spend_usd": 0.0
+  },
+  "safety": {
+    "strategy_generation_allowed": false,
+    "strategy_or_parameter_mutation_allowed": false,
+    "q4_access_allowed": false,
+    "forward_gap_access_allowed": false,
+    "broker_or_order_capability_allowed": false
+  },
+  "output": {
+    "directory": "reports/v7/phase2",
+    "result": "reports/v7/phase2/phase2_result.json",
+    "report": "reports/v7/phase2/phase2_report.md",
+    "cluster_manifest": "reports/v7/phase2/behavioral_clusters.json",
+    "representative_manifest": "reports/v7/phase2/selected_representatives.json"
+  },
+  "honest_green_statement": "Every counter component, DSR formula, BH family, clustering cutoff, stress threshold, fold rule and selection ranking is frozen before daily PnL vectors or candidate Phase 2 statistics are computed."
+}
