@@ -783,6 +783,7 @@ class AutonomousMissionController:
             set_kv(conn, "current_experiment", None)
         self._reconcile_planned_experiment_flags(conn)
         self._reconcile_completed_experiments(conn)
+        self._repair_turbo_promotion_prototype_inflation(conn)
         self._refresh_latest_completed_experiment_metadata(conn)
         self._refresh_foundry_candidate_counts(conn)
         contract_map_repair_required = contract_map_repair_required or bool(
@@ -8633,7 +8634,12 @@ class AutonomousMissionController:
     def _route_turbo_promotion_result(
         self, conn: Any, result: dict[str, Any], experiment_id: str
     ) -> None:
-        self._update_foundry_candidate_bank(conn, result, experiment_id)
+        self._update_foundry_candidate_bank(
+            conn,
+            result,
+            experiment_id,
+            counts_as_new_prototypes=False,
+        )
         set_kv(
             conn,
             "turbo_promotion_latest_metrics",
@@ -8738,11 +8744,28 @@ class AutonomousMissionController:
 
     @staticmethod
     def _update_foundry_candidate_bank(
-        conn: Any, result: dict[str, Any], experiment_id: str
+        conn: Any,
+        result: dict[str, Any],
+        experiment_id: str,
+        *,
+        counts_as_new_prototypes: bool = True,
     ) -> None:
         accounted = set(get_kv(conn, "foundry_accounted_experiments", []) or [])
+        nonprototype = set(
+            get_kv(conn, "foundry_nonprototype_experiments", []) or []
+        )
+        if not counts_as_new_prototypes and experiment_id not in nonprototype:
+            # Persist this marker before the accounted marker. If the process
+            # stops between the two writes, reconciliation still cannot count
+            # a promotion replay as a newly generated structure.
+            nonprototype.add(experiment_id)
+            set_kv(conn, "foundry_nonprototype_experiments", sorted(nonprototype))
         if experiment_id not in accounted:
-            count = int(result.get("candidate_count", 0))
+            count = (
+                int(result.get("candidate_count", 0))
+                if counts_as_new_prototypes and experiment_id not in nonprototype
+                else 0
+            )
             set_kv(
                 conn,
                 "strategy_prototypes_generated",
@@ -8802,6 +8825,79 @@ class AutonomousMissionController:
             max(int(get_kv(conn, "strategies_screened", 0)), candidate_total),
         )
         AutonomousMissionController._refresh_foundry_candidate_counts(conn)
+
+    @staticmethod
+    def _repair_turbo_promotion_prototype_inflation(conn: Any) -> dict[str, Any]:
+        """Remove historical Turbo-promotion double counts exactly once.
+
+        Promotion candidates are frozen descendants of an already counted
+        discovery epoch. Older controller versions added their candidate_count
+        again. The repair uses an absolute planned target so interruption at
+        any individual durable KV write remains idempotent.
+        """
+
+        key = "turbo_promotion_prototype_count_repair_v1"
+        repair = dict(get_kv(conn, key, {}) or {})
+        if str(repair.get("status") or "") == "COMPLETED":
+            return repair
+        nonprototype = set(
+            get_kv(conn, "foundry_nonprototype_experiments", []) or []
+        )
+        if not repair:
+            accounted = set(
+                get_kv(conn, "foundry_accounted_experiments", []) or []
+            )
+            rows = conn.execute(
+                "SELECT experiment_id,result FROM experiments WHERE "
+                "experiment_type='turbo_promotion_batch' AND status='COMPLETED' "
+                "ORDER BY experiment_id"
+            ).fetchall()
+            inflated: list[tuple[str, int]] = []
+            for experiment_id, result_text in rows:
+                identifier = str(experiment_id)
+                if identifier not in accounted or identifier in nonprototype:
+                    continue
+                try:
+                    payload = json.loads(result_text or "{}")
+                except (TypeError, json.JSONDecodeError):
+                    payload = {}
+                inflated.append(
+                    (identifier, max(int(payload.get("candidate_count") or 0), 0))
+                )
+            inflation = sum(count for _identifier, count in inflated)
+            prototypes_before = int(
+                get_kv(conn, "strategy_prototypes_generated", 0)
+            )
+            screened_before = int(get_kv(conn, "strategies_screened", 0))
+            if inflation > prototypes_before or inflation > screened_before:
+                raise RuntimeError(
+                    "Turbo promotion prototype repair exceeds persisted counters."
+                )
+            repair = {
+                "status": "PLANNED",
+                "experiment_ids": [identifier for identifier, _count in inflated],
+                "inflated_candidate_count": inflation,
+                "prototypes_before": prototypes_before,
+                "screened_before": screened_before,
+                "corrected_prototypes": prototypes_before - inflation,
+                "corrected_screened": screened_before - inflation,
+            }
+            set_kv(conn, key, repair)
+        set_kv(
+            conn,
+            "strategy_prototypes_generated",
+            int(repair.get("corrected_prototypes") or 0),
+        )
+        set_kv(
+            conn,
+            "strategies_screened",
+            int(repair.get("corrected_screened") or 0),
+        )
+        nonprototype.update(str(value) for value in repair.get("experiment_ids") or [])
+        set_kv(conn, "foundry_nonprototype_experiments", sorted(nonprototype))
+        repair = {**repair, "status": "COMPLETED", "completed_at_utc": utc_now_iso()}
+        set_kv(conn, key, repair)
+        return repair
 
     @staticmethod
     def _refresh_foundry_candidate_counts(conn: Any) -> None:

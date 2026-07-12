@@ -836,3 +836,88 @@ def test_turbo_stale_failed_blocker_reuses_pending_epoch(tmp_path: Path) -> None
         assert get_kv(conn, "current_blocker") is None
     finally:
         conn.close()
+
+
+def test_turbo_promotion_updates_candidate_bank_without_clone_inflation(
+    tmp_path: Path,
+) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    experiment_id = "turbo_promotion_batch_0042"
+    try:
+        set_kv(conn, "strategy_prototypes_generated", 100)
+        set_kv(conn, "strategies_screened", 100)
+        controller._route_turbo_promotion_result(
+            conn,
+            {
+                "source_batch_index": 42,
+                "candidate_count": 5,
+                "candidates": [],
+                "robust_research_candidates": 0,
+                "shadow_candidates": 0,
+                "topstep_path_candidates": 0,
+                "paper_shadow_ready": 0,
+                "scientific_conclusion": "NO_PROMOTION",
+                "result_hash": "4" * 64,
+            },
+            experiment_id,
+        )
+
+        assert get_kv(conn, "strategy_prototypes_generated") == 100
+        assert get_kv(conn, "strategies_screened") == 100
+        assert experiment_id in get_kv(conn, "foundry_accounted_experiments")
+        assert experiment_id in get_kv(conn, "foundry_nonprototype_experiments")
+    finally:
+        conn.close()
+
+
+def test_turbo_promotion_inflation_repair_is_exact_and_idempotent(
+    tmp_path: Path,
+) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    experiment_ids = ["turbo_promotion_batch_0000", "turbo_promotion_batch_0001"]
+    try:
+        for experiment_id, count in zip(experiment_ids, (3, 4), strict=True):
+            enqueue_experiment(
+                conn,
+                experiment_id,
+                {"experiment_type": "turbo_promotion_batch"},
+            )
+            claimed = claim_next_experiment(conn)
+            assert claimed is not None and claimed["experiment_id"] == experiment_id
+            complete_experiment(
+                conn,
+                experiment_id,
+                {"candidate_count": count, "result_hash": str(count) * 64},
+                claim_token=str(claimed["claim_token"]),
+            )
+        set_kv(conn, "foundry_accounted_experiments", experiment_ids)
+        set_kv(conn, "strategy_prototypes_generated", 100)
+        set_kv(conn, "strategies_screened", 90)
+
+        repair = controller._repair_turbo_promotion_prototype_inflation(conn)
+        assert repair["status"] == "COMPLETED"
+        assert repair["inflated_candidate_count"] == 7
+        assert get_kv(conn, "strategy_prototypes_generated") == 93
+        assert get_kv(conn, "strategies_screened") == 83
+        assert set(get_kv(conn, "foundry_nonprototype_experiments")) == set(
+            experiment_ids
+        )
+
+        # Re-entry after completion is a no-op.
+        controller._repair_turbo_promotion_prototype_inflation(conn)
+        assert get_kv(conn, "strategy_prototypes_generated") == 93
+        assert get_kv(conn, "strategies_screened") == 83
+
+        # A crash after the plan but before every absolute write converges to
+        # the same target instead of subtracting twice.
+        set_kv(conn, "strategy_prototypes_generated", 100)
+        set_kv(conn, "strategies_screened", 90)
+        set_kv(conn, "turbo_promotion_prototype_count_repair_v1", {
+            **repair,
+            "status": "PLANNED",
+        })
+        controller._repair_turbo_promotion_prototype_inflation(conn)
+        assert get_kv(conn, "strategy_prototypes_generated") == 93
+        assert get_kv(conn, "strategies_screened") == 83
+    finally:
+        conn.close()
