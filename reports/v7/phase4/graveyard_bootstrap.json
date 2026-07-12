@@ -1,0 +1,38 @@
+{
+  "schema": "hydra_v7_graveyard_bootstrap_report_v1",
+  "built_at_utc": "2026-07-12T15:08:00Z",
+  "graveyard_path": "mission/state/graveyard.db",
+  "graveyard_sha256": "eb0950cb74a75e737ca2b8712604a8e4d158cb19c5fa8ad83dba1f84f696c04a",
+  "integrity": "ok",
+  "class_signature_count": 46,
+  "legacy_indexed_count": 115388,
+  "new_phase2_tombstone_count": 55,
+  "indexed_object_count": 115443,
+  "registered_candidate_count": 75312,
+  "unregistered_residual_count": 40076,
+  "generator_feedback_scope": [
+    "mechanism_class",
+    "regime",
+    "death_cause",
+    "candidate_count"
+  ],
+  "parameter_level_columns": [],
+  "largest_death_causes": {
+    "SCREENED_NOT_REGISTRY_PERSISTED": 40076,
+    "MARCH_OOS_WEAK": 27987,
+    "VIABLE_ONLY_IN_ONE_SPLIT": 25813,
+    "NO_ECONOMIC_SIGNAL": 13943,
+    "WEAK_BUT_MUTATABLE_ECONOMIC_PROFILE": 2550,
+    "FRAGILE_TRADE_ORDER": 2079
+  },
+  "phase2_class_tombstone": {
+    "mechanism_class": "V6_STATIC_ACCOUNT_BASKET",
+    "regime": "DEVELOPMENT_2023_TO_2024Q3",
+    "death_cause": "MULTIPLICITY_BH_NOT_REJECTED",
+    "candidate_count": 55,
+    "evidence_sha256": "586a9957fbe5a1c35050d9c52b8bba01f2e00ec93100b471326748624badac9e"
+  },
+  "SMC_scope_note": "Historical OHLC-only SMC nulls must be classified as SMC_ON_OHLC, never as a falsification of future print/book microstructure SMC hypotheses.",
+  "outbound_order_count": 0,
+  "CONTRE": "Forty thousand historical prototypes were not individually persisted in the registry and are therefore represented by one coarse UNREGISTERED class; this prevents parameter leakage but weakens distance guidance for that residual."
+}
