@@ -40,6 +40,8 @@ def test_flow_shift_preserves_prices_and_changes_flow() -> None:
         shifted_event["signed_aggressor_volume"],
         event["signed_aggressor_volume"],
     )
+    assert float((shifted_minute["total_volume"] > 0.0).mean()) > 0.90
+    assert float((shifted_event["total_volume"] > 0.0).mean()) > 0.90
 
 
 def test_shifted_flow_recomputes_frozen_signal_population() -> None:
@@ -51,6 +53,9 @@ def test_shifted_flow_recomputes_frozen_signal_population() -> None:
 
     assert set(shifted) == set(real)
     assert any(len(shifted[key]) != len(real[key]) for key in real)
+    assert sum(len(rows) for rows in shifted.values()) > 0.50 * sum(
+        len(rows) for rows in real.values()
+    )
 
 
 def test_mes_micro_equivalent_is_valid_at_one_contract() -> None:

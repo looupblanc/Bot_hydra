@@ -453,6 +453,7 @@ def _shift_flow_one_prior_session(
 
 
 def _shift_frame_flow(frame: pd.DataFrame, timestamp_column: str) -> pd.DataFrame:
+    source = frame.copy()
     output = frame.copy()
     timestamps = pd.to_datetime(
         output[timestamp_column].to_numpy(dtype=np.int64), unit="ns", utc=True
@@ -484,7 +485,7 @@ def _shift_frame_flow(frame: pd.DataFrame, timestamp_column: str) -> pd.DataFram
                 np.linspace(0, len(donor) - 1, len(recipient))
             ).astype(np.int64)
             for column in flow_columns:
-                output.loc[recipient, column] = output.loc[
+                output.loc[recipient, column] = source.loc[
                     donor[source_positions], column
                 ].to_numpy()
     return output.drop(columns=["_local_date"])
