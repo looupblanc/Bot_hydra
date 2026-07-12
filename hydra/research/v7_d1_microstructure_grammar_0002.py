@@ -393,7 +393,12 @@ def _attach_execution(
                 mechanism_class=spec.mechanism_class,
                 product=spec.product,
                 calendar_year=year,
-                source_bar_type=str(row.get("source_bar_type", "FIVE_MINUTE_PRINT_AGGREGATE")),
+                source_bar_type=(
+                    "SYNCHRONIZED_FIVE_MINUTE_PRINT_AGGREGATE"
+                    if spec.hypothesis_id
+                    == "D1H6_MINI_MICRO_PARTICIPATION_DIVERGENCE"
+                    else "FIVE_MINUTE_PRINT_AGGREGATE"
+                ),
                 source_block_start_ns=int(row["block_start_ns"]),
                 source_close_ns=int(row["source_close_ns"]),
                 decision_ns=decision_ns,
