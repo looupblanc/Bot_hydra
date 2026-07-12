@@ -1,0 +1,101 @@
+{
+  "schema": "hydra_v7_1_event_time_executable_diagnostic_v1",
+  "diagnostic_id": "hydra_v7_1_event_time_executable_diagnostic_0001",
+  "principal_amendment_path": "MISSION_CONTRACT_AMENDMENT_002_POWER_AWARE.md",
+  "principal_amendment_sha256": "f41caaa9b4a1ad17c7436f4594ed669c3784321d4afac805dee0b87f79a02caf",
+  "candidate_freeze_path": "WORM/v7.1-power-aware-candidate-freeze-0001-2026-07-12.json",
+  "candidate_freeze_sha256": "b66e462989213356106f0cbcd88d31ba4547a61f9900eb1de3e6010cb3d35d83",
+  "power_audit_path": "reports/v7_1/power_aware_0001/v71_power_aware_candidate_audit_result.json",
+  "power_audit_sha256": "f0eb23117b5703b3d50823365cff7cf9d37c7faeb6ce5628ca7e6c19f04c930b",
+  "scientific_status": "BOUNDED_DIAGNOSTIC_ONLY_NO_PROMOTION",
+  "event_time_tripwire_status": "ARTEFACT_GEOMETRY_ONLY",
+  "combine_pass_rate_is_edge_fitness": false,
+  "candidates": [
+    {
+      "candidate_id": "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+      "alias": "fast_volume_completion_60m",
+      "specification_hash": "88db95c23f163645f546b98fa173faa7036e66bebdb5d82ece433aee38b77fc0",
+      "signal_path_hash": "a19a69d6dd80f715c96a5150b29467850a9561f4960a641b49267279ae8630dc",
+      "power_status": "PROMISING_UNDERPOWERED",
+      "motif_thresholds": "unchanged_frozen_grammar_0003",
+      "direction": "CONTINUATION",
+      "entry": "first_ES_minute_open_at_or_after_frozen_event_availability",
+      "exit": "ES_minute_open_exactly_60_minutes_after_entry",
+      "stop_or_target_overlay": "none",
+      "position_quantity_primary": 1,
+      "diagnostic_quantities": [1, 2, 4, 8]
+    },
+    {
+      "candidate_id": "v71g3_signed_flow_rate_high_rate_low_progress_continuation_h60",
+      "alias": "high_rate_low_progress_60m",
+      "specification_hash": "95d929822cd9e96e1ae6a2347ca91a8057aa29550132454f5959799fc66e8831",
+      "signal_path_hash": "5110717913efc73e82d354a3613f1ba98f12fb1d03a3c2cf8a19b6081f4bbc46",
+      "power_status": "WF_POSITIVE_BUT_FRAGILE",
+      "motif_thresholds": "unchanged_frozen_grammar_0003",
+      "direction": "CONTINUATION",
+      "entry": "first_ES_minute_open_at_or_after_frozen_event_availability",
+      "exit": "ES_minute_open_exactly_60_minutes_after_entry",
+      "stop_or_target_overlay": "none",
+      "position_quantity_primary": 1,
+      "diagnostic_quantities": [1, 2, 4, 8]
+    }
+  ],
+  "execution": {
+    "market": "ES",
+    "explicit_contract_from_signal": true,
+    "position_limit_mini_equivalent": 15,
+    "maximum_one_open_position_per_candidate": true,
+    "averaging": false,
+    "pyramiding": false,
+    "same_bar_policy": "conservative_no_same_bar_exit",
+    "session_flatten": true,
+    "cost_model_path": "config/v7/phase0_g0_preregistration.json",
+    "cost_model_sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "primary_cost_stress": "BASE",
+    "elevated_cost_stresses": ["STRESS_1_5X", "STRESS_2X"]
+  },
+  "rolling_combine": {
+    "profit_target_usd": 9000.0,
+    "maximum_loss_limit_usd": 4500.0,
+    "maximum_duration_trading_days": 20,
+    "episode_starts": "all_block_aware_eligible_starts_in_each_frozen_calendar_year",
+    "nearly_adjacent_starts_are_not_independent_evidence": true,
+    "mll_modes": ["eod_level_rt_breach", "intraday_hwm"],
+    "consistency_best_day_fraction_exclusive": 0.5,
+    "shared_account_target": true,
+    "shared_account_MLL": true
+  },
+  "basket": {
+    "basket_id": "v71g3_named_pair_serialized_equal_one_ES",
+    "components": [
+      "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+      "v71g3_signed_flow_rate_high_rate_low_progress_continuation_h60"
+    ],
+    "quantity_each": 1,
+    "conflict_policy": "chronological_first_signal_wins_and_later_overlapping_signal_is_blocked",
+    "same_timestamp_priority": "lexicographic_candidate_id",
+    "standalone_summary_PnL_may_not_be_summed": true,
+    "merged_trade_timeline_required": true
+  },
+  "required_metrics": [
+    "episode_start_count",
+    "pass_count",
+    "MLL_breach_count",
+    "timeout_count",
+    "pass_rate",
+    "MLL_breach_rate",
+    "median_target_progress",
+    "median_days_to_target_for_passes",
+    "minimum_MLL_buffer",
+    "consistency_pass_rate",
+    "net_after_costs",
+    "basket_marginal_target_progress",
+    "blocked_conflict_count"
+  ],
+  "forward_or_shadow_promotion_authorized": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "broker_or_order_adapter": false,
+  "outbound_orders": 0,
+  "CONTRE": "Only about one month per calendar year is available, so the number of 20-day rolling starts may be too small for a decision; pass rates must remain diagnostic and null-adjusted."
+}
