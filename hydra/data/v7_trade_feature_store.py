@@ -140,7 +140,7 @@ def build_feature_store(
             "timezone": "America/Chicago",
             "start_inclusive": "08:30:00",
             "end_exclusive": "15:10:00",
-            "weekdays_only": true
+            "weekdays_only": True
         },
         "aggressor_side_encoding": {
             "B": "BUY_AGGRESSOR",
