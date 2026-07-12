@@ -1,0 +1,188 @@
+{
+  "CONTRE": "A larger required sample can make D1 unable to decide many rare mechanisms; those cases must remain INSUFFICIENT_POWER.",
+  "cell_results": [
+    {
+      "confusion": {
+        "FN": 0,
+        "FP": 0,
+        "TN": 320,
+        "TP": 0
+      },
+      "effect_usd_per_trade": 0.0,
+      "event_count": 240,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "world": "SYNTHETIC_GAUSSIAN"
+    },
+    {
+      "confusion": {
+        "FN": 35,
+        "FP": 0,
+        "TN": 240,
+        "TP": 45
+      },
+      "effect_usd_per_trade": 50.0,
+      "event_count": 240,
+      "false_positive_rate": 0.0,
+      "power": 0.5625,
+      "world": "SYNTHETIC_GAUSSIAN"
+    },
+    {
+      "confusion": {
+        "FN": 0,
+        "FP": 0,
+        "TN": 320,
+        "TP": 0
+      },
+      "effect_usd_per_trade": 0.0,
+      "event_count": 320,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "world": "SYNTHETIC_GAUSSIAN"
+    },
+    {
+      "confusion": {
+        "FN": 3,
+        "FP": 0,
+        "TN": 240,
+        "TP": 77
+      },
+      "effect_usd_per_trade": 50.0,
+      "event_count": 320,
+      "false_positive_rate": 0.0,
+      "power": 0.9625,
+      "world": "SYNTHETIC_GAUSSIAN"
+    },
+    {
+      "confusion": {
+        "FN": 0,
+        "FP": 0,
+        "TN": 320,
+        "TP": 0
+      },
+      "effect_usd_per_trade": 0.0,
+      "event_count": 480,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "world": "SYNTHETIC_GAUSSIAN"
+    },
+    {
+      "confusion": {
+        "FN": 0,
+        "FP": 0,
+        "TN": 240,
+        "TP": 80
+      },
+      "effect_usd_per_trade": 50.0,
+      "event_count": 480,
+      "false_positive_rate": 0.0,
+      "power": 1.0,
+      "world": "SYNTHETIC_GAUSSIAN"
+    },
+    {
+      "confusion": {
+        "FN": 0,
+        "FP": 0,
+        "TN": 320,
+        "TP": 0
+      },
+      "effect_usd_per_trade": 0.0,
+      "event_count": 240,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "world": "SEMI_SYNTHETIC_D1_ES_RESIDUAL_BOOTSTRAP"
+    },
+    {
+      "confusion": {
+        "FN": 10,
+        "FP": 0,
+        "TN": 240,
+        "TP": 70
+      },
+      "effect_usd_per_trade": 50.0,
+      "event_count": 240,
+      "false_positive_rate": 0.0,
+      "power": 0.875,
+      "world": "SEMI_SYNTHETIC_D1_ES_RESIDUAL_BOOTSTRAP"
+    },
+    {
+      "confusion": {
+        "FN": 0,
+        "FP": 0,
+        "TN": 320,
+        "TP": 0
+      },
+      "effect_usd_per_trade": 0.0,
+      "event_count": 320,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "world": "SEMI_SYNTHETIC_D1_ES_RESIDUAL_BOOTSTRAP"
+    },
+    {
+      "confusion": {
+        "FN": 4,
+        "FP": 0,
+        "TN": 240,
+        "TP": 76
+      },
+      "effect_usd_per_trade": 50.0,
+      "event_count": 320,
+      "false_positive_rate": 0.0,
+      "power": 0.95,
+      "world": "SEMI_SYNTHETIC_D1_ES_RESIDUAL_BOOTSTRAP"
+    },
+    {
+      "confusion": {
+        "FN": 0,
+        "FP": 0,
+        "TN": 320,
+        "TP": 0
+      },
+      "effect_usd_per_trade": 0.0,
+      "event_count": 480,
+      "false_positive_rate": 0.0,
+      "power": 0.0,
+      "world": "SEMI_SYNTHETIC_D1_ES_RESIDUAL_BOOTSTRAP"
+    },
+    {
+      "confusion": {
+        "FN": 4,
+        "FP": 0,
+        "TN": 240,
+        "TP": 76
+      },
+      "effect_usd_per_trade": 50.0,
+      "event_count": 480,
+      "false_positive_rate": 0.0,
+      "power": 0.95,
+      "world": "SEMI_SYNTHETIC_D1_ES_RESIDUAL_BOOTSTRAP"
+    }
+  ],
+  "minimum_required_event_count": 320,
+  "new_data_purchase_count": 0,
+  "next_action": "freeze_power_aware_minimum_and_run_D1_stage0_stage2",
+  "outbound_order_count": 0,
+  "plan_path": "WORM/v7.1-power-sample-size-extension-2026-07-12.json",
+  "plan_sha256": "8e3df65fa75aa3b64c12a3e35f945711d21480ae59a82ba80478df3dd4bddd1a",
+  "protected_holdout_access_count_delta": 0,
+  "raw_global_N_trials_after": 261972,
+  "raw_global_N_trials_before": 258132,
+  "real_candidate_results_read": false,
+  "schema": "hydra_v7_1_power_sample_extension_result_v1",
+  "thresholds_changed": false,
+  "verdict": "GREEN",
+  "world_summaries": {
+    "SEMI_SYNTHETIC_D1_ES_RESIDUAL_BOOTSTRAP": {
+      "minimum_required_event_count": 240,
+      "null_false_positive_rate": 0.0,
+      "passed": true,
+      "power_at_required_count": 0.875
+    },
+    "SYNTHETIC_GAUSSIAN": {
+      "minimum_required_event_count": 320,
+      "null_false_positive_rate": 0.0,
+      "passed": true,
+      "power_at_required_count": 0.9625
+    }
+  }
+}
