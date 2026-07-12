@@ -1,0 +1,71 @@
+{
+  "schema": "hydra_v7_databento_d1_official_cost_estimate_v1",
+  "estimated_at_utc": "2026-07-12T15:03:00Z",
+  "provider": "Databento",
+  "dataset": "GLBX.MDP3",
+  "schema_name": "trades",
+  "stype_in": "continuous",
+  "network_operation": "metadata.get_cost + metadata.get_billable_size + metadata.get_record_count",
+  "market_data_downloaded": false,
+  "billable_data_request_executed": false,
+  "actual_spend_usd": 0.0,
+  "contract_D1_cap_usd": 60.0,
+  "queries": [
+    {
+      "label": "ES_MES_21M",
+      "symbols": ["ES.c.0", "MES.c.0"],
+      "start": "2023-01-01",
+      "end_exclusive": "2024-10-01",
+      "official_cost_usd": 357.49085944891,
+      "billable_bytes": 13709031696,
+      "record_count": 285604827
+    },
+    {
+      "label": "ES_21M",
+      "symbols": ["ES.c.0"],
+      "start": "2023-01-01",
+      "end_exclusive": "2024-10-01",
+      "official_cost_usd": 215.96295440197,
+      "billable_bytes": 8281730592,
+      "record_count": 172536054
+    },
+    {
+      "label": "MES_21M",
+      "symbols": ["MES.c.0"],
+      "start": "2023-01-01",
+      "end_exclusive": "2024-10-01",
+      "official_cost_usd": 141.52790504694,
+      "billable_bytes": 5427301104,
+      "record_count": 113068773
+    },
+    {
+      "label": "ES_MES_2Y",
+      "symbols": ["ES.c.0", "MES.c.0"],
+      "start": "2022-10-01",
+      "end_exclusive": "2024-10-01",
+      "official_cost_usd": 433.101781010628,
+      "billable_bytes": 16608553440,
+      "record_count": 346011530
+    },
+    {
+      "label": "ES_MES_1Y",
+      "symbols": ["ES.c.0", "MES.c.0"],
+      "start": "2023-10-01",
+      "end_exclusive": "2024-10-01",
+      "official_cost_usd": 200.25698786974,
+      "billable_bytes": 7679439408,
+      "record_count": 159988321
+    }
+  ],
+  "cache_audit": {
+    "matching_trades_cache_present": false,
+    "existing_ohlcv_1m_reused_for_track_B": true
+  },
+  "decision": "BLOCKED_COST_NO_PURCHASE",
+  "reason": "Every request satisfying the WORM D1 horizon and ES/MES scope exceeds the USD 60 D1 cap; server-side pricing does not provide an RTH-only time-of-day filter.",
+  "information_value": "Trade prints would enable aggressor-side delta, CVD, volume/event bars and print-level sweep hypotheses, but paying above the immutable cap is prohibited.",
+  "next_action": "Continue hypothesis-first Track B on existing OHLCV 1m; retain D1 as a quantified future data-scope decision without silently shrinking its preregistered horizon.",
+  "api_key_recorded": false,
+  "outbound_order_count": 0,
+  "CONTRE": "A narrower event-window purchase could fit USD 60, but it would not satisfy the preregistered D1 claim of two to three years and could induce event-selection bias; it therefore requires a separately versioned WORM data hypothesis rather than an ad hoc substitution."
+}
