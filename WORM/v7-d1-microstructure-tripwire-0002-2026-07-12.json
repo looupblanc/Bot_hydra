@@ -1,0 +1,46 @@
+{
+  "schema": "hydra_v7_d1_new_grammar_tripwire_policy_v1",
+  "tripwire_id": "hydra_v7_d1_new_grammar_tripwire_0002",
+  "preregistered_at_utc": "2026-07-12T18:53:00Z",
+  "grammar_path": "WORM/v7-d1-microstructure-grammar-0002-2026-07-12.json",
+  "grammar_sha256": "fac0b5166351940d1fde5334bdeaf846d56e56efc8cef9772a9599b8b86feee9",
+  "feature_manifest_sha256": "5c700f1ec38ab03a1206af7013a28600a681a0b3334781979b37ec356b5421ab",
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "method": "Permute complete normalized intraday price paths across recipient sessions while leaving recipient flow features, product clocks and explicit contracts fixed.",
+      "seeds": {"2023_ES": 810301, "2023_MES": 810302, "2024_ES": 810401, "2024_MES": 810402}
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "method": "Generate zero-drift session price paths with each recipient session's realized one-minute volatility; retain observed flow, volume and timestamps before full signal recomputation.",
+      "seeds": {"2023_ES": 820301, "2023_MES": 820302, "2024_ES": 820401, "2024_MES": 820402}
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "method": "Swap normalized ordinal-matched August price paths between 2023 and 2024 while retaining recipient flow and timestamps.",
+      "seed": 830001
+    }
+  },
+  "pipeline": {
+    "candidate_structures": 8,
+    "diagnostic_quantities": [1, 2, 4, 8],
+    "episode_start": "every eligible session",
+    "episode_horizon_sessions": 20,
+    "mll_mode": "eod_level_rt_breach",
+    "full_feature_and_signal_recomputation": true,
+    "null_episode_count_must_be_at_least_real": true,
+    "combine_pass_rate_is_diagnostic_not_fitness": true
+  },
+  "verdict": {
+    "threshold": 0.8,
+    "formula": "NULL_RATIO = pooled null pass rate / real pass rate",
+    "if_real_pass_count_zero": "BLOCKED_UNDERPOWERED",
+    "if_NULL_RATIO_gte_0_8": "ARTEFACT_GEOMETRY_ONLY",
+    "if_NULL_RATIO_lt_0_8": "GREEN_NULL_ADJUSTED_BASELINE"
+  },
+  "safety": {
+    "candidate_validation_allowed_only_after_GREEN": true,
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "outbound_orders_allowed": false
+  },
+  "CONTRE": "A pass-rate tripwire can detect account geometry but cannot prove economic edge; all candidate promotion remains expectancy-and-DSR based."
+}

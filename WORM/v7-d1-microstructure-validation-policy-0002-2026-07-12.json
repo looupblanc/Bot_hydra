@@ -1,0 +1,49 @@
+{
+  "schema": "hydra_v7_d1_microstructure_validation_policy_v2",
+  "policy_id": "hydra_v7_d1_microstructure_validation_0002",
+  "preregistered_at_utc": "2026-07-12T18:53:00Z",
+  "grammar_path": "WORM/v7-d1-microstructure-grammar-0002-2026-07-12.json",
+  "grammar_sha256": "fac0b5166351940d1fde5334bdeaf846d56e56efc8cef9772a9599b8b86feee9",
+  "tripwire_path": "WORM/v7-d1-microstructure-tripwire-0002-2026-07-12.json",
+  "tripwire_sha256": "a2e5c568345b0250255c59f6829da20cab9b280a65b1cbfcfa727343f0d023b7",
+  "N_trials": 247892,
+  "multiplicity_delta": {
+    "candidate_evaluations": 80,
+    "tripwire_account_probes": 128,
+    "total": 208
+  },
+  "FDR": 0.10,
+  "minimum_events": 30,
+  "walk_forward": {
+    "folds": 4,
+    "purge": "candidate holding horizon",
+    "embargo_trading_days": 5,
+    "pooled_stress_1_5x_expectancy_gt": 0.0
+  },
+  "candidate_nulls": {
+    "SIGN_INVERSION": "Same opportunities and path with side flipped.",
+    "FIVE_SESSION_SIGNAL_DELAY": "Same frozen sides and local clocks five later sessions with invalid contract windows skipped.",
+    "FLOW_PRICE_DECOUPLING": "Shift all aggressor-flow inputs by one complete prior session relative to recipient prices, then recompute the frozen signals."
+  },
+  "gates": {
+    "new_grammar_tripwire_GREEN": true,
+    "minimum_events": 30,
+    "base_expectancy_gt": 0.0,
+    "stress_1_5x_expectancy_gt": 0.0,
+    "stress_2x_expectancy_gt": 0.0,
+    "candidate_actual_1_5x_expectancy_gt_every_null": true,
+    "walk_forward_pooled_expectancy_gt": 0.0,
+    "DSR_deflated_z_gt": 0.0,
+    "BH_rejected": true,
+    "ruleset_compliance": true
+  },
+  "SIM_EXPLOIT_definition": "base expectancy strictly positive and stress-2x expectancy non-positive",
+  "candidate_Combine_pass_rate_used_as_fitness": false,
+  "candidate_Combine_pass_rate_used_as_gate": false,
+  "safety": {
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "outbound_orders_allowed": false
+  },
+  "CONTRE": "N_trials=247892 makes the short two-block DSR gate intentionally difficult; a null is a valid verdict and does not authorize threshold relaxation."
+}

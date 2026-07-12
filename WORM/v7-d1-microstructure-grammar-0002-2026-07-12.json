@@ -1,0 +1,94 @@
+{
+  "schema": "hydra_v7_d1_microstructure_grammar_v2",
+  "grammar_id": "hydra_v7_d1_microstructure_grammar_0002",
+  "preregistered_at_utc": "2026-07-12T18:53:00Z",
+  "contract_sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+  "source_snapshot": "mission/state/snapshots/v7_pre_d1_grammar0002_20260712T185152Z.tar.gz",
+  "source_snapshot_sha256": "067908955bbe85bc14b53d4bc53684cb025541bf0556d78e40e52f34e112a835",
+  "feature_manifest": {
+    "path": "data/manifests/v7_d1_date_matched_event_store_v1.json",
+    "sha256": "5c700f1ec38ab03a1206af7013a28600a681a0b3334781979b37ec356b5421ab",
+    "minute_output_sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb",
+    "years": [2023, 2024],
+    "data_role": "DEVELOPMENT_ONLY"
+  },
+  "candidate_structures": [
+    {
+      "candidate_id_pattern": "v7d1g2_delta_extreme_rejection_{product}",
+      "products": ["ES", "MES"],
+      "hypothesis_id": "D1H5_DELTA_EXTREME_REJECTION",
+      "mechanism_class": "print_delta_rejection_at_past_extreme",
+      "economic_hypothesis": "Aggressive traders who force a new past-only 60-minute extreme but cannot hold a five-minute close beyond it are trapped against replenishing passive liquidity and pay the first reversal leg.",
+      "who_pays": "Late aggressive breakout entrants whose flow fails to secure price acceptance.",
+      "source_bar_type": "FIVE_MINUTE_PRINT_AGGREGATE",
+      "signal": "At a completed five-minute boundary, price traded beyond the prior completed 60-minute high or low, five-minute absolute signed aggressor fraction is at or above its past-only 20-block q75, and the close returned inside the prior extreme.",
+      "warmup_completed_blocks": 20,
+      "entry": "next one-minute open after feature availability",
+      "exit": "fifteenth later one-minute open",
+      "side": "opposite failed extreme direction"
+    },
+    {
+      "candidate_id_pattern": "v7d1g2_cross_contract_participation_divergence_{product}",
+      "products": ["ES", "MES"],
+      "hypothesis_id": "D1H6_MINI_MICRO_PARTICIPATION_DIVERGENCE",
+      "mechanism_class": "mini_micro_aggressor_participation_divergence",
+      "economic_hypothesis": "An extreme five-minute aggressor imbalance isolated in the micro or mini contract without confirmation by its fungible sibling reflects participant segmentation rather than broad information and mean-reverts.",
+      "who_pays": "Contract-specific urgent traders whose imbalance is not confirmed in the fungible sibling market.",
+      "source_bar_type": "SYNCHRONIZED_FIVE_MINUTE_PRINT_AGGREGATE",
+      "signal": "At a completed synchronized five-minute boundary, one contract's absolute signed fraction is at or above its past-only 20-block q90 while the sibling signed fraction has the opposite sign or absolute magnitude below its past-only median.",
+      "warmup_completed_blocks": 20,
+      "entry": "next one-minute open in the candidate product",
+      "exit": "fifteenth later one-minute open",
+      "side": "opposite isolated aggressor imbalance"
+    },
+    {
+      "candidate_id_pattern": "v7d1g2_aggressor_regime_flip_{product}",
+      "products": ["ES", "MES"],
+      "hypothesis_id": "D1H7_AGGRESSOR_REGIME_FLIP",
+      "mechanism_class": "completed_flow_regime_transition",
+      "economic_hypothesis": "After three completed same-side five-minute flow blocks, an extreme opposite flow block marks an inventory-control transition whose urgent execution persists for the next short horizon.",
+      "who_pays": "Participants anchored to the exhausted prior flow regime and liquidity providers repricing the inventory transition.",
+      "source_bar_type": "FIVE_MINUTE_PRINT_AGGREGATE",
+      "signal": "The prior three completed five-minute signed-flow blocks share a sign; the current completed block flips sign and its absolute signed fraction exceeds the past-only 20-block q75.",
+      "warmup_completed_blocks": 20,
+      "entry": "next one-minute open after feature availability",
+      "exit": "fifteenth later one-minute open",
+      "side": "new aggressor regime"
+    },
+    {
+      "candidate_id_pattern": "v7d1g2_vwap_acceptance_{product}",
+      "products": ["ES", "MES"],
+      "hypothesis_id": "D1H8_VWAP_ACCEPTANCE_WITH_FLOW",
+      "mechanism_class": "session_value_migration_with_aggressor_confirmation",
+      "economic_hypothesis": "Two completed five-minute closes beyond the prior completed 30-minute volume-weighted value with confirming aggressor flow reveal benchmark and hedge demand that persists as session value migrates.",
+      "who_pays": "Inventory holders fading a value migration before benchmark and hedge demand completes.",
+      "source_bar_type": "FIVE_MINUTE_PRINT_AGGREGATE",
+      "signal": "Two consecutive completed five-minute closes lie on the same side of the prior completed 30-minute rolling VWAP and both five-minute signed-flow aggregates confirm that side.",
+      "warmup_completed_blocks": 6,
+      "entry": "next one-minute open after the second confirming block",
+      "exit": "thirtieth later one-minute open",
+      "side": "accepted value-migration direction"
+    }
+  ],
+  "candidate_count": 8,
+  "execution": {
+    "fixed_quantity": 1,
+    "non_overlapping_trades_per_candidate": true,
+    "explicit_contract_only": true,
+    "same_contract_entry_exit": true,
+    "closed_minute_and_closed_five_minute_features_only": true,
+    "cost_model_path": "config/v7/phase0_g0_preregistration.json",
+    "cost_model_sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "holding_horizons_minutes": [15, 30],
+    "same_bar_fill_allowed": false
+  },
+  "safety": {
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "outbound_orders_allowed": false,
+    "combine_pass_rate_as_fitness": false,
+    "combine_pass_rate_as_gate": false,
+    "parameter_feedback_from_grammar0001": false
+  },
+  "CONTRE": "The two date-matched August blocks cannot establish year-round microstructure stability, and mini/micro divergence can be a cost or sizing artifact despite explicit normalization."
+}
