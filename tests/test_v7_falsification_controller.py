@@ -16,6 +16,7 @@ from hydra.mission.v7_falsification_controller import (
     V7ControllerConfig,
     V7ControllerIntegrityError,
     V7FalsificationController,
+    _classify_v71_power_aware_action,
     classify_v7_action,
 )
 from scripts.run_v7_falsification_mission import main
@@ -181,6 +182,23 @@ def test_v71_controller_recognizes_frozen_g2_confirmation_queue(
 
     assert result["action_type"] == "V71_CONFIRMATION_QUEUE_FROZEN_DISCOVERY_CONTINUES"
     assert result["confirmation_candidate_count"] == 3
+    assert result["new_data_purchase_authorized"] is False
+    assert result["shadow_admission_authorized"] is False
+
+
+def test_v71_power_aware_integrated_action_pauses_broad_D1_generation() -> None:
+    result = _classify_v71_power_aware_action(
+        Path.cwd(), prior_positive=11, g2_positive=3
+    )
+
+    assert (
+        result["action_type"]
+        == "V71_INDEPENDENT_CONFIRMATION_REQUIRED_LIMITED_DISCOVERY_ONLY"
+    )
+    assert result["walk_forward_positive_count"] == 16
+    assert result["powered_candidate_count"] == 0
+    assert result["rolling_episode_start_count"] == 5
+    assert result["broad_D1_generation_authorized"] is False
     assert result["new_data_purchase_authorized"] is False
     assert result["shadow_admission_authorized"] is False
 

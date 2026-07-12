@@ -33,7 +33,7 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v3"
+CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v4"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-falsification-single-writer"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
@@ -74,6 +74,28 @@ V71_G2_TRIPWIRE_RELATIVE_PATH = Path(
 V71_CONFIRMATION_QUEUE_RELATIVE_PATH = Path(
     "WORM/v7.1-independent-confirmation-queue-0001-2026-07-12.json"
 )
+V71_G3_GRAMMAR_RELATIVE_PATH = Path(
+    "WORM/v7.1-event-time-grammar-0003-2026-07-12.json"
+)
+V71_G3_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0003/v71_event_time_signal_manifest.json"
+)
+V71_G3_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0003/v71_event_time_funnel_result.json"
+)
+V71_G3_TRIPWIRE_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0003/v71_event_time_tripwire_result.json"
+)
+V71_POWER_AWARE_CALIBRATION_RELATIVE_PATH = Path(
+    "reports/v7_1/power_aware_0001/"
+    "v71_candidate_specific_power_calibration_result.json"
+)
+V71_POWER_AWARE_AUDIT_RELATIVE_PATH = Path(
+    "reports/v7_1/power_aware_0001/v71_power_aware_candidate_audit_result.json"
+)
+V71_ROLLING_DIAGNOSTIC_RELATIVE_PATH = Path(
+    "reports/v7_1/power_aware_0001/v71_event_time_rolling_diagnostic_result.json"
+)
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
     str(V71_POLICY_RELATIVE_PATH): "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
@@ -82,6 +104,12 @@ V71_FROZEN_HASHES = {
     str(V71_G2_GRAMMAR_RELATIVE_PATH): "ef44e6e72c42b2ed4b7228f3addbd2f182e3e51bcfb619aa4c0a2102db6d3566",
     "WORM/v7.1-opportunity-density-tripwire-0002-2026-07-12.json": "8e1b7e511f99e1f108a113bb80a69d4985d498ed9d78d2d049e9468a6afdcacf",
     str(V71_CONFIRMATION_QUEUE_RELATIVE_PATH): "23c2925253887a9b86699aac9fa71072fc28848087cb38cc9624bb78751ee0b1",
+    "MISSION_CONTRACT_AMENDMENT_002_POWER_AWARE.md": "f41caaa9b4a1ad17c7436f4594ed669c3784321d4afac805dee0b87f79a02caf",
+    str(V71_G3_GRAMMAR_RELATIVE_PATH): "df9ffd7c6c87707838f53c30e474d7477bf17532ba29bffc1baa2b2a5bd0903f",
+    "WORM/v7.1-event-time-tripwire-0003-2026-07-12.json": "6119d44841456f5a13798cdb4e310de9de6bed388f032b6b3dab2fc00a94229b",
+    "WORM/v7.1-power-aware-candidate-freeze-0001-2026-07-12.json": "b66e462989213356106f0cbcd88d31ba4547a61f9900eb1de3e6010cb3d35d83",
+    "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673",
+    "WORM/v7.1-event-time-executable-diagnostic-0001-2026-07-12.json": "058278f8111dc35d6f19ef484ed4b0674f5bb323dbb2a941ebd9d7971080c944",
 }
 
 
@@ -313,6 +341,12 @@ def _classify_v71_g2_action(root: Path, prior_positive: int) -> dict[str, Any]:
     candidates = list(queue.get("candidates") or [])
     if len(candidates) != 3 or queue.get("queue_status") != "QUEUED_NO_DATA_PURCHASE_AUTHORIZED_IN_V7_1":
         raise V7ControllerIntegrityError("V7.1 independent confirmation queue drift")
+    if (root / V71_G3_GRAMMAR_RELATIVE_PATH).is_file():
+        return _classify_v71_power_aware_action(
+            root,
+            prior_positive=prior_positive,
+            g2_positive=int(funnel.get("walk_forward_positive_count") or 0),
+        )
     return {
         "action_type": "V71_CONFIRMATION_QUEUE_FROZEN_DISCOVERY_CONTINUES",
         "phase": "4",
@@ -335,6 +369,143 @@ def _classify_v71_g2_action(root: Path, prior_positive: int) -> dict[str, Any]:
             "Three G2 mechanisms remain underpowered and are frozen for future "
             "independent confirmation; controlled discovery must move to a "
             "distinct event-time class without buying data."
+        ),
+    }
+
+
+def _classify_v71_power_aware_action(
+    root: Path,
+    *,
+    prior_positive: int,
+    g2_positive: int,
+) -> dict[str, Any]:
+    required = (
+        (V71_G3_SIGNAL_RELATIVE_PATH, "V71_G3_SIGNAL_MANIFEST_REQUIRED"),
+        (V71_G3_FUNNEL_RELATIVE_PATH, "V71_G3_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V71_G3_TRIPWIRE_RELATIVE_PATH, "V71_G3_TRIPWIRE_REQUIRED"),
+        (
+            Path("MISSION_CONTRACT_AMENDMENT_002_POWER_AWARE.md"),
+            "V71_POWER_AWARE_AMENDMENT_REQUIRED",
+        ),
+        (
+            Path("WORM/v7.1-power-aware-candidate-freeze-0001-2026-07-12.json"),
+            "V71_POWER_AWARE_CANDIDATE_FREEZE_REQUIRED",
+        ),
+        (
+            Path("WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json"),
+            "V71_CANDIDATE_SPECIFIC_POWER_POLICY_REQUIRED",
+        ),
+        (
+            V71_POWER_AWARE_CALIBRATION_RELATIVE_PATH,
+            "V71_CANDIDATE_SPECIFIC_POWER_CALIBRATION_REQUIRED",
+        ),
+        (V71_POWER_AWARE_AUDIT_RELATIVE_PATH, "V71_POWER_AWARE_AUDIT_REQUIRED"),
+        (
+            Path("WORM/v7.1-event-time-executable-diagnostic-0001-2026-07-12.json"),
+            "V71_EVENT_TIME_EXECUTABLE_FREEZE_REQUIRED",
+        ),
+        (
+            V71_ROLLING_DIAGNOSTIC_RELATIVE_PATH,
+            "V71_EVENT_TIME_ROLLING_DIAGNOSTIC_REQUIRED",
+        ),
+    )
+    for path, action in required:
+        if not (root / path).is_file():
+            return {
+                "action_type": action,
+                "phase": "4",
+                "progressed": False,
+                "required_path": str(path),
+                "broad_D1_generation_authorized": False,
+                "new_data_purchase_authorized": False,
+                "reason": (
+                    "The principal-authorized power-aware conversion sequence "
+                    "must complete before any further broad D1 grammar."
+                ),
+            }
+    hashes = {
+        V71_G3_SIGNAL_RELATIVE_PATH: "e515a0ab84600edfd8552c46b3471f77d0ba17ad3b761cf7757d5fdaa89c736d",
+        V71_G3_FUNNEL_RELATIVE_PATH: "22f9816aeb2bae8734571dcd84485f0ccbfdb21b4735cbe0ed11356dcbc0358b",
+        V71_G3_TRIPWIRE_RELATIVE_PATH: "ae22d7a48eef4ef1804fb81c26453dafc1efdcd138c09c04fd48766cbe1a5b44",
+        V71_POWER_AWARE_CALIBRATION_RELATIVE_PATH: "edd3bcdb2ec56bcef2830be7783d74df02041a57b4234b76c1c1803e40b647f5",
+        V71_POWER_AWARE_AUDIT_RELATIVE_PATH: "f0eb23117b5703b3d50823365cff7cf9d37c7faeb6ce5628ca7e6c19f04c930b",
+        V71_ROLLING_DIAGNOSTIC_RELATIVE_PATH: "0c4203c04e2d0cb598bd6ae485cd884a732287f8d74c4237645ced02f5202bbd",
+    }
+    drift = [
+        str(path)
+        for path, expected in hashes.items()
+        if _sha256(root / path) != expected
+    ]
+    if drift:
+        raise V7ControllerIntegrityError(
+            "V7.1 power-aware evidence drift: " + ",".join(drift)
+        )
+    signal = _load_json(root / V71_G3_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V71_G3_FUNNEL_RELATIVE_PATH)
+    tripwire = _load_json(root / V71_G3_TRIPWIRE_RELATIVE_PATH)
+    calibration = _load_json(root / V71_POWER_AWARE_CALIBRATION_RELATIVE_PATH)
+    audit = _load_json(root / V71_POWER_AWARE_AUDIT_RELATIVE_PATH)
+    rolling = _load_json(root / V71_ROLLING_DIAGNOSTIC_RELATIVE_PATH)
+    if int(signal.get("candidate_count") or 0) != 128:
+        raise V7ControllerIntegrityError("V7.1 G3 candidate count drift")
+    if int(funnel.get("walk_forward_positive_count") or 0) != 2:
+        raise V7ControllerIntegrityError("V7.1 G3 walk-forward count drift")
+    if tripwire.get("verdict") != "ARTEFACT_GEOMETRY_ONLY":
+        raise V7ControllerIntegrityError("V7.1 G3 tripwire verdict drift")
+    if calibration.get("verdict") != "GREEN":
+        raise V7ControllerIntegrityError("V7.1 power-aware calibration is not GREEN")
+    status_counts = dict(audit.get("status_counts") or {})
+    if sum(int(value) for value in status_counts.values()) != 16:
+        raise V7ControllerIntegrityError("V7.1 power-aware candidate count drift")
+    powered = list(audit.get("powered_candidate_ids") or [])
+    if rolling.get("episode_power_status") != "INSUFFICIENT_EPISODE_STARTS":
+        raise V7ControllerIntegrityError("V7.1 rolling episode power status drift")
+    if rolling.get("scientific_status") != "BOUNDED_DIAGNOSTIC_ONLY_NO_PROMOTION":
+        raise V7ControllerIntegrityError("V7.1 rolling scientific status drift")
+    if powered:
+        return {
+            "action_type": "V71_POWERED_CANDIDATE_NULLS_DSR_BH_REQUIRED",
+            "phase": "4",
+            "progressed": True,
+            "powered_candidate_ids": [str(value) for value in powered],
+            "broad_D1_generation_authorized": False,
+            "new_data_purchase_authorized": False,
+            "shadow_admission_authorized": False,
+            "reason": (
+                "Powered walk-forward candidates require relevant nulls and "
+                "campaign-level DSR/BH before any shadow decision."
+            ),
+        }
+    return {
+        "action_type": "V71_INDEPENDENT_CONFIRMATION_REQUIRED_LIMITED_DISCOVERY_ONLY",
+        "phase": "4",
+        "progressed": True,
+        "walk_forward_positive_count": prior_positive + g2_positive + 2,
+        "power_status_counts": status_counts,
+        "powered_candidate_count": 0,
+        "principal_named_diagnostic_count": len(
+            audit.get("principal_named_bounded_diagnostic_ids") or []
+        ),
+        "rolling_episode_start_count": int(rolling["episode_start_count"]),
+        "rolling_episode_power_status": rolling["episode_power_status"],
+        "g3_tripwire_verdict": tripwire["verdict"],
+        "g3_NULL_RATIO": float(tripwire["NULL_RATIO"]),
+        "broad_D1_generation_authorized": False,
+        "limited_structural_discovery_authorized": True,
+        "conversion_priority": 0.95,
+        "limited_discovery_allocation": 0.05,
+        "new_data_purchase_authorized": False,
+        "shadow_admission_authorized": False,
+        "next_experiment_id": "hydra_v7_1_independent_confirmation_planning_0001",
+        "next_experiment_state": "FRESH_EVIDENCE_REQUIRED_NO_PURCHASE_IN_CURRENT_PHASE",
+        "principal_blocker": (
+            "No candidate satisfies the preregistered candidate-specific power "
+            "policy; only five 20-day starts exist and G3 pass rates are geometry-contaminated."
+        ),
+        "reason": (
+            "The sixteen frozen candidates are resolved under the calibrated "
+            "policy. Independent fresh evidence is required; broad D1 generation "
+            "remains paused and only limited distinct discovery may continue."
         ),
     }
 
