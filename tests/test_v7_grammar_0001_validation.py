@@ -10,10 +10,12 @@ from hydra.research.v7_hypothesis_grammar import (
     V7Signal,
 )
 from hydra.validation.v7_grammar_0001_validation import (
+    _synthetic_market_bars,
     horizon_cost_bucket,
     null_ratio_verdict,
     signal_to_event,
 )
+from hydra.validation.v7_null_tripwire import NullControl, SyntheticMarketPath
 
 
 def test_horizon_cost_bucket_is_frozen_and_monotone() -> None:
@@ -102,6 +104,28 @@ def test_null_tripwire_verdict_is_preregistered() -> None:
     verdict, ratio = null_ratio_verdict(0.10, 0.02)
     assert verdict == "GREEN_NULL_ADJUSTED_BASELINE"
     assert ratio == pytest.approx(0.2)
+
+
+def test_synthetic_return_path_is_rebased_to_positive_tradeable_prices() -> None:
+    real = _bars()
+    path = SyntheticMarketPath(
+        market="ES",
+        control=NullControl.VOLATILITY_MATCHED_RANDOM_WALK,
+        timestamp_ns=real.timestamp_ns,
+        session_day=real.session_day,
+        segment_code=real.segment_code,
+        close=np.asarray([0.0, -1.0, 1.0, 2.0, -0.5]),
+        high=np.asarray([0.5, -0.5, 1.5, 2.5, 0.0]),
+        low=np.asarray([-0.5, -1.5, 0.5, 1.5, -1.0]),
+        path_hash="d" * 64,
+    )
+
+    synthetic = _synthetic_market_bars(real, path)
+
+    assert np.all(synthetic.open > 0.0)
+    assert np.all(synthetic.close > 0.0)
+    assert np.all(synthetic.high >= np.maximum(synthetic.open, synthetic.close))
+    assert np.all(synthetic.low <= np.minimum(synthetic.open, synthetic.close))
 
 
 def _spec() -> V7CandidateSpec:

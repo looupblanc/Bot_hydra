@@ -591,14 +591,51 @@ def _load_feature_matrices(root: Path) -> dict[str, FeatureMatrix]:
 def _synthetic_market_bars(
     real: V7MarketBars, path: SyntheticMarketPath
 ) -> V7MarketBars:
-    close = np.asarray(path.close, dtype=np.float64)
-    open_ = close.copy()
-    contiguous = (
-        (real.segment_code[1:] == real.segment_code[:-1])
-        & (real.contract_code[1:] == real.contract_code[:-1])
-        & (real.timestamp_ns[1:] - real.timestamp_ns[:-1] == MINUTE_NS)
+    raw_close = np.asarray(path.close, dtype=np.float64)
+    raw_high = np.asarray(path.high, dtype=np.float64)
+    raw_low = np.asarray(path.low, dtype=np.float64)
+    close = np.empty_like(raw_close)
+    high = np.empty_like(raw_high)
+    low = np.empty_like(raw_low)
+    open_ = np.empty_like(raw_close)
+    tick = instrument_spec(real.market).tick_size
+    days, starts, counts = np.unique(
+        real.session_day, return_index=True, return_counts=True
     )
-    open_[1:] = np.where(contiguous, close[:-1], close[1:])
+    for _day, raw_start, raw_count in zip(days, starts, counts, strict=True):
+        start = int(raw_start)
+        end = int(raw_start + raw_count)
+        positions = slice(start, end)
+        # Phase-1 paths are return-like and may be centred around zero.  V7
+        # hypotheses use ratios, so anchor every trading session to its real
+        # pre-null opening level without changing any within-session increment.
+        offset = float(real.open[start] - raw_close[start])
+        minimum = float(np.min(raw_low[positions] + offset))
+        if minimum <= tick:
+            offset += (2.0 * tick) - minimum
+        close[positions] = raw_close[positions] + offset
+        high[positions] = raw_high[positions] + offset
+        low[positions] = raw_low[positions] + offset
+        open_[start] = float(real.open[start])
+        for index in range(start + 1, end):
+            contiguous = bool(
+                real.segment_code[index] == real.segment_code[index - 1]
+                and real.contract_code[index] == real.contract_code[index - 1]
+                and real.timestamp_ns[index] - real.timestamp_ns[index - 1]
+                == MINUTE_NS
+            )
+            open_[index] = close[index - 1] if contiguous else close[index]
+    high = np.maximum(high, np.maximum(open_, close))
+    low = np.minimum(low, np.minimum(open_, close))
+    if not (
+        np.all(np.isfinite(open_))
+        and np.all(np.isfinite(high))
+        and np.all(np.isfinite(low))
+        and np.all(np.isfinite(close))
+        and np.all(open_ > 0.0)
+        and np.all(close > 0.0)
+    ):
+        raise GrammarValidationError("synthetic price rebasing failed")
     return V7MarketBars(
         market=real.market,
         timestamp_ns=real.timestamp_ns,
@@ -608,8 +645,8 @@ def _synthetic_market_bars(
         contract_code=real.contract_code,
         segment_code=real.segment_code,
         open=open_,
-        high=np.maximum(np.asarray(path.high, dtype=np.float64), np.maximum(open_, close)),
-        low=np.minimum(np.asarray(path.low, dtype=np.float64), np.minimum(open_, close)),
+        high=high,
+        low=low,
         close=close,
         local_minute=real.local_minute,
         local_weekday=real.local_weekday,
