@@ -3,15 +3,19 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from hydra.features.feature_matrix import FeatureMatrix
 from hydra.research.qd_economic_tournament import FEATURES, MARKET_PAIRS
 from hydra.research.turbo_feature_builder import CONTEXT_MINUTES, HORIZONS
 from hydra.research.turbo_foundry_v2 import (
+    TurboFoundryError,
     _population_coverage,
+    _quality_diversity_cap,
     _stage1_event_matrix,
     generate_turbo_population,
 )
+from hydra.strategies.turbo_dsl import ComparisonOperator, StrategySpec
 
 
 def _matrix(market: str, rows: int = 2_000) -> FeatureMatrix:
@@ -89,3 +93,147 @@ def test_missing_metal_ecology_redistributes_quota_before_stage1():
         "energy": 200,
         "equity_indices": 200,
     }
+
+
+def test_sparse_ecology_family_intersection_uses_feasible_strict_allocation():
+    specs: list[StrategySpec] = []
+    inventory = {
+        "ES": {family: 40 for family in ("a", "b", "c", "d", "e")},
+        "CL": {"a": 40, "b": 40, "c": 5, "d": 5, "e": 5},
+    }
+    # This ordering reproduces the old failure: the one-pass selector spent the
+    # global a/b family caps in equities before it could fill the energy quota.
+    ordered_cells = [
+        ("ES", "a"),
+        ("ES", "b"),
+        ("CL", "a"),
+        ("CL", "b"),
+        ("CL", "c"),
+        ("CL", "d"),
+        ("CL", "e"),
+        ("ES", "c"),
+        ("ES", "d"),
+        ("ES", "e"),
+    ]
+    for market, family in ordered_cells:
+        for index in range(inventory[market][family]):
+            specs.append(
+                StrategySpec(
+                    candidate_id=f"{market}_{family}_{index}",
+                    lineage_id=f"lineage_{market}_{family}_{index}",
+                    family=family,
+                    market=market,
+                    timeframe="1m",
+                    feature="past_return_60",
+                    operator=ComparisonOperator.GREATER_EQUAL,
+                    threshold=float(index),
+                    side=1,
+                    holding_events=5,
+                    point_value=1.0,
+                    round_turn_cost=1.0,
+                )
+            )
+
+    first = _quality_diversity_cap(specs, count=100)
+    second = _quality_diversity_cap(specs, count=100)
+    coverage = _population_coverage(first)
+
+    assert [spec.candidate_id for spec in first] == [
+        spec.candidate_id for spec in second
+    ]
+    assert len(first) == 100
+    assert coverage["market_ecologies"] == {
+        "energy": 50,
+        "equity_indices": 50,
+    }
+    assert coverage["maximum_family_share"] <= 0.25
+    assert coverage["maximum_lineage_share"] <= 0.02
+
+
+def test_infeasible_ecology_quota_relaxes_without_relaxing_family_or_lineage():
+    specs: list[StrategySpec] = []
+    for market, per_family in (("CL", 6), ("ES", 40)):
+        for family in ("a", "b", "c", "d", "e"):
+            for index in range(per_family):
+                specs.append(
+                    StrategySpec(
+                        candidate_id=f"relaxed_{market}_{family}_{index}",
+                        lineage_id=f"relaxed_lineage_{market}_{family}_{index}",
+                        family=family,
+                        market=market,
+                        timeframe="1m",
+                        feature="past_return_60",
+                        operator=ComparisonOperator.GREATER_EQUAL,
+                        threshold=float(index),
+                        side=1,
+                        holding_events=5,
+                        point_value=1.0,
+                        round_turn_cost=1.0,
+                    )
+                )
+
+    selected = _quality_diversity_cap(specs, count=100)
+    coverage = _population_coverage(selected)
+
+    assert len(selected) == 100
+    assert coverage["market_ecologies"] == {
+        "energy": 30,
+        "equity_indices": 70,
+    }
+    assert coverage["ecology_cap_relaxed_for_feasibility"]
+    assert coverage["maximum_family_share"] <= 0.25
+    assert coverage["maximum_lineage_share"] <= 0.02
+
+
+def test_family_capacity_is_not_silently_relaxed():
+    specs = [
+        StrategySpec(
+            candidate_id=f"insufficient_{index}",
+            lineage_id=f"insufficient_lineage_{index}",
+            family=("a", "b", "c")[index % 3],
+            market="ES",
+            timeframe="1m",
+            feature="past_return_60",
+            operator=ComparisonOperator.GREATER_EQUAL,
+            threshold=float(index),
+            side=1,
+            holding_events=5,
+            point_value=1.0,
+            round_turn_cost=1.0,
+        )
+        for index in range(120)
+    ]
+
+    with pytest.raises(TurboFoundryError, match="family/lineage caps permit only 75"):
+        _quality_diversity_cap(specs, count=100)
+
+
+def test_lineage_cannot_span_multiple_ecology_family_cells():
+    shared = {
+        "lineage_id": "shared_lineage",
+        "timeframe": "1m",
+        "feature": "past_return_60",
+        "operator": ComparisonOperator.GREATER_EQUAL,
+        "threshold": 0.0,
+        "side": 1,
+        "holding_events": 5,
+        "point_value": 1.0,
+        "round_turn_cost": 1.0,
+    }
+    specs = [
+        StrategySpec(
+            candidate_id="candidate_equity",
+            family="family_a",
+            market="ES",
+            **shared,
+        ),
+        StrategySpec(
+            candidate_id="candidate_energy",
+            family="family_b",
+            market="CL",
+            **shared,
+        ),
+    ]
+
+    with pytest.raises(TurboFoundryError, match="Lineage spans multiple"):
+        _quality_diversity_cap(specs, count=2)

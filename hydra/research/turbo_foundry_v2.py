@@ -175,7 +175,9 @@ def run_turbo_foundry_v2_epoch(
         "maximum_ecology_share": 0.40,
         "ecology_cap_feasibility_policy": (
             "40_percent_with_three_valid_ecologies; redistribute unavailable "
-            "ecology quota equally across ecologies with calibration support"
+            "ecology quota across ecologies with calibration support, then use "
+            "the minimum deterministic ecology-cap relaxation required by the "
+            "pre-Stage-1 structural inventory"
         ),
         "maximum_lineage_share": 0.02,
         "stage1_hard_gates": [
@@ -594,6 +596,10 @@ def generate_turbo_population(
 def _quality_diversity_cap(
     specs: Sequence[StrategySpec], *, count: int
 ) -> list[StrategySpec]:
+    if len(specs) < count:
+        raise TurboFoundryError(
+            f"Only {len(specs)} unique structures are available for {count} requested."
+        )
     available_ecologies = sorted({_ecology(spec.market) for spec in specs})
     if not available_ecologies:
         raise TurboFoundryError("No ecology has sufficient calibration observations.")
@@ -615,27 +621,163 @@ def _quality_diversity_cap(
         }
     family_cap = max(1, math.floor(count * 0.25))
     lineage_cap = max(1, math.floor(count * 0.02))
-    selected: list[StrategySpec] = []
-    ecologies: Counter[str] = Counter()
-    families: Counter[str] = Counter()
+    allocation, strict_total = _strict_cell_allocation(
+        specs,
+        ecology_caps=ecology_caps,
+        family_cap=family_cap,
+        lineage_cap=lineage_cap,
+        target=count,
+    )
+    ecology_relaxed = len(available_ecologies) < 3 or strict_total < count
+    if strict_total < count:
+        # Find the smallest common ecology ceiling that restores feasibility.
+        # This is a metadata-only preflight: no Stage-1 outcome participates.
+        lower = max(ecology_caps.values())
+        upper = count
+        while lower < upper:
+            candidate_cap = (lower + upper) // 2
+            _candidate_allocation, candidate_total = _strict_cell_allocation(
+                specs,
+                ecology_caps={
+                    ecology: candidate_cap for ecology in available_ecologies
+                },
+                family_cap=family_cap,
+                lineage_cap=lineage_cap,
+                target=count,
+            )
+            if candidate_total >= count:
+                upper = candidate_cap
+            else:
+                lower = candidate_cap + 1
+        allocation, feasible_total = _strict_cell_allocation(
+            specs,
+            ecology_caps={ecology: lower for ecology in available_ecologies},
+            family_cap=family_cap,
+            lineage_cap=lineage_cap,
+            target=count,
+        )
+        if feasible_total < count:
+            raise TurboFoundryError(
+                "INSUFFICIENT_STRUCTURAL_DIVERSITY: family/lineage caps permit only "
+                f"{feasible_total} of {count} requested structures after ecology relaxation."
+            )
+    selected_indices: set[int] = set()
     lineages: Counter[str] = Counter()
-    for spec in specs:
-        ecology = _ecology(spec.market)
-        if ecologies[ecology] >= ecology_caps[ecology]:
-            continue
-        if families[spec.family] >= family_cap:
+    cell_counts: Counter[tuple[str, str]] = Counter()
+    for index, spec in enumerate(specs):
+        cell = (_ecology(spec.market), spec.family)
+        if cell_counts[cell] >= allocation.get(cell, 0):
             continue
         if lineages[spec.lineage_id] >= lineage_cap:
             continue
-        selected.append(spec)
-        ecologies[ecology] += 1
-        families[spec.family] += 1
+        selected_indices.add(index)
+        cell_counts[cell] += 1
         lineages[spec.lineage_id] += 1
-        if len(selected) == count:
-            return selected
+
+    selected = [spec for index, spec in enumerate(specs) if index in selected_indices]
+    if len(selected) == count:
+        return selected
     raise TurboFoundryError(
-        f"Quality-diversity caps yielded {len(selected)} structures, below {count}."
+        "INSUFFICIENT_STRUCTURAL_DIVERSITY: deterministic cell allocation selected "
+        f"{len(selected)} of {count} structures (strict feasible total {strict_total}; "
+        f"ecology relaxed={ecology_relaxed})."
     )
+
+
+def _strict_cell_allocation(
+    specs: Sequence[StrategySpec],
+    *,
+    ecology_caps: Mapping[str, int],
+    family_cap: int,
+    lineage_cap: int,
+    target: int,
+) -> tuple[dict[tuple[str, str], int], int]:
+    """Solve the small ecology/family intersection as deterministic max flow.
+
+    The previous single greedy pass could spend a global family quota in the
+    equity ecology before visiting the same family in a sparse energy ecology.
+    This allocation uses specification metadata only and therefore cannot leak
+    Stage-1 or later performance.
+    """
+
+    cell_lineages: dict[tuple[str, str], Counter[str]] = defaultdict(Counter)
+    lineage_cells: dict[str, tuple[str, str]] = {}
+    for spec in specs:
+        cell = (_ecology(spec.market), spec.family)
+        previous_cell = lineage_cells.setdefault(spec.lineage_id, cell)
+        if previous_cell != cell:
+            raise TurboFoundryError(
+                "Lineage spans multiple ecology/family cells: "
+                f"{spec.lineage_id} belongs to {previous_cell} and {cell}."
+            )
+        cell_lineages[cell][spec.lineage_id] += 1
+    cell_capacity = {
+        cell: sum(min(count, lineage_cap) for count in lineage_counts.values())
+        for cell, lineage_counts in cell_lineages.items()
+    }
+    ecologies = sorted(ecology_caps)
+    families = sorted({family for _, family in cell_capacity})
+    source = "source"
+    sink = "sink"
+    residual: dict[tuple[str, str], int] = {}
+    adjacency: dict[str, set[str]] = defaultdict(set)
+
+    def add_edge(left: str, right: str, capacity: int) -> None:
+        residual[(left, right)] = capacity
+        residual.setdefault((right, left), 0)
+        adjacency[left].add(right)
+        adjacency[right].add(left)
+
+    for ecology in ecologies:
+        add_edge(source, f"ecology:{ecology}", ecology_caps[ecology])
+    edge_capacity: dict[tuple[str, str], int] = {}
+    for ecology in ecologies:
+        for family in families:
+            cell = (ecology, family)
+            capacity = cell_capacity.get(cell, 0)
+            if capacity:
+                edge_capacity[cell] = capacity
+                add_edge(f"ecology:{ecology}", f"family:{family}", capacity)
+    for family in families:
+        add_edge(f"family:{family}", sink, family_cap)
+
+    total = 0
+    while total < target:
+        parent: dict[str, str | None] = {source: None}
+        queue = [source]
+        for node in queue:
+            for neighbour in sorted(adjacency[node]):
+                if neighbour in parent or residual[(node, neighbour)] <= 0:
+                    continue
+                parent[neighbour] = node
+                queue.append(neighbour)
+                if neighbour == sink:
+                    break
+            if sink in parent:
+                break
+        if sink not in parent:
+            break
+        amount = math.inf
+        node = sink
+        while parent[node] is not None:
+            previous = parent[node]
+            amount = min(amount, residual[(previous, node)])
+            node = previous
+        increment = min(int(amount), target - total)
+        node = sink
+        while parent[node] is not None:
+            previous = parent[node]
+            residual[(previous, node)] -= increment
+            residual[(node, previous)] += increment
+            node = previous
+        total += increment
+
+    allocation = {
+        cell: capacity
+        - residual[(f"ecology:{cell[0]}", f"family:{cell[1]}")]
+        for cell, capacity in edge_capacity.items()
+    }
+    return allocation, total
 
 
 def _stage1_event_matrix(matrix: FeatureMatrix) -> EventMatrix:
@@ -901,8 +1043,12 @@ def _generic_meta_features(
 
 
 def _population_coverage(specs: Sequence[StrategySpec]) -> dict[str, Any]:
+    ecology_counts = Counter(_ecology(spec.market) for spec in specs)
+    maximum_ecology_share = max(ecology_counts.values(), default=0) / max(
+        len(specs), 1
+    )
     return {
-        "market_ecologies": dict(Counter(_ecology(spec.market) for spec in specs)),
+        "market_ecologies": dict(ecology_counts),
         "markets": dict(Counter(spec.market for spec in specs)),
         "mechanism_families": dict(Counter(spec.family for spec in specs)),
         "timeframes": dict(Counter(spec.timeframe for spec in specs)),
@@ -910,11 +1056,8 @@ def _population_coverage(specs: Sequence[StrategySpec]) -> dict[str, Any]:
         "lineages": len({spec.lineage_id for spec in specs}),
         "maximum_family_share": max(Counter(spec.family for spec in specs).values(), default=0)
         / max(len(specs), 1),
-        "maximum_ecology_share": max(Counter(_ecology(spec.market) for spec in specs).values(), default=0)
-        / max(len(specs), 1),
-        "ecology_cap_relaxed_for_feasibility": bool(
-            len({_ecology(spec.market) for spec in specs}) < 3
-        ),
+        "maximum_ecology_share": maximum_ecology_share,
+        "ecology_cap_relaxed_for_feasibility": maximum_ecology_share > 0.40 + 1e-12,
         "missing_ecologies": sorted(
             {"equity_indices", "metals", "energy"}
             - {_ecology(spec.market) for spec in specs}

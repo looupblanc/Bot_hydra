@@ -771,9 +771,68 @@ def test_turbo_commit_drift_recovery_advances_to_fresh_batch_id(tmp_path: Path) 
         )
 
         assert controller._next_turbo_batch_index(conn) == 3
+        assert controller._pending_or_next_turbo_batch_index(conn) == 3
         controller._refresh_latest_completed_experiment_metadata(conn)
         assert get_kv(conn, "latest_completed_experiment")["experiment_id"] == (
             "turbo_foundry_v2_epoch_0001"
         )
+    finally:
+        conn.close()
+
+
+def test_turbo_stale_failed_blocker_reuses_pending_epoch(tmp_path: Path) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        failed_id = "turbo_foundry_v2_epoch_0004"
+        enqueue_experiment(
+            conn,
+            failed_id,
+            {
+                "experiment_type": "turbo_foundry_v2_epoch",
+                "batch_index": 4,
+                "max_attempts": 1,
+            },
+        )
+        failed_claim = claim_next_experiment(conn)
+        assert failed_claim is not None
+        assert (
+            fail_experiment(
+                conn,
+                failed_id,
+                "Quality-diversity caps yielded too few structures",
+                retryable=True,
+                claim_token=str(failed_claim["claim_token"]),
+            )
+            == "FAILED"
+        )
+
+        pending_id = "turbo_foundry_v2_epoch_0005"
+        enqueue_experiment(
+            conn,
+            pending_id,
+            {
+                "experiment_type": "turbo_foundry_v2_epoch",
+                "batch_index": 5,
+            },
+        )
+        assert controller._pending_or_next_turbo_batch_index(conn) == 5
+
+        pending_claim = claim_next_experiment(conn)
+        assert pending_claim is not None
+        assert pending_claim["experiment_id"] == pending_id
+        assert controller._pending_or_next_turbo_batch_index(conn) == 5
+
+        set_kv(conn, "current_phase", "EXPERIMENT_BLOCKED")
+        set_kv(conn, "current_blocker", f"EXPERIMENT_FAILED:{failed_id}")
+        resumed_index = controller._pending_or_next_turbo_batch_index(conn)
+        assert controller._reconcile_turbo_foundry_v2(
+            conn, batch_index=resumed_index
+        )
+
+        assert experiment_record(conn, failed_id)["status"] == "FAILED"
+        assert experiment_record(conn, pending_id)["status"] == "RUNNING"
+        assert experiment_record(conn, "turbo_foundry_v2_epoch_0006") is None
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+        assert get_kv(conn, "current_blocker") is None
     finally:
         conn.close()

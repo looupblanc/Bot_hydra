@@ -1193,7 +1193,7 @@ class AutonomousMissionController:
             self._reconcile_turbo_foundry_v2(
                 conn,
                 batch_index=(
-                    self._next_turbo_batch_index(conn)
+                    self._pending_or_next_turbo_batch_index(conn)
                     if turbo_resume_after_failed_commit
                     else 0
                 ),
@@ -2043,6 +2043,30 @@ class AutonomousMissionController:
             if token.isdigit():
                 indices.append(int(token))
         return max(indices, default=-1) + 1
+
+    @classmethod
+    def _pending_or_next_turbo_batch_index(cls, conn: Any) -> int:
+        """Reuse durable pending work before allocating another Turbo epoch.
+
+        Enqueue and resume-state updates are separate durable writes.  If the
+        controller stops after enqueue but before clearing a stale failed-epoch
+        blocker, startup must resume that row instead of skipping to a second
+        new batch.
+        """
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='turbo_foundry_v2_epoch' "
+            "AND status IN ('QUEUED', 'RUNNING')"
+        ).fetchall()
+        pending_indices: list[int] = []
+        for row in rows:
+            suffix = str(row[0]).removeprefix(TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX)
+            token = suffix.split("_", 1)[0]
+            if token.isdigit():
+                pending_indices.append(int(token))
+        if pending_indices:
+            return min(pending_indices)
+        return cls._next_turbo_batch_index(conn)
 
     @staticmethod
     def _refresh_latest_completed_experiment_metadata(conn: Any) -> None:
