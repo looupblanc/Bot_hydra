@@ -486,14 +486,15 @@ def _risk_transfer_signals(
         source_start, source_end = source_window
         target_start, target_end = target_window
         if not _same_segment(source, source_start, source_end) or not _same_segment(
-            target, target_start, int(target_exit)
+            target, target_start, target_end
         ):
             continue
         source_move = float(source.close[source_end] / source.open[source_start] - 1.0)
         target_move = float(target.close[target_end] / target.open[target_start] - 1.0)
         source_threshold = float(np.quantile(source_history[-60:], 0.80)) if len(source_history) >= 60 else None
         target_threshold = float(np.quantile(target_history[-60:], 0.80)) if len(target_history) >= 60 else None
-        if source_threshold is not None and target_threshold is not None and abs(source_move) >= source_threshold and abs(target_move) < 0.50 * target_threshold and source_move != 0.0:
+        executable = _same_segment(target, int(target_entry), int(target_exit))
+        if source_threshold is not None and target_threshold is not None and abs(source_move) >= source_threshold and abs(target_move) < 0.50 * target_threshold and source_move != 0.0 and executable:
             side = int(math.copysign(1, source_move))
             if relation == "opposite":
                 side *= -1
