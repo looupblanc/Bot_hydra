@@ -1,0 +1,95 @@
+{
+  "schema": "hydra_v7_grammar_validation_policy_v1",
+  "policy_id": "hydra_v7_grammar_0002_validation_policy_0001",
+  "preregistered_at_utc": "2026-07-12T16:12:00Z",
+  "grammar": {
+    "path": "WORM/v7-grammar-0002-hypotheses-2026-07-12.json",
+    "sha256": "2060c042296edc05ce0f39d0289a292bc251a86aea9de33946698e6486c1ca54",
+    "tag": "worm/v7-grammar-0002-2026-07-12",
+    "signal_manifest_path": "reports/v7/phase4/grammar0002_signal_manifest.json",
+    "signal_manifest_sha256": "70ebca128cf5077a12273ae866a868054dc604fac44a54a6fad8b911e56d3d85"
+  },
+  "contract": {
+    "path": "MISSION_CONTRACT.md",
+    "sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
+  },
+  "multiplicity": {
+    "N_trials": 247176,
+    "proof_registry_event_id": "v7_grammar_0002_multiplicity_reservation",
+    "BH_FDR": 0.10,
+    "family_size": 23
+  },
+  "stages": {
+    "stage1": {
+      "minimum_events": 30,
+      "base_expectancy_per_trade_gt": 0.0
+    },
+    "stage2": {
+      "stress_1_5x_expectancy_per_trade_gt": 0.0,
+      "stress_2x_expectancy_per_trade_gt": 0.0,
+      "trajectory_compliance": 1.0,
+      "SIM_EXPLOIT_definition": "base expectancy is strictly positive and stress-2x expectancy is non-positive",
+      "zero_or_insufficient_events_are_SIM_EXPLOIT": false
+    },
+    "stage3": {
+      "walk_forward_folds": 4,
+      "embargo_trading_days": 5,
+      "walk_forward_pooled_1_5x_expectancy_gt": 0.0,
+      "DSR_deflated_z_gt": 0.0,
+      "BH_rejected": true,
+      "candidate_null_gate": "actual 1.5x expectancy must be strictly greater than every valid null expectancy",
+      "minimum_delayed_or_clock_null_retention": 0.80
+    },
+    "stage4": {
+      "permanent_tripwire_verdict": "GREEN",
+      "maximum_shadow_candidates": 5,
+      "maximum_one_per_mechanism_class": true
+    }
+  },
+  "candidate_nulls": {
+    "SIGN_INVERSION": {
+      "definition": "Keep every signal timestamp, quantity, cost and holding window fixed; flip side; recompute gross, net, MFE and MAE from the same market path.",
+      "retention": 1.0
+    },
+    "FIVE_SESSION_SIGNAL_DELAY": {
+      "definition": "Move each frozen side and same local entry/exit clock to the fifth later eligible Chicago session of the same market, preserving duration, explicit contract, costs and non-overlap; skip invalid contract or gap windows.",
+      "minimum_retention": 0.80
+    },
+    "OPPORTUNITY_COUNT_MATCHED_CLOCK": {
+      "definition": "Move each frozen side, entry and exit exactly 30 minutes later within the same Chicago session, preserving duration, explicit contract, costs and non-overlap; skip invalid contract or gap windows.",
+      "minimum_retention": 0.80
+    }
+  },
+  "permanent_tripwire": {
+    "action": "Rerun the exact frozen Phase 1 account pipeline with its three WORM controls before grammar validation.",
+    "preregistration_sha256": "4ca94dd368ed2aca1eaf92674ba7ba8778ff2e9e11f9ad402841c515e0deea0f",
+    "reference_summary_sha256": "ea90964588a22546aeb7ea14df7d418e06936d37145fa444358769cfad8abf72",
+    "required_real_episode_count": 25680,
+    "required_null_episode_count": 77040,
+    "required_real_pass_count": 9144,
+    "required_null_pass_count": 1359,
+    "required_NULL_RATIO": 0.04954068241469816,
+    "maximum_NULL_RATIO": 0.8,
+    "candidate_pass_rate_used_as_fitness": false,
+    "candidate_pass_rate_used_as_promotion_gate": false
+  },
+  "diagnostics": {
+    "rolling_Combine": "Run unchanged one-contract episodes under both R2 modes and optional DLL; report only.",
+    "one_contract_zero_pass": "Not a grammar blocker because Combine sizing is downstream under contract clause 3.",
+    "same_bar_ambiguity": "Report count and require later 1s/TBBO evidence only if it can change a surviving candidate decision."
+  },
+  "verdicts": {
+    "tripwire_mismatch": "BLOCKED",
+    "tripwire_ARTEFACT": "ARTEFACT",
+    "one_or_more_promotions": "GREEN",
+    "no_promotions": "NULL"
+  },
+  "safety": {
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "new_paid_data_allowed": false,
+    "outbound_orders_allowed": false,
+    "validation_commit_may_modify_strategy_code": false
+  },
+  "CONTRE": "The delayed and plus-30-minute nulls preserve side but not every latent market state, so beating them is a sanity check rather than causal proof; DSR/BH and untouched forward windows remain decisive."
+}
