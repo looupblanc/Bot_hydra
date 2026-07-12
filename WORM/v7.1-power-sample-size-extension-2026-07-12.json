@@ -1,0 +1,22 @@
+{
+  "schema": "hydra_v7_1_power_sample_size_extension_v1",
+  "initial_result_path": "reports/v7_1/calibration/v71_power_audit_result.json",
+  "initial_result_sha256": "8c21d9816c9e55a02e7f6189bb82d1377ccdb53cf537b775110957c5f7b206e7",
+  "initial_verdict": "RED_POWER",
+  "thresholds_changed": false,
+  "reason": "The frozen validator rejected all nulls but had only 46.25% minimum power for the preregistered +50 USD/trade effect at 100-160 events; determine the required sample size without weakening DSR>0 or BH FDR 10%.",
+  "control_worlds": ["SYNTHETIC_GAUSSIAN", "SEMI_SYNTHETIC_D1_ES_RESIDUAL_BOOTSTRAP"],
+  "seeds": [71001, 71002, 71003, 71004, 71005, 71006, 71007, 71008, 71009, 71010],
+  "family_size": 32,
+  "event_counts": [240, 320, 480],
+  "net_effects_usd_per_trade": [0.0, 50.0],
+  "statistical_test_count": 3840,
+  "acceptance": {"null_false_positive_rate_max": 0.10, "power_min": 0.60, "target_effect_usd_per_trade": 50.0},
+  "output": "minimum event count at which each control world reaches power >= 0.60",
+  "real_candidate_policy": "Candidates below the maximum required count across worlds are INSUFFICIENT_POWER and cannot be declared NULL or enter DSR/BH.",
+  "real_candidate_results_read_before_freeze": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "Augmenter la taille requise restaure la puissance theorique mais peut rendre D1 incapable de statuer; ce serait une limite de donnees explicite, pas une raison pour affaiblir les gates."
+}
