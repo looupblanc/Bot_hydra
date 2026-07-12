@@ -1,0 +1,48 @@
+{
+  "schema": "hydra_v7_d1_new_dataset_tripwire_policy_v1",
+  "tripwire_id": "hydra_v7_d1_new_dataset_tripwire_0001",
+  "preregistered_at_utc": "2026-07-12T17:39:00Z",
+  "grammar_path": "WORM/v7-d1-microstructure-grammar-0001-2026-07-12.json",
+  "grammar_sha256": "f7b7f3d8d0a43749d31986e4848eeb7285123654dd9ca47eb327284831dd1691",
+  "feature_manifest_sha256": "5c700f1ec38ab03a1206af7013a28600a681a0b3334781979b37ec356b5421ab",
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "method": "Within each year and product, permute complete intraday normalized price paths across sessions while leaving recipient aggressor-flow features and timestamps fixed.",
+      "seeds": {"2023_ES": 710301, "2023_MES": 710302, "2024_ES": 710401, "2024_MES": 710402}
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "method": "Within each session, generate zero-drift Gaussian close increments using the session's realized one-minute volatility; retain observed flow, volume and timestamps and reconstruct valid OHLC ranges.",
+      "seeds": {"2023_ES": 720301, "2023_MES": 720302, "2024_ES": 720401, "2024_MES": 720402}
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "method": "Swap normalized August price paths between ordinal-matched 2023 and 2024 sessions for each product while retaining recipient flow and timestamps.",
+      "seed": 730001
+    }
+  },
+  "pipeline": {
+    "candidate_structures": 8,
+    "diagnostic_quantities": [1, 2, 4, 8],
+    "maximum_contracts": 15,
+    "episode_start": "every eligible session",
+    "episode_horizon_sessions": 20,
+    "mll_mode": "eod_level_rt_breach",
+    "same_frozen_signal_logic_in_all_worlds": true,
+    "feature_and_signal_recomputation": true,
+    "null_episode_count_must_be_at_least_real": true,
+    "combine_pass_rate_is_diagnostic_not_fitness": true
+  },
+  "verdict": {
+    "threshold": 0.8,
+    "formula": "NULL_RATIO = pooled null pass rate / real pass rate",
+    "if_real_pass_count_zero": "BLOCKED_UNDERPOWERED",
+    "if_NULL_RATIO_gte_0_8": "ARTEFACT_GEOMETRY_ONLY",
+    "if_NULL_RATIO_lt_0_8": "GREEN_NULL_ADJUSTED_BASELINE"
+  },
+  "safety": {
+    "candidate_validation_allowed_only_after_GREEN": true,
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "outbound_orders_allowed": false
+  },
+  "CONTRE": "Only two year blocks make YEAR_BLOCK_PERMUTATION coarse, and a zero real pass count would block rather than falsify the microstructure classes."
+}

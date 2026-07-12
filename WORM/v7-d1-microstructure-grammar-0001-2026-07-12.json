@@ -1,0 +1,94 @@
+{
+  "schema": "hydra_v7_d1_microstructure_grammar_v1",
+  "grammar_id": "hydra_v7_d1_microstructure_grammar_0001",
+  "preregistered_at_utc": "2026-07-12T17:39:00Z",
+  "contract_sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+  "source_snapshot": "mission/state/snapshots/v7_pre_d1_grammar0001_20260712T173853Z.tar.gz",
+  "source_snapshot_sha256": "ada7766d1733121e14dbf40c306e893b1ad0e001ace9ae45b227c44f2e12fe30",
+  "feature_manifest": {
+    "path": "data/manifests/v7_d1_date_matched_event_store_v1.json",
+    "sha256": "5c700f1ec38ab03a1206af7013a28600a681a0b3334781979b37ec356b5421ab",
+    "minute_output_sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb",
+    "event_output_sha256": "ea0208fc3666f912b39e9b21b302a466bd7ee00c802140d6a6beed73098aa4a3",
+    "years": [2023, 2024],
+    "data_role": "DEVELOPMENT_ONLY"
+  },
+  "candidate_structures": [
+    {
+      "candidate_id_pattern": "v7d1g1_aggressor_persistence_{product}",
+      "products": ["ES", "MES"],
+      "hypothesis_id": "D1H1_AGGRESSOR_IMBALANCE_PERSISTENCE",
+      "mechanism_class": "print_aggressor_imbalance_persistence",
+      "economic_hypothesis": "Urgent informed or mandate-driven aggressors split a parent order across successive volume bars, so efficient signed flow continues after the triggering bar.",
+      "who_pays": "Liquidity providers and slower participants absorbing an unfinished parent order.",
+      "source_bar_type": "VOLUME_BAR",
+      "signal": "Absolute signed-volume fraction is at or above the past-only q90 of the previous 1000 bars, its sign agrees with price change, and absolute signed path efficiency is at least 0.25.",
+      "warmup_bars": 1000,
+      "entry": "next completed event bar open",
+      "exit": "close of the fifth later event bar",
+      "side": "signed aggressor volume"
+    },
+    {
+      "candidate_id_pattern": "v7d1g1_absorption_reversal_{product}",
+      "products": ["ES", "MES"],
+      "hypothesis_id": "D1H2_PRINT_ABSORPTION_REVERSAL",
+      "mechanism_class": "print_absorption_exhaustion_reversal",
+      "economic_hypothesis": "Extreme signed flow with little price progress is absorbed by resting liquidity and reverses after the aggressive burst exhausts.",
+      "who_pays": "Late aggressive entrants whose market orders fail to move price efficiently.",
+      "source_bar_type": "SIGNED_IMBALANCE_BAR",
+      "signal": "Absolute signed-volume fraction is at or above the past-only q90 of the previous 1000 bars and absolute price-change/path-length efficiency is at most 0.10.",
+      "warmup_bars": 1000,
+      "entry": "next completed event bar open",
+      "exit": "close of the fifth later event bar",
+      "side": "opposite signed aggressor volume"
+    },
+    {
+      "candidate_id_pattern": "v7d1g1_sweep_quality_{product}",
+      "products": ["ES", "MES"],
+      "hypothesis_id": "D1H3_SWEEP_QUALITY_CONTINUATION",
+      "mechanism_class": "print_sweep_quality_continuation",
+      "economic_hypothesis": "A dense same-side burst with efficient price follow-through identifies a genuine urgent sweep whose execution continues over subsequent dollar bars.",
+      "who_pays": "Resting liquidity and participants entering before the urgent taker completes execution.",
+      "source_bar_type": "DOLLAR_BAR",
+      "signal": "Trade count is at or above past-only q90 and absolute signed-volume fraction at or above past-only q75 over the previous 1000 bars; flow and price signs agree and absolute path efficiency is at least 0.50.",
+      "warmup_bars": 1000,
+      "entry": "next completed event bar open",
+      "exit": "close of the third later event bar",
+      "side": "signed aggressor volume"
+    },
+    {
+      "candidate_id_pattern": "v7d1g1_cash_open_aggression_{product}",
+      "products": ["ES", "MES"],
+      "hypothesis_id": "D1H4_CASH_OPEN_AGGRESSION_STATE",
+      "mechanism_class": "cash_open_aggression_state_persistence",
+      "economic_hypothesis": "A large signed cash-open aggression state reflects inventory transfer that persists through the next hour while opening participants complete their hedges.",
+      "who_pays": "Participants reacting after the opening inventory transfer is already observable.",
+      "source_bar_type": "MINUTE_PRINT_FEATURES",
+      "signal": "At 09:00 CT, aggregate 08:30-09:00 signed aggressor fraction exceeds the median absolute fraction of the prior five sessions.",
+      "warmup_sessions": 5,
+      "entry": "09:01 CT minute open",
+      "exit": "10:00 CT minute close",
+      "side": "cash-open aggregate signed aggressor volume"
+    }
+  ],
+  "candidate_count": 8,
+  "execution": {
+    "fixed_quantity": 1,
+    "non_overlapping_trades_per_candidate": true,
+    "explicit_contract_only": true,
+    "same_contract_entry_exit": true,
+    "cost_model_path": "config/v7/phase0_g0_preregistration.json",
+    "cost_model_sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "event_candidate_cost_horizon": "5m",
+    "cash_open_cost_horizon": "60m",
+    "same_bar_fill_allowed": false
+  },
+  "safety": {
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "outbound_orders_allowed": false,
+    "combine_pass_rate_as_fitness": false,
+    "combine_pass_rate_as_gate": false
+  },
+  "CONTRE": "Rolling quantiles adapt to activity but the two August samples may share seasonal microstructure; candidate validation is forbidden unless the new-dataset tripwire is GREEN."
+}

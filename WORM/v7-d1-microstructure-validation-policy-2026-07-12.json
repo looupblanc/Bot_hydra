@@ -1,0 +1,49 @@
+{
+  "schema": "hydra_v7_d1_microstructure_validation_policy_v1",
+  "policy_id": "hydra_v7_d1_microstructure_validation_0001",
+  "preregistered_at_utc": "2026-07-12T17:39:00Z",
+  "grammar_path": "WORM/v7-d1-microstructure-grammar-0001-2026-07-12.json",
+  "grammar_sha256": "f7b7f3d8d0a43749d31986e4848eeb7285123654dd9ca47eb327284831dd1691",
+  "tripwire_path": "WORM/v7-d1-new-dataset-tripwire-2026-07-12.json",
+  "tripwire_sha256": "8bf84b324be6292de1213e5ade0d88bf1f83cae67502ef4ff7321c8c50c4be7d",
+  "N_trials": 247684,
+  "multiplicity_delta": {
+    "candidate_evaluations": 80,
+    "tripwire_account_probes": 128,
+    "total": 208
+  },
+  "FDR": 0.10,
+  "minimum_events": 30,
+  "walk_forward": {
+    "folds": 4,
+    "purge": "candidate holding horizon",
+    "embargo_trading_days": 5,
+    "pooled_stress_1_5x_expectancy_gt": 0.0
+  },
+  "candidate_nulls": {
+    "SIGN_INVERSION": "Same opportunities and path with side flipped.",
+    "FIVE_SESSION_SIGNAL_DELAY": "Same frozen sides and local clocks five later sessions, invalid contract windows skipped.",
+    "FLOW_PRICE_DECOUPLING": "Shift all aggressor-flow features by one complete prior session relative to price, recompute the frozen signal, and preserve recipient prices and clocks."
+  },
+  "gates": {
+    "new_dataset_tripwire_GREEN": true,
+    "minimum_events": 30,
+    "base_expectancy_gt": 0.0,
+    "stress_1_5x_expectancy_gt": 0.0,
+    "stress_2x_expectancy_gt": 0.0,
+    "candidate_actual_1_5x_expectancy_gt_every_null": true,
+    "walk_forward_pooled_expectancy_gt": 0.0,
+    "DSR_deflated_z_gt": 0.0,
+    "BH_rejected": true,
+    "ruleset_compliance": true
+  },
+  "SIM_EXPLOIT_definition": "base expectancy strictly positive and stress-2x expectancy non-positive",
+  "candidate_Combine_pass_rate_used_as_fitness": false,
+  "candidate_Combine_pass_rate_used_as_gate": false,
+  "safety": {
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "outbound_orders_allowed": false
+  },
+  "CONTRE": "With roughly 42 sessions, DSR under 247684 trials has low power for modest effects; this is intentional protection and fresh shadow evidence remains the only clean expansion path."
+}
