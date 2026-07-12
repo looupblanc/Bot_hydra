@@ -26,6 +26,7 @@ def test_proof_window_can_be_appended_then_burned_exactly_once(tmp_path: Path) -
     source = Path("mission/state/proof_registry.json")
     destination = tmp_path / "proof_registry.json"
     destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    initial_count = int(load_and_verify(destination)["entry_count"])
     common = {
         "event_type": "PROOF_WINDOW_STATUS",
         "recorded_at_utc": "2026-07-12T13:30:00Z",
@@ -47,7 +48,7 @@ def test_proof_window_can_be_appended_then_burned_exactly_once(tmp_path: Path) -
     )
 
     registry = load_and_verify(destination)
-    assert registry["entry_count"] == 3
+    assert registry["entry_count"] == initial_count + 2
     assert "FORWARD_2026_W28" in burned_window_ids(registry)
     with pytest.raises(ProofRegistryError, match="irreversibly BURNED"):
         append_entry(
@@ -141,4 +142,52 @@ def test_manifest_prefix_anchor_survives_only_valid_registry_extension(
     with pytest.raises(ProofRegistryError, match="prefix chain head mismatch"):
         verify_registry_prefix(
             extended, entry_count=frozen_count, chain_head="f" * 64
+        )
+
+
+def test_annotation_corrects_metadata_without_consuming_window_or_trials(
+    tmp_path: Path,
+) -> None:
+    source = Path("mission/state/proof_registry.json")
+    destination = tmp_path / "proof_registry.json"
+    destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    before = load_and_verify(destination)
+    trials = multiplicity_trial_count(before)
+    burned = burned_window_ids(before)
+    referenced = str(before["entries"][-1]["event_id"])
+    append_entry(
+        destination,
+        {
+            "event_id": "metadata-correction",
+            "event_type": "REGISTRY_ANNOTATION",
+            "recorded_at_utc": "2026-07-12T14:45:00Z",
+            "references_event_id": referenced,
+            "correction": {
+                "field": "evidence.preregistration_commit",
+                "incorrect": "0" * 40,
+                "correct": "1" * 40,
+                "reason": "transcription error",
+            },
+        },
+    )
+
+    after = load_and_verify(destination)
+    assert multiplicity_trial_count(after) == trials
+    assert burned_window_ids(after) == burned
+
+
+def test_annotation_cannot_reference_unknown_event(tmp_path: Path) -> None:
+    source = Path("mission/state/proof_registry.json")
+    destination = tmp_path / "proof_registry.json"
+    destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    with pytest.raises(ProofRegistryError, match="reference a prior event"):
+        append_entry(
+            destination,
+            {
+                "event_id": "orphan-correction",
+                "event_type": "REGISTRY_ANNOTATION",
+                "recorded_at_utc": "2026-07-12T14:46:00Z",
+                "references_event_id": "missing",
+                "correction": {"field": "x", "correct": "y"},
+            },
         )

@@ -10,7 +10,10 @@ from typing import Any, Mapping
 GENESIS_HASH = "0" * 64
 PROOF_WINDOW_EVENT = "PROOF_WINDOW_STATUS"
 MULTIPLICITY_EVENT = "MULTIPLICITY_COUNTER"
-SUPPORTED_EVENT_TYPES = frozenset({PROOF_WINDOW_EVENT, MULTIPLICITY_EVENT})
+ANNOTATION_EVENT = "REGISTRY_ANNOTATION"
+SUPPORTED_EVENT_TYPES = frozenset(
+    {PROOF_WINDOW_EVENT, MULTIPLICITY_EVENT, ANNOTATION_EVENT}
+)
 
 
 class ProofRegistryError(RuntimeError):
@@ -57,7 +60,7 @@ def load_and_verify(path: str | Path) -> dict[str, Any]:
             window = entry.get("window")
             if not isinstance(window, Mapping) or not str(window.get("id") or ""):
                 raise ProofRegistryError("proof-window event requires a window ID")
-        else:
+        elif event_type == MULTIPLICITY_EVENT:
             counter = entry.get("multiplicity")
             if not isinstance(counter, Mapping):
                 raise ProofRegistryError("multiplicity event requires counter payload")
@@ -69,6 +72,13 @@ def load_and_verify(path: str | Path) -> dict[str, Any]:
             if delta <= 0 or cumulative != prior + delta:
                 raise ProofRegistryError("multiplicity counter must increase exactly")
             multiplicity = cumulative
+        else:
+            reference = str(entry.get("references_event_id") or "")
+            correction = entry.get("correction")
+            if reference not in event_ids - {event_id}:
+                raise ProofRegistryError("annotation must reference a prior event")
+            if not isinstance(correction, Mapping) or not correction:
+                raise ProofRegistryError("annotation requires a correction payload")
         previous = stored
     if str(registry.get("chain_head")) != previous:
         raise ProofRegistryError("proof registry chain head mismatch")
@@ -126,7 +136,7 @@ def append_entry(path: str | Path, payload: Mapping[str, Any]) -> dict[str, Any]
             raise ProofRegistryError(
                 f"proof window is irreversibly BURNED: {window_id}"
             )
-    else:
+    elif event_type == MULTIPLICITY_EVENT:
         if "window" in payload:
             raise ProofRegistryError("multiplicity events cannot consume a window")
         counter = payload.get("multiplicity")
@@ -139,6 +149,17 @@ def append_entry(path: str | Path, payload: Mapping[str, Any]) -> dict[str, Any]
         cumulative = int(counter.get("cumulative_N_trials", -1))
         if delta <= 0 or cumulative != prior + delta:
             raise ProofRegistryError("multiplicity counter must increase exactly")
+    else:
+        if "window" in payload or "multiplicity" in payload:
+            raise ProofRegistryError("annotation cannot consume proof or trials")
+        reference = str(payload.get("references_event_id") or "")
+        if reference not in {
+            str(entry.get("event_id") or "") for entry in registry["entries"]
+        }:
+            raise ProofRegistryError("annotation must reference a prior event")
+        correction = payload.get("correction")
+        if not isinstance(correction, Mapping) or not correction:
+            raise ProofRegistryError("annotation requires a correction payload")
     if any(
         str(entry.get("event_id")) == str(payload.get("event_id"))
         for entry in registry["entries"]
