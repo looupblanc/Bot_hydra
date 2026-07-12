@@ -684,3 +684,41 @@ def test_completed_turbo_epoch_routes_candidates_and_queues_next_epoch(
         ] == 4
     finally:
         conn.close()
+
+
+def test_completed_historical_route_is_not_replayed_after_reconciliation_event(
+    tmp_path: Path,
+) -> None:
+    controller, conn, _paths = _controller(tmp_path)
+    try:
+        enqueue_experiment(
+            conn,
+            MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID,
+            {"experiment_type": "mini_micro_participation_divergence"},
+        )
+        claimed = claim_next_experiment(conn)
+        assert claimed is not None
+        complete_experiment(
+            conn,
+            MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID,
+            {
+                "scientific_conclusion": (
+                    "MINI_MICRO_PARTICIPATION_PRIMARY_INSUFFICIENT_PIVOT_MECHANISM"
+                ),
+                "candidate_count": 96,
+                "promising_candidates": 0,
+                "candidates": [],
+                "result_hash": "b" * 64,
+            },
+            claim_token=str(claimed["claim_token"]),
+        )
+        controller._reconcile_completed_experiments(conn)
+        assert get_kv(conn, "current_blocker") == "DISTINCT_MECHANISM_OR_FORWARD_DATA_REQUIRED"
+
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        controller._reconcile_completed_experiments(conn)
+        assert get_kv(conn, "current_phase") == "PLANNING_NEXT_ACTION"
+        assert get_kv(conn, "current_blocker") is None
+    finally:
+        conn.close()

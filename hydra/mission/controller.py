@@ -1718,6 +1718,24 @@ class AutonomousMissionController:
                 "scientific_conclusion": finding,
                 "report_path": result.get("report_path") or (result.get("paths") or {}).get("report"),
             }
+            # A reconciliation event is committed in the same mission SQLite
+            # transaction after routing. Replaying every historical route on
+            # every new completion can overwrite the current scheduler state
+            # and can conflict with immutable shadow registry entries.
+            if self._event_reconciliation_exists(conn, reconciliation_id):
+                if not self._evidence_reconciliation_exists(reconciliation_id):
+                    record_evidence(
+                        self.paths,
+                        {
+                            "reconciliation_id": reconciliation_id,
+                            "scope": "EXPERIMENT",
+                            "experiment_id": experiment_id,
+                            "experiment_type": experiment_type,
+                            "status": "COMPLETED",
+                            "result": result,
+                        },
+                    )
+                continue
             set_kv(conn, completion_flag, True)
             result_key = {
                 "calibration_affected_atom_retest_design": "calibration_retest_design_result",
@@ -8461,6 +8479,22 @@ class AutonomousMissionController:
         }
         set_kv(conn, "turbo_foundry_v2_latest_metrics", metrics)
         set_kv(conn, "turbo_foundry_v2_latest_report", result.get("report_path"))
+        set_kv(
+            conn,
+            "latest_completed_experiment",
+            {
+                "experiment_id": experiment_id,
+                "experiment_type": "turbo_foundry_v2_epoch",
+                "scientific_conclusion": result.get("scientific_conclusion"),
+                "report_path": result.get("report_path"),
+                "result_hash": result.get("result_hash"),
+            },
+        )
+        set_kv(
+            conn,
+            "latest_scientific_finding",
+            result.get("scientific_conclusion"),
+        )
         set_kv(conn, "turbo_foundry_v2_current_batch", batch_index)
         set_kv(conn, "discovery_pipeline_status", "TURBO_V2_BATCH_COMPLETED")
         promotion_queued = self._reconcile_turbo_promotion(
@@ -8529,6 +8563,22 @@ class AutonomousMissionController:
                 "conclusion": result.get("scientific_conclusion"),
                 "report_path": result.get("report_path"),
             },
+        )
+        set_kv(
+            conn,
+            "latest_completed_experiment",
+            {
+                "experiment_id": experiment_id,
+                "experiment_type": "turbo_promotion_batch",
+                "scientific_conclusion": result.get("scientific_conclusion"),
+                "report_path": result.get("report_path"),
+                "result_hash": result.get("result_hash"),
+            },
+        )
+        set_kv(
+            conn,
+            "latest_scientific_finding",
+            result.get("scientific_conclusion"),
         )
         shadow = int(result.get("shadow_candidates") or 0)
         set_kv(conn, "promotion_pipeline_status", "TURBO_PROMOTION_COMPLETED")
