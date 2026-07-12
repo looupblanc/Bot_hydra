@@ -1,0 +1,72 @@
+{
+  "schema": "hydra_v7_1_independent_confirmation_queue_v1",
+  "queue_id": "hydra_v7_1_independent_confirmation_queue_0001",
+  "created_from_grammar": "hydra_v7_1_opportunity_density_grammar_0002",
+  "source_funnel_path": "reports/v7_1/discovery_0002/v71_opportunity_density_funnel_result.json",
+  "source_funnel_sha256": "2a45c4da55875f90438cd6cb19f1ce79ec8de7d934f7a442e78000364aff5897",
+  "source_tripwire_path": "reports/v7_1/discovery_0002/v71_opportunity_density_tripwire_result.json",
+  "source_tripwire_sha256": "dddabdad7e828e84bbee974dc47432a1a90b2a1989d26a44d48bf88cef91cbb2",
+  "tripwire_verdict": "GREEN_NULL_ADJUSTED_BASELINE",
+  "tripwire_NULL_RATIO": 0.7806267806267806,
+  "tripwire_evidence_strength": "VERT_NET",
+  "queue_status": "QUEUED_NO_DATA_PURCHASE_AUTHORIZED_IN_V7_1",
+  "candidates": [
+    {
+      "priority": 1,
+      "candidate_id": "v71g2_state_transition_coverage_recovery_or_failed_extension_continuation_h60",
+      "family_id": "STATE_TRANSITION_COVERAGE",
+      "specification_hash": "a95354a88623936c0e272260a47ff8540b719fd9cac49c0525a0a82db73ccdaf",
+      "signal_path_hash": "91e5edadec10882ae6e6ba2ceac191df8aa0ab7396a410cebd7d43b487e63af1",
+      "development_classification": "MECHANISM_UNDERPOWERED_REQUIRES_INDEPENDENT_CONFIRMATION",
+      "retained_walk_forward_events": 156,
+      "positive_fold_count": 3,
+      "pooled_expectancy_usd_per_trade": 4.933974358974363,
+      "confirmation_reason": "Three of four folds are positive but the pooled economic effect is small and needs untouched evidence before any null or DSR claim."
+    },
+    {
+      "priority": 2,
+      "candidate_id": "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+      "family_id": "EVENT_CLUSTER_HAZARD",
+      "specification_hash": "fbbe1548baebf10157566f8aacbe00574390839e51c5aaf47604fd11be1305ee",
+      "signal_path_hash": "dccbd45317bc31d4480fcb32839d1185dcfe3d0fca8eab4463ce6947eb319818",
+      "development_classification": "MECHANISM_UNDERPOWERED_REQUIRES_INDEPENDENT_CONFIRMATION",
+      "retained_walk_forward_events": 301,
+      "positive_fold_count": 2,
+      "pooled_expectancy_usd_per_trade": 9.893936877076417,
+      "confirmation_reason": "Event density is close to the frozen power minimum, but the fold sign reversal makes independent temporal confirmation mandatory."
+    },
+    {
+      "priority": 3,
+      "candidate_id": "v71g2_session_phase_event_density_afternoon_active_state_continuation_h60",
+      "family_id": "SESSION_PHASE_EVENT_DENSITY",
+      "specification_hash": "e5f037732ec85c73149ca2164a069e70cea25b83528a0087f26eaa9e8011f914",
+      "signal_path_hash": "66e02bde79fda466c89a1726c262acedcb6d5ecc0e9bfa8b233a48f42f901401",
+      "development_classification": "MECHANISM_UNDERPOWERED_REQUIRES_INDEPENDENT_CONFIRMATION",
+      "retained_walk_forward_events": 56,
+      "positive_fold_count": 2,
+      "pooled_expectancy_usd_per_trade": 69.6375,
+      "confirmation_reason": "Large raw effect with few events and a late-fold sign reversal requires a longer untouched window, not development repair."
+    }
+  ],
+  "admission_boundary": {
+    "not_shadow_eligible": true,
+    "candidate_nulls_completed": false,
+    "DSR_BH_completed": false,
+    "rolling_combine_completed": false,
+    "status_inherited": false,
+    "future_confirmation_cannot_reuse_D1_development_windows": true,
+    "Q4_is_BURNED": true
+  },
+  "future_data_action_requirements": [
+    "separate_WORM_confirmation_manifest_before_any_acquisition",
+    "official_cost_estimate",
+    "cache_and_data_access_audit",
+    "append_only_window_strictly_unobserved_by_candidate_and_lineage",
+    "budget_reserve_for_forward_and_execution_evidence",
+    "proof_registry_window_identity_and_hash"
+  ],
+  "current_phase_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "All three candidates can still be noise: their fold patterns are unstable, none reached the frozen powered gate, and the green grammar tripwire is close to its 0.8 artefact boundary."
+}
