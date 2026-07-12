@@ -1,0 +1,18 @@
+[Unit]
+Description=HYDRA V7 Perpetual Falsification Mission
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/hydra-bot
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=-/root/hydra-bot/.env
+ExecStart=/root/hydra-bot/.venv/bin/python /root/hydra-bot/scripts/run_v7_falsification_mission.py --project-root /root/hydra-bot --state-dir mission/state --sleep-seconds 15 --checkpoint-every-steps 25 --persistent --single-writer --no-live-trading
+Restart=on-failure
+RestartSec=30
+KillSignal=SIGTERM
+TimeoutStopSec=60
+
+[Install]
+WantedBy=multi-user.target
