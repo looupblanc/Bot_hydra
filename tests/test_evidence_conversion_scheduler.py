@@ -381,6 +381,9 @@ def test_two_zero_yield_cohorts_stop_before_redundant_followup(
             "evidence_conversion_v3_cohort_0002",
         )
         assert experiment_record(conn, "evidence_conversion_v3_cohort_0003") is None
+        assert experiment_record(conn, "evidence_conversion_v3_cohort_0002")[
+            "status"
+        ] == "BLOCKED"
         assert (
             get_kv(conn, "decision_bridge_v4_conversion_stop_reason")
             == "TWO_CONSECUTIVE_ZERO_NEW_PRE_HOLDOUT"
@@ -390,6 +393,41 @@ def test_two_zero_yield_cohorts_stop_before_redundant_followup(
             get_kv(conn, "current_blocker")
             == "FINAL_Q4_COHORT_AND_SHADOW_PACKAGES_REQUIRED"
         )
+    finally:
+        conn.close()
+
+
+def test_reconcile_retires_queued_cohort_after_stop_policy(tmp_path: Path) -> None:
+    controller, conn = _controller(tmp_path)
+    try:
+        _completed_promotion(conn, tmp_path)
+        set_kv(
+            conn,
+            "foundry_candidate_bank",
+            {"candidate_0": {"status": "PROMISING_RESEARCH_CANDIDATE"}},
+        )
+        set_kv(
+            conn,
+            "evidence_conversion_v3_pre_holdout_by_cohort",
+            {
+                "evidence_conversion_v3_cohort_0000": [],
+                "evidence_conversion_v3_cohort_0001": [],
+            },
+        )
+        assert controller._reconcile_evidence_conversion_v3(conn, cohort_index=2) is False
+        # No cohort is created once the stop is known.
+        assert experiment_record(conn, "evidence_conversion_v3_cohort_0002") is None
+
+        # A pre-existing crash-requeued row is retired on the next reconciliation.
+        enqueue_experiment(
+            conn,
+            "evidence_conversion_v3_cohort_0003",
+            {"experiment_type": "evidence_conversion_v3_cohort", "priority": 260.0},
+        )
+        assert controller._reconcile_evidence_conversion_v3(conn, cohort_index=4) is False
+        retired = experiment_record(conn, "evidence_conversion_v3_cohort_0003")
+        assert retired is not None and retired["status"] == "BLOCKED"
+        assert "superseded_by_decision_bridge_v4" in str(retired["last_error"])
     finally:
         conn.close()
 

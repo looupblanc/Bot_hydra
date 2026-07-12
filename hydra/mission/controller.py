@@ -26,6 +26,7 @@ from hydra.mission.evidence_conversion_scheduler import (
 )
 from hydra.mission.experiment_queue import (
     block_experiment,
+    block_queued_experiments_by_type,
     claim_next_experiment,
     complete_experiment,
     enqueue_experiment,
@@ -5681,8 +5682,14 @@ class AutonomousMissionController:
             ),
         )
         if stop_reason is not None:
+            retired = block_queued_experiments_by_type(
+                conn,
+                "evidence_conversion_v3_cohort",
+                f"superseded_by_decision_bridge_v4:{stop_reason}",
+            )
             set_kv(conn, "decision_bridge_v4_finalization_required", True)
             set_kv(conn, "decision_bridge_v4_conversion_stop_reason", stop_reason)
+            set_kv(conn, "decision_bridge_v4_retired_cohort_ids", retired)
             set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
             set_kv(
                 conn,
@@ -9328,12 +9335,18 @@ class AutonomousMissionController:
             remaining_evidence_debt=metrics["evidence_debt_queue_count"],
         )
         if finalization_reason is not None:
+            retired = block_queued_experiments_by_type(
+                conn,
+                "evidence_conversion_v3_cohort",
+                f"superseded_by_decision_bridge_v4:{finalization_reason}",
+            )
             set_kv(conn, "decision_bridge_v4_finalization_required", True)
             set_kv(
                 conn,
                 "decision_bridge_v4_conversion_stop_reason",
                 finalization_reason,
             )
+            set_kv(conn, "decision_bridge_v4_retired_cohort_ids", retired)
         followup_queued = False
         if finalization_reason is None and should_schedule_followup(result):
             suffix = experiment_id.removeprefix(

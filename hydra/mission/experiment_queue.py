@@ -248,6 +248,42 @@ def block_experiment(
     conn.commit()
 
 
+def block_queued_experiments_by_type(
+    conn: sqlite3.Connection,
+    experiment_type: str,
+    reason: str,
+) -> list[str]:
+    """Terminally retire queued work superseded by a scientific stop rule.
+
+    This is intentionally limited to unclaimed rows.  Running experiments must
+    still follow normal lease/shutdown handling, so the controller can never
+    invalidate work owned by another process.
+    """
+
+    ensure_experiment_schema(conn)
+    rows = conn.execute(
+        "SELECT experiment_id FROM experiments WHERE status='QUEUED' "
+        "AND experiment_type=? ORDER BY experiment_id",
+        (str(experiment_type),),
+    ).fetchall()
+    experiment_ids = [str(row[0]) for row in rows]
+    if not experiment_ids:
+        return []
+    updated = conn.execute(
+        "UPDATE experiments SET status='BLOCKED', updated_at=?, last_error=?, "
+        "claim_token=NULL, claimed_by=NULL, lease_expires_at=NULL "
+        "WHERE status='QUEUED' AND experiment_type=?",
+        (utc_now_iso(), str(reason)[:4000], str(experiment_type)),
+    ).rowcount
+    if int(updated) != len(experiment_ids):
+        conn.rollback()
+        raise RuntimeError(
+            "Queued experiment retirement raced with another scheduler claim."
+        )
+    conn.commit()
+    return experiment_ids
+
+
 def release_experiment_claim_for_shutdown(
     conn: sqlite3.Connection, experiment_id: str, *, claim_token: str, reason: str
 ) -> None:
