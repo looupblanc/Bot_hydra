@@ -18,12 +18,19 @@ def main() -> int:
     parser.add_argument(
         "--phase2-result", default="reports/v7/phase2/phase2_result.json"
     )
+    parser.add_argument(
+        "--grammar-result",
+        action="append",
+        default=[],
+        help="Frozen V7 grammar result to tombstone at class level (repeatable).",
+    )
     parser.add_argument("--output", default="mission/state/graveyard.db")
     args = parser.parse_args()
     result = build_graveyard(
         registry_path=args.registry,
         phase2_result_path=args.phase2_result,
         output_path=args.output,
+        grammar_result_paths=args.grammar_result,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0

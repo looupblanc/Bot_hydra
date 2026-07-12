@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 
-SCHEMA_VERSION = "hydra_v7_class_graveyard_v1"
+SCHEMA_VERSION = "hydra_v7_class_graveyard_v2"
 LEGACY_PROTOTYPE_COUNT = 115_388
 PHASE2_BASKET_COUNT = 55
 
@@ -46,6 +46,7 @@ def build_graveyard(
     registry_path: str | Path,
     phase2_result_path: str | Path,
     output_path: str | Path,
+    grammar_result_paths: Iterable[str | Path] = (),
 ) -> dict[str, Any]:
     registry = Path(registry_path)
     phase2 = Path(phase2_result_path)
@@ -56,6 +57,9 @@ def build_graveyard(
         phase2_payload.get("candidate_count", -1)
     ) != PHASE2_BASKET_COUNT:
         raise GraveyardError("Phase 2 null evidence is not the frozen 55-basket scope")
+    grammar_results = tuple(Path(path) for path in grammar_result_paths)
+    if any(not path.is_file() for path in grammar_results):
+        raise GraveyardError("grammar result source is missing")
     source_rows = _registry_class_rows(registry)
     registered_count = sum(row.candidate_count for row in source_rows)
     if registered_count > LEGACY_PROTOTYPE_COUNT:
@@ -83,6 +87,10 @@ def build_graveyard(
             evidence_sha256=_sha256(phase2),
         )
     )
+    grammar_rows: list[ClassTombstone] = []
+    for grammar_result in grammar_results:
+        grammar_rows.extend(_grammar_class_rows(grammar_result))
+    tombstones.extend(grammar_rows)
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     temporary = destination.with_name(destination.name + ".tmp")
@@ -99,6 +107,14 @@ def build_graveyard(
             "registered_candidate_count": str(registered_count),
             "unregistered_residual_count": str(residual),
             "phase2_new_tombstone_count": str(PHASE2_BASKET_COUNT),
+            "grammar_result_count": str(len(grammar_results)),
+            "grammar_new_tombstone_count": str(
+                sum(row.candidate_count for row in grammar_rows)
+            ),
+            "grammar_result_sha256s": json.dumps(
+                [_sha256(path) for path in grammar_results],
+                separators=(",", ":"),
+            ),
             "parameter_feedback_permitted": "false",
         },
     )
@@ -112,6 +128,9 @@ def build_graveyard(
             "unregistered_residual_count": residual,
             "legacy_indexed_count": LEGACY_PROTOTYPE_COUNT,
             "new_phase2_tombstone_count": PHASE2_BASKET_COUNT,
+            "new_grammar_tombstone_count": sum(
+                row.candidate_count for row in grammar_rows
+            ),
         }
     )
     return audit
@@ -201,6 +220,72 @@ def _registry_class_rows(path: Path) -> tuple[ClassTombstone, ...]:
         )
         for family, cause, count in rows
     )
+
+
+def _grammar_class_rows(path: Path) -> tuple[ClassTombstone, ...]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    grammar_id = str(payload.get("grammar_id", "")).strip()
+    candidate_results = payload.get("candidate_results")
+    if not grammar_id or not isinstance(candidate_results, list):
+        raise GraveyardError("invalid frozen grammar result")
+    if payload.get("selected_shadow_queue_candidate_ids"):
+        raise GraveyardError("graveyard cannot tombstone a grammar with promotions")
+    source_hash = _sha256(path)
+    grouped: dict[tuple[str, str], int] = {}
+    for result in candidate_results:
+        if not isinstance(result, dict):
+            raise GraveyardError("invalid grammar candidate result")
+        specification = result.get("specification")
+        if not isinstance(specification, dict):
+            raise GraveyardError("grammar result lacks class specification")
+        mechanism_class = str(specification.get("mechanism_class", "")).strip()
+        if not mechanism_class:
+            raise GraveyardError("grammar result has empty mechanism class")
+        cause = _contract_death_cause(result)
+        grouped[(mechanism_class, cause)] = (
+            grouped.get((mechanism_class, cause), 0) + 1
+        )
+    return tuple(
+        ClassTombstone(
+            mechanism_class=mechanism_class,
+            regime="DEVELOPMENT_2023_TO_2024Q3",
+            death_cause=cause,
+            candidate_count=count,
+            source_scope=f"HYDRA_V7_GRAMMAR:{grammar_id}",
+            evidence_sha256=source_hash,
+        )
+        for (mechanism_class, cause), count in sorted(grouped.items())
+    )
+
+
+def _contract_death_cause(result: Mapping[str, Any]) -> str:
+    base = result.get("base")
+    stress_2x = result.get("stress_2x")
+    base_expectancy = (
+        float(base.get("expectancy_per_trade", 0.0))
+        if isinstance(base, Mapping)
+        else 0.0
+    )
+    stress_2x_expectancy = (
+        float(stress_2x.get("expectancy_per_trade", 0.0))
+        if isinstance(stress_2x, Mapping)
+        else 0.0
+    )
+    if base_expectancy > 0.0 and stress_2x_expectancy <= 0.0:
+        return "SIM_EXPLOIT"
+    if not bool(result.get("stage1_pass")):
+        return "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS"
+    if not bool(result.get("stage2_pass")):
+        return "COST_OR_RULESET_FAILURE"
+    dsr = result.get("DSR")
+    bh = result.get("BH")
+    dsr_positive = isinstance(dsr, Mapping) and float(
+        dsr.get("deflated_z", -1.0e12)
+    ) > 0.0
+    bh_rejected = isinstance(bh, Mapping) and bool(bh.get("rejected"))
+    if not dsr_positive or not bh_rejected:
+        return "MULTIPLICITY_DEFLATION_FAILURE"
+    return "GRAMMAR_TRIPWIRE_OR_PROMOTION_FAILURE"
 
 
 def _write_database(
