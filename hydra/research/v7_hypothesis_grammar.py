@@ -13,7 +13,10 @@ import pandas as pd
 
 from hydra.features.feature_matrix import FeatureMatrix
 from hydra.markets.instruments import instrument_spec
-from hydra.research.v7_graveyard import class_feedback
+from hydra.research.v7_graveyard import (
+    canonical_mechanism_class,
+    class_feedback,
+)
 
 
 GRAMMAR_ID = "hydra_v7_grammar_0001_scheduled_inventory_and_hazard"
@@ -633,10 +636,17 @@ def _session_weekday(session_day: int) -> int:
 def assert_class_distance(
     graveyard_path: str | Path, specs: Sequence[V7CandidateSpec] | None = None
 ) -> None:
-    dead_classes = {str(row["mechanism_class"]) for row in class_feedback(graveyard_path)}
+    dead_classes = {
+        canonical_mechanism_class(str(row["mechanism_class"]))
+        for row in class_feedback(graveyard_path)
+    }
     proposed = specs or candidate_specs()
     collisions = sorted(
-        {row.mechanism_class for row in proposed if row.mechanism_class in dead_classes}
+        {
+            canonical_mechanism_class(row.mechanism_class)
+            for row in proposed
+            if canonical_mechanism_class(row.mechanism_class) in dead_classes
+        }
     )
     if collisions:
         raise V7GrammarError(

@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import sqlite3
+from dataclasses import replace
+
 import numpy as np
+import pytest
 
 from hydra.research.v7_hypothesis_grammar import (
     MARKETS,
+    V7GrammarError,
     V7MarketBars,
+    assert_class_distance,
     candidate_specs,
     generate_signal_population,
 )
@@ -58,6 +64,33 @@ def test_cross_market_signal_cannot_cross_target_segment() -> None:
     population = generate_signal_population(bars, graveyard_path=None)
 
     assert population["v7g1_risk_transfer_ES_CL"] == ()
+
+
+def test_generator_rejects_alias_of_dead_intra_product_class(tmp_path) -> None:
+    graveyard = tmp_path / "graveyard.db"
+    conn = sqlite3.connect(graveyard)
+    conn.execute(
+        "CREATE TABLE class_tombstones("
+        "mechanism_class TEXT,regime TEXT,death_cause TEXT,candidate_count INTEGER)"
+    )
+    conn.execute(
+        "INSERT INTO class_tombstones VALUES(?,?,?,?)",
+        (
+            "ARB_INTRA_PRODUIT",
+            "DEVELOPMENT_IS_TO_WF_COLLAPSE",
+            "SIM_EXPLOIT_ADJACENT_STALE_QUOTE_LATENCY",
+            2,
+        ),
+    )
+    conn.commit()
+    conn.close()
+    aliased = replace(
+        candidate_specs()[0],
+        mechanism_class="mini_micro_aggressor_participation_divergence",
+    )
+
+    with pytest.raises(V7GrammarError, match="ARB_INTRA_PRODUIT"):
+        assert_class_distance(graveyard, (aliased,))
 
 
 def _synthetic_bars(market: str) -> V7MarketBars:
