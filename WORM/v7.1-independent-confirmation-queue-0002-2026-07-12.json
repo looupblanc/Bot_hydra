@@ -1,0 +1,61 @@
+{
+  "schema": "hydra_v7_1_independent_confirmation_queue_v2",
+  "queue_id": "hydra_v7_1_independent_confirmation_queue_0002",
+  "principal_amendment_path": "MISSION_CONTRACT_AMENDMENT_002_POWER_AWARE.md",
+  "principal_amendment_sha256": "f41caaa9b4a1ad17c7436f4594ed669c3784321d4afac805dee0b87f79a02caf",
+  "candidate_freeze_path": "WORM/v7.1-power-aware-candidate-freeze-0001-2026-07-12.json",
+  "candidate_freeze_sha256": "b66e462989213356106f0cbcd88d31ba4547a61f9900eb1de3e6010cb3d35d83",
+  "power_audit_path": "reports/v7_1/power_aware_0001/v71_power_aware_candidate_audit_result.json",
+  "power_audit_sha256": "f0eb23117b5703b3d50823365cff7cf9d37c7faeb6ce5628ca7e6c19f04c930b",
+  "queue_status": "DEFERRED_NO_SHADOW_ELIGIBILITY_NO_DATA_PURCHASE",
+  "promising_underpowered_count": 13,
+  "fragile_retired_count": 3,
+  "powered_count": 0,
+  "shadow_slots_loaded": 0,
+  "proof_windows_opened": 0,
+  "proof_windows_burned_delta": 0,
+  "promising_underpowered_candidate_ids": [
+    "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+    "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30",
+    "v71g1_event_participation_state_distributed_participation_reversal_h60",
+    "v71g1_event_participation_state_participation_acceleration_continuation_h30",
+    "v71g1_event_participation_state_participation_acceleration_continuation_h60",
+    "v71g1_event_path_geometry_geometry_transition_motif_reversal_h60",
+    "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+    "v71g1_event_state_transitions_flow_acceleration_transition_continuation_h60",
+    "v71g1_future_path_hazard_continuation_hazard_state_reversal_h30",
+    "v71g1_future_path_hazard_continuation_hazard_state_reversal_h60",
+    "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+    "v71g2_session_phase_event_density_afternoon_active_state_continuation_h60",
+    "v71g3_event_completion_speed_fast_volume_completion_continuation_h60"
+  ],
+  "fragile_retired_candidate_ids": [
+    "v71g1_event_path_geometry_geometry_transition_motif_reversal_h30",
+    "v71g2_state_transition_coverage_recovery_or_failed_extension_continuation_h60",
+    "v71g3_signed_flow_rate_high_rate_low_progress_continuation_h60"
+  ],
+  "future_confirmation_contract": {
+    "candidate_version_must_remain_unchanged": true,
+    "candidate_or_lineage_may_not_reuse_seen_window": true,
+    "separate_WORM_window_manifest_required_before_access": true,
+    "append_only_post_manifest_data_only": true,
+    "current_D1_data_may_not_be_reclassified_as_fresh_proof": true,
+    "current_queue_does_not_authorize_market_data_purchase": true,
+    "current_queue_does_not_authorize_shadow_activation": true,
+    "current_queue_does_not_authorize_DSR_BH_bypass": true
+  },
+  "forward_feed_state": {
+    "required_roots": [],
+    "source_manifest_authorized": false,
+    "candidate_boundary_manifest_created": false,
+    "bars_requested": 0,
+    "bars_processed": 0,
+    "reason": "No candidate passed the candidate-specific power gate; proof slots remain empty and fail closed."
+  },
+  "next_information_action": "limited_distinct_mechanism_discovery_while_waiting_for_future_independent_confirmation_authority",
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "Deferring all thirteen underpowered candidates may miss a real rare edge, but loading them into scarce proof slots without the frozen power gate would convert uncertainty into selection bias."
+}
