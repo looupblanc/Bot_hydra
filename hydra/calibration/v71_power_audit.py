@@ -336,10 +336,8 @@ def _verify_inputs(
         raise V71PowerAuditError("V7.1 power multiplicity reservation is absent")
     if burned_window_ids(proof) != ("Q4_2024",):
         raise V71PowerAuditError("unexpected proof-window state")
-    return (
-        json.loads((root / POLICY_PATH).read_text(encoding="utf-8")),
-        json.loads((root / DESIGN_PATH).read_text(encoding="utf-8")),
-    )
+    policy = json.loads((root / POLICY_PATH).read_text(encoding="utf-8"))
+    return policy, dict(policy["power_calibration"])
 
 
 def _empty_confusion() -> defaultdict[str, int]:
