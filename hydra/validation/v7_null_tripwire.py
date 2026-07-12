@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import gzip
 import json
 import math
 from dataclasses import dataclass
@@ -908,17 +909,34 @@ def _write_blocked_result(
 def _write_result(result: dict[str, Any], output_dir: str | Path) -> dict[str, Any]:
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
+    persisted = dict(result)
+    object_results = persisted.pop("object_results", None)
+    if object_results is not None:
+        full_payload = (
+            json.dumps(result, indent=2, sort_keys=True) + "\n"
+        ).encode("utf-8")
+        detail_path = destination / "null_tripwire_full_evidence.json.gz"
+        detail_bytes = gzip.compress(full_payload, compresslevel=9, mtime=0)
+        detail_path.write_bytes(detail_bytes)
+        persisted["full_detail_evidence"] = {
+            "path": str(detail_path),
+            "compression": "gzip-mtime-0",
+            "object_result_count": len(object_results),
+            "compressed_sha256": hashlib.sha256(detail_bytes).hexdigest(),
+            "uncompressed_sha256": hashlib.sha256(full_payload).hexdigest(),
+            "uncompressed_bytes": len(full_payload),
+        }
     result_path = destination / "null_tripwire_result.json"
     result_path.write_text(
-        json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        json.dumps(persisted, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     result_sha = _sha256(result_path)
     report_path = destination / "null_tripwire_report.md"
     report_path.write_text(
-        _render_report(result, result_sha), encoding="utf-8"
+        _render_report(persisted, result_sha), encoding="utf-8"
     )
     return {
-        **result,
+        **persisted,
         "result_path": str(result_path),
         "result_sha256": result_sha,
         "report_path": str(report_path),

@@ -1,17 +1,24 @@
 from __future__ import annotations
 
+import gzip
+import hashlib
+import json
+
 import numpy as np
 
 from hydra.account_policy.basket import RoutedTrade
+from hydra.features.feature_matrix import FeatureMatrix
 from hydra.propfirm.combine_episode import TradePathEvent
 from hydra.validation.v7_null_tripwire import (
     NullControl,
     SyntheticMarketPath,
     block_shuffle_source_days,
+    build_synthetic_market_path,
     null_verdict,
     rebuild_counterfactual_trade,
     year_permutation_source_days,
 )
+from hydra.validation.v7_null_tripwire import _write_result
 
 
 def test_daily_block_shuffle_is_deterministic_nonidentity_and_block_preserving() -> None:
@@ -94,3 +101,71 @@ def test_null_ratio_threshold_is_frozen_at_point_eight() -> None:
     assert null_verdict(0.5, 0.399)[0] == "GREEN"
     assert null_verdict(0.5, 0.4) == ("ARTEFACT", 0.8)
     assert null_verdict(0.0, 0.0) == ("BLOCKED_UNDEFINED_RATIO", None)
+
+
+def test_synthetic_market_path_is_seed_deterministic_and_source_immutable() -> None:
+    days = np.repeat(np.arange(19000, 19012, dtype=np.int32), 3)
+    rows = len(days)
+    close = np.arange(rows, dtype=np.float64) + np.sin(np.arange(rows))
+    arrays = {
+        "timestamp_ns": np.arange(rows, dtype=np.int64) * 60_000_000_000,
+        "session_day": days,
+        "session_code": np.tile(np.asarray([0, 1, 2], dtype=np.int16), 12),
+        "segment_code": days.astype(np.int64),
+        "bar_open": close - 0.1,
+        "bar_high": close + 0.4,
+        "bar_low": close - 0.5,
+        "bar_close": close,
+    }
+    matrix = FeatureMatrix(
+        root=None,  # type: ignore[arg-type]
+        manifest={"row_count": rows, "bundle_hash": "test"},
+        arrays=arrays,
+    )
+    original = close.copy()
+
+    first = build_synthetic_market_path(
+        "ES",
+        matrix,
+        control=NullControl.DAILY_BLOCK_SHUFFLE,
+        seed=71002,
+        block_size=2,
+    )
+    second = build_synthetic_market_path(
+        "ES",
+        matrix,
+        control=NullControl.DAILY_BLOCK_SHUFFLE,
+        seed=71002,
+        block_size=2,
+    )
+
+    assert first.path_hash == second.path_hash
+    assert np.array_equal(first.close, second.close)
+    assert not np.array_equal(first.close, original)
+    assert np.array_equal(arrays["bar_close"], original)
+
+
+def test_full_object_evidence_is_deterministically_compressed(tmp_path) -> None:
+    result = {
+        "experiment_id": "test",
+        "verdict": "GREEN",
+        "NULL_RATIO": 0.1,
+        "threshold": 0.8,
+        "real": {"pass_rate": 0.5, "episode_count": 2},
+        "pooled_null": {"pass_rate": 0.05, "episode_count": 6},
+        "controls": {},
+        "object_results": {"alpha": {"real": {"pass_rate": 0.5}}},
+        "CONTRE": "conditional null",
+    }
+
+    persisted = _write_result(result, tmp_path)
+    summary = json.loads((tmp_path / "null_tripwire_result.json").read_text())
+    compressed = (tmp_path / "null_tripwire_full_evidence.json.gz").read_bytes()
+    full = gzip.decompress(compressed)
+
+    assert "object_results" not in summary
+    assert summary["full_detail_evidence"]["object_result_count"] == 1
+    assert hashlib.sha256(full).hexdigest() == persisted[
+        "full_detail_evidence"
+    ]["uncompressed_sha256"]
+    assert json.loads(full)["object_results"] == result["object_results"]
