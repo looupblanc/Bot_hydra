@@ -10,6 +10,12 @@ from typing import Any, Iterable, Mapping
 import numpy as np
 import pandas as pd
 
+from hydra.governance.proof_registry import (
+    ProofRegistryError,
+    load_and_verify as load_and_verify_proof_registry,
+    verify_registry_prefix,
+)
+
 
 SCHEMA = "hydra_v7_data_lake_manifest_v1"
 MARKET_PRODUCTS = (
@@ -273,13 +279,31 @@ def verify_v7_data_manifest(
                 raise DataManifestError(
                     f"manifest artifact hash mismatch: {artifact['path']}"
                 )
-        for audit_key in ("access_audit", "proof_registry_audit"):
-            if audit_key not in payload:
-                continue
-            audit = payload[audit_key]
-            audit_path = root / audit["path"]
-            if not audit_path.is_file() or sha256_file(audit_path) != audit["sha256"]:
-                raise DataManifestError(f"{audit_key} hash mismatch")
+        access_audit = payload.get("access_audit")
+        if access_audit is not None:
+            audit_path = root / access_audit["path"]
+            if (
+                not audit_path.is_file()
+                or sha256_file(audit_path) != access_audit["sha256"]
+            ):
+                raise DataManifestError("access_audit hash mismatch")
+        proof_audit = payload.get("proof_registry_audit")
+        if proof_audit is not None:
+            audit_path = root / proof_audit["path"]
+            if not audit_path.is_file():
+                raise DataManifestError("proof_registry_audit file missing")
+            if sha256_file(audit_path) != proof_audit["sha256"]:
+                try:
+                    current = load_and_verify_proof_registry(audit_path)
+                    verify_registry_prefix(
+                        current,
+                        entry_count=int(proof_audit["entry_count"]),
+                        chain_head=str(proof_audit["chain_head"]),
+                    )
+                except ProofRegistryError as exc:
+                    raise DataManifestError(
+                        "proof_registry_audit append-only prefix mismatch"
+                    ) from exc
         for row in payload.get("forward_data_audit", {}).get(
             "authorization_manifest_hashes", []
         ):
