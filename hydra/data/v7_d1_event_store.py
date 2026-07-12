@@ -244,6 +244,11 @@ def load_contract_definitions(path: str | Path) -> dict[int, ContractDefinition]
                 instrument_id
             ]
             raw_symbol = bytes(row["raw_symbol"]).rstrip(b"\x00").decode("ascii")
+            # GLBX instrument IDs are date-scoped and can be reused for a
+            # different contract in another year.  Only the WORM-frozen raw
+            # symbol is authoritative for the matching source window.
+            if raw_symbol != expected_symbol:
+                continue
             definition = ContractDefinition(
                 instrument_id=instrument_id,
                 product=product,
@@ -252,8 +257,6 @@ def load_contract_definitions(path: str | Path) -> dict[int, ContractDefinition]
                 / PRICE_SCALE,
                 point_value=float(row["unit_of_measure_qty"]) / PRICE_SCALE,
             )
-            if raw_symbol != expected_symbol:
-                raise D1EventStoreError("D1 explicit contract symbol drift")
             if not math.isclose(definition.min_price_increment, 0.25) or not math.isclose(
                 definition.point_value, expected_value
             ):
