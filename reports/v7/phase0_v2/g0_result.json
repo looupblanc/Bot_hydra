@@ -1,0 +1,87 @@
+{
+  "schema": "hydra_v7_gate_result_v1",
+  "gate": "G0",
+  "verdict": "GREEN",
+  "evaluated_at_utc": "2026-07-12T14:07:44Z",
+  "experiment_id": "hydra_v7_phase0_sim_truth_0002",
+  "source_commit": "0b4f44600c5df10bd86d35f2fe5d305c0b080d7a",
+  "contract": {
+    "path": "MISSION_CONTRACT.md",
+    "sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+    "tag": "worm/contract-2026-07-12-v2"
+  },
+  "preregistration": {
+    "path": "WORM/bootstrap-phase0-v2-2026-07-12.json",
+    "sha256": "bc060975d44439ee571b1d87167ff29d56639ff3948ae1ac1c4eb65b098640a6",
+    "tag": "worm/v7-bootstrap-p0-v2-2026-07-12"
+  },
+  "acceptance": {
+    "doctor_green": true,
+    "doctor_classification": "HEALTHY_STOPPED_FOR_V7_BOOTSTRAP",
+    "service_main_pid": 0,
+    "active_controller_count": 0,
+    "registry_writer_count": 0,
+    "branch": "mission/v7-falsification",
+    "baseline_is_ancestor": true,
+    "pytest_passed": 565,
+    "pytest_failed": 0,
+    "focused_no_lookahead_q4_budget_passed": 17,
+    "compileall_passed": true,
+    "mission_db_integrity": "ok",
+    "registry_db_integrity": "ok",
+    "strategy_registry_db_integrity": "ok",
+    "governance_passed": true,
+    "governance_semantic_hash": "05810bc193e51e3c40722163a1ee3ae82fd3a8d7762c48eafa25c3a4cba1102b",
+    "q4_access_count": 1,
+    "q4_status": "BURNED",
+    "proof_registry_valid": true,
+    "proof_registry_sha256": "04ea729551ec014abe6b93091050e6084b2ce3d02224039951c8aeead23ec537",
+    "secret_scan_passed": true,
+    "forbidden_artifact_scan_passed": true,
+    "outbound_order_count": 0
+  },
+  "data_manifest": {
+    "path": "data/manifest.json",
+    "file_sha256": "e471cc472a46e68d7164d73ef95c16e995bbded6bad9fcb8537cb89657274b38",
+    "canonical_hash": "cc8b6da2ea2c235f9871092ac4ddf3a97d4d5dc5c6ba589e30414a337f884371",
+    "artifact_count": 73,
+    "derived_array_count": 546,
+    "product_count": 12,
+    "unclassified_market_data_files": 0,
+    "forward_bars": 0
+  },
+  "divergence": {
+    "result_path": "reports/v7/phase0_v2/phase0_result.json",
+    "result_sha256": "8de76b03a183eb0a5b8fe79609f2c1d01e8afe4599d81a93adf9c1d88fc614f6",
+    "report_path": "reports/v7/phase0_v2/mll_divergence_report.md",
+    "report_sha256": "33009dd98ac986bff90f478082d699638faf18cb629c8460ee498d7c616d0beb",
+    "historical_classification": "HISTORICAL_DEFAULT_EQUIVALENT",
+    "historical_mismatch_count": 0,
+    "basket_count": 55,
+    "xfa_policy_count": 6,
+    "default_pass_rate": 0.4518939393939394,
+    "intraday_hwm_pass_rate": 0.42992424242424243,
+    "default_mll_breach_rate": 0.12045454545454545,
+    "intraday_hwm_mll_breach_rate": 0.21553030303030302,
+    "terminal_transition_count": 251,
+    "intrabar_order_ambiguity_count": 30987
+  },
+  "cost_model": {
+    "path": "reports/v7/phase0_v2/costs_model.md",
+    "sha256": "b9928fbf275bc470ad0c63c463b5a068b6294483f2c7fcd7ddfc842cd9594d73",
+    "stress_profiles": ["BASE", "STRESS_1_5X", "STRESS_2X"],
+    "sim_exploit_gate_present": true
+  },
+  "budget": {
+    "phase_llm_mission_external_spend_usd": 0.0,
+    "phase_llm_limit_usd": 8.0,
+    "phase_data_spend_usd": 0.0,
+    "D1_data_limit_usd": 60.0,
+    "databento_historical_spend_usd": 27.988065242766993,
+    "legacy_hard_cap_remaining_usd": 72.011934757233
+  },
+  "generation_unlocked": false,
+  "phase1_required_before_generation": true,
+  "claim_scope": "G0 validates simulator/ruleset/data inventory consistency only; it is not evidence of economic edge.",
+  "CONTRE": "The R2 human conflict remains unresolved and 30,987 OHLC events lack intrabar MFE/MAE order, so the exact live-equity-HWM breach rate is bounded rather than identified."
+}
