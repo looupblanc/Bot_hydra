@@ -1,0 +1,56 @@
+{
+  "schema": "hydra_v7_graveyard_grammar_update_v1",
+  "built_at_utc": "2026-07-12T17:20:11Z",
+  "graveyard_path": "mission/state/graveyard.db",
+  "graveyard_sha256": "8cf5a823eba3187a97e00046df8526fd9be9487148ba4e8484801de4bec9fdd9",
+  "integrity": "ok",
+  "class_signature_count": 79,
+  "indexed_object_count": 115520,
+  "new_grammar_tombstone_count_total": 77,
+  "grammar0004_tombstone_count": 11,
+  "grammar_result_path": "reports/v7/phase4/grammar0004_validation_result.json",
+  "grammar_result_sha256": "3e77cd652940bbda1fb4c87b89de804ed4548e35ae24e1c2432bf413a8e1f64b",
+  "grammar0004_contract_death_causes": {
+    "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 6,
+    "CANDIDATE_NULL_FAILURE": 3,
+    "MULTIPLICITY_DEFLATION_FAILURE": 2,
+    "SIM_EXPLOIT": 0
+  },
+  "class_rows": [
+    {
+      "mechanism_class": "extreme_index_leadership_spread_reversion",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 1,
+        "CANDIDATE_NULL_FAILURE": 1
+      }
+    },
+    {
+      "mechanism_class": "intraday_index_breadth_catchup",
+      "causes": {
+        "CANDIDATE_NULL_FAILURE": 2,
+        "MULTIPLICITY_DEFLATION_FAILURE": 2
+      }
+    },
+    {
+      "mechanism_class": "scheduled_energy_inventory_information_drift",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 1
+      }
+    },
+    {
+      "mechanism_class": "synchronous_cross_ecology_macro_completion",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 2
+      }
+    },
+    {
+      "mechanism_class": "weekly_option_gamma_hedge_reversion",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 2
+      }
+    }
+  ],
+  "parameter_level_feedback": false,
+  "outbound_order_count": 0,
+  "CONTRE": "The breadth class contains two candidates that beat matched nulls and costs but fail DSR under the inherited multiplicity count; class tombstoning prevents local parameter rescue but may discard a small effect that only longer fresh evidence could distinguish."
+}
