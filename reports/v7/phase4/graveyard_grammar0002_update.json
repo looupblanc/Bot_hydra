@@ -1,0 +1,58 @@
+{
+  "schema": "hydra_v7_graveyard_grammar_update_v1",
+  "built_at_utc": "2026-07-12T16:21:00Z",
+  "graveyard_path": "mission/state/graveyard.db",
+  "graveyard_sha256": "0b1b6d791cad27896ed9123e9cb33172bddcff86f37d2704d463d291ba51f02f",
+  "integrity": "ok",
+  "class_signature_count": 61,
+  "indexed_object_count": 115490,
+  "new_grammar_tombstone_count_total": 47,
+  "grammar0002_tombstone_count": 23,
+  "grammar_result_path": "reports/v7/phase4/grammar0002_validation_result.json",
+  "grammar_result_sha256": "fcd3aee1496d4de5fae62b8fa883b30d8263533fc9eddabea20c7cbe3ec7062f",
+  "grammar0002_contract_death_causes": {
+    "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 16,
+    "CANDIDATE_NULL_FAILURE": 4,
+    "MULTIPLICITY_DEFLATION_FAILURE": 3,
+    "SIM_EXPLOIT": 0
+  },
+  "class_rows": [
+    {
+      "mechanism_class": "afternoon_inventory_reacceleration_after_compression",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 2,
+        "CANDIDATE_NULL_FAILURE": 2,
+        "MULTIPLICITY_DEFLATION_FAILURE": 2
+      }
+    },
+    {
+      "mechanism_class": "midday_liquidity_replenishment_reversion",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 6
+      }
+    },
+    {
+      "mechanism_class": "overnight_equity_inventory_risk_premium",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 2,
+        "CANDIDATE_NULL_FAILURE": 2
+      }
+    },
+    {
+      "mechanism_class": "overnight_inventory_partial_unwind",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 5,
+        "MULTIPLICITY_DEFLATION_FAILURE": 1
+      }
+    },
+    {
+      "mechanism_class": "weekly_energy_inventory_flow_continuation",
+      "causes": {
+        "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 1
+      }
+    }
+  ],
+  "parameter_level_feedback": false,
+  "outbound_order_count": 0,
+  "CONTRE": "Class-level aggregation prevents parameter leakage but cannot distinguish whether the three multiplicity failures need more independent time or represent genuinely unstable mechanisms."
+}
