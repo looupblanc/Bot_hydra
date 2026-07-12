@@ -1,0 +1,143 @@
+{
+  "schema": "hydra_v7_1_event_time_grammar_v1",
+  "grammar_id": "hydra_v7_1_event_time_grammar_0003",
+  "pre_registration_basis": {
+    "mechanism_class": "EVENT_TIME_DYNAMICS",
+    "class_is_absent_from_graveyard": true,
+    "outcome_or_pnl_read_for_design": false,
+    "prior_candidate_status_inherited": false,
+    "reason_for_selection": "The paid D1 event store exposes completion time and rate geometry that prior minute-state and opportunity-union grammars did not represent."
+  },
+  "economic_hypothesis": "Les besoins urgents d'execution paient lorsque l'horloge du marche accelere ou ralentit: la duree necessaire pour completer une quantite fixe, son debit signe et sa geometrie par seconde mesurent une pression temporelle distincte du simple rendement minute.",
+  "dataset_manifest": "data/manifests/v7_d1_date_matched_event_store_v1.json",
+  "dataset_manifest_sha256": "5c700f1ec38ab03a1206af7013a28600a681a0b3334781979b37ec356b5421ab",
+  "event_store_path": "data/cache/v7_d1/date_matched_event_bars_v1.parquet",
+  "event_store_sha256": "ea0208fc3666f912b39e9b21b302a466bd7ee00c802140d6a6beed73098aa4a3",
+  "execution_store_path": "data/cache/v7_d1/date_matched_minute_print_features_v2.parquet",
+  "execution_store_sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb",
+  "data_role": "DEVELOPMENT_ONLY",
+  "product": "ES",
+  "event_bar_types": [
+    "DOLLAR_BAR",
+    "VOLUME_BAR",
+    "SIGNED_IMBALANCE_BAR"
+  ],
+  "integrity_exclusions": {
+    "nonpositive_duration": true,
+    "start_and_end_on_different_Chicago_dates": true,
+    "contract_change_inside_source_or_execution_horizon": true,
+    "availability_before_event_end": true,
+    "entry_before_availability": true,
+    "incomplete_execution_horizon": true
+  },
+  "state_estimation": {
+    "grouping": "calendar_year + Chicago_session_day + explicit_contract + bar_type",
+    "rolling_history_events": 40,
+    "minimum_history_events": 40,
+    "past_only_shift_events": 1,
+    "high_quantile": 0.80,
+    "low_quantile": 0.20,
+    "duration_unit": "seconds",
+    "zero_or_cross_session_events_excluded_before_quantiles": true
+  },
+  "candidate_construction": {
+    "families": 4,
+    "motifs_per_family": 4,
+    "response_policies_per_motif": 2,
+    "bounded_horizons_per_structure": 4,
+    "candidate_count_per_family": 32,
+    "total_candidate_count": 128,
+    "execution_horizons_minutes": [
+      5,
+      15,
+      30,
+      60
+    ],
+    "response_policies": [
+      "CONTINUATION",
+      "REVERSAL"
+    ],
+    "unrestricted_parameter_grid": false,
+    "threshold_optimization": false,
+    "one_open_position_per_candidate": true
+  },
+  "families": [
+    {
+      "family_id": "EVENT_COMPLETION_SPEED",
+      "who_pays": "Les participants lents paient quand une quantite fixe se complete anormalement vite; les poursuivants paient lorsque la completion devient anormalement lente et signale l'epuisement.",
+      "motifs": [
+        "FAST_DOLLAR_COMPLETION",
+        "SLOW_DOLLAR_COMPLETION",
+        "FAST_VOLUME_COMPLETION",
+        "SLOW_VOLUME_COMPLETION"
+      ]
+    },
+    {
+      "family_id": "EVENT_CLOCK_ACCELERATION",
+      "who_pays": "Les inventaires adaptes au rythme precedent paient lorsque plusieurs barres de quantite fixe accelerent ou decelerent de facon persistante.",
+      "motifs": [
+        "DOLLAR_CLOCK_ACCELERATION",
+        "DOLLAR_CLOCK_DECELERATION",
+        "VOLUME_CLOCK_ACCELERATION",
+        "VOLUME_CLOCK_DECELERATION"
+      ]
+    },
+    {
+      "family_id": "SIGNED_FLOW_RATE",
+      "who_pays": "Les contreparties passives paient lorsqu'un debit agressif signe eleve arrive par seconde; les poursuivants paient si ce debit ne produit pas de progres proportionnel.",
+      "motifs": [
+        "DOLLAR_SIGNED_RATE",
+        "VOLUME_SIGNED_RATE",
+        "IMBALANCE_SIGNED_RATE",
+        "HIGH_RATE_LOW_PROGRESS"
+      ]
+    },
+    {
+      "family_id": "EVENT_TIME_PATH_GEOMETRY",
+      "who_pays": "Les participants extrapolant seulement la direction paient lorsque la longueur, le deplacement et l'efficacite du chemin rapportes au temps revelent une pression ou une absorption differente.",
+      "motifs": [
+        "HIGH_DOLLAR_PATH_RATE",
+        "HIGH_VOLUME_PATH_RATE",
+        "LOW_EFFICIENCY_HIGH_RATE",
+        "TIME_EFFICIENCY_TRANSITION"
+      ]
+    }
+  ],
+  "direction_policy": {
+    "completion_speed_and_clock": "sign_of_source_event_price_change_then_signed_flow_fallback",
+    "signed_flow_rate": "sign_of_signed_aggressor_volume",
+    "path_geometry": "sign_of_source_event_price_change",
+    "zero_direction": "reject_signal"
+  },
+  "funnel": {
+    "reuse_v7_1_stage0_stage2_policy": true,
+    "powered_minimum_walk_forward_events": 320,
+    "DSR_BH_before_positive_walk_forward": false,
+    "rolling_combine_before_DSR_BH": false
+  },
+  "mandatory_nulls_before_testing": {
+    "all_families": [
+      "SESSION_DAY_BLOCK_SHUFFLE",
+      "OPPORTUNITY_COUNT_MATCHED_RANDOM_DIRECTION",
+      "ONE_COMPLETED_EVENT_DELAY"
+    ],
+    "EVENT_COMPLETION_SPEED": [
+      "BAR_TYPE_ONLY_BASELINE"
+    ],
+    "EVENT_CLOCK_ACCELERATION": [
+      "SINGLE_EVENT_DURATION_BASELINE"
+    ],
+    "SIGNED_FLOW_RATE": [
+      "SIGNED_VOLUME_WITHOUT_TIME_BASELINE"
+    ],
+    "EVENT_TIME_PATH_GEOMETRY": [
+      "PATH_GEOMETRY_WITHOUT_TIME_BASELINE"
+    ]
+  },
+  "tripwire_required": true,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "Q4_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "La duree de completion peut surtout mesurer la liquidite intrajournaliere et non une prime directionnelle; les 122 barres traversant une date CT prouvent aussi que l'horloge doit etre auditee avant tout signal."
+}
