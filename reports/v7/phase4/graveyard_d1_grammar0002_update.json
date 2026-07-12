@@ -1,0 +1,30 @@
+{
+  "schema": "hydra_v7_graveyard_d1_update_v1",
+  "built_at_utc": "2026-07-12T20:02:37Z",
+  "graveyard_path": "mission/state/graveyard.db",
+  "graveyard_sha256": "e45e291f6828f6a962cf42099cc1c0b3ed29f3a1429f328d7f9d6bbbab1e09d1",
+  "integrity": "ok",
+  "class_signature_count": 91,
+  "indexed_object_count": 115536,
+  "grammar_tombstone_count_total": 93,
+  "d1_grammar0002_tombstone_count": 8,
+  "d1_grammar0002_new_class_signatures": 7,
+  "grammar_result_path": "reports/v7/data/d1_grammar0002_candidate_tribunal_result.json",
+  "grammar_result_sha256": "a5b6c8ac1073503f26a2ed82600bdcc6a12d873dde3611c081a2c0bd4249fc4f",
+  "d1_grammar0002_contract_death_causes": {
+    "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 4,
+    "MULTIPLICITY_DEFLATION_FAILURE": 2,
+    "SIM_EXPLOIT": 2
+  },
+  "parameter_level_feedback": false,
+  "generator_feedback_scope": [
+    "mechanism_class",
+    "regime",
+    "death_cause",
+    "candidate_count"
+  ],
+  "q4_access_delta": 0,
+  "forward_gap_access_delta": 0,
+  "outbound_order_count": 0,
+  "CONTRE": "Two ES mechanisms survived costs and nulls but failed temporal walk-forward and DSR; class-level tombstoning may hide a small regime-specific effect that only future data could distinguish."
+}
