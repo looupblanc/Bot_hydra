@@ -1,0 +1,27 @@
+{
+  "schema": "hydra_v7_d1_execution_addendum_v1",
+  "addendum_id": "v7_d1_microstructure_conservative_event_fills_0001",
+  "preregistered_at_utc": "2026-07-12T17:45:00Z",
+  "grammar_path": "WORM/v7-d1-microstructure-grammar-0001-2026-07-12.json",
+  "grammar_sha256": "f7b7f3d8d0a43749d31986e4848eeb7285123654dd9ca47eb327284831dd1691",
+  "validation_policy_path": "WORM/v7-d1-microstructure-validation-policy-2026-07-12.json",
+  "validation_policy_sha256": "f35fd49a91c38abfb975cacd1270249801d3e6289525559400155232ea7079ab",
+  "reason": "A completed event bar is known only after its trigger print is received; filling at that already-observed close would be an impossible same-print execution under R14.",
+  "frozen_execution": {
+    "event_entry": "first print/open of the first event bar whose event timestamp is not earlier than signal availability",
+    "event_holding": "count the preregistered number of fully completed post-entry event bars",
+    "event_exit": "first print/open of the immediately following event bar after the holding count completes",
+    "cash_open_entry": "first 09:01 CT print not earlier than 09:00-bar availability",
+    "cash_open_exit": "first 10:01 CT print after the completed 10:00 CT minute",
+    "same_trigger_print_fill": false,
+    "latency_proxy": "one subsequent observable print plus frozen slippage costs",
+    "contract_change": "fail closed"
+  },
+  "effect_direction": "The addendum can only add execution delay relative to the ambiguous close wording; it does not change signals, sides, thresholds, costs, nulls, DSR, BH or promotion gates.",
+  "safety": {
+    "q4_allowed": false,
+    "forward_gap_allowed": false,
+    "outbound_orders_allowed": false
+  },
+  "CONTRE": "The first subsequent print is still a bar-level executable proxy rather than a bid/ask quote; any survivor requires targeted TBBO evidence before a deployment ticket."
+}
