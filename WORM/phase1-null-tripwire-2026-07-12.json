@@ -1,0 +1,127 @@
+{
+  "schema": "hydra_v7_phase1_null_tripwire_preregistration_v1",
+  "experiment_id": "hydra_v7_null_tripwire_0001",
+  "preregistered_at_utc": "2026-07-12T14:12:52Z",
+  "contract": {
+    "path": "MISSION_CONTRACT.md",
+    "sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+    "tag": "worm/contract-2026-07-12-v2"
+  },
+  "gate_G0": {
+    "verdict": "GREEN",
+    "result_path": "reports/v7/phase0_v2/g0_result.json",
+    "result_sha256": "cc6f24342dd6a99a19bfb19c96ca02154c4ef4500e61ef74aa205106c9285aee"
+  },
+  "source_manifest": {
+    "path": "config/v7/phase1_source_manifest.sha256",
+    "sha256": "3065520036b6516c1542fd19d5f7e816266960d2e9349fa2d85f89befee4f07b"
+  },
+  "data_manifest": {
+    "path": "data/manifest.json",
+    "file_sha256": "e471cc472a46e68d7164d73ef95c16e995bbded6bad9fcb8537cb89657274b38",
+    "canonical_hash": "cc8b6da2ea2c235f9871092ac4ddf3a97d4d5dc5c6ba589e30414a337f884371"
+  },
+  "frozen_object_scope": {
+    "static_baskets": 55,
+    "nonrandom_adaptive_controllers": 960,
+    "object_count": 1015,
+    "real_episode_count": 25680,
+    "static_episode_count": 2640,
+    "controller_episode_count": 23040,
+    "selection": "All 55 P0 static basket elites plus every non-random controller in generations 0000 through 0005. The 240 MATCHED_RANDOM_HASH_CONTROL rows are diagnostics and are excluded from both numerator and denominator.",
+    "episode_starts": "Use each frozen object's exact recorded episode_start_days without reselection.",
+    "generation_frozen": true,
+    "parameter_changes_allowed": false,
+    "strategy_signal_schedule_frozen": true
+  },
+  "market_scope": ["CL", "ES", "GC", "NQ", "RTY", "YM"],
+  "counterfactual_level": {
+    "name": "FROZEN_SIGNAL_COMMON_MARKET_PATH",
+    "description": "Keep every strategy signal, basket, controller, cost, episode start and account rule frozen. Replace only the subsequent market OHLC path with a product-common counterfactual path, then rebuild every event PnL/MFE/MAE from that path.",
+    "feature_and_signal_recomputation": false,
+    "cross_component_market_path_shared": true,
+    "costs_preserved_exactly": true,
+    "CONTRE": "This is a conditional-outcome null for the frozen selected signals, not a full rerun of feature selection on synthetic raw data; it directly tests whether selected account pass-rates survive removal of signal/outcome alignment."
+  },
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "block_size_trading_days": 5,
+      "algorithm": "Partition each product's ordered Chicago trading days into consecutive five-day blocks, permute blocks with the frozen product seed (force one cyclic rotation only if RNG returns identity), assign source daily normalized OHLC paths to target days, and interpolate cumulative path on the target day's bar grid.",
+      "seeds": {"CL": 71001, "ES": 71002, "GC": 71003, "NQ": 71004, "RTY": 71005, "YM": 71006}
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "algorithm": "For each product and session phase, estimate close-to-close one-minute standard deviation from contiguous development bars; generate zero-drift Gaussian increments on the unchanged bar grid; sample empirical nonnegative upper/lower wick excursions within the same session phase; reset path level at each session while preserving a product-common path for every component.",
+      "seeds": {"CL": 72001, "ES": 72002, "GC": 72003, "NQ": 72004, "RTY": 72005, "YM": 72006}
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "algorithm": "Group Chicago trading-day OHLC paths by calendar year, rotate year blocks by one non-identity position, concatenate source days in the rotated order, assign them one-to-one to the original ordered target-day grid, and interpolate cumulative path when day lengths differ.",
+      "seeds": {"CL": 73001, "ES": 73002, "GC": 73003, "NQ": 73004, "RTY": 73005, "YM": 73006},
+      "nonidentity_rotation_required": true
+    }
+  },
+  "event_rebuild": {
+    "entry": "Synthetic close at the frozen event decision timestamp.",
+    "exit": "Synthetic close at the frozen event exit timestamp minus one bar.",
+    "gross_pnl": "(exit-entry)*frozen_side*frozen_point_value*frozen_quantity",
+    "net_pnl": "gross_pnl minus the original frozen round-turn cost",
+    "MFE_MAE": "Synthetic high/low extrema over the frozen holding interval, with the same cost deducted.",
+    "hard_fail": "Missing timestamp, segment crossing, nonfinite path, changed signal count, changed object, changed start, or account-rule mismatch."
+  },
+  "account_replay": {
+    "primary_mll_mode": "eod_level_rt_breach",
+    "diagnostic_mll_mode": "intraday_hwm",
+    "optional_DLL": false,
+    "same_baskets": true,
+    "same_controllers": true,
+    "same_conflict_rules": true,
+    "same_costs": true,
+    "same_episode_starts": true,
+    "real_equivalence_required_before_null_verdict": true
+  },
+  "episode_power": {
+    "real_episodes": 25680,
+    "null_episodes_per_control": 25680,
+    "pooled_null_episodes": 77040,
+    "null_at_least_real_required": true
+  },
+  "primary_metric": {
+    "real_pass_rate": "Total passes over all 25,680 frozen real episodes divided by 25,680.",
+    "null_pass_rate": "Total passes pooled over all three controls divided by 77,040.",
+    "NULL_RATIO": "null_pass_rate / real_pass_rate",
+    "weighting": "Each episode has equal weight; every object has identical real and per-control episode counts.",
+    "diagnostics": ["per_control_NULL_RATIO", "object_level_ratios", "MLL_breach_ratio", "net_expectancy", "target_progress"]
+  },
+  "verdict_policy": {
+    "threshold": 0.8,
+    "if_NULL_RATIO_gte_threshold": "ARTEFACT",
+    "artefact_actions": ["badge_all_55_elites_GEOMETRY_ONLY", "remove_pass_rate_from_primary_dashboards", "retain_expectancy_metrics", "generation_remains_blocked_until_artefact_resolved"],
+    "if_NULL_RATIO_lt_threshold": "GREEN",
+    "green_action": "Use null-adjusted baseline as zero for future metrics.",
+    "if_real_pass_rate_zero": "BLOCKED_UNDEFINED_RATIO",
+    "threshold_changes_after_run": false
+  },
+  "reproducibility": {
+    "all_rng": "numpy.random.Generator(PCG64)",
+    "seed_derivation": "No derived or ambient seeds; only the explicit product/control seeds above.",
+    "synthetic_path_hash_required": true,
+    "source_hash_verification_required": true
+  },
+  "budget": {
+    "phase_llm_limit_usd": 12.0,
+    "paid_data_allowed": false,
+    "expected_data_spend_usd": 0.0
+  },
+  "safety": {
+    "q4_access_allowed": false,
+    "gap_access_allowed": false,
+    "outbound_orders_allowed": false,
+    "strategy_generation_allowed": false
+  },
+  "output": {
+    "directory": "reports/v7/phase1",
+    "result": "reports/v7/phase1/null_tripwire_result.json",
+    "report": "reports/v7/phase1/null_tripwire_report.md",
+    "gate": "reports/v7/phase1/g1_report.md"
+  },
+  "honest_green_statement": "The 0.8 threshold, scope, seeds, transforms, weighting, primary MLL mode and all failure rules are frozen before any counterfactual path is generated or replayed."
+}
