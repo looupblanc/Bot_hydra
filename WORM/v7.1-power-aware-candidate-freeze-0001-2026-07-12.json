@@ -1,0 +1,236 @@
+{
+  "schema": "hydra_v7_1_power_aware_candidate_freeze_v1",
+  "freeze_id": "hydra_v7_1_power_aware_candidate_freeze_0001",
+  "principal_amendment_path": "MISSION_CONTRACT_AMENDMENT_002_POWER_AWARE.md",
+  "principal_amendment_sha256": "f41caaa9b4a1ad17c7436f4594ed669c3784321d4afac805dee0b87f79a02caf",
+  "selection_rule": "all_and_only_walk_forward_positive_candidates_from_frozen_grammars_0001_0002_0003",
+  "candidate_count": 16,
+  "status_inheritance": false,
+  "observed_threshold_tuning_authorized": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "cost_policy": {
+    "path": "config/v7/phase0_g0_preregistration.json",
+    "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "walk_forward_stress": "STRESS_1_5X",
+    "fragility_stress": "STRESS_2X",
+    "rolling_combine_initial_stress": "BASE",
+    "cost_horizon_is_candidate_holding_minutes": true
+  },
+  "data_fingerprints": {
+    "minute_print_features_path": "data/cache/v7_d1/date_matched_minute_print_features_v2.parquet",
+    "minute_print_features_sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb",
+    "event_bars_path": "data/cache/v7_d1/date_matched_event_bars_v1.parquet",
+    "event_bars_sha256": "ea0208fc3666f912b39e9b21b302a466bd7ee00c802140d6a6beed73098aa4a3"
+  },
+  "grammar_inputs": [
+    {
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "grammar_path": "WORM/v7.1-event-mechanism-grammar-0001-2026-07-12.json",
+      "grammar_sha256": "e1c8de955302da2be836bbcebf2bfedc07768b2d9b987ea32258a85a2b0caf8a",
+      "signal_manifest_path": "reports/v7_1/discovery/v71_signal_manifest.json",
+      "signal_manifest_sha256": "b366bd8f295b0a1110532988b15cc9dde70d450fc8ea9a53b476c16b61a7e15c",
+      "funnel_result_path": "reports/v7_1/discovery/v71_development_funnel_result.json",
+      "tripwire_status": "GREEN_NULL_ADJUSTED_BASELINE"
+    },
+    {
+      "grammar_id": "hydra_v7_1_opportunity_density_grammar_0002",
+      "grammar_path": "WORM/v7.1-opportunity-density-grammar-0002-2026-07-12.json",
+      "grammar_sha256": "ef44e6e72c42b2ed4b7228f3addbd2f182e3e51bcfb619aa4c0a2102db6d3566",
+      "signal_manifest_path": "reports/v7_1/discovery_0002/v71_opportunity_density_signal_manifest.json",
+      "signal_manifest_sha256": "c90a2321fc66e114d65dd533d077ec04308ae714369e28b82f5d9e996dd7fa24",
+      "funnel_result_path": "reports/v7_1/discovery_0002/v71_opportunity_density_funnel_result.json",
+      "tripwire_status": "GREEN_NULL_ADJUSTED_BASELINE"
+    },
+    {
+      "grammar_id": "hydra_v7_1_event_time_grammar_0003",
+      "grammar_path": "WORM/v7.1-event-time-grammar-0003-2026-07-12.json",
+      "grammar_sha256": "df9ffd7c6c87707838f53c30e474d7477bf17532ba29bffc1baa2b2a5bd0903f",
+      "signal_manifest_path": "reports/v7_1/discovery_0003/v71_event_time_signal_manifest.json",
+      "signal_manifest_sha256": "e515a0ab84600edfd8552c46b3471f77d0ba17ad3b761cf7757d5fdaa89c736d",
+      "funnel_result_path": "reports/v7_1/discovery_0003/v71_event_time_funnel_result.json",
+      "tripwire_status": "ARTEFACT_GEOMETRY_ONLY"
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "COST_RESILIENT_LOW_TURNOVER",
+      "motif": "RARE_INTENSITY_WITH_PROGRESS",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "b4c471a6f335d47313ec1dafe5911db276a0ca48e423f2ade12b15a5aeca3dc5",
+      "signal_path_hash": "977ec8a6682f751834b69e40d8cd7e20ddfaa0493aee0884cd471d028b93b0aa"
+    },
+    {
+      "candidate_id": "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "EFFORT_WITHOUT_PROGRESS",
+      "motif": "HIGH_PATH_LOW_EFFICIENCY",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 30,
+      "cost_horizon": "30m",
+      "specification_hash": "08bc192110ad27badb96edeb2c06e63f7d9bc81469116f887f4bf5d0634b4cf4",
+      "signal_path_hash": "8b4c283a6e8b792384fce01cb7caea88917ac2c3b97d3f30b36f1eaa22f19aa3"
+    },
+    {
+      "candidate_id": "v71g1_event_participation_state_distributed_participation_reversal_h60",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "EVENT_PARTICIPATION_STATE",
+      "motif": "DISTRIBUTED_PARTICIPATION",
+      "direction_policy": "REVERSAL",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "be854a964e1d08328002fc5c723e331771b016468ddadcbca03072be26ac0ef7",
+      "signal_path_hash": "7e991f703c6fd9a8ca564bc26bbf771c137799cfc5d5507c153050d4cc82d414"
+    },
+    {
+      "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h30",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "EVENT_PARTICIPATION_STATE",
+      "motif": "PARTICIPATION_ACCELERATION",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 30,
+      "cost_horizon": "30m",
+      "specification_hash": "e41868a1555cf8247b5c0ce18ed37ffddb53a6944bc9b05fcea81b8b598cdb73",
+      "signal_path_hash": "0e51c04cc634821ae7f78cc658ecfbe23c69f5d11dfa58a4520c939c0d4dc110"
+    },
+    {
+      "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h60",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "EVENT_PARTICIPATION_STATE",
+      "motif": "PARTICIPATION_ACCELERATION",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "8e76ba4f5f4ee6e9bc21a2413fa1206a329057a111eac296b36d590d69b09a71",
+      "signal_path_hash": "21d7d63ce037fc19e8ce716fc6b179483009c53f688651b4ff6f94c6be32c5cd"
+    },
+    {
+      "candidate_id": "v71g1_event_path_geometry_geometry_transition_motif_reversal_h30",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "EVENT_PATH_GEOMETRY",
+      "motif": "GEOMETRY_TRANSITION_MOTIF",
+      "direction_policy": "REVERSAL",
+      "holding_minutes": 30,
+      "cost_horizon": "30m",
+      "specification_hash": "54eb0668203e9afe840f6dc660b1c5a20a9ef3aa44b1ef0a38c6c76bbe319860",
+      "signal_path_hash": "e489358f30002a69fd191afb068bbe829ae830a2007171b8c9c5af44bdf7d081"
+    },
+    {
+      "candidate_id": "v71g1_event_path_geometry_geometry_transition_motif_reversal_h60",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "EVENT_PATH_GEOMETRY",
+      "motif": "GEOMETRY_TRANSITION_MOTIF",
+      "direction_policy": "REVERSAL",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "66d38a148c6b166138e766512e408ac61cb9b4a9e5fb29444c96f5ca7f04b3c7",
+      "signal_path_hash": "7e8efa159e0bb7b0941f9b3f39235e3fd3d52333a4807cb04c461e978819feee"
+    },
+    {
+      "candidate_id": "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "EVENT_STATE_TRANSITIONS",
+      "motif": "COMPRESSION_TO_EXPANSION",
+      "direction_policy": "REVERSAL",
+      "holding_minutes": 30,
+      "cost_horizon": "30m",
+      "specification_hash": "154a331712a38e42b798cfc5aa82bd3fe163799e9fe011efc121010e278bfb57",
+      "signal_path_hash": "39a6d9e2c10bf995b214bcd48fed4d4fe4b8ab6551770248e565b85d07b81407"
+    },
+    {
+      "candidate_id": "v71g1_event_state_transitions_flow_acceleration_transition_continuation_h60",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "EVENT_STATE_TRANSITIONS",
+      "motif": "FLOW_ACCELERATION_TRANSITION",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "386ba6154d9e0b7e8069173e655f5207b028ff7ca0d9ee6ab5294f8a71907876",
+      "signal_path_hash": "1ddd0bfed279c4f322136bbd11f765b41c7ee008b691508451e80ab4d2285329"
+    },
+    {
+      "candidate_id": "v71g1_future_path_hazard_continuation_hazard_state_reversal_h30",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "FUTURE_PATH_HAZARD",
+      "motif": "CONTINUATION_HAZARD_STATE",
+      "direction_policy": "REVERSAL",
+      "holding_minutes": 30,
+      "cost_horizon": "30m",
+      "specification_hash": "d397a4ba6bf2c5ddd1a2cacb106d20db5eae674f0ff7d6e99357e2e5effb51d0",
+      "signal_path_hash": "3cc3306b0944d67ffcc1cb92d07e7b29deabceebe0298df4975e5aa787f4568b"
+    },
+    {
+      "candidate_id": "v71g1_future_path_hazard_continuation_hazard_state_reversal_h60",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "family_id": "FUTURE_PATH_HAZARD",
+      "motif": "CONTINUATION_HAZARD_STATE",
+      "direction_policy": "REVERSAL",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "01ef080817283978eb75f0edd969c8683bca84a9bbbee02202d1c5dfb06778c6",
+      "signal_path_hash": "2e3b2576690c584a26680f92e0a020cd0b043860b61f108e491dce81f8b33a11"
+    },
+    {
+      "candidate_id": "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+      "grammar_id": "hydra_v7_1_opportunity_density_grammar_0002",
+      "family_id": "EVENT_CLUSTER_HAZARD",
+      "motif": "CLUSTER_RELEASE",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 30,
+      "cost_horizon": "30m",
+      "specification_hash": "fbbe1548baebf10157566f8aacbe00574390839e51c5aaf47604fd11be1305ee",
+      "signal_path_hash": "dccbd45317bc31d4480fcb32839d1185dcfe3d0fca8eab4463ce6947eb319818"
+    },
+    {
+      "candidate_id": "v71g2_session_phase_event_density_afternoon_active_state_continuation_h60",
+      "grammar_id": "hydra_v7_1_opportunity_density_grammar_0002",
+      "family_id": "SESSION_PHASE_EVENT_DENSITY",
+      "motif": "AFTERNOON_ACTIVE_STATE",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "e5f037732ec85c73149ca2164a069e70cea25b83528a0087f26eaa9e8011f914",
+      "signal_path_hash": "66e02bde79fda466c89a1726c262acedcb6d5ecc0e9bfa8b233a48f42f901401"
+    },
+    {
+      "candidate_id": "v71g2_state_transition_coverage_recovery_or_failed_extension_continuation_h60",
+      "grammar_id": "hydra_v7_1_opportunity_density_grammar_0002",
+      "family_id": "STATE_TRANSITION_COVERAGE",
+      "motif": "RECOVERY_OR_FAILED_EXTENSION",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "a95354a88623936c0e272260a47ff8540b719fd9cac49c0525a0a82db73ccdaf",
+      "signal_path_hash": "91e5edadec10882ae6e6ba2ceac191df8aa0ab7396a410cebd7d43b487e63af1"
+    },
+    {
+      "candidate_id": "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+      "grammar_id": "hydra_v7_1_event_time_grammar_0003",
+      "family_id": "EVENT_COMPLETION_SPEED",
+      "motif": "FAST_VOLUME_COMPLETION",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "88db95c23f163645f546b98fa173faa7036e66bebdb5d82ece433aee38b77fc0",
+      "signal_path_hash": "a19a69d6dd80f715c96a5150b29467850a9561f4960a641b49267279ae8630dc"
+    },
+    {
+      "candidate_id": "v71g3_signed_flow_rate_high_rate_low_progress_continuation_h60",
+      "grammar_id": "hydra_v7_1_event_time_grammar_0003",
+      "family_id": "SIGNED_FLOW_RATE",
+      "motif": "HIGH_RATE_LOW_PROGRESS",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "95d929822cd9e96e1ae6a2347ca91a8057aa29550132454f5959799fc66e8831",
+      "signal_path_hash": "5110717913efc73e82d354a3613f1ba98f12fb1d03a3c2cf8a19b6081f4bbc46"
+    }
+  ],
+  "promotion_state": "FROZEN_PENDING_CANDIDATE_SPECIFIC_POWER_AUDIT",
+  "CONTRE": "All sixteen candidates were selected after observing positive walk-forward expectancy; the power audit must account for this selection and the event-time grammar remains GEOMETRY_ONLY for Combine pass-rate interpretation."
+}
