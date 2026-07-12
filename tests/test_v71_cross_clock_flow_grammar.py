@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from hydra.research.v71_cross_clock_flow_grammar import (
+    build_cross_clock_pairs,
     candidate_specs,
     generate_signal_population,
     load_cross_clock_sources,
 )
+from hydra.research.v71_event_time_grammar import load_event_time_sources
 
 
 def test_cross_clock_grammar_is_bounded_and_deterministic() -> None:
@@ -19,3 +21,12 @@ def test_cross_clock_grammar_is_bounded_and_deterministic() -> None:
     for rows in first.values():
         assert all(row.availability_ns <= row.decision_ns <= row.entry_minute_start_ns for row in rows)
         assert all(row.entry_minute_start_ns < row.exit_minute_start_ns for row in rows)
+
+
+def test_cross_clock_pair_builder_matches_frozen_source_path() -> None:
+    minute, pairs, audit = load_cross_clock_sources(".")
+    raw_minute, event, _ = load_event_time_sources(".")
+    rebuilt, rebuilt_audit = build_cross_clock_pairs(raw_minute, event)
+    assert minute.equals(raw_minute)
+    assert pairs.equals(rebuilt)
+    assert audit == rebuilt_audit

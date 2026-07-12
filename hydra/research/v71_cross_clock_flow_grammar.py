@@ -105,6 +105,15 @@ def load_cross_clock_sources(
     root = Path(project_root).resolve()
     _load_grammar(root)
     minute, event, _ = load_event_time_sources(root)
+    pairs, audit = build_cross_clock_pairs(minute, event)
+    return minute, pairs, audit
+
+
+def build_cross_clock_pairs(
+    minute: pd.DataFrame,
+    event: pd.DataFrame,
+) -> tuple[pd.DataFrame, CrossClockSourceAudit]:
+    """Build the frozen cross-clock representation from supplied price worlds."""
     selected = event[event["bar_type"].isin(("VOLUME_BAR", "DOLLAR_BAR"))].copy()
     selected["availability_minute"] = (
         selected["availability_ns"].to_numpy(np.int64) // MINUTE_NS
@@ -165,7 +174,7 @@ def load_cross_clock_sources(
         executable_pair_count_30m=int(pairs["executable_30"].sum()),
         executable_pair_count_60m=int(pairs["executable_60"].sum()),
     )
-    return minute, pairs, audit
+    return pairs, audit
 
 
 def generate_signal_population(
@@ -311,6 +320,7 @@ __all__ = [
     "CrossClockSourceAudit",
     "GRAMMAR_ID",
     "V71CrossClockFlowError",
+    "build_cross_clock_pairs",
     "candidate_specs",
     "generate_signal_population",
     "load_cross_clock_sources",
