@@ -179,6 +179,10 @@ TURBO_PROMOTION_EXPERIMENT_PREFIX = "turbo_promotion_batch_"
 EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX = "evidence_conversion_v3_cohort_"
 DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0005"
 DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID = "q4_atomic_one_shot_0003"
+FORWARD_SHADOW_APPEND_UPDATE_PREFIX = "forward_shadow_append_update_"
+DELAYED_FORWARD_FEED_TASK_SHA256 = (
+    "b0d42b5720272403d7b054ffc95be7a063f19726c83039fcca827da8427a3419"
+)
 DECISION_BRIDGE_V4_TASK_SHA256 = (
     "e80a099f2fca2a67fedbde860cf0409d7298798d6681866eb05117aeec9ac942"
 )
@@ -361,6 +365,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "evidence_conversion_v3_cohort",
     "decision_bridge_v4_prepare",
     "q4_atomic_one_shot",
+    "forward_shadow_append_update",
 }
 
 
@@ -452,6 +457,10 @@ class AutonomousMissionController:
                 "action_type": "INTEGRITY_BLOCKED",
                 "rationale": str(exc),
             }, False
+        # Forward data is an independent persistent pipeline.  Its bounded
+        # read-only update may recover a feed-only engineering wait without
+        # changing the scientific or Q4 state.
+        self._reconcile_due_forward_shadow_update(conn)
         phase = str(get_kv(conn, "current_phase", ""))
         if phase in {"INTEGRITY_BLOCKED", "ENGINEERING_BLOCKED", "EXPERIMENT_BLOCKED"}:
             return {
@@ -539,6 +548,29 @@ class AutonomousMissionController:
             remaining_budget_usd=float(get_kv(conn, "remaining_databento_budget_usd", self.config.remaining_databento_budget_usd)),
         )
         if action.get("action_type") == "WAIT":
+            next_feed_check = get_kv(conn, "forward_feed_next_check_at_utc", None)
+            if next_feed_check:
+                try:
+                    deadline = datetime.fromisoformat(
+                        str(next_feed_check).replace("Z", "+00:00")
+                    ).astimezone(timezone.utc)
+                except ValueError:
+                    deadline = None
+                if deadline is not None and deadline > datetime.now(timezone.utc):
+                    set_kv(conn, "current_phase", "WAITING_FOR_NEXT_ACTION")
+                    set_kv(conn, "current_blocker", None)
+                    set_kv(conn, "last_error", None)
+                    set_kv(conn, "next_wake_at_utc", deadline.isoformat())
+                    return {
+                        **action,
+                        "action_id": "waiting_for_bounded_forward_update",
+                        "action_type": "WAIT",
+                        "rationale": (
+                            "No eligible bar exists yet; the append-only feed has "
+                            "a legitimate future scheduler deadline."
+                        ),
+                        "next_wake_at_utc": deadline.isoformat(),
+                    }, False
             first_stall = get_kv(conn, "current_phase") != "SCHEDULER_STALLED"
             set_kv(conn, "current_phase", "SCHEDULER_STALLED")
             set_kv(conn, "current_blocker", "NO_EXECUTABLE_ACTION_OR_SCHEDULER_DEADLINE")
@@ -2181,6 +2213,60 @@ class AutonomousMissionController:
         self._reconcile_completed_turbo_epochs(conn)
         self._reconcile_completed_turbo_promotions(conn)
         self._reconcile_completed_evidence_conversion_cohorts(conn)
+        self._reconcile_completed_forward_shadow_updates(conn)
+
+    def _reconcile_completed_forward_shadow_updates(self, conn: Any) -> None:
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='forward_shadow_append_update' AND status='COMPLETED' "
+            "ORDER BY experiment_id"
+        ).fetchall()
+        accounted = set(
+            get_kv(conn, "forward_feed_accounted_updates", []) or []
+        )
+        for row in rows:
+            experiment_id = str(row[0])
+            if experiment_id in accounted:
+                continue
+            record = experiment_record(conn, experiment_id)
+            result = dict((record or {}).get("result") or {})
+            if not result:
+                continue
+            self._route_forward_shadow_append_update_result(
+                conn, result, experiment_id
+            )
+            accounted.add(experiment_id)
+            set_kv(conn, "forward_feed_accounted_updates", sorted(accounted))
+            reconciliation_id = (
+                f"completed:{experiment_id}:"
+                f"{(record or {}).get('specification_hash') or result.get('result_hash') or 'unknown'}"
+            )
+            if not self._evidence_reconciliation_exists(reconciliation_id):
+                record_evidence(
+                    self.paths,
+                    {
+                        "reconciliation_id": reconciliation_id,
+                        "scope": "FORWARD_SHADOW_DATA",
+                        "experiment_id": experiment_id,
+                        "experiment_type": "forward_shadow_append_update",
+                        "status": "COMPLETED",
+                        "result": result,
+                    },
+                )
+            if not self._event_reconciliation_exists(conn, reconciliation_id):
+                append_event(
+                    conn,
+                    "completed_experiment_reconciled",
+                    {
+                        "experiment_id": experiment_id,
+                        "experiment_type": "forward_shadow_append_update",
+                        "scientific_conclusion": result.get(
+                            "scientific_conclusion"
+                        ),
+                        "report_path": result.get("report_path"),
+                        "reconciliation_id": reconciliation_id,
+                    },
+                )
 
     def _reconcile_completed_turbo_epochs(self, conn: Any) -> None:
         rows = conn.execute(
@@ -5893,10 +5979,20 @@ class AutonomousMissionController:
         )
 
     def _reconcile_evidence_conversion_v3(
-        self, conn: Any, *, cohort_index: int
+        self,
+        conn: Any,
+        *,
+        cohort_index: int,
+        post_q4_debt_closure: bool = False,
     ) -> bool:
         if cohort_index < 0:
             raise ValueError("Evidence-conversion cohort index must be non-negative.")
+        if post_q4_debt_closure:
+            q4_record = experiment_record(conn, DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID)
+            if (q4_record or {}).get("status") != "COMPLETED" or q4_access_count() != 1:
+                raise EvidenceConversionContractError(
+                    "Post-Q4 debt closure requires one closed authoritative Q4 transaction."
+                )
         history = self._evidence_conversion_pre_holdout_history(conn)
         stop_reason = self._evidence_conversion_finalization_reason(
             history,
@@ -5916,7 +6012,7 @@ class AutonomousMissionController:
                 else None
             ),
         )
-        if stop_reason is not None:
+        if stop_reason is not None and not post_q4_debt_closure:
             retired = block_queued_experiments_by_type(
                 conn,
                 "evidence_conversion_v3_cohort",
@@ -6050,6 +6146,9 @@ class AutonomousMissionController:
             "network_allowed": False,
             "live_or_broker_allowed": False,
             "paper_shadow_ready_allowed": False,
+            "post_q4_debt_closure": bool(post_q4_debt_closure),
+            "authoritative_q4_access_count_at_start": int(q4_access_count()),
+            "q4_reuse_prohibited": True,
             "expected_decision_information_gain": 0.99,
             **sources.to_specification_fields(),
         }
@@ -9431,6 +9530,12 @@ class AutonomousMissionController:
         self, conn: Any, result: dict[str, Any], experiment_id: str
     ) -> None:
         validate_evidence_conversion_result(result)
+        source_record = experiment_record(conn, experiment_id) or {}
+        post_q4_debt_closure = bool(
+            (source_record.get("specification") or {}).get(
+                "post_q4_debt_closure", False
+            )
+        )
         if str(result.get("cohort_id") or "") != experiment_id:
             raise EvidenceConversionContractError(
                 "Evidence-conversion result cohort ID differs from its immutable experiment ID."
@@ -9448,6 +9553,26 @@ class AutonomousMissionController:
         pre_holdout_ids = [
             str(value) for value in result.get("pre_holdout_candidate_ids") or []
         ]
+        if post_q4_debt_closure and pre_holdout_ids:
+            bank = dict(get_kv(conn, "foundry_candidate_bank", {}) or {})
+            independent = set(
+                get_kv(conn, "post_q4_independent_validation_candidate_ids", [])
+                or []
+            )
+            for candidate_id in pre_holdout_ids:
+                row = dict(bank.get(candidate_id) or {})
+                row["status"] = "POST_Q4_INDEPENDENT_VALIDATION_CANDIDATE"
+                row["evidence_tier"] = "POST_Q4_INDEPENDENT_VALIDATION_CANDIDATE"
+                row["q4_reuse_allowed"] = False
+                row["paper_shadow_ready"] = False
+                bank[candidate_id] = row
+                independent.add(candidate_id)
+            set_kv(conn, "foundry_candidate_bank", bank)
+            set_kv(
+                conn,
+                "post_q4_independent_validation_candidate_ids",
+                sorted(independent),
+            )
         completed_ids = {
             str(value)
             for value in result.get("complete_validation_candidate_ids") or []
@@ -9492,13 +9617,16 @@ class AutonomousMissionController:
         accumulated = set(
             get_kv(conn, "pre_holdout_candidate_ids", []) or []
         )
-        accumulated.update(pre_holdout_ids)
+        if not post_q4_debt_closure:
+            accumulated.update(pre_holdout_ids)
         set_kv(conn, "pre_holdout_candidate_ids", sorted(accumulated))
         set_kv(conn, "pre_holdout_candidate_count", len(accumulated))
         pre_holdout_history = self._evidence_conversion_pre_holdout_history(
             conn,
-            current_experiment_id=experiment_id,
-            current_result=result,
+            current_experiment_id=(
+                None if post_q4_debt_closure else experiment_id
+            ),
+            current_result=(None if post_q4_debt_closure else result),
         )
         set_kv(
             conn,
@@ -9543,6 +9671,10 @@ class AutonomousMissionController:
             "cumulative_decided_candidate_count": len(previously_decided),
             "paper_shadow_ready": 0,
             "q4_access_count": 0,
+            "post_q4_debt_closure": post_q4_debt_closure,
+            "post_q4_independent_candidate_ids": (
+                pre_holdout_ids if post_q4_debt_closure else []
+            ),
             "scientific_conclusion": result.get("scientific_conclusion"),
             "report_path": result.get("report_path"),
         }
@@ -9564,12 +9696,20 @@ class AutonomousMissionController:
         set_kv(conn, "paper_shadow_ready", int(get_kv(conn, "paper_shadow_ready", 0)))
         set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
 
-        finalization_reason = self._evidence_conversion_finalization_reason(
-            pre_holdout_history,
-            accumulated_pre_holdout_count=len(accumulated),
-            remaining_evidence_debt=metrics["evidence_debt_queue_count"],
+        finalization_reason = (
+            (
+                "POST_Q4_EVIDENCE_DEBT_CLOSED"
+                if metrics["evidence_debt_queue_count"] == 0
+                else None
+            )
+            if post_q4_debt_closure
+            else self._evidence_conversion_finalization_reason(
+                pre_holdout_history,
+                accumulated_pre_holdout_count=len(accumulated),
+                remaining_evidence_debt=metrics["evidence_debt_queue_count"],
+            )
         )
-        if finalization_reason is not None:
+        if finalization_reason is not None and not post_q4_debt_closure:
             retired = block_queued_experiments_by_type(
                 conn,
                 "evidence_conversion_v3_cohort",
@@ -9595,8 +9735,9 @@ class AutonomousMissionController:
             followup_queued = self._reconcile_evidence_conversion_v3(
                 conn,
                 cohort_index=followup_index,
+                post_q4_debt_closure=post_q4_debt_closure,
             )
-        if finalization_reason is not None:
+        if finalization_reason is not None and not post_q4_debt_closure:
             set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
             set_kv(
                 conn,
@@ -9614,6 +9755,11 @@ class AutonomousMissionController:
             set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
             set_kv(conn, "current_blocker", None)
             set_kv(conn, "last_error", None)
+        elif post_q4_debt_closure:
+            set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+            set_kv(conn, "current_blocker", None)
+            set_kv(conn, "last_error", None)
+            set_kv(conn, "post_q4_evidence_debt_closed", True)
         else:
             set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
             set_kv(
@@ -9861,6 +10007,222 @@ class AutonomousMissionController:
             set_kv(conn, "last_error", f"{type(exc).__name__}:{exc}"[:4000])
             set_kv(conn, "decision_bridge_v4_status", "Q4_PREFLIGHT_BLOCKED")
 
+    def _reconcile_due_forward_shadow_update(self, conn: Any) -> bool:
+        q4_record = experiment_record(conn, DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID)
+        if (q4_record or {}).get("status") != "COMPLETED":
+            return False
+        phase = str(get_kv(conn, "current_phase", ""))
+        blocker = str(get_kv(conn, "current_blocker", "") or "")
+        if phase == "INTEGRITY_BLOCKED" and blocker not in {
+            "FORWARD_DATA_INTEGRITY_BLOCKED",
+        }:
+            return False
+        active = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='forward_shadow_append_update' "
+            "AND status IN ('QUEUED','RUNNING') LIMIT 1"
+        ).fetchone()
+        if active is not None:
+            if phase in {"ENGINEERING_BLOCKED", "EXPERIMENT_BLOCKED", "SCHEDULER_STALLED"}:
+                set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+                set_kv(conn, "current_blocker", None)
+                set_kv(conn, "last_error", None)
+            return True
+        now = datetime.now(timezone.utc)
+        raw_due = get_kv(conn, "forward_feed_next_check_at_utc", None)
+        if raw_due:
+            due = datetime.fromisoformat(str(raw_due).replace("Z", "+00:00")).astimezone(
+                timezone.utc
+            )
+            if due > now:
+                return False
+        try:
+            boundary_path, boundary_sha, candidate_count = (
+                self._build_forward_boundary_manifest(conn, created_at=now)
+            )
+        except Exception as exc:
+            set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+            set_kv(conn, "current_blocker", "FORWARD_BOUNDARY_MANIFEST_REQUIRED")
+            set_kv(conn, "last_error", f"{type(exc).__name__}:{exc}"[:4000])
+            return False
+        task = project_path(
+            "reports", "engineering", "hydra_forward_shadow_feed_v1_20260712.md"
+        )
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != DELAYED_FORWARD_FEED_TASK_SHA256
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "FORWARD_FEED_TASK_MISMATCH")
+            set_kv(conn, "last_error", "Frozen forward-feed task is missing or changed.")
+            return False
+        sequence = int(get_kv(conn, "forward_feed_update_sequence", 0) or 0) + 1
+        experiment_id = f"{FORWARD_SHADOW_APPEND_UPDATE_PREFIX}{sequence:04d}"
+        mission_state_dir = Path(self.config.state_dir).resolve()
+        runtime_root = (
+            mission_state_dir.parent.parent
+            if mission_state_dir.name == "state"
+            and mission_state_dir.parent.name == "mission"
+            else mission_state_dir.parent
+        )
+        specification = {
+            "experiment_type": "forward_shadow_append_update",
+            "priority": 300.0,
+            "max_attempts": 2,
+            "pipeline": "SHADOW",
+            "parallel_safe": False,
+            "writes_data_access_ledger": False,
+            "writes_budget_ledger": True,
+            "writes_forward_store": True,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": DELAYED_FORWARD_FEED_TASK_SHA256,
+            "boundary_manifest_path": str(boundary_path),
+            "boundary_manifest_sha256": boundary_sha,
+            "candidate_count": candidate_count,
+            "shadow_state_dir": str(runtime_root / "shadow" / "state"),
+            "contract_map_dir": str(
+                project_path("data", "cache", "contract_maps")
+            ),
+            "budget_ledger_path": str(
+                project_path(
+                    "reports", "data_budget", "databento_spend_ledger.jsonl"
+                )
+            ),
+            "budget_summary_path": str(
+                project_path(
+                    "reports", "data_budget", "databento_budget_summary.md"
+                )
+            ),
+            "minimum_reserve_usd": 30.0,
+            "maximum_incremental_cost_usd": 0.10,
+            "data_cost": 0.10,
+            "data_role": "POST_FREEZE_APPEND_ONLY_FORWARD_EVIDENCE",
+            "forward_market_data_read_only": True,
+            "q4_access_allowed": False,
+            "paid_data_allowed": True,
+            "network_allowed": True,
+            "live_or_broker_allowed": False,
+            "automatic_order_capability": False,
+            "outbound_orders": 0,
+            "broker_connections": 0,
+            "code_commit": self._git_commit(),
+            "expected_decision_information_gain": 1.0,
+        }
+        created = enqueue_experiment(conn, experiment_id, specification)
+        if not created:
+            return False
+        set_kv(conn, "forward_feed_update_sequence", sequence)
+        set_kv(conn, "forward_feed_next_check_at_utc", None)
+        set_kv(conn, "forward_feed_status", "APPEND_UPDATE_QUEUED")
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": experiment_id,
+                "pipeline": "SHADOW",
+                "candidate_count": candidate_count,
+                "q4_access_authorized": False,
+                "market_data_read_only": True,
+                "maximum_incremental_cost_usd": 0.10,
+            },
+        )
+        append_event(
+            conn,
+            "forward_shadow_append_update_queued",
+            {
+                "experiment_id": experiment_id,
+                "boundary_manifest_sha256": boundary_sha,
+                "candidate_count": candidate_count,
+                "outbound_orders": 0,
+            },
+        )
+        return True
+
+    def _build_forward_boundary_manifest(
+        self, conn: Any, *, created_at: datetime
+    ) -> tuple[Path, str, int]:
+        from hydra.shadow.forward_feed_manifest import (
+            build_forward_boundary_manifest,
+            write_manifest,
+        )
+
+        registry = dict(get_kv(conn, "shadow_active_registry", {}) or {})
+        if not registry:
+            raise RuntimeError("No immutable shadow configurations are registered.")
+        activation_rows = conn.execute(
+            "SELECT experiment_id,completed_at,result FROM experiments WHERE "
+            "status='COMPLETED' AND completed_at IS NOT NULL AND "
+            "experiment_type LIKE '%activation%' ORDER BY completed_at"
+        ).fetchall()
+        completed_by_candidate: dict[str, str] = {}
+        for _experiment_id, completed_at, result_text in activation_rows:
+            try:
+                result = json.loads(result_text or "{}")
+            except json.JSONDecodeError:
+                continue
+            identifiers = {str(result.get("candidate_id") or "")}
+            identifiers.update(
+                str(value.get("candidate_id") or "")
+                for value in result.get("candidates") or []
+                if isinstance(value, dict)
+            )
+            for candidate_id in identifiers - {""}:
+                completed_by_candidate[candidate_id] = str(completed_at)
+        candidates: list[dict[str, Any]] = []
+        for candidate_id, entry_value in sorted(registry.items()):
+            entry = dict(entry_value or {})
+            config_path = Path(str(entry.get("configuration_path") or ""))
+            expected_sha = str(entry.get("configuration_sha256") or "")
+            if (
+                not config_path.is_file()
+                or hashlib.sha256(config_path.read_bytes()).hexdigest()
+                != expected_sha
+            ):
+                raise RuntimeError(
+                    f"Immutable shadow configuration changed: {candidate_id}"
+                )
+            config = json.loads(config_path.read_text(encoding="utf-8"))
+            if str(config.get("configuration_hash") or "") != str(
+                entry.get("configuration_hash") or ""
+            ):
+                raise RuntimeError(
+                    f"Shadow configuration semantic hash changed: {candidate_id}"
+                )
+            freeze = completed_by_candidate.get(candidate_id)
+            if not freeze:
+                raise RuntimeError(
+                    f"Activation completion boundary is missing: {candidate_id}"
+                )
+            candidates.append(
+                {
+                    "candidate_id": candidate_id,
+                    "configuration_path": str(config_path.resolve()),
+                    "configuration_sha256": expected_sha,
+                    "configuration_hash": str(entry["configuration_hash"]),
+                    "freeze_timestamp_utc": freeze,
+                    "required_roots": sorted(
+                        {str(value) for value in config.get("markets") or []}
+                    ),
+                    "stale_data_seconds": int(entry["stale_data_seconds"]),
+                }
+            )
+        manifest = build_forward_boundary_manifest(
+            candidates, created_at=created_at
+        )
+        destination = self.paths.state_dir / "forward_feed_manifests" / (
+            f"forward_boundary_{manifest['manifest_hash'][:16]}.json"
+        )
+        write_manifest(destination, manifest)
+        return (
+            destination.resolve(),
+            hashlib.sha256(destination.read_bytes()).hexdigest(),
+            len(candidates),
+        )
+
     def _route_decision_bridge_v4_q4_result(
         self, conn: Any, result: dict[str, Any]
     ) -> None:
@@ -9944,24 +10306,39 @@ class AutonomousMissionController:
                 else "Q4_ONE_SHOT_NO_PAPER_SHADOW_PASS"
             ),
         )
+        next_blocker = (
+            "FORWARD_FEED_AND_2025_FINAL_LOCKBOX_REQUIRED"
+            if pass_ids
+            else "FORWARD_FEED_AND_POST_Q4_RESEARCH_REQUIRED"
+        )
         set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
         set_kv(
             conn,
             "current_blocker",
-            "FORWARD_FEED_AND_2025_FINAL_LOCKBOX_REQUIRED",
+            next_blocker,
         )
         set_kv(
             conn,
             "last_error",
-            "Q4 one-shot committed. Append-only forward feed and 2025 independent "
-            "lockbox integration are the next protected capabilities.",
+            (
+                "Q4 one-shot committed. Append-only forward feed and 2025 "
+                "independent lockbox integration are next."
+                if pass_ids
+                else "Q4 one-shot committed without a pass. Append-only forward "
+                "evidence and post-Q4 targeted research are next; no 2025 lockbox "
+                "purchase is authorized without a survivor."
+            ),
         )
         set_kv(
             conn,
             "foundry_next_planned_action",
             {
-                "action": "FORWARD_FEED_AND_2025_FINAL_LOCKBOX_REQUIRED",
-                "pipeline": "SHADOW_AND_FINAL_LOCKBOX",
+                "action": next_blocker,
+                "pipeline": (
+                    "SHADOW_AND_FINAL_LOCKBOX"
+                    if pass_ids
+                    else "SHADOW_AND_POST_Q4_RESEARCH"
+                ),
                 "q4_pass_candidate_ids": sorted(pass_ids),
                 "q4_access_count": 1,
             },
@@ -9976,6 +10353,134 @@ class AutonomousMissionController:
                 "paper_shadow_ready": len(pass_ids),
                 "q4_access_count": 1,
                 "automatic_retry_allowed": False,
+            },
+        )
+
+    def _route_forward_shadow_append_update_result(
+        self, conn: Any, result: dict[str, Any], experiment_id: str
+    ) -> None:
+        from hydra.shadow.databento_forward_feed import RESULT_SCHEMA
+        from hydra.shadow.forward_feed_manifest import stable_hash
+
+        if str(result.get("schema") or "") != RESULT_SCHEMA:
+            raise RuntimeError("Unexpected append-only forward update schema.")
+        semantic = {
+            key: value
+            for key, value in result.items()
+            if key not in {"result_hash", "result_path", "result_sha256", "report_path"}
+        }
+        if str(result.get("result_hash") or "") != stable_hash(semantic):
+            raise RuntimeError("Append-only forward update result hash mismatch.")
+        if int(result.get("q4_access_delta") or 0) != 0:
+            raise RuntimeError("Forward update changed Q4 access state.")
+        if int(result.get("outbound_orders", -1)) != 0 or int(
+            result.get("broker_connections", -1)
+        ) != 0:
+            raise RuntimeError("Forward update exposed broker/order capability.")
+        actual_spend = float(
+            result.get("cumulative_databento_spend_usd") or 0.0
+        )
+        remaining = float(result.get("remaining_databento_budget_usd") or 0.0)
+        if remaining < float(result.get("protected_reserve_usd") or 30.0):
+            raise RuntimeError("Forward update violated the protected budget reserve.")
+        set_kv(conn, "cumulative_databento_spend_usd", actual_spend)
+        set_kv(conn, "remaining_databento_budget_usd", remaining)
+        set_kv(conn, "forward_feed_last_result", result)
+        set_kv(conn, "forward_feed_last_experiment_id", experiment_id)
+        set_kv(
+            conn,
+            "forward_feed_next_check_at_utc",
+            str(result["next_check_at_utc"]),
+        )
+        bars = int(result.get("fresh_forward_bars_processed") or 0)
+        heartbeats = int(result.get("candidate_heartbeats_published") or 0)
+        set_kv(
+            conn,
+            "fresh_forward_bars_processed",
+            int(get_kv(conn, "fresh_forward_bars_processed", 0) or 0) + bars,
+        )
+        set_kv(
+            conn,
+            "forward_candidate_heartbeats_published",
+            int(
+                get_kv(conn, "forward_candidate_heartbeats_published", 0) or 0
+            )
+            + heartbeats,
+        )
+        set_kv(
+            conn,
+            "forward_feed_status",
+            "FORWARD_EVIDENCE_FLOWING"
+            if heartbeats
+            else "WAITING_FOR_FIRST_POST_FREEZE_BAR",
+        )
+        set_kv(
+            conn,
+            "latest_completed_experiment",
+            {
+                "experiment_id": experiment_id,
+                "experiment_type": "forward_shadow_append_update",
+                "scientific_conclusion": result.get("scientific_conclusion"),
+                "report_path": result.get("report_path"),
+                "result_hash": result.get("result_hash"),
+            },
+        )
+        set_kv(conn, "latest_scientific_finding", result.get("scientific_conclusion"))
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+        remaining_debt = int(
+            dict(get_kv(conn, "evidence_conversion_v3_latest_metrics", {}) or {}).get(
+                "evidence_debt_queue_count"
+            )
+            or 0
+        )
+        post_q4_conversion_queued = False
+        if remaining_debt > 0:
+            post_q4_conversion_queued = self._reconcile_evidence_conversion_v3(
+                conn,
+                cohort_index=self._pending_or_next_evidence_conversion_cohort(conn),
+                post_q4_debt_closure=True,
+            )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": (
+                    f"{EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX}"
+                    f"{self._pending_or_next_evidence_conversion_cohort(conn):04d}"
+                    if post_q4_conversion_queued
+                    else "WAIT_FOR_NEXT_BOUNDED_FORWARD_UPDATE"
+                ),
+                "pipeline": (
+                    "PROMOTION_AND_SHADOW"
+                    if post_q4_conversion_queued
+                    else "SHADOW"
+                ),
+                "next_check_at_utc": result["next_check_at_utc"],
+                "fresh_forward_bars_this_update": bars,
+                "candidate_heartbeats_this_update": heartbeats,
+                "parallel_research_required": True,
+                "remaining_evidence_debt": remaining_debt,
+                "post_q4_conversion_queued": post_q4_conversion_queued,
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+        append_event(
+            conn,
+            "forward_shadow_append_update_routed",
+            {
+                "experiment_id": experiment_id,
+                "fresh_forward_bars": bars,
+                "candidate_heartbeats": heartbeats,
+                "next_check_at_utc": result["next_check_at_utc"],
+                "incremental_databento_spend_usd": result.get(
+                    "incremental_databento_spend_usd"
+                ),
+                "post_q4_conversion_queued": post_q4_conversion_queued,
+                "outbound_orders": 0,
             },
         )
 
@@ -10191,6 +10696,7 @@ class AutonomousMissionController:
             "SHADOW_RESEARCH_CANDIDATE",
             "SHADOW_RESEARCH_ONLY",
             "PRE_HOLDOUT_READY",
+            "POST_Q4_INDEPENDENT_VALIDATION_CANDIDATE",
             "PAPER_SHADOW_READY",
             "SHADOW_ACTIVE",
             "SHADOW_CONFIRMED",
@@ -10199,6 +10705,7 @@ class AutonomousMissionController:
             "SHADOW_RESEARCH_CANDIDATE",
             "SHADOW_RESEARCH_ONLY",
             "PRE_HOLDOUT_READY",
+            "POST_Q4_INDEPENDENT_VALIDATION_CANDIDATE",
             "PAPER_SHADOW_READY",
             "SHADOW_ACTIVE",
             "SHADOW_CONFIRMED",
@@ -10435,7 +10942,8 @@ class AutonomousMissionController:
         # one-shot a second time solely because its required scope flags are
         # true.
         if (
-            experiment_type != "q4_atomic_one_shot"
+            experiment_type
+            not in {"q4_atomic_one_shot", "forward_shadow_append_update"}
             and (
                 experiment.get("q4_access_allowed")
                 or experiment.get("paid_data_allowed")
@@ -10944,12 +11452,41 @@ class AutonomousMissionController:
             ):
                 raise RuntimeError("Q4 authorization token ID mismatch.")
             q4_one_shot_authorized = True
+        if experiment_type == "forward_shadow_append_update":
+            from hydra.shadow.forward_feed_manifest import (
+                validate_forward_boundary_manifest,
+            )
+
+            if not (
+                bool(experiment.get("forward_market_data_read_only"))
+                and bool(experiment.get("network_allowed"))
+                and not bool(experiment.get("q4_access_allowed"))
+                and not bool(experiment.get("live_or_broker_allowed"))
+                and float(experiment.get("maximum_incremental_cost_usd") or 0.0)
+                <= 0.10
+                and float(experiment.get("minimum_reserve_usd") or 0.0) >= 30.0
+            ):
+                raise RuntimeError("Forward read-only experiment scope is incomplete.")
+            boundary_path = Path(str(experiment["boundary_manifest_path"]))
+            if (
+                not boundary_path.is_file()
+                or hashlib.sha256(boundary_path.read_bytes()).hexdigest()
+                != str(experiment["boundary_manifest_sha256"])
+            ):
+                raise RuntimeError("Forward boundary manifest hash mismatch.")
+            validate_forward_boundary_manifest(
+                json.loads(boundary_path.read_text(encoding="utf-8"))
+            )
         check_action_allowed(
             {
                 "action_type": "Q4_ACCESS"
                 if experiment.get("q4_access_allowed")
                 else ("LIVE_TRADING" if "live" in experiment_type.lower() else "RUN_RESEARCH_EXPERIMENT"),
-                "data_cost": float(experiment.get("data_cost", 0.0)),
+                "data_cost": float(
+                    experiment.get("maximum_incremental_cost_usd")
+                    if experiment_type == "forward_shadow_append_update"
+                    else experiment.get("data_cost", 0.0)
+                ),
                 "q4_one_shot_authorization_valid": q4_one_shot_authorized,
             },
             baseline_commit=self.config.baseline_commit,
@@ -10958,7 +11495,8 @@ class AutonomousMissionController:
             ),
         )
         if (
-            experiment_type != "q4_atomic_one_shot"
+            experiment_type
+            not in {"q4_atomic_one_shot", "forward_shadow_append_update"}
             and (
                 experiment.get("q4_access_allowed")
                 or experiment.get("paid_data_allowed")

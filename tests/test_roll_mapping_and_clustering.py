@@ -51,6 +51,25 @@ class RollMappingAndClusteringTests(unittest.TestCase):
         self.assertEqual(active_contract(roll_map, "ES", "2024-04-01T12:00:00Z").contract, "ESM4")
         self.assertEqual(active_contract(roll_map, "ES", "2024-04-01T12:00:00Z").tick_value, 12.5)
 
+    def test_explicit_roll_map_accepts_timezone_aware_request_bounds(self) -> None:
+        roll_map = build_explicit_roll_map(
+            ["ES"],
+            start="2026-07-10T00:00:00Z",
+            end="2026-07-11T23:30:00Z",
+            continuous_mapping={
+                "ES.c.0": [
+                    {"d0": "2026-07-10", "d1": "2026-07-12", "s": "101"}
+                ]
+            },
+            raw_symbol_mapping={"101": "ESU6"},
+            definition_records={
+                "101": {"expiration": "2026-09-18T00:00:00+00:00"}
+            },
+        )
+
+        self.assertEqual(roll_map.contracts[0].contract, "ESU6")
+        self.assertEqual(roll_map.contracts[0].roll_date, "2026-07-12")
+
     def test_mismatched_maturity_rejection(self) -> None:
         roll_map = build_explicit_roll_map(
             ["ES", "NQ"],

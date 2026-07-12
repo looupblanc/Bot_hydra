@@ -1159,4 +1159,30 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             access_ledger_path=Path(str(experiment["access_ledger_path"])),
             evaluator=evaluator,
         )
+    if experiment_type == "forward_shadow_append_update":
+        from hydra.data.budget import DatabentoBudgetConfig
+        from hydra.shadow.databento_forward_feed import (
+            run_databento_forward_update,
+        )
+
+        return run_databento_forward_update(
+            output_dir,
+            boundary_manifest_path=Path(
+                str(experiment["boundary_manifest_path"])
+            ),
+            boundary_manifest_sha256=str(
+                experiment["boundary_manifest_sha256"]
+            ),
+            state_dir=Path(str(experiment["shadow_state_dir"])),
+            contract_map_dir=Path(str(experiment["contract_map_dir"])),
+            budget=DatabentoBudgetConfig(
+                ledger_path=str(experiment["budget_ledger_path"]),
+                summary_path=str(experiment["budget_summary_path"]),
+            ),
+            code_commit=str(experiment["code_commit"]),
+            minimum_reserve_usd=float(experiment["minimum_reserve_usd"]),
+            maximum_incremental_cost_usd=float(
+                experiment["maximum_incremental_cost_usd"]
+            ),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")

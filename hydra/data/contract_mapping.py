@@ -170,7 +170,11 @@ def build_explicit_roll_map(
             tick_size = _definition_float(definition, "min_price_increment", spec.tick_size)
             tick_value = spec.tick_value
             point_value = spec.point_value
-            roll_date = active_start if pd.Timestamp(active_start) > pd.Timestamp(start) else active_end
+            roll_date = (
+                active_start
+                if _as_utc_timestamp(active_start) > _as_utc_timestamp(start)
+                else active_end
+            )
             contracts.append(
                 ContractInfo(
                     root=root,

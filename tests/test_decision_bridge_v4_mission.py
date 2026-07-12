@@ -174,6 +174,90 @@ def test_serial_executor_does_not_reject_validated_atomic_q4_twice(
         conn.close()
 
 
+def test_completed_q4_queues_bounded_read_only_forward_update(
+    tmp_path: Path,
+) -> None:
+    controller, conn = _controller(tmp_path)
+    try:
+        enqueue_experiment(
+            conn,
+            DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
+            {"experiment_type": "q4_atomic_one_shot", "priority": 1.0},
+        )
+        q4_claim = claim_next_experiment(conn)
+        assert q4_claim is not None
+        complete_experiment(
+            conn,
+            DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
+            {"result_hash": "a" * 64},
+            claim_token=str(q4_claim["claim_token"]),
+        )
+        config_payload = {
+            "configuration_hash": "b" * 64,
+            "markets": ["MYM"],
+        }
+        config_path = tmp_path / "shadow.json"
+        config_path.write_text(json.dumps(config_payload) + "\n", encoding="utf-8")
+        activation_id = "test_shadow_activation_v1"
+        enqueue_experiment(
+            conn,
+            activation_id,
+            {"experiment_type": "immutable_shadow_activation", "priority": 1.0},
+        )
+        activation_claim = claim_next_experiment(conn)
+        assert activation_claim is not None
+        complete_experiment(
+            conn,
+            activation_id,
+            {"candidate_id": "strategy_forward_controller_test_v1"},
+            claim_token=str(activation_claim["claim_token"]),
+        )
+        set_kv(
+            conn,
+            "shadow_active_registry",
+            {
+                "strategy_forward_controller_test_v1": {
+                    "candidate_id": "strategy_forward_controller_test_v1",
+                    "configuration_hash": "b" * 64,
+                    "configuration_path": str(config_path),
+                    "configuration_sha256": hashlib.sha256(
+                        config_path.read_bytes()
+                    ).hexdigest(),
+                    "stale_data_seconds": 75,
+                    "outbound_orders_enabled": False,
+                }
+            },
+        )
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(
+            conn,
+            "current_blocker",
+            "FORWARD_FEED_AND_POST_Q4_RESEARCH_REQUIRED",
+        )
+
+        assert controller._reconcile_due_forward_shadow_update(conn)
+
+        row = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='forward_shadow_append_update'"
+        ).fetchone()
+        assert row is not None
+        forward = experiment_record(conn, str(row[0]))
+        assert forward is not None and forward["status"] == "QUEUED"
+        specification = forward["specification"]
+        assert specification["forward_market_data_read_only"] is True
+        assert specification["q4_access_allowed"] is False
+        assert specification["live_or_broker_allowed"] is False
+        assert specification["outbound_orders"] == 0
+        assert specification["broker_connections"] == 0
+        assert specification["minimum_reserve_usd"] == 30.0
+        assert specification["maximum_incremental_cost_usd"] == 0.10
+        assert Path(specification["boundary_manifest_path"]).is_file()
+        controller._check_experiment_allowed(conn, specification)
+    finally:
+        conn.close()
+
+
 @pytest.mark.parametrize(
     ("experiment_id", "experiment_type", "route_name"),
     [

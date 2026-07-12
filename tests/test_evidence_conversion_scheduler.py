@@ -8,6 +8,7 @@ import pytest
 
 from hydra.mission.controller import (
     AutonomousMissionController,
+    DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
     EVIDENCE_CONVERSION_V3_INITIAL_EXPERIMENT_ID,
     MissionControllerConfig,
 )
@@ -428,6 +429,78 @@ def test_reconcile_retires_queued_cohort_after_stop_policy(tmp_path: Path) -> No
         retired = experiment_record(conn, "evidence_conversion_v3_cohort_0003")
         assert retired is not None and retired["status"] == "BLOCKED"
         assert "superseded_by_decision_bridge_v4" in str(retired["last_error"])
+    finally:
+        conn.close()
+
+
+def test_closed_q4_allows_remaining_debt_without_reusing_q4(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    controller, conn = _controller(tmp_path)
+    try:
+        _completed_promotion(conn, tmp_path)
+        set_kv(
+            conn,
+            "foundry_candidate_bank",
+            {"candidate_0": {"status": "PROMISING_RESEARCH_CANDIDATE"}},
+        )
+        set_kv(
+            conn,
+            "evidence_conversion_v3_pre_holdout_by_cohort",
+            {
+                "evidence_conversion_v3_cohort_0000": [],
+                "evidence_conversion_v3_cohort_0001": [],
+            },
+        )
+        enqueue_experiment(
+            conn,
+            DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
+            {"experiment_type": "q4_atomic_one_shot", "priority": 1.0},
+        )
+        q4 = claim_next_experiment(conn)
+        assert q4 is not None
+        complete_experiment(
+            conn,
+            DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
+            {"result_hash": "f" * 64},
+            claim_token=str(q4["claim_token"]),
+        )
+        monkeypatch.setattr("hydra.mission.controller.q4_access_count", lambda: 1)
+
+        assert controller._reconcile_evidence_conversion_v3(
+            conn,
+            cohort_index=2,
+            post_q4_debt_closure=True,
+        )
+
+        record = experiment_record(conn, "evidence_conversion_v3_cohort_0002")
+        assert record is not None and record["status"] == "QUEUED"
+        specification = record["specification"]
+        assert specification["post_q4_debt_closure"] is True
+        assert specification["authoritative_q4_access_count_at_start"] == 1
+        assert specification["q4_reuse_prohibited"] is True
+        assert specification["q4_access_allowed"] is False
+        assert specification["network_allowed"] is False
+
+        controller._route_evidence_conversion_v3_result(
+            conn,
+            _conversion_result(
+                tmp_path,
+                "evidence_conversion_v3_cohort_0002",
+                debt=0,
+                pre_holdout=True,
+            ),
+            "evidence_conversion_v3_cohort_0002",
+        )
+        bank = get_kv(conn, "foundry_candidate_bank")
+        assert bank["candidate_0"]["status"] == (
+            "POST_Q4_INDEPENDENT_VALIDATION_CANDIDATE"
+        )
+        assert bank["candidate_0"]["q4_reuse_allowed"] is False
+        assert get_kv(conn, "pre_holdout_candidate_ids", []) == []
+        assert get_kv(conn, "post_q4_independent_validation_candidate_ids") == [
+            "candidate_0"
+        ]
     finally:
         conn.close()
 
