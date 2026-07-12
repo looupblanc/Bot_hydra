@@ -34,6 +34,8 @@ POLICY_SHA256 = "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916
 POWER_MINIMUM_PATH = "WORM/v7.1-powered-promotion-minimum-2026-07-12.json"
 POWER_MINIMUM_SHA256 = "3e0211c6a5acea81713431802fc1576da4d5be2a0cc37bf900cd02eabd68c6fa"
 EXPECTED_GLOBAL_N_TRIALS = 262_228
+FROZEN_RESULT_PATH = "reports/v7_1/discovery/v71_development_funnel_result.json"
+FROZEN_RESULT_SHA256 = "b8767eb9a2c5a8f9ef7c85d640cf5b1368f2607f49da3cc0b0c9a92a73f16fe2"
 POINT_VALUE = 50.0
 
 
@@ -351,14 +353,41 @@ def _verify_inputs(
     if not proof_path.is_absolute():
         proof_path = root / proof_path
     proof = load_and_verify(proof_path)
-    if multiplicity_trial_count(proof) != EXPECTED_GLOBAL_N_TRIALS:
-        raise V71EventFunnelError("V7.1 candidate reservation is absent")
+    _verify_historical_multiplicity_checkpoint(
+        root,
+        proof,
+        expected=EXPECTED_GLOBAL_N_TRIALS,
+        result_path=FROZEN_RESULT_PATH,
+        result_sha256=FROZEN_RESULT_SHA256,
+    )
     if burned_window_ids(proof) != ("Q4_2024",):
         raise V71EventFunnelError("unexpected proof-window state")
     return (
         json.loads((root / POLICY_PATH).read_text(encoding="utf-8")),
         json.loads((root / POWER_MINIMUM_PATH).read_text(encoding="utf-8")),
     )
+
+
+def _verify_historical_multiplicity_checkpoint(
+    root: Path,
+    proof: Mapping[str, Any],
+    *,
+    expected: int,
+    result_path: str,
+    result_sha256: str,
+) -> None:
+    checkpoints = {
+        int(entry["multiplicity"]["cumulative_N_trials"])
+        for entry in proof.get("entries", ())
+        if entry.get("event_type") == "MULTIPLICITY_COUNTER"
+    }
+    current = multiplicity_trial_count(proof)
+    if expected not in checkpoints or current < expected:
+        raise V71EventFunnelError("V7.1 candidate reservation is absent")
+    if current != expected and _sha256(root / result_path) != result_sha256:
+        raise V71EventFunnelError(
+            "V7.1 multiplicity suffix is allowed only for frozen historical replay"
+        )
 
 
 def _verify_signal_manifest(

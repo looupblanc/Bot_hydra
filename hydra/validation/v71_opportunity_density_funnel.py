@@ -46,6 +46,12 @@ POLICY_SHA256 = "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916
 POWER_PATH = "WORM/v7.1-powered-promotion-minimum-2026-07-12.json"
 POWER_SHA256 = "3e0211c6a5acea81713431802fc1576da4d5be2a0cc37bf900cd02eabd68c6fa"
 EXPECTED_GLOBAL_N_TRIALS = 262_356
+FROZEN_RESULT_PATH = (
+    "reports/v7_1/discovery_0002/v71_opportunity_density_funnel_result.json"
+)
+FROZEN_RESULT_SHA256 = (
+    "2a45c4da55875f90438cd6cb19f1ce79ec8de7d934f7a442e78000364aff5897"
+)
 
 
 class V71OpportunityDensityFunnelError(RuntimeError):
@@ -273,10 +279,7 @@ def _verify_inputs(
     if not proof_path.is_absolute():
         proof_path = root / proof_path
     proof = load_and_verify(proof_path)
-    if multiplicity_trial_count(proof) != EXPECTED_GLOBAL_N_TRIALS:
-        raise V71OpportunityDensityFunnelError(
-            "opportunity-density candidate reservation is absent"
-        )
+    _verify_historical_multiplicity_checkpoint(root, proof)
     if burned_window_ids(proof) != ("Q4_2024",):
         raise V71OpportunityDensityFunnelError("unexpected proof-window state")
     return (
@@ -284,6 +287,28 @@ def _verify_inputs(
         json.loads((root / POWER_PATH).read_text(encoding="utf-8")),
         json.loads((root / SIGNAL_MANIFEST_PATH).read_text(encoding="utf-8")),
     )
+
+
+def _verify_historical_multiplicity_checkpoint(
+    root: Path, proof: Mapping[str, Any]
+) -> None:
+    checkpoints = {
+        int(entry["multiplicity"]["cumulative_N_trials"])
+        for entry in proof.get("entries", ())
+        if entry.get("event_type") == "MULTIPLICITY_COUNTER"
+    }
+    current = multiplicity_trial_count(proof)
+    if EXPECTED_GLOBAL_N_TRIALS not in checkpoints or current < EXPECTED_GLOBAL_N_TRIALS:
+        raise V71OpportunityDensityFunnelError(
+            "opportunity-density candidate reservation is absent"
+        )
+    if (
+        current != EXPECTED_GLOBAL_N_TRIALS
+        and _sha256(root / FROZEN_RESULT_PATH) != FROZEN_RESULT_SHA256
+    ):
+        raise V71OpportunityDensityFunnelError(
+            "opportunity-density multiplicity suffix requires frozen historical result"
+        )
 
 
 def _verify_signal_manifest(
