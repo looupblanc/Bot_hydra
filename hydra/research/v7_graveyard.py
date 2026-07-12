@@ -277,6 +277,9 @@ def _contract_death_cause(result: Mapping[str, Any]) -> str:
         return "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS"
     if not bool(result.get("stage2_pass")):
         return "COST_OR_RULESET_FAILURE"
+    null_suite = result.get("candidate_null_suite")
+    if isinstance(null_suite, Mapping) and not bool(null_suite.get("passed")):
+        return "CANDIDATE_NULL_FAILURE"
     dsr = result.get("DSR")
     bh = result.get("BH")
     dsr_positive = isinstance(dsr, Mapping) and float(

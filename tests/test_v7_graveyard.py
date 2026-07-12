@@ -133,6 +133,17 @@ def test_grammar_results_feed_only_class_level_death_causes(tmp_path: Path) -> N
                         "DSR": {"deflated_z": -0.2},
                         "BH": {"rejected": False},
                     },
+                    {
+                        "candidate_id": "private_four",
+                        "specification": {"mechanism_class": "inventory"},
+                        "stage1_pass": True,
+                        "stage2_pass": True,
+                        "base": {"expectancy_per_trade": 4.0},
+                        "stress_2x": {"expectancy_per_trade": 2.0},
+                        "candidate_null_suite": {"passed": False},
+                        "DSR": {"deflated_z": 1.0},
+                        "BH": {"rejected": True},
+                    },
                 ],
             }
         ),
@@ -147,8 +158,8 @@ def test_grammar_results_feed_only_class_level_death_causes(tmp_path: Path) -> N
         output_path=output,
     )
 
-    assert result["new_grammar_tombstone_count"] == 3
-    assert result["indexed_object_count"] == 115_446
+    assert result["new_grammar_tombstone_count"] == 4
+    assert result["indexed_object_count"] == 115_447
     feedback = class_feedback(output)
     assert {
         (row["mechanism_class"], row["death_cause"], row["candidate_count"])
@@ -158,6 +169,7 @@ def test_grammar_results_feed_only_class_level_death_causes(tmp_path: Path) -> N
         ("clock_flow", "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS", 1),
         ("clock_flow", "SIM_EXPLOIT", 1),
         ("inventory", "MULTIPLICITY_DEFLATION_FAILURE", 1),
+        ("inventory", "CANDIDATE_NULL_FAILURE", 1),
     }
     conn = sqlite3.connect(output)
     stored = " ".join(
@@ -169,6 +181,7 @@ def test_grammar_results_feed_only_class_level_death_causes(tmp_path: Path) -> N
     assert "never_persist_me" not in stored
     assert "also_private" not in stored
     assert "private_three" not in stored
+    assert "private_four" not in stored
 
 
 def test_graveyard_rejects_tombstoning_promoted_grammar(tmp_path: Path) -> None:
