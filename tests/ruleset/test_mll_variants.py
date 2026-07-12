@@ -12,7 +12,7 @@ from hydra.propfirm.combine_episode import (
     run_combine_episode,
 )
 from hydra.propfirm.intraday_mll import conservative_intraday_mll_audit
-from hydra.propfirm.mll_variants import MllVariant
+from hydra.propfirm.mll_variants import MllMode, MllVariant
 from hydra.propfirm.topstep_150k import Topstep150KConfig
 from hydra.propfirm.xfa_episode import XfaTerminal, run_xfa_episode
 
@@ -59,6 +59,32 @@ def test_combine_mll_variants_are_selectable_and_diverge_conservatively() -> Non
     assert not default.mll_breached
     assert live_hwm.terminal is CombineTerminal.MLL_BREACH
     assert live_hwm.minimum_mll_buffer < 0.0
+
+
+def test_public_mll_mode_flag_has_exact_contract_values_and_legacy_aliases() -> None:
+    public_default = Topstep150KConfig(mll_mode="eod_level_rt_breach")
+    public_live = Topstep150KConfig(mll_mode="intraday_hwm")
+    legacy_live = Topstep150KConfig(
+        mll_variant=(
+            MllVariant.INTRADAY_LIVE_EQUITY_HWM_CONSERVATIVE_MFE_FIRST
+        )
+    )
+
+    assert public_default.resolved_mll_mode is MllMode.EOD_LEVEL_RT_BREACH
+    assert public_live.resolved_mll_mode is MllMode.INTRADAY_HWM
+    assert legacy_live.resolved_mll_mode is MllMode.INTRADAY_HWM
+
+
+def test_conflicting_public_and_legacy_mll_flags_fail_closed() -> None:
+    import pytest
+
+    with pytest.raises(ValueError, match="disagree"):
+        Topstep150KConfig(
+            mll_mode=MllMode.EOD_LEVEL_RT_BREACH,
+            mll_variant=(
+                MllVariant.INTRADAY_LIVE_EQUITY_HWM_CONSERVATIVE_MFE_FIRST
+            ),
+        )
 
 
 def test_shared_account_uses_the_same_explicit_mll_variant() -> None:

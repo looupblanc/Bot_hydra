@@ -153,6 +153,10 @@ def render_cost_model_markdown(model: V7CostModel) -> str:
             "",
             "`SIM_EXPLOIT`: net edge <= 0 after the Stress 2× slippage profile.",
             "",
+            "## CONTRE",
+            "",
+            "This bar-level model uses a preregistered slippage schedule rather than observed bid/ask spreads; finalist execution ambiguity still requires targeted MBP-1/TBBO evidence.",
+            "",
         ]
     )
     return "\n".join(lines)

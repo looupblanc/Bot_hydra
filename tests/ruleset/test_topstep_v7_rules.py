@@ -8,7 +8,7 @@ def test_ruleset_is_complete_versioned_and_blocks_unresolved_ticket() -> None:
     ruleset = load_ruleset()
 
     assert [rule.rule_id for rule in ruleset.rules] == [
-        f"R{index}" for index in range(1, 16)
+        f"R{index}" for index in range(1, 17)
     ]
     assert ruleset.schema == "hydra_topstep_150k_ruleset_v7"
     assert ruleset.deployment_ticket_blockers == ("R2", "R6", "R7", "R11")
@@ -35,6 +35,15 @@ def test_ruleset_numeric_contract_matches_simulator_defaults() -> None:
     assert config.payout_cap == rules["R9"].parameters["payout_cap_usd"]
     assert config.funded_consistency_largest_day_max_pct_of_total_profit == rules["R11"].parameters["simulated_largest_day_max_fraction"]
     assert config.profit_split_trader == rules["R12"].parameters["trader_fraction"]
+    assert config.trading_timezone == rules["R16"].parameters["timezone"]
+    assert (
+        config.trading_day_start_local
+        == rules["R16"].parameters["trading_day_start_local"]
+    )
+    assert (
+        config.winning_day_lock_local
+        == rules["R16"].parameters["winning_day_lock_local"]
+    )
 
 
 def test_ruleset_permanently_forbids_orders_from_research_server() -> None:
@@ -44,4 +53,3 @@ def test_ruleset_permanently_forbids_orders_from_research_server() -> None:
     assert rules["R13"].parameters["remote_execution_allowed"] is False
     assert rules["R15"].parameters["hydra_order_count"] == 0
     assert rules["R15"].parameters["fix_tag"] == 1028
-

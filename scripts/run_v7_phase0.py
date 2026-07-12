@@ -17,12 +17,12 @@ def main() -> None:
     parser.add_argument("--project-root", default=".")
     parser.add_argument(
         "--preregistration",
-        default="config/v7/phase0_g0_preregistration.json",
+        default="WORM/bootstrap-phase0-v2-2026-07-12.json",
     )
     parser.add_argument(
         "--proof-registry", default="mission/state/proof_registry.json"
     )
-    parser.add_argument("--output-dir", default="reports/v7/phase0")
+    parser.add_argument("--output-dir", default="reports/v7/phase0_v2")
     args = parser.parse_args()
     result = run_phase0_divergence(
         project_root=Path(args.project_root),

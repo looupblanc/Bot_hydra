@@ -7,7 +7,8 @@ import numpy as np
 import pandas as pd
 
 from hydra.propfirm.intraday_mll import conservative_intraday_mll_audit
-from hydra.propfirm.mll_variants import MllVariant
+from hydra.propfirm.mll_variants import MllMode, MllVariant, normalized_mode
+from hydra.propfirm.trading_day import trading_day_for_timestamp
 from hydra.propfirm.xfa_consistency import simulate_xfa_consistency
 from hydra.propfirm.xfa_standard import simulate_xfa_standard
 
@@ -19,7 +20,8 @@ class Topstep150KConfig:
     combine_profit_target: float = 9000.0
     combine_max_loss_limit: float = 4500.0
     combine_starting_balance: float = 150000.0
-    mll_variant: MllVariant = MllVariant.EOD_REALIZED_BALANCE
+    mll_mode: MllMode | str | None = None
+    mll_variant: MllVariant | str | None = None
     no_daily_loss_limit: bool = True
     optional_daily_loss_limit: float = 3000.0
     use_optional_daily_loss_limit: bool = False
@@ -37,6 +39,26 @@ class Topstep150KConfig:
     internal_daily_stop_enabled: bool = True
     max_losing_days_per_10_trading_days: int = 5
     max_consecutive_losing_days_limit: int = 3
+    trading_timezone: str = "America/Chicago"
+    trading_day_start_local: str = "17:00"
+    session_flatten_local: str = "15:10"
+    winning_day_lock_local: str = "16:00"
+
+    def __post_init__(self) -> None:
+        if self.mll_mode is not None and self.mll_variant is not None:
+            if normalized_mode(self.mll_mode) is not normalized_mode(
+                self.mll_variant
+            ):
+                raise ValueError("mll_mode and legacy mll_variant disagree")
+
+    @property
+    def resolved_mll_mode(self) -> MllMode:
+        selected = (
+            self.mll_mode
+            if self.mll_mode is not None
+            else self.mll_variant
+        )
+        return normalized_mode(selected or MllMode.EOD_LEVEL_RT_BREACH)
 
     @property
     def combine_starting_mll(self) -> float:
@@ -108,7 +130,9 @@ def trades_to_topstep_daily(trades: list[dict], df: pd.DataFrame, overlay: Inter
         exit_i = min(max(int(trade["exit_i"]), 0), len(timestamps) - 1)
         rows.append(
             {
-                "date": timestamps.iloc[exit_i].date().isoformat(),
+                "date": trading_day_for_timestamp(
+                    timestamps.iloc[exit_i]
+                ).trading_day,
                 "pnl": float(trade["pnl"]),
                 "mae": float(trade.get("mae", min(0.0, trade["pnl"]))),
             }
@@ -171,7 +195,7 @@ def evaluate_topstep_150k(
         starting_floor=config.combine_starting_mll,
         mll_distance=config.combine_max_loss_limit,
         floor_lock=config.combine_starting_balance,
-        mll_variant=config.mll_variant,
+        mll_variant=config.resolved_mll_mode,
     )
     combine["min_mll_buffer"] = min(float(combine["min_mll_buffer"]), float(intraday.min_buffer))
     combine["intrabar_ambiguous_requires_tick_validation"] = bool(intraday.ambiguous_same_bar_count)

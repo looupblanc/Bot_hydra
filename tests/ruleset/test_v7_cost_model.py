@@ -41,4 +41,4 @@ def test_cost_model_report_contains_every_current_product_and_stress() -> None:
     assert "Stress 1.5×" in report
     assert "Stress 2×" in report
     assert "SIM_EXPLOIT" in report
-
+    assert "## CONTRE" in report

@@ -108,7 +108,7 @@ def run_combine_episode(
     """Replay one immutable account episode in chronological order.
 
     MLL is checked on each event using conservative unrealized OHLC loss.  Its
-    advancement follows the explicitly versioned ``config.mll_variant``.
+    advancement follows the explicitly versioned ``config.mll_mode``.
     """
 
     rules = config or Topstep150KConfig()
@@ -188,7 +188,7 @@ def run_combine_episode(
                 + max(float(event.best_unrealized_pnl), 0.0),
                 distance=float(rules.combine_max_loss_limit),
                 lock=float(rules.combine_starting_balance),
-                variant=rules.mll_variant,
+                variant=rules.resolved_mll_mode,
             )
             adverse_pnl = min(float(event.worst_unrealized_pnl), 0.0)
             intraday_low = balance + adverse_pnl
@@ -214,7 +214,7 @@ def run_combine_episode(
                         live_equity_high=balance,
                         distance=float(rules.combine_max_loss_limit),
                         lock=float(rules.combine_starting_balance),
-                        variant=rules.mll_variant,
+                        variant=rules.resolved_mll_mode,
                     )
                     dll_triggered = True
                 break
@@ -229,7 +229,7 @@ def run_combine_episode(
                 live_equity_high=balance,
                 distance=float(rules.combine_max_loss_limit),
                 lock=float(rules.combine_starting_balance),
-                variant=rules.mll_variant,
+                variant=rules.resolved_mll_mode,
             )
             minimum_buffer = min(minimum_buffer, balance - floor)
             if balance <= floor:

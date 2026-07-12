@@ -20,8 +20,10 @@
       "status": "CONFLICT",
       "parameters": {
         "distance_usd": 4500.0,
-        "default_variant": "EOD_REALIZED_BALANCE",
-        "sensitivity_variant": "INTRADAY_LIVE_EQUITY_HWM_CONSERVATIVE_MFE_FIRST",
+        "default_variant": "eod_level_rt_breach",
+        "sensitivity_variant": "intraday_hwm",
+        "legacy_default_alias": "EOD_REALIZED_BALANCE",
+        "legacy_sensitivity_alias": "INTRADAY_LIVE_EQUITY_HWM_CONSERVATIVE_MFE_FIRST",
         "touch_is_breach": true,
         "floor_never_falls": true,
         "combine_floor_lock_usd": 150000.0
@@ -130,6 +132,20 @@
       "date": "2026-07-12",
       "status": "WEB_SOURCED",
       "parameters": {"fix_tag": 1028, "automated_indicator": "N", "hydra_order_count": 0}
+    },
+    {
+      "id": "R16",
+      "statement": "Topstep trading days are attributed in America/Chicago from 17:00 CT; payout winning days lock at 16:00 CT, independently of the mandatory 15:10 CT position flatten.",
+      "source": "https://help.topstep.com/en/articles/8284233-topstep-payout-policy",
+      "date": "2026-07-12",
+      "status": "WEB_SOURCED",
+      "parameters": {
+        "timezone": "America/Chicago",
+        "trading_day_start_local": "17:00",
+        "session_flatten_local": "15:10",
+        "winning_day_lock_local": "16:00",
+        "dst_aware": true
+      }
     }
   ]
 }

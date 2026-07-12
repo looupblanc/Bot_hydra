@@ -121,7 +121,7 @@ def run_xfa_episode(
                 live_equity_high=balance + max(event.best_unrealized_pnl, 0.0),
                 distance=abs(float(rules.funded_starting_mll)),
                 lock=0.0,
-                variant=rules.mll_variant,
+                variant=rules.resolved_mll_mode,
             )
             adverse_pnl = min(event.worst_unrealized_pnl, 0.0)
             intraday_low = balance + adverse_pnl
@@ -147,7 +147,7 @@ def run_xfa_episode(
                         live_equity_high=balance,
                         distance=abs(float(rules.funded_starting_mll)),
                         lock=0.0,
-                        variant=rules.mll_variant,
+                        variant=rules.resolved_mll_mode,
                     )
                 break
             if intraday_low <= floor:
@@ -161,7 +161,7 @@ def run_xfa_episode(
                 live_equity_high=balance,
                 distance=abs(float(rules.funded_starting_mll)),
                 lock=0.0,
-                variant=rules.mll_variant,
+                variant=rules.resolved_mll_mode,
             )
             minimum_buffer = min(minimum_buffer, balance - floor)
             if balance <= floor:

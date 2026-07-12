@@ -48,10 +48,10 @@ class TopstepRulesetV7:
         return not self.deployment_ticket_blockers
 
     def validate(self) -> None:
-        expected = {f"R{index}" for index in range(1, 16)}
+        expected = {f"R{index}" for index in range(1, 17)}
         actual = {rule.rule_id for rule in self.rules}
         if actual != expected or len(self.rules) != len(expected):
-            raise ValueError("ruleset must contain exactly R1 through R15")
+            raise ValueError("ruleset must contain exactly R1 through R16")
         for rule in self.rules:
             if not rule.statement.strip() or not rule.source.strip() or not rule.date.strip():
                 raise ValueError(f"{rule.rule_id} has incomplete provenance")

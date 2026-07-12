@@ -10,9 +10,10 @@ from hydra.account_policy.basket import RoutedTrade, evaluate_account_policy
 from hydra.account_policy.schema import BasketPolicy, stable_hash
 from hydra.account_policy.xfa import evaluate_serial_xfa_basket
 from hydra.execution.v7_cost_model import load_cost_model, render_cost_model_markdown
+from hydra.data.v7_manifest import verify_v7_data_manifest
 from hydra.governance.proof_registry import burned_window_ids, load_and_verify
 from hydra.propfirm.mll_variants import (
-    MllVariant,
+    MllMode,
     favorable_first_is_ambiguous,
 )
 from hydra.propfirm.rolling_combine import EpisodeStartPolicy
@@ -20,13 +21,17 @@ from hydra.propfirm.topstep_150k import Topstep150KConfig
 from hydra.propfirm.ruleset_v7 import load_ruleset
 
 
-PREREGISTRATION_SHA256 = (
+BASE_PREREGISTRATION_SHA256 = (
     "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6"
 )
-DEFAULT_VARIANT = MllVariant.EOD_REALIZED_BALANCE
-SENSITIVITY_VARIANT = (
-    MllVariant.INTRADAY_LIVE_EQUITY_HWM_CONSERVATIVE_MFE_FIRST
+OVERLAY_PREREGISTRATION_SHA256 = (
+    "bc060975d44439ee571b1d87167ff29d56639ff3948ae1ac1c4eb65b098640a6"
 )
+DATA_MANIFEST_FILE_SHA256 = (
+    "e471cc472a46e68d7164d73ef95c16e995bbded6bad9fcb8537cb89657274b38"
+)
+DEFAULT_MODE = MllMode.EOD_LEVEL_RT_BREACH
+SENSITIVITY_MODE = MllMode.INTRADAY_HWM
 
 
 class Phase0DivergenceError(RuntimeError):
@@ -42,9 +47,24 @@ def run_phase0_divergence(
 ) -> dict[str, Any]:
     root = Path(project_root).resolve()
     prereg_path = Path(preregistration_path).resolve()
-    if _sha256(prereg_path) != PREREGISTRATION_SHA256:
-        raise Phase0DivergenceError("Phase 0 preregistration hash mismatch")
-    prereg = json.loads(prereg_path.read_text(encoding="utf-8"))
+    if _sha256(prereg_path) != OVERLAY_PREREGISTRATION_SHA256:
+        raise Phase0DivergenceError("Phase 0 v2 overlay hash mismatch")
+    overlay = json.loads(prereg_path.read_text(encoding="utf-8"))
+    base_path = root / str(overlay["base_preregistration"]["path"])
+    if _sha256(base_path) != BASE_PREREGISTRATION_SHA256:
+        raise Phase0DivergenceError("Phase 0 base preregistration hash mismatch")
+    prereg = json.loads(base_path.read_text(encoding="utf-8"))
+    contract_path = root / str(overlay["active_contract"]["path"])
+    if _sha256(contract_path) != overlay["active_contract"]["sha256"]:
+        raise Phase0DivergenceError("active V7 contract hash mismatch")
+    data_manifest_path = root / str(
+        overlay["additive_requirements"]["data_manifest"]["path"]
+    )
+    if _sha256(data_manifest_path) != DATA_MANIFEST_FILE_SHA256:
+        raise Phase0DivergenceError("V7 data manifest file hash mismatch")
+    data_manifest_verification = verify_v7_data_manifest(
+        root, data_manifest_path
+    )
     source_manifest = root / str(prereg["source_manifest_path"])
     _verify_source_manifest(root, source_manifest)
     proof_registry = load_and_verify(proof_registry_path)
@@ -96,7 +116,7 @@ def run_phase0_divergence(
                 basket=basket,
                 episode_policy=policy,
                 explicit_start_days=starts,
-                config=Topstep150KConfig(mll_variant=DEFAULT_VARIANT),
+                config=Topstep150KConfig(mll_mode=DEFAULT_MODE),
             )
             sensitivity = evaluate_account_policy(
                 components,
@@ -104,7 +124,7 @@ def run_phase0_divergence(
                 basket=basket,
                 episode_policy=policy,
                 explicit_start_days=starts,
-                config=Topstep150KConfig(mll_variant=SENSITIVITY_VARIANT),
+                config=Topstep150KConfig(mll_mode=SENSITIVITY_MODE),
             )
             mismatch = _compare_historical_summary(
                 baseline["summary"], default.to_dict()
@@ -154,14 +174,14 @@ def run_phase0_divergence(
                 bank["eligible_session_days"],
                 basket=basket,
                 maximum_starts=12,
-                config=Topstep150KConfig(mll_variant=DEFAULT_VARIANT),
+                config=Topstep150KConfig(mll_mode=DEFAULT_MODE),
             )
             sensitivity = evaluate_serial_xfa_basket(
                 components,
                 bank["eligible_session_days"],
                 basket=basket,
                 maximum_starts=12,
-                config=Topstep150KConfig(mll_variant=SENSITIVITY_VARIANT),
+                config=Topstep150KConfig(mll_mode=SENSITIVITY_MODE),
             )
             mismatch = _compare_xfa_summary(
                 baseline["rolling_xfa"], default["rolling_xfa"]
@@ -218,9 +238,10 @@ def run_phase0_divergence(
         - aggregate["default"]["mll_breach_rate"]
     )
     result = {
-        "schema": "hydra_v7_phase0_divergence_result_v1",
-        "experiment_id": prereg["experiment_id"],
-        "preregistration_sha256": PREREGISTRATION_SHA256,
+        "schema": "hydra_v7_phase0_divergence_result_v2",
+        "experiment_id": overlay["experiment_id"],
+        "preregistration_sha256": OVERLAY_PREREGISTRATION_SHA256,
+        "base_preregistration_sha256": BASE_PREREGISTRATION_SHA256,
         "source_manifest_sha256": prereg["source_manifest_sha256"],
         "historical_classification": classification,
         "historical_default_mismatch_count": len(exact_mismatches),
@@ -241,6 +262,19 @@ def run_phase0_divergence(
                 ruleset.deployment_ticket_blockers
             ),
         },
+        "R16": dict(overlay["additive_requirements"]["R16"]),
+        "mll_modes": {
+            "default": DEFAULT_MODE.value,
+            "sensitivity": SENSITIVITY_MODE.value,
+        },
+        "reproducibility": dict(
+            overlay["additive_requirements"]["reproducibility"]
+        ),
+        "data_manifest": {
+            "path": str(data_manifest_path.relative_to(root)),
+            "file_sha256": DATA_MANIFEST_FILE_SHA256,
+            **data_manifest_verification,
+        },
         "q4_burned": True,
         "phase_spend_usd": 0.0,
         "outbound_order_count": 0,
@@ -252,10 +286,18 @@ def run_phase0_divergence(
             "hydra/propfirm/intraday_mll.py",
             "hydra/propfirm/mll_variants.py",
             "hydra/propfirm/topstep_150k.py",
+            "hydra/propfirm/trading_day.py",
             "hydra/propfirm/xfa_episode.py",
             "hydra/validation/v7_phase0_divergence.py",
+            "hydra/data/v7_manifest.py",
+            "config/rulesets/topstep_150k_v7.json",
             "tests/ruleset/",
         ],
+        "CONTRE": (
+            "The source paths contain OHLC extrema without their intrabar order; "
+            "the intraday-HWM sensitivity therefore remains conservative and "
+            "cannot resolve the human R2 conflict."
+        ),
     }
     destination = Path(output_dir)
     destination.mkdir(parents=True, exist_ok=True)
@@ -447,6 +489,12 @@ def _render_divergence_report(result: Mapping[str, Any]) -> str:
         [
             "# HYDRA V7 — Phase 0 MLL divergence",
             "",
+            "[HYDRA-V7] phase=0 step=2 verdict=NULL",
+            "gate=G0 preuve=reports/v7/phase0_v2/phase0_result.json#pending tests=pending",
+            "budget_llm=0.000000/8.00 budget_data=0.000000/60.00 N_trials=pending_retro_estimate burned=1",
+            "diff_validation=" + ",".join(result["diff_validation"]) + " CONTRE=" + str(result["CONTRE"]),
+            "prochaine_action=exécuter_la_régression_totale_puis_rendre_le_verdict_G0",
+            "",
             "Validation/simulation diff: "
             + ", ".join(result["diff_validation"]),
             "",
@@ -460,6 +508,10 @@ def _render_divergence_report(result: Mapping[str, Any]) -> str:
             f"Q4 BURNED: `{result['q4_burned']}`; orders: `{result['outbound_order_count']}`; paid spend: `${result['phase_spend_usd']:.6f}`.",
             "",
             "These are development-only sensitivity results, not promotion evidence.",
+            "",
+            "## CONTRE",
+            "",
+            str(result["CONTRE"]),
             "",
         ]
     )

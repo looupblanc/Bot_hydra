@@ -228,7 +228,7 @@ def run_shared_account_episode(
                     live_equity_high=balance,
                     distance=float(rules.combine_max_loss_limit),
                     lock=float(rules.combine_starting_balance),
-                    variant=rules.mll_variant,
+                    variant=rules.resolved_mll_mode,
                 )
                 contribution[trade.component_id] += position.net_pnl
                 day_components[trade.component_id] += position.net_pnl
@@ -349,7 +349,7 @@ def run_shared_account_episode(
                 live_equity_high=balance + conservative_open_gain,
                 distance=float(rules.combine_max_loss_limit),
                 lock=float(rules.combine_starting_balance),
-                variant=rules.mll_variant,
+                variant=rules.resolved_mll_mode,
             )
             intraday_low = balance + conservative_open_loss
             minimum_buffer = min(minimum_buffer, intraday_low - floor)
@@ -384,7 +384,7 @@ def run_shared_account_episode(
                         live_equity_high=balance,
                         distance=float(rules.combine_max_loss_limit),
                         lock=float(rules.combine_starting_balance),
-                        variant=rules.mll_variant,
+                        variant=rules.resolved_mll_mode,
                     )
                     dll_triggered = True
                 break
