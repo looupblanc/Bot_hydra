@@ -1,0 +1,29 @@
+{
+  "schema": "hydra_v7_graveyard_d1_update_v1",
+  "built_at_utc": "2026-07-12T19:52:48Z",
+  "graveyard_path": "mission/state/graveyard.db",
+  "graveyard_sha256": "3fc35c6392531dac089e751e7cfd40e5d059c37ed0f610ee1e45be5ee680f90e",
+  "integrity": "ok",
+  "class_signature_count": 84,
+  "indexed_object_count": 115528,
+  "grammar_tombstone_count_total": 85,
+  "d1_grammar0001_tombstone_count": 8,
+  "d1_grammar0001_new_class_signatures": 5,
+  "grammar_result_path": "reports/v7/data/d1_candidate_tribunal_result.json",
+  "grammar_result_sha256": "fcdb9477d00c0bfa80e77ac414892fdfc9b2ebd854f19296f221f172d7ca2203",
+  "d1_grammar0001_contract_death_causes": {
+    "INSUFFICIENT_EVENT_COUNT_OR_BASE_ECONOMICS": 7,
+    "SIM_EXPLOIT": 1
+  },
+  "parameter_level_feedback": false,
+  "generator_feedback_scope": [
+    "mechanism_class",
+    "regime",
+    "death_cause",
+    "candidate_count"
+  ],
+  "q4_access_delta": 0,
+  "forward_gap_access_delta": 0,
+  "outbound_order_count": 0,
+  "CONTRE": "This tombstones only the four exact grammar0001 mechanism classes in the two August development blocks; it does not falsify every possible print-based microstructure mechanism."
+}
