@@ -1,0 +1,84 @@
+{
+  "schema": "hydra_v7_d1_trades_acquisition_preregistration_v1",
+  "plan_id": "v7_d1_es_mes_trades_development_pilot_0001",
+  "preregistered_at_utc": "2026-07-12T15:46:00Z",
+  "contract": {
+    "path": "MISSION_CONTRACT.md",
+    "sha256": "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab",
+    "tag": "worm/contract-2026-07-12-v2",
+    "clauses": [1, 2, 5, 6, 8]
+  },
+  "authorization": {
+    "phase": "D1",
+    "phase_cap_usd": 60.0,
+    "legacy_databento_hard_cap_usd": 100.0,
+    "actual_spend_before_usd": 27.986516065895,
+    "official_estimate_usd": 40.401062786579,
+    "projected_actual_spend_usd": 68.387578852474,
+    "projected_hard_cap_remaining_usd": 31.612421147526,
+    "minimum_remaining_usd": 30.0,
+    "authorized_maximum_request_cost_usd": 40.41,
+    "broad_two_to_three_year_request_rejected_as_over_budget": true
+  },
+  "request": {
+    "dataset": "GLBX.MDP3",
+    "schema": "trades",
+    "symbols": ["ES.c.0", "MES.c.0"],
+    "stype_in": "continuous",
+    "stype_out": "instrument_id",
+    "start_inclusive": "2024-08-01T00:00:00Z",
+    "end_exclusive": "2024-10-01T00:00:00Z",
+    "data_role": "DEVELOPMENT_ONLY",
+    "q4_included": false,
+    "forward_gap_included": false,
+    "raw_output_path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+    "record_count": 32277017,
+    "billable_size_bytes": 1549296816,
+    "cache_audit": "MISS"
+  },
+  "scope_rationale": {
+    "decision_information": "Test whether real aggressor-side prints support mechanism classes that OHLC shadows cannot identify, while retaining at least USD 30 under the persistent Databento hard cap.",
+    "why_two_months": "One month costs USD 15.5472625494 and three months costs USD 60.161034822464; two months is the largest observed bounded pair request below both the D1 cap and the USD 30 reserve constraint.",
+    "rth_first": true,
+    "raw_full_session_download_then_past_only_rth_filter": true,
+    "explicit_contract_resolution_required": true,
+    "event_based_representations_authorized": [
+      "volume_bars",
+      "signed_imbalance_bars",
+      "dollar_bars"
+    ]
+  },
+  "economic_hypothesis_classes": [
+    {
+      "id": "D1H1_AGGRESSOR_IMBALANCE_PERSISTENCE",
+      "who_pays": "Urgent informed or mandate-driven aggressors that split a larger parent order across successive prints.",
+      "hypothesis": "An aggressor-side volume shock accompanied by efficient price displacement persists over the next event bars because the parent order is not completed in one print burst."
+    },
+    {
+      "id": "D1H2_PRINT_ABSORPTION_REVERSAL",
+      "who_pays": "Aggressive late entrants whose market orders are absorbed by resting liquidity without commensurate price progress.",
+      "hypothesis": "Extreme signed traded volume with abnormally small price displacement marks absorption and reverses after the aggressive flow exhausts."
+    },
+    {
+      "id": "D1H3_SWEEP_QUALITY_CONTINUATION",
+      "who_pays": "Urgent liquidity takers that sweep several price levels and must continue executing after a genuine high-quality burst.",
+      "hypothesis": "A clustered burst of same-side prints is predictive only when price follows the signed volume efficiently; low-follow-through bursts are not continuation signals."
+    },
+    {
+      "id": "D1H4_SESSION_AGGRESSION_STATE_TRANSITION",
+      "who_pays": "Participants entering after the cash open while inherited pre-open aggressor inventory is still being transferred.",
+      "hypothesis": "A change in signed aggression between pre-open and cash-session event bars reveals an inventory handoff whose direction persists until the new session reaches balance."
+    }
+  ],
+  "post_download_invariants": {
+    "no_candidate_result_before_separate_WORM_grammar": true,
+    "new_dataset_requires_null_tripwire": true,
+    "proof_window_consumed": false,
+    "proof_registry_burn_delta": 0,
+    "q4_access_delta": 0,
+    "outbound_order_count": 0,
+    "api_key_must_not_be_logged_or_committed": true,
+    "raw_data_must_not_be_committed": true
+  },
+  "CONTRE": "Two development months can expose print-level mechanisms and generate many events, but they are too short to establish seasonal stability; any survivor still requires purged multiplicity-adjusted evidence and untouched forward confirmation."
+}
