@@ -130,6 +130,10 @@ def test_controller_migrates_fresh_mission_schema_before_first_step(
     )
     monkeypatch.setattr(controller, "_verify_constitution", lambda: "# MISSION HYDRA V7\n")
     monkeypatch.setattr(
+        "hydra.mission.v7_falsification_controller.load_and_verify",
+        lambda _path: {"entries": []},
+    )
+    monkeypatch.setattr(
         "hydra.mission.v7_falsification_controller.classify_v7_action",
         lambda _root: {
             "action_type": "V71_TEST_CONTINUATION",
@@ -173,6 +177,10 @@ def test_running_v7_controller_renews_watchdog_lease(
     )
     monkeypatch.setattr(controller, "_verify_constitution", lambda: "# MISSION HYDRA V7\n")
     monkeypatch.setattr(
+        "hydra.mission.v7_falsification_controller.load_and_verify",
+        lambda _path: {"entries": []},
+    )
+    monkeypatch.setattr(
         "hydra.mission.v7_falsification_controller.classify_v7_action",
         lambda _root: {
             "action_type": "V71_TEST_CONTINUATION",
@@ -202,6 +210,9 @@ def test_running_v7_controller_renews_watchdog_lease(
     assert health["classification"] == "HEALTHY_AND_PROGRESSING"
     assert snapshot["current_experiment"]["claimed_by"] == "v7_falsification_controller"
     assert snapshot["broker_order_capability"] is False
+    heartbeat = heartbeat_status(controller.paths).payload
+    assert heartbeat["remaining_databento_budget_usd"] == 125.0
+    assert heartbeat["q4_access_count"] == 0
 
 
 def test_runner_uses_non_restarting_integrity_exit(monkeypatch: pytest.MonkeyPatch) -> None:

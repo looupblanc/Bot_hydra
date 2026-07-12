@@ -11,6 +11,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
+from hydra.data.budget import DatabentoBudgetConfig, cumulative_spend
+from hydra.governance.invariants import q4_access_count
 from hydra.governance.proof_registry import burned_window_ids, load_and_verify
 from hydra.mission.experiment_queue import ensure_experiment_schema
 from hydra.mission.mission_state import (
@@ -360,6 +362,7 @@ class V7FalsificationController:
             "current_experiment",
             self._current_experiment(lease_expires_at),
         )
+        self._refresh_authoritative_runtime_metrics(conn)
         append_event(conn, "V7_CONTROLLER_INITIALIZED", payload)
         append_jsonl(
             self.paths.decision_ledger,
@@ -399,6 +402,7 @@ class V7FalsificationController:
             "current_experiment",
             self._current_experiment(lease_expires_at),
         )
+        self._refresh_authoritative_runtime_metrics(conn)
         if _stable_json(previous) != _stable_json(action):
             append_event(
                 conn,
@@ -500,6 +504,14 @@ class V7FalsificationController:
             "latest_checkpoint": get_kv(conn, "v7_latest_checkpoint", ""),
             "last_progress_at_utc": get_kv(conn, "last_progress_at_utc", None),
             "current_experiment": get_kv(conn, "current_experiment", {}),
+            "q4_access_count": int(get_kv(conn, "q4_access_count", 0)),
+            "cumulative_databento_spend_usd": float(
+                get_kv(conn, "cumulative_databento_spend_usd", 0.0)
+            ),
+            "remaining_databento_budget_usd": float(
+                get_kv(conn, "remaining_databento_budget_usd", 0.0)
+            ),
+            "registry_n_trials": int(get_kv(conn, "v7_registry_n_trials", 0)),
             "process_lock": str(self.paths.lock_path),
             "single_writer": True,
             "broker_connections": 0,
@@ -512,6 +524,24 @@ class V7FalsificationController:
         return (
             datetime.now(timezone.utc) + timedelta(seconds=seconds)
         ).replace(microsecond=0).isoformat()
+
+    def _refresh_authoritative_runtime_metrics(
+        self, conn: sqlite3.Connection
+    ) -> None:
+        budget = DatabentoBudgetConfig()
+        _estimated, actual = cumulative_spend(self.root / budget.ledger_path)
+        proof = load_and_verify(self.root / "mission/state/proof_registry.json")
+        access_count = q4_access_count(
+            str(self.root / "reports/data_access/data_access_ledger.jsonl")
+        )
+        set_kv(conn, "cumulative_databento_spend_usd", float(actual))
+        set_kv(
+            conn,
+            "remaining_databento_budget_usd",
+            max(float(budget.hard_cap_usd) - float(actual), 0.0),
+        )
+        set_kv(conn, "q4_access_count", int(access_count))
+        set_kv(conn, "v7_registry_n_trials", _multiplicity(proof))
 
     @staticmethod
     def _current_experiment(lease_expires_at: str) -> dict[str, Any]:
