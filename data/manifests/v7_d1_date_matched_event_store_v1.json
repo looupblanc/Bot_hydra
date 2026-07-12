@@ -1,0 +1,113 @@
+{
+  "CONTRE": "The event bars are deterministic and native to prints, but fixed thresholds can induce different sampling rates across contracts; the new-dataset tripwire remains mandatory.",
+  "audits": [
+    {
+      "bounded_record_count": 15545497,
+      "event_bar_count": 505238,
+      "excluded_instrument_record_count": 0,
+      "invalid_action_record_count": 0,
+      "minute_group_count": 17600,
+      "raw_record_count": 15545497,
+      "retained_rth_record_count": 12456537,
+      "year": 2023
+    },
+    {
+      "bounded_record_count": 18408542,
+      "event_bar_count": 576928,
+      "excluded_instrument_record_count": 0,
+      "invalid_action_record_count": 0,
+      "minute_group_count": 16800,
+      "raw_record_count": 32277017,
+      "retained_rth_record_count": 14103274,
+      "year": 2024
+    }
+  ],
+  "data_role": "DEVELOPMENT_ONLY",
+  "definitions": {
+    "contracts": [
+      "ESU3",
+      "ESU4",
+      "MESU3",
+      "MESU4"
+    ],
+    "path": "data/cache/contract_maps/definitions_GLBX-MDP3_2023-01-01_2024-10-01_1faa319bb6354a47.dbn.zst",
+    "sha256": "a5374a723fdf442f8c5e31f98af26ff813070a61008d24e46f848df69c819dcc"
+  },
+  "event_output": {
+    "counts": {
+      "2023:ES:DOLLAR_BAR": 230134,
+      "2023:ES:SIGNED_IMBALANCE_BAR": 5452,
+      "2023:ES:VOLUME_BAR": 27597,
+      "2023:MES:DOLLAR_BAR": 145207,
+      "2023:MES:SIGNED_IMBALANCE_BAR": 29187,
+      "2023:MES:VOLUME_BAR": 67661,
+      "2024:ES:DOLLAR_BAR": 263606,
+      "2024:ES:SIGNED_IMBALANCE_BAR": 3860,
+      "2024:ES:VOLUME_BAR": 25671,
+      "2024:MES:DOLLAR_BAR": 188953,
+      "2024:MES:SIGNED_IMBALANCE_BAR": 23192,
+      "2024:MES:VOLUME_BAR": 71646
+    },
+    "path": "data/cache/v7_d1/date_matched_event_bars_v1.parquet",
+    "row_count": 1082166,
+    "sha256": "ea0208fc3666f912b39e9b21b302a466bd7ee00c802140d6a6beed73098aa4a3"
+  },
+  "forward_gap_access_count": 0,
+  "minute_output": {
+    "path": "data/cache/v7_d1/date_matched_minute_print_features_v2.parquet",
+    "row_count": 34400,
+    "sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb"
+  },
+  "outbound_order_count": 0,
+  "outcome_or_pnl_columns": [],
+  "preregistration_path": "WORM/v7-d1-event-representations-2026-07-12.json",
+  "preregistration_sha256": "5a72dd7f991dd62c387b101c857e562b4fca05414b6340e41ec6388e16ea1d5b",
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "schema": "hydra_v7_d1_date_matched_event_store_manifest_v1",
+  "session_filter": {
+    "end_exclusive": "15:10:00",
+    "start_inclusive": "08:30:00",
+    "timezone": "America/Chicago",
+    "weekdays_only": true
+  },
+  "sources": [
+    {
+      "instrument_ids": [
+        2922,
+        3445
+      ],
+      "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2023-08-02_2023-09-01.dbn.zst",
+      "sha256": "d93e5c8bd657a28bff5f05560b845caa3bb04e9252882ddc2751033fedd1c468",
+      "slice_end_ns": 1693526400000000000,
+      "slice_start_ns": 1690934400000000000,
+      "year": 2023
+    },
+    {
+      "instrument_ids": [
+        118,
+        7114
+      ],
+      "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+      "sha256": "a312d6df524205c2d1632c20f1033ecb74081c98d6608eacc1a9cdb08bcf9b63",
+      "slice_end_ns": 1725148800000000000,
+      "slice_start_ns": 1722556800000000000,
+      "year": 2024
+    }
+  ],
+  "thresholds": {
+    "dollar": {
+      "ES": 25000000.0,
+      "MES": 2500000.0
+    },
+    "signed_imbalance": {
+      "ES": 500.0,
+      "MES": 125.0
+    },
+    "volume": {
+      "ES": 1000.0,
+      "MES": 250.0
+    }
+  },
+  "transformation_version": "hydra_v7_d1_date_matched_event_store_v1"
+}
