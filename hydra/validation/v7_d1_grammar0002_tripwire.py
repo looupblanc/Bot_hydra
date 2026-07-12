@@ -32,6 +32,8 @@ from hydra.validation.v7_d1_new_dataset_tripwire import (
     _within_year_price_null,
     _year_permuted_prices,
 )
+from hydra.validation.v7_report_schema import validate_v7_report_text
+from hydra.validation.v7_tripwire_evidence import exact_tripwire_evidence
 
 
 GRAMMAR_SHA256 = "fac0b5166351940d1fde5334bdeaf846d56e56efc8cef9772a9599b8b86feee9"
@@ -122,6 +124,13 @@ def run_d1_grammar0002_tripwire(
         raise D1Grammar0002TripwireError(
             "grammar0002 null episode count is below real"
         )
+    exact_evidence = exact_tripwire_evidence(
+        real_passes=int(real["pass_count"]),
+        real_episodes=int(real["episode_count"]),
+        null_passes=pooled_passes,
+        null_episodes=pooled_episodes,
+        tripwire_verdict=verdict,
+    )
     result = {
         "schema": "hydra_v7_d1_grammar0002_tripwire_result_v1",
         "tripwire_id": "hydra_v7_d1_new_grammar_tripwire_0002",
@@ -129,6 +138,12 @@ def run_d1_grammar0002_tripwire(
         "verdict": verdict,
         "threshold": NULL_THRESHOLD,
         "NULL_RATIO": null_ratio,
+        "raw_pass_counts": {
+            "real": f"{int(real['pass_count'])}/{int(real['episode_count'])}",
+            "null": f"{pooled_passes}/{pooled_episodes}",
+        },
+        "exact_binomial_test": exact_evidence.to_dict(),
+        "evidence_strength": exact_evidence.evidence_strength,
         "real": {
             **real,
             "signal_count": sum(len(rows) for rows in real_signals.values()),
@@ -358,7 +373,9 @@ def _write_result(result: dict[str, Any], output_dir: str | Path) -> dict[str, A
         encoding="utf-8",
     )
     os.replace(temporary, result_path)
-    report_path.write_text(_render_report(result), encoding="utf-8")
+    report_text = _render_report(result)
+    validate_v7_report_text(report_text)
+    report_path.write_text(report_text, encoding="utf-8")
     result["result_path"] = str(result_path)
     result["result_sha256"] = _sha256(result_path)
     result["report_path"] = str(report_path)
@@ -381,6 +398,9 @@ def _render_report(result: Mapping[str, Any]) -> str:
             f"- Null episodes: `{result['pooled_null']['episode_count']}`",
             f"- Null passes: `{result['pooled_null']['pass_count']}`",
             f"- NULL_RATIO: `{result['NULL_RATIO']}`",
+            f"- Comptes bruts: réel `{result['raw_pass_counts']['real']}` vs null `{result['raw_pass_counts']['null']}`",
+            f"- P-value binomiale exacte unilatérale: `{result['exact_binomial_test']['exact_binomial_one_sided_p_value']}`",
+            f"- Force de preuve: `{result['evidence_strength']}`",
             "",
             "## CONTRE",
             "",
