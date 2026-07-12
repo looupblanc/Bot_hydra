@@ -120,7 +120,9 @@ def run_databento_forward_update(
     calendar = calendar_from_manifest(calendar_manifest, now=observed)
 
     map_paths = discover_roll_maps(contract_map_dir)
-    resolution_time = min(available_end, observed) - timedelta(microseconds=1)
+    resolution_time = _latest_open_time(
+        min(available_end, observed) - timedelta(microseconds=1), calendar
+    )
     resolution = resolve_current_contracts(map_paths, roots, as_of=resolution_time)
     map_receipt: dict[str, Any] | None = None
     definitions_spend = 0.0
@@ -129,7 +131,12 @@ def run_databento_forward_update(
         # current segment's start to the request boundary.  That preserves the
         # observed roll date instead of mistaking today's request end for a
         # roll transition.
-        mapping_start = (resolution_time - timedelta(days=45)).isoformat()
+        mapping_start = (
+            pd.Timestamp(resolution_time)
+            .normalize()
+            .to_pydatetime()
+            - timedelta(days=45)
+        ).isoformat()
         mapping_end = resolution_time.isoformat()
         receipt = ensure_current_contract_map(
             historical,
@@ -550,6 +557,25 @@ def _next_check(
             return probe + timedelta(minutes=2)
         probe += timedelta(minutes=1)
     raise DatabentoForwardFeedError("Could not locate the next CME open.")
+
+
+def _latest_open_time(value: datetime, calendar: Any) -> datetime:
+    """Clamp metadata availability to the last tradable minute.
+
+    Databento's dataset range can advance during weekend definition broadcasts
+    even though OHLCV has no new tradable bar.  Contract symbology intervals
+    are date-exclusive, so resolving at that non-trading metadata timestamp can
+    appear one day beyond exact coverage.  Walking backward only through
+    calendar-closed minutes avoids extrapolating a contract into an open
+    session.
+    """
+
+    probe = _utc(value)
+    for _ in range(8 * 24 * 60):
+        if calendar.market_state(probe) == "OPEN":
+            return probe
+        probe -= timedelta(minutes=1)
+    raise DatabentoForwardFeedError("Could not locate prior open CME minute.")
 
 
 def _historical_client() -> Any:

@@ -71,11 +71,11 @@ class _Metadata:
         assert dataset == "GLBX.MDP3"
         return {
             "start": "2010-01-01T00:00:00Z",
-            "end": "2026-07-11T23:35:00Z",
+            "end": "2026-07-12T00:05:00Z",
             "schema": {
                 "ohlcv-1m": {
                     "start": "2010-01-01T00:00:00Z",
-                    "end": "2026-07-11T23:35:00Z",
+                    "end": "2026-07-12T00:05:00Z",
                 }
             },
         }
