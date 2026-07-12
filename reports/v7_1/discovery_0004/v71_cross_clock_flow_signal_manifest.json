@@ -1,0 +1,172 @@
+{
+  "CONTRE": "Cross-clock agreement can be duplicated information from the same print stream; economic replay and the grammar tripwire remain mandatory.",
+  "archive_duplicate_count": 0,
+  "candidate_count": 12,
+  "candidate_paths": [
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_continuation_h30",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "response_policy": "CONTINUATION",
+      "signal_count": 464,
+      "signal_path_hash": "80b65d7b14a1ba5a6383c040cecef312f5b219857c7552c6324d515ac0315dac",
+      "specification_hash": "3b3a6ceae2f03235841cdd1b32b58755d869fc676b609e88baea4d42dfa94092",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_continuation_h60",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "response_policy": "CONTINUATION",
+      "signal_count": 246,
+      "signal_path_hash": "f2c63fc2a76ff5eb3c9b60f4fee71169c80ed70603a25e5941734893098689fa",
+      "specification_hash": "403f43b4ed7b01da1042101555fb699266e9d7bd32706d86b5dcf558205bc6cf",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h30",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "response_policy": "REVERSAL",
+      "signal_count": 464,
+      "signal_path_hash": "cc6e26e62772f5ae69993ceae7aa61524123c260c22ac8a16be618e6baa70fab",
+      "specification_hash": "7835354b3c3206ccb07cd642e4e0926332941bf73dfee4e489c0baf4319a7f9c",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "response_policy": "REVERSAL",
+      "signal_count": 246,
+      "signal_path_hash": "f14fd905c30f02572cebc6c9aa8e450a1ece96a50ff757b3ad00e8a9a24dd146",
+      "specification_hash": "ee91025aaf7ab38bacb7540aff8282a5b28703e987eb1dd20e122106e2468b62",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_agreement_continuation_h30",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_SIGN_AGREEMENT",
+      "response_policy": "CONTINUATION",
+      "signal_count": 516,
+      "signal_path_hash": "34dd56dd25316435ddafcc11542f61afc842aea6287e87fa335c5897f8ba0d05",
+      "specification_hash": "2c8742339f4184473ccc692520414b7a577648b7e3b42569d2a457c76df051ec",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_agreement_continuation_h60",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_SIGN_AGREEMENT",
+      "response_policy": "CONTINUATION",
+      "signal_count": 258,
+      "signal_path_hash": "92be2a2640ecee8d03a493021a5462783371e1429014730895bce96c0adac2bc",
+      "specification_hash": "ddbc245e5a2bfc953835161f99f78bc7abed7412e7cd0257842bbf7226773f84",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_agreement_reversal_h30",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_SIGN_AGREEMENT",
+      "response_policy": "REVERSAL",
+      "signal_count": 516,
+      "signal_path_hash": "c2c86b0739b157e00b615171e2356eec2f8b7171abefec8fd7cf48f340fa7470",
+      "specification_hash": "1e48073f21a8403e2305d7d4d4cbf5fb99226ccba5ef887340a806e7adc2733e",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_agreement_reversal_h60",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_SIGN_AGREEMENT",
+      "response_policy": "REVERSAL",
+      "signal_count": 258,
+      "signal_path_hash": "ce41f7a10c34959b8c8297ddd0323fd9536e76f2103a5934885d9a4ad3a331c5",
+      "specification_hash": "770cf78da58eca47badfc542d8155e772d1b69adb1e895479a928346aab4565e",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_disagreement_continuation_h30",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_SIGN_DISAGREEMENT",
+      "response_policy": "CONTINUATION",
+      "signal_count": 515,
+      "signal_path_hash": "879f25398691be4dd0d6dcc4f8a433852fbd9383935f458885d6488621aaf060",
+      "specification_hash": "3db29bd9860a46cce6fbe0a53da2b9d12e88ad48dd09aa01b718076bdf60e53b",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_disagreement_continuation_h60",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_SIGN_DISAGREEMENT",
+      "response_policy": "CONTINUATION",
+      "signal_count": 258,
+      "signal_path_hash": "07465e3dd6a7ac9bd581594b221096309ba0a5590f9621ec2ad3cb4a4a40d585",
+      "specification_hash": "7cf2f1f14a9cea28dbfb0fdbdfafe26227d89b6cc505216ebe5ef771419cd83e",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_disagreement_reversal_h30",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 30,
+      "motif": "FLOW_SIGN_DISAGREEMENT",
+      "response_policy": "REVERSAL",
+      "signal_count": 515,
+      "signal_path_hash": "b66eea7fe399dfda2e9a8f6ebd59cadaffcec4ee0214a2fd33046411dadb9317",
+      "specification_hash": "4ac71484aac5403481209bfca40356e32134de00bf48f16357eb1828fdca65fa",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_sign_disagreement_reversal_h60",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "holding_minutes": 60,
+      "motif": "FLOW_SIGN_DISAGREEMENT",
+      "response_policy": "REVERSAL",
+      "signal_count": 258,
+      "signal_path_hash": "de5fcbdbbaa1290bdbc97a4353e8af7f4b734efb5b70f63270546dfec410ed2c",
+      "specification_hash": "3806ac4e88a76cb7e11fe7d273c7f55dadf694c805552bdcf8eca078a15214ad",
+      "within_manifest_duplicate_of": null
+    }
+  ],
+  "candidates_per_family": {
+    "CROSS_CLOCK_FLOW_CONFIRMATION": 12
+  },
+  "contains_outcomes_or_pnl": false,
+  "family_count": 1,
+  "grammar_id": "hydra_v7_1_cross_clock_flow_grammar_0004",
+  "manifest_hash": "52e786d81b1dc5efa21a12aeecf503a0ebcc03725c5e2e51f94462fd2139e64d",
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "protected_holdout_access_count": 0,
+  "schema": "hydra_v7_1_cross_clock_flow_signal_manifest_v1",
+  "signal_count": 4514,
+  "source_audit": {
+    "aligned_availability_minute_count": 16957,
+    "dollar_event_count": 489366,
+    "executable_pair_count_30m": 15636,
+    "executable_pair_count_60m": 14361,
+    "same_contract_session_pair_count": 16957,
+    "volume_event_count": 53206
+  },
+  "within_manifest_duplicate_count": 0
+}
