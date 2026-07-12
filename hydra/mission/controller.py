@@ -15,6 +15,15 @@ from typing import Any
 from hydra.calibration.validator_benchmark import benchmark_validator, write_calibration_report
 from hydra.governance.kernel import initialize_governance_kernel
 from hydra.mission.engineering_runner import detect_engineering_capability
+from hydra.mission.evidence_conversion_scheduler import (
+    EVIDENCE_CONVERSION_ALLOCATION,
+    EvidenceConversionContractError,
+    FrozenEvidenceSources,
+    candidate_bank_manifest,
+    is_turbo_structural_exhaustion,
+    should_schedule_followup,
+    validate_evidence_conversion_result,
+)
 from hydra.mission.experiment_queue import (
     block_experiment,
     claim_next_experiment,
@@ -155,6 +164,13 @@ MINI_MICRO_PARTICIPATION_DIVERGENCE_EXPERIMENT_ID = (
 TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX = "turbo_foundry_v2_epoch_"
 TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID = f"{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}0000"
 TURBO_PROMOTION_EXPERIMENT_PREFIX = "turbo_promotion_batch_"
+EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX = "evidence_conversion_v3_cohort_"
+EVIDENCE_CONVERSION_V3_INITIAL_EXPERIMENT_ID = (
+    f"{EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX}0000"
+)
+EVIDENCE_CONVERSION_V3_TASK_SHA256 = (
+    "0840ebd9506aae8697c411195b8f854cf56b0dbb4d9f8204956d4d9e0bf3b1f5"
+)
 V3_TASK_SHA256 = "2ad1137abe0ee83f7ec1ce21acd48749df7aeed465a48777fe90a9796f606de9"
 V3_REPAIR_RESULT_HASH = "a932819f1eb0b72557b39ea867d3e930fd7d9e9dcad3e4cb64e10a0bbe2abb0d"
 V3_REPAIR_FILE_SHA256 = "9137d0850efae03a00c139b9628063a6b7237d4614979491956dca7063e5e1a9"
@@ -322,6 +338,7 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "mini_micro_participation_divergence",
     "turbo_foundry_v2_epoch",
     "turbo_promotion_batch",
+    "evidence_conversion_v3_cohort",
 }
 
 
@@ -709,6 +726,27 @@ class AutonomousMissionController:
             and str(previous_blocker or "")
             == "EQUITY_PRECLOSE_INVENTORY_DISPERSION_REQUIRED"
         )
+        turbo_failure_blocker = str(previous_blocker or "").startswith(
+            f"EXPERIMENT_FAILED:{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}"
+        )
+        turbo_structural_exhaustion = bool(
+            turbo_failure_blocker
+            and is_turbo_structural_exhaustion(str(previous_last_error or ""))
+        )
+        evidence_conversion_v3_required = bool(
+            previous_phase
+            in {
+                "SCHEDULER_STALLED",
+                "ENGINEERING_BLOCKED",
+                "EXPERIMENT_BLOCKED",
+                "STOPPED_CLEANLY",
+            }
+            and (
+                turbo_structural_exhaustion
+                or str(previous_blocker or "")
+                == "EVIDENCE_CONVERSION_V3_CONTINUATION_REQUIRED"
+            )
+        )
         turbo_foundry_v2_required = bool(
             previous_phase
             in {
@@ -723,15 +761,12 @@ class AutonomousMissionController:
                     "DISTINCT_MECHANISM_OR_FORWARD_DATA_REQUIRED",
                     "TURBO_FOUNDRY_V2_CONTINUATION_REQUIRED",
                 }
-                or str(previous_blocker or "").startswith(
-                    f"EXPERIMENT_FAILED:{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}"
-                )
+                or turbo_failure_blocker
             )
+            and not turbo_structural_exhaustion
         )
         turbo_resume_after_failed_commit = bool(
-            str(previous_blocker or "").startswith(
-                f"EXPERIMENT_FAILED:{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}"
-            )
+            turbo_failure_blocker and not turbo_structural_exhaustion
         )
         recovered_missing_handler_rows = 0
         if resolved_missing_handler_type is not None:
@@ -1021,6 +1056,35 @@ class AutonomousMissionController:
                 "TURBO_FOUNDRY_V2_CONTINUATION_REQUIRED",
             }
         )
+        current_turbo_exhaustion = bool(
+            str(get_kv(conn, "current_blocker") or "").startswith(
+                f"EXPERIMENT_FAILED:{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}"
+            )
+            and is_turbo_structural_exhaustion(
+                str(get_kv(conn, "last_error") or "")
+            )
+        )
+        if current_turbo_exhaustion:
+            turbo_foundry_v2_required = False
+            set_kv(
+                conn,
+                "turbo_discovery_grammar_status",
+                "DISCOVERY_GRAMMAR_CAPACITY_EXHAUSTED_NONFATAL",
+            )
+            set_kv(
+                conn,
+                "discovery_pipeline_status",
+                "REPRESENTATION_PIVOT_REQUIRED_CONVERSION_CONTINUES",
+            )
+        evidence_conversion_v3_required = evidence_conversion_v3_required or bool(
+            current_turbo_exhaustion
+            or (
+                str(get_kv(conn, "current_phase", ""))
+                in {"SCHEDULER_STALLED", "ENGINEERING_BLOCKED", "EXPERIMENT_BLOCKED"}
+                and str(get_kv(conn, "current_blocker") or "")
+                == "EVIDENCE_CONVERSION_V3_CONTINUATION_REQUIRED"
+            )
+        )
         contract_map_repair_queued = (
             self._reconcile_contract_map_repair(conn) if contract_map_repair_required else False
         )
@@ -1202,6 +1266,14 @@ class AutonomousMissionController:
             if turbo_foundry_v2_required
             else False
         )
+        evidence_conversion_v3_queued = (
+            self._reconcile_evidence_conversion_v3(
+                conn,
+                cohort_index=self._pending_or_next_evidence_conversion_cohort(conn),
+            )
+            if evidence_conversion_v3_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -1252,6 +1324,7 @@ class AutonomousMissionController:
             and not role_conditioned_epoch_queued
             and not equity_preclose_queued
             and not turbo_foundry_v2_queued
+            and not evidence_conversion_v3_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -1312,6 +1385,7 @@ class AutonomousMissionController:
                 "role_conditioned_epoch_queued": role_conditioned_epoch_queued,
                 "equity_preclose_queued": equity_preclose_queued,
                 "turbo_foundry_v2_queued": turbo_foundry_v2_queued,
+                "evidence_conversion_v3_queued": evidence_conversion_v3_queued,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
             },
         )
@@ -1944,6 +2018,10 @@ class AutonomousMissionController:
                 self._route_mini_micro_participation_divergence_result(conn, result)
             elif experiment_type == "turbo_foundry_v2_epoch":
                 self._route_turbo_foundry_v2_result(conn, result, experiment_id)
+            elif experiment_type == "evidence_conversion_v3_cohort":
+                self._route_evidence_conversion_v3_result(
+                    conn, result, experiment_id
+                )
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -1964,6 +2042,7 @@ class AutonomousMissionController:
                 )
         self._reconcile_completed_turbo_epochs(conn)
         self._reconcile_completed_turbo_promotions(conn)
+        self._reconcile_completed_evidence_conversion_cohorts(conn)
 
     def _reconcile_completed_turbo_epochs(self, conn: Any) -> None:
         rows = conn.execute(
@@ -2030,6 +2109,61 @@ class AutonomousMissionController:
             self._route_turbo_promotion_result(conn, result, experiment_id)
             accounted.add(experiment_id)
             set_kv(conn, "turbo_promotion_accounted_batches", sorted(accounted))
+
+    def _reconcile_completed_evidence_conversion_cohorts(self, conn: Any) -> None:
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='evidence_conversion_v3_cohort' AND status='COMPLETED' "
+            "ORDER BY experiment_id"
+        ).fetchall()
+        accounted = set(
+            get_kv(conn, "evidence_conversion_v3_accounted_cohorts", []) or []
+        )
+        for row in rows:
+            experiment_id = str(row[0])
+            if experiment_id in accounted:
+                continue
+            record = experiment_record(conn, experiment_id)
+            result = dict((record or {}).get("result") or {})
+            if not result:
+                continue
+            self._route_evidence_conversion_v3_result(conn, result, experiment_id)
+            accounted.add(experiment_id)
+            set_kv(
+                conn,
+                "evidence_conversion_v3_accounted_cohorts",
+                sorted(accounted),
+            )
+            reconciliation_id = (
+                f"completed:{experiment_id}:"
+                f"{(record or {}).get('specification_hash') or result.get('result_hash') or 'unknown'}"
+            )
+            if not self._evidence_reconciliation_exists(reconciliation_id):
+                record_evidence(
+                    self.paths,
+                    {
+                        "reconciliation_id": reconciliation_id,
+                        "scope": "EXPERIMENT",
+                        "experiment_id": experiment_id,
+                        "experiment_type": "evidence_conversion_v3_cohort",
+                        "status": "COMPLETED",
+                        "result": result,
+                    },
+                )
+            if not self._event_reconciliation_exists(conn, reconciliation_id):
+                append_event(
+                    conn,
+                    "completed_experiment_reconciled",
+                    {
+                        "experiment_id": experiment_id,
+                        "experiment_type": "evidence_conversion_v3_cohort",
+                        "scientific_conclusion": result.get(
+                            "scientific_conclusion"
+                        ),
+                        "report_path": result.get("report_path"),
+                        "reconciliation_id": reconciliation_id,
+                    },
+                )
 
     @staticmethod
     def _next_turbo_batch_index(conn: Any) -> int:
@@ -5353,6 +5487,241 @@ class AutonomousMissionController:
         )
         set_kv(conn, "promotion_pipeline_status", "TURBO_PROMOTION_QUEUED")
         return True
+
+    @staticmethod
+    def _next_evidence_conversion_cohort(conn: Any) -> int:
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='evidence_conversion_v3_cohort'"
+        ).fetchall()
+        indices: list[int] = []
+        for row in rows:
+            suffix = str(row[0]).removeprefix(
+                EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX
+            )
+            token = suffix.split("_", 1)[0]
+            if token.isdigit():
+                indices.append(int(token))
+        return max(indices, default=-1) + 1
+
+    @classmethod
+    def _pending_or_next_evidence_conversion_cohort(cls, conn: Any) -> int:
+        rows = conn.execute(
+            "SELECT experiment_id FROM experiments WHERE "
+            "experiment_type='evidence_conversion_v3_cohort' "
+            "AND status IN ('QUEUED', 'RUNNING')"
+        ).fetchall()
+        pending: list[int] = []
+        for row in rows:
+            suffix = str(row[0]).removeprefix(
+                EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX
+            )
+            token = suffix.split("_", 1)[0]
+            if token.isdigit():
+                pending.append(int(token))
+        return min(pending) if pending else cls._next_evidence_conversion_cohort(conn)
+
+    def _evidence_conversion_artifact_dir(self, cohort_id: str) -> Path:
+        canonical_state = project_path("mission", "state").resolve()
+        if self.paths.state_dir.resolve() == canonical_state:
+            return project_path("reports", "mission_experiments", cohort_id)
+        return self.paths.state_dir.parent / "reports" / "mission_experiments" / cohort_id
+
+    @staticmethod
+    def _frozen_evidence_conversion_sources(conn: Any) -> FrozenEvidenceSources:
+        rows = conn.execute(
+            "SELECT experiment_id,payload,result FROM experiments WHERE "
+            "experiment_type='turbo_promotion_batch' AND status='COMPLETED' "
+            "ORDER BY experiment_id"
+        ).fetchall()
+        promotion_sources: list[dict[str, str]] = []
+        exact_sources: list[dict[str, str]] = []
+        for experiment_id, payload_text, result_text in rows:
+            specification = json.loads(payload_text or "{}")
+            result = json.loads(result_text or "{}")
+            artifacts = dict(result.get("artifacts") or {})
+            result_path = Path(str(artifacts.get("result_path") or ""))
+            exact_path = Path(str(specification.get("exact_results_path") or ""))
+            if not result_path.is_file() or not exact_path.is_file():
+                raise EvidenceConversionContractError(
+                    f"Completed promotion {experiment_id} lacks an immutable result or exact ledger."
+                )
+            result_sha = hashlib.sha256(result_path.read_bytes()).hexdigest()
+            exact_sha = hashlib.sha256(exact_path.read_bytes()).hexdigest()
+            expected_exact = str(specification.get("exact_results_sha256") or "")
+            if expected_exact and exact_sha != expected_exact:
+                raise EvidenceConversionContractError(
+                    f"Exact replay hash drift for {experiment_id}."
+                )
+            persisted = json.loads(result_path.read_text(encoding="utf-8"))
+            if str(persisted.get("result_hash") or "") != str(
+                result.get("result_hash") or ""
+            ):
+                raise EvidenceConversionContractError(
+                    f"Promotion semantic result drift for {experiment_id}."
+                )
+            promotion_sources.append(
+                {
+                    "experiment_id": str(experiment_id),
+                    "path": str(result_path),
+                    "sha256": result_sha,
+                }
+            )
+            exact_sources.append(
+                {
+                    "experiment_id": str(experiment_id),
+                    "path": str(exact_path),
+                    "sha256": exact_sha,
+                }
+            )
+        return FrozenEvidenceSources.build(
+            promotion_sources=promotion_sources,
+            exact_sources=exact_sources,
+        )
+
+    def _reconcile_evidence_conversion_v3(
+        self, conn: Any, *, cohort_index: int
+    ) -> bool:
+        if cohort_index < 0:
+            raise ValueError("Evidence-conversion cohort index must be non-negative.")
+        cohort_id = f"{EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX}{cohort_index:04d}"
+        existing = experiment_record(conn, cohort_id)
+        if existing is not None:
+            if str(existing.get("status")) in {"QUEUED", "RUNNING"}:
+                self._clear_resolved_resume_block(conn)
+                return True
+            return str(existing.get("status")) == "COMPLETED"
+        task = project_path(
+            "reports",
+            "engineering",
+            "hydra_evidence_conversion_foundry_v3_20260712.md",
+        )
+        if (
+            not task.is_file()
+            or hashlib.sha256(task.read_bytes()).hexdigest()
+            != EVIDENCE_CONVERSION_V3_TASK_SHA256
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "EVIDENCE_CONVERSION_V3_TASK_MISMATCH")
+            set_kv(conn, "last_error", "Frozen Evidence Conversion V3 task is missing or changed.")
+            return False
+        contract_map = project_path(
+            "data",
+            "cache",
+            "contract_maps",
+            "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        )
+        if not contract_map.is_file():
+            contract_map = Path(
+                "/root/hydra-bot/data/cache/contract_maps/"
+                "roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+            )
+        if (
+            not contract_map.is_file()
+            or hashlib.sha256(contract_map.read_bytes()).hexdigest()
+            != PATH_GEOMETRY_MAP_SHA256
+        ):
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "EVIDENCE_CONVERSION_V3_CONTRACT_MAP_MISMATCH")
+            set_kv(conn, "last_error", "Frozen explicit-contract map is missing or changed.")
+            return False
+        try:
+            sources = self._frozen_evidence_conversion_sources(conn)
+            bank = dict(get_kv(conn, "foundry_candidate_bank", {}) or {})
+            manifest = candidate_bank_manifest(
+                bank,
+                cohort_id=cohort_id,
+                code_commit=self._git_commit(),
+                sources=sources,
+                killed_candidate_ids=list(
+                    get_kv(conn, "foundry_killed_candidate_ids", []) or []
+                ),
+            )
+            destination = self._evidence_conversion_artifact_dir(cohort_id)
+            destination.mkdir(parents=True, exist_ok=True)
+            manifest_path = destination / "candidate_bank_manifest.json"
+            encoded = json.dumps(manifest, indent=2, sort_keys=True, default=str) + "\n"
+            if manifest_path.exists():
+                if manifest_path.read_text(encoding="utf-8") != encoded:
+                    raise EvidenceConversionContractError(
+                        f"Immutable candidate-bank manifest drift for {cohort_id}."
+                    )
+            else:
+                temporary = manifest_path.with_name(f".{manifest_path.name}.{os.getpid()}.tmp")
+                temporary.write_text(encoded, encoding="utf-8")
+                os.replace(temporary, manifest_path)
+            manifest_sha = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+        except EvidenceConversionContractError as exc:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "EVIDENCE_CONVERSION_V3_SOURCE_INTEGRITY")
+            set_kv(conn, "last_error", str(exc)[:4000])
+            return False
+
+        specification: dict[str, Any] = {
+            "experiment_type": "evidence_conversion_v3_cohort",
+            "priority": 260.0,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION",
+            "parallel_safe": True,
+            "writes_data_access_ledger": False,
+            "cohort_id": cohort_id,
+            "cohort_index": cohort_index,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": EVIDENCE_CONVERSION_V3_TASK_SHA256,
+            "candidate_bank_manifest_path": str(manifest_path),
+            "candidate_bank_manifest_sha256": manifest_sha,
+            "contract_map_path": str(contract_map),
+            "contract_map_sha256": PATH_GEOMETRY_MAP_SHA256,
+            "contract_map_hash": PATH_GEOMETRY_ROLL_HASH,
+            "allocation": dict(EVIDENCE_CONVERSION_ALLOCATION),
+            "max_representatives": 40,
+            "max_complete_validation": 20,
+            "previously_decided_candidate_ids": sorted(
+                {
+                    str(value)
+                    for value in (
+                        get_kv(
+                            conn,
+                            "evidence_conversion_v3_decided_candidate_ids",
+                            [],
+                        )
+                        or []
+                    )
+                }
+            ),
+            "code_commit": self._git_commit(),
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "paper_shadow_ready_allowed": False,
+            "expected_decision_information_gain": 0.99,
+            **sources.to_specification_fields(),
+        }
+        created = enqueue_experiment(conn, cohort_id, specification)
+        set_kv(conn, "evidence_conversion_v3_active", True)
+        set_kv(conn, "evidence_conversion_v3_current_cohort", cohort_index)
+        set_kv(conn, "evidence_conversion_v3_source_fingerprint", sources.source_fingerprint)
+        set_kv(conn, "promotion_pipeline_status", "EVIDENCE_CONVERSION_V3_QUEUED")
+        set_kv(conn, "foundry_current_engine", "EVIDENCE_CONVERSION_FOUNDRY_V3")
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": cohort_id,
+                "pipeline": "PROMOTION",
+                "candidate_bank_count": int(manifest["candidate_count"]),
+                "source_candidate_bank_count": int(
+                    manifest["source_candidate_bank_count"]
+                ),
+                "source_promotion_batches": len(sources.source_experiment_ids),
+                "allocation": dict(EVIDENCE_CONVERSION_ALLOCATION),
+                "q4_access_authorized": False,
+                "queued": created or existing is not None,
+            },
+        )
+        self._clear_resolved_resume_block(conn)
+        return created or experiment_record(conn, cohort_id) is not None
 
     @staticmethod
     def _meta_failure_snapshot(conn: Any) -> dict[str, Any]:
@@ -8703,6 +9072,194 @@ class AutonomousMissionController:
         )
         self._tick_shadow_pipeline(conn)
 
+    def _route_evidence_conversion_v3_result(
+        self, conn: Any, result: dict[str, Any], experiment_id: str
+    ) -> None:
+        validate_evidence_conversion_result(result)
+        if str(result.get("cohort_id") or "") != experiment_id:
+            raise EvidenceConversionContractError(
+                "Evidence-conversion result cohort ID differs from its immutable experiment ID."
+            )
+        self._update_foundry_candidate_bank(
+            conn,
+            result,
+            experiment_id,
+            counts_as_new_prototypes=False,
+        )
+        status_counts = {
+            str(key): int(value)
+            for key, value in dict(result.get("status_counts") or {}).items()
+        }
+        pre_holdout_ids = [
+            str(value) for value in result.get("pre_holdout_candidate_ids") or []
+        ]
+        completed_ids = {
+            str(value)
+            for value in result.get("complete_validation_candidate_ids") or []
+        }
+        decisions_by_cohort = dict(
+            get_kv(conn, "evidence_conversion_v3_decisions_by_cohort", {}) or {}
+        )
+        existing_cohort_ids = {
+            str(value) for value in decisions_by_cohort.get(experiment_id, []) or []
+        }
+        if existing_cohort_ids and existing_cohort_ids != completed_ids:
+            raise EvidenceConversionContractError(
+                "Immutable evidence-conversion decisions changed during reconciliation."
+            )
+        other_cohort_ids = {
+            str(value)
+            for cohort, values in decisions_by_cohort.items()
+            if str(cohort) != experiment_id
+            for value in (values or [])
+        }
+        overlap = completed_ids & other_cohort_ids
+        if overlap:
+            raise EvidenceConversionContractError(
+                "Evidence conversion attempted to replay candidates decided by another cohort: "
+                f"{sorted(overlap)[:5]}"
+            )
+        decisions_by_cohort[experiment_id] = sorted(completed_ids)
+        set_kv(
+            conn,
+            "evidence_conversion_v3_decisions_by_cohort",
+            decisions_by_cohort,
+        )
+        previously_decided = set(
+            get_kv(conn, "evidence_conversion_v3_decided_candidate_ids", []) or []
+        )
+        previously_decided.update(completed_ids)
+        set_kv(
+            conn,
+            "evidence_conversion_v3_decided_candidate_ids",
+            sorted(previously_decided),
+        )
+        accumulated = set(
+            get_kv(conn, "pre_holdout_candidate_ids", []) or []
+        )
+        accumulated.update(pre_holdout_ids)
+        set_kv(conn, "pre_holdout_candidate_ids", sorted(accumulated))
+        set_kv(conn, "pre_holdout_candidate_count", len(accumulated))
+        metrics = {
+            "cohort_id": experiment_id,
+            "candidates_before_clustering": int(
+                result.get("candidates_before_clustering") or 0
+            ),
+            "candidate_inventory_count": int(
+                result.get("candidate_inventory_count") or 0
+            ),
+            "behavioral_clusters": int(result.get("behavioral_clusters") or 0),
+            "representative_count": int(result.get("representative_count") or 0),
+            "total_distinct_representative_count": int(
+                result.get("total_distinct_representative_count") or 0
+            ),
+            "role_distribution": dict(result.get("role_distribution") or {}),
+            "evidence_debt_queue_count": int(
+                result.get("evidence_debt_queue_count") or 0
+            ),
+            "evidence_debt_inventory_count": int(
+                result.get("evidence_debt_inventory_count") or 0
+            ),
+            "full_economic_replay_count": int(
+                result.get("full_economic_replay_count") or 0
+            ),
+            "full_risk_replay_count": int(
+                result.get("full_risk_replay_count") or 0
+            ),
+            "full_promotion_validation_count": int(
+                result.get("full_promotion_validation_count") or 0
+            ),
+            "promotion_decisions_count": int(
+                result.get("promotion_decisions_count") or 0
+            ),
+            "status_counts": status_counts,
+            "pre_holdout_candidate_ids": pre_holdout_ids,
+            "complete_validation_candidate_ids": sorted(completed_ids),
+            "cumulative_decided_candidate_count": len(previously_decided),
+            "paper_shadow_ready": 0,
+            "q4_access_count": 0,
+            "scientific_conclusion": result.get("scientific_conclusion"),
+            "report_path": result.get("report_path"),
+        }
+        set_kv(conn, "evidence_conversion_v3_latest_metrics", metrics)
+        set_kv(conn, "evidence_conversion_v3_latest_report", result.get("report_path"))
+        set_kv(
+            conn,
+            "latest_completed_experiment",
+            {
+                "experiment_id": experiment_id,
+                "experiment_type": "evidence_conversion_v3_cohort",
+                "scientific_conclusion": result.get("scientific_conclusion"),
+                "report_path": result.get("report_path"),
+                "result_hash": result.get("result_hash"),
+            },
+        )
+        set_kv(conn, "latest_scientific_finding", result.get("scientific_conclusion"))
+        set_kv(conn, "promotion_pipeline_status", "EVIDENCE_CONVERSION_V3_COMPLETED")
+        set_kv(conn, "paper_shadow_ready", int(get_kv(conn, "paper_shadow_ready", 0)))
+        set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
+
+        followup_queued = False
+        if should_schedule_followup(result):
+            suffix = experiment_id.removeprefix(
+                EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX
+            ).split("_", 1)[0]
+            followup_index = (
+                int(suffix)
+                if suffix.isdigit()
+                else self._next_evidence_conversion_cohort(conn) - 1
+            ) + 1
+            followup_queued = self._reconcile_evidence_conversion_v3(
+                conn,
+                cohort_index=followup_index,
+            )
+        if followup_queued or queue_size(conn) > 0:
+            set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+            set_kv(conn, "current_blocker", None)
+            set_kv(conn, "last_error", None)
+        else:
+            set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+            set_kv(
+                conn,
+                "current_blocker",
+                "NOVEL_REPRESENTATION_OR_PRE_HOLDOUT_FREEZE_REQUIRED",
+            )
+            set_kv(
+                conn,
+                "last_error",
+                "The frozen candidate bank has no remaining conversion debt. A new "
+                "representation or lawful pre-holdout freeze is required; Turbo's "
+                "exhausted finite grammar will not be restarted.",
+            )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": (
+                    f"{EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX}"
+                    f"{self._pending_or_next_evidence_conversion_cohort(conn):04d}"
+                    if followup_queued
+                    else str(get_kv(conn, "current_blocker") or "QUEUED_RESEARCH")
+                ),
+                "pipeline": "PROMOTION",
+                "evidence_debt_queue_count": metrics["evidence_debt_queue_count"],
+                "pre_holdout_candidate_count": len(accumulated),
+                "q4_access_authorized": False,
+                "followup_queued": followup_queued,
+            },
+        )
+        append_event(
+            conn,
+            "evidence_conversion_v3_cohort_routed",
+            {
+                **metrics,
+                "followup_queued": followup_queued,
+                "paper_shadow_ready": 0,
+                "q4_access_authorized": False,
+            },
+        )
+        self._tick_shadow_pipeline(conn)
+
     def _route_barrier_shadow_activation_result(
         self, conn: Any, result: dict[str, Any]
     ) -> None:
@@ -8913,12 +9470,16 @@ class AutonomousMissionController:
             "PROMISING_RESEARCH_CANDIDATE",
             "ROBUST_RESEARCH_CANDIDATE",
             "SHADOW_RESEARCH_CANDIDATE",
+            "SHADOW_RESEARCH_ONLY",
+            "PRE_HOLDOUT_READY",
             "PAPER_SHADOW_READY",
             "SHADOW_ACTIVE",
             "SHADOW_CONFIRMED",
         }
         shadow_tiers = {
             "SHADOW_RESEARCH_CANDIDATE",
+            "SHADOW_RESEARCH_ONLY",
+            "PRE_HOLDOUT_READY",
             "PAPER_SHADOW_READY",
             "SHADOW_ACTIVE",
             "SHADOW_CONFIRMED",
@@ -9224,11 +9785,18 @@ class AutonomousMissionController:
             set_kv(conn, "last_error", str(exc)[:4000])
             return
         except Exception as exc:
+            turbo_exhausted = bool(
+                experiment_type == "turbo_foundry_v2_epoch"
+                and is_turbo_structural_exhaustion(exc)
+            )
             status = fail_experiment(
                 conn,
                 experiment_id,
                 f"{type(exc).__name__}:{exc}",
-                retryable=True,
+                # Structural-space exhaustion is deterministic. Retrying the
+                # same immutable grammar cannot add information and used to
+                # consume both retries before blocking the whole mission.
+                retryable=not turbo_exhausted,
                 claim_token=str(experiment["claim_token"]),
             )
             set_kv(conn, "current_experiment", None)
@@ -9239,6 +9807,48 @@ class AutonomousMissionController:
                 self.paths,
                 {"scope": "EXPERIMENT", "experiment_id": experiment_id, "status": status, "reason": str(exc)},
             )
+            if turbo_exhausted:
+                set_kv(
+                    conn,
+                    "turbo_discovery_grammar_status",
+                    "DISCOVERY_GRAMMAR_CAPACITY_EXHAUSTED_NONFATAL",
+                )
+                set_kv(
+                    conn,
+                    "discovery_pipeline_status",
+                    "REPRESENTATION_PIVOT_REQUIRED_CONVERSION_CONTINUES",
+                )
+                set_kv(
+                    conn,
+                    "turbo_structural_exhaustion",
+                    {
+                        "experiment_id": experiment_id,
+                        "reason": str(exc),
+                        "failed_without_retry": True,
+                        "observed_at_utc": utc_now_iso(),
+                    },
+                )
+                conversion_queued = self._reconcile_evidence_conversion_v3(
+                    conn,
+                    cohort_index=self._pending_or_next_evidence_conversion_cohort(
+                        conn
+                    ),
+                )
+                if conversion_queued:
+                    set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+                    set_kv(conn, "current_blocker", None)
+                    set_kv(conn, "last_error", None)
+                    append_event(
+                        conn,
+                        "turbo_structural_exhaustion_pivoted",
+                        {
+                            "failed_experiment_id": experiment_id,
+                            "failed_without_retry": True,
+                            "next_engine": "EVIDENCE_CONVERSION_FOUNDRY_V3",
+                            "q4_access_authorized": False,
+                        },
+                    )
+                return
             if (
                 status != "QUEUED"
                 and experiment_type == "turbo_foundry_v2_epoch"

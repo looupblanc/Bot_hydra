@@ -35,9 +35,9 @@ from hydra.research.qd_economic_tournament import (
 from hydra.markets.instruments import instrument_spec
 
 
-FEATURE_BUNDLE_VERSION = "hydra_turbo_feature_bundle_v2_1"
+FEATURE_BUNDLE_VERSION = "hydra_turbo_feature_bundle_v3_risk_path"
 FEATURE_DAG_HASH = hashlib.sha256(
-    b"past_only_v3|closed_5_15_30_60_v1|session_day_datetime64D_v2|one_bar_delay|explicit_contracts"
+    b"past_only_v3|closed_5_15_30_60_v1|session_day_datetime64D_v2|one_bar_delay|explicit_contracts|conservative_ohlc_risk_path_v1"
 ).hexdigest()
 HORIZONS = (5, 15, 30, 60)
 CONTEXT_MINUTES = (5, 15, 30, 60)
@@ -208,6 +208,10 @@ def _market_arrays(
         "session_code": _session_codes(data),
         "contract_code": pd.factorize(data["active_contract"].astype(str), sort=True)[0].astype(np.int16),
         "entry_price": entry_price.to_numpy(dtype=np.float64),
+        "bar_open": pd.to_numeric(data["open"], errors="coerce").to_numpy(dtype=np.float64),
+        "bar_high": pd.to_numeric(data["high"], errors="coerce").to_numpy(dtype=np.float64),
+        "bar_low": pd.to_numeric(data["low"], errors="coerce").to_numpy(dtype=np.float64),
+        "bar_close": pd.to_numeric(data["close"], errors="coerce").to_numpy(dtype=np.float64),
     }
     for feature in FEATURES:
         arrays[f"feature__{feature}"] = pd.to_numeric(

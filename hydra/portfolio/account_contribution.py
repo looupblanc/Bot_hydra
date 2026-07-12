@@ -609,9 +609,16 @@ def build_shared_daily_path(events: pd.DataFrame) -> pd.DataFrame:
             )
         )
     rows: list[dict[str, Any]] = []
+    grouped = {
+        str(session_id): day
+        for session_id, day in events.groupby("event_session_id", sort=False)
+    }
     ordering = events.groupby("event_session_id")["entry_timestamp"].min().sort_values()
-    for session_id in ordering.index:
-        day = events[events["event_session_id"].eq(session_id)]
+    for raw_session_id in ordering.index:
+        session_id = str(raw_session_id)
+        # Reusing the pre-grouped frame avoids an O(sessions × trades)
+        # boolean scan inside every matched-control replay.
+        day = grouped[session_id]
         actions: list[tuple[pd.Timestamp, int, str, float, float, int]] = []
         for trade in day.itertuples(index=False):
             key = f"{trade.strategy_id}:{trade.trade_id}"

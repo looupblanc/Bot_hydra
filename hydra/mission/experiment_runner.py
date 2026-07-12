@@ -1042,4 +1042,52 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
             code_commit=str(experiment.get("code_commit") or "unknown"),
             random_seed=int(experiment.get("random_seed") or 20260713),
         )
+    if experiment_type == "evidence_conversion_v3_cohort":
+        from hydra.promotion.evidence_conversion import run_evidence_conversion_cohort
+
+        return run_evidence_conversion_cohort(
+            output_dir,
+            cohort_id=str(experiment["cohort_id"]),
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            candidate_bank_manifest_path=Path(
+                str(experiment["candidate_bank_manifest_path"])
+            ),
+            candidate_bank_manifest_sha256=str(
+                experiment["candidate_bank_manifest_sha256"]
+            ),
+            contract_map_path=Path(str(experiment["contract_map_path"])),
+            contract_map_sha256=str(experiment["contract_map_sha256"]),
+            source_result_paths=[
+                Path(str(value)) for value in experiment["source_result_paths"]
+            ],
+            source_result_sha256s={
+                str(key): str(value)
+                for key, value in dict(experiment["source_result_sha256s"]).items()
+            },
+            source_exact_result_paths=[
+                Path(str(value))
+                for value in experiment["source_exact_result_paths"]
+            ],
+            source_exact_result_sha256s={
+                str(key): str(value)
+                for key, value in dict(
+                    experiment["source_exact_result_sha256s"]
+                ).items()
+            },
+            allocation={
+                str(key): float(value)
+                for key, value in dict(experiment["allocation"]).items()
+            },
+            code_commit=str(experiment.get("code_commit") or "unknown"),
+            max_representatives=int(experiment.get("max_representatives") or 40),
+            max_complete_validation=int(
+                experiment.get("max_complete_validation") or 20
+            ),
+            previously_decided_candidate_ids=[
+                str(value)
+                for value in experiment.get("previously_decided_candidate_ids", [])
+            ],
+            q4_access_allowed=bool(experiment.get("q4_access_allowed", False)),
+        )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")

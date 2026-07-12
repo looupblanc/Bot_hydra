@@ -45,6 +45,7 @@ def main() -> int:
     if args.json:
         print(json.dumps(status, indent=2, sort_keys=True, default=str))
     else:
+        conversion = dict(snapshot.get("evidence_conversion_v3_latest_metrics") or {})
         print(f"mission_id: {heartbeat.get('mission_id') or snapshot.get('mission_id')}")
         print(f"phase: {heartbeat.get('current_phase') or snapshot.get('current_phase')}")
         print(f"action: {heartbeat.get('current_action') or snapshot.get('current_action')}")
@@ -68,6 +69,13 @@ def main() -> int:
         print(f"lineages_frozen: {heartbeat.get('lineages_frozen', snapshot.get('lineages_frozen', 0))}")
         print(f"topstep_path_candidates: {heartbeat.get('topstep_path_candidates', snapshot.get('topstep_path_candidates', 0))}")
         print(f"q4_candidates: {heartbeat.get('q4_candidates', snapshot.get('q4_candidates', 0))}")
+        print(f"pre_holdout_ready: {snapshot.get('pre_holdout_candidate_count', 0)}")
+        print(f"evidence_debt_remaining: {conversion.get('evidence_debt_queue_count', 0)}")
+        print(f"full_economic_replays: {conversion.get('full_economic_replay_count', 0)}")
+        print(f"full_risk_replays: {conversion.get('full_risk_replay_count', 0)}")
+        print(f"full_promotion_validations: {conversion.get('full_promotion_validation_count', 0)}")
+        print(f"evidence_conversion_statuses: {conversion.get('status_counts', {})}")
+        print(f"evidence_conversion_report: {conversion.get('report_path')}")
         print(f"model_quota_state: {heartbeat.get('model_quota_state') or snapshot.get('model_quota_state')}")
         print(f"last_meaningful_progress: {heartbeat.get('last_meaningful_progress_at_utc') or snapshot.get('last_meaningful_progress_at_utc')}")
         print(f"next_planned_action: {heartbeat.get('foundry_next_planned_action') or snapshot.get('foundry_next_planned_action')}")
