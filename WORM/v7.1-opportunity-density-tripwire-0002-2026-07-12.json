@@ -1,0 +1,61 @@
+{
+  "schema": "hydra_v7_1_opportunity_density_tripwire_policy_v1",
+  "tripwire_id": "hydra_v7_1_opportunity_density_tripwire_0002",
+  "grammar_id": "hydra_v7_1_opportunity_density_grammar_0002",
+  "grammar_path": "WORM/v7.1-opportunity-density-grammar-0002-2026-07-12.json",
+  "grammar_sha256": "ef44e6e72c42b2ed4b7228f3addbd2f182e3e51bcfb619aa4c0a2102db6d3566",
+  "signal_manifest_path": "reports/v7_1/discovery_0002/v71_opportunity_density_signal_manifest.json",
+  "signal_manifest_sha256": "c90a2321fc66e114d65dd533d077ec04308ae714369e28b82f5d9e996dd7fa24",
+  "stage0_stage2_result_path": "reports/v7_1/discovery_0002/v71_opportunity_density_funnel_result.json",
+  "stage0_stage2_result_sha256": "2a45c4da55875f90438cd6cb19f1ce79ec8de7d934f7a442e78000364aff5897",
+  "purpose": "Permanent grammar-level geometry tripwire. Combine passage is diagnostic only and is not candidate fitness or promotion evidence.",
+  "real_world": "unchanged_D1_ES_minute_print_features",
+  "null_worlds": [
+    "DAILY_BLOCK_SHUFFLE",
+    "VOLATILITY_MATCHED_RANDOM_WALK",
+    "YEAR_BLOCK_PERMUTATION"
+  ],
+  "seeds": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "2023_ES": 910301,
+      "2024_ES": 910401
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "2023_ES": 920301,
+      "2024_ES": 920401
+    },
+    "YEAR_BLOCK_PERMUTATION": "deterministic_year_swap"
+  },
+  "pipeline": {
+    "feature_and_signal_recomputation_per_world": true,
+    "real_and_null_pipeline_identical": true,
+    "cost_stress": "BASE",
+    "diagnostic_quantities": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "combine_horizon_trading_days": 20,
+    "mll_mode": "eod_level_rt_breach",
+    "maximum_mini_equivalent": 15.0,
+    "explicit_contracts": true,
+    "session_flatten": true
+  },
+  "decision": {
+    "NULL_RATIO": "pooled_null_pass_rate / real_pass_rate",
+    "artefact_threshold_inclusive": 0.8,
+    "zero_real_passes": "BLOCKED_UNDERPOWERED",
+    "ratio_at_or_above_threshold": "ARTEFACT_GEOMETRY_ONLY",
+    "ratio_below_threshold": "GREEN_NULL_ADJUSTED_BASELINE",
+    "exact_one_sided_binomial_p_value_required": true,
+    "raw_counts_required": true,
+    "evidence_strength_required": true
+  },
+  "candidate_promotion_authorized": false,
+  "candidate_status_inheritance": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "Deux blocs calendaires D1 peuvent rendre le taux de passage très instable; même un tripwire vert ne transformerait aucun des trois effets walk-forward sous-puissants en edge validé."
+}
