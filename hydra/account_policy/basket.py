@@ -16,6 +16,10 @@ from hydra.account_policy.router import (
 )
 from hydra.account_policy.schema import BasketPolicy, ControllerPolicy
 from hydra.propfirm.combine_episode import CombineTerminal, TradePathEvent
+from hydra.propfirm.mll_variants import (
+    advance_end_of_day_floor,
+    advance_intraday_floor,
+)
 from hydra.propfirm.rolling_combine import (
     EpisodeStartPolicy,
     select_episode_starts,
@@ -142,6 +146,7 @@ class _OpenPosition:
     net_pnl: float
     gross_pnl: float
     worst_unrealized_pnl: float
+    best_unrealized_pnl: float
 
 
 def run_shared_account_episode(
@@ -203,6 +208,7 @@ def run_shared_account_episode(
     for elapsed, day in enumerate(episode_days, start=1):
         open_positions: dict[str, _OpenPosition] = {}
         day_pnl = 0.0
+        dll_triggered = False
         day_components: dict[str, float] = defaultdict(float)
         day_traded = False
         actions: list[tuple[int, int, str, RoutedTrade]] = []
@@ -217,12 +223,26 @@ def run_shared_account_episode(
                     continue
                 balance += position.net_pnl
                 day_pnl += position.net_pnl
+                floor = advance_intraday_floor(
+                    floor,
+                    live_equity_high=balance,
+                    distance=float(rules.combine_max_loss_limit),
+                    lock=float(rules.combine_starting_balance),
+                    variant=rules.mll_variant,
+                )
                 contribution[trade.component_id] += position.net_pnl
                 day_components[trade.component_id] += position.net_pnl
                 minimum_buffer = min(minimum_buffer, balance - floor)
                 if balance <= floor:
                     terminal = CombineTerminal.MLL_BREACH
                     terminal_reason = "realized_mll_touch_or_breach"
+                    break
+                if (
+                    rules.use_optional_daily_loss_limit
+                    and day_pnl <= -float(rules.optional_daily_loss_limit)
+                ):
+                    dll_triggered = True
+                    open_positions.clear()
                     break
                 continue
 
@@ -303,6 +323,7 @@ def run_shared_account_episode(
                 net_pnl=float(event.net_pnl * ratio),
                 gross_pnl=float(event.gross_pnl * ratio),
                 worst_unrealized_pnl=float(event.worst_unrealized_pnl * ratio),
+                best_unrealized_pnl=float(event.best_unrealized_pnl * ratio),
             )
             open_positions[event_id] = position
             accepted += 1
@@ -319,8 +340,54 @@ def run_shared_account_episode(
                 min(item.worst_unrealized_pnl, 0.0)
                 for item in open_positions.values()
             )
+            conservative_open_gain = sum(
+                max(item.best_unrealized_pnl, 0.0)
+                for item in open_positions.values()
+            )
+            floor = advance_intraday_floor(
+                floor,
+                live_equity_high=balance + conservative_open_gain,
+                distance=float(rules.combine_max_loss_limit),
+                lock=float(rules.combine_starting_balance),
+                variant=rules.mll_variant,
+            )
             intraday_low = balance + conservative_open_loss
             minimum_buffer = min(minimum_buffer, intraday_low - floor)
+            if (
+                rules.use_optional_daily_loss_limit
+                and day_pnl + conservative_open_loss
+                <= -float(rules.optional_daily_loss_limit)
+            ):
+                forced_total = min(
+                    sum(item.net_pnl for item in open_positions.values()),
+                    -float(rules.optional_daily_loss_limit) - day_pnl,
+                )
+                weights = {
+                    item.routed.component_id: abs(item.worst_unrealized_pnl)
+                    for item in open_positions.values()
+                }
+                weight_total = sum(weights.values()) or float(len(weights) or 1)
+                for component_id, weight in weights.items():
+                    share = forced_total * (weight or 1.0) / weight_total
+                    contribution[component_id] += share
+                    day_components[component_id] += share
+                balance += forced_total
+                day_pnl += forced_total
+                open_positions.clear()
+                minimum_buffer = min(minimum_buffer, balance - floor)
+                if balance <= floor:
+                    terminal = CombineTerminal.MLL_BREACH
+                    terminal_reason = "dll_liquidation_mll_touch_or_breach"
+                else:
+                    floor = advance_intraday_floor(
+                        floor,
+                        live_equity_high=balance,
+                        distance=float(rules.combine_max_loss_limit),
+                        lock=float(rules.combine_starting_balance),
+                        variant=rules.mll_variant,
+                    )
+                    dll_triggered = True
+                break
             if intraday_low <= floor:
                 terminal = CombineTerminal.MLL_BREACH
                 terminal_reason = "correlated_open_position_mll_touch_or_breach"
@@ -340,6 +407,7 @@ def run_shared_account_episode(
                     "balance": balance,
                     "mll_floor": floor,
                     "day_pnl": day_pnl,
+                    "dll_triggered": dll_triggered,
                 }
             )
             break
@@ -364,9 +432,11 @@ def run_shared_account_episode(
             or concentration
             <= rules.consistency_best_day_max_pct_of_profit_target + 1e-12
         )
-        floor = min(
-            float(rules.combine_starting_balance),
-            max(floor, balance - float(rules.combine_max_loss_limit)),
+        floor = advance_end_of_day_floor(
+            floor,
+            closing_balance=balance,
+            distance=float(rules.combine_max_loss_limit),
+            lock=float(rules.combine_starting_balance),
         )
         minimum_buffer = min(minimum_buffer, balance - floor)
         consecutive_losing_days = (
@@ -378,6 +448,7 @@ def run_shared_account_episode(
                 "balance": balance,
                 "mll_floor": floor,
                 "day_pnl": day_pnl,
+                "dll_triggered": dll_triggered,
             }
         )
         if (
@@ -435,6 +506,7 @@ def evaluate_account_policy(
     controller: ControllerPolicy | None = None,
     episode_policy: EpisodeStartPolicy | None = None,
     explicit_start_days: Sequence[int] | None = None,
+    config: Topstep150KConfig | None = None,
 ) -> AccountPolicyRollingSummary:
     policy = episode_policy or EpisodeStartPolicy()
     day_regimes = _past_only_day_regimes(component_events, eligible_session_days)
@@ -451,6 +523,7 @@ def evaluate_account_policy(
             controller=controller,
             start_day=start,
             maximum_duration_days=policy.maximum_duration_sessions,
+            config=config,
         )
         for start in starts
     )

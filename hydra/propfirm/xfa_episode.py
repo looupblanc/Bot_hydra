@@ -6,6 +6,10 @@ from enum import StrEnum
 from typing import Any, Literal, Sequence
 
 from hydra.propfirm.combine_episode import TradePathEvent
+from hydra.propfirm.mll_variants import (
+    advance_end_of_day_floor,
+    advance_intraday_floor,
+)
 from hydra.propfirm.payout_cycles import payout_request
 from hydra.propfirm.topstep_150k import Topstep150KConfig
 
@@ -112,14 +116,53 @@ def run_xfa_episode(
                     else "session_policy_violation"
                 )
                 break
-            intraday_low = balance + min(event.worst_unrealized_pnl, 0.0)
+            floor = advance_intraday_floor(
+                floor,
+                live_equity_high=balance + max(event.best_unrealized_pnl, 0.0),
+                distance=abs(float(rules.funded_starting_mll)),
+                lock=0.0,
+                variant=rules.mll_variant,
+            )
+            adverse_pnl = min(event.worst_unrealized_pnl, 0.0)
+            intraday_low = balance + adverse_pnl
             minimum_buffer = min(minimum_buffer, intraday_low - floor)
+            if (
+                rules.use_optional_daily_loss_limit
+                and day_pnl + adverse_pnl
+                <= -float(rules.optional_daily_loss_limit)
+            ):
+                forced_pnl = min(
+                    float(event.net_pnl),
+                    -float(rules.optional_daily_loss_limit) - day_pnl,
+                )
+                balance += forced_pnl
+                day_pnl += forced_pnl
+                minimum_buffer = min(minimum_buffer, balance - floor)
+                if balance <= floor:
+                    terminal = XfaTerminal.MLL_BREACH
+                    reason = "dll_liquidation_mll_touch_or_breach"
+                else:
+                    floor = advance_intraday_floor(
+                        floor,
+                        live_equity_high=balance,
+                        distance=abs(float(rules.funded_starting_mll)),
+                        lock=0.0,
+                        variant=rules.mll_variant,
+                    )
+                break
             if intraday_low <= floor:
                 terminal = XfaTerminal.MLL_BREACH
                 reason = "intraday_unrealized_mll_touch_or_breach"
                 break
             balance += event.net_pnl
             day_pnl += event.net_pnl
+            floor = advance_intraday_floor(
+                floor,
+                live_equity_high=balance,
+                distance=abs(float(rules.funded_starting_mll)),
+                lock=0.0,
+                variant=rules.mll_variant,
+            )
             minimum_buffer = min(minimum_buffer, balance - floor)
             if balance <= floor:
                 terminal = XfaTerminal.MLL_BREACH
@@ -128,7 +171,12 @@ def run_xfa_episode(
         if terminal != XfaTerminal.SURVIVED_WINDOW:
             break
 
-        floor = min(0.0, max(floor, balance - abs(rules.funded_starting_mll)))
+        floor = advance_end_of_day_floor(
+            floor,
+            closing_balance=balance,
+            distance=abs(float(rules.funded_starting_mll)),
+            lock=0.0,
+        )
         total_profit_since_payout += day_pnl
         best_day_since_payout = max(best_day_since_payout, day_pnl)
         if day_pnl >= rules.payout_winning_day_min_profit:

@@ -5,6 +5,10 @@ from dataclasses import asdict, dataclass
 from enum import StrEnum
 from typing import Any, Iterable, Sequence
 
+from hydra.propfirm.mll_variants import (
+    advance_end_of_day_floor,
+    advance_intraday_floor,
+)
 from hydra.propfirm.topstep_150k import Topstep150KConfig
 
 
@@ -103,9 +107,8 @@ def run_combine_episode(
 ) -> CombineEpisodeResult:
     """Replay one immutable account episode in chronological order.
 
-    MLL is checked on each event using conservative unrealized OHLC loss.  The
-    trailing floor advances only from end-of-day realized balance, matching the
-    versioned Topstep rule snapshot used by the project.
+    MLL is checked on each event using conservative unrealized OHLC loss.  Its
+    advancement follows the explicitly versioned ``config.mll_variant``.
     """
 
     rules = config or Topstep150KConfig()
@@ -157,6 +160,7 @@ def run_combine_episode(
 
     for elapsed, day in enumerate(episode_days, start=1):
         day_pnl = 0.0
+        dll_triggered = False
         day_events = by_day.get(int(day), [])
         if day_events:
             traded_days += 1
@@ -178,14 +182,55 @@ def run_combine_episode(
                     else "session_policy_violation"
                 )
                 break
-            intraday_low = balance + min(float(event.worst_unrealized_pnl), 0.0)
+            floor = advance_intraday_floor(
+                floor,
+                live_equity_high=balance
+                + max(float(event.best_unrealized_pnl), 0.0),
+                distance=float(rules.combine_max_loss_limit),
+                lock=float(rules.combine_starting_balance),
+                variant=rules.mll_variant,
+            )
+            adverse_pnl = min(float(event.worst_unrealized_pnl), 0.0)
+            intraday_low = balance + adverse_pnl
             minimum_buffer = min(minimum_buffer, intraday_low - floor)
+            if (
+                rules.use_optional_daily_loss_limit
+                and day_pnl + adverse_pnl
+                <= -float(rules.optional_daily_loss_limit)
+            ):
+                forced_pnl = min(
+                    float(event.net_pnl),
+                    -float(rules.optional_daily_loss_limit) - day_pnl,
+                )
+                balance += forced_pnl
+                day_pnl += forced_pnl
+                minimum_buffer = min(minimum_buffer, balance - floor)
+                if balance <= floor:
+                    terminal = CombineTerminal.MLL_BREACH
+                    terminal_reason = "dll_liquidation_mll_touch_or_breach"
+                else:
+                    floor = advance_intraday_floor(
+                        floor,
+                        live_equity_high=balance,
+                        distance=float(rules.combine_max_loss_limit),
+                        lock=float(rules.combine_starting_balance),
+                        variant=rules.mll_variant,
+                    )
+                    dll_triggered = True
+                break
             if intraday_low <= floor:
                 terminal = CombineTerminal.MLL_BREACH
                 terminal_reason = "intraday_unrealized_mll_touch_or_breach"
                 break
             balance += float(event.net_pnl)
             day_pnl += float(event.net_pnl)
+            floor = advance_intraday_floor(
+                floor,
+                live_equity_high=balance,
+                distance=float(rules.combine_max_loss_limit),
+                lock=float(rules.combine_starting_balance),
+                variant=rules.mll_variant,
+            )
             minimum_buffer = min(minimum_buffer, balance - floor)
             if balance <= floor:
                 terminal = CombineTerminal.MLL_BREACH
@@ -198,6 +243,7 @@ def run_combine_episode(
                 "balance": float(balance),
                 "mll_floor": float(floor),
                 "day_pnl": float(day_pnl),
+                "dll_triggered": dll_triggered,
             }
         )
         if terminal in {
@@ -225,9 +271,11 @@ def run_combine_episode(
             or concentration
             <= rules.consistency_best_day_max_pct_of_profit_target + 1e-12
         )
-        floor = min(
-            float(rules.combine_starting_balance),
-            max(floor, balance - float(rules.combine_max_loss_limit)),
+        floor = advance_end_of_day_floor(
+            floor,
+            closing_balance=balance,
+            distance=float(rules.combine_max_loss_limit),
+            lock=float(rules.combine_starting_balance),
         )
         minimum_buffer = min(minimum_buffer, balance - floor)
         if (

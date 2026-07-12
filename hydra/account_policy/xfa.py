@@ -8,6 +8,7 @@ from hydra.account_policy.schema import BasketPolicy
 from hydra.propfirm.combine_episode import TradePathEvent
 from hydra.propfirm.combine_fitness import xfa_payout_fitness
 from hydra.propfirm.payout_episode import evaluate_rolling_xfa
+from hydra.propfirm.topstep_150k import Topstep150KConfig
 
 
 def evaluate_serial_xfa_basket(
@@ -16,6 +17,7 @@ def evaluate_serial_xfa_basket(
     *,
     basket: BasketPolicy,
     maximum_starts: int = 12,
+    config: Topstep150KConfig | None = None,
 ) -> dict[str, Any]:
     """Evaluate a frozen XFA version using one globally serial open position.
 
@@ -57,6 +59,7 @@ def evaluate_serial_xfa_basket(
         eligible_session_days,
         day_regimes=regimes,
         maximum_starts=maximum_starts,
+        config=config,
     )
     fitness = xfa_payout_fitness(
         summary,

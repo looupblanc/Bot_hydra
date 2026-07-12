@@ -6,6 +6,12 @@ from typing import Any
 import pandas as pd
 
 from hydra.markets.instruments import instrument_spec
+from hydra.propfirm.mll_variants import (
+    MllVariant,
+    advance_end_of_day_floor,
+    advance_intraday_floor,
+    normalized_variant,
+)
 
 
 @dataclass(frozen=True)
@@ -27,6 +33,7 @@ def conservative_intraday_mll_audit(
     mll_distance: float,
     floor_lock: float,
     forced_liquidation_slippage_bps: float = 1.0,
+    mll_variant: MllVariant | str = MllVariant.EOD_REALIZED_BALANCE,
 ) -> IntradayMLLResult:
     if not trades:
         return IntradayMLLResult(False, starting_balance - starting_floor, None, None, 0, 0.0, [])
@@ -38,6 +45,8 @@ def conservative_intraday_mll_audit(
     notes: list[str] = []
     ambiguous = 0
     total_forced_slippage = 0.0
+    variant = normalized_variant(mll_variant)
+    previous_session: object | None = None
     for trade_index, trade in enumerate(sorted(trades, key=lambda t: int(t.get("exit_i", 0)))):
         entry_i = max(0, min(int(trade.get("entry_i", 0)), len(frame) - 1))
         exit_i = max(entry_i, min(int(trade.get("exit_i", entry_i)), len(frame) - 1))
@@ -48,12 +57,28 @@ def conservative_intraday_mll_audit(
         risk_scale = float(trade.get("risk_scale", 1.0))
         entry_price = _entry_price(trade, frame, entry_i)
         path = frame.iloc[entry_i : exit_i + 1]
+        session = timestamps.iloc[entry_i].date()
+        if previous_session is not None and session != previous_session:
+            floor = advance_end_of_day_floor(
+                floor,
+                closing_balance=balance,
+                distance=mll_distance,
+                lock=floor_lock,
+            )
+        previous_session = session
         adverse_price = path["low"].min() if side > 0 else path["high"].max()
         favorable_price = path["high"].max() if side > 0 else path["low"].min()
         worst_unrealized = (float(adverse_price) - entry_price) * side * point_value * risk_scale
         best_unrealized = (float(favorable_price) - entry_price) * side * point_value * risk_scale
         if worst_unrealized < 0 < best_unrealized and entry_i == exit_i:
             ambiguous += 1
+        floor = advance_intraday_floor(
+            floor,
+            live_equity_high=balance + max(best_unrealized, 0.0),
+            distance=mll_distance,
+            lock=floor_lock,
+            variant=variant,
+        )
         forced_slippage = abs(entry_price) * forced_liquidation_slippage_bps / 10_000.0 * point_value * risk_scale
         intraday_equity_low = balance + worst_unrealized - forced_slippage
         min_buffer = min(min_buffer, intraday_equity_low - floor)
@@ -70,6 +95,13 @@ def conservative_intraday_mll_audit(
             )
         pnl = float(trade.get("pnl", 0.0))
         balance += pnl
+        floor = advance_intraday_floor(
+            floor,
+            live_equity_high=balance,
+            distance=mll_distance,
+            lock=floor_lock,
+            variant=variant,
+        )
         min_buffer = min(min_buffer, balance - floor)
         if balance <= floor:
             return IntradayMLLResult(
@@ -81,7 +113,6 @@ def conservative_intraday_mll_audit(
                 float(total_forced_slippage),
                 notes + ["realized_mll_touch_or_breach"],
             )
-        floor = min(floor_lock, max(floor, balance - mll_distance))
     if ambiguous:
         notes.append("same_bar_path_ambiguity_present")
     return IntradayMLLResult(False, float(min_buffer), None, None, ambiguous, float(total_forced_slippage), notes)
@@ -91,4 +122,3 @@ def _entry_price(trade: dict[str, Any], frame: pd.DataFrame, entry_i: int) -> fl
     if "entry_price" in trade:
         return float(trade["entry_price"])
     return float(frame["close"].iloc[entry_i])
-

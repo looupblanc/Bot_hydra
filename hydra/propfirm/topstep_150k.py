@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 from hydra.propfirm.intraday_mll import conservative_intraday_mll_audit
+from hydra.propfirm.mll_variants import MllVariant
 from hydra.propfirm.xfa_consistency import simulate_xfa_consistency
 from hydra.propfirm.xfa_standard import simulate_xfa_standard
 
@@ -18,6 +19,7 @@ class Topstep150KConfig:
     combine_profit_target: float = 9000.0
     combine_max_loss_limit: float = 4500.0
     combine_starting_balance: float = 150000.0
+    mll_variant: MllVariant = MllVariant.EOD_REALIZED_BALANCE
     no_daily_loss_limit: bool = True
     optional_daily_loss_limit: float = 3000.0
     use_optional_daily_loss_limit: bool = False
@@ -169,6 +171,7 @@ def evaluate_topstep_150k(
         starting_floor=config.combine_starting_mll,
         mll_distance=config.combine_max_loss_limit,
         floor_lock=config.combine_starting_balance,
+        mll_variant=config.mll_variant,
     )
     combine["min_mll_buffer"] = min(float(combine["min_mll_buffer"]), float(intraday.min_buffer))
     combine["intrabar_ambiguous_requires_tick_validation"] = bool(intraday.ambiguous_same_bar_count)
