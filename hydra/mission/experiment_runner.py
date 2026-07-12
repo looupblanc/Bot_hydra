@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import traceback
@@ -1089,5 +1090,73 @@ def run_experiment(experiment: dict[str, Any], *, output_root: Path | None = Non
                 for value in experiment.get("previously_decided_candidate_ids", [])
             ],
             q4_access_allowed=bool(experiment.get("q4_access_allowed", False)),
+        )
+    if experiment_type == "decision_bridge_v4_prepare":
+        from hydra.promotion.decision_bridge_prepare import (
+            run_decision_bridge_v4_preparation,
+        )
+
+        return run_decision_bridge_v4_preparation(
+            output_dir,
+            pre_holdout_manifest_path=Path(
+                str(experiment["pre_holdout_manifest_path"])
+            ),
+            pre_holdout_manifest_sha256=str(
+                experiment["pre_holdout_manifest_sha256"]
+            ),
+            complete_validation_path=Path(
+                str(experiment["complete_validation_path"])
+            ),
+            complete_validation_sha256=str(
+                experiment["complete_validation_sha256"]
+            ),
+            behavioral_clusters_path=Path(
+                str(experiment["behavioral_clusters_path"])
+            ),
+            behavioral_clusters_sha256=str(
+                experiment["behavioral_clusters_sha256"]
+            ),
+            policy_path=Path(str(experiment["policy_path"])),
+            policy_sha256=str(experiment["policy_sha256"]),
+            engineering_task_path=Path(str(experiment["engineering_task_path"])),
+            engineering_task_sha256=str(experiment["engineering_task_sha256"]),
+            code_commit=str(experiment["code_commit"]),
+            freeze_timestamp_utc=str(experiment["freeze_timestamp_utc"]),
+            q4_access_count=int(experiment.get("q4_access_count") or 0),
+        )
+    if experiment_type == "q4_atomic_one_shot":
+        from functools import partial
+
+        from hydra.data.budget import DatabentoBudgetConfig
+        from hydra.validation.q4_atomic_runner import run_q4_atomic_one_shot
+        from hydra.validation.q4_market_evaluator import evaluate_q4_from_data_plan
+
+        data_plan_path = Path(str(experiment["q4_data_plan_path"]))
+        if hashlib.sha256(data_plan_path.read_bytes()).hexdigest() != str(
+            experiment["q4_data_plan_sha256"]
+        ):
+            raise RuntimeError("Frozen Q4 data plan hash mismatch.")
+        data_plan = json.loads(data_plan_path.read_text(encoding="utf-8"))
+        evaluator = partial(
+            evaluate_q4_from_data_plan,
+            data_plan=data_plan,
+            budget=DatabentoBudgetConfig(
+                ledger_path=str(experiment["budget_ledger_path"]),
+                summary_path=str(experiment["budget_summary_path"]),
+            ),
+        )
+        return run_q4_atomic_one_shot(
+            output_dir,
+            cohort_manifest_path=Path(str(experiment["cohort_manifest_path"])),
+            cohort_manifest_sha256=str(experiment["cohort_manifest_sha256"]),
+            cohort_manifest_hash=str(experiment["cohort_manifest_hash"]),
+            authorization_path=Path(str(experiment["authorization_path"])),
+            authorization_hash=str(experiment["authorization_hash"]),
+            authorization_token=str(experiment["authorization_token"]),
+            code_commit=str(experiment["code_commit"]),
+            mission_db_path=Path(str(experiment["mission_db_path"])),
+            registry_db_path=Path(str(experiment["registry_db_path"])),
+            access_ledger_path=Path(str(experiment["access_ledger_path"])),
+            evaluator=evaluator,
         )
     raise UnknownExperimentType(f"No approved handler for experiment type {experiment_type!r}.")

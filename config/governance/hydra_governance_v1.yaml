@@ -4,6 +4,7 @@ protected_invariants:
   - no_live_trading
   - no_broker_execution
   - q4_sealed_until_freeze
+  - q4_single_atomic_manifest_bound_one_shot
   - databento_budget_hard_cap
   - evidence_scope_no_upward_promotion
   - unknown_proxy_inherited_not_passed
@@ -15,16 +16,35 @@ protected_files:
   - hydra/governance/kernel.py
   - hydra/governance/invariants.py
   - hydra/governance/protected_manifest.py
+  - hydra/governance/cohort_authorization.py
+  - hydra/governance/q4_one_shot.py
+  - hydra/mission/safety_governor.py
   - hydra/validation/evidence_scope.py
   - hydra/validation/status_provenance.py
   - hydra/validation/promotion_contract.py
   - hydra/validation/lockbox_guard.py
+  - hydra/validation/q4_atomic_runner.py
+  - hydra/validation/q4_market_evaluator.py
+  - hydra/promotion/final_cohort.py
+  - hydra/shadow/package_factory.py
   - hydra/data/budget.py
   - tests/test_mission_governance_and_calibration.py
+  - tests/test_q4_one_shot_authorization.py
+  - tests/test_q4_atomic_runner.py
 q4_policy:
   sealed_start: "2024-10-01"
   freeze_required: true
   automatic_access_allowed_only_after_governance_pass: true
+  access_mode: single_atomic_manifest_bound_one_shot
+  maximum_authoritative_access_count: 1
+  cohort_size_minimum: 3
+  cohort_size_maximum: 8
+  one_time_token_required: true
+  general_loader_access_allowed: false
+  automatic_scientific_retry_allowed: false
+  crash_disposition: Q4_REVIEW_REQUIRED
+  paper_shadow_after_q4_pass_and_complete_zero_order_package: true
+  final_2025_lockbox_required_for_funded_promotion_not_initial_paper_shadow: true
 budget_policy:
   hard_cap_usd: 100.0
   preserve_until_strategy_survivors_usd: 30.0

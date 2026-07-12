@@ -51,8 +51,11 @@ def enforce_data_access(
         raise LockboxViolation("Sealed blind holdout data may not be loaded, summarized, or inspected before an approved freeze.")
     if role == DataRole.BLIND_VALIDATION and not freeze_manifest_hash:
         raise LockboxViolation("Q3 blind validation access requires a freeze manifest hash.")
-    if role == DataRole.FINAL_LOCKBOX and not freeze_manifest_hash:
-        raise LockboxViolation("Q4 final lockbox access requires an immutable freeze manifest hash.")
+    if role == DataRole.FINAL_LOCKBOX:
+        raise LockboxViolation(
+            "Q4 final lockbox access is available only through the dedicated "
+            "manifest-bound atomic one-shot capability; general loaders remain sealed."
+        )
     record = DataAccessRecord(
         code_commit=current_commit(),
         process_id=os.getpid(),

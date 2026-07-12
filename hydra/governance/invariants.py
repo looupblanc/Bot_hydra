@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sqlite3
@@ -66,6 +67,17 @@ def q4_access_count(ledger_path: str = "reports/data_access/data_access_ledger.j
     return count
 
 
+def governance_semantic_hash(
+    config_path: str = "config/governance/hydra_governance_v1.yaml",
+) -> str:
+    import yaml
+
+    payload = yaml.safe_load(project_path(config_path).read_text(encoding="utf-8"))
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode()
+    ).hexdigest()
+
+
 def _normalize_exclusive_boundary(value: str) -> str:
     """Remove one exact terminal metadata marker before date comparison.
 
@@ -105,9 +117,29 @@ def run_governance_checks(*, baseline_commit: str, remaining_budget_usd: float |
     budget = DatabentoBudgetConfig()
     _estimated, actual = cumulative_spend(project_path(budget.ledger_path))
     manifest = build_protected_manifest(baseline_commit=baseline_commit)
+    from hydra.governance.q4_one_shot import audit_q4_one_shot_state
+
+    access_count = q4_access_count()
+    q4_audit = audit_q4_one_shot_state(
+        authorization_root=project_path("mission", "state", "q4_one_shot"),
+        ledger_path=project_path("reports", "data_access", "data_access_ledger.jsonl"),
+    )
+    q4_policy_valid = bool(
+        q4_audit.get("valid")
+        and (
+            (access_count == 0 and int(q4_audit.get("transaction_count") or 0) == 0)
+            or (
+                access_count == 1
+                and int(q4_audit.get("transaction_count") or 0) == 1
+                and q4_audit.get("status") in {"COMMITTED", "Q4_REVIEW_REQUIRED"}
+            )
+        )
+    )
     checks = {
         "registry_integrity": registry_integrity() == "ok",
-        "q4_not_accessed": q4_access_count() == 0,
+        # Compatibility key retained for existing monitoring.  Its V4 meaning
+        # is now "unopened OR one valid closed manifest-bound transaction".
+        "q4_not_accessed": q4_policy_valid,
         "budget_under_hard_cap": actual <= budget.hard_cap_usd,
         "remaining_budget_matches_or_exceeds_floor": remaining_budget_usd is None or remaining_budget_usd >= 0,
         "no_live_trading": assert_no_live_trading_enabled(),
@@ -116,7 +148,9 @@ def run_governance_checks(*, baseline_commit: str, remaining_budget_usd: float |
     }
     details = {
         "registry_integrity_result": registry_integrity(),
-        "q4_access_count": q4_access_count(),
+        "q4_access_count": access_count,
+        "q4_one_shot_audit": q4_audit,
+        "governance_semantic_hash": governance_semantic_hash(),
         "cumulative_actual_databento_spend_usd": actual,
         "protected_manifest_hash": manifest.manifest_hash(),
         "missing_protected_files": [item.path for item in manifest.digests if not item.exists],

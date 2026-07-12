@@ -54,3 +54,24 @@ def require_atom_validated(evidence: list[StatusProvenance]) -> None:
     statuses = {item.status for item in evidence if evidence_can_support_scope(item, EvidenceScope.EDGE_ATOM)}
     if "ATOM_VALIDATED" not in statuses:
         raise ValueError("Only fully validated Edge Atoms may be assembled into strategies.")
+
+
+def paper_shadow_ready_after_q4(
+    *,
+    q4_classification: str,
+    shadow_package_complete: bool,
+    hard_integrity_issue: bool,
+    deterministic_forward_features: bool,
+    fail_closed_virtual_execution: bool,
+    broker_or_order_capability: bool,
+) -> bool:
+    """V4 zero-risk paper admission; 2025 is intentionally a later contract."""
+
+    return bool(
+        q4_classification == "Q4_LOCKBOX_PASS"
+        and shadow_package_complete
+        and not hard_integrity_issue
+        and deterministic_forward_features
+        and fail_closed_virtual_execution
+        and not broker_or_order_capability
+    )

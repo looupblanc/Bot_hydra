@@ -13,6 +13,13 @@ from pathlib import Path
 from typing import Any
 
 from hydra.calibration.validator_benchmark import benchmark_validator, write_calibration_report
+from hydra.data.budget import DatabentoBudgetConfig, cumulative_spend
+from hydra.data.q4_data_plan import build_q4_data_plan
+from hydra.governance.cohort_authorization import (
+    issue_cohort_authorization,
+    validate_authorization,
+)
+from hydra.governance.invariants import governance_semantic_hash, q4_access_count
 from hydra.governance.kernel import initialize_governance_kernel
 from hydra.mission.engineering_runner import detect_engineering_capability
 from hydra.mission.evidence_conversion_scheduler import (
@@ -64,6 +71,9 @@ from hydra.pipelines.shadow_pipeline import (
     tick_shadow_pipeline,
 )
 from hydra.pipelines.resource_scheduler import claim_parallel_batch
+from hydra.promotion.decision_bridge_prepare import (
+    validate_decision_bridge_preparation_result,
+)
 from hydra.utils.config import project_path
 from hydra.utils.time import utc_now_iso
 
@@ -166,6 +176,14 @@ TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX = "turbo_foundry_v2_epoch_"
 TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID = f"{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}0000"
 TURBO_PROMOTION_EXPERIMENT_PREFIX = "turbo_promotion_batch_"
 EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX = "evidence_conversion_v3_cohort_"
+DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0001"
+DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID = "q4_atomic_one_shot_0001"
+DECISION_BRIDGE_V4_TASK_SHA256 = (
+    "e80a099f2fca2a67fedbde860cf0409d7298798d6681866eb05117aeec9ac942"
+)
+DECISION_BRIDGE_V4_POLICY_SHA256 = (
+    "2827559f5755945214313c8df81499a2d4ff903e687c57e9a156e8e05f894428"
+)
 EVIDENCE_CONVERSION_V3_INITIAL_EXPERIMENT_ID = (
     f"{EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX}0000"
 )
@@ -340,6 +358,8 @@ SUPPORTED_EXPERIMENT_TYPES = {
     "turbo_foundry_v2_epoch",
     "turbo_promotion_batch",
     "evidence_conversion_v3_cohort",
+    "decision_bridge_v4_prepare",
+    "q4_atomic_one_shot",
 }
 
 
@@ -747,6 +767,18 @@ class AutonomousMissionController:
                 or str(previous_blocker or "")
                 == "EVIDENCE_CONVERSION_V3_CONTINUATION_REQUIRED"
             )
+        )
+        decision_bridge_v4_required = bool(
+            previous_phase
+            in {
+                "ENGINEERING_BLOCKED",
+                "EXPERIMENT_BLOCKED",
+                "STOPPED_CLEANLY",
+            }
+            and str(previous_blocker or "")
+            == "FINAL_Q4_COHORT_AND_SHADOW_PACKAGES_REQUIRED"
+            and experiment_record(conn, DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID)
+            is None
         )
         turbo_foundry_v2_required = bool(
             previous_phase
@@ -1275,6 +1307,11 @@ class AutonomousMissionController:
             if evidence_conversion_v3_required
             else False
         )
+        decision_bridge_v4_queued = (
+            self._reconcile_decision_bridge_v4_preparation(conn)
+            if decision_bridge_v4_required
+            else False
+        )
         self._reconcile_legacy_plan(conn)
         reconciliation_phase = str(get_kv(conn, "current_phase", ""))
         reconciliation_created_block = reconciliation_phase in {
@@ -1326,6 +1363,7 @@ class AutonomousMissionController:
             and not equity_preclose_queued
             and not turbo_foundry_v2_queued
             and not evidence_conversion_v3_queued
+            and not decision_bridge_v4_queued
         ):
             set_kv(conn, "current_phase", previous_phase)
             set_kv(conn, "current_blocker", previous_blocker)
@@ -1357,7 +1395,22 @@ class AutonomousMissionController:
             ),
         )
         retired_v4_cohorts: list[str] = []
-        if conversion_stop_reason is not None:
+        bridge_records = [
+            experiment_record(conn, DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID),
+            experiment_record(conn, DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID),
+        ]
+        bridge_work_pending = any(
+            str((record or {}).get("status") or "") in {"QUEUED", "RUNNING"}
+            for record in bridge_records
+        )
+        bridge_q4_completed = str(
+            (bridge_records[1] or {}).get("status") or ""
+        ) == "COMPLETED"
+        if (
+            conversion_stop_reason is not None
+            and not bridge_work_pending
+            and not bridge_q4_completed
+        ):
             retired_v4_cohorts = block_queued_experiments_by_type(
                 conn,
                 "evidence_conversion_v3_cohort",
@@ -1440,6 +1493,7 @@ class AutonomousMissionController:
                 "equity_preclose_queued": equity_preclose_queued,
                 "turbo_foundry_v2_queued": turbo_foundry_v2_queued,
                 "evidence_conversion_v3_queued": evidence_conversion_v3_queued,
+                "decision_bridge_v4_queued": decision_bridge_v4_queued,
                 "decision_bridge_v4_conversion_stop_reason": conversion_stop_reason,
                 "decision_bridge_v4_retired_cohort_ids": retired_v4_cohorts,
                 "reconciliation_created_block": reconciliation_phase if reconciliation_created_block else None,
@@ -2078,6 +2132,10 @@ class AutonomousMissionController:
                 self._route_evidence_conversion_v3_result(
                     conn, result, experiment_id
                 )
+            elif experiment_type == "decision_bridge_v4_prepare":
+                self._route_decision_bridge_v4_preparation_result(conn, result)
+            elif experiment_type == "q4_atomic_one_shot":
+                self._route_decision_bridge_v4_q4_result(conn, result)
             if not self._evidence_reconciliation_exists(reconciliation_id):
                 record_evidence(
                     self.paths,
@@ -5659,6 +5717,104 @@ class AutonomousMissionController:
         if self.paths.state_dir.resolve() == canonical_state:
             return project_path("reports", "mission_experiments", cohort_id)
         return self.paths.state_dir.parent / "reports" / "mission_experiments" / cohort_id
+
+    def _reconcile_decision_bridge_v4_preparation(self, conn: Any) -> bool:
+        existing = experiment_record(conn, DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID)
+        if existing is not None:
+            return str(existing.get("status") or "") in {
+                "QUEUED",
+                "RUNNING",
+                "COMPLETED",
+            }
+        if q4_access_count() != 0:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "DECISION_BRIDGE_Q4_ALREADY_ACCESSED")
+            set_kv(conn, "last_error", "Decision Bridge preparation requires Q4 count zero.")
+            return False
+        source = self._evidence_conversion_artifact_dir(
+            "evidence_conversion_v3_cohort_0000"
+        )
+        task = project_path(
+            "reports", "engineering", "hydra_decision_bridge_v4_20260712.md"
+        )
+        policy = project_path(
+            "reports", "governance", "decision_bridge_v4_q4_policy_20260712.md"
+        )
+        artifacts = {
+            "pre_holdout_manifest": source / "pre_holdout_cohort_manifest.json",
+            "complete_validation": source / "complete_validation.json",
+            "behavioral_clusters": source / "behavioral_clusters.json",
+        }
+        expected = {
+            task: DECISION_BRIDGE_V4_TASK_SHA256,
+            policy: DECISION_BRIDGE_V4_POLICY_SHA256,
+        }
+        missing = [str(path) for path in [task, policy, *artifacts.values()] if not path.is_file()]
+        drift = [
+            str(path)
+            for path, digest in expected.items()
+            if path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() != digest
+        ]
+        if missing or drift:
+            set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+            set_kv(conn, "current_blocker", "DECISION_BRIDGE_V4_SOURCE_MISMATCH")
+            set_kv(
+                conn,
+                "last_error",
+                f"Decision Bridge sources missing={missing} drift={drift}"[:4000],
+            )
+            return False
+        specification = {
+            "experiment_type": "decision_bridge_v4_prepare",
+            "priority": 300.0,
+            "max_attempts": 2,
+            "pipeline": "PROMOTION",
+            "parallel_safe": False,
+            "writes_data_access_ledger": False,
+            "engineering_task_path": str(task),
+            "engineering_task_sha256": DECISION_BRIDGE_V4_TASK_SHA256,
+            "policy_path": str(policy),
+            "policy_sha256": DECISION_BRIDGE_V4_POLICY_SHA256,
+            "pre_holdout_manifest_path": str(artifacts["pre_holdout_manifest"]),
+            "pre_holdout_manifest_sha256": hashlib.sha256(
+                artifacts["pre_holdout_manifest"].read_bytes()
+            ).hexdigest(),
+            "complete_validation_path": str(artifacts["complete_validation"]),
+            "complete_validation_sha256": hashlib.sha256(
+                artifacts["complete_validation"].read_bytes()
+            ).hexdigest(),
+            "behavioral_clusters_path": str(artifacts["behavioral_clusters"]),
+            "behavioral_clusters_sha256": hashlib.sha256(
+                artifacts["behavioral_clusters"].read_bytes()
+            ).hexdigest(),
+            "freeze_timestamp_utc": utc_now_iso(),
+            "q4_access_count": 0,
+            "code_commit": self._git_commit(),
+            "q4_access_allowed": False,
+            "paid_data_allowed": False,
+            "network_allowed": False,
+            "live_or_broker_allowed": False,
+            "paper_shadow_ready_allowed": False,
+            "expected_decision_information_gain": 1.0,
+        }
+        created = enqueue_experiment(
+            conn, DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID, specification
+        )
+        set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+        set_kv(conn, "current_blocker", None)
+        set_kv(conn, "last_error", None)
+        set_kv(conn, "decision_bridge_v4_status", "PREPARATION_QUEUED")
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID,
+                "pipeline": "PROMOTION",
+                "q4_access_authorized": False,
+                "candidate_count": 3,
+            },
+        )
+        return created
 
     @staticmethod
     def _frozen_evidence_conversion_sources(conn: Any) -> FrozenEvidenceSources:
@@ -9479,6 +9635,275 @@ class AutonomousMissionController:
         )
         self._tick_shadow_pipeline(conn)
 
+    def _route_decision_bridge_v4_preparation_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        validate_decision_bridge_preparation_result(result)
+        if str(result.get("source_commit") or "") != self._git_commit():
+            raise RuntimeError("Decision Bridge preparation commit drifted.")
+        set_kv(conn, "decision_bridge_v4_preparation_result", result)
+        set_kv(conn, "decision_bridge_v4_status", "FINAL_COHORT_FROZEN_Q4_CLOSED")
+        try:
+            manifest_path = Path(str(result["cohort_manifest_path"]))
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            data_plan = build_q4_data_plan(
+                manifest,
+                cache_root=project_path("data", "cache", "databento"),
+                budget=DatabentoBudgetConfig(),
+                record_request_plans=True,
+            )
+            plan_path = manifest_path.parent / "q4_data_plan.json"
+            plan_content = json.dumps(
+                data_plan, indent=2, sort_keys=True, default=str
+            ) + "\n"
+            if plan_path.exists():
+                if plan_path.read_text(encoding="utf-8") != plan_content:
+                    raise RuntimeError("Frozen Q4 data plan drifted.")
+            else:
+                temporary = plan_path.with_name(
+                    f".{plan_path.name}.{os.getpid()}.tmp"
+                )
+                temporary.write_text(plan_content, encoding="utf-8")
+                os.replace(temporary, plan_path)
+            access_ledger = project_path(
+                "reports", "data_access", "data_access_ledger.jsonl"
+            )
+            governance_yaml = project_path(
+                "config", "governance", "hydra_governance_v1.yaml"
+            )
+            authorization = issue_cohort_authorization(
+                cohort_manifest_path=manifest_path,
+                cohort_manifest_sha256=str(result["cohort_manifest_sha256"]),
+                cohort_manifest_hash=str(result["cohort_manifest_hash"]),
+                source_commit=self._git_commit(),
+                governance_semantic_hash=governance_semantic_hash(),
+                governance_yaml_sha256=hashlib.sha256(
+                    governance_yaml.read_bytes()
+                ).hexdigest(),
+                authorization_root=self.paths.state_dir / "q4_one_shot",
+                access_ledger_path=access_ledger,
+            )
+            enqueue_experiment(
+                conn,
+                DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
+                {
+                    "experiment_type": "q4_atomic_one_shot",
+                    "priority": 320.0,
+                    "max_attempts": 1,
+                    "pipeline": "HOLDOUT",
+                    "parallel_safe": False,
+                    "writes_data_access_ledger": True,
+                    "cohort_manifest_path": str(manifest_path),
+                    "cohort_manifest_sha256": str(
+                        result["cohort_manifest_sha256"]
+                    ),
+                    "cohort_manifest_hash": str(result["cohort_manifest_hash"]),
+                    "authorization_path": authorization.authorization_path,
+                    "authorization_hash": authorization.authorization_hash,
+                    "authorization_token": authorization.token,
+                    "authorization_token_id": authorization.token_id,
+                    "q4_data_plan_path": str(plan_path),
+                    "q4_data_plan_sha256": hashlib.sha256(
+                        plan_path.read_bytes()
+                    ).hexdigest(),
+                    "official_estimated_data_cost_usd": float(
+                        data_plan["official_total_estimated_cost_usd"]
+                    ),
+                    "data_cost": float(
+                        data_plan["official_total_estimated_cost_usd"]
+                    ),
+                    "budget_ledger_path": str(
+                        project_path(
+                            "reports",
+                            "data_budget",
+                            "databento_spend_ledger.jsonl",
+                        )
+                    ),
+                    "budget_summary_path": str(
+                        project_path(
+                            "reports", "data_budget", "databento_budget_summary.md"
+                        )
+                    ),
+                    "mission_db_path": str(self.paths.database),
+                    "registry_db_path": str(
+                        project_path("registry", "hydra_registry.db")
+                    ),
+                    "access_ledger_path": str(access_ledger),
+                    "code_commit": self._git_commit(),
+                    "q4_access_allowed": True,
+                    "q4_one_shot": True,
+                    "paid_data_allowed": bool(
+                        float(data_plan["official_total_estimated_cost_usd"]) > 0.0
+                    ),
+                    "network_allowed": bool(
+                        float(data_plan["official_total_estimated_cost_usd"]) > 0.0
+                    ),
+                    "live_or_broker_allowed": False,
+                    "paper_shadow_ready_allowed": True,
+                    "automatic_retry_allowed": False,
+                    "expected_decision_information_gain": 1.0,
+                },
+            )
+            set_kv(
+                conn,
+                "decision_bridge_v4_authorization",
+                {
+                    "token_id": authorization.token_id,
+                    "token_sha256": authorization.token_sha256,
+                    "authorization_path": authorization.authorization_path,
+                    "authorization_hash": authorization.authorization_hash,
+                    "cohort_manifest_hash": result["cohort_manifest_hash"],
+                    "q4_data_plan_path": str(plan_path),
+                    "official_estimated_data_cost_usd": data_plan[
+                        "official_total_estimated_cost_usd"
+                    ],
+                },
+            )
+            set_kv(conn, "decision_bridge_v4_status", "Q4_ONE_SHOT_AUTHORIZED_QUEUED")
+            set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
+            set_kv(conn, "current_blocker", None)
+            set_kv(conn, "last_error", None)
+            set_kv(
+                conn,
+                "foundry_next_planned_action",
+                {
+                    "action": DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
+                    "pipeline": "HOLDOUT",
+                    "cohort_manifest_hash": result["cohort_manifest_hash"],
+                    "q4_access_authorized": True,
+                    "official_estimated_data_cost_usd": data_plan[
+                        "official_total_estimated_cost_usd"
+                    ],
+                },
+            )
+        except Exception as exc:
+            set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+            set_kv(
+                conn,
+                "current_blocker",
+                "Q4_DATA_PREFLIGHT_OR_AUTHORIZATION_REQUIRED",
+            )
+            set_kv(conn, "last_error", f"{type(exc).__name__}:{exc}"[:4000])
+            set_kv(conn, "decision_bridge_v4_status", "Q4_PREFLIGHT_BLOCKED")
+
+    def _route_decision_bridge_v4_q4_result(
+        self, conn: Any, result: dict[str, Any]
+    ) -> None:
+        from hydra.validation.q4_atomic_runner import validate_q4_atomic_result
+
+        preparation = dict(
+            get_kv(conn, "decision_bridge_v4_preparation_result", {}) or {}
+        )
+        manifest_path = Path(str(preparation.get("cohort_manifest_path") or ""))
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        validate_q4_atomic_result(manifest, result)
+        authoritative_count = q4_access_count()
+        if authoritative_count != 1:
+            raise RuntimeError(
+                f"Q4 one-shot result committed with access count {authoritative_count}, expected 1."
+            )
+        pass_ids = {
+            str(value) for value in result.get("q4_pass_candidate_ids") or []
+        }
+        candidate_results = {
+            str(row["candidate_id"]): dict(row)
+            for row in result.get("candidate_results") or []
+        }
+        bank = dict(get_kv(conn, "foundry_candidate_bank", {}) or {})
+        for candidate_id, q4_result in candidate_results.items():
+            row = dict(bank.get(candidate_id) or {})
+            classification = str(q4_result["classification"])
+            row["q4_classification"] = classification
+            row["q4_result_hash"] = result["result_hash"]
+            row["q4_manifest_hash"] = result["cohort_manifest_hash"]
+            row["q4_parameters_mutated"] = False
+            if candidate_id in pass_ids:
+                row["status"] = "PAPER_SHADOW_READY"
+                row["evidence_tier"] = "PAPER_SHADOW_READY"
+                row["paper_shadow_ready"] = True
+            elif classification == "Q4_LOCKBOX_FAIL":
+                row["status"] = "Q4_LOCKBOX_FAIL"
+                row["tombstoned_exact_version"] = True
+            else:
+                row["status"] = "Q4_LOCKBOX_INSUFFICIENT"
+            bank[candidate_id] = row
+        set_kv(conn, "foundry_candidate_bank", bank)
+        set_kv(conn, "q4_access_count", authoritative_count)
+        _estimated_spend, actual_spend = cumulative_spend(
+            project_path(
+                "reports", "data_budget", "databento_spend_ledger.jsonl"
+            )
+        )
+        set_kv(conn, "cumulative_databento_spend_usd", actual_spend)
+        set_kv(
+            conn,
+            "remaining_databento_budget_usd",
+            max(100.0 - actual_spend, 0.0),
+        )
+        set_kv(conn, "paper_shadow_ready", len(pass_ids))
+        set_kv(conn, "paper_shadow_ready_candidate_ids", sorted(pass_ids))
+        set_kv(conn, "decision_bridge_v4_q4_result", result)
+        set_kv(conn, "decision_bridge_v4_q4_completed", True)
+        set_kv(conn, "decision_bridge_v4_status", "Q4_ONE_SHOT_COMMITTED")
+        set_kv(
+            conn,
+            "latest_completed_experiment",
+            {
+                "experiment_id": DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID,
+                "experiment_type": "q4_atomic_one_shot",
+                "scientific_conclusion": (
+                    "Q4_ONE_SHOT_PAPER_SHADOW_READY_FOUND"
+                    if pass_ids
+                    else "Q4_ONE_SHOT_NO_PAPER_SHADOW_PASS"
+                ),
+                "report_path": result.get("result_path"),
+                "result_hash": result.get("result_hash"),
+            },
+        )
+        set_kv(
+            conn,
+            "latest_scientific_finding",
+            (
+                "Q4_ONE_SHOT_PAPER_SHADOW_READY_FOUND"
+                if pass_ids
+                else "Q4_ONE_SHOT_NO_PAPER_SHADOW_PASS"
+            ),
+        )
+        set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+        set_kv(
+            conn,
+            "current_blocker",
+            "FORWARD_FEED_AND_2025_FINAL_LOCKBOX_REQUIRED",
+        )
+        set_kv(
+            conn,
+            "last_error",
+            "Q4 one-shot committed. Append-only forward feed and 2025 independent "
+            "lockbox integration are the next protected capabilities.",
+        )
+        set_kv(
+            conn,
+            "foundry_next_planned_action",
+            {
+                "action": "FORWARD_FEED_AND_2025_FINAL_LOCKBOX_REQUIRED",
+                "pipeline": "SHADOW_AND_FINAL_LOCKBOX",
+                "q4_pass_candidate_ids": sorted(pass_ids),
+                "q4_access_count": 1,
+            },
+        )
+        append_event(
+            conn,
+            "decision_bridge_v4_q4_committed",
+            {
+                "cohort_id": result["cohort_id"],
+                "status_counts": result["status_counts"],
+                "q4_pass_candidate_ids": sorted(pass_ids),
+                "paper_shadow_ready": len(pass_ids),
+                "q4_access_count": 1,
+                "automatic_retry_allowed": False,
+            },
+        )
+
     def _route_barrier_shadow_activation_result(
         self, conn: Any, result: dict[str, Any]
     ) -> None:
@@ -10019,6 +10444,28 @@ class AutonomousMissionController:
                 claim_token=str(experiment["claim_token"]),
             )
             set_kv(conn, "current_experiment", None)
+            if experiment_type == "q4_atomic_one_shot":
+                set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
+                set_kv(conn, "current_blocker", "Q4_REVIEW_REQUIRED")
+                set_kv(
+                    conn,
+                    "last_error",
+                    f"{type(exc).__name__}:{exc}; Q4 scientific retry is prohibited."[
+                        :4000
+                    ],
+                )
+                set_kv(conn, "decision_bridge_v4_status", "Q4_REVIEW_REQUIRED")
+                record_evidence(
+                    self.paths,
+                    {
+                        "scope": "Q4_COHORT",
+                        "experiment_id": experiment_id,
+                        "status": "Q4_REVIEW_REQUIRED",
+                        "reason": str(exc),
+                        "automatic_retry_allowed": False,
+                    },
+                )
+                return
             set_kv(conn, "current_phase", "RETRY_SCHEDULED" if status == "QUEUED" else "EXPERIMENT_BLOCKED")
             set_kv(conn, "current_blocker", None if status == "QUEUED" else f"EXPERIMENT_FAILED:{experiment_id}")
             set_kv(conn, "last_error", f"{type(exc).__name__}:{exc}"[:4000])
@@ -10388,19 +10835,49 @@ class AutonomousMissionController:
 
     def _check_experiment_allowed(self, conn: Any, experiment: dict[str, Any]) -> None:
         experiment_type = str(experiment.get("experiment_type") or "")
+        q4_one_shot_authorized = False
+        if experiment_type == "q4_atomic_one_shot":
+            if not (
+                bool(experiment.get("q4_access_allowed"))
+                and bool(experiment.get("q4_one_shot"))
+                and not bool(experiment.get("live_or_broker_allowed"))
+                and int(experiment.get("max_attempts") or 0) == 1
+            ):
+                raise RuntimeError("Q4 one-shot experiment scope is incomplete.")
+            authorization = validate_authorization(
+                token=str(experiment["authorization_token"]),
+                authorization_path=Path(str(experiment["authorization_path"])),
+                expected_authorization_hash=str(experiment["authorization_hash"]),
+                expected_manifest_hash=str(experiment["cohort_manifest_hash"]),
+                expected_source_commit=str(experiment["code_commit"]),
+                access_ledger_path=Path(str(experiment["access_ledger_path"])),
+            )
+            if str(authorization.get("token_id")) != str(
+                experiment.get("authorization_token_id")
+            ):
+                raise RuntimeError("Q4 authorization token ID mismatch.")
+            q4_one_shot_authorized = True
         check_action_allowed(
             {
                 "action_type": "Q4_ACCESS"
                 if experiment.get("q4_access_allowed")
                 else ("LIVE_TRADING" if "live" in experiment_type.lower() else "RUN_RESEARCH_EXPERIMENT"),
                 "data_cost": float(experiment.get("data_cost", 0.0)),
+                "q4_one_shot_authorization_valid": q4_one_shot_authorized,
             },
             baseline_commit=self.config.baseline_commit,
             remaining_budget_usd=float(
                 get_kv(conn, "remaining_databento_budget_usd", self.config.remaining_databento_budget_usd)
             ),
         )
-        if experiment.get("q4_access_allowed") or experiment.get("paid_data_allowed") or "live" in experiment_type.lower():
+        if (
+            experiment_type != "q4_atomic_one_shot"
+            and (
+                experiment.get("q4_access_allowed")
+                or experiment.get("paid_data_allowed")
+                or "live" in experiment_type.lower()
+            )
+        ):
             raise RuntimeError("Experiment specification requests a prohibited Q4, paid-data, or live path.")
 
     def _run_experiment_with_heartbeat(

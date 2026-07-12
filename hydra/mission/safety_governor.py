@@ -13,6 +13,9 @@ def check_action_allowed(action: dict[str, Any], *, baseline_commit: str, remain
         raise GovernanceViolation("Action would exceed remaining Databento budget.")
     if action.get("action_type") == "LIVE_TRADING":
         raise GovernanceViolation("Live trading is prohibited.")
-    if action.get("action_type") == "Q4_ACCESS":
-        raise GovernanceViolation("Q4 access requires a frozen manifest and is not allowed by the initial mission loop.")
-
+    if action.get("action_type") == "Q4_ACCESS" and not bool(
+        action.get("q4_one_shot_authorization_valid")
+    ):
+        raise GovernanceViolation(
+            "Q4 access requires the validated manifest-bound atomic one-shot capability."
+        )
