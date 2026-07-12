@@ -5521,6 +5521,83 @@ class AutonomousMissionController:
                 pending.append(int(token))
         return min(pending) if pending else cls._next_evidence_conversion_cohort(conn)
 
+    @staticmethod
+    def _evidence_conversion_pre_holdout_history(
+        conn: Any,
+        *,
+        current_experiment_id: str | None = None,
+        current_result: dict[str, Any] | None = None,
+    ) -> dict[str, list[str]]:
+        """Return immutable development-only PRE_HOLDOUT yields by cohort.
+
+        The history is reconstructed from completed experiment results and then
+        reconciled with the compact mission-state accumulator.  Supplying the
+        current result keeps direct routing and crash-window reconciliation
+        deterministic even when the caller has not persisted the experiment
+        result yet.
+        """
+
+        history: dict[str, list[str]] = {
+            str(cohort): sorted({str(value) for value in (values or [])})
+            for cohort, values in dict(
+                get_kv(conn, "evidence_conversion_v3_pre_holdout_by_cohort", {})
+                or {}
+            ).items()
+        }
+        rows = conn.execute(
+            "SELECT experiment_id,result FROM experiments WHERE "
+            "experiment_type='evidence_conversion_v3_cohort' "
+            "AND status='COMPLETED' ORDER BY experiment_id"
+        ).fetchall()
+        for experiment_id, result_text in rows:
+            result = json.loads(result_text or "{}")
+            candidate_ids = sorted(
+                {
+                    str(value)
+                    for value in result.get("pre_holdout_candidate_ids") or []
+                }
+            )
+            existing = history.get(str(experiment_id))
+            if existing is not None and existing != candidate_ids:
+                raise EvidenceConversionContractError(
+                    "Immutable PRE_HOLDOUT yield changed during reconciliation "
+                    f"for {experiment_id}."
+                )
+            history[str(experiment_id)] = candidate_ids
+        if current_experiment_id is not None and current_result is not None:
+            candidate_ids = sorted(
+                {
+                    str(value)
+                    for value in current_result.get("pre_holdout_candidate_ids") or []
+                }
+            )
+            existing = history.get(str(current_experiment_id))
+            if existing is not None and existing != candidate_ids:
+                raise EvidenceConversionContractError(
+                    "Immutable PRE_HOLDOUT yield changed during current cohort "
+                    f"routing for {current_experiment_id}."
+                )
+            history[str(current_experiment_id)] = candidate_ids
+        return dict(sorted(history.items()))
+
+    @staticmethod
+    def _evidence_conversion_finalization_reason(
+        history: dict[str, list[str]],
+        *,
+        accumulated_pre_holdout_count: int,
+        remaining_evidence_debt: int | None,
+    ) -> str | None:
+        """Apply the preregistered earliest-stop policy without holdout data."""
+
+        if accumulated_pre_holdout_count >= 5:
+            return "PREFERRED_PRE_HOLDOUT_COHORT_AVAILABLE"
+        if remaining_evidence_debt is not None and remaining_evidence_debt <= 0:
+            return "ALL_DETAILED_REPRESENTATIVES_RESOLVED"
+        ordered = [history[key] for key in sorted(history)]
+        if len(ordered) >= 2 and not ordered[-1] and not ordered[-2]:
+            return "TWO_CONSECUTIVE_ZERO_NEW_PRE_HOLDOUT"
+        return None
+
     def _evidence_conversion_artifact_dir(self, cohort_id: str) -> Path:
         canonical_state = project_path("mission", "state").resolve()
         if self.paths.state_dir.resolve() == canonical_state:
@@ -5584,6 +5661,42 @@ class AutonomousMissionController:
     ) -> bool:
         if cohort_index < 0:
             raise ValueError("Evidence-conversion cohort index must be non-negative.")
+        history = self._evidence_conversion_pre_holdout_history(conn)
+        stop_reason = self._evidence_conversion_finalization_reason(
+            history,
+            accumulated_pre_holdout_count=int(
+                get_kv(conn, "pre_holdout_candidate_count", 0) or 0
+            ),
+            remaining_evidence_debt=(
+                int(
+                    dict(
+                        get_kv(conn, "evidence_conversion_v3_latest_metrics", {})
+                        or {}
+                    ).get("evidence_debt_queue_count")
+                    or 0
+                )
+                if get_kv(conn, "evidence_conversion_v3_latest_metrics", None)
+                is not None
+                else None
+            ),
+        )
+        if stop_reason is not None:
+            set_kv(conn, "decision_bridge_v4_finalization_required", True)
+            set_kv(conn, "decision_bridge_v4_conversion_stop_reason", stop_reason)
+            set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+            set_kv(
+                conn,
+                "current_blocker",
+                "FINAL_Q4_COHORT_AND_SHADOW_PACKAGES_REQUIRED",
+            )
+            set_kv(
+                conn,
+                "last_error",
+                "Evidence conversion reached its preregistered earliest stop: "
+                f"{stop_reason}. Final cohort selection and immutable shadow "
+                "packaging must complete before any Q4 authorization.",
+            )
+            return False
         cohort_id = f"{EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX}{cohort_index:04d}"
         existing = experiment_record(conn, cohort_id)
         if existing is not None:
@@ -9140,6 +9253,16 @@ class AutonomousMissionController:
         accumulated.update(pre_holdout_ids)
         set_kv(conn, "pre_holdout_candidate_ids", sorted(accumulated))
         set_kv(conn, "pre_holdout_candidate_count", len(accumulated))
+        pre_holdout_history = self._evidence_conversion_pre_holdout_history(
+            conn,
+            current_experiment_id=experiment_id,
+            current_result=result,
+        )
+        set_kv(
+            conn,
+            "evidence_conversion_v3_pre_holdout_by_cohort",
+            pre_holdout_history,
+        )
         metrics = {
             "cohort_id": experiment_id,
             "candidates_before_clustering": int(
@@ -9199,8 +9322,20 @@ class AutonomousMissionController:
         set_kv(conn, "paper_shadow_ready", int(get_kv(conn, "paper_shadow_ready", 0)))
         set_kv(conn, "last_meaningful_progress_at_utc", utc_now_iso())
 
+        finalization_reason = self._evidence_conversion_finalization_reason(
+            pre_holdout_history,
+            accumulated_pre_holdout_count=len(accumulated),
+            remaining_evidence_debt=metrics["evidence_debt_queue_count"],
+        )
+        if finalization_reason is not None:
+            set_kv(conn, "decision_bridge_v4_finalization_required", True)
+            set_kv(
+                conn,
+                "decision_bridge_v4_conversion_stop_reason",
+                finalization_reason,
+            )
         followup_queued = False
-        if should_schedule_followup(result):
+        if finalization_reason is None and should_schedule_followup(result):
             suffix = experiment_id.removeprefix(
                 EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX
             ).split("_", 1)[0]
@@ -9213,7 +9348,21 @@ class AutonomousMissionController:
                 conn,
                 cohort_index=followup_index,
             )
-        if followup_queued or queue_size(conn) > 0:
+        if finalization_reason is not None:
+            set_kv(conn, "current_phase", "ENGINEERING_BLOCKED")
+            set_kv(
+                conn,
+                "current_blocker",
+                "FINAL_Q4_COHORT_AND_SHADOW_PACKAGES_REQUIRED",
+            )
+            set_kv(
+                conn,
+                "last_error",
+                "Evidence conversion reached its preregistered earliest stop: "
+                f"{finalization_reason}. Final cohort selection and immutable "
+                "shadow packaging must complete before any Q4 authorization.",
+            )
+        elif followup_queued or queue_size(conn) > 0:
             set_kv(conn, "current_phase", "PLANNING_NEXT_ACTION")
             set_kv(conn, "current_blocker", None)
             set_kv(conn, "last_error", None)
@@ -9246,6 +9395,7 @@ class AutonomousMissionController:
                 "pre_holdout_candidate_count": len(accumulated),
                 "q4_access_authorized": False,
                 "followup_queued": followup_queued,
+                "finalization_reason": finalization_reason,
             },
         )
         append_event(
@@ -9254,6 +9404,7 @@ class AutonomousMissionController:
             {
                 **metrics,
                 "followup_queued": followup_queued,
+                "finalization_reason": finalization_reason,
                 "paper_shadow_ready": 0,
                 "q4_access_authorized": False,
             },

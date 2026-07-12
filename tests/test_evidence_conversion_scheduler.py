@@ -105,8 +105,15 @@ def _completed_promotion(conn: object, tmp_path: Path, *, index: int = 0) -> Non
 
 
 def _conversion_result(
-    tmp_path: Path, cohort_id: str, *, debt: int = 1
+    tmp_path: Path,
+    cohort_id: str,
+    *,
+    debt: int = 1,
+    pre_holdout: bool = True,
+    candidate_suffix: str = "",
 ) -> dict[str, object]:
+    primary_candidate_id = f"candidate_0{candidate_suffix}"
+    shadow_candidate_id = f"candidate_shadow{candidate_suffix}"
     payload: dict[str, object] = {
         "schema": "hydra_evidence_conversion_foundry_v3",
         "cohort_id": cohort_id,
@@ -120,25 +127,32 @@ def _conversion_result(
         "full_risk_replay_count": 2,
         "full_promotion_validation_count": 2,
         "promotion_decisions_count": 2,
-        "complete_validation_candidate_ids": ["candidate_0", "candidate_shadow"],
+        "complete_validation_candidate_ids": [
+            primary_candidate_id,
+            shadow_candidate_id,
+        ],
         "status_counts": {
             "PROMOTION_FAILED": 0,
-            "SHADOW_RESEARCH_ONLY": 1,
-            "PRE_HOLDOUT_READY": 1,
+            "SHADOW_RESEARCH_ONLY": 1 if pre_holdout else 2,
+            "PRE_HOLDOUT_READY": 1 if pre_holdout else 0,
         },
-        "pre_holdout_candidate_ids": ["candidate_0"],
+        "pre_holdout_candidate_ids": [primary_candidate_id] if pre_holdout else [],
         "q4_access_count": 0,
         "paper_shadow_ready": 0,
         "scientific_conclusion": "EVIDENCE_CONVERSION_PROGRESS",
         "candidate_count": 2,
         "candidates": [
             {
-                "candidate_id": "candidate_0",
-                "status": "PRE_HOLDOUT_READY",
+                "candidate_id": primary_candidate_id,
+                "status": (
+                    "PRE_HOLDOUT_READY"
+                    if pre_holdout
+                    else "SHADOW_RESEARCH_ONLY"
+                ),
                 "role": "COMBINE_PASSER",
             },
             {
-                "candidate_id": "candidate_shadow",
+                "candidate_id": shadow_candidate_id,
                 "status": "SHADOW_RESEARCH_ONLY",
                 "role": "XFA_PAYOUT",
             },
@@ -314,6 +328,68 @@ def test_completed_cohort_routes_debt_to_next_frozen_cohort(tmp_path: Path) -> N
             EVIDENCE_CONVERSION_V3_INITIAL_EXPERIMENT_ID,
         )
         assert experiment_record(conn, "evidence_conversion_v3_cohort_0002") is None
+    finally:
+        conn.close()
+
+
+def test_two_zero_yield_cohorts_stop_before_redundant_followup(
+    tmp_path: Path,
+) -> None:
+    controller, conn = _controller(tmp_path)
+    try:
+        _completed_promotion(conn, tmp_path)
+        set_kv(
+            conn,
+            "foundry_candidate_bank",
+            {
+                "candidate_0": {"status": "PROMISING_RESEARCH_CANDIDATE"},
+                "candidate_shadow": {"status": "SHADOW_RESEARCH_CANDIDATE"},
+            },
+        )
+        assert controller._reconcile_evidence_conversion_v3(conn, cohort_index=0)
+        controller._route_evidence_conversion_v3_result(
+            conn,
+            _conversion_result(
+                tmp_path,
+                "evidence_conversion_v3_cohort_0000",
+                debt=4,
+                pre_holdout=True,
+            ),
+            "evidence_conversion_v3_cohort_0000",
+        )
+        controller._route_evidence_conversion_v3_result(
+            conn,
+            _conversion_result(
+                tmp_path,
+                "evidence_conversion_v3_cohort_0001",
+                debt=2,
+                pre_holdout=False,
+                candidate_suffix="_c1",
+            ),
+            "evidence_conversion_v3_cohort_0001",
+        )
+        assert experiment_record(conn, "evidence_conversion_v3_cohort_0002") is not None
+        controller._route_evidence_conversion_v3_result(
+            conn,
+            _conversion_result(
+                tmp_path,
+                "evidence_conversion_v3_cohort_0002",
+                debt=1,
+                pre_holdout=False,
+                candidate_suffix="_c2",
+            ),
+            "evidence_conversion_v3_cohort_0002",
+        )
+        assert experiment_record(conn, "evidence_conversion_v3_cohort_0003") is None
+        assert (
+            get_kv(conn, "decision_bridge_v4_conversion_stop_reason")
+            == "TWO_CONSECUTIVE_ZERO_NEW_PRE_HOLDOUT"
+        )
+        assert get_kv(conn, "current_phase") == "ENGINEERING_BLOCKED"
+        assert (
+            get_kv(conn, "current_blocker")
+            == "FINAL_Q4_COHORT_AND_SHADOW_PACKAGES_REQUIRED"
+        )
     finally:
         conn.close()
 
