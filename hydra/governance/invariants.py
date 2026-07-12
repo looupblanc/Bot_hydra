@@ -57,10 +57,25 @@ def q4_access_count(ledger_path: str = "reports/data_access/data_access_ledger.j
         period = str(row.get("period_accessed") or "")
         if ":" not in period:
             continue
-        start, end = period.split(":", 1)
+        start, end = (
+            _normalize_exclusive_boundary(value)
+            for value in period.split(":", 1)
+        )
         if start >= q4_start or end > q4_start:
             count += 1
     return count
+
+
+def _normalize_exclusive_boundary(value: str) -> str:
+    """Remove one exact terminal metadata marker before date comparison.
+
+    A repeated or non-terminal marker is deliberately left partially or fully
+    intact, so malformed labels cannot use this normalization as a Q4-count
+    evasion path.
+    """
+
+    marker = "_EXCLUSIVE"
+    return value[: -len(marker)] if value.endswith(marker) else value
 
 
 def assert_no_live_trading_enabled() -> bool:
@@ -114,4 +129,3 @@ def assert_governance_passes(*, baseline_commit: str, remaining_budget_usd: floa
     if not result.passed:
         raise GovernanceViolation(json.dumps(result.to_dict(), sort_keys=True))
     return result
-

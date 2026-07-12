@@ -47,6 +47,43 @@ def test_q4_access_counter_respects_exclusive_development_boundary(tmp_path: Pat
     assert q4_access_count(str(ledger)) == 3
 
 
+def test_q4_access_counter_normalizes_only_exact_exclusive_boundary_marker(
+    tmp_path: Path,
+) -> None:
+    ledger = tmp_path / "data_access.jsonl"
+    rows = [
+        {
+            "period_accessed": "2023-01-01:2024-10-01_EXCLUSIVE",
+            "data_role": "CONTAMINATED_DEVELOPMENT",
+        },
+        {
+            "period_accessed": "2023-01-01:2024-10-02_EXCLUSIVE",
+            "data_role": "DEVELOPMENT",
+        },
+        {
+            "period_accessed": "2024-10-01_EXCLUSIVE:2024-10-02_EXCLUSIVE",
+            "data_role": "DEVELOPMENT",
+        },
+        {
+            "period_accessed": "2023-01-01:2024-10-01_EXCLUSIVE_EXCLUSIVE",
+            "data_role": "DEVELOPMENT",
+        },
+        {
+            "period_accessed": "2024-08-01:2024-08-02",
+            "data_role": "SEALED_BLIND_HOLDOUT",
+        },
+        {
+            "period_accessed": "2024-08-01:2024-08-02",
+            "data_role": "FINAL_LOCKBOX",
+        },
+    ]
+    ledger.write_text("\n".join(json.dumps(row) for row in rows), encoding="utf-8")
+
+    # Exact development boundary is excluded.  Later/marked starts,
+    # ambiguous repeated markers, and protected roles remain counted.
+    assert q4_access_count(str(ledger)) == 5
+
+
 def test_governance_manifest_contains_protected_files() -> None:
     manifest = build_protected_manifest(baseline_commit=BASELINE)
     protected = {item.path for item in manifest.digests}
