@@ -16,8 +16,8 @@ AUTO_UNDER_HARD_CAP = "AUTO_UNDER_HARD_CAP"
 @dataclass(frozen=True)
 class DatabentoBudgetConfig:
     budget_start: str = "2026-07-10"
-    hard_cap_usd: float = 100.0
-    safety_ceiling_usd: float = 98.0
+    hard_cap_usd: float = 125.0
+    safety_ceiling_usd: float = 123.0
     ledger_path: str = "reports/data_budget/databento_spend_ledger.jsonl"
     summary_path: str = "reports/data_budget/databento_budget_summary.md"
 
@@ -144,4 +144,3 @@ def write_budget_summary(config: DatabentoBudgetConfig) -> Path:
         )
     summary_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return summary_path
-
