@@ -39,6 +39,35 @@ class IssuedCohortAuthorization:
     authorization_hash: str
 
 
+def revoke_unconsumed_authorization(
+    authorization_path: str | Path,
+    *,
+    reason: str,
+    access_ledger_path: str | Path,
+) -> Path:
+    path = Path(authorization_path)
+    root = path.parent
+    if not path.is_file():
+        raise CohortAuthorizationError("Authorization to revoke does not exist.")
+    if (root / "consumption.json").exists() or (root / "data_opened.json").exists():
+        raise CohortAuthorizationError("Consumed/opened Q4 authorization cannot be revoked.")
+    if q4_access_count(str(access_ledger_path)) != 0:
+        raise CohortAuthorizationError("Authorization revocation requires Q4 count zero.")
+    revocation = root / "revocation.json"
+    payload = {
+        "schema": "hydra_q4_unconsumed_authorization_revocation_v1",
+        "authorization_sha256": _sha256(path),
+        "revoked_at_utc": utc_now_iso(),
+        "reason": str(reason),
+        "q4_access_count": 0,
+        "authorization_was_consumed": False,
+        "q4_data_was_opened": False,
+    }
+    payload["revocation_hash"] = _stable_hash(payload)
+    _write_exclusive(revocation, payload)
+    return revocation
+
+
 def issue_cohort_authorization(
     *,
     cohort_manifest_path: str | Path,

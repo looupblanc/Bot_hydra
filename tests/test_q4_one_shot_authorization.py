@@ -9,6 +9,7 @@ import pytest
 from hydra.governance.cohort_authorization import (
     CohortAuthorizationError,
     issue_cohort_authorization,
+    revoke_unconsumed_authorization,
 )
 from hydra.governance.q4_one_shot import (
     Q4OneShotError,
@@ -119,6 +120,30 @@ def test_wrong_manifest_commit_or_existing_access_is_rejected(tmp_path: Path) ->
             authorization_root=tmp_path / "q4",
             access_ledger_path=ledger,
         )
+
+
+def test_unconsumed_orphan_can_be_revoked_without_q4_access(tmp_path: Path) -> None:
+    manifest_path, manifest = _manifest(tmp_path)
+    ledger = tmp_path / "access.jsonl"
+    issued = issue_cohort_authorization(
+        cohort_manifest_path=manifest_path,
+        cohort_manifest_sha256=hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        cohort_manifest_hash=str(manifest["manifest_hash"]),
+        source_commit="a" * 40,
+        governance_semantic_hash="b" * 64,
+        governance_yaml_sha256="c" * 64,
+        authorization_root=tmp_path / "q4",
+        access_ledger_path=ledger,
+    )
+    revocation = revoke_unconsumed_authorization(
+        issued.authorization_path,
+        reason="preflight failed before Q4 enqueue",
+        access_ledger_path=ledger,
+    )
+    payload = json.loads(revocation.read_text())
+    assert payload["q4_access_count"] == 0
+    assert payload["authorization_was_consumed"] is False
+    assert not ledger.exists()
     ledger.write_text(
         json.dumps(
             {

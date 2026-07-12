@@ -136,7 +136,7 @@ def build_final_cohort_manifest(
         )
     manifest: dict[str, Any] = {
         "schema": FINAL_COHORT_SCHEMA,
-        "cohort_id": "hydra_decision_bridge_v4_q4_cohort_0001",
+        "cohort_id": "hydra_decision_bridge_v4_q4_cohort_0002",
         "freeze_timestamp_utc": freeze_timestamp_utc,
         "source_commit": source_commit,
         "source_pre_holdout_manifest_hash": str(

@@ -17,6 +17,7 @@ from hydra.data.budget import DatabentoBudgetConfig, cumulative_spend
 from hydra.data.q4_data_plan import build_q4_data_plan
 from hydra.governance.cohort_authorization import (
     issue_cohort_authorization,
+    revoke_unconsumed_authorization,
     validate_authorization,
 )
 from hydra.governance.invariants import governance_semantic_hash, q4_access_count
@@ -176,7 +177,7 @@ TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX = "turbo_foundry_v2_epoch_"
 TURBO_FOUNDRY_V2_INITIAL_EXPERIMENT_ID = f"{TURBO_FOUNDRY_V2_EXPERIMENT_PREFIX}0000"
 TURBO_PROMOTION_EXPERIMENT_PREFIX = "turbo_promotion_batch_"
 EVIDENCE_CONVERSION_V3_EXPERIMENT_PREFIX = "evidence_conversion_v3_cohort_"
-DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0002"
+DECISION_BRIDGE_V4_PREPARE_EXPERIMENT_ID = "decision_bridge_v4_prepare_0003"
 DECISION_BRIDGE_V4_Q4_EXPERIMENT_ID = "q4_atomic_one_shot_0001"
 DECISION_BRIDGE_V4_TASK_SHA256 = (
     "e80a099f2fca2a67fedbde860cf0409d7298798d6681866eb05117aeec9ac942"
@@ -9713,6 +9714,29 @@ class AutonomousMissionController:
             governance_yaml = project_path(
                 "config", "governance", "hydra_governance_v1.yaml"
             )
+            authorization_root = self.paths.state_dir / "q4_one_shot"
+            if authorization_root.exists():
+                for prior in sorted(authorization_root.glob("*/authorization.json")):
+                    if prior.parent.name == str(manifest["cohort_id"]):
+                        continue
+                    if any(
+                        (prior.parent / name).exists()
+                        for name in (
+                            "consumption.json",
+                            "data_opened.json",
+                            "closure.json",
+                            "revocation.json",
+                        )
+                    ):
+                        continue
+                    revoke_unconsumed_authorization(
+                        prior,
+                        reason=(
+                            "controller_preflight_failed_before_q4_enqueue; "
+                            "superseded_by_new_manifest_bound_commit"
+                        ),
+                        access_ledger_path=access_ledger,
+                    )
             authorization = issue_cohort_authorization(
                 cohort_manifest_path=manifest_path,
                 cohort_manifest_sha256=str(result["cohort_manifest_sha256"]),
@@ -9722,7 +9746,7 @@ class AutonomousMissionController:
                 governance_yaml_sha256=hashlib.sha256(
                     governance_yaml.read_bytes()
                 ).hexdigest(),
-                authorization_root=self.paths.state_dir / "q4_one_shot",
+                authorization_root=authorization_root,
                 access_ledger_path=access_ledger,
             )
             enqueue_experiment(
@@ -9766,7 +9790,7 @@ class AutonomousMissionController:
                             "reports", "data_budget", "databento_budget_summary.md"
                         )
                     ),
-                    "mission_db_path": str(self.paths.database),
+                    "mission_db_path": str(self.paths.db_path),
                     "registry_db_path": str(
                         project_path("registry", "hydra_registry.db")
                     ),
