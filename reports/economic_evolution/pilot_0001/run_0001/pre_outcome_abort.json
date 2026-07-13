@@ -1,0 +1,31 @@
+{
+  "schema": "hydra_economic_evolution_pre_outcome_abort_v1",
+  "campaign_id": "hydra_economic_evolution_pilot_0001",
+  "attempt": 1,
+  "status": "PRE_OUTCOME_STRUCTURAL_ABORT",
+  "recorded_at_utc": "2026-07-13T10:45:06Z",
+  "failure_type": "STAGE0_CALIBRATION_AVAILABILITY_IMPLEMENTATION_DEFECT",
+  "failure": "A market-feature combination with fewer than 100 finite calibration observations raised ValueError for extreme_dwell and aborted the whole campaign.",
+  "scientific_outcomes_seen": {
+    "cheap_screen": false,
+    "pnl": false,
+    "incremental_value": false,
+    "account_policy": false,
+    "rolling_combine": false,
+    "xfa": false
+  },
+  "artifacts_created_before_abort": {
+    "preregistration_copy_sha256": "95df925715d2575dde0d63882d85de54f2aef70088a487110b046b78ca17ecde",
+    "validator_null_calibration_sha256": "5cfcde7efedd087d96f56340066ab37259da20e5d93742244cbf877beb35706f",
+    "structural_population_summary_sha256": "a70ffc5e864aac4cf8c106b4194a1ea9f33ed0c817a5262e778cd2ab6881f3ff",
+    "structural_sleeve_manifest_written": true
+  },
+  "threshold_change": false,
+  "population_change": false,
+  "multiplicity_reservation_retained": true,
+  "q4_access_count_delta": 0,
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "corrective_action": "Reject each unavailable market-feature structure explicitly at Stage 0 and allow all other frozen structures to continue.",
+  "CONTRE": "Quantile feature values were read before the abort even though no economic outcome was computed; the revision therefore retains the exact candidate population and every frozen economic threshold."
+}
