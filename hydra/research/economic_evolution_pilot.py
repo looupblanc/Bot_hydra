@@ -115,7 +115,12 @@ def run_economic_evolution_pilot(
         market: FeatureMatrix.open(path, mmap=True)
         for market, path in feature_build.market_paths.items()
     }
-    _verify_data_fingerprint(prereg, feature_build.source_fingerprint, contract_map_path)
+    _verify_data_fingerprint(
+        prereg,
+        feature_build.source_fingerprint,
+        contract_map_path,
+        feature_build.market_paths,
+    )
     timings["feature_open_seconds"] = time.perf_counter() - stage_start
 
     stage_start = time.perf_counter()
@@ -123,6 +128,10 @@ def run_economic_evolution_pilot(
         campaign_id=str(prereg["campaign_id"]),
         raw_proposal_count=int(prereg["funnel"]["raw_proposals"]),
     )
+    if generated.candidate_manifest_hash != str(
+        prereg["structural_population"]["candidate_manifest_hash"]
+    ):
+        raise EconomicEvolutionPilotError("frozen structural population drift")
     writer.write_json("structural_population_summary.json", generated.summary())
     writer.write_jsonl_batch(
         "structural_sleeves.jsonl", [row.to_dict() for row in generated.sleeves]
@@ -308,16 +317,39 @@ def _validate_preregistration(value: Mapping[str, Any], path: Path) -> None:
         raise EconomicEvolutionPilotError("pilot must evaluate at least 100 policies")
     if not path.is_file():
         raise EconomicEvolutionPilotError("preregistration is missing")
+    project_root = path.parents[2]
+    for relative, digest in value["implementation_files"].items():
+        candidate = project_root / str(relative)
+        if not candidate.is_file() or _sha256(candidate) != str(digest):
+            raise EconomicEvolutionPilotError(
+                f"frozen implementation drift: {relative}"
+            )
+    implementation_commit = str(value["implementation_commit"])
+    ancestor = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", implementation_commit, "HEAD"],
+        cwd=project_root,
+        check=False,
+    )
+    if ancestor.returncode != 0:
+        raise EconomicEvolutionPilotError("implementation commit is not an ancestor")
 
 
 def _verify_data_fingerprint(
-    prereg: Mapping[str, Any], source_fingerprint: str, contract_map_path: str | Path
+    prereg: Mapping[str, Any],
+    source_fingerprint: str,
+    contract_map_path: str | Path,
+    market_paths: Mapping[str, str],
 ) -> None:
     expected = prereg["data"]
     if source_fingerprint != expected["feature_source_fingerprint"]:
         raise EconomicEvolutionPilotError("feature source fingerprint drift")
     if _sha256(Path(contract_map_path)) != expected["contract_map_sha256"]:
         raise EconomicEvolutionPilotError("contract-map checksum drift")
+    for market, digest in expected["feature_manifest_sha256"].items():
+        if market not in market_paths:
+            raise EconomicEvolutionPilotError(f"feature matrix missing: {market}")
+        if _sha256(Path(market_paths[market]) / "manifest.json") != str(digest):
+            raise EconomicEvolutionPilotError(f"feature manifest drift: {market}")
 
 
 def _quality_diverse_exact_selection(
