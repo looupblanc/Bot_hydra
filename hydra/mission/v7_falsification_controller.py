@@ -33,7 +33,7 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v8"
+CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v9"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-falsification-single-writer"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
@@ -164,6 +164,24 @@ V71_G7_FUNNEL_RELATIVE_PATH = Path(
 V71_G7_TRIPWIRE_RELATIVE_PATH = Path(
     "reports/v7_1/discovery_0007/v71_flow_sign_sequence_tripwire_result.json"
 )
+V71_G8_GRAMMAR_RELATIVE_PATH = Path(
+    "WORM/v7.1-intraminute-flow-grammar-0008-2026-07-13.json"
+)
+V71_G8_FEATURE_MANIFEST_RELATIVE_PATH = Path(
+    "data/manifests/v7_d1_intraminute_flow_v1.json"
+)
+V71_G8_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0008/v71_intraminute_flow_signal_manifest.json"
+)
+V71_G8_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0008/v71_intraminute_flow_funnel_result.json"
+)
+V71_G8_TRIPWIRE_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0008/v71_intraminute_flow_tripwire_result.json"
+)
+V71_G8_POWER_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0008/v71_intraminute_flow_power_audit_result.json"
+)
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
     str(V71_POLICY_RELATIVE_PATH): "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
@@ -195,6 +213,9 @@ V71_FROZEN_HASHES = {
     "WORM/v7.1-underpowered-combine-diagnostic-verdict-0001-2026-07-13.json": "7116dba7d9a50e9e109489b55f6fbef32992fd7d96e0c767270d84c127b7fa39",
     str(V71_G7_GRAMMAR_RELATIVE_PATH): "4cb89b0e774f754037fde8a6f86703cda0047eefcd01174e1f65bb8d37fc45ab",
     "WORM/v7.1-flow-sign-sequence-tripwire-0007-2026-07-13.json": "c7806c7ac4c512a05ca468388857419bd87a4a316967366ac8892ca38d25ff7a",
+    str(V71_G8_GRAMMAR_RELATIVE_PATH): "36f5d4f8dd2582979d809925782881fb1e159d23ddfbd50dc6a9d348cf5c18dc",
+    "WORM/v7.1-intraminute-flow-tripwire-0008-2026-07-13.json": "e4968cc24c5574a42ace695a8ec65f56578d5ca66a8954eac1239efbbfa4a535",
+    "WORM/v7.1-intraminute-flow-power-audit-0001-2026-07-13.json": "3f1b8fb8eca73bebf5582071c9c79b75971a5d2d57afda9c006ea9edff9e5104",
 }
 
 
@@ -1149,7 +1170,7 @@ def _classify_v71_g7_action(
         conn.close()
     if cemetery_count != 6:
         raise V7ControllerIntegrityError("V7.1 G7 class tombstone is absent")
-    return {
+    g7_action = {
         **dict(g6_action),
         "action_type": "V71_G7_GEOMETRY_ONLY_NULL_COMPLETE",
         "g7_candidate_count": 6,
@@ -1184,6 +1205,105 @@ def _classify_v71_g7_action(
             "GEOMETRY_ONLY (5/120 real versus 17/360 null). The exact class is "
             "tombstoned, no candidate was promoted, all prior 22 WF-positive "
             "formulations remain explicitly reconciled, and no data was purchased."
+        ),
+    }
+    if (root / V71_G8_GRAMMAR_RELATIVE_PATH).is_file():
+        return _classify_v71_g8_action(root, g7_action=g7_action)
+    return g7_action
+
+
+def _classify_v71_g8_action(
+    root: Path,
+    *,
+    g7_action: Mapping[str, Any],
+) -> dict[str, Any]:
+    required = (
+        (V71_G8_FEATURE_MANIFEST_RELATIVE_PATH, "V71_G8_FEATURE_MANIFEST_REQUIRED"),
+        (V71_G8_SIGNAL_RELATIVE_PATH, "V71_G8_SIGNAL_MANIFEST_REQUIRED"),
+        (V71_G8_FUNNEL_RELATIVE_PATH, "V71_G8_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V71_G8_TRIPWIRE_RELATIVE_PATH, "V71_G8_TRIPWIRE_REQUIRED"),
+        (V71_G8_POWER_RELATIVE_PATH, "V71_G8_POWER_AUDIT_REQUIRED"),
+    )
+    for path, action in required:
+        if not (root / path).is_file():
+            return {
+                **dict(g7_action),
+                "action_type": action,
+                "progressed": False,
+                "required_path": str(path),
+                "reason": (
+                    "The preregistered G8 intraminute-flow sequence must complete "
+                    "its feature, Stage 0-2, tripwire and power-audit chain."
+                ),
+            }
+    hashes = {
+        V71_G8_FEATURE_MANIFEST_RELATIVE_PATH: "b228dc89ed36d1b47660073dd6e68703eb44c85e6c0e5897a62f3a14168f6ad4",
+        V71_G8_SIGNAL_RELATIVE_PATH: "7b5af1090f219055f62180c7bbc03dac4c18af8573452d148f15354d55f95979",
+        V71_G8_FUNNEL_RELATIVE_PATH: "cdf426936a6350a997958f4f6bfb326466538881f290d7943bd057d9361dd69b",
+        V71_G8_TRIPWIRE_RELATIVE_PATH: "b8e43659e47c0ccf68bd68e95dfea4328035babb0eca3433282bb1a2606000f8",
+        V71_G8_POWER_RELATIVE_PATH: "170f56a092f3b33e42f47a9076f562dccd1000db7022957fe4dd59fd498aa1b6",
+    }
+    drift = [str(path) for path, expected in hashes.items() if _sha256(root / path) != expected]
+    if drift:
+        raise V7ControllerIntegrityError("V7.1 G8 evidence drift: " + ",".join(drift))
+    feature = _load_json(root / V71_G8_FEATURE_MANIFEST_RELATIVE_PATH)
+    signal = _load_json(root / V71_G8_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V71_G8_FUNNEL_RELATIVE_PATH)
+    tripwire = _load_json(root / V71_G8_TRIPWIRE_RELATIVE_PATH)
+    power = _load_json(root / V71_G8_POWER_RELATIVE_PATH)
+    if int(feature.get("output", {}).get("row_count") or 0) != 17_200:
+        raise V7ControllerIntegrityError("V7.1 G8 feature row count drift")
+    if int(signal.get("candidate_count") or 0) != 6 or int(signal.get("signal_count") or 0) != 2_182:
+        raise V7ControllerIntegrityError("V7.1 G8 signal manifest drift")
+    if int(funnel.get("stage0_valid_novel_count") or 0) != 6 or int(funnel.get("stage1_pass_count") or 0) != 2 or int(funnel.get("walk_forward_positive_count") or 0) != 2:
+        raise V7ControllerIntegrityError("V7.1 G8 funnel drift")
+    if tripwire.get("verdict") != "GREEN_NULL_ADJUSTED_BASELINE" or tripwire.get("evidence_strength") != "VERT_MINCE" or float(tripwire.get("NULL_RATIO") or 1.0) >= 0.8:
+        raise V7ControllerIntegrityError("V7.1 G8 tripwire drift")
+    if tripwire.get("raw_pass_counts") != {"real": "10/120", "null": "22/360"}:
+        raise V7ControllerIntegrityError("V7.1 G8 tripwire count drift")
+    if power.get("status_counts") != {"WF_POSITIVE_BUT_FRAGILE": 2} or power.get("powered_candidate_ids"):
+        raise V7ControllerIntegrityError("V7.1 G8 power classification drift")
+    cumulative_status = dict(g7_action["cumulative_power_status_counts"])
+    cumulative_status["WF_POSITIVE_BUT_FRAGILE"] = int(cumulative_status.get("WF_POSITIVE_BUT_FRAGILE", 0)) + 2
+    return {
+        **dict(g7_action),
+        "action_type": "V71_G8_GREEN_THIN_FRAGILE_NO_PROMOTION",
+        "walk_forward_positive_count": 24,
+        "g8_feature_row_count": 17_200,
+        "g8_candidate_count": 6,
+        "g8_signal_count": 2_182,
+        "g8_stage0_valid_count": 6,
+        "g8_stage1_survivor_count": 2,
+        "g8_walk_forward_positive_count": 2,
+        "g8_tripwire_verdict": "GREEN_NULL_ADJUSTED_BASELINE",
+        "g8_tripwire_evidence_strength": "VERT_MINCE",
+        "g8_NULL_RATIO": float(tripwire["NULL_RATIO"]),
+        "g8_real_pass_count": tripwire["raw_pass_counts"]["real"],
+        "g8_null_pass_count": tripwire["raw_pass_counts"]["null"],
+        "g8_power_status_counts": dict(power["status_counts"]),
+        "g8_powered_candidate_count": 0,
+        "g8_rolling_combine_executed": False,
+        "cumulative_power_status_counts": cumulative_status,
+        "confirmation_queue_fragile_retired_count": 6,
+        "evidence_reconciliation_accounted_count": 24,
+        "evidence_reconciliation_unaccounted_count": 0,
+        "powered_candidate_count": 0,
+        "rolling_combine_promotions": 0,
+        "new_data_purchase_authorized": False,
+        "shadow_admission_authorized": False,
+        "next_experiment_id": "hydra_v7_1_independent_confirmation_and_distinct_hypothesis_review_0009",
+        "next_experiment_state": "PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+        "principal_blocker": (
+            "No candidate passes the unchanged 80% power gate; both G8 positives "
+            "lose their edge at 2x costs and after removal of the best event."
+        ),
+        "reason": (
+            "G8 derived 17,200 outcome-free ES intraminute observations from "
+            "already purchased D1 prints. Two of six candidates were barely "
+            "walk-forward positive and the class tripwire was VERT_MINCE, but "
+            "both exact versions are WF_POSITIVE_BUT_FRAGILE. No candidate, "
+            "Combine, shadow, holdout or purchase was authorized, and all 24 "
+            "walk-forward-positive formulations are explicitly accounted for."
         ),
     }
 

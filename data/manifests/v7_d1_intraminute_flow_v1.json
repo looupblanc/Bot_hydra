@@ -1,0 +1,100 @@
+{
+  "CONTRE": "Half-minute aggregation is deterministic and outcome-free, but the 30-second boundary can remain an arbitrary clock partition; the permanent price-null tripwire is mandatory.",
+  "audits": [
+    {
+      "bounded_record_count": 15545497,
+      "calendar_year": 2023,
+      "contract": "ESU3",
+      "excluded_instrument_record_count": 5711166,
+      "excluded_session_record_count": 1873761,
+      "invalid_action_record_count": 0,
+      "minute_group_count": 8800,
+      "raw_record_count": 15545497,
+      "retained_es_rth_record_count": 7960570
+    },
+    {
+      "bounded_record_count": 18408542,
+      "calendar_year": 2024,
+      "contract": "ESU4",
+      "excluded_instrument_record_count": 8016481,
+      "excluded_session_record_count": 2222767,
+      "invalid_action_record_count": 0,
+      "minute_group_count": 8400,
+      "raw_record_count": 32277017,
+      "retained_es_rth_record_count": 8169294
+    }
+  ],
+  "data_role": "DEVELOPMENT_ONLY",
+  "feature_policy": {
+    "aggressor_sign": {
+      "A": -1,
+      "B": 1,
+      "N": 0
+    },
+    "availability": "minute_start_ns+60s",
+    "first_half": "[minute_start,minute_start+30s)",
+    "second_half": "[minute_start+30s,minute_start+60s)"
+  },
+  "forward_gap_access_count": 0,
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "outcome_or_pnl_columns": [],
+  "output": {
+    "columns": [
+      "calendar_year",
+      "product",
+      "contract",
+      "instrument_id",
+      "minute_start_ns",
+      "availability_ns",
+      "first_trade_count",
+      "second_trade_count",
+      "first_total_volume",
+      "second_total_volume",
+      "first_signed_flow",
+      "second_signed_flow",
+      "transformation_version"
+    ],
+    "contracts": [
+      "ESU3",
+      "ESU4"
+    ],
+    "first_minute_start_ns": 1690983000000000000,
+    "last_minute_start_ns": 1725048540000000000,
+    "path": "data/cache/v7_d1/date_matched_intraminute_flow_v1.parquet",
+    "row_count": 17200,
+    "sha256": "13dd79815211e8461dea2b708691c656841738d7af06c22cab7d7b7d688c0196"
+  },
+  "preregistration_path": "WORM/v7.1-intraminute-flow-grammar-0008-2026-07-13.json",
+  "preregistration_sha256": "36f5d4f8dd2582979d809925782881fb1e159d23ddfbd50dc6a9d348cf5c18dc",
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "schema": "hydra_v7_d1_intraminute_flow_manifest_v1",
+  "session_filter": {
+    "end_exclusive": "15:10:00",
+    "start_inclusive": "08:30:00",
+    "timezone": "America/Chicago",
+    "weekdays_only": true
+  },
+  "sources": [
+    {
+      "calendar_year": 2023,
+      "contract": "ESU3",
+      "end_ns": 1693526400000000000,
+      "instrument_id": 3445,
+      "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2023-08-02_2023-09-01.dbn.zst",
+      "sha256": "d93e5c8bd657a28bff5f05560b845caa3bb04e9252882ddc2751033fedd1c468",
+      "start_ns": 1690934400000000000
+    },
+    {
+      "calendar_year": 2024,
+      "contract": "ESU4",
+      "end_ns": 1725148800000000000,
+      "instrument_id": 118,
+      "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+      "sha256": "a312d6df524205c2d1632c20f1033ecb74081c98d6608eacc1a9cdb08bcf9b63",
+      "start_ns": 1722556800000000000
+    }
+  ],
+  "transformation_version": "hydra_v7_d1_intraminute_flow_v1"
+}

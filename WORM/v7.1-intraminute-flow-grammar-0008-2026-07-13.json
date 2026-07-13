@@ -1,0 +1,133 @@
+{
+  "schema": "hydra_v7_1_limited_intraminute_flow_grammar_v1",
+  "grammar_id": "hydra_v7_1_intraminute_flow_grammar_0008",
+  "allocation_role": "LIMITED_STRUCTURAL_DISCOVERY_5_PERCENT",
+  "broad_D1_batch": false,
+  "economic_hypothesis": "The temporal allocation of ES aggressive flow inside a completed minute distinguishes a persistent execution program, exhausted front-loaded urgency, and a late inventory handoff; liquidity suppliers or late aggressive participants can pay the subsequent path when they adjust after the frozen minute boundary.",
+  "who_pays": "Execution programs that continue after back-loaded acceleration, late followers who extrapolate a front-loaded impulse after it has decayed, and liquidity suppliers who update inventory after a late sign handoff.",
+  "persistence_rationale": "The class uses the natural first and second 30-second halves of each completed ES minute, computed directly from raw prints. It does not reuse event-clock completion speed, event-bar thresholds, trade-size averages, cross-clock relations, or inter-minute flow-sign sequences.",
+  "source": {
+    "dataset": "GLBX.MDP3",
+    "schema": "trades",
+    "product": "ES",
+    "sources": [
+      {
+        "calendar_year": 2023,
+        "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2023-08-02_2023-09-01.dbn.zst",
+        "sha256": "d93e5c8bd657a28bff5f05560b845caa3bb04e9252882ddc2751033fedd1c468",
+        "start_ns_inclusive": 1690934400000000000,
+        "end_ns_exclusive": 1693526400000000000,
+        "instrument_id": 3445,
+        "contract": "ESU3"
+      },
+      {
+        "calendar_year": 2024,
+        "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+        "sha256": "a312d6df524205c2d1632c20f1033ecb74081c98d6608eacc1a9cdb08bcf9b63",
+        "start_ns_inclusive": 1722556800000000000,
+        "end_ns_exclusive": 1725148800000000000,
+        "instrument_id": 118,
+        "contract": "ESU4"
+      }
+    ],
+    "definitions_path": "data/cache/contract_maps/definitions_GLBX-MDP3_2023-01-01_2024-10-01_1faa319bb6354a47.dbn.zst",
+    "definitions_sha256": "a5374a723fdf442f8c5e31f98af26ff813070a61008d24e46f848df69c819dcc",
+    "rth_timezone": "America/Chicago",
+    "rth_start_inclusive": "08:30:00",
+    "rth_end_exclusive": "15:10:00",
+    "completed_minutes_only": true,
+    "derived_store_path": "data/cache/v7_d1/date_matched_intraminute_flow_v1.parquet",
+    "derived_manifest_path": "data/manifests/v7_d1_intraminute_flow_v1.json",
+    "transformation_version": "hydra_v7_d1_intraminute_flow_v1"
+  },
+  "feature_policy": {
+    "minute_split": "[00s,30s) and [30s,60s) by exchange event timestamp",
+    "first_half_signed_flow": "buy aggressor size minus sell aggressor size in [00s,30s)",
+    "second_half_signed_flow": "buy aggressor size minus sell aggressor size in [30s,60s)",
+    "first_half_total_volume": "all trade size in [00s,30s)",
+    "second_half_total_volume": "all trade size in [30s,60s)",
+    "zero_signed_half": "ineligible for every motif",
+    "availability": "minute_start_ns plus 60 seconds",
+    "outcomes_or_future_prices_used": false
+  },
+  "mechanism_class": "V71_INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+  "motifs": [
+    {
+      "motif": "BACK_LOADED_SAME_SIGN_ACCELERATION",
+      "response_policy": "CONTINUATION",
+      "definition": "first- and second-half signed flows have the same nonzero sign, absolute second-half flow is strictly larger, and second-half total volume is strictly larger; direction is the second-half sign"
+    },
+    {
+      "motif": "FRONT_LOADED_FLOW_DECAY",
+      "response_policy": "REVERSAL",
+      "definition": "first- and second-half signed flows have the same nonzero sign, absolute first-half flow is strictly larger, and first-half total volume is strictly larger; direction is opposite the first-half sign"
+    },
+    {
+      "motif": "LATE_FLOW_HANDOFF",
+      "response_policy": "CONTINUATION",
+      "definition": "first- and second-half signed flows have opposite nonzero signs and absolute second-half flow is strictly larger; direction is the second-half sign"
+    }
+  ],
+  "holding_minutes": [30, 60],
+  "candidate_ids": [
+    "v71g8_intraminute_flow_back_loaded_same_sign_acceleration_continuation_h30",
+    "v71g8_intraminute_flow_back_loaded_same_sign_acceleration_continuation_h60",
+    "v71g8_intraminute_flow_front_loaded_flow_decay_reversal_h30",
+    "v71g8_intraminute_flow_front_loaded_flow_decay_reversal_h60",
+    "v71g8_intraminute_flow_late_flow_handoff_continuation_h30",
+    "v71g8_intraminute_flow_late_flow_handoff_continuation_h60"
+  ],
+  "candidate_count": 6,
+  "bounded_parameter_alternatives_per_structure": 1,
+  "signal_policy": {
+    "decision_timestamp": "minute_start_ns plus 60 seconds after the complete source minute",
+    "entry": "first explicit-contract 1m open at or after decision timestamp",
+    "exit": "explicit-contract 1m open at entry plus frozen holding_minutes",
+    "overlapping_signals_per_candidate": false,
+    "session_crossing": false,
+    "contract_crossing": false
+  },
+  "cost_policy": {
+    "path": "config/v7/phase0_g0_preregistration.json",
+    "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "primary_walk_forward_stress": "STRESS_1_5X",
+    "SIM_EXPLOIT_stress": "STRESS_2X"
+  },
+  "funnel": {
+    "stage0": "validity_novelty_nonoverlap_and_explicit_contract_intraminute_source",
+    "stage1": "frozen_existing_cheap_economic_policy",
+    "stage2": "four_fold_walk_forward_with_five_day_embargo",
+    "stage3": "hypothesis_specific_nulls_only_after_green_tripwire_and_powered_walk_forward",
+    "stage4": "campaign_DSR_BH_only_if_powered",
+    "stage5": "rolling_Combine_diagnostic_only_after_statistical_survival_or_explicit_research_stage_policy",
+    "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+    "candidate_specific_power_policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673"
+  },
+  "mandatory_grammar_tripwire": {
+    "policy_path": "WORM/v7.1-intraminute-flow-tripwire-0008-2026-07-13.json",
+    "worlds": ["DAILY_BLOCK_SHUFFLE", "VOLATILITY_MATCHED_RANDOM_WALK", "YEAR_BLOCK_PERMUTATION"],
+    "NULL_RATIO_artefact_threshold_inclusive": 0.8,
+    "raw_counts_and_exact_binomial_test_required": true,
+    "combine_pass_rate_is_fitness": false
+  },
+  "cemetery_firewall": {
+    "feedback_scope": "mechanism_class_x_regime_x_death_cause_only",
+    "parameter_feedback_used": false,
+    "candidate_outcome_feedback_used": false,
+    "excluded_classes": [
+      "ARB_INTRA_PRODUIT",
+      "V71_EVENT_TIME_CLOCK_STATES",
+      "V71_CROSS_CLOCK_FLOW_CONFIRMATION",
+      "V71_CROSS_CLOCK_SPEED_LEADERSHIP",
+      "V71_TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "V71_AGGRESSOR_FLOW_SIGN_SEQUENCES"
+    ]
+  },
+  "candidate_status_inheritance": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "shadow_admission_authorized": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "Natural half-minute comparisons may still be arbitrary partitions of one-minute price geometry, and using only two D1 calendar blocks can leave regime dependence unresolved; no positive development result can advance without the permanent tripwire and calibrated power audit."
+}

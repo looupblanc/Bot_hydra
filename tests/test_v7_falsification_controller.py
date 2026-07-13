@@ -186,13 +186,13 @@ def test_v71_controller_recognizes_frozen_g2_confirmation_queue(
     assert result["shadow_admission_authorized"] is False
 
 
-def test_v71_power_aware_integrated_action_reports_g7_null_after_bounded_combine() -> None:
+def test_v71_power_aware_integrated_action_reports_g8_fragile_after_g7_null() -> None:
     result = _classify_v71_power_aware_action(
         Path.cwd(), prior_positive=11, g2_positive=3
     )
 
-    assert result["action_type"] == "V71_G7_GEOMETRY_ONLY_NULL_COMPLETE"
-    assert result["walk_forward_positive_count"] == 22
+    assert result["action_type"] == "V71_G8_GREEN_THIN_FRAGILE_NO_PROMOTION"
+    assert result["walk_forward_positive_count"] == 24
     assert result["powered_candidate_count"] == 0
     assert result["rolling_combine_promotions"] == 0
     assert result["g6_candidate_count"] == 6
@@ -200,7 +200,7 @@ def test_v71_power_aware_integrated_action_reports_g7_null_after_bounded_combine
     assert result["g6_tripwire_verdict"] == "GREEN_NULL_ADJUSTED_BASELINE"
     assert result["g5_cemetery_candidate_count"] == 12
     assert result["confirmation_queue_underpowered_count"] == 16
-    assert result["evidence_reconciliation_accounted_count"] == 22
+    assert result["evidence_reconciliation_accounted_count"] == 24
     assert result["evidence_reconciliation_unaccounted_count"] == 0
     assert result["underpowered_combine_selected_count"] == 5
     assert result["underpowered_combine_episode_start_count"] == 24
@@ -216,6 +216,18 @@ def test_v71_power_aware_integrated_action_reports_g7_null_after_bounded_combine
     assert result["g7_real_pass_count"] == "5/120"
     assert result["g7_null_pass_count"] == "17/360"
     assert result["g7_cemetery_candidate_count"] == 6
+    assert result["g8_feature_row_count"] == 17200
+    assert result["g8_candidate_count"] == 6
+    assert result["g8_signal_count"] == 2182
+    assert result["g8_stage1_survivor_count"] == 2
+    assert result["g8_walk_forward_positive_count"] == 2
+    assert result["g8_tripwire_verdict"] == "GREEN_NULL_ADJUSTED_BASELINE"
+    assert result["g8_tripwire_evidence_strength"] == "VERT_MINCE"
+    assert result["g8_power_status_counts"] == {"WF_POSITIVE_BUT_FRAGILE": 2}
+    assert result["g8_powered_candidate_count"] == 0
+    assert result["confirmation_queue_fragile_retired_count"] == 6
+    assert result["evidence_reconciliation_accounted_count"] == 24
+    assert result["evidence_reconciliation_unaccounted_count"] == 0
     assert result["broad_D1_generation_authorized"] is False
     assert result["new_data_purchase_authorized"] is False
     assert result["shadow_admission_authorized"] is False

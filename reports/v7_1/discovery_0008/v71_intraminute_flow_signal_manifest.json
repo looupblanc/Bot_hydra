@@ -1,0 +1,102 @@
+{
+  "CONTRE": "Natural half-minute flow allocation can remain arbitrary clock geometry; economic replay and the permanent price-null tripwire remain mandatory.",
+  "archive_duplicate_count": 0,
+  "candidate_count": 6,
+  "candidate_paths": [
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g8_intraminute_flow_back_loaded_same_sign_acceleration_continuation_h30",
+      "family_id": "INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+      "holding_minutes": 30,
+      "motif": "BACK_LOADED_SAME_SIGN_ACCELERATION",
+      "response_policy": "CONTINUATION",
+      "signal_count": 457,
+      "signal_path_hash": "ab1a3a9bc11143fcc767089d75216dfebdd4ab6f1cbaa7e5d7c04851fcec0bd8",
+      "specification_hash": "9156089e1ae86ab6d6be2ae96b19fec525f913c43fbf70e7a30d4d368d0d6d01",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g8_intraminute_flow_back_loaded_same_sign_acceleration_continuation_h60",
+      "family_id": "INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+      "holding_minutes": 60,
+      "motif": "BACK_LOADED_SAME_SIGN_ACCELERATION",
+      "response_policy": "CONTINUATION",
+      "signal_count": 242,
+      "signal_path_hash": "367f50c10dbe6a061b6abcaf66f757ca74dc39e11ff3d4959b73a5bc4c3a4ed1",
+      "specification_hash": "2190fbec540154beba94434edffd55baab991d01be133fdfa84af5b61b17c5bc",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g8_intraminute_flow_front_loaded_flow_decay_reversal_h30",
+      "family_id": "INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+      "holding_minutes": 30,
+      "motif": "FRONT_LOADED_FLOW_DECAY",
+      "response_policy": "REVERSAL",
+      "signal_count": 487,
+      "signal_path_hash": "7bb5e1e145bd6a0d5aa692cba1f5228ac1dbcc639fcb1b7486cc65cb9c9af1c3",
+      "specification_hash": "1cf81188789734ee36fcf6309660bdb3cbfacfdbf8ccd82169870e74ea71c3da",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g8_intraminute_flow_front_loaded_flow_decay_reversal_h60",
+      "family_id": "INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+      "holding_minutes": 60,
+      "motif": "FRONT_LOADED_FLOW_DECAY",
+      "response_policy": "REVERSAL",
+      "signal_count": 256,
+      "signal_path_hash": "e0ce5b42ed40924b533920a0aa833df5bee52736eb25ad116af6fcc6165551d1",
+      "specification_hash": "fa4750bd145f5749821b1840dfdc37b493885a9e792da8dc4cb789c1e37e375d",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g8_intraminute_flow_late_flow_handoff_continuation_h30",
+      "family_id": "INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+      "holding_minutes": 30,
+      "motif": "LATE_FLOW_HANDOFF",
+      "response_policy": "CONTINUATION",
+      "signal_count": 488,
+      "signal_path_hash": "cde7c12ce98d167008c11fa0bbc0f694c4ff38ee3d1e9bfacca1e3e1657c08fe",
+      "specification_hash": "b3faa566ecbfab4db21d2e422fd2fa2c6c06111e34cd90aad5b54465dc51ba45",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g8_intraminute_flow_late_flow_handoff_continuation_h60",
+      "family_id": "INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+      "holding_minutes": 60,
+      "motif": "LATE_FLOW_HANDOFF",
+      "response_policy": "CONTINUATION",
+      "signal_count": 252,
+      "signal_path_hash": "95e2978a439fb2444f1213dc8deaa5da78469c83ef4adda73e8c0f8fc9a04791",
+      "specification_hash": "a62aeebac42b685d165533ccb5247c2edf2ff2e352b4eddc558f1e26a1ff92a1",
+      "within_manifest_duplicate_of": null
+    }
+  ],
+  "candidates_per_family": {
+    "INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION": 6
+  },
+  "contains_outcomes_or_pnl": false,
+  "family_count": 1,
+  "grammar_id": "hydra_v7_1_intraminute_flow_grammar_0008",
+  "manifest_hash": "1ed5995217aa54af038bc7f485e15c423301afbf36622277d5050b39773b1fcc",
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "protected_holdout_access_count": 0,
+  "schema": "hydra_v7_1_intraminute_flow_signal_manifest_v1",
+  "signal_count": 2182,
+  "source_audit": {
+    "back_loaded_same_sign_acceleration_count": 2525,
+    "exact_source_match_count": 17200,
+    "executable_state_count_30m": 15867,
+    "executable_state_count_60m": 14577,
+    "front_loaded_flow_decay_count": 3706,
+    "late_flow_handoff_count": 3334,
+    "minute_count": 17200,
+    "session_count": 43
+  },
+  "within_manifest_duplicate_count": 0
+}
