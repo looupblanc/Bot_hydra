@@ -21,6 +21,7 @@ from hydra.mission.economic_evolution_validation_runtime import (
     MULTIPLICITY_EVENT_ID,
     VALIDATION_ID,
     EconomicEvolutionValidationRuntime,
+    _worker_environment,
     expensive_validation_action_from_result,
     load_and_verify_expensive_validation_result,
 )
@@ -177,6 +178,44 @@ def test_validation_reservation_rejects_trial_count_drift(tmp_path: Path) -> Non
 
     with pytest.raises(EconomicEvolutionRuntimeError, match="trial-count drift"):
         runtime._ensure_multiplicity_reservation(_config(trials=100))
+
+
+def test_validation_worker_environment_imports_project_root(tmp_path: Path) -> None:
+    environment = _worker_environment(tmp_path.resolve())
+    assert environment["PYTHONPATH"].split(":")[0] == str(tmp_path.resolve())
+
+
+def test_pre_execution_import_recovery_is_one_time_and_outcome_free(
+    tmp_path: Path,
+) -> None:
+    state_dir = tmp_path / "mission/state"
+    runtime = EconomicEvolutionValidationRuntime(tmp_path, state_dir)
+    runtime._attempt = 3
+    runtime.log_path.parent.mkdir(parents=True)
+    signature = "ModuleNotFoundError: No module named 'hydra'"
+    runtime.log_path.write_text(
+        "\n".join([f"Traceback\n{signature}" for _ in range(3)]),
+        encoding="utf-8",
+    )
+
+    runtime._recover_pre_execution_import_failures()
+
+    assert runtime._attempt == 0
+    recovery = json.loads(
+        (
+            tmp_path
+            / "reports/economic_evolution/"
+            "expensive_validation_0005_bootstrap_recovery.json"
+        ).read_text()
+    )
+    assert recovery["pre_execution_failure_count"] == 3
+    assert recovery["validation_outcomes_seen"] is False
+    assert recovery["multiplicity_delta_added"] == 0
+    assert recovery["orders"] == 0
+
+    runtime._attempt = 3
+    with pytest.raises(EconomicEvolutionRuntimeError, match="already consumed"):
+        runtime._recover_pre_execution_import_failures()
 
 
 def test_validation_requires_exact_frozen_predecessor(tmp_path: Path) -> None:

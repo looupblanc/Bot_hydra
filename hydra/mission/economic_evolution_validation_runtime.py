@@ -279,6 +279,7 @@ class EconomicEvolutionValidationRuntime:
         return entry
 
     def _start_worker(self) -> None:
+        self._recover_pre_execution_import_failures()
         if self._attempt >= 3:
             raise EconomicEvolutionRuntimeError(
                 "expensive-validation worker exhausted three deterministic attempts"
@@ -300,7 +301,7 @@ class EconomicEvolutionValidationRuntime:
             "--cache-root",
             str(self.root / FEATURE_CACHE_RELATIVE_PATH),
         ]
-        environment = dict(os.environ)
+        environment = _worker_environment(self.root)
         environment.update(
             {
                 "PYTHONHASHSEED": "0",
@@ -320,6 +321,77 @@ class EconomicEvolutionValidationRuntime:
                 start_new_session=False,
             )
         self._record_runtime_state("RUNNING")
+
+    def _recover_pre_execution_import_failures(self) -> None:
+        """Permit one audited retry after the original launcher never imported.
+
+        This is deliberately narrower than a scientific retry.  Recovery is
+        possible only when all three old attempts ended at Python import, no
+        output artifact exists, and no prior recovery was consumed.  The
+        frozen validation implementation, inputs, gates, and proof reservation
+        remain unchanged.
+        """
+
+        if self._attempt < 3:
+            return
+        recovery_path = (
+            self.root
+            / "reports/economic_evolution/"
+            "expensive_validation_0005_bootstrap_recovery.json"
+        )
+        if recovery_path.exists():
+            raise EconomicEvolutionRuntimeError(
+                "expensive-validation bootstrap recovery was already consumed"
+            )
+        if self.result_path.exists() or (
+            self.output_dir.exists() and any(self.output_dir.iterdir())
+        ):
+            raise EconomicEvolutionRuntimeError(
+                "expensive-validation attempts cannot recover after outcome artifacts"
+            )
+        if not self.log_path.is_file():
+            raise EconomicEvolutionRuntimeError(
+                "expensive-validation worker exhausted three deterministic attempts"
+            )
+        log_text = self.log_path.read_text(encoding="utf-8", errors="replace")
+        signature = "ModuleNotFoundError: No module named 'hydra'"
+        if log_text.count(signature) != 3:
+            raise EconomicEvolutionRuntimeError(
+                "expensive-validation worker exhausted three deterministic attempts"
+            )
+        log_sha256 = _sha256(self.log_path)
+        _atomic_json(
+            recovery_path,
+            {
+                "schema": (
+                    "hydra_economic_evolution_pre_execution_bootstrap_recovery_v1"
+                ),
+                "validation_id": VALIDATION_ID,
+                "recorded_at_utc": datetime.now(UTC).isoformat(),
+                "failure_signature": signature,
+                "pre_execution_failure_count": 3,
+                "log_sha256": log_sha256,
+                "worker_import_completed": False,
+                "validation_outcomes_seen": False,
+                "result_artifacts_seen": False,
+                "proof_reservation_reused": True,
+                "multiplicity_delta_added": 0,
+                "new_data_purchase_count": 0,
+                "q4_access_count_delta": 0,
+                "broker_connections": 0,
+                "orders": 0,
+                "CONTRE": (
+                    "This engineering recovery is valid only because Python never "
+                    "imported the frozen validator and therefore observed no outcome."
+                ),
+            },
+        )
+        self._attempt = 0
+        self._record_runtime_state(
+            "PRE_EXECUTION_BOOTSTRAP_RECOVERED",
+            pre_execution_failure_count=3,
+            prior_log_sha256=log_sha256,
+        )
 
     def _quarantine_incomplete_attempt(self) -> None:
         if not self.output_dir.exists() or not any(self.output_dir.iterdir()):
@@ -580,6 +652,15 @@ def _atomic_json(path: Path, value: Mapping[str, Any]) -> None:
         handle.flush()
         os.fsync(handle.fileno())
     os.replace(temporary, path)
+
+
+def _worker_environment(root: Path) -> dict[str, str]:
+    environment = dict(os.environ)
+    existing = environment.get("PYTHONPATH", "")
+    environment["PYTHONPATH"] = str(root) + (
+        os.pathsep + existing if existing else ""
+    )
+    return environment
 
 
 def _sha256(path: str | Path) -> str:
