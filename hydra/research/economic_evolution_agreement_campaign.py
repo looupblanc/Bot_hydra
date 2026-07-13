@@ -637,7 +637,7 @@ def report(result: Mapping[str, Any], prereg: Mapping[str, Any]) -> str:
             ),
             (
                 "diff_validation=hydra/research/"
-                "economic_evolution_agreement_campaign.py," 
+                "economic_evolution_agreement_campaign.py,"
                 "tests/test_economic_evolution_agreement_campaign.py "
                 f"CONTRE={against}"
             ),
