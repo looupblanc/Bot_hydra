@@ -1,0 +1,120 @@
+{
+  "schema": "hydra_economic_evolution_failure_directed_review_preregistration_v1",
+  "review_id": "hydra_economic_evolution_failure_directed_review_0006_revision_02",
+  "created_at_utc": "2026-07-13T17:55:00+00:00",
+  "purpose": "Freeze the exact 0005 policy after its underpowered verdict, classify only already-observed failure dimensions, and select a new class-level research representation without parameter rescue, new statistical testing, proof consumption or data access.",
+  "implementation_commit": "ceac448b6483b396852c45b2a20c736a1b454086",
+  "implementation_files": {
+    "hydra/research/economic_evolution_failure_review.py": "86d00046e9144caca9113f49b1c2915140675b6c41fb706a5dd9adcb367e27ae",
+    "scripts/run_economic_evolution_failure_review.py": "d13a5062fc9327f1d379a8837b59f0986a6c978c507554151ca813c40c01c1ff"
+  },
+  "supersedes": {
+    "path": "config/v7/economic_evolution_failure_review_0006_revision_01.json",
+    "sha256": "8e96562545dc91e9603bb7be757fec9187cf6289714929cad374c0f3b74d05db",
+    "scientific_outcomes_seen": false,
+    "multiplicity_reserved": 0,
+    "reason": "Revision 01 corrected source sleeve ordering but contained a 62-character transcription of the matched-controls SHA256. Revision 02 restores the exact 64-character digest; evidence, decisions, thresholds and research class are unchanged."
+  },
+  "constitutional_basis": {
+    "contract": "MISSION_CONTRACT.md",
+    "amendment": "MISSION_CONTRACT_AMENDMENT_004_ECONOMIC_EVOLUTION.md",
+    "class_level_learning_clause": 6,
+    "honest_green_clause": 2,
+    "retrospective_review_is_new_evidence": false,
+    "exact_policy_status_can_be_rescued": false
+  },
+  "retrospective_only": true,
+  "new_statistical_comparisons_allowed": false,
+  "multiplicity_delta": 0,
+  "source_artifacts": {
+    "paths": {
+      "validation_result": "reports/economic_evolution/expensive_validation_0005/expensive_validation_result.json",
+      "profile_results": "reports/economic_evolution/expensive_validation_0005/account_profile_results.json",
+      "statistical_validation": "reports/economic_evolution/expensive_validation_0005/statistical_validation.json",
+      "matched_controls": "reports/economic_evolution/expensive_validation_0005/matched_controls.json",
+      "source_account_policies": "reports/economic_evolution/persistent_0003_revision_01/account_policy_results.jsonl",
+      "exact_components": "reports/economic_evolution/persistent_0003_revision_01/exact_component_results.jsonl"
+    },
+    "sha256": {
+      "validation_result": "1c8796a3ecb471308c5a96e9148275fa54b155a94526cee29cbcf34efe23fb3f",
+      "profile_results": "4815518a7453a943201cf12c83d785fac2e0933218db34c72c638ec7112a17ba",
+      "statistical_validation": "08574b148105a8741af3476385dccdc70e8b6964ce90f9c735241cdf544e532d",
+      "matched_controls": "ad46188aeb16e7798a85ef695f4ba236e502f77bcf7ccb29cece43a76e3b91be",
+      "source_account_policies": "1646fcd46a27b2cf4d64919617584b62891c6da3650b042e2b6022b6bd75bf67",
+      "exact_components": "deecc5c5da50e8009b308c1a248696dfd65fc0578fa1498f974104ea86e000f6"
+    }
+  },
+  "candidate": {
+    "policy_id": "account_policy_child_9a7e901bda15207c0e7ba25d",
+    "policy_specification_hash": "3662c57afa0b6c9e2ea7b5969109a21694ad61c1cd7e7a91f90cde19a597a252",
+    "source_validation_status": "EXPENSIVE_VALIDATION_UNDERPOWERED",
+    "exact_terminal_status": "FROZEN_DEVELOPMENT_UNDERPOWERED_NO_PROOF",
+    "sleeve_ids": [
+      "sleeve_66ae033ef4acbc5ea759661d",
+      "sleeve_f85e46cd5d5793e6b9042cdb",
+      "sleeve_958d5ade0f6a1090ba0d95aa",
+      "sleeve_56d62ae303bf865ba98c7748"
+    ],
+    "parameter_mutation_allowed": false,
+    "risk_rule_mutation_allowed": false,
+    "signal_mutation_allowed": false,
+    "unchanged_replay_allowed": false,
+    "independent_confirmation_allowed": false
+  },
+  "diagnostic_reference": {
+    "useful_target_progress": 0.75,
+    "source": "config/v7/economic_evolution_persistent_0003_revision_01.json#failure_policy",
+    "is_new_promotion_gate": false
+  },
+  "decision_policy": {
+    "hard_integrity_failure": "TOMBSTONE_EXACT_POLICY_HARD_FAILURE",
+    "sim_exploit_failure": "TOMBSTONE_EXACT_POLICY_SIM_EXPLOIT",
+    "simpler_control_dominates": "FREEZE_EXACT_POLICY_SIMPLER_CONTROL_DOMINATES",
+    "underpowered_with_positive_stressed_economics": "FREEZE_EXACT_POLICY_AND_ALLOW_CLASS_REFORMULATION",
+    "null_indistinguishable": "FREEZE_EXACT_POLICY_NULL_INDISTINGUISHABLE",
+    "threshold_change_after_result_allowed": false,
+    "promotion_claim_allowed": false
+  },
+  "next_research_class": {
+    "class_id": "INDEPENDENT_OPPORTUNITY_DENSITY_CONSISTENCY_ASSEMBLY_V1",
+    "next_experiment_id": "hydra_economic_evolution_density_diversification_0007",
+    "economic_hypothesis": "Behaviorally distinct market and session sleeves that each retain positive stressed development economics can create more temporally dispersed daily account expectancy, improve consistency and raise independent evidence density without consuming additional MLL buffer.",
+    "who_pays": "Independent forced-flow and inventory-transfer episodes across non-identical markets and sessions pay complementary sleeves at different times, reducing dependence on a single account path.",
+    "structural_change": "Generate new component and policy identities around opportunity-density dispersion, independently cost-resilient sleeve roles and shared-account chronology; do not modify or replay the exact 0005 policy.",
+    "mandatory_pre_outcome_controls": [
+      "new WORM campaign manifest and candidate IDs",
+      "new structural and semantic fingerprints",
+      "no exact or behavioral clone of the 0005 policy",
+      "no status inheritance",
+      "normal and 1.5x cost economics",
+      "temporal block dispersion",
+      "matched add-one and leave-one-out contribution",
+      "family-level null calibration before expensive validation",
+      "identical account starts for parent-class controls and new assemblies"
+    ],
+    "forbidden_feedback": [
+      "threshold tuning from 0005 outcomes",
+      "reusing the exact negative block as a selection target",
+      "parameter-neighbor rescue",
+      "retuning the exact candidate",
+      "using Combine pass rate as sole fitness",
+      "consuming independent proof before all frozen final gates pass"
+    ],
+    "new_ids_required": true,
+    "status_inheritance_allowed": false,
+    "new_data_required": false,
+    "q4_required": false
+  },
+  "q4_access_allowed": false,
+  "new_data_purchase_allowed": false,
+  "network_access_allowed": false,
+  "broker_or_orders_allowed": false,
+  "shadow_admission_allowed": false,
+  "proof_window_consumption_allowed": false,
+  "pre_holdout_promotion_allowed": false,
+  "paper_shadow_promotion_allowed": false,
+  "parameter_rescue_allowed": false,
+  "status_inheritance_allowed": false,
+  "CONTRE": "The class-level hypothesis is chosen after observing 0005 and can still encode selection bias; only a new preregistered development campaign followed by powered independent confirmation can support promotion.",
+  "preregistration_hash": "ade6ab76b7d428dc238452a79ac63564571207503c24dafe1b5a8458c6e727a2"
+}
