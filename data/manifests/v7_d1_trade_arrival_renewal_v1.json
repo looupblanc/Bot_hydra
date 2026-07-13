@@ -1,0 +1,124 @@
+{
+  "CONTRE": "Arrival clustering can encode only the intraday activity curve or generic volatility; the permanent price-world tripwire and walk-forward transfer remain mandatory.",
+  "audits": [
+    {
+      "bounded_record_count": 15545497,
+      "calendar_year": 2023,
+      "contract": "ESU3",
+      "excluded_instrument_record_count": 5711166,
+      "excluded_session_record_count": 1873761,
+      "invalid_action_record_count": 0,
+      "minute_group_count": 8800,
+      "positive_gap_eligible_minute_count": 8800,
+      "raw_record_count": 15545497,
+      "retained_es_rth_record_count": 7960570
+    },
+    {
+      "bounded_record_count": 18408542,
+      "calendar_year": 2024,
+      "contract": "ESU4",
+      "excluded_instrument_record_count": 8016481,
+      "excluded_session_record_count": 2222767,
+      "invalid_action_record_count": 0,
+      "minute_group_count": 8400,
+      "positive_gap_eligible_minute_count": 8400,
+      "raw_record_count": 32277017,
+      "retained_es_rth_record_count": 8169294
+    }
+  ],
+  "data_role": "DEVELOPMENT_ONLY",
+  "feature_policy": {
+    "aggressor_sign": {
+      "A": -1,
+      "B": 1,
+      "N": 0
+    },
+    "arrival_entropy_normalization": "log(12)",
+    "availability": "minute_start_ns+60s",
+    "minute_partition": "twelve fixed five-second exchange-event bins",
+    "positive_gap": "strictly positive exchange-event timestamp difference inside a completed minute",
+    "positive_gap_median_minimum_count": 2,
+    "price_scale": 1000000000.0
+  },
+  "forward_gap_access_count": 0,
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "outcome_or_future_pnl_columns": [],
+  "output": {
+    "columns": [
+      "calendar_year",
+      "product",
+      "contract",
+      "instrument_id",
+      "minute_start_ns",
+      "source_close_ns",
+      "availability_ns",
+      "trade_count",
+      "total_volume",
+      "signed_volume",
+      "signed_flow_fraction",
+      "positive_gap_count",
+      "positive_gap_median_ns",
+      "arrival_entropy",
+      "maximum_five_second_share",
+      "first_price",
+      "last_price",
+      "price_progress_points",
+      "transformation_version",
+      "trade_count_5s_00",
+      "trade_count_5s_01",
+      "trade_count_5s_02",
+      "trade_count_5s_03",
+      "trade_count_5s_04",
+      "trade_count_5s_05",
+      "trade_count_5s_06",
+      "trade_count_5s_07",
+      "trade_count_5s_08",
+      "trade_count_5s_09",
+      "trade_count_5s_10",
+      "trade_count_5s_11"
+    ],
+    "contracts": [
+      "ESU3",
+      "ESU4"
+    ],
+    "eligible_positive_gap_minutes": 17200,
+    "first_minute_start_ns": 1690983000000000000,
+    "last_minute_start_ns": 1725048540000000000,
+    "path": "data/cache/v7_d1/date_matched_trade_arrival_renewal_v1.parquet",
+    "row_count": 17200,
+    "sha256": "83529896a80aa4bc08cb3fa3ba44602ec23c408404ab5fc6c3320555e0d6b95e"
+  },
+  "preregistration_path": "WORM/v7.2-trade-arrival-renewal-grammar-0011-2026-07-13.json",
+  "preregistration_sha256": "d69f021bf4de5b4e5a0fe92d318eba9f00b08c80d99cb3941c43daab4a6b10c2",
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "schema": "hydra_v7_d1_trade_arrival_renewal_manifest_v1",
+  "session_filter": {
+    "end_exclusive": "15:10:00",
+    "start_inclusive": "08:30:00",
+    "timezone": "America/Chicago",
+    "weekdays_only": true
+  },
+  "sources": [
+    {
+      "calendar_year": 2023,
+      "contract": "ESU3",
+      "end_ns": 1693526400000000000,
+      "instrument_id": 3445,
+      "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2023-08-02_2023-09-01.dbn.zst",
+      "sha256": "d93e5c8bd657a28bff5f05560b845caa3bb04e9252882ddc2751033fedd1c468",
+      "start_ns": 1690934400000000000
+    },
+    {
+      "calendar_year": 2024,
+      "contract": "ESU4",
+      "end_ns": 1725148800000000000,
+      "instrument_id": 118,
+      "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+      "sha256": "a312d6df524205c2d1632c20f1033ecb74081c98d6608eacc1a9cdb08bcf9b63",
+      "start_ns": 1722556800000000000
+    }
+  ],
+  "transformation_version": "hydra_v7_d1_trade_arrival_renewal_v1"
+}
