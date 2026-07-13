@@ -1,0 +1,102 @@
+{
+  "schema": "hydra_v7_1_limited_cross_clock_speed_leadership_grammar_v1",
+  "grammar_id": "hydra_v7_1_cross_clock_speed_leadership_grammar_0005",
+  "allocation_role": "LIMITED_STRUCTURAL_DISCOVERY_5_PERCENT",
+  "broad_D1_batch": false,
+  "economic_hypothesis": "A transition in which completed ES event clock is faster, volume or dollar, reveals a change in the size/notional composition of aggressive participation; participants extrapolating the prior composition can pay either delayed continuation or inventory reversal after the transition.",
+  "who_pays": "Liquidity suppliers and late aggressive followers whose inventory and execution response remains calibrated to the previously faster event clock.",
+  "persistence_rationale": "The comparison is ordinal and threshold-free after the frozen construction of each event clock; it measures a transition in trade-size composition rather than the same-minute flow agreement tested by grammar 0004.",
+  "source": {
+    "product": "ES",
+    "event_store_path": "data/cache/v7_d1/date_matched_event_bars_v1.parquet",
+    "event_store_sha256": "ea0208fc3666f912b39e9b21b302a466bd7ee00c802140d6a6beed73098aa4a3",
+    "minute_store_path": "data/cache/v7_d1/date_matched_minute_print_features_v2.parquet",
+    "minute_store_sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb",
+    "required_bar_types": [
+      "VOLUME_BAR",
+      "DOLLAR_BAR"
+    ],
+    "completed_events_only": true,
+    "past_only_pairing": "At each completed event availability timestamp, use that event and only the latest already completed event of the other clock in the same explicit contract and session.",
+    "explicit_contract_must_match": true
+  },
+  "mechanism_class": "V71_CROSS_CLOCK_SPEED_LEADERSHIP",
+  "motifs": [
+    {
+      "motif": "VOLUME_SPEED_TAKES_LEAD",
+      "definition": "volume duration becomes strictly shorter than the latest completed dollar duration after previously being greater than or equal"
+    },
+    {
+      "motif": "DOLLAR_SPEED_TAKES_LEAD",
+      "definition": "dollar duration becomes strictly shorter than the latest completed volume duration after previously being greater than or equal"
+    },
+    {
+      "motif": "SPEED_LEAD_FLIP_FLOW_DISAGREEMENT",
+      "definition": "either speed leadership transition occurs while the two latest completed bars have nonzero opposite signed-aggressor-flow signs"
+    }
+  ],
+  "response_policies": [
+    "CONTINUATION",
+    "REVERSAL"
+  ],
+  "holding_minutes": [
+    30,
+    60
+  ],
+  "candidate_count": 12,
+  "bounded_parameter_alternatives_per_structure": 1,
+  "signal_policy": {
+    "decision_timestamp": "availability_ns of the event that causes the frozen speed-leadership transition",
+    "entry": "first explicit-contract 1m open at or after decision timestamp",
+    "exit": "explicit-contract 1m open at entry plus frozen holding_minutes",
+    "motif_direction": "signed-aggressor-flow sign of the newly faster completed event clock",
+    "response_policy_applied_after_motif_direction": true,
+    "ties_generate_signal": false,
+    "overlapping_signals_per_candidate": false,
+    "session_crossing": false,
+    "contract_crossing": false
+  },
+  "cost_policy": {
+    "path": "config/v7/phase0_g0_preregistration.json",
+    "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "primary_walk_forward_stress": "STRESS_1_5X",
+    "SIM_EXPLOIT_stress": "STRESS_2X"
+  },
+  "funnel": {
+    "stage0": "validity_novelty_and_nonoverlap",
+    "stage1": "frozen_existing_cheap_economic_policy",
+    "stage2": "four_fold_walk_forward_with_five_day_embargo",
+    "stage3": "hypothesis_specific_nulls_only_if_powered",
+    "stage4": "campaign_DSR_BH_only_if_powered",
+    "stage5": "rolling_Combine_diagnostic_only_after_statistical_survival",
+    "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+    "candidate_specific_power_policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673"
+  },
+  "mandatory_grammar_tripwire": {
+    "worlds": [
+      "DAILY_BLOCK_SHUFFLE",
+      "VOLATILITY_MATCHED_RANDOM_WALK",
+      "YEAR_BLOCK_PERMUTATION"
+    ],
+    "NULL_RATIO_artefact_threshold_inclusive": 0.8,
+    "raw_counts_and_exact_binomial_test_required": true,
+    "combine_pass_rate_is_fitness": false
+  },
+  "cemetery_firewall": {
+    "feedback_scope": "mechanism_class_x_regime_x_death_cause_only",
+    "parameter_feedback_used": false,
+    "candidate_outcome_feedback_used": false,
+    "excluded_classes": [
+      "ARB_INTRA_PRODUIT",
+      "V71_EVENT_TIME_CLOCK_STATES",
+      "V71_CROSS_CLOCK_FLOW_CONFIRMATION"
+    ]
+  },
+  "candidate_status_inheritance": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "shadow_admission_authorized": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "Both clocks are constructed from the same prints and their duration thresholds are frozen but related; the transition may still be generic activity geometry rather than a tradable economic mechanism."
+}
