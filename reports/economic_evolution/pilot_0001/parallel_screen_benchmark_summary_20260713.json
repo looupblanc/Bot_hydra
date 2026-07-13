@@ -1,0 +1,76 @@
+{
+  "schema": "hydra_economic_evolution_parallel_screen_selection_v1",
+  "recorded_at_utc": "2026-07-13T11:09:06Z",
+  "campaign_id": "hydra_economic_evolution_pilot_0001",
+  "candidate_manifest_hash": "909d104e4a945ec788d2fbcf7b796cd556e4afbb93350be56600c1428faaa52b",
+  "data_fingerprint": "1c773f5044f0f9c3bc50e67003b93a7c35ecaf8c505879fd1c20d6d03edada6c",
+  "canonical_result_hash": "93d7e8b38bc362678de8111d071df1758517e99dbd1c14b675e094badc5f33fc",
+  "row_count": 45056,
+  "unique_execution_paths": 34842,
+  "survivor_count": 2216,
+  "benchmarks": [
+    {
+      "mode": "SERIAL",
+      "workers": 1,
+      "elapsed_seconds": 111.53498370299349,
+      "screens_per_second": 312.3862921142371,
+      "speedup": 1.0
+    },
+    {
+      "mode": "THREADS",
+      "workers": 3,
+      "elapsed_seconds": 58.08939655096037,
+      "screens_per_second": 599.8142592979455,
+      "speedup": 1.9200575376118194,
+      "artifact_sha256": "118a274a16142ed886dbec4b7265f028a64358f7efd20d200c7f82522d0c7103"
+    },
+    {
+      "mode": "PROCESSES",
+      "workers": 2,
+      "elapsed_seconds": 70.99002457904862,
+      "screens_per_second": 490.93223432696726,
+      "speedup": 1.5711360062820847,
+      "aggregate_cpu_pct_of_one_core": 173.65928751119776,
+      "artifact_sha256": "d271c97190e249433c4169141d180ef3972721fabf26efe3cfd2771bbe019bfa"
+    },
+    {
+      "mode": "PROCESSES",
+      "workers": 3,
+      "elapsed_seconds": 51.56670051900437,
+      "screens_per_second": 675.8958856232504,
+      "speedup": 2.162926512272943,
+      "aggregate_cpu_pct_of_one_core": 244.49446124158237,
+      "coordinator_peak_rss_mb": 820.09765625,
+      "maximum_single_child_rss_mb": 440.796875,
+      "artifact_sha256": "a0682716a39c4dfd2456744dc883eca851ba7606bd35724347e5b1e547cf7f39"
+    },
+    {
+      "mode": "PROCESSES",
+      "workers": 4,
+      "elapsed_seconds": 49.949160831049085,
+      "screens_per_second": 697.8391866775319,
+      "speedup": 2.232970120964711,
+      "aggregate_cpu_pct_of_one_core": 281.3926209679787,
+      "coordinator_peak_rss_mb": 821.40234375,
+      "maximum_single_child_rss_mb": 442.17578125,
+      "artifact_sha256": "8106962b53cc4e1ccaf93be82275d15ac8b84c0c92f580301613395f176bf6d4"
+    }
+  ],
+  "selected_configuration": {
+    "mode": "PROCESSES",
+    "compute_workers": 3,
+    "coordinator_and_single_writer": 1,
+    "reason": "Four compute workers improve wall time by only 3.24% over three while consuming the coordinator's reserved core. Three processes preserve service responsiveness and single-writer capacity.",
+    "all_rows_bit_identical": true
+  },
+  "acceptance": {
+    "scientific_outcome_changed": false,
+    "threshold_changed": false,
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "remaining_bottleneck": "Market-size imbalance and result serialization limit average host utilization to 61.1% during the selected screen stage; finer shared-result micro-batches are the next architecture if this remains dominant persistently.",
+  "CONTRE": "The benchmark uses a warm local cache and one frozen population, so persistent-cycle speed must still be measured after deployment."
+}
