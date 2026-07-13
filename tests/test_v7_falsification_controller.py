@@ -245,13 +245,13 @@ def test_v71_power_aware_integrated_action_reports_g9_falsification() -> None:
     assert result["shadow_admission_authorized"] is False
 
 
-def test_v72_integrated_action_records_G12_geometry_only_terminal_pivot() -> None:
+def test_economic_evolution_action_preserves_G12_terminal_evidence() -> None:
     result = classify_v7_action(Path.cwd())
 
-    assert CONTROLLER_SCHEMA == "hydra_v7_2_price_occupancy_controller_v4"
-    assert result["action_type"] == (
-        "V72_G12_GEOMETRY_ONLY_CLASS_TOMBSTONED_BOOSTED_DUAL_TRACK_REQUIRED"
-    )
+    assert CONTROLLER_SCHEMA == "hydra_v7_economic_evolution_controller_v5"
+    assert result["action_type"] == "ECONOMIC_EVOLUTION_CAMPAIGN_0002_PREREGISTERED"
+    assert result["economic_campaign_id"] == "hydra_economic_evolution_persistent_0002"
+    assert result["economic_campaign_state"] == "READY_FOR_CONTROLLER_OWNED_LAUNCH"
     assert result["v72_static_structure_count"] == 1009
     assert result["v72_design_episode_count"] == 24216
     assert result["v72_cross_fit_rotation_count"] == 4
@@ -423,7 +423,7 @@ def test_running_v7_controller_renews_watchdog_lease(
     )
     assert health["classification"] == "HEALTHY_AND_PROGRESSING"
     assert snapshot["current_experiment"]["claimed_by"] == (
-        "v7_2_arrival_renewal_controller"
+        "v7_economic_evolution_controller"
     )
     assert snapshot["broker_order_capability"] is False
     heartbeat = heartbeat_status(controller.paths).payload

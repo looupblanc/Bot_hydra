@@ -19,6 +19,12 @@ from hydra.governance.proof_registry import (
     multiplicity_trial_count,
 )
 from hydra.mission.experiment_queue import ensure_experiment_schema
+from hydra.mission.economic_evolution_runtime import (
+    CAMPAIGN_CONFIG_RELATIVE_PATH,
+    EconomicEvolutionRuntime,
+    classify_economic_evolution_action,
+    verify_economic_evolution_freeze,
+)
 from hydra.mission.mission_state import (
     append_event,
     append_jsonl,
@@ -37,10 +43,10 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_2_price_occupancy_controller_v4"
+CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v5"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
-CONTROLLER_CLAIM_TOKEN = "v7-2-price-occupancy-single-writer"
-CONTROLLER_OWNER = "v7_2_price_occupancy_controller"
+CONTROLLER_CLAIM_TOKEN = "v7-economic-evolution-single-writer"
+CONTROLLER_OWNER = "v7_economic_evolution_controller"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
 G1_RELATIVE_PATH = Path("reports/v7/phase1/g1_result.json")
 D1_TRIBUNAL_RELATIVE_PATH = Path(
@@ -390,6 +396,9 @@ class V7ControllerConfig:
 
 def classify_v7_action(project_root: str | Path) -> dict[str, Any]:
     root = Path(project_root).resolve()
+    if (root / CAMPAIGN_CONFIG_RELATIVE_PATH).is_file():
+        predecessor = _classify_v72_action(root)
+        return classify_economic_evolution_action(root, predecessor)
     if (root / V72_POLICY_RELATIVE_PATH).is_file():
         return _classify_v72_action(root)
     if (root / V71_POLICY_RELATIVE_PATH).is_file():
@@ -2287,6 +2296,11 @@ class V7FalsificationController:
             state_dir = self.root / state_dir
         self.paths = mission_paths(str(state_dir))
         self._shutdown = False
+        self._economic_runtime = (
+            EconomicEvolutionRuntime(self.root, self.paths.state_dir)
+            if (self.root / CAMPAIGN_CONFIG_RELATIVE_PATH).is_file()
+            else None
+        )
 
     def run(self) -> int:
         signal.signal(signal.SIGTERM, self._handle_signal)
@@ -2316,6 +2330,8 @@ class V7FalsificationController:
                 self._stop_cleanly(conn, "signal")
                 return 0
             except Exception as exc:
+                if self._economic_runtime is not None:
+                    self._economic_runtime.stop()
                 set_kv(conn, "service_state", "V7_INTEGRITY_BLOCKED")
                 set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
                 set_kv(conn, "current_blocker", f"{type(exc).__name__}:{exc}"[:4000])
@@ -2424,6 +2440,8 @@ class V7FalsificationController:
         contract_text = self._verify_constitution()
         _verify_database_integrity(conn)
         action = classify_v7_action(self.root)
+        if self._economic_runtime is not None:
+            action = self._economic_runtime.advance(action)
         previous = get_kv(conn, "v7_current_action", {})
         step = int(get_kv(conn, "v7_step", 0)) + 1
         progress_at = utc_now_iso()
@@ -2497,6 +2515,8 @@ class V7FalsificationController:
         proof = load_and_verify(self.root / "mission/state/proof_registry.json")
         if burned_window_ids(proof) != ("Q4_2024",):
             raise V7ControllerIntegrityError("unexpected proof-window state")
+        if (self.root / CAMPAIGN_CONFIG_RELATIVE_PATH).is_file():
+            verify_economic_evolution_freeze(self.root)
         return text
 
     def _checkpoint(
@@ -2539,7 +2559,7 @@ class V7FalsificationController:
     def _heartbeat(
         self, conn: sqlite3.Connection, *, action: Mapping[str, Any]
     ) -> dict[str, Any]:
-        return {
+        heartbeat = {
             "controller_version": CONTROLLER_SCHEMA,
             "mission_id": EXPERIMENT_ID,
             "service_state": get_kv(conn, "service_state", "UNKNOWN"),
@@ -2563,6 +2583,9 @@ class V7FalsificationController:
             "outbound_orders": 0,
             "automatic_order_capability": False,
         }
+        if self._economic_runtime is not None:
+            heartbeat["economic_evolution"] = self._economic_runtime.snapshot()
+        return heartbeat
 
     def _lease_expires_at(self) -> str:
         seconds = max(90.0, self.config.sleep_seconds * 4.0 + 30.0)
@@ -2599,6 +2622,8 @@ class V7FalsificationController:
         }
 
     def _stop_cleanly(self, conn: sqlite3.Connection, reason: str) -> None:
+        if self._economic_runtime is not None:
+            self._economic_runtime.stop()
         now = utc_now_iso()
         set_kv(conn, "service_state", "STOPPED_CLEANLY_V7")
         set_kv(conn, "current_phase", "STOPPED_CLEANLY")
