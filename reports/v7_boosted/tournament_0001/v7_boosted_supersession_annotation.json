@@ -1,0 +1,22 @@
+{
+  "CONTRE": "The conservative reservation lowers future power even though the superseded tournament produced no outcomes; retaining it prevents retroactive optional-stopping bias.",
+  "amendment_commit": "e82aaf61b1eb19ebc8fee488890b539a3ae97ba4",
+  "amendment_path": "MISSION_CONTRACT_AMENDMENT_004_ECONOMIC_EVOLUTION.md",
+  "amendment_sha256": "0e7c9da13f6f04b5cb0ae7deffca23a9af3af8143c9e4ba8bc17807bccd6747a",
+  "annotation_entry_hash": "cb35d3052580640189bf735ba76454a916f20dfc047bddec1c6cc715764bfaa5",
+  "annotation_event_id": "v7_boosted_dual_track_tournament_0001_superseded_before_result",
+  "global_N_trials": 266954,
+  "new_account_results_seen": false,
+  "new_data_purchase_count": 0,
+  "new_feature_results_seen": false,
+  "new_pnl_results_seen": false,
+  "new_signal_results_seen": false,
+  "outbound_order_count": 0,
+  "prochaine_action": "preregister_economic_evolution_engine_pilot",
+  "q4_access_count_delta": 0,
+  "reservation_event_id": "v7_boosted_dual_track_tournament_0001_multiplicity_reservation",
+  "reserved_trial_count_retained": 1607,
+  "schema": "hydra_v7_boosted_supersession_annotation_v1",
+  "status": "SUPERSEDED_BEFORE_ANY_RESULT",
+  "tournament_id": "hydra_v7_boosted_dual_track_tournament_0001"
+}
