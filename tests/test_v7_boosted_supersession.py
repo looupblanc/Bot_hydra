@@ -38,7 +38,8 @@ def test_supersession_is_idempotent_and_preserves_trials_and_windows(
 
     after = load_and_verify(proof)
     assert first == second
-    assert multiplicity_trial_count(after) == trials == 266_954
+    assert multiplicity_trial_count(after) == trials
+    assert trials >= 266_954
     assert burned_window_ids(after) == burned == ("Q4_2024",)
     assert sum(
         row["event_id"] == ANNOTATION_EVENT_ID for row in after["entries"]

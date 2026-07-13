@@ -62,8 +62,7 @@ def annotate_supersession(
     _assert_no_boosted_results(root)
 
     before = load_and_verify(proof_path)
-    if multiplicity_trial_count(before) != EXPECTED_TRIAL_COUNT:
-        raise RuntimeError("unexpected multiplicity before supersession")
+    trials_before = multiplicity_trial_count(before)
     if burned_window_ids(before) != ("Q4_2024",):
         raise RuntimeError("unexpected proof-window state before supersession")
     reservation = next(
@@ -76,7 +75,11 @@ def annotate_supersession(
     )
     if reservation is None:
         raise RuntimeError("boosted multiplicity reservation missing")
-    if reservation["status"] != "RESERVED_BEFORE_ANY_BOOSTED_RESULT":
+    if (
+        reservation["status"] != "RESERVED_BEFORE_ANY_BOOSTED_RESULT"
+        or int(reservation["multiplicity"]["cumulative_N_trials"])
+        != EXPECTED_TRIAL_COUNT
+    ):
         raise RuntimeError("boosted reservation status drift")
 
     existing = next(
@@ -88,6 +91,10 @@ def annotate_supersession(
         None,
     )
     if existing is None:
+        if trials_before != EXPECTED_TRIAL_COUNT:
+            raise RuntimeError(
+                "supersession cannot be added retroactively after later trials"
+            )
         annotation = append_entry(
             proof_path,
             {
@@ -125,7 +132,7 @@ def annotate_supersession(
         annotation = existing
 
     after = load_and_verify(proof_path)
-    if multiplicity_trial_count(after) != EXPECTED_TRIAL_COUNT:
+    if multiplicity_trial_count(after) != trials_before:
         raise RuntimeError("supersession annotation changed multiplicity")
     if burned_window_ids(after) != ("Q4_2024",):
         raise RuntimeError("supersession annotation changed proof windows")
