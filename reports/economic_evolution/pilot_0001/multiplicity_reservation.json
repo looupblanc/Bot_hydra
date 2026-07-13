@@ -1,0 +1,20 @@
+{
+  "CONTRE": "The upper-bound reservation counts many structures that will die before statistical testing; this is conservative and reduces final power.",
+  "burned_windows": [
+    "Q4_2024"
+  ],
+  "cumulative_N_trials": 318954,
+  "delta_trials": 52000,
+  "entry_hash": "5cc617adb1995130e6aee62a83b05352627bc1d8b9334adc65dc3133e4642b2b",
+  "event_id": "hydra_economic_evolution_pilot_0001_multiplicity_reservation",
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "previous_N_trials": 266954,
+  "prochaine_action": "run_fixed_validator_controls_then_pilot_funnel",
+  "q4_access_count_delta": 0,
+  "schema": "hydra_economic_evolution_multiplicity_reservation_v1",
+  "status": "RESERVED_BEFORE_ANY_ECONOMIC_EVOLUTION_OUTCOME",
+  "worm_commit": "91380f91076dba7aece9dad6317e1270e5f00953",
+  "worm_path": "config/v7/economic_evolution_pilot_0001.json",
+  "worm_sha256": "dced549b9df09381c2bd6108e55e680a9c8fed7d384a21d2a293a551917e3ab2"
+}
