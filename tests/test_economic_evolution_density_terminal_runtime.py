@@ -25,7 +25,10 @@ from hydra.research.v7_graveyard import audit_graveyard, class_feedback
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-LIVE_STATE_ROOT = Path("/root/hydra-bot")
+LIVE_STATE_ROOT = Path(
+    "/root/hydra-bot/mission/state/snapshots/"
+    "economic_agreement_0008_predeploy_20260713T210612Z"
+)
 
 
 def _predecessor() -> dict[str, object]:
@@ -84,10 +87,10 @@ def test_terminal_runtime_appends_once_and_recovers_idempotently(
     state = root / "mission/state"
     state.mkdir(parents=True)
     shutil.copy2(
-        LIVE_STATE_ROOT / "mission/state/graveyard.db", state / "graveyard.db"
+        LIVE_STATE_ROOT / "graveyard.db", state / "graveyard.db"
     )
     shutil.copy2(
-        LIVE_STATE_ROOT / "mission/state/proof_registry.json",
+        LIVE_STATE_ROOT / "proof_registry.json",
         state / "proof_registry.json",
     )
     result = _frozen_result()
@@ -146,10 +149,10 @@ def test_terminal_action_cannot_promote_or_authorize_data(
     state = root / "mission/state"
     state.mkdir(parents=True)
     shutil.copy2(
-        LIVE_STATE_ROOT / "mission/state/graveyard.db", state / "graveyard.db"
+        LIVE_STATE_ROOT / "graveyard.db", state / "graveyard.db"
     )
     shutil.copy2(
-        LIVE_STATE_ROOT / "mission/state/proof_registry.json",
+        LIVE_STATE_ROOT / "proof_registry.json",
         state / "proof_registry.json",
     )
     monkeypatch.setattr(terminal_module, "verify_density_freeze", lambda _root: {})
@@ -179,10 +182,10 @@ def test_completed_terminal_allows_later_campaign_reservation(
     state = root / "mission/state"
     state.mkdir(parents=True)
     shutil.copy2(
-        LIVE_STATE_ROOT / "mission/state/graveyard.db", state / "graveyard.db"
+        LIVE_STATE_ROOT / "graveyard.db", state / "graveyard.db"
     )
     shutil.copy2(
-        LIVE_STATE_ROOT / "mission/state/proof_registry.json",
+        LIVE_STATE_ROOT / "proof_registry.json",
         state / "proof_registry.json",
     )
     monkeypatch.setattr(terminal_module, "verify_density_freeze", lambda _root: {})

@@ -18,11 +18,21 @@ from hydra.mission.economic_evolution_agreement_terminal_runtime import (
     load_and_verify_agreement_terminal_verdict,
 )
 from hydra.mission.economic_evolution_runtime import EconomicEvolutionRuntimeError
-from hydra.research.v7_graveyard import audit_graveyard, class_feedback
+from hydra.research.v7_graveyard import (
+    ClassTombstone,
+    append_class_tombstone,
+    audit_graveyard,
+    class_feedback,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 LIVE_STATE_ROOT = Path("/root/hydra-bot")
+BASELINE_STATE_ROOT = (
+    LIVE_STATE_ROOT
+    / "mission/state/snapshots/"
+    "economic_agreement_0008_predeploy_20260713T210612Z"
+)
 
 
 def _predecessor() -> dict[str, object]:
@@ -71,11 +81,43 @@ def _runtime_fixture(
     state = root / "mission/state"
     state.mkdir(parents=True)
     shutil.copy2(
-        LIVE_STATE_ROOT / "mission/state/graveyard.db", state / "graveyard.db"
+        BASELINE_STATE_ROOT / "graveyard.db", state / "graveyard.db"
+    )
+    append_class_tombstone(
+        state / "graveyard.db",
+        ClassTombstone(
+            mechanism_class=(
+                "INDEPENDENT_OPPORTUNITY_DENSITY_CONSISTENCY_ASSEMBLY_V1"
+            ),
+            regime="DEVELOPMENT_2023Q3_TO_2024Q3_MULTI_MARKET",
+            death_cause="GEOMETRY_ONLY_NULL_RATIO_GTE_0_8",
+            candidate_count=22,
+            source_scope="HYDRA_ECONOMIC_EVOLUTION_DENSITY_0007_REAL_SLEEVES",
+            evidence_sha256=(
+                "88cc32dc9032d85defc8bde98d0c5b73"
+                "bb09d4cf488d3a7183f739cf74c60ccd"
+            ),
+        ),
     )
     shutil.copy2(
-        LIVE_STATE_ROOT / "mission/state/proof_registry.json",
+        BASELINE_STATE_ROOT / "proof_registry.json",
         state / "proof_registry.json",
+    )
+    append_entry(
+        state / "proof_registry.json",
+        {
+            "event_id": "agreement_0008_test_reservation",
+            "event_type": MULTIPLICITY_EVENT,
+            "recorded_at_utc": "2026-07-13T21:00:00+00:00",
+            "status": "RESERVED",
+            "scientific_role": "DEVELOPMENT_ONLY",
+            "evidence": {"campaign_id": CAMPAIGN_ID},
+            "multiplicity": {
+                "previous_N_trials": EXPECTED_N_TRIALS - 2_400,
+                "delta_trials": 2_400,
+                "cumulative_N_trials": EXPECTED_N_TRIALS,
+            },
+        },
     )
     monkeypatch.setattr(terminal_module, "verify_agreement_freeze", lambda _root: {})
     monkeypatch.setattr(

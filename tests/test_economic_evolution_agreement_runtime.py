@@ -25,14 +25,17 @@ from hydra.research.economic_evolution_agreement_campaign import (
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-LIVE_STATE_ROOT = Path("/root/hydra-bot")
+LIVE_STATE_ROOT = Path(
+    "/root/hydra-bot/mission/state/snapshots/"
+    "economic_agreement_0008_predeploy_20260713T210612Z"
+)
 
 
 def _state(tmp_path: Path) -> Path:
     state = tmp_path / "mission/state"
     state.mkdir(parents=True)
     shutil.copy2(
-        LIVE_STATE_ROOT / "mission/state/proof_registry.json",
+        LIVE_STATE_ROOT / "proof_registry.json",
         state / "proof_registry.json",
     )
     return state
