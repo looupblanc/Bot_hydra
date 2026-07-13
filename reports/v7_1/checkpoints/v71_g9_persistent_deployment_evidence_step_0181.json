@@ -1,0 +1,47 @@
+{
+  "schema": "hydra_v7_1_g9_persistent_deployment_evidence_v1",
+  "recorded_at_utc": "2026-07-13T05:22:16Z",
+  "baseline_commit": "9452e2790a37a80cf0852c957a2141134e9d9ab8",
+  "integrated_commit": "edaec5a94e77ace6a8cab64be00b2f4151399316",
+  "push_verified": true,
+  "controller_version": "hydra_v7_1_falsification_controller_v10",
+  "mission_id": "hydra_v7_1_falsification_20260712_0001",
+  "service": {
+    "name": "hydra-autonomous-mission.service",
+    "active": true,
+    "enabled": true,
+    "pid": 475687,
+    "restart_count": 0,
+    "controller_count": 1,
+    "single_writer": true,
+    "running_experiment_count": 1,
+    "persistent_step_after_restart": 1887,
+    "outbound_orders": 0,
+    "broker_connections": 0
+  },
+  "g9": {
+    "terminal_classification": "G9_FORMULATION_FALSIFIED",
+    "candidate_count": 4,
+    "stage1_pass_count": 0,
+    "walk_forward_positive_count": 0,
+    "basket_component_authorized": false
+  },
+  "integrity": {
+    "full_pytest": "749/749",
+    "mission_db": "ok",
+    "registry_db": "ok",
+    "governance_passed": true,
+    "q4_access_count": 1,
+    "q4_status": "COMMITTED_BURNED_NO_REUSE",
+    "proof_registry_entry_count": 35,
+    "registry_n_trials": 263902,
+    "secret_scan_hits": 0
+  },
+  "budget": {
+    "new_data_purchase_count": 0,
+    "cumulative_spend_usd": 87.84738838672598,
+    "remaining_usd": 37.15261161327402
+  },
+  "next_action": "BEGIN_V72_ROLLING_COMBINE_SEMANTICS_AUDIT_COMPONENT_RECONCILIATION_AND_CROSS_FIT",
+  "CONTRE": "A healthy persistent process is not scientific progress; G9 supplied no eligible component and V7.2 must establish unseen-block account improvement from prior underpowered candidates."
+}
