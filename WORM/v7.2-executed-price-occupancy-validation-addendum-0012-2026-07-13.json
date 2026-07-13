@@ -1,0 +1,66 @@
+{
+  "schema": "hydra_v7_2_executed_price_occupancy_validation_addendum_v1",
+  "addendum_id": "hydra_v7_2_executed_price_occupancy_validation_addendum_0012",
+  "grammar_path": "WORM/v7.2-executed-price-occupancy-grammar-0012-2026-07-13.json",
+  "grammar_sha256": "d0fa4eb200f47e1df9d3323c09f9e0c3729802a001b9c946bdf43824846a4c0c",
+  "tripwire_path": "WORM/v7.2-executed-price-occupancy-tripwire-0012-2026-07-13.json",
+  "tripwire_sha256": "0a40db491ae3cc28fedfe00107b3e3ba417896f4533460e3fabc1c1a1c664786",
+  "signal_manifest_path": "reports/v7_2/discovery_0012/v72_executed_price_occupancy_signal_manifest.json",
+  "signal_manifest_sha256": "8c6796df76cea34ca87c83e01d5291bc8b5f401d86acf4ce7090891b9a1955d0",
+  "outcomes_or_pnl_seen_before_freeze": false,
+  "thresholds_or_candidate_set_changed": false,
+  "null_reconstruction": {
+    "bridge_coordinate": "stable within-minute retained trade rank i/(n-1); a single-trade minute uses coordinate zero",
+    "real_residual": "real integer quarter-tick minus the exact rational bridge joining the first and last real retained ticks",
+    "null_bridge": "exact rational bridge joining the preregistered null minute open and close, each first rounded to an integer ES quarter-tick",
+    "reconstructed_tick": "null bridge plus frozen real residual, rounded to nearest integer quarter-tick; exact half-tick ties choose the lower tick",
+    "invariants": [
+      "calendar_year",
+      "contract",
+      "minute_start_ns",
+      "availability_ns",
+      "exchange_event_timestamp",
+      "stable_event_order",
+      "trade_size",
+      "aggressor_side",
+      "trade_count",
+      "total_volume"
+    ],
+    "recomputed_from_reconstructed_prints": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume_weighted_price",
+      "all_executed_price_occupancy_features",
+      "past_only_state_quantiles",
+      "signals",
+      "trade_paths",
+      "account_episodes"
+    ],
+    "minute_ohlc_policy": "first, maximum, minimum and last reconstructed tick converted at USD 0.25 per tick",
+    "minute_vwap_policy": "reconstructed tick weighted by invariant trade size"
+  },
+  "funnel_implementation": {
+    "stage1_minimum_nonoverlapping_events": 40,
+    "stage1_cost_stress": "STRESS_1_5X",
+    "walk_forward_folds": 4,
+    "walk_forward_embargo_days": 5,
+    "walk_forward_purge": "holding horizon through nonoverlapping signal construction",
+    "SIM_EXPLOIT_cost_stress": "STRESS_2X",
+    "candidate_specific_power_only_after_positive_walk_forward": true,
+    "candidate_nulls_DSR_BH_and_rolling_combine_before_green_tripwire": false
+  },
+  "tripwire_account_diagnostic": {
+    "quantities": [1, 2, 4, 8],
+    "real_episode_denominator": 480,
+    "pooled_null_episode_denominator": 1440,
+    "maximum_duration_days": 20,
+    "mll_mode": "eod_level_rt_breach",
+    "combine_pass_probability_is_fitness": false
+  },
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "Rank-based residual reconstruction preserves the ordering geometry of real within-minute prints and can therefore be conservative for occupancy motifs; the class verdict must still follow the preregistered NULL_RATIO and exact-binomial policy without reinterpretation."
+}
