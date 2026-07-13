@@ -1,0 +1,69 @@
+{
+  "schema": "hydra_account_state_router_hypothesis_v1",
+  "campaign_id": "hydra_economic_evolution_account_state_router_0011",
+  "class_id": "ACCOUNT_STATE_CONDITIONAL_ROLE_ROUTER_V1",
+  "issued_at_utc": "2026-07-13T23:48:00Z",
+  "parent_terminal_verdict": {
+    "path": "WORM/economic-evolution-role-aware-account-0010-verdict-2026-07-13.json",
+    "file_sha256": "d269a125ecb525ae063652be07d47b90e23bb96e2ac89006f68836584596472f",
+    "semantic_hash": "dbb50e7f2a00557b13a9c2da9708ae2e16bc6b486cd9fa79f099258f05526343",
+    "verdict": "CLASS_TOMBSTONE_EXACT_GRAMMAR"
+  },
+  "economic_hypothesis": "Static role weights fail because a sleeve's account value is conditional on state: while target distance is large and the full MLL buffer remains, bounded alpha concurrency can accelerate positive expectancy; after losses, buffer depletion or a large daily gain, routing toward stabilizing roles or inactivity should preserve the same accumulated expectancy better than a role-permuted control.",
+  "who_pays": "The proposed edge remains the frozen development sleeve economics; the router claims only that scarce account risk is wasted when identical sleeves are treated uniformly across high-buffer and defensive account states.",
+  "why_it_may_persist": "Topstep target, MLL and consistency constraints create stable account-state asymmetry: the marginal value of another unit of exposure differs when the account has a full buffer, is near its MLL floor, or has already concentrated profit in the current day.",
+  "structural_change_from_0010": {
+    "0010": "STATIC_ROLE_AWARE_PRIORITY_AND_RISK_WITH_GENERIC_DERISK_GUARDS",
+    "0011": "PAST_ONLY_ACCOUNT_STATE_MACHINE_SELECTING_ROLE_ELIGIBILITY_CONCURRENCY_AND_BOUNDED_INTEGER_RISK",
+    "parameter_neighbor_rescue": false,
+    "new_candidate_ids": true,
+    "status_inheritance": false
+  },
+  "past_only_state_inputs": [
+    "current_realized_balance",
+    "current_MLL_floor",
+    "current_MLL_buffer",
+    "current_day_realized_PnL",
+    "consecutive_losing_days",
+    "remaining_target_distance",
+    "current_open_exposure"
+  ],
+  "bounded_actions": [
+    "ALLOW_OR_BLOCK_FROZEN_COMPONENT",
+    "SELECT_FROZEN_ROLE_ELIGIBILITY_SET",
+    "ONE_OR_TWO_INTEGER_RISK_UNITS",
+    "ONE_TO_THREE_SIMULTANEOUS_POSITIONS",
+    "DAILY_PROFIT_LOCK",
+    "DAILY_LOSS_GUARD",
+    "PROTECTIVE_INACTIVITY"
+  ],
+  "matched_control": {
+    "same_sleeve_membership": true,
+    "same_component_event_paths": true,
+    "same_state_thresholds": true,
+    "same_action_and_risk_multisets": true,
+    "same_account_limits": true,
+    "difference": "DETERMINISTIC_WITHIN_MEMBERSHIP_ROLE_LABEL_PERMUTATION",
+    "future_outcomes_available_to_router": false
+  },
+  "mandatory_falsification": {
+    "primary": "PAIRED_STRESSED_ACCOUNT_EXPECTANCY_UPLIFT",
+    "secondary": [
+      "TARGET_PROGRESS_UPLIFT",
+      "NO_MLL_BREACH_DETERIORATION",
+      "NO_CONSISTENCY_DETERIORATION"
+    ],
+    "family_tripwire_required": true,
+    "same_class_parameter_rescue_after_failure": false
+  },
+  "governance": {
+    "development_only": true,
+    "proof_windows_consumed": 0,
+    "new_data_purchase_allowed": false,
+    "q4_access_allowed": false,
+    "broker_connections_allowed": false,
+    "orders_allowed": false
+  },
+  "CONTRE": "The frozen component roles were assigned from development evidence and may not carry causal information. A state router also adds complexity and can manufacture target progress by taking more risk; same-membership role-permutation controls and explicit MLL/consistency non-deterioration are therefore mandatory.",
+  "hypothesis_hash": "81324f1d148c8ac545c9c69c38b37383067c0cbfd37fbfd22e8767d38571c289"
+}
