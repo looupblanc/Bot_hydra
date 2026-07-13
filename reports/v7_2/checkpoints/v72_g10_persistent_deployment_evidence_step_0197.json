@@ -1,0 +1,68 @@
+{
+  "schema": "hydra_v7_2_g10_persistent_deployment_evidence_v1",
+  "recorded_at_utc": "2026-07-13T08:01:38Z",
+  "baseline_commit": "0ef28b617f79ae1cc34ccb570a4033ac7c20319b",
+  "deployment_commit": "6bf5714d9e0a6fee0b34ac1a22486eb1217ff6f8",
+  "remote_branch": "origin/mission/v7-falsification",
+  "remote_commit_verified": "6bf5714d9e0a6fee0b34ac1a22486eb1217ff6f8",
+  "controller_version": "hydra_v7_2_flow_impact_conversion_controller_v2",
+  "mission_id": "hydra_v7_1_falsification_20260712_0001",
+  "service": {
+    "unit": "hydra-autonomous-mission.service",
+    "active": true,
+    "enabled": true,
+    "pid": 500171,
+    "restart_count": 0,
+    "single_controller_process": true,
+    "single_writer": true,
+    "process_lock_owner_pid": 500171,
+    "heartbeat_at_utc": "2026-07-13T08:01:30+00:00",
+    "heartbeat_fresh": true,
+    "step": 2516,
+    "progressed_after_restart": true
+  },
+  "persistent_state": {
+    "experiment_id": "hydra_v7_1_falsification_20260712_0001",
+    "experiment_status": "RUNNING",
+    "experiment_claimed_by": "v7_2_flow_impact_conversion_controller",
+    "completed_experiment_count": 116,
+    "running_experiment_count": 1,
+    "queued_experiment_count": 0,
+    "historical_blocked_experiment_count": 2,
+    "historical_failed_experiment_count": 9,
+    "next_experiment_id": "hydra_v7_2_distinct_mechanism_hypothesis_review_0003",
+    "next_experiment_state": "WORM_PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE"
+  },
+  "g10_action": {
+    "action_type": "V72_G10_GREEN_TRIPWIRE_UNDERPOWERED_NO_PROMOTION_DISTINCT_MECHANISM_PIVOT",
+    "walk_forward_positive_count": 5,
+    "promising_underpowered_count": 2,
+    "fragile_count": 2,
+    "powered_count": 0,
+    "candidate_nulls_executed": false,
+    "dsr_bh_executed": false,
+    "rolling_combine_executed": false,
+    "shadow_admission_authorized": false
+  },
+  "integrity": {
+    "mission_doctor": "HEALTHY_AND_PROGRESSING",
+    "mission_db": "ok",
+    "registry_db": "ok",
+    "governance_passed": true,
+    "governance_semantic_hash": "05810bc193e51e3c40722163a1ee3ae82fd3a8d7762c48eafa25c3a4cba1102b",
+    "governance_yaml_sha256": "3c9fd63f43037c65d79ecd688ce76bc126c42cc6eeaceb6bed8636548ffaff57",
+    "q4_access_count": 1,
+    "q4_status": "COMMITTED_BURNED_NO_REUSE",
+    "registry_n_trials": 265107,
+    "broker_connections": 0,
+    "outbound_orders": 0
+  },
+  "budget": {
+    "new_data_purchase_count": 0,
+    "cumulative_spend_usd": 87.84738838672598,
+    "remaining_usd": 37.15261161327402
+  },
+  "pre_deployment_snapshot": "mission/state/snapshots/v72_g10_pre_deploy_20260713T080015Z.tar.gz",
+  "next_action": "PREREGISTER_A_DISTINCT_MECHANISM_BEFORE_ANY_NEW_EVALUATION",
+  "CONTRE": "The persistent controller correctly carries G10 forward, but persistence is not scientific validation. The two non-fragile G10 candidates remain underpowered and may still be noise."
+}
