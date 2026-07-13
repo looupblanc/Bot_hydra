@@ -245,12 +245,12 @@ def test_v71_power_aware_integrated_action_reports_g9_falsification() -> None:
     assert result["shadow_admission_authorized"] is False
 
 
-def test_v72_integrated_action_records_G11_geometry_only_pivot() -> None:
+def test_v72_integrated_action_records_G12_geometry_only_terminal_pivot() -> None:
     result = classify_v7_action(Path.cwd())
 
-    assert CONTROLLER_SCHEMA == "hydra_v7_2_arrival_renewal_controller_v3"
+    assert CONTROLLER_SCHEMA == "hydra_v7_2_price_occupancy_controller_v4"
     assert result["action_type"] == (
-        "V72_G11_GEOMETRY_ONLY_CLASS_TOMBSTONED_DISTINCT_MECHANISM_PIVOT"
+        "V72_G12_GEOMETRY_ONLY_CLASS_TOMBSTONED_BOOSTED_DUAL_TRACK_REQUIRED"
     )
     assert result["v72_static_structure_count"] == 1009
     assert result["v72_design_episode_count"] == 24216
@@ -297,10 +297,28 @@ def test_v72_integrated_action_records_G11_geometry_only_pivot() -> None:
     assert result["g11_candidate_nulls_executed"] is False
     assert result["g11_DSR_BH_executed"] is False
     assert result["g11_rolling_combine_executed"] is False
+    assert result["g12_candidate_count"] == 24
+    assert result["g12_signal_count"] == 2506
+    assert result["g12_stage0_valid_count"] == 24
+    assert result["g12_insufficient_power_count"] == 8
+    assert result["g12_stage1_survivor_count"] == 1
+    assert result["g12_walk_forward_positive_count"] == 0
+    assert result["g12_SIM_EXPLOIT_survivor_count"] == 0
+    assert result["g12_tripwire_verdict"] == "ARTEFACT_GEOMETRY_ONLY"
+    assert result["g12_tripwire_evidence_strength"] == "ARTEFACT"
+    assert result["g12_NULL_RATIO"] == 9.5
+    assert result["g12_real_pass_count"] == "2/480"
+    assert result["g12_null_pass_count"] == "57/1440"
+    assert result["g12_real_mll_breach_count"] == 341
+    assert result["g12_cemetery_candidate_count"] == 24
+    assert result["g12_power_audit_executed"] is False
+    assert result["g12_candidate_nulls_executed"] is False
+    assert result["g12_DSR_BH_executed"] is False
+    assert result["g12_rolling_combine_executed"] is False
     assert result["walk_forward_positive_count"] == 31
     assert result["evidence_reconciliation_accounted_count"] == 31
     assert result["evidence_reconciliation_unaccounted_count"] == 0
-    assert result["raw_global_N_trials"] >= 265227
+    assert result["raw_global_N_trials"] >= 265347
     assert result["new_data_purchase_authorized"] is False
     assert result["protected_holdout_access_authorized"] is False
     assert result["shadow_admission_authorized"] is False

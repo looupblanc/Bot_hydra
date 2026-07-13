@@ -37,10 +37,10 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_2_arrival_renewal_controller_v3"
+CONTROLLER_SCHEMA = "hydra_v7_2_price_occupancy_controller_v4"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
-CONTROLLER_CLAIM_TOKEN = "v7-2-arrival-renewal-single-writer"
-CONTROLLER_OWNER = "v7_2_arrival_renewal_controller"
+CONTROLLER_CLAIM_TOKEN = "v7-2-price-occupancy-single-writer"
+CONTROLLER_OWNER = "v7_2_price_occupancy_controller"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
 G1_RELATIVE_PATH = Path("reports/v7/phase1/g1_result.json")
 D1_TRIBUNAL_RELATIVE_PATH = Path(
@@ -271,6 +271,27 @@ V72_G11_FUNNEL_RELATIVE_PATH = Path(
 V72_G11_TRIPWIRE_RELATIVE_PATH = Path(
     "reports/v7_2/discovery_0011/v72_trade_arrival_renewal_tripwire_result.json"
 )
+V72_G12_GRAMMAR_RELATIVE_PATH = Path(
+    "WORM/v7.2-executed-price-occupancy-grammar-0012-2026-07-13.json"
+)
+V72_G12_TRIPWIRE_POLICY_RELATIVE_PATH = Path(
+    "WORM/v7.2-executed-price-occupancy-tripwire-0012-2026-07-13.json"
+)
+V72_G12_VALIDATION_ADDENDUM_RELATIVE_PATH = Path(
+    "WORM/v7.2-executed-price-occupancy-validation-addendum-0012-2026-07-13.json"
+)
+V72_G12_FEATURE_MANIFEST_RELATIVE_PATH = Path(
+    "data/manifests/v7_d1_executed_price_occupancy_v1.json"
+)
+V72_G12_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_2/discovery_0012/v72_executed_price_occupancy_signal_manifest.json"
+)
+V72_G12_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_2/discovery_0012/v72_executed_price_occupancy_funnel_result.json"
+)
+V72_G12_TRIPWIRE_RELATIVE_PATH = Path(
+    "reports/v7_2/discovery_0012/v72_executed_price_occupancy_tripwire_result.json"
+)
 V72_FROZEN_HASHES = {
     str(V72_POLICY_RELATIVE_PATH): "94f4ad89a2ae2ea347f1fce4a9cb4682690652429f34e42e72edf79e03da6677",
     str(V72_SEMANTICS_RELATIVE_PATH): "08200f3009d9c0c474aa665575c0607b918097a172b7f68db1c7f7ed6ac58fbe",
@@ -299,6 +320,15 @@ V72_G11_FROZEN_HASHES = {
     str(V72_G11_SIGNAL_RELATIVE_PATH): "6225c8067ac813e47f03e5037ce08ba0dfd7392f81421d04f0440c2795260944",
     str(V72_G11_FUNNEL_RELATIVE_PATH): "c1de25fbbd7ca35a96a54c661da686c64cfc2b2b4f46491640e68a7d3a88fff6",
     str(V72_G11_TRIPWIRE_RELATIVE_PATH): "80a4c4a90fbdc4d12d5ba7694683ace5e0df3902b9f529383c8f3a0c2df6ae34",
+}
+V72_G12_FROZEN_HASHES = {
+    str(V72_G12_GRAMMAR_RELATIVE_PATH): "d0fa4eb200f47e1df9d3323c09f9e0c3729802a001b9c946bdf43824846a4c0c",
+    str(V72_G12_TRIPWIRE_POLICY_RELATIVE_PATH): "0a40db491ae3cc28fedfe00107b3e3ba417896f4533460e3fabc1c1a1c664786",
+    str(V72_G12_VALIDATION_ADDENDUM_RELATIVE_PATH): "badd801bf80dbeba77424e5d73de9c3c1187a9a8d52e38da96127a2de88f2dbd",
+    str(V72_G12_FEATURE_MANIFEST_RELATIVE_PATH): "e6c41b6f0b819668798af90aaf7246c07be499badd338cb87bd646f7f95f5408",
+    str(V72_G12_SIGNAL_RELATIVE_PATH): "8c6796df76cea34ca87c83e01d5291bc8b5f401d86acf4ce7090891b9a1955d0",
+    str(V72_G12_FUNNEL_RELATIVE_PATH): "c250331d1d1cac086694459ec0a667096ceb06923bbb1c68edb1706f67fcd6d3",
+    str(V72_G12_TRIPWIRE_RELATIVE_PATH): "8da2418520231d37fd96af3a4a3b60756c6585fd40a19542d78b8f57701c8fbe",
 }
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
@@ -1981,7 +2011,7 @@ def _classify_v72_g11_action(
         "80a4c4a90fbdc4d12d5ba7694683ace5e0df3902b9f529383c8f3a0c2df6ae34",
     ):
         raise V7ControllerIntegrityError("V7.2 G11 class tombstone is absent")
-    return {
+    g11_action = {
         **dict(g10_action),
         "action_type": (
             "V72_G11_GEOMETRY_ONLY_CLASS_TOMBSTONED_DISTINCT_MECHANISM_PIVOT"
@@ -2039,6 +2069,207 @@ def _classify_v72_g11_action(
             "are tombstoned at class level; power audit, candidate nulls, DSR/BH, "
             "Rolling Combine, shadow, holdout, data purchase and orders remain "
             "forbidden. The perpetual factory requires a new WORM mechanism."
+        ),
+    }
+    if (root / V72_G12_GRAMMAR_RELATIVE_PATH).is_file():
+        return _classify_v72_g12_action(root, g11_action=g11_action)
+    return g11_action
+
+
+def _classify_v72_g12_action(
+    root: Path,
+    *,
+    g11_action: Mapping[str, Any],
+) -> dict[str, Any]:
+    required = (
+        (
+            V72_G12_TRIPWIRE_POLICY_RELATIVE_PATH,
+            "V72_G12_TRIPWIRE_POLICY_REQUIRED",
+        ),
+        (
+            V72_G12_VALIDATION_ADDENDUM_RELATIVE_PATH,
+            "V72_G12_VALIDATION_ADDENDUM_REQUIRED",
+        ),
+        (
+            V72_G12_FEATURE_MANIFEST_RELATIVE_PATH,
+            "V72_G12_FEATURE_MANIFEST_REQUIRED",
+        ),
+        (V72_G12_SIGNAL_RELATIVE_PATH, "V72_G12_SIGNAL_MANIFEST_REQUIRED"),
+        (V72_G12_FUNNEL_RELATIVE_PATH, "V72_G12_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V72_G12_TRIPWIRE_RELATIVE_PATH, "V72_G12_TRIPWIRE_REQUIRED"),
+    )
+    for path, action_type in required:
+        if not (root / path).is_file():
+            return {
+                **dict(g11_action),
+                "action_type": action_type,
+                "progressed": False,
+                "required_path": str(path),
+                "new_data_purchase_authorized": False,
+                "protected_holdout_access_authorized": False,
+                "shadow_admission_authorized": False,
+                "reason": (
+                    "The preregistered G12 chain is incomplete; no later "
+                    "inference, power audit or promotion is authorized."
+                ),
+            }
+    drift = [
+        path
+        for path, expected in V72_G12_FROZEN_HASHES.items()
+        if _sha256(root / path) != expected
+    ]
+    if drift:
+        raise V7ControllerIntegrityError(
+            "V7.2 G12 frozen evidence drift: " + ",".join(drift)
+        )
+    feature_manifest = _load_json(root / V72_G12_FEATURE_MANIFEST_RELATIVE_PATH)
+    signal_manifest = _load_json(root / V72_G12_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V72_G12_FUNNEL_RELATIVE_PATH)
+    tripwire = _load_json(root / V72_G12_TRIPWIRE_RELATIVE_PATH)
+    if (
+        int(feature_manifest.get("output", {}).get("row_count") or 0) != 17_200
+        or int(feature_manifest.get("output", {}).get("session_count") or 0)
+        != 43
+        or sum(
+            int(row.get("retained_es_rth_record_count") or 0)
+            for row in feature_manifest.get("audits", [])
+        )
+        != 16_129_864
+    ):
+        raise V7ControllerIntegrityError("V7.2 G12 feature-manifest drift")
+    if (
+        int(signal_manifest.get("candidate_count") or 0) != 24
+        or int(signal_manifest.get("nonempty_candidate_count") or 0) != 24
+        or int(signal_manifest.get("signal_count") or 0) != 2_506
+        or int(signal_manifest.get("archive_duplicate_count") or 0) != 0
+        or int(signal_manifest.get("within_manifest_duplicate_count") or 0) != 0
+        or signal_manifest.get("contains_outcomes_or_pnl") is not False
+    ):
+        raise V7ControllerIntegrityError("V7.2 G12 signal-manifest drift")
+    if (
+        int(funnel.get("candidate_count") or 0) != 24
+        or int(funnel.get("stage0_valid_novel_count") or 0) != 24
+        or int(funnel.get("insufficient_power_count") or 0) != 8
+        or int(funnel.get("stage1_pass_count") or 0) != 1
+        or int(funnel.get("walk_forward_positive_count") or 0) != 0
+        or int(funnel.get("SIM_EXPLOIT_survivor_count") or 0) != 0
+        or bool(funnel.get("candidate_nulls_executed"))
+        or bool(funnel.get("DSR_BH_executed"))
+        or bool(funnel.get("rolling_combine_executed"))
+        or int(funnel.get("new_data_purchase_count") or 0) != 0
+        or int(funnel.get("protected_holdout_access_count_delta") or 0) != 0
+        or int(funnel.get("outbound_order_count") or 0) != 0
+    ):
+        raise V7ControllerIntegrityError("V7.2 G12 funnel drift")
+    if (
+        tripwire.get("verdict") != "ARTEFACT_GEOMETRY_ONLY"
+        or tripwire.get("evidence_strength") != "ARTEFACT"
+        or tripwire.get("raw_pass_counts")
+        != {"real": "2/480", "null": "57/1440"}
+        or abs(float(tripwire.get("NULL_RATIO") or 0.0) - 9.5) > 1.0e-15
+        or int(tripwire.get("real", {}).get("mll_breach_count") or 0) != 341
+        or bool(tripwire.get("candidate_promotion_authorized"))
+        or int(tripwire.get("new_data_purchase_count") or 0) != 0
+        or int(tripwire.get("q4_access_count_delta") or 0) != 0
+        or int(tripwire.get("proof_window_burn_delta") or 0) != 0
+        or int(tripwire.get("outbound_order_count") or 0) != 0
+    ):
+        raise V7ControllerIntegrityError("V7.2 G12 tripwire drift")
+    proof = load_and_verify(root / "mission/state/proof_registry.json")
+    current_trials = multiplicity_trial_count(proof)
+    by_id = {str(row["event_id"]): row for row in proof["entries"]}
+    reservation = by_id.get(
+        "v7_2_executed_price_occupancy_structural_tripwire_reservation_0012"
+    )
+    if (
+        current_trials < 265_347
+        or burned_window_ids(proof) != ("Q4_2024",)
+        or reservation is None
+        or int(reservation["multiplicity"]["delta_trials"]) != 120
+        or int(reservation["multiplicity"]["cumulative_N_trials"]) != 265_347
+        or reservation.get("evidence", {}).get(
+            "feature_results_seen_before_reservation"
+        )
+        is not False
+        or reservation.get("evidence", {}).get(
+            "signal_results_seen_before_reservation"
+        )
+        is not False
+        or reservation.get("evidence", {}).get(
+            "pnl_results_seen_before_reservation"
+        )
+        is not False
+    ):
+        raise V7ControllerIntegrityError("V7.2 G12 proof-registry drift")
+    graveyard = root / "mission/state/graveyard.db"
+    conn = sqlite3.connect(f"file:{graveyard}?mode=ro", uri=True)
+    try:
+        row = conn.execute(
+            "SELECT COALESCE(SUM(candidate_count),0),COUNT(*),"
+            "MIN(evidence_sha256) FROM class_tombstones "
+            "WHERE mechanism_class=? AND regime=? AND death_cause=?",
+            (
+                "v72g12_executed_price_occupancy_topology",
+                "D1_2023_2024_DEVELOPMENT_PRICE_NULLS",
+                "GEOMETRY_ONLY_NULL_RATIO_GTE_0_8",
+            ),
+        ).fetchone()
+    finally:
+        conn.close()
+    if row != (
+        24,
+        1,
+        "8da2418520231d37fd96af3a4a3b60756c6585fd40a19542d78b8f57701c8fbe",
+    ):
+        raise V7ControllerIntegrityError("V7.2 G12 class tombstone is absent")
+    return {
+        **dict(g11_action),
+        "action_type": (
+            "V72_G12_GEOMETRY_ONLY_CLASS_TOMBSTONED_BOOSTED_DUAL_TRACK_REQUIRED"
+        ),
+        "phase": "4",
+        "progressed": True,
+        "g12_candidate_count": 24,
+        "g12_signal_count": 2_506,
+        "g12_stage0_valid_count": 24,
+        "g12_insufficient_power_count": 8,
+        "g12_stage1_survivor_count": 1,
+        "g12_walk_forward_positive_count": 0,
+        "g12_SIM_EXPLOIT_survivor_count": 0,
+        "g12_tripwire_verdict": "ARTEFACT_GEOMETRY_ONLY",
+        "g12_tripwire_evidence_strength": "ARTEFACT",
+        "g12_NULL_RATIO": 9.5,
+        "g12_real_pass_count": "2/480",
+        "g12_null_pass_count": "57/1440",
+        "g12_real_mll_breach_count": 341,
+        "g12_cemetery_candidate_count": 24,
+        "g12_power_audit_executed": False,
+        "g12_candidate_nulls_executed": False,
+        "g12_DSR_BH_executed": False,
+        "g12_rolling_combine_executed": False,
+        "powered_candidate_count": 0,
+        "rolling_combine_promotions": 0,
+        "raw_global_N_trials": current_trials,
+        "broad_D1_generation_authorized": False,
+        "limited_structural_discovery_authorized": True,
+        "new_data_purchase_authorized": False,
+        "protected_holdout_access_authorized": False,
+        "shadow_admission_authorized": False,
+        "next_experiment_id": "hydra_v7_boosted_dual_track_tournament_0001",
+        "next_experiment_state": "WORM_PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+        "principal_blocker": (
+            "G12 produced no positive walk-forward formulation and its matched "
+            "null account paths passed 57/1440 versus 2/480 real paths "
+            "(NULL_RATIO=9.5; real MLL breaches 341/480)."
+        ),
+        "reason": (
+            "The frozen G12 executed-price occupancy grammar tested 24 distinct "
+            "structures. One passed Stage 1, none remained positive walk-forward, "
+            "and the permanent tripwire classified the class GEOMETRY_ONLY. All "
+            "24 exact structures are tombstoned; power audit, DSR/BH, Rolling "
+            "Combine, shadow, holdout, data purchase and orders remain forbidden. "
+            "The next lawful action is a preregistered multi-family mechanism "
+            "tournament run concurrently with account-component conversion."
         ),
     }
 
