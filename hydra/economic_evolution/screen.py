@@ -7,7 +7,9 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 
 from hydra.economic_evolution.schema import EconomicRole, SleeveSpec
+from hydra.execution.v7_cost_model import load_cost_model
 from hydra.features.feature_matrix import FeatureMatrix
+from hydra.markets.instruments import instrument_spec
 from hydra.research.turbo_feature_builder import HORIZONS, feature_names_for_bundle
 from hydra.strategies.turbo_batch_fingerprint import structural_fingerprint
 from hydra.strategies.turbo_compiler import compile_strategy_batch
@@ -274,9 +276,7 @@ def bind_sleeves_to_calibration(
         return value
 
     output: list[BoundSleeve] = []
-    provenance = dict(matrix.manifest.get("provenance") or {})
-    point_value = float(provenance["point_value"])
-    round_turn_cost = float(provenance["round_turn_cost"])
+    cost_model = load_cost_model()
     for sleeve in sleeves:
         trigger_threshold = threshold(
             sleeve.trigger_feature, sleeve.trigger_quantile
@@ -290,15 +290,21 @@ def bind_sleeves_to_calibration(
             candidate_id=sleeve.sleeve_id,
             lineage_id=sleeve.lineage_id,
             family=sleeve.trigger_feature,
-            market=sleeve.market,
+            # The cached matrix supplies the synchronized primary-market signal;
+            # economic replay is priced on the explicitly frozen execution
+            # contract.  This avoids silently charging mini costs to a micro
+            # execution declaration.
+            market=sleeve.execution_market,
             timeframe=sleeve.timeframe,
             feature=sleeve.trigger_feature,
             operator=_operator(sleeve.trigger_operator),
             threshold=trigger_threshold,
             side=sleeve.side,
             holding_events=sleeve.holding_bars,
-            point_value=point_value,
-            round_turn_cost=round_turn_cost,
+            point_value=instrument_spec(sleeve.execution_market).point_value,
+            round_turn_cost=cost_model.round_turn_cost(
+                sleeve.execution_market, f"{sleeve.holding_bars}m"
+            ),
             role=_role(sleeve.role),
             context_feature=sleeve.context_feature,
             context_operator=(
