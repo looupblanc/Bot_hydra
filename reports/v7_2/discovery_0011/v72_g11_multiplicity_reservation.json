@@ -1,0 +1,33 @@
+{
+  "schema": "hydra_v7_2_g11_multiplicity_reservation_v1",
+  "reservation_id": "hydra_v7_2_trade_arrival_renewal_multiplicity_0011",
+  "grammar_id": "hydra_v7_2_trade_arrival_renewal_grammar_0011",
+  "worm_commit": "4e8eabca54b6cc0369c2575da83589fdf293aad3",
+  "worm_tag": "worm/v72-trade-arrival-renewal-0011-2026-07-13",
+  "grammar_path": "WORM/v7.2-trade-arrival-renewal-grammar-0011-2026-07-13.json",
+  "grammar_sha256": "d69f021bf4de5b4e5a0fe92d318eba9f00b08c80d99cb3941c43daab4a6b10c2",
+  "tripwire_path": "WORM/v7.2-trade-arrival-renewal-tripwire-0011-2026-07-13.json",
+  "tripwire_sha256": "1e42cb7fcb70542096b0ddab559ade74bf1e9cb4cfd49150e643a804d41db4dc",
+  "proof_registry_event_id": "v7_2_trade_arrival_renewal_structural_tripwire_reservation_0011",
+  "proof_registry_entry_hash": "6749663cd4e23d5705015432bd7d37a902778d13d3d9d007f4af73f371bbdcbc",
+  "proof_registry_commit_annotation_event_id": "v7_2_trade_arrival_renewal_reservation_0011_commit_annotation",
+  "proof_registry_commit_annotation_entry_hash": "3e08cb28ffaa08ef9037a418c8dad4aa05e44aee9c94e8dcaed3e973a4023b50",
+  "annotation_disclosure": "The first append-only entry transcribed the long commit SHA incorrectly while retaining the correct tag and both content hashes. The next append-only annotation corrected only that metadata before any signal or PnL result.",
+  "accounting": {
+    "structural_candidate_trials": 24,
+    "tripwire_candidate_world_trials": 96,
+    "delta_trials": 120,
+    "global_N_trials_before": 265107,
+    "global_N_trials_after": 265227,
+    "campaign_inflation_factor": 1.5,
+    "campaign_effective_N_trials": 180.0
+  },
+  "reservation_preceded_signal_or_pnl_results": true,
+  "threshold_or_null_policy_changed": false,
+  "candidate_selection_changed": false,
+  "new_data_purchase_count": 0,
+  "protected_holdout_access_count_delta": 0,
+  "outbound_order_count": 0,
+  "status": "PREREGISTERED_AND_RESERVED_BEFORE_RESULTS",
+  "CONTRE": "The append-only metadata correction is auditable but demonstrates why content hashes and immutable tags, rather than manually copied commit strings alone, must bind the scientific transaction."
+}
