@@ -1,0 +1,38 @@
+{
+  "schema": "hydra_v7_2_flow_impact_relaxation_tripwire_policy_v1",
+  "tripwire_id": "hydra_v7_2_flow_impact_relaxation_tripwire_0010",
+  "grammar_path": "WORM/v7.2-flow-impact-relaxation-grammar-0010-2026-07-13.json",
+  "grammar_candidate_count": 36,
+  "development_data_previously_accessed": true,
+  "this_grammar_outcomes_seen_before_freeze": false,
+  "real_episode_starts_per_candidate": 20,
+  "null_worlds": [
+    {"name": "DAILY_BLOCK_SHUFFLE", "seed": 7210001, "replicates": 1},
+    {"name": "VOLATILITY_MATCHED_RANDOM_WALK", "seed": 7210002, "replicates": 1},
+    {"name": "YEAR_BLOCK_PERMUTATION", "seed": 7210003, "replicates": 1}
+  ],
+  "real_pass_denominator": 720,
+  "null_pass_denominator": 2160,
+  "NULL_RATIO_artefact_threshold_inclusive": 0.8,
+  "null_zero_policy": "if both pass proportions are zero classify ARTEFACT_GEOMETRY_ONLY; if real is positive and null is zero NULL_RATIO is zero",
+  "exact_test": {
+    "name": "one_sided_exact_binomial",
+    "null_probability": "observed pooled null pass proportion",
+    "alternative": "real pass proportion greater than null",
+    "evidence_labels": {
+      "VERT_NET": "p<0.05 with NULL_RATIO<0.8",
+      "VERT_MINCE": "p>=0.05 with NULL_RATIO<0.8",
+      "ARTEFACT": "NULL_RATIO>=0.8",
+      "INDETERMINE": "zero real passes or denominator integrity failure"
+    }
+  },
+  "price_null_policy": "aggressive-flow and timestamp features remain fixed; all price-dependent impulse and response states are recomputed from each null price world before signals and account episodes",
+  "invariant_fields": ["calendar_year", "contract", "minute_start_ns", "availability_ns", "total_volume", "signed_aggressor_fraction"],
+  "fitness_prohibited": "Combine pass probability",
+  "primary_metric": "account-level net expectancy after frozen costs",
+  "no_threshold_change_after_results": true,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "The tripwire has more episodes than prior limited grammars but still only two calendar-year development blocks; a green result cannot authorize promotion without positive walk-forward economics and candidate-specific power."
+}

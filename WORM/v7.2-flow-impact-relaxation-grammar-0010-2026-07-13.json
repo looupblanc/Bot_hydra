@@ -1,0 +1,213 @@
+{
+  "schema": "hydra_v7_2_flow_impact_relaxation_grammar_v1",
+  "grammar_id": "hydra_v7_2_flow_impact_relaxation_grammar_0010",
+  "campaign_id": "hydra_v7_2_distinct_mechanism_hypothesis_review_0002",
+  "allocation_role": "DISTINCT_MECHANISM_PIVOT_AFTER_NULL_CROSS_FIT",
+  "broad_D1_batch": false,
+  "economic_hypothesis": "After a completed ES aggressive-flow impulse, informed inventory transfer leaves persistent price impact while a temporary liquidity shock relaxes after urgency decays; late followers of transient impact and liquidity suppliers fading persistent impact pay the subsequent path.",
+  "who_pays": "Late aggressive followers who extrapolate a temporary price impact, and passive liquidity suppliers who fade an informed impulse whose price impact remains after the initiating flow has decayed.",
+  "persistence_rationale": "The mechanism measures the delayed impulse-response path after the initiating minute is complete. It is not contemporaneous effort-without-progress, a sequence of flow signs, a half-minute allocation, trade-size composition, an event-clock speed comparison, mini/micro latency, or a static basket recombination.",
+  "source": {
+    "dataset": "GLBX.MDP3",
+    "schema": "trades_derived_completed_minute_features",
+    "product": "ES",
+    "contracts": ["ESU3", "ESU4"],
+    "data_role": "DEVELOPMENT_ONLY",
+    "feature_path": "data/cache/v7_d1/date_matched_minute_print_features_v2.parquet",
+    "feature_sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb",
+    "feature_manifest_path": "data/manifests/v7_d1_date_matched_event_store_v1.json",
+    "feature_manifest_sha256": "5c700f1ec38ab03a1206af7013a28600a681a0b3334781979b37ec356b5421ab",
+    "calendar_years": [2023, 2024],
+    "rth_timezone": "America/Chicago",
+    "rth_start_inclusive": "08:30:00",
+    "rth_end_exclusive": "15:10:00",
+    "completed_minutes_only": true,
+    "feature_availability": "minute_start_ns plus 60 seconds",
+    "new_data_purchase": false,
+    "protected_holdout_access": false
+  },
+  "impulse_definition": {
+    "required_history_completed_minutes_same_session": 30,
+    "aggressive_flow": "absolute signed_aggressor_fraction is strictly above the expanding 80th percentile of preceding completed minutes in the same CT session",
+    "participation": "total_volume is strictly above the expanding median of preceding completed minutes in the same CT session",
+    "price_response": "price_change_points is nonzero, at least one ES tick in absolute value, and has the same sign as signed_aggressor_fraction",
+    "direction": "sign of the completed impulse-minute price_change_points",
+    "thresholds_use_future_or_outcomes": false
+  },
+  "response_definition": {
+    "response_windows_minutes": [2, 4],
+    "all_response_minutes_completed_before_decision": true,
+    "response_flow_ratio": "absolute mean signed_aggressor_fraction over the completed response window divided by absolute impulse signed_aggressor_fraction",
+    "response_flow_side": "sign of mean signed_aggressor_fraction over the completed response window relative to impulse direction",
+    "response_price_ratio": "impulse_direction times (last response close minus impulse close) divided by absolute impulse price_change_points",
+    "first_half_price_ratio": "same ratio measured at the end of the first half of the completed response window",
+    "quiet_flow_max_inclusive": 0.5,
+    "active_flow_min_exclusive": 0.5,
+    "retention_lower_inclusive": -0.25,
+    "retention_upper_inclusive": 0.25,
+    "extension_min_exclusive": 0.25,
+    "reversion_max_exclusive": -0.5,
+    "repricing_boundary": -0.25,
+    "thresholds_use_future_or_outcomes": false
+  },
+  "mechanism_class": "V72_DELAYED_FLOW_IMPACT_RELAXATION",
+  "motifs": [
+    {
+      "motif": "QUIET_IMPACT_RETENTION",
+      "response_policy": "CONTINUATION",
+      "definition": "response_flow_ratio <= 0.5 and -0.25 <= response_price_ratio <= 0.25"
+    },
+    {
+      "motif": "QUIET_PASSIVE_EXTENSION",
+      "response_policy": "CONTINUATION",
+      "definition": "response_flow_ratio <= 0.5 and response_price_ratio > 0.25"
+    },
+    {
+      "motif": "QUIET_LIQUIDITY_REVERSION",
+      "response_policy": "REVERSAL",
+      "definition": "response_flow_ratio <= 0.5 and response_price_ratio < -0.5"
+    },
+    {
+      "motif": "SAME_FLOW_REPRICING",
+      "response_policy": "CONTINUATION",
+      "definition": "response_flow_ratio > 0.5, response flow agrees with impulse, and response_price_ratio > 0.25"
+    },
+    {
+      "motif": "SAME_FLOW_EXHAUSTION",
+      "response_policy": "REVERSAL",
+      "definition": "response_flow_ratio > 0.5, response flow agrees with impulse, and response_price_ratio < -0.25"
+    },
+    {
+      "motif": "COUNTERFLOW_ABSORPTION",
+      "response_policy": "CONTINUATION",
+      "definition": "response_flow_ratio > 0.5, response flow opposes impulse, and response_price_ratio >= -0.25"
+    },
+    {
+      "motif": "COUNTERFLOW_REPRICING",
+      "response_policy": "REVERSAL",
+      "definition": "response_flow_ratio > 0.5, response flow opposes impulse, and response_price_ratio < -0.25"
+    },
+    {
+      "motif": "EXTEND_THEN_FAIL",
+      "response_policy": "REVERSAL",
+      "definition": "first_half_price_ratio > 0.25 and response_price_ratio < -0.25"
+    },
+    {
+      "motif": "RETRACE_THEN_RESUME",
+      "response_policy": "CONTINUATION",
+      "definition": "first_half_price_ratio < -0.25 and response_price_ratio > 0.25"
+    }
+  ],
+  "response_windows_minutes": [2, 4],
+  "holding_minutes": [30, 60],
+  "candidate_ids": [
+    "v72g10_flow_impact_relaxation_quiet_impact_retention_continuation_r2_h30",
+    "v72g10_flow_impact_relaxation_quiet_impact_retention_continuation_r2_h60",
+    "v72g10_flow_impact_relaxation_quiet_impact_retention_continuation_r4_h30",
+    "v72g10_flow_impact_relaxation_quiet_impact_retention_continuation_r4_h60",
+    "v72g10_flow_impact_relaxation_quiet_passive_extension_continuation_r2_h30",
+    "v72g10_flow_impact_relaxation_quiet_passive_extension_continuation_r2_h60",
+    "v72g10_flow_impact_relaxation_quiet_passive_extension_continuation_r4_h30",
+    "v72g10_flow_impact_relaxation_quiet_passive_extension_continuation_r4_h60",
+    "v72g10_flow_impact_relaxation_quiet_liquidity_reversion_reversal_r2_h30",
+    "v72g10_flow_impact_relaxation_quiet_liquidity_reversion_reversal_r2_h60",
+    "v72g10_flow_impact_relaxation_quiet_liquidity_reversion_reversal_r4_h30",
+    "v72g10_flow_impact_relaxation_quiet_liquidity_reversion_reversal_r4_h60",
+    "v72g10_flow_impact_relaxation_same_flow_repricing_continuation_r2_h30",
+    "v72g10_flow_impact_relaxation_same_flow_repricing_continuation_r2_h60",
+    "v72g10_flow_impact_relaxation_same_flow_repricing_continuation_r4_h30",
+    "v72g10_flow_impact_relaxation_same_flow_repricing_continuation_r4_h60",
+    "v72g10_flow_impact_relaxation_same_flow_exhaustion_reversal_r2_h30",
+    "v72g10_flow_impact_relaxation_same_flow_exhaustion_reversal_r2_h60",
+    "v72g10_flow_impact_relaxation_same_flow_exhaustion_reversal_r4_h30",
+    "v72g10_flow_impact_relaxation_same_flow_exhaustion_reversal_r4_h60",
+    "v72g10_flow_impact_relaxation_counterflow_absorption_continuation_r2_h30",
+    "v72g10_flow_impact_relaxation_counterflow_absorption_continuation_r2_h60",
+    "v72g10_flow_impact_relaxation_counterflow_absorption_continuation_r4_h30",
+    "v72g10_flow_impact_relaxation_counterflow_absorption_continuation_r4_h60",
+    "v72g10_flow_impact_relaxation_counterflow_repricing_reversal_r2_h30",
+    "v72g10_flow_impact_relaxation_counterflow_repricing_reversal_r2_h60",
+    "v72g10_flow_impact_relaxation_counterflow_repricing_reversal_r4_h30",
+    "v72g10_flow_impact_relaxation_counterflow_repricing_reversal_r4_h60",
+    "v72g10_flow_impact_relaxation_extend_then_fail_reversal_r2_h30",
+    "v72g10_flow_impact_relaxation_extend_then_fail_reversal_r2_h60",
+    "v72g10_flow_impact_relaxation_extend_then_fail_reversal_r4_h30",
+    "v72g10_flow_impact_relaxation_extend_then_fail_reversal_r4_h60",
+    "v72g10_flow_impact_relaxation_retrace_then_resume_continuation_r2_h30",
+    "v72g10_flow_impact_relaxation_retrace_then_resume_continuation_r2_h60",
+    "v72g10_flow_impact_relaxation_retrace_then_resume_continuation_r4_h30",
+    "v72g10_flow_impact_relaxation_retrace_then_resume_continuation_r4_h60"
+  ],
+  "candidate_count": 36,
+  "bounded_parameter_alternatives_per_structure": 2,
+  "signal_policy": {
+    "decision_timestamp": "availability of the final completed response minute",
+    "entry": "first explicit-contract 1m open at or after decision timestamp",
+    "exit": "explicit-contract 1m open exactly frozen holding_minutes after entry",
+    "overlapping_signals_per_candidate": false,
+    "session_crossing": false,
+    "contract_crossing": false,
+    "position_size": 1,
+    "online_learning": false
+  },
+  "cost_policy": {
+    "path": "config/v7/phase0_g0_preregistration.json",
+    "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "stage1": "BASE",
+    "primary_walk_forward_stress": "STRESS_1_5X",
+    "SIM_EXPLOIT_stress": "STRESS_2X"
+  },
+  "funnel": {
+    "validation_policy_path": "WORM/v7.1-hierarchical-validation-policy-2026-07-12.json",
+    "validation_policy_sha256": "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
+    "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+    "candidate_specific_power_policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673",
+    "stage0": "validity_availability_explicit_contract_novelty_and_nonoverlap",
+    "stage1": "unchanged_frozen_cheap_economic_screen",
+    "stage2": "four_fold_walk_forward_with_five_day_embargo_and_exact_frozen_costs",
+    "stage3": "hypothesis_specific_delayed_impulse_direction_inversion_and_within_session_block_nulls_only_for_positive_walk_forward",
+    "stage4": "campaign_stratified_DSR_and_BH_FDR_10_percent_only_if_candidate_specific_power_is_sufficient",
+    "stage5": "rolling_Combine_is_downstream_diagnostic_and_never_search_fitness"
+  },
+  "multiplicity": {
+    "raw_global_N_trials_before": 264911,
+    "raw_candidates_reserved_before_results": 36,
+    "raw_global_N_trials_after": 264947,
+    "campaign_inflation_factor": 1.5,
+    "campaign_effective_N_trials": 54.0,
+    "BH_FDR": 0.1,
+    "retroactive_rejudgment": false
+  },
+  "mandatory_grammar_tripwire": {
+    "policy_path": "WORM/v7.2-flow-impact-relaxation-tripwire-0010-2026-07-13.json",
+    "worlds": ["DAILY_BLOCK_SHUFFLE", "VOLATILITY_MATCHED_RANDOM_WALK", "YEAR_BLOCK_PERMUTATION"],
+    "NULL_RATIO_artefact_threshold_inclusive": 0.8,
+    "raw_counts_and_exact_binomial_test_required": true,
+    "combine_pass_rate_is_fitness": false
+  },
+  "cemetery_firewall": {
+    "feedback_scope": "mechanism_class_x_regime_x_death_cause_only",
+    "parameter_feedback_used": false,
+    "candidate_outcome_feedback_used": false,
+    "excluded_classes": [
+      "ARB_INTRA_PRODUIT",
+      "V71_EVENT_TIME_CLOCK_STATES",
+      "V71_CROSS_CLOCK_FLOW_CONFIRMATION",
+      "V71_CROSS_CLOCK_SPEED_LEADERSHIP",
+      "V71_TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "V71_AGGRESSOR_FLOW_SIGN_SEQUENCES",
+      "V71_INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+      "V71_INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY"
+    ],
+    "novelty_basis": "delayed post-impulse price-impact relaxation after a separately completed response window"
+  },
+  "development_data_previously_accessed": true,
+  "this_grammar_signal_or_pnl_results_seen_before_freeze": false,
+  "candidate_status_inheritance": false,
+  "shadow_admission_authorized": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "Only two one-month calendar-year blocks exist, response-ratio cutoffs can still discretize generic price geometry, and the class may overlap economically with absorption; the unchanged tripwire, walk-forward, SIM_EXPLOIT and power gates are mandatory."
+}
