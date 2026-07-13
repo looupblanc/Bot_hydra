@@ -1,0 +1,102 @@
+{
+  "CONTRE": "Prior-session normalization may only repackage intraday activity; economic replay and the permanent tripwire remain mandatory.",
+  "archive_duplicate_count": 0,
+  "candidate_count": 6,
+  "candidate_paths": [
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g6_trade_size_composition_large_clip_absorption_reversal_h30",
+      "family_id": "TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "holding_minutes": 30,
+      "motif": "LARGE_CLIP_ABSORPTION",
+      "response_policy": "REVERSAL",
+      "signal_count": 220,
+      "signal_path_hash": "aa48148c3e1c9f6f9a5e74ed4f761919d16eb918ba485168fe18547768e9681a",
+      "specification_hash": "1f3eb1c8ebd305905a186db7ee79cedaa86cece22dc5827b3c36bcf5998f6cbc",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g6_trade_size_composition_large_clip_absorption_reversal_h60",
+      "family_id": "TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "holding_minutes": 60,
+      "motif": "LARGE_CLIP_ABSORPTION",
+      "response_policy": "REVERSAL",
+      "signal_count": 132,
+      "signal_path_hash": "30f4c95004e6519187e24c4879537403635244e43c9bc37ee9159691eca6a1fd",
+      "specification_hash": "4f5b50f1f6fa722e38b32531fa7aeeb8383b7b47eb6953edd4ac081b5d20505e",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g6_trade_size_composition_large_clip_flow_onset_continuation_h30",
+      "family_id": "TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "holding_minutes": 30,
+      "motif": "LARGE_CLIP_FLOW_ONSET",
+      "response_policy": "CONTINUATION",
+      "signal_count": 424,
+      "signal_path_hash": "6e090b8abd2ee03a62cb557842501668c198565b04274bea60f604b3ccd554b0",
+      "specification_hash": "347689c37327f0919863bcc713a9fe0ac3f6dfdcd2ce8f91ad471166391387a9",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g6_trade_size_composition_large_clip_flow_onset_continuation_h60",
+      "family_id": "TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "holding_minutes": 60,
+      "motif": "LARGE_CLIP_FLOW_ONSET",
+      "response_policy": "CONTINUATION",
+      "signal_count": 223,
+      "signal_path_hash": "b3ac40aa599d759c27c593d19b2abcc611ae292659b469d169dff1ac4513a3e0",
+      "specification_hash": "d2c75b72012b099ca0a355ca1f01891506b7b5027a0652116c1fa7d4ce051e71",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g6_trade_size_composition_small_clip_participation_burst_continuation_h30",
+      "family_id": "TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "holding_minutes": 30,
+      "motif": "SMALL_CLIP_PARTICIPATION_BURST",
+      "response_policy": "CONTINUATION",
+      "signal_count": 336,
+      "signal_path_hash": "613ea554420a43cce9e8bded23a41d8538c6b647f0b69434719acfaa677a2839",
+      "specification_hash": "8e863632f703e601767d8a36c664bc74332d72e9f64513f6f87be80283a72af6",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g6_trade_size_composition_small_clip_participation_burst_continuation_h60",
+      "family_id": "TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "holding_minutes": 60,
+      "motif": "SMALL_CLIP_PARTICIPATION_BURST",
+      "response_policy": "CONTINUATION",
+      "signal_count": 189,
+      "signal_path_hash": "aea7272d0b9e4e8f0472f04e001092725c42a2810a2086b12b15599f57c0ee4c",
+      "specification_hash": "ddbb61ace385dc07fc4a530839ac4fe35117fb61f6aa1ca0e2b0c36ae61197dc",
+      "within_manifest_duplicate_of": null
+    }
+  ],
+  "candidates_per_family": {
+    "TRADE_SIZE_COMPOSITION_TRANSITIONS": 6
+  },
+  "contains_outcomes_or_pnl": false,
+  "family_count": 1,
+  "grammar_id": "hydra_v7_1_trade_size_composition_grammar_0006",
+  "manifest_hash": "88d800b3ee0858257f23d6462410138492d651582d4dbf97be1037769529732b",
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "protected_holdout_access_count": 0,
+  "schema": "hydra_v7_1_trade_size_composition_signal_manifest_v1",
+  "signal_count": 1524,
+  "source_audit": {
+    "executable_state_count_30m": 15867,
+    "executable_state_count_60m": 14577,
+    "large_clip_absorption_count": 578,
+    "large_clip_flow_onset_count": 2315,
+    "minute_count": 17200,
+    "same_contract_prior_session_baseline_count": 16400,
+    "session_count": 43,
+    "small_clip_participation_burst_count": 1677
+  },
+  "within_manifest_duplicate_count": 0
+}
