@@ -1,0 +1,83 @@
+{
+  "schema": "hydra_v7_1_g7_integrated_deployment_evidence_v1",
+  "recorded_at_utc": "2026-07-13T03:31:01+00:00",
+  "baseline_commit": "8ef997cfc6e202e4d07bf98dd6c3d59a91d95ea9",
+  "integrated_commit": "1afd63c17672368c92b8cfd2acf06926a9006e2c",
+  "controller_version": "hydra_v7_1_falsification_controller_v8",
+  "mission_id": "hydra_v7_1_falsification_20260712_0001",
+  "service": {
+    "name": "hydra-autonomous-mission.service",
+    "active": true,
+    "enabled": true,
+    "pid": 456785,
+    "restart_count": 0,
+    "single_writer": true,
+    "outbound_orders": 0,
+    "broker_connections": 0
+  },
+  "research_stage_gate_correction": {
+    "final_confirmation_power_threshold": 0.8,
+    "final_confirmation_power_threshold_changed": false,
+    "research_status": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+    "selected_candidate_count": 5,
+    "episode_start_count": 24,
+    "effective_nonoverlapping_block_count": 4,
+    "candidate_pass_count": 0,
+    "basket_pass_count": 0,
+    "validated_or_promoted_count": 0
+  },
+  "evidence_reconciliation": {
+    "walk_forward_positive_total": 22,
+    "promising_underpowered": 16,
+    "walk_forward_positive_but_fragile": 4,
+    "geometry_only_terminal_without_power_audit": 2,
+    "accounted": 22,
+    "unaccounted": 0
+  },
+  "g7": {
+    "grammar_id": "hydra_v7_1_flow_sign_sequence_grammar_0007",
+    "candidate_count": 6,
+    "signal_count": 1889,
+    "archive_duplicate_count": 0,
+    "within_manifest_duplicate_count": 0,
+    "stage0_valid_novel_count": 6,
+    "stage1_pass_count": 0,
+    "walk_forward_positive_count": 0,
+    "tripwire_real": "5/120",
+    "tripwire_null": "17/360",
+    "null_ratio": 1.1333333333333333,
+    "exact_binomial_one_sided_p_value": 0.6738558452399335,
+    "verdict": "ARTEFACT_GEOMETRY_ONLY",
+    "class_tombstone_count": 6,
+    "power_audit_executed": false,
+    "rolling_combine_executed": false,
+    "promotion_count": 0
+  },
+  "integrity": {
+    "full_pytest": "731/731",
+    "no_lookahead_and_ruleset": "91/91",
+    "mission_db": "ok",
+    "registry_db": "ok",
+    "graveyard_db": "ok",
+    "governance_passed": true,
+    "governance_semantic_hash": "05810bc193e51e3c40722163a1ee3ae82fd3a8d7762c48eafa25c3a4cba1102b",
+    "governance_yaml_sha256": "3c9fd63f43037c65d79ecd688ce76bc126c42cc6eeaceb6bed8636548ffaff57",
+    "q4_access_count": 1,
+    "q4_status": "COMMITTED_BURNED_NO_REUSE",
+    "proof_registry_entry_count": 30,
+    "registry_n_trials": 263844,
+    "proof_chain_head": "e1266a913b349164e04cbcb7b98e35e9955e4c53aca6d7524bfaf48f5bdc5e5b",
+    "secret_scan_hits": 0,
+    "deterministic_manifest_sha256": "eae86b8260596bb1ba9b8155769dfb16cb528736764ad57c194f5bdf3db48ee6"
+  },
+  "budget": {
+    "new_data_purchase_count": 0,
+    "cumulative_spend_usd": 87.84738838672598,
+    "remaining_usd": 37.15261161327402
+  },
+  "snapshot_path": "mission/state/snapshots/v71_g7_pre_deploy_20260713T032907Z",
+  "current_action": "V71_G7_GEOMETRY_ONLY_NULL_COMPLETE",
+  "next_experiment_id": "hydra_v7_1_independent_confirmation_and_distinct_hypothesis_review_0008",
+  "next_experiment_state": "PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+  "CONTRE": "The clean G7 null does not invalidate every possible order-flow sequence mechanism; it invalidates only this preregistered ordinal class on two D1 calendar blocks, while all existing positive candidates remain below the unchanged final-confirmation power threshold."
+}
