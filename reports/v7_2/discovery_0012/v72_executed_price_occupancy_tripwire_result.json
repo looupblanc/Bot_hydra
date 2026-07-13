@@ -1,0 +1,3953 @@
+{
+  "CONTRE": "Rank-residual null reconstruction intentionally preserves within-minute event ordering geometry, so it can be conservative; raw counts and exact-binomial evidence must be read separately from the already negative walk-forward economics.",
+  "NULL_RATIO": 9.5,
+  "N_trials": 265347,
+  "candidate_count": 24,
+  "candidate_promotion_authorized": false,
+  "combine_pass_rate_is_diagnostic_not_fitness": true,
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "candidate_quantity_results": {
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.08916944444442763,
+            "minimum_mll_buffer": 1321.1250000001746,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1783388888888973,
+            "minimum_mll_buffer": -146.95000000004075,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.21786666666667184,
+            "minimum_mll_buffer": -1383.100000000035,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.05179999999999806,
+            "minimum_mll_buffer": -3066.1999999999825,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.048480555555569786,
+            "minimum_mll_buffer": 1054.4000000001397,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.096961111111104,
+            "minimum_mll_buffer": -305.4000000000233,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.05435555555555038,
+            "minimum_mll_buffer": -2533.100000000035,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.09697498315030163,
+            "minimum_mll_buffer": -5776.999999999971,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.04893055555556202,
+            "minimum_mll_buffer": 1500.1750000001048,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.09786111111110787,
+            "minimum_mll_buffer": -80.40000000002328,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.19572222222221575,
+            "minimum_mll_buffer": -2305.4000000000233,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.3914444444444477,
+            "minimum_mll_buffer": -2855.399999999994,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          }
+        },
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.053097222222228686,
+            "minimum_mll_buffer": 737.6750000001048,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.1061944444444412,
+            "minimum_mll_buffer": -16.550000000017462,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.2123888888888824,
+            "minimum_mll_buffer": -1427.7000000000116,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -7355.399999999994,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.31422222222214463,
+            "minimum_mll_buffer": -42.374999999592546,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1600166666666919,
+            "minimum_mll_buffer": -1538.8500000000058,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -7577.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -19655.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.07182499999994697,
+            "minimum_mll_buffer": -685.4499999996042,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1538.8500000000058,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.10197907688145935,
+            "minimum_mll_buffer": -7577.700000000012,
+            "mll_breach_count": 3,
+            "pass_count": 1,
+            "timeout_count": 1
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -19655.399999999994,
+            "mll_breach_count": 3,
+            "pass_count": 1,
+            "timeout_count": 1
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.08849166666661364,
+            "minimum_mll_buffer": 307.62500000040745,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.17698333333335986,
+            "minimum_mll_buffer": -1266.5500000000175,
+            "mll_breach_count": 1,
+            "pass_count": 0,
+            "timeout_count": 4
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -2255.4000000000233,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.39787695328479744,
+            "minimum_mll_buffer": -6755.399999999994,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.15502777777773896,
+            "minimum_mll_buffer": 40.90000000037253,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.290050000000011,
+            "minimum_mll_buffer": -107.75000000008731,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.02409999999999612,
+            "minimum_mll_buffer": -3427.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -11355.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.00724444444443927,
+            "minimum_mll_buffer": 2045.9500000000698,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.014488888888891476,
+            "minimum_mll_buffer": -408.1000000000349,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.028977777777782952,
+            "minimum_mll_buffer": -1960.8000000000466,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.2728222222222216,
+            "minimum_mll_buffer": -2787.7999999999593,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.03008611111110723,
+            "minimum_mll_buffer": 2465.375000000058,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.06017222222222416,
+            "minimum_mll_buffer": 430.7499999999709,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.12034444444444832,
+            "minimum_mll_buffer": -3210.8000000000466,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -2355.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.16220000000000517,
+            "minimum_mll_buffer": 4005.5750000000116,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.3243999999999974,
+            "minimum_mll_buffer": 3511.149999999994,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.6487999999999948,
+            "minimum_mll_buffer": 2522.2999999999884,
+            "mll_breach_count": 0,
+            "pass_count": 1,
+            "timeout_count": 4
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.9822696228509927,
+            "minimum_mll_buffer": 544.6000000000058,
+            "mll_breach_count": 0,
+            "pass_count": 2,
+            "timeout_count": 3
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.11358888888889407,
+            "minimum_mll_buffer": 3586.1500000000233,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.2271777777777752,
+            "minimum_mll_buffer": 2805.749999999971,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.4543555555555504,
+            "minimum_mll_buffer": 2522.2999999999884,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.7651087078546591,
+            "minimum_mll_buffer": 544.6000000000058,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.28199722222216145,
+            "minimum_mll_buffer": -600.4749999994528,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.26309444444447094,
+            "minimum_mll_buffer": -4174.300000000105,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -888.5000000000582,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -5655.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.17987777777774155,
+            "minimum_mll_buffer": -2686.799999999581,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.35975555555557365,
+            "minimum_mll_buffer": -5266.20000000007,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -2860.8000000000466,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6155.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.13591666666655025,
+            "minimum_mll_buffer": -293.19999999925494,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1770888888889458,
+            "minimum_mll_buffer": -615.8500000001222,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.09061111111113052,
+            "minimum_mll_buffer": -977.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.009755555555551028,
+            "minimum_mll_buffer": -6455.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.36598888888885267,
+            "minimum_mll_buffer": -302.1749999996391,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.23359444444445157,
+            "minimum_mll_buffer": -241.20000000006985,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.09316666666667313,
+            "minimum_mll_buffer": -977.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6455.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.008822222222237745,
+            "minimum_mll_buffer": 2054.225000000035,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.017644444444436684,
+            "minimum_mll_buffer": -391.55000000001746,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3234222222222274,
+            "minimum_mll_buffer": -832.4000000001397,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.02342222222222093,
+            "minimum_mll_buffer": -2121.5999999999767,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.2643777777777933,
+            "minimum_mll_buffer": 2241.725000000035,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.5287555555555478,
+            "minimum_mll_buffer": 2111.499999999942,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 1.0575111111110955,
+            "minimum_mll_buffer": 1572.2999999999884,
+            "mll_breach_count": 0,
+            "pass_count": 3,
+            "timeout_count": 2
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 1.0025555555555588,
+            "minimum_mll_buffer": 133.80000000001746,
+            "mll_breach_count": 0,
+            "pass_count": 3,
+            "timeout_count": 2
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.004766666666656319,
+            "minimum_mll_buffer": 2147.3000000000466,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.009533333333338508,
+            "minimum_mll_buffer": -205.40000000002328,
+            "mll_breach_count": 1,
+            "pass_count": 0,
+            "timeout_count": 4
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.019066666666677015,
+            "minimum_mll_buffer": -405.4000000000233,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.05525556279676323,
+            "minimum_mll_buffer": -5310.799999999988,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.16190000000001034,
+            "minimum_mll_buffer": 2022.3000000000466,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.3237999999999948,
+            "minimum_mll_buffer": -416.55000000001746,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.6475999999999896,
+            "minimum_mll_buffer": -605.4000000000233,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.9642325381332136,
+            "minimum_mll_buffer": -55.39999999999418,
+            "mll_breach_count": 2,
+            "pass_count": 1,
+            "timeout_count": 2
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.42000555555552194,
+            "minimum_mll_buffer": -324.4749999996857,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.37544444444447034,
+            "minimum_mll_buffer": -1366.5500000000175,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.10247777777777649,
+            "minimum_mll_buffer": -4255.400000000023,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6110.799999999988,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.10335277777766007,
+            "minimum_mll_buffer": -195.07499999954598,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.3454999999999806,
+            "minimum_mll_buffer": -1858.100000000035,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.747833333333288,
+            "minimum_mll_buffer": -2333.100000000035,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.07832732268590421,
+            "minimum_mll_buffer": -4955.399999999994,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.46848611111109173,
+            "minimum_mll_buffer": -448.29999999981374,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3850166666666919,
+            "minimum_mll_buffer": -804.3500000001804,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.31583333333336566,
+            "minimum_mll_buffer": -5177.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.11351111111110852,
+            "minimum_mll_buffer": -14855.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.3491055555556668,
+            "minimum_mll_buffer": -646.0749999993131,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.6982111111110555,
+            "minimum_mll_buffer": -2038.8500000000058,
+            "mll_breach_count": 2,
+            "pass_count": 2,
+            "timeout_count": 1
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -8577.700000000012,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.12717777777777842,
+            "minimum_mll_buffer": -21655.399999999994,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 480,
+      "mll_breach_count": 270,
+      "mll_breach_rate": 0.5625,
+      "pass_count": 24,
+      "pass_rate": 0.05,
+      "reconstruction_audit": {
+        "bridge_coordinate": "stable_trade_rank",
+        "control": "DAILY_BLOCK_SHUFFLE",
+        "minute_count": 17200,
+        "retained_trade_count": 16129864,
+        "rounding": "nearest_quarter_tick_half_ties_lower",
+        "source_audits": [
+          {
+            "bounded_record_count": 15545497,
+            "bridge_minute_count": 8800,
+            "calendar_year": 2023,
+            "contract": "ESU3",
+            "metric_minute_count": 8800,
+            "minute_group_count": 8800,
+            "raw_record_count": 15545497,
+            "retained_es_rth_record_count": 7960570
+          },
+          {
+            "bounded_record_count": 18408542,
+            "bridge_minute_count": 8400,
+            "calendar_year": 2024,
+            "contract": "ESU4",
+            "metric_minute_count": 8400,
+            "minute_group_count": 8400,
+            "raw_record_count": 32277017,
+            "retained_es_rth_record_count": 8169294
+          }
+        ]
+      },
+      "signal_count": 2459,
+      "source_audit": {
+        "exact_source_match_count": 17200,
+        "executable_counts": {
+          "w20:h30": 15867,
+          "w20:h60": 14577,
+          "w60:h30": 15867,
+          "w60:h60": 14577
+        },
+        "history_windows": [
+          20,
+          60
+        ],
+        "minute_count": 17200,
+        "motif_state_counts": {
+          "w20:BIMODAL_AUCTION_RESOLUTION": 36,
+          "w20:CONCENTRATED_MODE_ESCAPE": 170,
+          "w20:CONCENTRATED_MODE_RECAPTURE": 15,
+          "w20:MODE_MIGRATION_PERSISTENCE": 439,
+          "w20:REVISIT_PRESSURE_BREAK": 40,
+          "w20:REVISIT_PRESSURE_FAILURE": 1812,
+          "w60:BIMODAL_AUCTION_RESOLUTION": 17,
+          "w60:CONCENTRATED_MODE_ESCAPE": 114,
+          "w60:CONCENTRATED_MODE_RECAPTURE": 14,
+          "w60:MODE_MIGRATION_PERSISTENCE": 318,
+          "w60:REVISIT_PRESSURE_BREAK": 26,
+          "w60:REVISIT_PRESSURE_FAILURE": 1472
+        },
+        "outcome_or_future_price_columns_used": [],
+        "session_count": 43
+      },
+      "timeout_count": 186
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "candidate_quantity_results": {
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.04164722222221058,
+            "minimum_mll_buffer": 3134.8000000000466,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.08329444444445026,
+            "minimum_mll_buffer": 1769.5999999999767,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.10931111111110335,
+            "minimum_mll_buffer": -677.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.14389434939125803,
+            "minimum_mll_buffer": -5855.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.013569444444437978,
+            "minimum_mll_buffer": 1504.4000000001397,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.027138888888892123,
+            "minimum_mll_buffer": -927.7000000000116,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6355.400000000023,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.28033333333333654,
+            "minimum_mll_buffer": -12855.399999999994,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.04814166666666279,
+            "minimum_mll_buffer": 3023.6500000000233,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.09628333333333527,
+            "minimum_mll_buffer": 1547.2999999999884,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.19256666666667055,
+            "minimum_mll_buffer": -677.7000000000116,
+            "mll_breach_count": 1,
+            "pass_count": 0,
+            "timeout_count": 4
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.0900888888888876,
+            "minimum_mll_buffer": -5855.399999999994,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          }
+        },
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.005086111111107231,
+            "minimum_mll_buffer": 1259.8000000000466,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.010172222222224163,
+            "minimum_mll_buffer": -1980.4000000000233,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.17469999999999872,
+            "minimum_mll_buffer": -4177.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.34940000000000065,
+            "minimum_mll_buffer": -12855.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.29797777777786055,
+            "minimum_mll_buffer": 128.22500000026776,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.5959555555555142,
+            "minimum_mll_buffer": -1102.7000000000116,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.08085555555555685,
+            "minimum_mll_buffer": -6705.400000000023,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -17910.79999999999,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.38436388888885914,
+            "minimum_mll_buffer": -1547.1249999999418,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.26351111111112147,
+            "minimum_mll_buffer": -1702.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.15120000000000516,
+            "minimum_mll_buffer": -7905.400000000023,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -17655.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.18430555555549089,
+            "minimum_mll_buffer": -15.199999999953434,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3465833333333366,
+            "minimum_mll_buffer": -685.8000000000466,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.19008888888889405,
+            "minimum_mll_buffer": -2360.8000000000466,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.021022222222223514,
+            "minimum_mll_buffer": -5955.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.2506972222222701,
+            "minimum_mll_buffer": -308.2749999999651,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.26325000000000326,
+            "minimum_mll_buffer": -5116.5500000000175,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.12102222222221705,
+            "minimum_mll_buffer": -3527.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.16051111111111177,
+            "minimum_mll_buffer": -11555.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.17205277777776873,
+            "minimum_mll_buffer": 2672.3000000000466,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3441055555555601,
+            "minimum_mll_buffer": 844.5999999999767,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.10675555555556072,
+            "minimum_mll_buffer": -1033.100000000035,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.21351111111110851,
+            "minimum_mll_buffer": -6566.1999999999825,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.15322777777777002,
+            "minimum_mll_buffer": 2409.8000000000466,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3064555555555594,
+            "minimum_mll_buffer": 319.5999999999767,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.004355555555550381,
+            "minimum_mll_buffer": -2610.8000000000466,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.009911111111112404,
+            "minimum_mll_buffer": -6255.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.018375000000006466,
+            "minimum_mll_buffer": 2602.875000000058,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.036749999999996764,
+            "minimum_mll_buffer": 705.7499999999709,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.07349999999999353,
+            "minimum_mll_buffer": -2010.8000000000466,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.3198222222222248,
+            "minimum_mll_buffer": -5010.799999999988,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.06835555555555038,
+            "minimum_mll_buffer": 2014.0250000000815,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1367111111111137,
+            "minimum_mll_buffer": -16.550000000017462,
+            "mll_breach_count": 1,
+            "pass_count": 0,
+            "timeout_count": 4
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.25367777777778167,
+            "minimum_mll_buffer": -1605.4000000000233,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.05179999999999806,
+            "minimum_mll_buffer": -4255.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3637333333332402,
+            "minimum_mll_buffer": -1379.0499999999302,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.23111666666667507,
+            "minimum_mll_buffer": -1391.5500000000175,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.1284555555555465,
+            "minimum_mll_buffer": -2605.4000000000233,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.016066666666667312,
+            "minimum_mll_buffer": -9710.799999999988,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.23028888888882162,
+            "minimum_mll_buffer": -576.3499999999767,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1481222222222261,
+            "minimum_mll_buffer": -5652.700000000012,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1605.4000000000233,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6955.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.40031388888879965,
+            "minimum_mll_buffer": -126.29999999911524,
+            "mll_breach_count": 3,
+            "pass_count": 1,
+            "timeout_count": 1
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.35585555555555687,
+            "minimum_mll_buffer": -1391.5500000000175,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3585555555555685,
+            "minimum_mll_buffer": -3983.100000000035,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.22837777777777712,
+            "minimum_mll_buffer": -9710.799999999988,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1941972222221666,
+            "minimum_mll_buffer": -1483.274999999965,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.25153888888888953,
+            "minimum_mll_buffer": -5652.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -4327.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -13155.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.11649722222221316,
+            "minimum_mll_buffer": 2070.95000000007,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.287011111111115,
+            "minimum_mll_buffer": -358.1000000000349,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.28145555555555946,
+            "minimum_mll_buffer": -3155.4000000000233,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.3605111111111118,
+            "minimum_mll_buffer": -1310.7999999999884,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.20029999999999482,
+            "minimum_mll_buffer": 2265.375000000058,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.40060000000000257,
+            "minimum_mll_buffer": 30.749999999970896,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.08085555555555685,
+            "minimum_mll_buffer": -1683.100000000035,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -5610.799999999988,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.002008333333334627,
+            "minimum_mll_buffer": 3011.1500000000233,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.00401666666666602,
+            "minimum_mll_buffer": 1522.2999999999884,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.00803333333333204,
+            "minimum_mll_buffer": -427.70000000001164,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.016066666666667312,
+            "minimum_mll_buffer": -5355.399999999994,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.07299166666666537,
+            "minimum_mll_buffer": 2955.5750000000116,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.145983333333334,
+            "minimum_mll_buffer": 1411.1499999999942,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.291966666666668,
+            "minimum_mll_buffer": -1677.7000000000116,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -7855.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.29180555555536153,
+            "minimum_mll_buffer": -951.1749999998719,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3046166666666686,
+            "minimum_mll_buffer": -1130.4000000000233,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -4677.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -13855.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.2171166666666589,
+            "minimum_mll_buffer": -563.8499999999767,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1530.4000000000233,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0600529369846125,
+            "minimum_mll_buffer": -4727.700000000012,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -13955.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.41044722222210195,
+            "minimum_mll_buffer": -791.5499999999302,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3073555555555633,
+            "minimum_mll_buffer": -763.8500000000058,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.13393333333333593,
+            "minimum_mll_buffer": -6027.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.052999999999996765,
+            "minimum_mll_buffer": -16555.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3266499999999715,
+            "minimum_mll_buffer": -463.8499999999767,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.17773888888889472,
+            "minimum_mll_buffer": -2158.100000000035,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -7127.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -18755.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 480,
+      "mll_breach_count": 308,
+      "mll_breach_rate": 0.6416666666666667,
+      "pass_count": 14,
+      "pass_rate": 0.029166666666666667,
+      "reconstruction_audit": {
+        "bridge_coordinate": "stable_trade_rank",
+        "control": "VOLATILITY_MATCHED_RANDOM_WALK",
+        "minute_count": 17200,
+        "retained_trade_count": 16129864,
+        "rounding": "nearest_quarter_tick_half_ties_lower",
+        "source_audits": [
+          {
+            "bounded_record_count": 15545497,
+            "bridge_minute_count": 8800,
+            "calendar_year": 2023,
+            "contract": "ESU3",
+            "metric_minute_count": 8800,
+            "minute_group_count": 8800,
+            "raw_record_count": 15545497,
+            "retained_es_rth_record_count": 7960570
+          },
+          {
+            "bounded_record_count": 18408542,
+            "bridge_minute_count": 8400,
+            "calendar_year": 2024,
+            "contract": "ESU4",
+            "metric_minute_count": 8400,
+            "minute_group_count": 8400,
+            "raw_record_count": 32277017,
+            "retained_es_rth_record_count": 8169294
+          }
+        ]
+      },
+      "signal_count": 2383,
+      "source_audit": {
+        "exact_source_match_count": 17200,
+        "executable_counts": {
+          "w20:h30": 15867,
+          "w20:h60": 14577,
+          "w60:h30": 15867,
+          "w60:h60": 14577
+        },
+        "history_windows": [
+          20,
+          60
+        ],
+        "minute_count": 17200,
+        "motif_state_counts": {
+          "w20:BIMODAL_AUCTION_RESOLUTION": 28,
+          "w20:CONCENTRATED_MODE_ESCAPE": 192,
+          "w20:CONCENTRATED_MODE_RECAPTURE": 17,
+          "w20:MODE_MIGRATION_PERSISTENCE": 408,
+          "w20:REVISIT_PRESSURE_BREAK": 24,
+          "w20:REVISIT_PRESSURE_FAILURE": 1771,
+          "w60:BIMODAL_AUCTION_RESOLUTION": 11,
+          "w60:CONCENTRATED_MODE_ESCAPE": 136,
+          "w60:CONCENTRATED_MODE_RECAPTURE": 20,
+          "w60:MODE_MIGRATION_PERSISTENCE": 341,
+          "w60:REVISIT_PRESSURE_BREAK": 10,
+          "w60:REVISIT_PRESSURE_FAILURE": 1404
+        },
+        "outcome_or_future_price_columns_used": [],
+        "session_count": 43
+      },
+      "timeout_count": 158
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "candidate_quantity_results": {
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.009063888888864313,
+            "minimum_mll_buffer": 2204.225000000035,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.12897777777778296,
+            "minimum_mll_buffer": -91.55000000001746,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.13273333333333073,
+            "minimum_mll_buffer": -1927.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -8355.399999999994,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.13660000000001551,
+            "minimum_mll_buffer": 2444.600000000093,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.2731999999999922,
+            "minimum_mll_buffer": 389.19999999995343,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -2927.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -10355.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.07175277777777389,
+            "minimum_mll_buffer": 2033.4500000000698,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1435055555555575,
+            "minimum_mll_buffer": -380.4000000000233,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.287011111111115,
+            "minimum_mll_buffer": -1005.4000000000233,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.02837777777777713,
+            "minimum_mll_buffer": -6510.799999999988,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.10647499999999611,
+            "minimum_mll_buffer": 2598.6500000000233,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.21295000000000194,
+            "minimum_mll_buffer": 697.2999999999884,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.16914444444444315,
+            "minimum_mll_buffer": -877.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.3382888888888895,
+            "minimum_mll_buffer": -6255.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3366527777777325,
+            "minimum_mll_buffer": -256.7499999998836,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.04590555555556784,
+            "minimum_mll_buffer": -416.20000000006985,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1117111111111137,
+            "minimum_mll_buffer": -3621.600000000093,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -8466.199999999983,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.0041083333332984084,
+            "minimum_mll_buffer": -82.92499999975553,
+            "mll_breach_count": 1,
+            "pass_count": 0,
+            "timeout_count": 4
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0982223252413535,
+            "minimum_mll_buffer": -1093.9000000000815,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0982223252413535,
+            "minimum_mll_buffer": -1983.100000000035,
+            "mll_breach_count": 3,
+            "pass_count": 1,
+            "timeout_count": 1
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.5000000000000003,
+            "minimum_mll_buffer": -5055.399999999994,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.12922500000003492,
+            "minimum_mll_buffer": 1785.5000000004657,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.2584499999999825,
+            "minimum_mll_buffer": 139.89999999984866,
+            "mll_breach_count": 0,
+            "pass_count": 1,
+            "timeout_count": 4
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.35698888888885916,
+            "minimum_mll_buffer": -364.8000000002794,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 1.1125866533032707,
+            "minimum_mll_buffer": -5055.399999999994,
+            "mll_breach_count": 2,
+            "pass_count": 3,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_escape_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.45097777777780884,
+            "minimum_mll_buffer": -506.7499999998836,
+            "mll_breach_count": 1,
+            "pass_count": 0,
+            "timeout_count": 4
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.9019555555555401,
+            "minimum_mll_buffer": -302.70000000001164,
+            "mll_breach_count": 2,
+            "pass_count": 1,
+            "timeout_count": 2
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 1.2374282454774246,
+            "minimum_mll_buffer": -488.5000000000582,
+            "mll_breach_count": 2,
+            "pass_count": 3,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 1.2374282454774286,
+            "minimum_mll_buffer": -5055.399999999994,
+            "mll_breach_count": 2,
+            "pass_count": 3,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.028866666666671842,
+            "minimum_mll_buffer": 1916.9000000001397,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.05773333333333075,
+            "minimum_mll_buffer": -57.75000000008731,
+            "mll_breach_count": 1,
+            "pass_count": 0,
+            "timeout_count": 4
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.1154666666666615,
+            "minimum_mll_buffer": -127.70000000001164,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.16125128014151563,
+            "minimum_mll_buffer": -4755.399999999994,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.23025555555556074,
+            "minimum_mll_buffer": 2043.0750000000116,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.37946220118473006,
+            "minimum_mll_buffer": -413.8500000000058,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.37946220118473006,
+            "minimum_mll_buffer": -1355.4000000000233,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.37946220118473273,
+            "minimum_mll_buffer": -7210.799999999988,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.030405555555558142,
+            "minimum_mll_buffer": 3343.0750000000116,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.06081111111110982,
+            "minimum_mll_buffer": 2186.149999999994,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.12162222222221963,
+            "minimum_mll_buffer": -127.70000000001164,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.24324444444444573,
+            "minimum_mll_buffer": -4755.399999999994,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          }
+        },
+        "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.019594444444441857,
+            "minimum_mll_buffer": 3343.0750000000116,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.03918888888889018,
+            "minimum_mll_buffer": 2186.149999999994,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.07837777777778036,
+            "minimum_mll_buffer": -127.70000000001164,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3617111111111105,
+            "minimum_mll_buffer": -4755.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.36231111111109043,
+            "minimum_mll_buffer": -642.7249999998021,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.24992222222223387,
+            "minimum_mll_buffer": -938.8500000000058,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6377.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.46546666666666797,
+            "minimum_mll_buffer": -17255.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.38327499999996506,
+            "minimum_mll_buffer": -1658.274999999965,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.028416666666663433,
+            "minimum_mll_buffer": -1402.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.056833333333326866,
+            "minimum_mll_buffer": -7305.400000000023,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.18648888888889148,
+            "minimum_mll_buffer": -17255.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.2892611111110568,
+            "minimum_mll_buffer": -143.89999999967404,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.34748333333334047,
+            "minimum_mll_buffer": -1049.6500000000524,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.09692222222222092,
+            "minimum_mll_buffer": -2955.4000000000233,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.09890145085354304,
+            "minimum_mll_buffer": -10110.799999999988,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_mode_migration_persistence_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1510499999999819,
+            "minimum_mll_buffer": -1001.1749999998719,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.2393551220583336,
+            "minimum_mll_buffer": -1893.9000000000815,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.2562200344032462,
+            "minimum_mll_buffer": -7305.400000000023,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -9821.599999999977,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.18686111111109818,
+            "minimum_mll_buffer": -385.9749999999185,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0025166666666595525,
+            "minimum_mll_buffer": -1216.5500000000175,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -2527.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -9555.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.12357222222219894,
+            "minimum_mll_buffer": -985.7999999998137,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0614430011857067,
+            "minimum_mll_buffer": -1474.6500000000524,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0614430011857067,
+            "minimum_mll_buffer": -6727.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -17955.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.020213888888887595,
+            "minimum_mll_buffer": 923.8250000001281,
+            "mll_breach_count": 0,
+            "pass_count": 0,
+            "timeout_count": 5
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.04042777777777842,
+            "minimum_mll_buffer": -1277.7000000000116,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.039488888888891474,
+            "minimum_mll_buffer": -777.7000000000116,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.07897777777777648,
+            "minimum_mll_buffer": -6055.399999999994,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_break_continuation_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.13348333333333073,
+            "minimum_mll_buffer": -1871.949999999837,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.2586333333333346,
+            "minimum_mll_buffer": -852.7000000000116,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.21974444444444574,
+            "minimum_mll_buffer": -3027.7000000000116,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.43948888888888826,
+            "minimum_mll_buffer": -7310.799999999988,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w20_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.14916944444468633,
+            "minimum_mll_buffer": -981.5749999997788,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.22781666666666084,
+            "minimum_mll_buffer": -219.2500000000291,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -4577.700000000012,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -13655.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w20_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3063249999999987,
+            "minimum_mll_buffer": -1791.5499999999302,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1788.8500000000058,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -8077.700000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -20655.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w60_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.37064444444442374,
+            "minimum_mll_buffer": -633.0999999998603,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.09718333333333916,
+            "minimum_mll_buffer": -838.5000000000582,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1977.7000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -8455.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v72g12_price_occupancy_revisit_pressure_failure_reversal_w60_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.054558333333290646,
+            "minimum_mll_buffer": -976.1749999998719,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0515777777777726,
+            "minimum_mll_buffer": -901.6500000001688,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -3893.9000000000815,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -9355.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 480,
+      "mll_breach_count": 305,
+      "mll_breach_rate": 0.6354166666666666,
+      "pass_count": 19,
+      "pass_rate": 0.03958333333333333,
+      "reconstruction_audit": {
+        "bridge_coordinate": "stable_trade_rank",
+        "control": "YEAR_BLOCK_PERMUTATION",
+        "minute_count": 17200,
+        "retained_trade_count": 16129864,
+        "rounding": "nearest_quarter_tick_half_ties_lower",
+        "source_audits": [
+          {
+            "bounded_record_count": 15545497,
+            "bridge_minute_count": 8800,
+            "calendar_year": 2023,
+            "contract": "ESU3",
+            "metric_minute_count": 8800,
+            "minute_group_count": 8800,
+            "raw_record_count": 15545497,
+            "retained_es_rth_record_count": 7960570
+          },
+          {
+            "bounded_record_count": 18408542,
+            "bridge_minute_count": 8400,
+            "calendar_year": 2024,
+            "contract": "ESU4",
+            "metric_minute_count": 8400,
+            "minute_group_count": 8400,
+            "raw_record_count": 32277017,
+            "retained_es_rth_record_count": 8169294
+          }
+        ]
+      },
+      "signal_count": 2323,
+      "source_audit": {
+        "exact_source_match_count": 17200,
+        "executable_counts": {
+          "w20:h30": 15867,
+          "w20:h60": 14577,
+          "w60:h30": 15867,
+          "w60:h60": 14577
+        },
+        "history_windows": [
+          20,
+          60
+        ],
+        "minute_count": 17200,
+        "motif_state_counts": {
+          "w20:BIMODAL_AUCTION_RESOLUTION": 37,
+          "w20:CONCENTRATED_MODE_ESCAPE": 145,
+          "w20:CONCENTRATED_MODE_RECAPTURE": 26,
+          "w20:MODE_MIGRATION_PERSISTENCE": 444,
+          "w20:REVISIT_PRESSURE_BREAK": 84,
+          "w20:REVISIT_PRESSURE_FAILURE": 1376,
+          "w60:BIMODAL_AUCTION_RESOLUTION": 13,
+          "w60:CONCENTRATED_MODE_ESCAPE": 96,
+          "w60:CONCENTRATED_MODE_RECAPTURE": 8,
+          "w60:MODE_MIGRATION_PERSISTENCE": 337,
+          "w60:REVISIT_PRESSURE_BREAK": 53,
+          "w60:REVISIT_PRESSURE_FAILURE": 1115
+        },
+        "outcome_or_future_price_columns_used": [],
+        "session_count": 43
+      },
+      "timeout_count": 156
+    }
+  },
+  "cost_stress": "STRESS_1_5X",
+  "diagnostic_quantities": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "event_timestamps_sizes_sides_preserved_in_price_nulls": true,
+  "evidence_strength": "ARTEFACT",
+  "exact_binomial_test": {
+    "evidence_strength": "ARTEFACT",
+    "exact_binomial_one_sided_p_value": 0.9999999208665388,
+    "null_episodes": 1440,
+    "null_observed_rate": 0.03958333333333333,
+    "null_passes": 57,
+    "real_episodes": 480,
+    "real_passes": 2
+  },
+  "forward_gap_access_count": 0,
+  "grammar_id": "hydra_v7_2_executed_price_occupancy_grammar_0012",
+  "new_data_purchase_count": 0,
+  "occupancy_features_signals_and_account_paths_recomputed": true,
+  "outbound_order_count": 0,
+  "pooled_null": {
+    "episode_count": 1440,
+    "pass_count": 57,
+    "pass_rate": 0.03958333333333333
+  },
+  "prochaine_action": "tombstone_executed_price_occupancy_class_as_geometry_only",
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "raw_pass_counts": {
+    "null": "57/1440",
+    "real": "2/480"
+  },
+  "real": {
+    "candidate_quantity_results": {
+      "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w20_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.16946388888890054,
+          "minimum_mll_buffer": 2204.225000000035,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.33892777777777194,
+          "minimum_mll_buffer": -91.55000000001746,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.6778555555555439,
+          "minimum_mll_buffer": -633.1000000000349,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.24204444444444703,
+          "minimum_mll_buffer": -310.79999999998836,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w20_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.2051055555555633,
+          "minimum_mll_buffer": 2523.6500000000233,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.41021111111110725,
+          "minimum_mll_buffer": 547.2999999999884,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.7840111111111021,
+          "minimum_mll_buffer": -127.70000000001164,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.14564444444444316,
+          "minimum_mll_buffer": -4755.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w60_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.057394444444436685,
+          "minimum_mll_buffer": 2033.4500000000698,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.11478888888889277,
+          "minimum_mll_buffer": -380.4000000000233,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.36726666666666924,
+          "minimum_mll_buffer": -1005.4000000000233,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -6510.799999999988,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w60_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.09072777777777001,
+          "minimum_mll_buffer": 2272.3000000000466,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.18145555555555942,
+          "minimum_mll_buffer": 44.59999999997672,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -977.7000000000116,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -6455.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_concentrated_mode_escape_continuation_w20_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.043661111111196485,
+          "minimum_mll_buffer": -256.7499999998836,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.09531666666662851,
+          "minimum_mll_buffer": -421.60000000009313,
+          "mll_breach_count": 4,
+          "pass_count": 0,
+          "timeout_count": 1
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.1117111111111137,
+          "minimum_mll_buffer": -3621.600000000093,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -8466.199999999983,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_concentrated_mode_escape_continuation_w20_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.1808027777778334,
+          "minimum_mll_buffer": 242.07500000024447,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.29013809519562,
+          "minimum_mll_buffer": 29.099999999802094,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0982223252413535,
+          "minimum_mll_buffer": -1983.100000000035,
+          "mll_breach_count": 4,
+          "pass_count": 0,
+          "timeout_count": 1
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -5521.599999999977,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_concentrated_mode_escape_continuation_w60_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.46720833333328804,
+          "minimum_mll_buffer": -266.02499999961583,
+          "mll_breach_count": 3,
+          "pass_count": 0,
+          "timeout_count": 2
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.41962777777779653,
+          "minimum_mll_buffer": -423.95000000015716,
+          "mll_breach_count": 3,
+          "pass_count": 1,
+          "timeout_count": 1
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.31351111111112145,
+          "minimum_mll_buffer": -366.20000000006985,
+          "mll_breach_count": 4,
+          "pass_count": 1,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.07026666666666279,
+          "minimum_mll_buffer": -5055.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_concentrated_mode_escape_continuation_w60_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.4115222222221912,
+          "minimum_mll_buffer": -1209.2749999997322,
+          "mll_breach_count": 4,
+          "pass_count": 0,
+          "timeout_count": 1
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.3845333333333385,
+          "minimum_mll_buffer": -546.9500000000407,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.24008888888889407,
+          "minimum_mll_buffer": -1233.100000000035,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -5055.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w20_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.040727777777770015,
+          "minimum_mll_buffer": 1916.9000000001397,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.08145555555555943,
+          "minimum_mll_buffer": -57.75000000008731,
+          "mll_breach_count": 1,
+          "pass_count": 0,
+          "timeout_count": 4
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.16291111111111886,
+          "minimum_mll_buffer": -127.70000000001164,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.05315555555555814,
+          "minimum_mll_buffer": -4755.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w20_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.039977777777782955,
+          "minimum_mll_buffer": 2043.0750000000116,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.07995555555555296,
+          "minimum_mll_buffer": -413.8500000000058,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.15991111111110592,
+          "minimum_mll_buffer": -1355.4000000000233,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.3198222222222248,
+          "minimum_mll_buffer": -7210.799999999988,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        }
+      },
+      "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w60_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.040127777777780364,
+          "minimum_mll_buffer": 3343.0750000000116,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.08025555555555426,
+          "minimum_mll_buffer": 2186.149999999994,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.16051111111110852,
+          "minimum_mll_buffer": -127.70000000001164,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.32102222222222354,
+          "minimum_mll_buffer": -4755.399999999994,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        }
+      },
+      "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w60_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.02068333333333592,
+          "minimum_mll_buffer": 3343.0750000000116,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.04136666666666537,
+          "minimum_mll_buffer": 2186.149999999994,
+          "mll_breach_count": 0,
+          "pass_count": 0,
+          "timeout_count": 5
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.08273333333333074,
+          "minimum_mll_buffer": -127.70000000001164,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.16546666666666796,
+          "minimum_mll_buffer": -4755.399999999994,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        }
+      },
+      "v72g12_price_occupancy_mode_migration_persistence_continuation_w20_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.2942472222223813,
+          "minimum_mll_buffer": -642.7249999998021,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.1196666666666796,
+          "minimum_mll_buffer": -938.8500000000058,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -6377.700000000012,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -17255.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_mode_migration_persistence_continuation_w20_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.4260305555555258,
+          "minimum_mll_buffer": -1658.274999999965,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.17278333333334175,
+          "minimum_mll_buffer": -938.8500000000058,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.2838555555555698,
+          "minimum_mll_buffer": -6377.700000000012,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -17255.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_mode_migration_persistence_continuation_w60_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.025405555555428793,
+          "minimum_mll_buffer": -143.89999999967404,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.4166277777777836,
+          "minimum_mll_buffer": -1049.6500000000524,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.12582222222223774,
+          "minimum_mll_buffer": -2955.4000000000233,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -6055.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_mode_migration_persistence_continuation_w60_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.08438333333331523,
+          "minimum_mll_buffer": -979.0499999999302,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.09516368466283247,
+          "minimum_mll_buffer": -1953.3000000003376,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.013238338932696717,
+          "minimum_mll_buffer": -3906.600000000675,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -7813.199999999662,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_revisit_pressure_break_continuation_w20_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.41690833333329325,
+          "minimum_mll_buffer": -622.9499999996042,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.34902222222223,
+          "minimum_mll_buffer": -966.5500000000175,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.3628333333333527,
+          "minimum_mll_buffer": -2443.9000000000815,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -4155.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_revisit_pressure_break_continuation_w20_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.15146111111106195,
+          "minimum_mll_buffer": -985.7999999998137,
+          "mll_breach_count": 4,
+          "pass_count": 0,
+          "timeout_count": 1
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.03746666666664856,
+          "minimum_mll_buffer": -1474.6500000000524,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.004277777777784245,
+          "minimum_mll_buffer": -2955.4000000000233,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -4355.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_revisit_pressure_break_continuation_w60_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.45521666666664856,
+          "minimum_mll_buffer": -366.1999999997206,
+          "mll_breach_count": 3,
+          "pass_count": 0,
+          "timeout_count": 2
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.29504444444444705,
+          "minimum_mll_buffer": -1277.7000000000116,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.2839333333333359,
+          "minimum_mll_buffer": -3333.100000000035,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.2728222222222216,
+          "minimum_mll_buffer": -6055.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_revisit_pressure_break_continuation_w60_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.28605277777774285,
+          "minimum_mll_buffer": -1871.949999999837,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.2586333333333346,
+          "minimum_mll_buffer": -1430.4000000000233,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.2617111111111137,
+          "minimum_mll_buffer": -5005.400000000023,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -2455.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_revisit_pressure_failure_reversal_w20_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.4528305555554948,
+          "minimum_mll_buffer": -981.5749999997788,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.1724444444444574,
+          "minimum_mll_buffer": -546.9500000000407,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.20915555555557108,
+          "minimum_mll_buffer": -4577.700000000012,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.054199999999995474,
+          "minimum_mll_buffer": -13655.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_revisit_pressure_failure_reversal_w20_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.4163083333333036,
+          "minimum_mll_buffer": -1791.5499999999302,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.17406111111111305,
+          "minimum_mll_buffer": -3130.0500000000757,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.2876111111111176,
+          "minimum_mll_buffer": -8077.700000000012,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -20655.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_revisit_pressure_failure_reversal_w60_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.03384999999984736,
+          "minimum_mll_buffer": -633.0999999998603,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.3357333333333437,
+          "minimum_mll_buffer": -760.450000000099,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.31726666666666925,
+          "minimum_mll_buffer": -2860.8000000000466,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.21966666666666343,
+          "minimum_mll_buffer": -5155.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v72g12_price_occupancy_revisit_pressure_failure_reversal_w60_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.2722277777778735,
+          "minimum_mll_buffer": -976.1749999998719,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.2975222222222235,
+          "minimum_mll_buffer": -1541.5500000000175,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.21974444444444574,
+          "minimum_mll_buffer": -3893.9000000000815,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -6410.799999999988,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      }
+    },
+    "compliance_failure_count": 0,
+    "episode_count": 480,
+    "mll_breach_count": 341,
+    "mll_breach_rate": 0.7104166666666667,
+    "pass_count": 2,
+    "pass_rate": 0.004166666666666667,
+    "signal_count": 2506,
+    "timeout_count": 137
+  },
+  "schema": "hydra_v7_2_executed_price_occupancy_tripwire_result_v1",
+  "signal_paths_allowed_to_change_in_price_nulls": true,
+  "source_audit": {
+    "exact_source_match_count": 17200,
+    "executable_counts": {
+      "w20:h30": 15867,
+      "w20:h60": 14577,
+      "w60:h30": 15867,
+      "w60:h60": 14577
+    },
+    "history_windows": [
+      20,
+      60
+    ],
+    "minute_count": 17200,
+    "motif_state_counts": {
+      "w20:BIMODAL_AUCTION_RESOLUTION": 32,
+      "w20:CONCENTRATED_MODE_ESCAPE": 184,
+      "w20:CONCENTRATED_MODE_RECAPTURE": 28,
+      "w20:MODE_MIGRATION_PERSISTENCE": 548,
+      "w20:REVISIT_PRESSURE_BREAK": 141,
+      "w20:REVISIT_PRESSURE_FAILURE": 932,
+      "w60:BIMODAL_AUCTION_RESOLUTION": 17,
+      "w60:CONCENTRATED_MODE_ESCAPE": 111,
+      "w60:CONCENTRATED_MODE_RECAPTURE": 8,
+      "w60:MODE_MIGRATION_PERSISTENCE": 413,
+      "w60:REVISIT_PRESSURE_BREAK": 107,
+      "w60:REVISIT_PRESSURE_FAILURE": 728
+    },
+    "outcome_or_future_price_columns_used": [],
+    "session_count": 43
+  },
+  "threshold": 0.8,
+  "tripwire_id": "hydra_v7_2_executed_price_occupancy_tripwire_0012",
+  "verdict": "ARTEFACT_GEOMETRY_ONLY"
+}
