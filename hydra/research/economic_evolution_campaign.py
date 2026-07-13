@@ -28,6 +28,7 @@ from hydra.economic_evolution.archive import (
 from hydra.economic_evolution.assembly import generate_account_policy_population
 from hydra.economic_evolution.failure_model import derive_failure_vector
 from hydra.economic_evolution.generator import generate_structural_population
+from hydra.economic_evolution.null_calibration import calibrate_incremental_validator
 from hydra.economic_evolution.parallel_screen import (
     run_ultra_cheap_screen_processes,
 )
@@ -57,6 +58,7 @@ from hydra.research.economic_evolution_pilot import (
     _descriptor,
     _exact_component_eligible,
     _expected_payouts,
+    _incremental_policy,
     _objectives,
     _quality_diverse_exact_selection,
     _run_incremental_tournament,
@@ -98,6 +100,24 @@ def run_economic_evolution_campaign(
     state_writer = AtomicResultWriter(output_dir, immutable=False)
     writer.write_json("preregistration_copy.json", prereg)
     _stage(state_writer, "PREREGISTRATION_VERIFIED", prereg)
+
+    calibration = calibrate_incremental_validator(
+        _incremental_policy(prereg),
+        seed=int(prereg["validator_calibration"]["seed"]),
+        repetitions=int(prereg["validator_calibration"]["repetitions"]),
+        starts_per_block=int(prereg["validator_calibration"]["starts_per_block"]),
+        noise_scale=float(prereg["validator_calibration"]["noise_scale"]),
+    )
+    writer.write_json("validator_null_calibration.json", calibration.to_dict())
+    if calibration.null_false_positive_rate > float(
+        prereg["validator_calibration"]["maximum_false_positive_rate"]
+    ) or calibration.meaningful_effect_power < float(
+        prereg["validator_calibration"]["minimum_meaningful_effect_power"]
+    ):
+        raise EconomicEvolutionCampaignError(
+            "fixed incremental validator failed preregistered controls"
+        )
+    _stage(state_writer, "VALIDATOR_CALIBRATION_GREEN", prereg)
 
     stage_timings: dict[str, float] = {}
     stage_start = time.perf_counter()
@@ -317,6 +337,7 @@ def run_economic_evolution_campaign(
         mutation_comparisons=mutation_comparisons,
         rolling_rows=rolling_rows,
         archive=archive,
+        calibration=calibration,
         timings=stage_timings,
         total_wall=total_wall,
         total_cpu=total_cpu,
@@ -727,6 +748,7 @@ def _campaign_summary(**values: Any) -> dict[str, Any]:
             "new_data_purchases": 0,
             "q4_access_delta": 0,
         },
+        "validator_calibration": values["calibration"].to_dict(),
         "funnel": {
             "raw_structural_proposals": generated.raw_proposal_count,
             "unique_sleeves": generated.unique_sleeve_count,
