@@ -29,6 +29,7 @@ from hydra.research.v7_graveyard import (
     append_class_tombstone,
     audit_graveyard,
     class_feedback,
+    verify_class_tombstone,
 )
 
 
@@ -76,9 +77,21 @@ class EconomicEvolutionDensityTerminalRuntime:
         )
         self._verify_proof_state()
         tombstone = _tombstone_from_verdict(verdict)
-        append_result = append_class_tombstone(self.graveyard_path, tombstone)
-        _verify_append_result(verdict, append_result)
-        receipt = self._write_or_verify_receipt(verdict, tombstone, append_result)
+        receipt_exists = self.receipt_path.is_file()
+        if receipt_exists:
+            append_result = verify_class_tombstone(
+                self.graveyard_path, tombstone
+            )
+        else:
+            append_result = append_class_tombstone(
+                self.graveyard_path, tombstone
+            )
+        _verify_append_result(
+            verdict,
+            append_result,
+            allow_downstream_growth=receipt_exists,
+        )
+        receipt = self._write_or_verify_receipt(verdict, tombstone)
         return density_terminal_action(predecessor, verdict, receipt)
 
     def snapshot(self) -> dict[str, Any]:
@@ -163,8 +176,8 @@ class EconomicEvolutionDensityTerminalRuntime:
         self,
         verdict: Mapping[str, Any],
         tombstone: ClassTombstone,
-        append_result: Mapping[str, Any],
     ) -> dict[str, Any]:
+        frozen_append = verdict["graveyard_append"]
         receipt = {
             "schema": "hydra_density_terminal_graveyard_receipt_v1",
             "campaign_id": CAMPAIGN_ID,
@@ -177,8 +190,12 @@ class EconomicEvolutionDensityTerminalRuntime:
             "death_cause": tombstone.death_cause,
             "candidate_count": tombstone.candidate_count,
             "evidence_sha256": tombstone.evidence_sha256,
-            "class_signature_count": int(append_result["class_signature_count"]),
-            "indexed_object_count": int(append_result["indexed_object_count"]),
+            "class_signature_count": int(
+                frozen_append["class_signature_count_after"]
+            ),
+            "indexed_object_count": int(
+                frozen_append["indexed_object_count_after"]
+            ),
             "parameter_level_feedback": False,
             "matched_null_controls_counted_as_candidates": False,
             "unevaluated_account_policies_counted_as_candidates": False,
@@ -327,16 +344,30 @@ def _tombstone_from_verdict(verdict: Mapping[str, Any]) -> ClassTombstone:
 
 
 def _verify_append_result(
-    verdict: Mapping[str, Any], result: Mapping[str, Any]
+    verdict: Mapping[str, Any],
+    result: Mapping[str, Any],
+    *,
+    allow_downstream_growth: bool = False,
 ) -> None:
     frozen = verdict["graveyard_append"]
+    actual_classes = int(result.get("class_signature_count", -1))
+    actual_objects = int(result.get("indexed_object_count", -1))
+    expected_classes = int(frozen["class_signature_count_after"])
+    expected_objects = int(frozen["indexed_object_count_after"])
+    if allow_downstream_growth:
+        count_mismatch = (
+            actual_classes < expected_classes
+            or actual_objects < expected_objects
+        )
+    else:
+        count_mismatch = (
+            actual_classes != expected_classes
+            or actual_objects != expected_objects
+        )
     if (
         result.get("append_status")
         not in {"APPENDED", "ALREADY_PRESENT_IDENTICAL"}
-        or int(result.get("class_signature_count", -1))
-        != int(frozen["class_signature_count_after"])
-        or int(result.get("indexed_object_count", -1))
-        != int(frozen["indexed_object_count_after"])
+        or count_mismatch
         or result.get("parameter_level_columns") != []
     ):
         raise EconomicEvolutionRuntimeError(

@@ -220,3 +220,28 @@ def test_completed_terminal_allows_later_campaign_reservation(
     )
     second = runtime.advance(_predecessor())
     assert first == second
+
+
+def test_completed_terminal_allows_later_class_tombstone(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runtime = _runtime_fixture(tmp_path, monkeypatch)
+    first = runtime.advance(_predecessor())
+    append_class_tombstone(
+        runtime.graveyard_path,
+        ClassTombstone(
+            mechanism_class="DOWNSTREAM_TEST_CLASS",
+            regime="DEVELOPMENT_TEST",
+            death_cause="DOWNSTREAM_NULL",
+            candidate_count=3,
+            source_scope="TEST_ONLY",
+            evidence_sha256="b" * 64,
+        ),
+    )
+
+    second = runtime.advance(_predecessor())
+
+    assert first == second
+    audit = audit_graveyard(runtime.graveyard_path)
+    assert audit["class_signature_count"] == 97
+    assert audit["indexed_object_count"] == 115_671

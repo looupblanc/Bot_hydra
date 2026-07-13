@@ -296,6 +296,52 @@ def append_class_tombstone(
     return result
 
 
+def verify_class_tombstone(
+    path: str | Path,
+    tombstone: ClassTombstone,
+) -> dict[str, Any]:
+    """Verify one completed append without mutating a later graveyard state.
+
+    Terminal campaign runtimes are replayed on every controller step.  Once a
+    receipt exists, later campaigns may legitimately append other class-level
+    tombstones, so recovery must verify the immutable row rather than require
+    the global table totals to remain frozen forever.
+    """
+
+    destination = Path(path)
+    audit = audit_graveyard(destination)
+    conn = sqlite3.connect(
+        f"file:{destination.resolve()}?mode=ro",
+        uri=True,
+    )
+    try:
+        prior = conn.execute(
+            "SELECT mechanism_class,regime,death_cause,candidate_count,"
+            "source_scope,evidence_sha256 FROM class_tombstones "
+            "WHERE signature_hash=?",
+            (tombstone.signature_hash,),
+        ).fetchone()
+    finally:
+        conn.close()
+    expected = (
+        tombstone.mechanism_class,
+        tombstone.regime,
+        tombstone.death_cause,
+        tombstone.candidate_count,
+        tombstone.source_scope,
+        tombstone.evidence_sha256,
+    )
+    if prior is None:
+        raise GraveyardError("completed incremental tombstone is missing")
+    if tuple(prior) != expected:
+        raise GraveyardError(
+            "completed incremental tombstone differs from its receipt"
+        )
+    audit["append_status"] = "ALREADY_PRESENT_IDENTICAL"
+    audit["signature_hash"] = tombstone.signature_hash
+    return audit
+
+
 def canonical_mechanism_class(mechanism_class: str) -> str:
     normalized = str(mechanism_class).strip()
     return _CLASS_ALIASES.get(normalized, normalized)

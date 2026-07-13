@@ -21,7 +21,12 @@ from hydra.mission.economic_evolution_density_terminal_runtime import (
     load_and_verify_density_terminal_verdict,
 )
 from hydra.mission.economic_evolution_runtime import EconomicEvolutionRuntimeError
-from hydra.research.v7_graveyard import audit_graveyard, class_feedback
+from hydra.research.v7_graveyard import (
+    ClassTombstone,
+    append_class_tombstone,
+    audit_graveyard,
+    class_feedback,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -219,3 +224,47 @@ def test_completed_terminal_allows_later_campaign_reservation(
     )
     second = runtime.advance(_predecessor())
     assert first == second
+
+
+def test_completed_terminal_allows_later_class_tombstone(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "project"
+    state = root / "mission/state"
+    state.mkdir(parents=True)
+    shutil.copy2(LIVE_STATE_ROOT / "graveyard.db", state / "graveyard.db")
+    shutil.copy2(
+        LIVE_STATE_ROOT / "proof_registry.json",
+        state / "proof_registry.json",
+    )
+    monkeypatch.setattr(terminal_module, "verify_density_freeze", lambda _root: {})
+    monkeypatch.setattr(
+        terminal_module,
+        "load_and_verify_density_result",
+        lambda _path, _config: _frozen_result(),
+    )
+    monkeypatch.setattr(
+        terminal_module,
+        "load_and_verify_density_terminal_verdict",
+        lambda _root, *, result: _frozen_verdict(),
+    )
+    runtime = EconomicEvolutionDensityTerminalRuntime(root, state)
+    first = runtime.advance(_predecessor())
+    append_class_tombstone(
+        state / "graveyard.db",
+        ClassTombstone(
+            mechanism_class="DOWNSTREAM_TEST_CLASS",
+            regime="DEVELOPMENT_TEST",
+            death_cause="DOWNSTREAM_NULL",
+            candidate_count=44,
+            source_scope="TEST_ONLY",
+            evidence_sha256="a" * 64,
+        ),
+    )
+
+    second = runtime.advance(_predecessor())
+
+    assert first == second
+    audit = audit_graveyard(state / "graveyard.db")
+    assert audit["class_signature_count"] == 96
+    assert audit["indexed_object_count"] == 115_668
