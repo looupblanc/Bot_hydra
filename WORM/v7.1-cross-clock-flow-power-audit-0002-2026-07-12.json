@@ -1,0 +1,78 @@
+{
+  "schema": "hydra_v7_1_cross_clock_flow_power_audit_freeze_v1",
+  "audit_id": "hydra_v7_1_cross_clock_flow_power_audit_0002",
+  "grammar_id": "hydra_v7_1_cross_clock_flow_grammar_0004",
+  "source_commit": "9280a0c4fd3a20cfd1809ae3e7e5075df976893d",
+  "grammar_path": "WORM/v7.1-cross-clock-flow-grammar-0004-2026-07-12.json",
+  "grammar_sha256": "9341e576b4090f2626079f1678170ad738b523ca10394b89261292a3ee1b2c0e",
+  "signal_manifest_path": "reports/v7_1/discovery_0004/v71_cross_clock_flow_signal_manifest.json",
+  "signal_manifest_sha256": "35393b8bee755da085b9214fde3a89975221f1f4ac7915251ed3e8f596f758b8",
+  "funnel_result_path": "reports/v7_1/discovery_0004/v71_cross_clock_flow_funnel_result.json",
+  "funnel_result_sha256": "737e484c7fc51380ccaf588b7dc4bc76f3183530254219a2e621494d025cd828",
+  "tripwire_result_path": "reports/v7_1/discovery_0004/v71_cross_clock_flow_tripwire_result.json",
+  "tripwire_result_sha256": "95a9ba4d548fb1fad18a0dae2f11d67bfcf50d4d280f14363c1f51d918a3aaa0",
+  "tripwire_verdict": "GREEN_NULL_ADJUSTED_BASELINE",
+  "tripwire_NULL_RATIO": 0.6363636363636362,
+  "power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+  "power_policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673",
+  "calibration_result_path": "reports/v7_1/power_aware_0001/v71_candidate_specific_power_calibration_result.json",
+  "calibration_result_sha256": "edd3bcdb2ec56bcef2830be7783d74df02041a57b4234b76c1c1803e40b647f5",
+  "candidate_count": 2,
+  "candidates": [
+    {
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h30",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "direction_policy": "REVERSAL",
+      "holding_minutes": 30,
+      "cost_horizon": "30m",
+      "specification_hash": "7835354b3c3206ccb07cd642e4e0926332941bf73dfee4e489c0baf4319a7f9c",
+      "signal_path_hash": "cc6e26e62772f5ae69993ceae7aa61524123c260c22ac8a16be618e6baa70fab",
+      "raw_signal_count": 464,
+      "frozen_walk_forward_event_count": 304,
+      "frozen_walk_forward_expectancy_STRESS_1_5X": 4.752631578947379
+    },
+    {
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "direction_policy": "REVERSAL",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "ee91025aaf7ab38bacb7540aff8282a5b28703e987eb1dd20e122106e2468b62",
+      "signal_path_hash": "f14fd905c30f02572cebc6c9aa8e450a1ece96a50ff757b3ad00e8a9a24dd146",
+      "raw_signal_count": 246,
+      "frozen_walk_forward_event_count": 161,
+      "frozen_walk_forward_expectancy_STRESS_1_5X": 73.19922360248448
+    }
+  ],
+  "inference": {
+    "primary_cost_stress": "STRESS_1_5X",
+    "normal_and_elevated_costs_reported": true,
+    "temporal_blocks": "calendar_year_x_Chicago_ISO_week",
+    "bootstrap_draws": 20000,
+    "candidate_specific_power": true,
+    "universal_raw_event_threshold": false,
+    "status_vocabulary": [
+      "POWERED_WF_POSITIVE",
+      "PROMISING_UNDERPOWERED",
+      "WF_POSITIVE_BUT_FRAGILE",
+      "WF_FALSE_POSITIVE"
+    ]
+  },
+  "multiplicity_reservation": {
+    "candidate_count": 2,
+    "inferential_diagnostics_per_candidate": 4,
+    "delta_trials": 8,
+    "expected_prior_global_N_trials": 263664,
+    "expected_post_reservation_global_N_trials": 263672
+  },
+  "rolling_combine_eligibility": "POWERED_WF_POSITIVE_only",
+  "candidate_nulls_executed_in_this_audit": false,
+  "DSR_BH_executed_in_this_audit": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "status_inheritance": false,
+  "outbound_orders": 0,
+  "CONTRE": "Both candidates were selected after positive D1 walk-forward results; the audit quantifies dependence and fragility but is not fresh independent proof."
+}
