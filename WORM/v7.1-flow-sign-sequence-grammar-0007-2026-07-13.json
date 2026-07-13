@@ -1,0 +1,121 @@
+{
+  "schema": "hydra_v7_1_limited_flow_sign_sequence_grammar_v1",
+  "grammar_id": "hydra_v7_1_flow_sign_sequence_grammar_0007",
+  "allocation_role": "LIMITED_STRUCTURAL_DISCOVERY_5_PERCENT",
+  "broad_D1_batch": false,
+  "economic_hypothesis": "The completed-minute sequence of ES aggressive-flow signs reveals whether urgent inventory is handing off, restarting after a brief counter-flow interruption, or escaping a two-sided alternation state; participants who continue executing the exhausted sequence or liquidity suppliers who lag the new sequence can pay the subsequent path.",
+  "who_pays": "Late aggressive participants who extrapolate an exhausted run, liquidity suppliers who update inventory after a confirmed sign handoff, and execution programs whose temporary one-minute interruption is mistaken for termination.",
+  "persistence_rationale": "The grammar uses only the ordinal sequence of nonzero signed aggressor flow in contiguous completed ES minutes. It does not reuse magnitude thresholds, event-clock speed, cross-clock agreement, trade-size composition, price progress, or mini/micro divergence.",
+  "source": {
+    "product": "ES",
+    "minute_store_path": "data/cache/v7_d1/date_matched_minute_print_features_v2.parquet",
+    "minute_store_sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb",
+    "required_fields": [
+      "minute_start_ns",
+      "availability_ns",
+      "contract",
+      "calendar_year",
+      "signed_aggressor_volume",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "completed_minutes_only": true,
+    "flow_sign": "sign(signed_aggressor_volume); zero-flow minutes are ineligible and break every sequence",
+    "contiguity": "all motif source minutes are exactly one minute apart in the same explicit contract and Chicago session day",
+    "magnitude_thresholds": false,
+    "price_outcomes_in_signal_definition": false
+  },
+  "mechanism_class": "V71_AGGRESSOR_FLOW_SIGN_SEQUENCES",
+  "motifs": [
+    {
+      "motif": "RUN_TERMINATION_HANDOFF",
+      "response_policy": "CURRENT_FLOW_CONTINUATION",
+      "definition": "the preceding three contiguous completed minutes share one nonzero aggressive-flow sign and the current completed minute has the opposite sign; direction is the current sign"
+    },
+    {
+      "motif": "RUN_RESTART_AFTER_ONE_COUNTER",
+      "response_policy": "CURRENT_FLOW_CONTINUATION",
+      "definition": "three contiguous completed minutes share one nonzero sign, the next minute has the opposite sign, and the current completed minute restores the original sign; direction is the current sign"
+    },
+    {
+      "motif": "ALTERNATION_BREAK_TO_PERSISTENCE",
+      "response_policy": "CURRENT_FLOW_CONTINUATION",
+      "definition": "the preceding four contiguous completed minutes alternate nonzero signs and the current completed minute repeats the immediately preceding sign; direction is the current sign"
+    }
+  ],
+  "holding_minutes": [
+    30,
+    60
+  ],
+  "candidate_ids": [
+    "v71g7_flow_sign_sequence_run_termination_handoff_current_flow_continuation_h30",
+    "v71g7_flow_sign_sequence_run_termination_handoff_current_flow_continuation_h60",
+    "v71g7_flow_sign_sequence_run_restart_after_one_counter_current_flow_continuation_h30",
+    "v71g7_flow_sign_sequence_run_restart_after_one_counter_current_flow_continuation_h60",
+    "v71g7_flow_sign_sequence_alternation_break_to_persistence_current_flow_continuation_h30",
+    "v71g7_flow_sign_sequence_alternation_break_to_persistence_current_flow_continuation_h60"
+  ],
+  "candidate_count": 6,
+  "bounded_parameter_alternatives_per_structure": 1,
+  "sequence_lengths": {
+    "same_sign_run": 3,
+    "alternating_sequence": 4,
+    "selection_basis": "minimal completed sequence needed to distinguish persistence, one-counter restart, and alternation break; frozen before outcomes"
+  },
+  "signal_policy": {
+    "decision_timestamp": "availability_ns of the current completed source minute",
+    "entry": "first explicit-contract 1m open at or after decision timestamp",
+    "exit": "explicit-contract 1m open at entry plus frozen holding_minutes",
+    "overlapping_signals_per_candidate": false,
+    "session_crossing": false,
+    "contract_crossing": false
+  },
+  "cost_policy": {
+    "path": "config/v7/phase0_g0_preregistration.json",
+    "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "primary_walk_forward_stress": "STRESS_1_5X",
+    "SIM_EXPLOIT_stress": "STRESS_2X"
+  },
+  "funnel": {
+    "stage0": "validity_novelty_nonoverlap_and_same_contract_contiguous_sequence",
+    "stage1": "frozen_existing_cheap_economic_policy",
+    "stage2": "four_fold_walk_forward_with_five_day_embargo",
+    "stage3": "hypothesis_specific_nulls_only_after_green_tripwire_and_powered_walk_forward",
+    "stage4": "campaign_DSR_BH_only_if_powered",
+    "stage5": "rolling_Combine_diagnostic_only_after_statistical_survival_or_explicit_research_stage_policy",
+    "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+    "candidate_specific_power_policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673"
+  },
+  "mandatory_grammar_tripwire": {
+    "policy_path": "WORM/v7.1-flow-sign-sequence-tripwire-0007-2026-07-13.json",
+    "worlds": [
+      "DAILY_BLOCK_SHUFFLE",
+      "VOLATILITY_MATCHED_RANDOM_WALK",
+      "YEAR_BLOCK_PERMUTATION"
+    ],
+    "NULL_RATIO_artefact_threshold_inclusive": 0.8,
+    "raw_counts_and_exact_binomial_test_required": true,
+    "combine_pass_rate_is_fitness": false
+  },
+  "cemetery_firewall": {
+    "feedback_scope": "mechanism_class_x_regime_x_death_cause_only",
+    "parameter_feedback_used": false,
+    "candidate_outcome_feedback_used": false,
+    "excluded_classes": [
+      "ARB_INTRA_PRODUIT",
+      "V71_EVENT_TIME_CLOCK_STATES",
+      "V71_CROSS_CLOCK_FLOW_CONFIRMATION",
+      "V71_CROSS_CLOCK_SPEED_LEADERSHIP",
+      "V71_TRADE_SIZE_COMPOSITION_TRANSITIONS"
+    ]
+  },
+  "candidate_status_inheritance": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "shadow_admission_authorized": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "Flow-sign sequences may be common combinatorial patterns whose apparent economics are entirely market-drift geometry; fixed minimal run lengths are not evidence of a persistent economic edge, so the permanent tripwire and power audit remain mandatory."
+}

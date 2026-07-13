@@ -1,0 +1,1019 @@
+{
+  "CONTRE": "Only two D1 calendar blocks exist and the observed flow-sign sequences are held fixed in price nulls; even a green tripwire cannot rescue six formulations that failed the preregistered economic screen.",
+  "NULL_RATIO": 1.1333333333333333,
+  "N_trials": 263844,
+  "candidate_count": 6,
+  "candidate_promotion_authorized": false,
+  "combine_pass_rate_is_diagnostic_not_fitness": true,
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "candidate_quantity_results": {
+        "v71g7_flow_sign_sequence_alternation_break_to_persistence_current_flow_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.4168580714508781,
+            "minimum_mll_buffer": -925.3386553000018,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.36814302092528994,
+            "minimum_mll_buffer": -1384.3671728031477,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -2394.060249278089,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6042.494692881504,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_alternation_break_to_persistence_current_flow_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3862301657995461,
+            "minimum_mll_buffer": -1350.508790635562,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.277336749648546,
+            "minimum_mll_buffer": -2112.4672627157415,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -4810.051353761082,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -8212.994334341056,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_restart_after_one_counter_current_flow_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.38428031575030763,
+            "minimum_mll_buffer": -393.19318617210956,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.32174378785789787,
+            "minimum_mll_buffer": -953.8705300574948,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.2951576820251907,
+            "minimum_mll_buffer": -1386.0399317407282,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -7272.0798634814855,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_restart_after_one_counter_current_flow_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.03705640494546646,
+            "minimum_mll_buffer": -614.264860645635,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.10069989197274683,
+            "minimum_mll_buffer": -1162.4443224660645,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.11396069739673921,
+            "minimum_mll_buffer": -1918.9950917367241,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -7707.6477886013745,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_termination_handoff_current_flow_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.306031762584782,
+            "minimum_mll_buffer": -44.537064577278215,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.196262721390596,
+            "minimum_mll_buffer": -782.1738351084641,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.17805898466620257,
+            "minimum_mll_buffer": -986.7843367273745,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.10746355931680429,
+            "minimum_mll_buffer": -5035.71850212937,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_termination_handoff_current_flow_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.215133274366607,
+            "minimum_mll_buffer": -772.7391276805138,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1542855137336236,
+            "minimum_mll_buffer": -2462.661456524889,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.011408811960608646,
+            "minimum_mll_buffer": -4105.654563371005,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.05065231538229333,
+            "minimum_mll_buffer": -7179.744631893467,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 120,
+      "mll_breach_count": 113,
+      "mll_breach_rate": 0.9416666666666667,
+      "pass_count": 0,
+      "pass_rate": 0.0,
+      "signal_count": 1889,
+      "timeout_count": 7
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "candidate_quantity_results": {
+        "v71g7_flow_sign_sequence_alternation_break_to_persistence_current_flow_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.18809032302216575,
+            "minimum_mll_buffer": -1254.6242091483437,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.016382908986098805,
+            "minimum_mll_buffer": -1877.150372585369,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.168151510942045,
+            "minimum_mll_buffer": -2616.388982031087,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -9732.777964062174,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_alternation_break_to_persistence_current_flow_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.39128501910572716,
+            "minimum_mll_buffer": -928.1536646655295,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1515.089417628682,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -7530.178835257364,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -19560.3576705147,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_restart_after_one_counter_current_flow_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.410957161743058,
+            "minimum_mll_buffer": -215.45133081707172,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.2928694955225963,
+            "minimum_mll_buffer": -222.1452604898077,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.1175460548506364,
+            "minimum_mll_buffer": -2603.009379101597,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -7008.440883995703,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_restart_after_one_counter_current_flow_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.38091828262598654,
+            "minimum_mll_buffer": -1117.0237766884675,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.20517943382641857,
+            "minimum_mll_buffer": -2234.0475533770514,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.038011587830968675,
+            "minimum_mll_buffer": -4468.095106754074,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -10937.122237051139,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_termination_handoff_current_flow_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.02089405015864112,
+            "minimum_mll_buffer": -280.45727113302564,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.08922527070244218,
+            "minimum_mll_buffer": -2755.72516338306,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.08559042883642193,
+            "minimum_mll_buffer": -3861.581689752522,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -12223.163379505044,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_termination_handoff_current_flow_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.013768708297918137,
+            "minimum_mll_buffer": -865.9578616402287,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1193.2801592976903,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6886.560318595351,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -18273.120637190732,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 120,
+      "mll_breach_count": 105,
+      "mll_breach_rate": 0.875,
+      "pass_count": 10,
+      "pass_rate": 0.08333333333333333,
+      "signal_count": 1889,
+      "timeout_count": 5
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "candidate_quantity_results": {
+        "v71g7_flow_sign_sequence_alternation_break_to_persistence_current_flow_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.47973191090005435,
+            "minimum_mll_buffer": -1690.4500000002154,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -4695.100000000006,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -13890.200000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -32280.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_alternation_break_to_persistence_current_flow_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -2597.79999999993,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -4695.100000000006,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -13890.200000000012,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -32280.399999999994,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_restart_after_one_counter_current_flow_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.10909407761939736,
+            "minimum_mll_buffer": -980.9849843413103,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1624.5820234519779,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -7749.164046903927,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -19998.328093807853,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_restart_after_one_counter_current_flow_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.08314945298935184,
+            "minimum_mll_buffer": -719.5320291450771,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.053709198813002235,
+            "minimum_mll_buffer": -2662.772224100685,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -8901.711240632896,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -22303.422481265792,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_termination_handoff_current_flow_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.38659157710154735,
+            "minimum_mll_buffer": -856.6499999998196,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.33502222222221384,
+            "minimum_mll_buffer": -1638.6642137433228,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -3140.2000000000116,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -10780.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g7_flow_sign_sequence_run_termination_handoff_current_flow_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.21360315356902235,
+            "minimum_mll_buffer": -1545.9152087515395,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1333.4906737977872,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6440.200000000012,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -17380.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 120,
+      "mll_breach_count": 109,
+      "mll_breach_rate": 0.9083333333333333,
+      "pass_count": 7,
+      "pass_rate": 0.058333333333333334,
+      "signal_count": 1889,
+      "timeout_count": 4
+    }
+  },
+  "diagnostic_quantities": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "evidence_strength": "ARTEFACT",
+  "exact_binomial_test": {
+    "evidence_strength": "ARTEFACT",
+    "exact_binomial_one_sided_p_value": 0.6738558452399335,
+    "null_episodes": 360,
+    "null_observed_rate": 0.04722222222222222,
+    "null_passes": 17,
+    "real_episodes": 120,
+    "real_passes": 5
+  },
+  "flow_sign_sequences_invariant_in_price_nulls": true,
+  "forward_gap_access_count": 0,
+  "grammar_id": "hydra_v7_1_flow_sign_sequence_grammar_0007",
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "pooled_null": {
+    "episode_count": 360,
+    "pass_count": 17,
+    "pass_rate": 0.04722222222222222
+  },
+  "price_derived_fields_recomputed_in_each_null": true,
+  "prochaine_action": "tombstone_flow_sign_sequence_class_as_geometry_only",
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "raw_pass_counts": {
+    "null": "17/360",
+    "real": "5/120"
+  },
+  "real": {
+    "candidate_quantity_results": {
+      "v71g7_flow_sign_sequence_alternation_break_to_persistence_current_flow_continuation_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.2641388888888307,
+          "minimum_mll_buffer": -1690.4499999998952,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.02293333333334239,
+          "minimum_mll_buffer": -4695.100000000006,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -13890.200000000012,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -32280.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v71g7_flow_sign_sequence_alternation_break_to_persistence_current_flow_continuation_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.09142777777770404,
+          "minimum_mll_buffer": -2597.79999999993,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.02046271545762977,
+          "minimum_mll_buffer": -4695.100000000006,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.025822222222237744,
+          "minimum_mll_buffer": -13890.200000000012,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -32280.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v71g7_flow_sign_sequence_run_restart_after_one_counter_current_flow_continuation_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.11153888888865994,
+          "minimum_mll_buffer": -498.29999999981374,
+          "mll_breach_count": 3,
+          "pass_count": 0,
+          "timeout_count": 2
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.04038888888881451,
+          "minimum_mll_buffer": -771.2000000003609,
+          "mll_breach_count": 4,
+          "pass_count": 1,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -1590.2000000000116,
+          "mll_breach_count": 4,
+          "pass_count": 1,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -7680.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v71g7_flow_sign_sequence_run_restart_after_one_counter_current_flow_continuation_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.14261111111121458,
+          "minimum_mll_buffer": -423.04999999987194,
+          "mll_breach_count": 3,
+          "pass_count": 0,
+          "timeout_count": 2
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.053709198813048066,
+          "minimum_mll_buffer": -1281.4000000000815,
+          "mll_breach_count": 3,
+          "pass_count": 2,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -1590.2000000000116,
+          "mll_breach_count": 4,
+          "pass_count": 1,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -7680.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v71g7_flow_sign_sequence_run_termination_handoff_current_flow_continuation_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.41008333333324926,
+          "minimum_mll_buffer": -856.6499999996158,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.3467444444444813,
+          "minimum_mll_buffer": -1635.3000000000175,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.08051111111114086,
+          "minimum_mll_buffer": -3140.2000000000116,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -10780.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v71g7_flow_sign_sequence_run_termination_handoff_current_flow_continuation_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.42424444444436166,
+          "minimum_mll_buffer": -618.1499999998487,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.16122222222222868,
+          "minimum_mll_buffer": -3471.600000000093,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.07908888888890053,
+          "minimum_mll_buffer": -6440.200000000012,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -17380.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      }
+    },
+    "compliance_failure_count": 0,
+    "episode_count": 120,
+    "mll_breach_count": 111,
+    "mll_breach_rate": 0.925,
+    "pass_count": 5,
+    "pass_rate": 0.041666666666666664,
+    "signal_count": 1889,
+    "timeout_count": 4
+  },
+  "schema": "hydra_v7_1_flow_sign_sequence_tripwire_result_v1",
+  "source_audit": {
+    "alternation_break_to_persistence_count": 906,
+    "contiguous_five_minute_count": 17028,
+    "executable_state_count_30m": 15867,
+    "executable_state_count_60m": 14577,
+    "minute_count": 17200,
+    "nonzero_flow_minute_count": 17177,
+    "run_restart_after_one_counter_count": 1085,
+    "run_termination_handoff_count": 2261,
+    "session_count": 43
+  },
+  "threshold": 0.8,
+  "tripwire_id": "hydra_v7_1_flow_sign_sequence_tripwire_0007",
+  "verdict": "ARTEFACT_GEOMETRY_ONLY"
+}

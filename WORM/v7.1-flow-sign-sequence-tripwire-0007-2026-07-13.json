@@ -1,0 +1,40 @@
+{
+  "schema": "hydra_v7_1_flow_sign_sequence_tripwire_policy_v1",
+  "tripwire_id": "hydra_v7_1_flow_sign_sequence_tripwire_0007",
+  "grammar_id": "hydra_v7_1_flow_sign_sequence_grammar_0007",
+  "preregistered_before_signal_generation": true,
+  "controls": [
+    "DAILY_BLOCK_SHUFFLE",
+    "VOLATILITY_MATCHED_RANDOM_WALK",
+    "YEAR_BLOCK_PERMUTATION"
+  ],
+  "daily_block_shuffle_seeds": {
+    "2023_ES": 992301,
+    "2024_ES": 992401
+  },
+  "volatility_matched_random_walk_seeds": {
+    "2023_ES": 993301,
+    "2024_ES": 993401
+  },
+  "null_recomputation_policy": "Preserve timestamps, contracts and signed aggressor-flow fields, hence the frozen outcome-free signal paths. Recompute price-derived fields in every null world before identical account episodes.",
+  "real_and_null_pipeline_identical_after_world_construction": true,
+  "minimum_null_episode_count_relative_to_real": 1.0,
+  "NULL_RATIO_definition": "pass_rate(null pooled) / pass_rate(real)",
+  "artefact_threshold_inclusive": 0.8,
+  "exact_binomial_test": {
+    "alternative": "greater",
+    "null_probability": "pooled null pass rate",
+    "raw_counts_required": true
+  },
+  "evidence_labels": [
+    "VERT_MINCE",
+    "VERT_NET",
+    "ARTEFACT"
+  ],
+  "promotion_policy": "ARTEFACT_GEOMETRY_ONLY tombstones the exact mechanism class before candidate power, null, DSR/BH, Combine, or shadow work. GREEN_NULL_ADJUSTED_BASELINE permits power audit only for frozen walk-forward-positive candidates.",
+  "candidate_outcome_feedback_used": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "The price-null worlds preserve the observed aggressive-flow sequence, so they isolate price-path geometry but cannot test whether that flow sequence itself was selected by an unobserved regime; a green result remains development evidence."
+}
