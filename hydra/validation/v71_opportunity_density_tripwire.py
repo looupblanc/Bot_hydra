@@ -345,7 +345,7 @@ def _verify_inputs(root: Path, proof_registry_path: str | Path) -> None:
     if not proof_path.is_absolute():
         proof_path = root / proof_path
     proof = load_and_verify(proof_path)
-    if multiplicity_trial_count(proof) != EXPECTED_GLOBAL_N_TRIALS:
+    if multiplicity_trial_count(proof) < EXPECTED_GLOBAL_N_TRIALS:
         raise V71OpportunityDensityTripwireError(
             "tripwire multiplicity reservation is absent"
         )

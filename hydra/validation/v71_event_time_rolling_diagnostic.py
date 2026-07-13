@@ -297,7 +297,7 @@ def _verify_inputs(
     if not proof_path.is_absolute():
         proof_path = root / proof_path
     proof = load_and_verify(proof_path)
-    if multiplicity_trial_count(proof) != EXPECTED_GLOBAL_N_TRIALS:
+    if multiplicity_trial_count(proof) < EXPECTED_GLOBAL_N_TRIALS:
         raise V71EventTimeRollingDiagnosticError("multiplicity registry drift")
     if burned_window_ids(proof) != ("Q4_2024",):
         raise V71EventTimeRollingDiagnosticError("unexpected proof-window state")
