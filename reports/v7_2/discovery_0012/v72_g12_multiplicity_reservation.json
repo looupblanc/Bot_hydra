@@ -1,0 +1,31 @@
+{
+  "schema": "hydra_v7_2_g12_multiplicity_reservation_v1",
+  "reservation_id": "hydra_v7_2_executed_price_occupancy_multiplicity_0012",
+  "grammar_id": "hydra_v7_2_executed_price_occupancy_grammar_0012",
+  "worm_commit": "db6db17abdc95f42a1f320493702d5681431bb69",
+  "worm_tag": "worm/v72-executed-price-occupancy-0012-2026-07-13",
+  "grammar_path": "WORM/v7.2-executed-price-occupancy-grammar-0012-2026-07-13.json",
+  "grammar_sha256": "d0fa4eb200f47e1df9d3323c09f9e0c3729802a001b9c946bdf43824846a4c0c",
+  "tripwire_path": "WORM/v7.2-executed-price-occupancy-tripwire-0012-2026-07-13.json",
+  "tripwire_sha256": "0a40db491ae3cc28fedfe00107b3e3ba417896f4533460e3fabc1c1a1c664786",
+  "proof_registry_event_id": "v7_2_executed_price_occupancy_structural_tripwire_reservation_0012",
+  "proof_registry_entry_hash": "5f4544d4c786a94a257872ff457f3dcc58a0152fb84c74b1847f53a1adeaa22b",
+  "proof_registry_snapshot_before": "/root/hydra-bot/mission/state/snapshots/v72_g12_pre_multiplicity_20260713T090532Z_proof_registry.json",
+  "accounting": {
+    "structural_candidate_trials": 24,
+    "tripwire_candidate_world_trials": 96,
+    "delta_trials": 120,
+    "global_N_trials_before": 265227,
+    "global_N_trials_after": 265347,
+    "campaign_inflation_factor": 1.5,
+    "campaign_effective_N_trials": 180.0
+  },
+  "reservation_preceded_feature_signal_or_pnl_results": true,
+  "threshold_or_null_policy_changed": false,
+  "candidate_selection_changed": false,
+  "new_data_purchase_count": 0,
+  "protected_holdout_access_count_delta": 0,
+  "outbound_order_count": 0,
+  "status": "PREREGISTERED_AND_RESERVED_BEFORE_RESULTS",
+  "CONTRE": "The reservation proves temporal ordering and bounded multiplicity, not scientific merit; executed-price occupancy may still be contemporaneous price geometry and must pass the frozen class tripwire."
+}
