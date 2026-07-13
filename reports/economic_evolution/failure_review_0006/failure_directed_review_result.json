@@ -1,0 +1,152 @@
+{
+  "CONTRE": "The class-level hypothesis is chosen after observing 0005 and can still encode selection bias; only a new preregistered development campaign followed by powered independent confirmation can support promotion.",
+  "broker_connections": 0,
+  "candidate_exact_status": "FROZEN_DEVELOPMENT_UNDERPOWERED_NO_PROOF",
+  "candidate_id": "account_policy_child_9a7e901bda15207c0e7ba25d",
+  "candidate_specification_hash": "3662c57afa0b6c9e2ea7b5969109a21694ad61c1cd7e7a91f90cde19a597a252",
+  "candidate_validated": false,
+  "class_status": "CLASS_REFORMULATION_ALLOWED_NEW_IDS_ONLY",
+  "completed_at_utc": "2026-07-13T18:02:47+00:00",
+  "decision": {
+    "admit_shadow": false,
+    "class_level_reformulation": true,
+    "consume_independent_proof": false,
+    "inherit_status": false,
+    "mutate_exact_policy": false,
+    "new_ids_required": true,
+    "purchase_new_data": false,
+    "remove_tombstones": false,
+    "replay_exact_policy_unchanged": false,
+    "reuse_q4": false
+  },
+  "dominant_failure": "INSUFFICIENT_STATISTICAL_POWER",
+  "failure_scores": {
+    "CONSISTENCY_RULE_FAILURE": 0.75,
+    "INSUFFICIENT_STATISTICAL_POWER": 1.0,
+    "INSUFFICIENT_TARGET_VELOCITY": 0.794282037036903,
+    "MLL_BREACH": 0.0,
+    "UNSTABLE_TEMPORAL_TRANSFER": 0.25,
+    "WEAK_COST_MARGIN": 0.34312118645448886
+  },
+  "multiplicity_delta": 0,
+  "new_data_purchase_count": 0,
+  "new_statistical_comparisons_executed": 0,
+  "next_experiment_id": "hydra_economic_evolution_density_diversification_0007",
+  "next_experiment_state": "WORM_PREREGISTRATION_REQUIRED_BEFORE_OUTCOMES",
+  "next_research_class": {
+    "class_id": "INDEPENDENT_OPPORTUNITY_DENSITY_CONSISTENCY_ASSEMBLY_V1",
+    "economic_hypothesis": "Behaviorally distinct market and session sleeves that each retain positive stressed development economics can create more temporally dispersed daily account expectancy, improve consistency and raise independent evidence density without consuming additional MLL buffer.",
+    "forbidden_feedback": [
+      "threshold tuning from 0005 outcomes",
+      "reusing the exact negative block as a selection target",
+      "parameter-neighbor rescue",
+      "retuning the exact candidate",
+      "using Combine pass rate as sole fitness",
+      "consuming independent proof before all frozen final gates pass"
+    ],
+    "mandatory_pre_outcome_controls": [
+      "new WORM campaign manifest and candidate IDs",
+      "new structural and semantic fingerprints",
+      "no exact or behavioral clone of the 0005 policy",
+      "no status inheritance",
+      "normal and 1.5x cost economics",
+      "temporal block dispersion",
+      "matched add-one and leave-one-out contribution",
+      "family-level null calibration before expensive validation",
+      "identical account starts for parent-class controls and new assemblies"
+    ],
+    "new_data_required": false,
+    "new_ids_required": true,
+    "next_experiment_id": "hydra_economic_evolution_density_diversification_0007",
+    "q4_required": false,
+    "status_inheritance_allowed": false,
+    "structural_change": "Generate new component and policy identities around opportunity-density dispersion, independently cost-resilient sleeve roles and shared-account chronology; do not modify or replay the exact 0005 policy.",
+    "who_pays": "Independent forced-flow and inventory-transfer episodes across non-identical markets and sessions pay complementary sleeves at different times, reducing dependence on a single account path."
+  },
+  "observed_evidence": {
+    "bh_rejected": false,
+    "block_count": 4,
+    "block_results_1_5x": [
+      {
+        "block_id": "B1",
+        "consistency_ok": true,
+        "mll_breached": false,
+        "net_usd": 1640.352500001056,
+        "target_progress": 0.1822613888890062
+      },
+      {
+        "block_id": "B2",
+        "consistency_ok": false,
+        "mll_breached": false,
+        "net_usd": -1147.079999999376,
+        "target_progress": -0.127453333333264
+      },
+      {
+        "block_id": "B3",
+        "consistency_ok": false,
+        "mll_breached": false,
+        "net_usd": 1136.8400000007532,
+        "target_progress": 0.12631555555563925
+      },
+      {
+        "block_id": "B4",
+        "consistency_ok": false,
+        "mll_breached": false,
+        "net_usd": 2216.497500000929,
+        "target_progress": 0.24627750000010323
+      }
+    ],
+    "block_sign_null_p_value": 0.07658468306338732,
+    "bootstrap_confidence_interval_95_usd_per_day": [
+      -9.148937905844141,
+      61.41189245129866
+    ],
+    "consistency_pass_rate_1_5x": 0.25,
+    "daily_observations": 154,
+    "dominating_leave_one_out_sleeves": [],
+    "dsr_deflated_z": -2.4612517466795305,
+    "effective_independent_observations": 154.0,
+    "maximum_target_progress_1_5x": 0.24627750000010323,
+    "median_target_progress_1_5x": 0.15428847222232273,
+    "minimum_mll_buffer_2x_usd": 2506.319999999978,
+    "mll_breach_rate_2x": 0.0,
+    "negative_blocks": [
+      "B2"
+    ],
+    "negative_stressed_exact_components": [
+      {
+        "execution_market": "MCL",
+        "market": "CL",
+        "normal_net_usd": -120.7999999999954,
+        "role": "MARKET_DIVERSIFIER",
+        "sleeve_id": "sleeve_958d5ade0f6a1090ba0d95aa",
+        "stress_1_5x_net_usd": -227.19999999999573
+      }
+    ],
+    "normal_net_usd": 4633.97499999986,
+    "positive_blocks": 3,
+    "probability_mean_net_positive": 0.9224,
+    "static_control_dominates": false,
+    "stress_1_5x_net_usd": 3846.610000003362,
+    "stress_2x_net_usd": 3043.959999999468,
+    "validator_power": 0.0
+  },
+  "orders": 0,
+  "outbound_order_capability": false,
+  "paper_shadow_ready_count": 0,
+  "pre_holdout_ready_count": 0,
+  "proof_window_consumed": false,
+  "q4_access_delta": 0,
+  "ranked_failure_dimensions": [
+    "INSUFFICIENT_STATISTICAL_POWER",
+    "INSUFFICIENT_TARGET_VELOCITY",
+    "CONSISTENCY_RULE_FAILURE",
+    "WEAK_COST_MARGIN",
+    "UNSTABLE_TEMPORAL_TRANSFER",
+    "MLL_BREACH"
+  ],
+  "result_sha256": "0e9636b85266f8f24860c0af040698a993152b27801b30f6f5f692a328833048",
+  "retrospective_only": true,
+  "review_id": "hydra_economic_evolution_failure_directed_review_0006_revision_02",
+  "schema": "hydra_economic_evolution_failure_directed_review_v1"
+}
