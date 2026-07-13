@@ -1,0 +1,61 @@
+{
+  "schema": "hydra_v7_1_underpowered_combine_diagnostic_verdict_v1",
+  "verdict_id": "hydra_v7_1_underpowered_combine_diagnostic_verdict_0001",
+  "diagnostic_result_path": "reports/v7_1/combine_research_0001/v71_underpowered_combine_diagnostic_result.json",
+  "diagnostic_result_sha256": "6dff583d4aa945f4e2c479b801cf6fa954e0616b8f65d32bada401797ce0c4e0",
+  "verdict": "NULL_DIAGNOSTIC_NO_PASS_NO_PROMOTION",
+  "raw_episode_start_count": 24,
+  "effective_nonoverlapping_block_count": 4,
+  "candidate_count": 5,
+  "primary_variant": "eod_level_rt_breach__DLL_disabled",
+  "primary_results": {
+    "candidate_pass_count_total": 0,
+    "candidate_episode_count_each": 24,
+    "basket_pass_count": 0,
+    "basket_episode_count": 24,
+    "basket_MLL_breach_rate": 0.20833333333333334,
+    "basket_maximum_target_progress_median": 0.4622972222222856,
+    "basket_projected_days_to_target": 21.63110552974882
+  },
+  "highest_progress_candidate": {
+    "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+    "maximum_target_progress_median": 0.6200305555556292,
+    "projected_days_to_target": 16.128237407652723,
+    "MLL_breach_rate": 0.20833333333333334,
+    "pass_rate": 0.0
+  },
+  "lowest_breach_progress_candidate": {
+    "candidate_id": "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+    "maximum_target_progress_median": 0.45418888888894837,
+    "projected_days_to_target": 22.01727132617076,
+    "MLL_breach_rate": 0.0,
+    "pass_rate": 0.0
+  },
+  "candidate_statuses": {
+    "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+    "v71g1_event_participation_state_participation_acceleration_continuation_h60": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+    "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+    "v71g1_event_state_transitions_compression_to_expansion_reversal_h30": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+    "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH"
+  },
+  "G6_pending_statuses": {
+    "v71g6_trade_size_composition_large_clip_absorption_reversal_h60": "PROMISING_UNDERPOWERED_PENDING_INDEPENDENT_CONFIRMATION",
+    "v71g6_trade_size_composition_large_clip_flow_onset_continuation_h60": "PROMISING_UNDERPOWERED_PENDING_INDEPENDENT_CONFIRMATION"
+  },
+  "evidence_reconciliation": {
+    "walk_forward_positive_total_after_G6": 22,
+    "candidate_specific_power_decisions": 20,
+    "G5_GEOMETRY_ONLY_terminals_without_power": 2,
+    "unaccounted_count": 0
+  },
+  "scientific_power_requirement": 0.8,
+  "scientific_power_requirement_changed": false,
+  "validated_candidate_count": 0,
+  "shadow_promotion_authorized": false,
+  "data_purchase_count": 0,
+  "protected_holdout_access_count_delta": 0,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "next_action": "retain all explicit statuses, seek independent confirmation for nonfragile candidates, and continue only preregistered distinct mechanism discovery without parameter feedback",
+  "CONTRE": "Zero passes in four effective blocks cannot establish that the candidates never pass; conversely, projected days derived from partial progress are extrapolations and must not be treated as passes or validation."
+}
