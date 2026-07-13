@@ -1,0 +1,137 @@
+{
+  "CONTRE": "The store is deterministic and closed-minute only, but occupancy can still be a transformation of contemporaneous range and volatility; walk-forward and the frozen class tripwire remain mandatory.",
+  "audits": [
+    {
+      "bounded_record_count": 15545497,
+      "calendar_year": 2023,
+      "contract": "ESU3",
+      "excluded_instrument_record_count": 5711166,
+      "excluded_session_record_count": 1873761,
+      "invalid_action_record_count": 0,
+      "minute_group_count": 8800,
+      "raw_record_count": 15545497,
+      "retained_es_rth_record_count": 7960570,
+      "trade_count_reconciled": true,
+      "volume_reconciled": true
+    },
+    {
+      "bounded_record_count": 18408542,
+      "calendar_year": 2024,
+      "contract": "ESU4",
+      "excluded_instrument_record_count": 8016481,
+      "excluded_session_record_count": 2222767,
+      "invalid_action_record_count": 0,
+      "minute_group_count": 8400,
+      "raw_record_count": 32277017,
+      "retained_es_rth_record_count": 8169294,
+      "trade_count_reconciled": true,
+      "volume_reconciled": true
+    }
+  ],
+  "data_role": "DEVELOPMENT_ONLY",
+  "feature_policy": {
+    "aggressor_sign": {
+      "A": -1,
+      "B": 1,
+      "N": 0
+    },
+    "availability": "minute_start_ns+60s",
+    "mode_migration": "current minus prior contiguous completed-minute mode in same contract and CT session",
+    "mode_tie_break": "maximum volume, nearest exact volume-weighted mean, then lower tick",
+    "occupancy_entropy_normalization": "log(unique_tick_count), zero for one level",
+    "price_tick": "nearest integer quarter-point ES tick",
+    "revisit": "transition into a previously seen tick after an intervening different tick",
+    "revisit_denominator": "adjacent unequal-tick transition count",
+    "second_mode_tie_break": "same ordering after removal of the first mode"
+  },
+  "forward_gap_access_count": 0,
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "outcome_or_future_pnl_columns": [],
+  "output": {
+    "columns": [
+      "calendar_year",
+      "session_date",
+      "product",
+      "contract",
+      "instrument_id",
+      "minute_start_ns",
+      "source_close_ns",
+      "availability_ns",
+      "trade_count",
+      "total_volume",
+      "buy_volume",
+      "sell_volume",
+      "neutral_volume",
+      "signed_volume",
+      "signed_flow_fraction",
+      "unique_tick_count",
+      "occupancy_entropy",
+      "mode_tick",
+      "second_mode_tick",
+      "mode_volume",
+      "second_mode_volume",
+      "mode_volume_share",
+      "top_two_volume_share",
+      "second_to_first_mode_ratio",
+      "mode_signed_flow_fraction",
+      "adjacent_tick_transition_count",
+      "revisit_count",
+      "revisit_ratio",
+      "first_tick",
+      "last_tick",
+      "low_tick",
+      "high_tick",
+      "last_minus_mode_ticks",
+      "maximum_excursion_from_mode_ticks",
+      "maximum_excursion_direction",
+      "first_price",
+      "last_price",
+      "transformation_version",
+      "mode_migration_ticks"
+    ],
+    "contiguous_mode_migration_count": 17157,
+    "contracts": [
+      "ESU3",
+      "ESU4"
+    ],
+    "first_minute_start_ns": 1690983000000000000,
+    "last_minute_start_ns": 1725048540000000000,
+    "path": "data/cache/v7_d1/date_matched_executed_price_occupancy_v1.parquet",
+    "row_count": 17200,
+    "session_count": 43,
+    "sha256": "46dede4ba706eb955ce523f8b7d117a0382a31291b40f9c236209bda47cd2374"
+  },
+  "preregistration_path": "WORM/v7.2-executed-price-occupancy-grammar-0012-2026-07-13.json",
+  "preregistration_sha256": "d0fa4eb200f47e1df9d3323c09f9e0c3729802a001b9c946bdf43824846a4c0c",
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "schema": "hydra_v7_d1_executed_price_occupancy_manifest_v1",
+  "session_filter": {
+    "end_exclusive": "15:10:00",
+    "start_inclusive": "08:30:00",
+    "timezone": "America/Chicago",
+    "weekdays_only": true
+  },
+  "sources": [
+    {
+      "calendar_year": 2023,
+      "contract": "ESU3",
+      "end_ns": 1693526400000000000,
+      "instrument_id": 3445,
+      "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2023-08-02_2023-09-01.dbn.zst",
+      "sha256": "d93e5c8bd657a28bff5f05560b845caa3bb04e9252882ddc2751033fedd1c468",
+      "start_ns": 1690934400000000000
+    },
+    {
+      "calendar_year": 2024,
+      "contract": "ESU4",
+      "end_ns": 1725148800000000000,
+      "instrument_id": 118,
+      "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+      "sha256": "a312d6df524205c2d1632c20f1033ecb74081c98d6608eacc1a9cdb08bcf9b63",
+      "start_ns": 1722556800000000000
+    }
+  ],
+  "transformation_version": "hydra_v7_d1_executed_price_occupancy_v1"
+}
