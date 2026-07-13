@@ -9,6 +9,7 @@ from hydra.economic_evolution.account_evaluation import (
     UnsupportedExactExecution,
     compile_account_policy,
     evaluate_compiled_account_policy,
+    matched_observations_from_evaluation,
 )
 from hydra.economic_evolution.failure_model import derive_failure_vector, failure_scores
 from hydra.economic_evolution.schema import AccountPolicyGenome, EconomicRole
@@ -126,6 +127,12 @@ def test_compiled_policy_uses_one_shared_account_and_identical_starts() -> None:
         row.event.mini_equivalent
         for row in compiled.component_events["alpha-b"]
     ) == pytest.approx(0.2)
+    observations = matched_observations_from_evaluation(
+        result,
+        block_by_start={0: "B0", 30: "B1", 60: "B2"},
+    )
+    assert [row.block_id for row in observations] == ["B0", "B1", "B2"]
+    assert all(row.stressed_net_after_costs > 0.0 for row in observations)
 
 
 def test_unimplemented_conflict_policy_fails_closed() -> None:

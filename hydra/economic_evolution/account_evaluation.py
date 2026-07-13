@@ -12,6 +12,7 @@ from hydra.account_policy.schema import BasketPolicy, ControllerPolicy
 from hydra.account_policy.xfa import evaluate_serial_xfa_basket
 from hydra.economic_evolution.schema import AccountPolicyGenome, EconomicRole
 from hydra.economic_evolution.screen import BoundSleeve
+from hydra.economic_evolution.incremental_value import MatchedAccountObservation
 from hydra.features.feature_matrix import FeatureMatrix
 from hydra.propfirm.combine_episode import TradePathEvent
 from hydra.propfirm.rolling_combine import EpisodeStartPolicy
@@ -292,6 +293,40 @@ def evaluate_compiled_account_policy(
     )
 
 
+def matched_observations_from_evaluation(
+    result: AccountEvaluationResult,
+    *,
+    block_by_start: Mapping[int, str],
+) -> tuple[MatchedAccountObservation, ...]:
+    """Expose matched base/stress account rows for incremental-value tests."""
+
+    base = {row.start_day: row for row in result.controlled_base.episodes}
+    stressed = {
+        row.start_day: row for row in result.controlled_stress_1_5x.episodes
+    }
+    starts = result.episode_start_days
+    if set(starts) != set(base) or set(starts) != set(stressed):
+        raise ValueError("account episode ledgers are incomplete")
+    missing_blocks = [start for start in starts if start not in block_by_start]
+    if missing_blocks:
+        raise ValueError(f"block provenance missing for starts: {missing_blocks}")
+    return tuple(
+        MatchedAccountObservation(
+            start_id=str(start),
+            block_id=str(block_by_start[start]),
+            net_after_costs=base[start].net_pnl,
+            stressed_net_after_costs=stressed[start].net_pnl,
+            target_progress=base[start].target_progress,
+            mll_breached=base[start].mll_breached,
+            consistency_ok=base[start].consistency_ok,
+            shared_loss_days=base[start].shared_loss_days,
+            conflict_count=base[start].conflict_count,
+            total_cost=base[start].total_cost,
+        )
+        for start in starts
+    )
+
+
 def _runtime_from_path(
     bound: BoundSleeve,
     path: ExactTradePath,
@@ -365,4 +400,5 @@ __all__ = [
     "build_exact_sleeve_runtime",
     "compile_account_policy",
     "evaluate_compiled_account_policy",
+    "matched_observations_from_evaluation",
 ]
