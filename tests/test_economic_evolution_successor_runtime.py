@@ -7,6 +7,7 @@ import pytest
 
 from hydra.economic_evolution.schema import stable_hash
 from hydra.governance.proof_registry import (
+    ANNOTATION_EVENT,
     GENESIS_HASH,
     MULTIPLICITY_EVENT,
     PROOF_WINDOW_EVENT,
@@ -23,6 +24,8 @@ from hydra.mission.economic_evolution_successor_runtime import (
     CAMPAIGN_RESULT_NAME,
     MULTIPLICITY_DELTA,
     MULTIPLICITY_EVENT_ID,
+    SUPERSEDED_MULTIPLICITY_EVENT_ID,
+    SUPERSESSION_ANNOTATION_EVENT_ID,
     EconomicEvolutionSuccessorRuntime,
     load_and_verify_successor_result,
     successor_action_from_result,
@@ -65,6 +68,34 @@ def _proof_registry(path: Path, *, trials: int = 100) -> None:
         },
         str(q4["entry_hash"]),
     )
+    superseded = _entry(
+        {
+            "event_id": SUPERSEDED_MULTIPLICITY_EVENT_ID,
+            "event_type": MULTIPLICITY_EVENT,
+            "recorded_at_utc": "2026-07-13T00:00:02+00:00",
+            "status": "RESERVED_BEFORE_CAMPAIGN_OUTCOMES",
+            "multiplicity": {
+                "previous_N_trials": trials,
+                "delta_trials": 28_500,
+                "cumulative_N_trials": trials + 28_500,
+            },
+        },
+        str(counter["entry_hash"]),
+    )
+    annotation = _entry(
+        {
+            "event_id": SUPERSESSION_ANNOTATION_EVENT_ID,
+            "event_type": ANNOTATION_EVENT,
+            "recorded_at_utc": "2026-07-13T00:00:03+00:00",
+            "status": "PRE_OUTCOME_ENGINEERING_ABORT",
+            "references_event_id": SUPERSEDED_MULTIPLICITY_EVENT_ID,
+            "correction": {
+                "scientific_outcomes_seen": False,
+                "engineering_attempts": 2,
+            },
+        },
+        str(superseded["entry_hash"]),
+    )
     path.parent.mkdir(parents=True)
     path.write_text(
         json.dumps(
@@ -72,9 +103,9 @@ def _proof_registry(path: Path, *, trials: int = 100) -> None:
                 "schema": "hydra_proof_registry_v1",
                 "format": "append_only_hash_chain",
                 "chain_algorithm": "sha256",
-                "entry_count": 2,
-                "chain_head": counter["entry_hash"],
-                "entries": [q4, counter],
+                "entry_count": 4,
+                "chain_head": annotation["entry_hash"],
+                "entries": [q4, counter, superseded, annotation],
             }
         ),
         encoding="utf-8",
@@ -86,7 +117,7 @@ def _runtime_config() -> dict[str, object]:
         "preregistration_hash": "frozen",
         "structural_population": {"candidate_manifest_hash": "manifest"},
         "funnel": {
-            "raw_proposals": 25_000,
+            "raw_proposals": 50_000,
             "maximum_exact_component_replays": 700,
             "incremental_value_evaluations": 400,
             "maximum_component_bank": 100,
@@ -106,7 +137,7 @@ def _successor_result() -> dict[str, object]:
         "preregistration_hash": "frozen",
         "engine_version": "hydra_economic_evolution_engine_v2",
         "funnel": {
-            "raw_structural_proposals": 25_000,
+            "raw_structural_proposals": 50_000,
             "unique_sleeves": 22_000,
             "cheap_screen_survivors": 2_000,
             "exact_component_replays": 700,
@@ -150,6 +181,7 @@ def test_successor_reservation_is_prospective_and_idempotent(
     _proof_registry(registry_path)
     runtime = EconomicEvolutionSuccessorRuntime(tmp_path, state_dir)
     config = _runtime_config()
+    before = multiplicity_trial_count(load_and_verify(registry_path))
 
     first = runtime._ensure_multiplicity_reservation(config)
     second = runtime._ensure_multiplicity_reservation(config)
@@ -157,7 +189,7 @@ def test_successor_reservation_is_prospective_and_idempotent(
 
     assert first == second
     assert first["event_id"] == MULTIPLICITY_EVENT_ID
-    assert multiplicity_trial_count(registry) == 100 + MULTIPLICITY_DELTA
+    assert multiplicity_trial_count(registry) == before + MULTIPLICITY_DELTA
     assert burned_window_ids(registry) == ("Q4_2024",)
     assert sum(
         row["event_id"] == MULTIPLICITY_EVENT_ID
@@ -180,7 +212,7 @@ def test_successor_result_is_fail_closed_and_action_is_explicit(
         verified,
     )
 
-    assert action["action_type"] == "ECONOMIC_EVOLUTION_CAMPAIGN_0003_COMPLETE"
+    assert action["action_type"] == "ECONOMIC_EVOLUTION_CAMPAIGN_0003_R1_COMPLETE"
     assert action["g12_candidate_count"] == 24
     assert action["economic_combine_pass_count"] == 1
     assert action["economic_pre_holdout_ready_count"] == 0

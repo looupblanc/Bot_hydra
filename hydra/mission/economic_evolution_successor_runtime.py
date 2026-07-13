@@ -30,23 +30,30 @@ from hydra.mission.economic_evolution_runtime import (
 )
 
 
-CAMPAIGN_ID = "hydra_economic_evolution_persistent_0003"
+CAMPAIGN_ID = "hydra_economic_evolution_persistent_0003_revision_01"
 CAMPAIGN_CONFIG_RELATIVE_PATH = Path(
-    "config/v7/economic_evolution_persistent_0003.json"
+    "config/v7/economic_evolution_persistent_0003_revision_01.json"
 )
 CAMPAIGN_CONFIG_SHA256 = (
-    "2b099a484fcea563516a2fdef84fed4f6744bcf94e185725b76fc0f02bf775fa"
+    "5640ad2de8dc587bf99d7e19a7d2a3101ea699c9f023546163f71963c5df3693"
 )
-CAMPAIGN_WORM_TAG = "worm/economic-evolution-persistent-0003-2026-07-13"
-CAMPAIGN_WORM_COMMIT = "3ffc6f708357871698136858f69119352be992c1"
+CAMPAIGN_WORM_TAG = "worm/economic-evolution-persistent-0003-r1-2026-07-13"
+CAMPAIGN_WORM_COMMIT = "1a13064bb376cbded499747d4f7af124a8cac4ee"
 CAMPAIGN_OUTPUT_RELATIVE_PATH = Path(
-    "reports/economic_evolution/persistent_0003"
+    "reports/economic_evolution/persistent_0003_revision_01"
 )
 CAMPAIGN_RESULT_NAME = "economic_evolution_campaign_result.json"
 MULTIPLICITY_EVENT_ID = (
+    "hydra_economic_evolution_persistent_0003_revision_01_"
+    "multiplicity_reservation"
+)
+SUPERSEDED_MULTIPLICITY_EVENT_ID = (
     "hydra_economic_evolution_persistent_0003_multiplicity_reservation"
 )
-MULTIPLICITY_DELTA = 28_500
+SUPERSESSION_ANNOTATION_EVENT_ID = (
+    "hydra_economic_evolution_persistent_0003_pre_outcome_abort_annotation"
+)
+MULTIPLICITY_DELTA = 53_500
 SOURCE_RESULT_RELATIVE_PATH = Path(
     "reports/economic_evolution/persistent_0002/"
     "economic_evolution_campaign_result.json"
@@ -65,9 +72,11 @@ class EconomicEvolutionSuccessorRuntime:
         self.output_dir = self.root / CAMPAIGN_OUTPUT_RELATIVE_PATH
         self.result_path = self.output_dir / CAMPAIGN_RESULT_NAME
         self.runtime_state_path = (
-            self.state_dir / "economic_evolution_runtime_0003.json"
+            self.state_dir / "economic_evolution_runtime_0003_revision_01.json"
         )
-        self.log_path = self.state_dir / "logs/economic_evolution_0003.log"
+        self.log_path = (
+            self.state_dir / "logs/economic_evolution_0003_revision_01.log"
+        )
         self._process: subprocess.Popen[bytes] | None = None
         self._attempt = int(self._load_runtime_state().get("attempt", 0))
 
@@ -141,6 +150,33 @@ class EconomicEvolutionSuccessorRuntime:
         registry = load_and_verify(proof_path)
         if burned_window_ids(registry) != ("Q4_2024",):
             raise EconomicEvolutionRuntimeError("unexpected proof-window state")
+        superseded = next(
+            (
+                row
+                for row in registry["entries"]
+                if row["event_id"] == SUPERSEDED_MULTIPLICITY_EVENT_ID
+            ),
+            None,
+        )
+        annotation = next(
+            (
+                row
+                for row in registry["entries"]
+                if row["event_id"] == SUPERSESSION_ANNOTATION_EVENT_ID
+            ),
+            None,
+        )
+        if (
+            superseded is None
+            or annotation is None
+            or annotation.get("references_event_id")
+            != SUPERSEDED_MULTIPLICITY_EVENT_ID
+            or annotation.get("correction", {}).get("scientific_outcomes_seen")
+            is not False
+        ):
+            raise EconomicEvolutionRuntimeError(
+                "superseded pre-outcome reservation is not fully annotated"
+            )
         existing = next(
             (
                 row
@@ -230,7 +266,7 @@ class EconomicEvolutionSuccessorRuntime:
         _atomic_json(
             self.root
             / "reports/economic_evolution/"
-            "persistent_0003_multiplicity_reservation.json",
+            "persistent_0003_revision_01_multiplicity_reservation.json",
             {
                 "schema": "hydra_economic_evolution_multiplicity_reservation_v2",
                 "event_id": MULTIPLICITY_EVENT_ID,
@@ -298,7 +334,7 @@ class EconomicEvolutionSuccessorRuntime:
         quarantine = (
             self.root
             / "reports/economic_evolution/quarantine"
-            / f"persistent_0003_attempt_{self._attempt:02d}"
+            / f"persistent_0003_revision_01_attempt_{self._attempt:02d}"
         )
         quarantine.parent.mkdir(parents=True, exist_ok=True)
         if quarantine.exists():
@@ -314,7 +350,7 @@ class EconomicEvolutionSuccessorRuntime:
     ) -> dict[str, Any]:
         return {
             **dict(predecessor),
-            "action_type": "ECONOMIC_EVOLUTION_CAMPAIGN_0003_RUNNING",
+            "action_type": "ECONOMIC_EVOLUTION_CAMPAIGN_0003_R1_RUNNING",
             "phase": "4",
             "progressed": True,
             "economic_evolution_engine": "hydra_economic_evolution_engine_v2",
@@ -504,7 +540,7 @@ def successor_action_from_result(
     rolling = dict(result["rolling_combine"])
     return {
         **dict(predecessor),
-        "action_type": "ECONOMIC_EVOLUTION_CAMPAIGN_0003_COMPLETE",
+        "action_type": "ECONOMIC_EVOLUTION_CAMPAIGN_0003_R1_COMPLETE",
         "phase": "4",
         "progressed": True,
         "economic_evolution_engine": result["engine_version"],

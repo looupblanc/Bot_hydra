@@ -7,10 +7,16 @@ from pathlib import Path
 from hydra.economic_evolution.generator import generate_structural_population
 from hydra.economic_evolution.schema import stable_hash
 from hydra.economic_evolution.seed_archive import load_and_verify_seed_archive
+from hydra.research.economic_evolution_campaign import (
+    _load_and_validate_preregistration,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFIG = ROOT / "config/v7/economic_evolution_persistent_0003.json"
+SUPERSEDED_CONFIG = ROOT / "config/v7/economic_evolution_persistent_0003.json"
+CONFIG = (
+    ROOT / "config/v7/economic_evolution_persistent_0003_revision_01.json"
+)
 
 
 def test_successor_preregistration_is_frozen_and_gate_equivalent() -> None:
@@ -46,6 +52,12 @@ def test_successor_preregistration_is_frozen_and_gate_equivalent() -> None:
     assert value["network_access_allowed"] is False
     assert value["broker_or_orders_allowed"] is False
     assert value["successor_basis"]["status_inheritance"] is False
+    assert value["successor_basis"]["supersedes_preregistration_path"] == str(
+        SUPERSEDED_CONFIG.relative_to(ROOT)
+    )
+    assert value["successor_basis"]["superseded_scientific_outcomes_seen"] is False
+    assert value["funnel"]["raw_proposals"] >= 50_000
+    assert _load_and_validate_preregistration(CONFIG) == value
 
 
 def test_successor_structural_manifest_and_seed_are_deterministic() -> None:
