@@ -71,8 +71,15 @@ from hydra.mission.economic_evolution_agreement_terminal_runtime import (
 )
 from hydra.mission.economic_evolution_cross_session_runtime import (
     CAMPAIGN_CONFIG_RELATIVE_PATH as CROSS_SESSION_CONFIG_RELATIVE_PATH,
+    CAMPAIGN_OUTPUT_RELATIVE_PATH as CROSS_SESSION_OUTPUT_RELATIVE_PATH,
+    CAMPAIGN_RESULT_NAME as CROSS_SESSION_RESULT_NAME,
     EconomicEvolutionCrossSessionRuntime,
     verify_cross_session_freeze,
+)
+from hydra.mission.economic_evolution_cross_session_terminal_runtime import (
+    TERMINAL_VERDICT_RELATIVE_PATH as CROSS_SESSION_TERMINAL_VERDICT_RELATIVE_PATH,
+    EconomicEvolutionCrossSessionTerminalRuntime,
+    load_and_verify_cross_session_terminal_verdict,
 )
 from hydra.mission.mission_state import (
     append_event,
@@ -92,13 +99,16 @@ from hydra.research.economic_evolution_density_campaign import (
 from hydra.research.economic_evolution_agreement_campaign import (
     load_and_verify_agreement_result,
 )
+from hydra.research.economic_evolution_cross_session_campaign import (
+    load_and_verify_cross_session_result,
+)
 from hydra.utils.time import utc_now_iso
 
 
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v13"
+CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v14"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-economic-evolution-single-writer"
 CONTROLLER_OWNER = "v7_economic_evolution_controller"
@@ -2407,6 +2417,15 @@ class V7FalsificationController:
             if (self.root / CROSS_SESSION_CONFIG_RELATIVE_PATH).is_file()
             else None
         )
+        self._economic_cross_session_terminal_runtime = (
+            EconomicEvolutionCrossSessionTerminalRuntime(
+                self.root, self.paths.state_dir
+            )
+            if (
+                self.root / CROSS_SESSION_TERMINAL_VERDICT_RELATIVE_PATH
+            ).is_file()
+            else None
+        )
 
     def run(self) -> int:
         signal.signal(signal.SIGTERM, self._handle_signal)
@@ -2580,6 +2599,8 @@ class V7FalsificationController:
             action = self._economic_agreement_terminal_runtime.advance(action)
         if self._economic_cross_session_runtime is not None:
             action = self._economic_cross_session_runtime.advance(action)
+        if self._economic_cross_session_terminal_runtime is not None:
+            action = self._economic_cross_session_terminal_runtime.advance(action)
         previous = get_kv(conn, "v7_current_action", {})
         step = int(get_kv(conn, "v7_step", 0)) + 1
         progress_at = utc_now_iso()
@@ -2690,7 +2711,19 @@ class V7FalsificationController:
                     self.root, result=agreement_result
                 )
         if (self.root / CROSS_SESSION_CONFIG_RELATIVE_PATH).is_file():
-            verify_cross_session_freeze(self.root)
+            cross_session_config = verify_cross_session_freeze(self.root)
+            if (
+                self.root / CROSS_SESSION_TERMINAL_VERDICT_RELATIVE_PATH
+            ).is_file():
+                cross_session_result = load_and_verify_cross_session_result(
+                    self.root
+                    / CROSS_SESSION_OUTPUT_RELATIVE_PATH
+                    / CROSS_SESSION_RESULT_NAME,
+                    cross_session_config,
+                )
+                load_and_verify_cross_session_terminal_verdict(
+                    self.root, result=cross_session_result
+                )
         return text
 
     def _checkpoint(
@@ -2798,6 +2831,10 @@ class V7FalsificationController:
         if self._economic_cross_session_runtime is not None:
             heartbeat["economic_evolution_cross_session_account"] = (
                 self._economic_cross_session_runtime.snapshot()
+            )
+        if self._economic_cross_session_terminal_runtime is not None:
+            heartbeat["economic_evolution_cross_session_terminal"] = (
+                self._economic_cross_session_terminal_runtime.snapshot()
             )
         return heartbeat
 
