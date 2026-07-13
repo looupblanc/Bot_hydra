@@ -1,0 +1,27 @@
+{
+  "schema": "hydra_v7_2_g12_class_tombstone_result_v1",
+  "status": "APPENDED",
+  "mechanism_class": "v72g12_executed_price_occupancy_topology",
+  "regime": "D1_2023_2024_DEVELOPMENT_PRICE_NULLS",
+  "death_cause": "GEOMETRY_ONLY_NULL_RATIO_GTE_0_8",
+  "candidate_count": 24,
+  "source_scope": "HYDRA_V72_G12_EXECUTED_PRICE_OCCUPANCY",
+  "evidence_sha256": "8da2418520231d37fd96af3a4a3b60756c6585fd40a19542d78b8f57701c8fbe",
+  "signature_hash": "e6600d1e77c42bc8a434efc141521e994ab6cf4fba955ee5164f2db9297d1904",
+  "snapshot_before_append": "mission/state/snapshots/v72_g12_pre_tombstone_20260713T093827Z/graveyard.db",
+  "class_signature_count_after": 94,
+  "indexed_object_count_after": 115602,
+  "graveyard_integrity": "ok",
+  "generator_feedback_scope": [
+    "mechanism_class",
+    "regime",
+    "death_cause",
+    "candidate_count"
+  ],
+  "parameter_level_feedback_permitted": false,
+  "no_rescue_decision": "EXACT_G12_GRAMMAR_TERMINAL_NO_PARAMETER_RESCUE",
+  "new_data_purchase_count": 0,
+  "protected_holdout_access_count_delta": 0,
+  "outbound_order_count": 0,
+  "CONTRE": "The class-level tripwire kills this frozen executed-price occupancy grammar, not every conceivable auction-location mechanism; a future mechanism must be structurally and economically distinct and receive a new WORM."
+}
