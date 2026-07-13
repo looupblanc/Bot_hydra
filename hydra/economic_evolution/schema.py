@@ -392,8 +392,8 @@ class AccountPolicyGenome:
     def __post_init__(self) -> None:
         if not self.policy_id or not self.source_campaign:
             raise ValueError("policy and campaign IDs are required")
-        if not 1 <= len(self.sleeve_ids) <= 4:
-            raise ValueError("an account policy must contain one to four sleeves")
+        if not 1 <= len(self.sleeve_ids) <= 8:
+            raise ValueError("an account policy must contain one to eight sleeves")
         if len(set(self.sleeve_ids)) != len(self.sleeve_ids):
             raise ValueError("account policy sleeves must be unique")
         if len(self.allocation_units) != len(self.sleeve_ids):

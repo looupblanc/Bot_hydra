@@ -100,6 +100,28 @@ def test_shared_account_hits_one_target_without_summing_standalone_results() -> 
     assert result.maximum_mini_equivalent == 2.0
 
 
+def test_shared_account_supports_eight_frozen_components_but_rejects_nine() -> None:
+    components = tuple(f"component_{index}" for index in range(8))
+    basket = _basket(*components)
+    events = {
+        component: (_trade(component, f"M{index}", index, 100.0),)
+        for index, component in enumerate(components)
+    }
+
+    result = run_shared_account_episode(
+        events,
+        list(range(20)),
+        basket=basket,
+        start_day=0,
+        maximum_duration_days=20,
+    )
+
+    assert result.accepted_events == 8
+    assert result.net_pnl == 800.0
+    with pytest.raises(ValueError, match="one to eight"):
+        _basket(*components, "component_8")
+
+
 def test_correlated_open_adverse_excursions_breach_one_shared_mll() -> None:
     events = {
         "left": (_trade("left", "ES", 0, 1000.0, worst=-2500.0, duration=1000),),

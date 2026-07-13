@@ -98,6 +98,21 @@ def test_account_policy_rejects_unbounded_or_duplicate_construction() -> None:
     with pytest.raises(ValueError, match=r"\[1,15\]"):
         replace(policy, maximum_mini_equivalent=16)
 
+    eight = tuple(f"sleeve_{index}" for index in range(8))
+    expanded = replace(
+        policy,
+        sleeve_ids=eight,
+        allocation_units=(1,) * 8,
+        maximum_simultaneous_positions=4,
+    )
+    assert len(expanded.sleeve_ids) == 8
+    with pytest.raises(ValueError, match="one to eight"):
+        replace(
+            expanded,
+            sleeve_ids=(*eight, "sleeve_8"),
+            allocation_units=(1,) * 9,
+        )
+
 
 def test_sleeve_requires_closed_bounded_execution_fields() -> None:
     population = generate_structural_population(
