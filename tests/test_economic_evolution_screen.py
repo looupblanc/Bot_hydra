@@ -116,3 +116,43 @@ def test_screen_rejects_future_feature_availability() -> None:
         run_ultra_cheap_screen(
             population.sleeves, {"ES": future_matrix}, policy=policy
         )
+
+
+def test_insufficient_feature_calibration_rejects_sleeves_not_campaign() -> None:
+    matrix = _matrix()
+    arrays = dict(matrix.arrays)
+    extreme = np.array(arrays["feature__extreme_dwell"], copy=True)
+    extreme[:181] = np.nan
+    extreme.setflags(write=False)
+    arrays["feature__extreme_dwell"] = extreme
+    sparse = replace(matrix, arrays=arrays)
+    population = generate_structural_population(
+        campaign_id="sparse_calibration_test",
+        raw_proposal_count=500,
+        market_pairs={"ES": "MES"},
+    )
+    policy = CheapScreenPolicy(
+        calibration_start="2023-01-01",
+        calibration_end_exclusive="2023-05-01",
+        screen_start="2023-05-01",
+        screen_end_exclusive="2024-01-01",
+        minimum_opportunities=5,
+        stress_cost_multiplier=1.5,
+        maximum_best_positive_event_share=1.0,
+        maximum_approximate_drawdown=100_000.0,
+        require_nonnegative_half=False,
+    )
+
+    result = run_ultra_cheap_screen(
+        population.sleeves, {"ES": sparse}, policy=policy
+    )
+    rejected = [
+        row
+        for row in result.rows
+        if row["disposition"] == "HARD_INSUFFICIENT_CALIBRATION_AVAILABILITY"
+    ]
+
+    assert len(result.rows) == len(population.sleeves)
+    assert rejected
+    assert all(row["calibration_unavailable_feature"] == "extreme_dwell" for row in rejected)
+    assert result.summary()["structural_rejection_count"] == len(rejected)

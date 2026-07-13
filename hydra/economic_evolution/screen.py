@@ -92,6 +92,11 @@ class CheapScreenResult:
             "execution_cache_hit_count": self.execution_cache_hit_count,
             "execution_cache_hit_rate": self.cache_hit_rate,
             "survivor_count": len(self.survivors),
+            "structural_rejection_count": sum(
+                row["disposition"]
+                == "HARD_INSUFFICIENT_CALIBRATION_AVAILABILITY"
+                for row in self.rows
+            ),
             "elapsed_seconds": self.elapsed_seconds,
             "screens_per_second": self.screens_per_second,
             "policy": self.policy.to_dict(),
@@ -113,22 +118,25 @@ def run_ultra_cheap_screen(
 
     started = time.perf_counter()
     bound_by_market: dict[str, list[BoundSleeve]] = {}
+    calibration_rejections: list[dict[str, Any]] = []
     for market in sorted({row.market for row in sleeves}):
         matrix = matrices.get(market)
         if matrix is None:
             continue
-        bound_by_market[market] = list(
-            bind_sleeves_to_calibration(
-                [row for row in sleeves if row.market == market],
-                matrix,
-                policy=policy,
-            )
+        bound, rejected = _bind_sleeves_with_rejections(
+            [row for row in sleeves if row.market == market],
+            matrix,
+            policy=policy,
         )
+        bound_by_market[market] = list(bound)
+        calibration_rejections.extend(rejected)
 
     rows: list[dict[str, Any]] = []
     unique_total = 0
     cache_hits = 0
     for market, bound in sorted(bound_by_market.items()):
+        if not bound:
+            continue
         by_execution: dict[str, BoundSleeve] = {}
         for row in bound:
             by_execution.setdefault(row.execution_fingerprint, row)
@@ -235,6 +243,7 @@ def run_ultra_cheap_screen(
                     "rolling_combine_executed": False,
                 }
             )
+    rows.extend(calibration_rejections)
     rows.sort(key=lambda row: str(row["sleeve_id"]))
     return CheapScreenResult(
         policy=policy,
@@ -253,6 +262,24 @@ def bind_sleeves_to_calibration(
     *,
     policy: CheapScreenPolicy,
 ) -> tuple[BoundSleeve, ...]:
+    bound, rejected = _bind_sleeves_with_rejections(
+        sleeves, matrix, policy=policy
+    )
+    if rejected:
+        first = rejected[0]
+        raise ValueError(
+            "insufficient calibration observations for "
+            f"{first['calibration_unavailable_feature']}"
+        )
+    return bound
+
+
+def _bind_sleeves_with_rejections(
+    sleeves: Sequence[SleeveSpec],
+    matrix: FeatureMatrix,
+    *,
+    policy: CheapScreenPolicy,
+) -> tuple[tuple[BoundSleeve, ...], list[dict[str, Any]]]:
     day = matrix.array("session_day")
     session = matrix.array("session_code")
     calibration = (
@@ -260,32 +287,54 @@ def bind_sleeves_to_calibration(
         & (day < _day(policy.calibration_end_exclusive))
         & (session >= 0)
     )
-    threshold_cache: dict[tuple[str, float], float] = {}
+    threshold_cache: dict[tuple[str, float], tuple[float | None, int]] = {}
 
-    def threshold(feature: str, quantile: float) -> float:
+    def threshold(feature: str, quantile: float) -> tuple[float | None, int]:
         key = (feature, quantile)
-        cached = threshold_cache.get(key)
-        if cached is not None:
-            return cached
+        if key in threshold_cache:
+            return threshold_cache[key]
         values = matrix.array(f"feature__{feature}")[calibration]
         finite = values[np.isfinite(values)]
         if len(finite) < 100:
-            raise ValueError(f"insufficient calibration observations for {feature}")
+            result: tuple[float | None, int] = (None, int(len(finite)))
+            threshold_cache[key] = result
+            return result
         value = float(np.quantile(finite, quantile))
-        threshold_cache[key] = value
-        return value
+        result = (value, int(len(finite)))
+        threshold_cache[key] = result
+        return result
 
     output: list[BoundSleeve] = []
+    rejected: list[dict[str, Any]] = []
     cost_model = load_cost_model()
     for sleeve in sleeves:
-        trigger_threshold = threshold(
+        trigger_threshold, trigger_count = threshold(
             sleeve.trigger_feature, sleeve.trigger_quantile
         )
-        context_threshold = (
-            None
-            if sleeve.context_feature is None
-            else threshold(sleeve.context_feature, float(sleeve.context_quantile))
+        context_threshold: float | None = None
+        context_count: int | None = None
+        if sleeve.context_feature is not None:
+            context_threshold, context_count = threshold(
+                sleeve.context_feature, float(sleeve.context_quantile)
+            )
+        unavailable_feature = (
+            sleeve.trigger_feature
+            if trigger_threshold is None
+            else sleeve.context_feature if context_threshold is None and sleeve.context_feature else None
         )
+        if unavailable_feature is not None:
+            rejected.append(
+                _calibration_rejection_row(
+                    sleeve,
+                    feature=unavailable_feature,
+                    finite_observations=(
+                        trigger_count
+                        if unavailable_feature == sleeve.trigger_feature
+                        else int(context_count or 0)
+                    ),
+                )
+            )
+            continue
         strategy = StrategySpec(
             candidate_id=sleeve.sleeve_id,
             lineage_id=sleeve.lineage_id,
@@ -298,7 +347,7 @@ def bind_sleeves_to_calibration(
             timeframe=sleeve.timeframe,
             feature=sleeve.trigger_feature,
             operator=_operator(sleeve.trigger_operator),
-            threshold=trigger_threshold,
+            threshold=float(trigger_threshold),
             side=sleeve.side,
             holding_events=sleeve.holding_bars,
             point_value=instrument_spec(sleeve.execution_market).point_value,
@@ -325,7 +374,45 @@ def bind_sleeves_to_calibration(
                 context_threshold=context_threshold,
             )
         )
-    return tuple(output)
+    return tuple(output), rejected
+
+
+def _calibration_rejection_row(
+    sleeve: SleeveSpec, *, feature: str, finite_observations: int
+) -> dict[str, Any]:
+    return {
+        "sleeve_id": sleeve.sleeve_id,
+        "lineage_id": sleeve.lineage_id,
+        "market": sleeve.market,
+        "execution_market": sleeve.execution_market,
+        "role": sleeve.role.value,
+        "structural_fingerprint": sleeve.structural_fingerprint,
+        "behavioral_fingerprint": sleeve.behavioral_fingerprint,
+        "execution_fingerprint": None,
+        "execution_cache_hit": False,
+        "trigger_threshold": None,
+        "context_threshold": None,
+        "opportunity_count": 0,
+        "gross_pnl": 0.0,
+        "net_pnl": 0.0,
+        "stressed_net_pnl": 0.0,
+        "mean_net_pnl": None,
+        "win_rate": None,
+        "best_positive_event_share": 1.0,
+        "approximate_max_drawdown": 0.0,
+        "first_half_net_pnl": 0.0,
+        "second_half_net_pnl": 0.0,
+        "finite": False,
+        "cheap_screen_survivor": False,
+        "disposition": "HARD_INSUFFICIENT_CALIBRATION_AVAILABILITY",
+        "calibration_unavailable_feature": feature,
+        "calibration_finite_observations": finite_observations,
+        "validation_scope": "STAGE0_CALIBRATION_AVAILABILITY_ONLY",
+        "walk_forward_executed": False,
+        "tripwire_executed": False,
+        "DSR_BH_executed": False,
+        "rolling_combine_executed": False,
+    }
 
 
 def _screen_event_matrix(
