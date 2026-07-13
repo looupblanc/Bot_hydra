@@ -191,13 +191,13 @@ def test_v71_power_aware_integrated_action_pauses_broad_D1_generation() -> None:
         Path.cwd(), prior_positive=11, g2_positive=3
     )
 
-    assert (
-        result["action_type"]
-        == "V71_INDEPENDENT_CONFIRMATION_REQUIRED_LIMITED_DISCOVERY_ONLY"
-    )
-    assert result["walk_forward_positive_count"] == 16
+    assert result["action_type"] == "V71_G4_INDEPENDENT_CONFIRMATION_REQUIRED_NO_PROMOTION"
+    assert result["walk_forward_positive_count"] == 18
     assert result["powered_candidate_count"] == 0
-    assert result["rolling_episode_start_count"] == 5
+    assert result["rolling_combine_promotions"] == 0
+    assert result["g4_stage0_valid_count"] == 12
+    assert result["g4_walk_forward_positive_count"] == 2
+    assert result["confirmation_queue_underpowered_count"] == 14
     assert result["broad_D1_generation_authorized"] is False
     assert result["new_data_purchase_authorized"] is False
     assert result["shadow_admission_authorized"] is False

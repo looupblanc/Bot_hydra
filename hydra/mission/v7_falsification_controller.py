@@ -33,7 +33,7 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v4"
+CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v5"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-falsification-single-writer"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
@@ -96,6 +96,24 @@ V71_POWER_AWARE_AUDIT_RELATIVE_PATH = Path(
 V71_ROLLING_DIAGNOSTIC_RELATIVE_PATH = Path(
     "reports/v7_1/power_aware_0001/v71_event_time_rolling_diagnostic_result.json"
 )
+V71_G4_GRAMMAR_RELATIVE_PATH = Path(
+    "WORM/v7.1-cross-clock-flow-grammar-0004-2026-07-12.json"
+)
+V71_G4_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0004/v71_cross_clock_flow_signal_manifest.json"
+)
+V71_G4_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0004/v71_cross_clock_flow_funnel_result.json"
+)
+V71_G4_TRIPWIRE_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0004/v71_cross_clock_flow_tripwire_result.json"
+)
+V71_G4_POWER_AUDIT_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0004/v71_cross_clock_flow_power_audit_result.json"
+)
+V71_CONFIRMATION_QUEUE_V3_RELATIVE_PATH = Path(
+    "WORM/v7.1-independent-confirmation-queue-0003-2026-07-12.json"
+)
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
     str(V71_POLICY_RELATIVE_PATH): "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
@@ -110,6 +128,11 @@ V71_FROZEN_HASHES = {
     "WORM/v7.1-power-aware-candidate-freeze-0001-2026-07-12.json": "b66e462989213356106f0cbcd88d31ba4547a61f9900eb1de3e6010cb3d35d83",
     "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673",
     "WORM/v7.1-event-time-executable-diagnostic-0001-2026-07-12.json": "058278f8111dc35d6f19ef484ed4b0674f5bb323dbb2a941ebd9d7971080c944",
+    "WORM/v7.1-independent-confirmation-queue-0002-2026-07-12.json": "ce9d10ef013affed665f59aded39d051356ac5ddefbce7273b9612cb4bc7b82b",
+    str(V71_G4_GRAMMAR_RELATIVE_PATH): "9341e576b4090f2626079f1678170ad738b523ca10394b89261292a3ee1b2c0e",
+    "WORM/v7.1-cross-clock-flow-tripwire-0004-2026-07-12.json": "36504626470927c9ee7883c7eac79c7524dee2342cf30ace5277ce1c3629176a",
+    "WORM/v7.1-cross-clock-flow-power-audit-0002-2026-07-12.json": "5fc399bca8a7beab2bcf4972dca99c325f4213f309d28c2427411288b9d92260",
+    str(V71_CONFIRMATION_QUEUE_V3_RELATIVE_PATH): "e88641bd49bcf73f1d3007488db9baf09f74b06719255182010622b14c7a9ce3",
 }
 
 
@@ -476,6 +499,13 @@ def _classify_v71_power_aware_action(
                 "campaign-level DSR/BH before any shadow decision."
             ),
         }
+    if (root / V71_G4_GRAMMAR_RELATIVE_PATH).is_file():
+        return _classify_v71_g4_action(
+            root,
+            prior_positive=prior_positive,
+            g2_positive=g2_positive,
+            g3_status_counts=status_counts,
+        )
     return {
         "action_type": "V71_INDEPENDENT_CONFIRMATION_REQUIRED_LIMITED_DISCOVERY_ONLY",
         "phase": "4",
@@ -506,6 +536,142 @@ def _classify_v71_power_aware_action(
             "The sixteen frozen candidates are resolved under the calibrated "
             "policy. Independent fresh evidence is required; broad D1 generation "
             "remains paused and only limited distinct discovery may continue."
+        ),
+    }
+
+
+def _classify_v71_g4_action(
+    root: Path,
+    *,
+    prior_positive: int,
+    g2_positive: int,
+    g3_status_counts: Mapping[str, Any],
+) -> dict[str, Any]:
+    required = (
+        (V71_G4_SIGNAL_RELATIVE_PATH, "V71_G4_SIGNAL_MANIFEST_REQUIRED"),
+        (V71_G4_FUNNEL_RELATIVE_PATH, "V71_G4_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V71_G4_TRIPWIRE_RELATIVE_PATH, "V71_G4_TRIPWIRE_REQUIRED"),
+        (
+            Path("WORM/v7.1-cross-clock-flow-power-audit-0002-2026-07-12.json"),
+            "V71_G4_POWER_AUDIT_FREEZE_REQUIRED",
+        ),
+        (V71_G4_POWER_AUDIT_RELATIVE_PATH, "V71_G4_POWER_AUDIT_REQUIRED"),
+        (
+            V71_CONFIRMATION_QUEUE_V3_RELATIVE_PATH,
+            "V71_G4_CONFIRMATION_QUEUE_REQUIRED",
+        ),
+    )
+    for path, action in required:
+        if not (root / path).is_file():
+            return {
+                "action_type": action,
+                "phase": "4",
+                "progressed": False,
+                "required_path": str(path),
+                "broad_D1_generation_authorized": False,
+                "new_data_purchase_authorized": False,
+                "reason": (
+                    "The bounded cross-clock conversion sequence must finish "
+                    "before another structural discovery action."
+                ),
+            }
+    hashes = {
+        V71_G4_SIGNAL_RELATIVE_PATH: "35393b8bee755da085b9214fde3a89975221f1f4ac7915251ed3e8f596f758b8",
+        V71_G4_FUNNEL_RELATIVE_PATH: "737e484c7fc51380ccaf588b7dc4bc76f3183530254219a2e621494d025cd828",
+        V71_G4_TRIPWIRE_RELATIVE_PATH: "95a9ba4d548fb1fad18a0dae2f11d67bfcf50d4d280f14363c1f51d918a3aaa0",
+        V71_G4_POWER_AUDIT_RELATIVE_PATH: "204b79bcc0f75b22351c638469f4be1bc84bfaf636d09c88e1462f2a67c62f67",
+    }
+    drift = [
+        str(path)
+        for path, expected in hashes.items()
+        if _sha256(root / path) != expected
+    ]
+    if drift:
+        raise V7ControllerIntegrityError(
+            "V7.1 cross-clock evidence drift: " + ",".join(drift)
+        )
+    signal = _load_json(root / V71_G4_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V71_G4_FUNNEL_RELATIVE_PATH)
+    tripwire = _load_json(root / V71_G4_TRIPWIRE_RELATIVE_PATH)
+    audit = _load_json(root / V71_G4_POWER_AUDIT_RELATIVE_PATH)
+    queue = _load_json(root / V71_CONFIRMATION_QUEUE_V3_RELATIVE_PATH)
+    if int(signal.get("candidate_count") or 0) != 12:
+        raise V7ControllerIntegrityError("V7.1 G4 candidate count drift")
+    if int(funnel.get("walk_forward_positive_count") or 0) != 2:
+        raise V7ControllerIntegrityError("V7.1 G4 walk-forward count drift")
+    if tripwire.get("verdict") != "GREEN_NULL_ADJUSTED_BASELINE":
+        raise V7ControllerIntegrityError("V7.1 G4 tripwire verdict drift")
+    status_counts = dict(audit.get("status_counts") or {})
+    if sum(int(value) for value in status_counts.values()) != 2:
+        raise V7ControllerIntegrityError("V7.1 G4 power candidate count drift")
+    powered = list(audit.get("powered_candidate_ids") or [])
+    if powered:
+        return {
+            "action_type": "V71_G4_POWERED_ROLLING_COMBINE_REQUIRED",
+            "phase": "4",
+            "progressed": True,
+            "powered_candidate_ids": [str(value) for value in powered],
+            "broad_D1_generation_authorized": False,
+            "new_data_purchase_authorized": False,
+            "shadow_admission_authorized": False,
+            "reason": (
+                "Powered cross-clock candidates may enter the bounded rolling "
+                "Combine diagnostic under the frozen power amendment."
+            ),
+        }
+    if int(queue.get("cumulative_promising_underpowered_count") or 0) != 14:
+        raise V7ControllerIntegrityError("V7.1 confirmation queue underpowered count drift")
+    if int(queue.get("cumulative_fragile_retired_count") or 0) != 4:
+        raise V7ControllerIntegrityError("V7.1 confirmation queue fragile count drift")
+    cumulative_status = {
+        "PROMISING_UNDERPOWERED": int(
+            g3_status_counts.get("PROMISING_UNDERPOWERED", 0)
+        )
+        + int(status_counts.get("PROMISING_UNDERPOWERED", 0)),
+        "WF_POSITIVE_BUT_FRAGILE": int(
+            g3_status_counts.get("WF_POSITIVE_BUT_FRAGILE", 0)
+        )
+        + int(status_counts.get("WF_POSITIVE_BUT_FRAGILE", 0)),
+    }
+    return {
+        "action_type": "V71_G4_INDEPENDENT_CONFIRMATION_REQUIRED_NO_PROMOTION",
+        "phase": "4",
+        "progressed": True,
+        "walk_forward_positive_count": prior_positive + g2_positive + 2 + 2,
+        "g4_stage0_valid_count": int(funnel["stage0_valid_novel_count"]),
+        "g4_stage1_survivor_count": int(funnel["stage1_pass_count"]),
+        "g4_walk_forward_positive_count": int(funnel["walk_forward_positive_count"]),
+        "g4_tripwire_verdict": tripwire["verdict"],
+        "g4_NULL_RATIO": float(tripwire["NULL_RATIO"]),
+        "g4_tripwire_evidence_strength": tripwire["evidence_strength"],
+        "g4_power_status_counts": status_counts,
+        "cumulative_power_status_counts": cumulative_status,
+        "powered_candidate_count": 0,
+        "rolling_combine_promotions": 0,
+        "confirmation_queue_underpowered_count": int(
+            queue["cumulative_promising_underpowered_count"]
+        ),
+        "confirmation_queue_fragile_retired_count": int(
+            queue["cumulative_fragile_retired_count"]
+        ),
+        "broad_D1_generation_authorized": False,
+        "limited_structural_discovery_authorized": True,
+        "conversion_priority": 0.95,
+        "limited_discovery_allocation": 0.05,
+        "new_data_purchase_authorized": False,
+        "shadow_admission_authorized": False,
+        "next_experiment_id": "hydra_v7_1_independent_confirmation_planning_0002",
+        "next_experiment_state": "FRESH_EVIDENCE_REQUIRED_NO_PURCHASE_IN_CURRENT_PHASE",
+        "principal_blocker": (
+            "The strongest new 60-minute cross-clock candidate has a positive "
+            "D1 confidence interval but only 33.81% calibrated power versus the "
+            "frozen 80% gate; no fresh confirmation window is authorized."
+        ),
+        "reason": (
+            "The bounded grammar 0004 produced two walk-forward positives and a "
+            "VERT_NET tripwire, but neither candidate passed the frozen power "
+            "policy. The 30-minute version is fragile and the 60-minute version "
+            "is queued unchanged for future independent confirmation."
         ),
     }
 
