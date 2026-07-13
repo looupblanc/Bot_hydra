@@ -147,8 +147,25 @@ def test_systemd_units_reference_venv_and_single_writer() -> None:
     assert "Restart=on-failure" in service
 
 
-def test_governance_checks_pass_without_q4_or_live_trading() -> None:
+def test_governance_checks_pass_without_q4_or_live_trading(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Model the historical pre-Q4 scenario explicitly instead of inheriting
+    # whichever append-only Q4 transaction exists in the live project state.
+    monkeypatch.setattr(
+        "hydra.governance.invariants.registry_integrity", lambda: "ok"
+    )
+    monkeypatch.setattr("hydra.governance.invariants.q4_access_count", lambda: 0)
+    monkeypatch.setattr(
+        "hydra.governance.q4_one_shot.audit_q4_one_shot_state",
+        lambda **kwargs: {
+            "valid": True,
+            "status": "NO_Q4_ACCESS",
+            "transaction_count": 0,
+        },
+    )
     result = run_governance_checks(baseline_commit=BASELINE, remaining_budget_usd=77.036754)
+    assert result.passed
     assert result.checks["q4_not_accessed"]
     assert result.checks["no_live_trading"]
     assert result.checks["scope_promotion_blocked"]

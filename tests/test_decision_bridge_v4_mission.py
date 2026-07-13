@@ -179,7 +179,15 @@ def test_serial_executor_does_not_reject_validated_atomic_q4_twice(
 
 def test_completed_q4_queues_bounded_read_only_forward_update(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    # This test exercises the forward-update specification guard.  Keep the
+    # independent, project-wide governance check out of this tmp-path unit
+    # scenario; its Q4 and registry invariants are covered in the dedicated
+    # governance suite.
+    monkeypatch.setattr(
+        "hydra.mission.controller.check_action_allowed", lambda *args, **kwargs: None
+    )
     controller, conn = _controller(tmp_path)
     try:
         enqueue_experiment(
