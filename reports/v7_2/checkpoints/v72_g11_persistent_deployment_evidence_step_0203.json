@@ -1,0 +1,48 @@
+{
+  "CONTRE": "A healthy persistent controller and a class-level null verdict demonstrate operational continuity and honest falsification, not the existence of a tradable edge.",
+  "active_experiment": {
+    "claimed_by": "v7_2_arrival_renewal_controller",
+    "experiment_id": "hydra_v7_1_falsification_20260712_0001",
+    "running_count": 1,
+    "status": "RUNNING"
+  },
+  "broker_connections": 0,
+  "controller_process_count": 1,
+  "controller_version": "hydra_v7_2_arrival_renewal_controller_v3",
+  "cycle_after_restart": 2745,
+  "cycle_before_progress_check": 2743,
+  "database_integrity": {
+    "graveyard": "ok",
+    "mission": "ok",
+    "mission_registry_copy": "ok",
+    "registry": "ok"
+  },
+  "deployed_commit": "ecee3d20b75323ccc3daacdef65fbc4f3fb7441c",
+  "diff_validation": [],
+  "governance_doctor": "GREEN",
+  "mission_action": "V72_G11_GEOMETRY_ONLY_CLASS_TOMBSTONED_DISTINCT_MECHANISM_PIVOT",
+  "mission_id": "hydra_v7_1_falsification_20260712_0001",
+  "new_data_purchase_count_G11": 0,
+  "new_pid": 509022,
+  "old_pid": 500171,
+  "origin_commit": "ecee3d20b75323ccc3daacdef65fbc4f3fb7441c",
+  "outbound_orders": 0,
+  "process_lock": "HELD",
+  "q4_access_count": 1,
+  "q4_access_delta_G11": 0,
+  "queue_history_preserved": {
+    "blocked": 2,
+    "completed": 116,
+    "failed": 9,
+    "running": 1
+  },
+  "registry_N_trials": 265227,
+  "remaining_data_budget_usd": 37.15261161327402,
+  "restart_count": 0,
+  "scheduler": "HEALTHY_AND_PROGRESSING",
+  "schema": "hydra_v7_2_g11_persistent_deployment_evidence_v1",
+  "service_active": true,
+  "service_enabled": true,
+  "single_writer": true,
+  "snapshot_before_deploy": "mission/state/snapshots/v72_g11_pre_deploy_20260713T085755Z"
+}
