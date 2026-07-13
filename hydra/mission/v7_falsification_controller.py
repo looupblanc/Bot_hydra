@@ -33,7 +33,7 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v5"
+CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v6"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-falsification-single-writer"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
@@ -114,6 +114,21 @@ V71_G4_POWER_AUDIT_RELATIVE_PATH = Path(
 V71_CONFIRMATION_QUEUE_V3_RELATIVE_PATH = Path(
     "WORM/v7.1-independent-confirmation-queue-0003-2026-07-12.json"
 )
+V71_G5_GRAMMAR_RELATIVE_PATH = Path(
+    "WORM/v7.1-cross-clock-speed-leadership-grammar-0005-2026-07-13.json"
+)
+V71_G5_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0005/"
+    "v71_cross_clock_speed_leadership_signal_manifest.json"
+)
+V71_G5_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0005/"
+    "v71_cross_clock_speed_leadership_funnel_result.json"
+)
+V71_G5_TRIPWIRE_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0005/"
+    "v71_cross_clock_speed_leadership_tripwire_result.json"
+)
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
     str(V71_POLICY_RELATIVE_PATH): "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
@@ -133,6 +148,9 @@ V71_FROZEN_HASHES = {
     "WORM/v7.1-cross-clock-flow-tripwire-0004-2026-07-12.json": "36504626470927c9ee7883c7eac79c7524dee2342cf30ace5277ce1c3629176a",
     "WORM/v7.1-cross-clock-flow-power-audit-0002-2026-07-12.json": "5fc399bca8a7beab2bcf4972dca99c325f4213f309d28c2427411288b9d92260",
     str(V71_CONFIRMATION_QUEUE_V3_RELATIVE_PATH): "e88641bd49bcf73f1d3007488db9baf09f74b06719255182010622b14c7a9ce3",
+    str(V71_G5_GRAMMAR_RELATIVE_PATH): "27a937a112dd4963402f8c12feb69cf9cd347b020ce47396cfffff0e253726c2",
+    "WORM/v7.1-cross-clock-speed-leadership-tripwire-0005-2026-07-13.json": "03513d2b8f9dda7bd4208581ea96d9c5ab1f8c6ca21444fc80bbfe95deb67d8d",
+    "WORM/v7.1-cross-clock-speed-leadership-verdict-0005-2026-07-13.json": "d72b2f1a5b64a6e33219f6a503c36b79834254d38cb303df36805bcf1f4931d5",
 }
 
 
@@ -633,6 +651,14 @@ def _classify_v71_g4_action(
         )
         + int(status_counts.get("WF_POSITIVE_BUT_FRAGILE", 0)),
     }
+    if (root / V71_G5_GRAMMAR_RELATIVE_PATH).is_file():
+        return _classify_v71_g5_action(
+            root,
+            prior_positive=prior_positive,
+            g2_positive=g2_positive,
+            cumulative_status=cumulative_status,
+            confirmation_queue=queue,
+        )
     return {
         "action_type": "V71_G4_INDEPENDENT_CONFIRMATION_REQUIRED_NO_PROMOTION",
         "phase": "4",
@@ -672,6 +698,136 @@ def _classify_v71_g4_action(
             "VERT_NET tripwire, but neither candidate passed the frozen power "
             "policy. The 30-minute version is fragile and the 60-minute version "
             "is queued unchanged for future independent confirmation."
+        ),
+    }
+
+
+def _classify_v71_g5_action(
+    root: Path,
+    *,
+    prior_positive: int,
+    g2_positive: int,
+    cumulative_status: Mapping[str, int],
+    confirmation_queue: Mapping[str, Any],
+) -> dict[str, Any]:
+    required = (
+        (V71_G5_SIGNAL_RELATIVE_PATH, "V71_G5_SIGNAL_MANIFEST_REQUIRED"),
+        (V71_G5_FUNNEL_RELATIVE_PATH, "V71_G5_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V71_G5_TRIPWIRE_RELATIVE_PATH, "V71_G5_TRIPWIRE_REQUIRED"),
+        (
+            Path(
+                "WORM/v7.1-cross-clock-speed-leadership-verdict-0005-2026-07-13.json"
+            ),
+            "V71_G5_GEOMETRY_VERDICT_FREEZE_REQUIRED",
+        ),
+    )
+    for path, action in required:
+        if not (root / path).is_file():
+            return {
+                "action_type": action,
+                "phase": "4",
+                "progressed": False,
+                "required_path": str(path),
+                "broad_D1_generation_authorized": False,
+                "new_data_purchase_authorized": False,
+                "reason": (
+                    "The bounded speed-leadership sequence must complete before "
+                    "another limited structural class is considered."
+                ),
+            }
+    hashes = {
+        V71_G5_SIGNAL_RELATIVE_PATH: "fdae549a4542eae64b86208d295794b6ce5e58f4f791ae5a7d262da0ac5b3032",
+        V71_G5_FUNNEL_RELATIVE_PATH: "06d9a1f5600bbe51fc516841482e406a26ab2fab49cf6e599e97311cb4a49648",
+        V71_G5_TRIPWIRE_RELATIVE_PATH: "ea7755aa5ab60f78298557da422d497d98467457a24a259ff3f3a9919048fc1d",
+    }
+    drift = [
+        str(path)
+        for path, expected in hashes.items()
+        if _sha256(root / path) != expected
+    ]
+    if drift:
+        raise V7ControllerIntegrityError(
+            "V7.1 speed-leadership evidence drift: " + ",".join(drift)
+        )
+    signal = _load_json(root / V71_G5_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V71_G5_FUNNEL_RELATIVE_PATH)
+    tripwire = _load_json(root / V71_G5_TRIPWIRE_RELATIVE_PATH)
+    verdict = _load_json(
+        root
+        / "WORM/v7.1-cross-clock-speed-leadership-verdict-0005-2026-07-13.json"
+    )
+    if int(signal.get("candidate_count") or 0) != 12:
+        raise V7ControllerIntegrityError("V7.1 G5 candidate count drift")
+    if int(funnel.get("walk_forward_positive_count") or 0) != 2:
+        raise V7ControllerIntegrityError("V7.1 G5 walk-forward count drift")
+    if tripwire.get("verdict") != "ARTEFACT_GEOMETRY_ONLY":
+        raise V7ControllerIntegrityError("V7.1 G5 tripwire verdict drift")
+    if float(tripwire.get("NULL_RATIO") or 0.0) < 0.8:
+        raise V7ControllerIntegrityError("V7.1 G5 artefact threshold drift")
+    if verdict.get("badge") != "GEOMETRY_ONLY" or int(
+        verdict.get("powered_candidate_count") or 0
+    ) != 0:
+        raise V7ControllerIntegrityError("V7.1 G5 frozen verdict drift")
+    graveyard = root / "mission/state/graveyard.db"
+    conn = sqlite3.connect(f"file:{graveyard}?mode=ro", uri=True)
+    try:
+        cemetery_count = int(
+            conn.execute(
+                "SELECT COALESCE(SUM(candidate_count),0) FROM class_tombstones "
+                "WHERE mechanism_class=? AND regime=? AND death_cause=?",
+                (
+                    "v71g5_cross_clock_speed_leadership",
+                    "D1_2023_2024_DATE_MATCHED_BLOCKS",
+                    "GEOMETRY_ONLY_NULL_RATIO_GTE_0_8",
+                ),
+            ).fetchone()[0]
+        )
+    finally:
+        conn.close()
+    if cemetery_count != 12:
+        raise V7ControllerIntegrityError("V7.1 G5 class tombstone is absent")
+    return {
+        "action_type": "V71_G5_GEOMETRY_ONLY_PIVOT_TO_NEW_CLASS",
+        "phase": "4",
+        "progressed": True,
+        "walk_forward_positive_count": prior_positive + g2_positive + 2 + 2 + 2,
+        "g5_candidate_count": int(signal["candidate_count"]),
+        "g5_signal_count": int(signal["signal_count"]),
+        "g5_stage1_survivor_count": int(funnel["stage1_pass_count"]),
+        "g5_walk_forward_positive_count": int(funnel["walk_forward_positive_count"]),
+        "g5_tripwire_verdict": tripwire["verdict"],
+        "g5_NULL_RATIO": float(tripwire["NULL_RATIO"]),
+        "g5_real_pass_count": tripwire["raw_pass_counts"]["real"],
+        "g5_null_pass_count": tripwire["raw_pass_counts"]["null"],
+        "g5_power_audit_executed": False,
+        "g5_rolling_combine_promotions": 0,
+        "g5_cemetery_candidate_count": cemetery_count,
+        "cumulative_power_status_counts": dict(cumulative_status),
+        "confirmation_queue_underpowered_count": int(
+            confirmation_queue["cumulative_promising_underpowered_count"]
+        ),
+        "confirmation_queue_fragile_retired_count": int(
+            confirmation_queue["cumulative_fragile_retired_count"]
+        ),
+        "geometry_only_candidate_count": 12,
+        "powered_candidate_count": 0,
+        "broad_D1_generation_authorized": False,
+        "limited_structural_discovery_authorized": True,
+        "conversion_priority": 0.95,
+        "limited_discovery_allocation": 0.05,
+        "new_data_purchase_authorized": False,
+        "shadow_admission_authorized": False,
+        "next_experiment_id": "hydra_v7_1_distinct_hypothesis_review_0006",
+        "next_experiment_state": "PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+        "principal_blocker": (
+            "Fourteen candidates still require independent confirmation, while "
+            "the latest speed-leadership class is GEOMETRY_ONLY and cannot be salvaged."
+        ),
+        "reason": (
+            "The speed-leadership null passes more often than the real world. "
+            "All twelve formulations are class-tombstoned; the perpetual factory "
+            "must pivot to a genuinely distinct economic hypothesis without "
+            "purchasing data or reusing candidate-level feedback."
         ),
     }
 
