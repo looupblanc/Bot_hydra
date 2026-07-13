@@ -1,0 +1,70 @@
+{
+  "schema": "hydra_directional_agreement_terminal_verdict_v1",
+  "campaign_id": "hydra_economic_evolution_multi_horizon_agreement_0008",
+  "class_id": "DIRECTIONAL_CONTEXT_AGREEMENT_TRADE_VETO_V1",
+  "issued_at_utc": "2026-07-13T21:16:00Z",
+  "source_commit": "72b1730",
+  "preregistration": {
+    "path": "config/v7/economic_evolution_directional_agreement_0008_revision_02.json",
+    "file_sha256": "29dab8df0f370caf3baaf2cc9923491f16cccd9825a8c74c78f2934eda2f333c",
+    "semantic_hash": "e3c7126b182928c44db8c277037212f6d162448c7f8d2feb0abc56ae267688f8"
+  },
+  "result": {
+    "path": "reports/economic_evolution/directional_agreement_0008/directional_agreement_result.json",
+    "file_sha256": "4ca7fa41f47cd652ed7ad1f1ba23713aa1551660093b104f88c172a11ef17773",
+    "semantic_hash": "4cec539830311e71f7bec9dee88c0cf74a0edf5d9ddfafea8157678376888b1c",
+    "scientific_status": "ARTEFACT_GEOMETRY_ONLY",
+    "real_pass_count": 19,
+    "real_candidate_count": 44,
+    "matched_null_pass_count": 23,
+    "matched_null_candidate_count": 44,
+    "NULL_RATIO": 1.2105263157894737,
+    "maximum_NULL_RATIO": 0.8,
+    "exact_one_sided_binomial_p_value": 0.9128302563825326,
+    "account_policy_evaluated_count": 256,
+    "rolling_combine_episode_count": 6144,
+    "policies_with_at_least_one_combine_pass": 0,
+    "maximum_target_progress": 0.7027833333332544,
+    "median_target_progress": -0.020504027777610137,
+    "median_mll_breach_rate": 0.0,
+    "dominant_economic_failure": "NO_COMBINE_PASS"
+  },
+  "terminal_decision": {
+    "verdict": "CLASS_TOMBSTONE_EXACT_GRAMMAR",
+    "parameter_rescue_allowed": false,
+    "same_class_relaunch_allowed": false,
+    "threshold_change_allowed": false,
+    "candidate_status_inheritance_allowed": false,
+    "new_representation_required": true,
+    "new_candidate_ids_required": true,
+    "validated": false,
+    "pre_holdout_ready_count": 0,
+    "paper_shadow_ready_count": 0
+  },
+  "graveyard_append": {
+    "mechanism_class": "DIRECTIONAL_CONTEXT_AGREEMENT_TRADE_VETO_V1",
+    "regime": "DEVELOPMENT_2023Q3_TO_2024Q3_MULTI_MARKET_CLOSED_30M_60M",
+    "death_cause": "GEOMETRY_ONLY_NULL_RATIO_GTE_0_8",
+    "candidate_count": 44,
+    "source_scope": "HYDRA_ECONOMIC_EVOLUTION_AGREEMENT_0008_REAL_SLEEVES",
+    "evidence_sha256": "4ca7fa41f47cd652ed7ad1f1ba23713aa1551660093b104f88c172a11ef17773",
+    "class_signature_count_before": 95,
+    "class_signature_count_after": 96,
+    "indexed_object_count_before": 115624,
+    "indexed_object_count_after": 115668,
+    "matched_null_controls_counted_as_candidates": false,
+    "diagnostic_account_policies_counted_as_candidates": false,
+    "parameter_level_feedback": false
+  },
+  "governance": {
+    "multiplicity_N_trials": 456903,
+    "proof_windows_consumed": 0,
+    "new_data_purchase_count": 0,
+    "q4_access_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "next_action": "PREREGISTER_ACCOUNT_FIRST_CROSS_SESSION_SYNTHESIS_0009",
+  "CONTRE": "The opposite-direction matched null is specific to the frozen 30m/60m agreement veto. Tombstoning is limited to this exact directional-agreement class and does not invalidate structurally different account-level session complementarity.",
+  "verdict_hash": "f2e13eb4e6d055c18ac2fcf41b9bd9d150307f43cd229fee7e524b71811d69b9"
+}
