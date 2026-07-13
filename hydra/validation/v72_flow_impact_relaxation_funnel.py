@@ -305,9 +305,9 @@ def _verify_inputs(
     if not proof_path.is_absolute():
         proof_path = root / proof_path
     proof = load_and_verify(proof_path)
-    if multiplicity_trial_count(proof) != EXPECTED_GLOBAL_N_TRIALS:
+    if multiplicity_trial_count(proof) < EXPECTED_GLOBAL_N_TRIALS:
         raise V72FlowImpactRelaxationFunnelError(
-            "flow-impact candidate reservation absent or suffix present"
+            "flow-impact candidate reservation is absent"
         )
     by_id = {str(row["event_id"]): row for row in proof["entries"]}
     reservation = by_id.get(RESERVATION_EVENT_ID)
@@ -315,6 +315,8 @@ def _verify_inputs(
     if (
         reservation is None
         or int(reservation["multiplicity"]["delta_trials"]) != 36
+        or int(reservation["multiplicity"]["cumulative_N_trials"])
+        != EXPECTED_GLOBAL_N_TRIALS
         or annotation is None
         or annotation.get("references_event_id") != RESERVATION_EVENT_ID
         or annotation.get("correction", {}).get("correct_value")
