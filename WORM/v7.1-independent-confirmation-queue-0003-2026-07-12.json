@@ -1,0 +1,73 @@
+{
+  "schema": "hydra_v7_1_independent_confirmation_queue_v3",
+  "queue_id": "hydra_v7_1_independent_confirmation_queue_0003",
+  "supersedes_queue_path": "WORM/v7.1-independent-confirmation-queue-0002-2026-07-12.json",
+  "supersedes_queue_sha256": "ce9d10ef013affed665f59aded39d051356ac5ddefbce7273b9612cb4bc7b82b",
+  "cross_clock_power_audit_path": "reports/v7_1/discovery_0004/v71_cross_clock_flow_power_audit_result.json",
+  "cross_clock_power_audit_sha256": "204b79bcc0f75b22351c638469f4be1bc84bfaf636d09c88e1462f2a67c62f67",
+  "queue_status": "DEFERRED_NO_SHADOW_ELIGIBILITY_NO_DATA_PURCHASE",
+  "cumulative_promising_underpowered_count": 14,
+  "cumulative_fragile_retired_count": 4,
+  "cumulative_powered_count": 0,
+  "new_promising_underpowered_candidate_ids": [
+    "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60"
+  ],
+  "new_fragile_retired_candidate_ids": [
+    "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h30"
+  ],
+  "new_candidate_evidence": {
+    "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60": {
+      "raw_event_count": 161,
+      "effective_independent_event_count": 127.61284770323161,
+      "temporal_block_count": 8,
+      "STRESS_1_5X_mean_net": 73.19922360248448,
+      "confidence_interval_95": [
+        13.62714723926382,
+        127.01382640243295
+      ],
+      "probability_net_effect_positive": 0.98955,
+      "power_at_candidate_effect": 0.3381,
+      "status": "PROMISING_UNDERPOWERED"
+    },
+    "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h30": {
+      "raw_event_count": 304,
+      "effective_independent_event_count": 292.00197709744987,
+      "temporal_block_count": 8,
+      "STRESS_1_5X_mean_net": 4.752631578947379,
+      "confidence_interval_95": [
+        -33.95624999999999,
+        44.03358895705521
+      ],
+      "probability_net_effect_positive": 0.6091,
+      "power_at_candidate_effect": 0.15595,
+      "status": "WF_POSITIVE_BUT_FRAGILE"
+    }
+  },
+  "shadow_slots_loaded": 0,
+  "proof_windows_opened": 0,
+  "proof_windows_burned_delta": 0,
+  "future_confirmation_contract": {
+    "candidate_version_must_remain_unchanged": true,
+    "candidate_or_lineage_may_not_reuse_seen_window": true,
+    "separate_WORM_window_manifest_required_before_access": true,
+    "append_only_post_manifest_data_only": true,
+    "current_D1_data_may_not_be_reclassified_as_fresh_proof": true,
+    "current_queue_does_not_authorize_market_data_purchase": true,
+    "current_queue_does_not_authorize_shadow_activation": true,
+    "current_queue_does_not_authorize_DSR_BH_bypass": true
+  },
+  "forward_feed_state": {
+    "required_roots": [],
+    "source_manifest_authorized": false,
+    "candidate_boundary_manifest_created": false,
+    "bars_requested": 0,
+    "bars_processed": 0,
+    "reason": "No candidate passed the candidate-specific power gate; proof slots remain empty and fail closed."
+  },
+  "next_information_action": "await_independent_confirmation_authority_while_persistent_controller_keeps_only_bounded_distinct_discovery_available",
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "The 60-minute candidate has a positive CI but only 33.81% calibrated power; deferral may miss a real edge, yet promotion would violate the preregistered 80% power gate."
+}
