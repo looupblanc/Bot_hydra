@@ -161,6 +161,7 @@ def test_v72_simultaneous_entry_uses_frozen_component_priority() -> None:
     )
 
     assert result.component_contribution == {"high": 300.0}
+    assert result.conflict_count == 1
     assert result.skipped_reasons == {"MAXIMUM_SIMULTANEOUS_POSITIONS": 1}
 
 

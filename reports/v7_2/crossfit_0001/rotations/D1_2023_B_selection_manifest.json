@@ -1,0 +1,280 @@
+{
+  "design_block_ids": [
+    "D1_2023_A",
+    "D1_2024_A",
+    "D1_2024_B"
+  ],
+  "design_population_hash": "a3c95c0e322d7e35fbdfbf3529e8e18b98f4e640d84c85a11a2f021d0204bc6c",
+  "hard_filter_pass_count": 254,
+  "held_out_block_id": "D1_2023_B",
+  "held_out_block_used_in_selection": false,
+  "held_out_results_read": false,
+  "pareto_frontier_count": 23,
+  "retuning_after_held_out_result": false,
+  "rotation_manifest_hash": "3984db31e72c3370b51657b15f9acf90ae3f3cbd33bea7f7f37f2d5ba87cf4b9",
+  "schema": "hydra_v7_2_rotation_selection_manifest_v1",
+  "search_id": "hydra_v7_2_static_basket_crossfit_0001",
+  "selected_baskets": [
+    {
+      "design_metrics": {
+        "BASE": {
+          "accepted_event_count": 172,
+          "account_net_median": 18710.200000000186,
+          "account_net_p25": 14202.225000000064,
+          "account_net_p75": 25743.30000000006,
+          "account_net_sum": 61180.850000000064,
+          "conflict_count": 425,
+          "conflict_rate": 0.711892797319933,
+          "consistency_pass_rate": 0.6666666666666666,
+          "data_censored_count": 1,
+          "episode_count": 3,
+          "hard_rule_failure_count": 0,
+          "maximum_target_progress_median": 1.097713236968664,
+          "maximum_target_progress_p25": 1.0311890875401062,
+          "maximum_target_progress_p75": 1.1949761441389115,
+          "minimum_mll_buffer": 259.29999999995925,
+          "mll_breach_count": 0,
+          "mll_breach_rate": 0.0,
+          "pass_contributing_block_count": 2,
+          "pass_count": 2,
+          "pass_rate": 0.6666666666666666,
+          "projected_days_to_target": 9.109847329175887,
+          "skipped_event_count": 425
+        },
+        "STRESS_1_5X": {
+          "accepted_event_count": 172,
+          "account_net_median": 17810.200000000186,
+          "account_net_p25": 13213.162500000064,
+          "account_net_p75": 24955.80000000006,
+          "account_net_sum": 58527.725000000064,
+          "conflict_count": 425,
+          "conflict_rate": 0.711892797319933,
+          "consistency_pass_rate": 0.6666666666666666,
+          "data_censored_count": 1,
+          "episode_count": 3,
+          "hard_rule_failure_count": 0,
+          "maximum_target_progress_median": 1.0832697797784943,
+          "maximum_target_progress_p25": 1.0023045250335063,
+          "maximum_target_progress_p75": 1.1655624716627857,
+          "minimum_mll_buffer": 121.1249999999709,
+          "mll_breach_count": 0,
+          "mll_breach_rate": 0.0,
+          "pass_contributing_block_count": 2,
+          "pass_count": 2,
+          "pass_rate": 0.6666666666666666,
+          "projected_days_to_target": 9.231310783953365,
+          "skipped_event_count": 425
+        }
+      },
+      "frozen_basket": {
+        "allocation_profile": "TARGET_VELOCITY_TILT",
+        "basket_hash": "8c0aabe04e086b01d7ae239907c49b61e4a4502d6d6549ea2fe4aa7746fa2271",
+        "basket_id": "v72_rotation_8c0aabe04e086b01d7ae",
+        "component_ids": [
+          "v71g1_event_path_geometry_geometry_transition_motif_reversal_h60",
+          "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+          "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+          "v71g6_trade_size_composition_large_clip_absorption_reversal_h60"
+        ],
+        "component_priority": [
+          "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+          "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+          "v71g1_event_path_geometry_geometry_transition_motif_reversal_h60",
+          "v71g6_trade_size_composition_large_clip_absorption_reversal_h60"
+        ],
+        "component_risk_units": {
+          "v71g1_event_path_geometry_geometry_transition_motif_reversal_h60": 1,
+          "v71g2_event_cluster_hazard_cluster_release_continuation_h30": 1,
+          "v71g3_event_completion_speed_fast_volume_completion_continuation_h60": 2,
+          "v71g6_trade_size_composition_large_clip_absorption_reversal_h60": 1
+        },
+        "design_block_ids": [
+          "D1_2023_A",
+          "D1_2024_A",
+          "D1_2024_B"
+        ],
+        "held_out_block_id": "D1_2023_B",
+        "policy_version": "hydra_account_policy_v7_2_crossfit_v1",
+        "source_structural_hash": "3d46cab584b457eec5f04ae7190482928123590e2753fdf3da651a8d3718918c",
+        "source_structure_id": "v72_static_3d46cab584b457eec5f0"
+      },
+      "hard_filter_passed": true,
+      "source_structure_id": "v72_static_3d46cab584b457eec5f0"
+    },
+    {
+      "design_metrics": {
+        "BASE": {
+          "accepted_event_count": 175,
+          "account_net_median": 17343.050000000367,
+          "account_net_p25": 13536.175000000178,
+          "account_net_p75": 25059.72500000015,
+          "account_net_sum": 59848.75000000029,
+          "conflict_count": 431,
+          "conflict_rate": 0.7112211221122112,
+          "consistency_pass_rate": 0.6666666666666666,
+          "data_censored_count": 1,
+          "episode_count": 3,
+          "hard_rule_failure_count": 0,
+          "maximum_target_progress_median": 1.097713236968664,
+          "maximum_target_progress_p25": 1.0325414504132135,
+          "maximum_target_progress_p75": 1.1477643393747439,
+          "minimum_mll_buffer": 259.29999999995925,
+          "mll_breach_count": 0,
+          "mll_breach_rate": 0.0,
+          "pass_contributing_block_count": 2,
+          "pass_count": 2,
+          "pass_rate": 0.6666666666666666,
+          "projected_days_to_target": 9.109847329175887,
+          "skipped_event_count": 431
+        },
+        "STRESS_1_5X": {
+          "accepted_event_count": 175,
+          "account_net_median": 16508.675000000367,
+          "account_net_p25": 12584.612500000178,
+          "account_net_p75": 24305.03750000015,
+          "account_net_sum": 57270.62500000029,
+          "conflict_count": 431,
+          "conflict_rate": 0.7112211221122112,
+          "consistency_pass_rate": 0.6666666666666666,
+          "data_censored_count": 1,
+          "episode_count": 3,
+          "hard_rule_failure_count": 0,
+          "maximum_target_progress_median": 1.0832697797784943,
+          "maximum_target_progress_p25": 1.0040488982763738,
+          "maximum_target_progress_p75": 1.1199673999697286,
+          "minimum_mll_buffer": 121.1249999999709,
+          "mll_breach_count": 0,
+          "mll_breach_rate": 0.0,
+          "pass_contributing_block_count": 2,
+          "pass_count": 2,
+          "pass_rate": 0.6666666666666666,
+          "projected_days_to_target": 9.231310783953365,
+          "skipped_event_count": 431
+        }
+      },
+      "frozen_basket": {
+        "allocation_profile": "TARGET_VELOCITY_TILT",
+        "basket_hash": "30f25f14c4270c6e869d67a900e51ca1dab1574d79eafa9333a4b2c7282ba4ec",
+        "basket_id": "v72_rotation_30f25f14c4270c6e869d",
+        "component_ids": [
+          "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+          "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+          "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+          "v71g6_trade_size_composition_large_clip_absorption_reversal_h60"
+        ],
+        "component_priority": [
+          "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+          "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+          "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+          "v71g6_trade_size_composition_large_clip_absorption_reversal_h60"
+        ],
+        "component_risk_units": {
+          "v71g1_event_state_transitions_compression_to_expansion_reversal_h30": 1,
+          "v71g2_event_cluster_hazard_cluster_release_continuation_h30": 1,
+          "v71g3_event_completion_speed_fast_volume_completion_continuation_h60": 2,
+          "v71g6_trade_size_composition_large_clip_absorption_reversal_h60": 1
+        },
+        "design_block_ids": [
+          "D1_2023_A",
+          "D1_2024_A",
+          "D1_2024_B"
+        ],
+        "held_out_block_id": "D1_2023_B",
+        "policy_version": "hydra_account_policy_v7_2_crossfit_v1",
+        "source_structural_hash": "f052544e104fd947ea90d7afc3342bdcbeda81cb2c1c1ebbed6712bfc01bd8e8",
+        "source_structure_id": "v72_static_f052544e104fd947ea90"
+      },
+      "hard_filter_passed": true,
+      "source_structure_id": "v72_static_f052544e104fd947ea90"
+    },
+    {
+      "design_metrics": {
+        "BASE": {
+          "accepted_event_count": 168,
+          "account_net_median": 15473.200000000244,
+          "account_net_p25": 12963.750000000102,
+          "account_net_p75": 24124.80000000009,
+          "account_net_sum": 58703.90000000014,
+          "conflict_count": 413,
+          "conflict_rate": 0.7108433734939759,
+          "consistency_pass_rate": 0.6666666666666666,
+          "data_censored_count": 1,
+          "episode_count": 3,
+          "hard_rule_failure_count": 0,
+          "maximum_target_progress_median": 1.0686723438935448,
+          "maximum_target_progress_p25": 1.0233262790554536,
+          "maximum_target_progress_p75": 1.0831927904311045,
+          "minimum_mll_buffer": 146.79999999998836,
+          "mll_breach_count": 0,
+          "mll_breach_rate": 0.0,
+          "pass_contributing_block_count": 2,
+          "pass_count": 2,
+          "pass_rate": 0.6666666666666666,
+          "projected_days_to_target": 9.357405061654841,
+          "skipped_event_count": 413
+        },
+        "STRESS_1_5X": {
+          "accepted_event_count": 168,
+          "account_net_median": 14666.950000000244,
+          "account_net_p25": 12026.250000000102,
+          "account_net_p75": 23384.17500000009,
+          "account_net_sum": 56153.90000000014,
+          "conflict_count": 413,
+          "conflict_rate": 0.7108433734939759,
+          "consistency_pass_rate": 0.6666666666666666,
+          "data_censored_count": 1,
+          "episode_count": 3,
+          "hard_rule_failure_count": 0,
+          "maximum_target_progress_median": 1.0276262642186451,
+          "maximum_target_progress_p25": 0.9816261572864085,
+          "maximum_target_progress_p75": 1.0554480219985698,
+          "minimum_mll_buffer": 15.549999999988358,
+          "mll_breach_count": 0,
+          "mll_breach_rate": 0.0,
+          "pass_contributing_block_count": 2,
+          "pass_count": 2,
+          "pass_rate": 0.6666666666666666,
+          "projected_days_to_target": 9.731164284326162,
+          "skipped_event_count": 413
+        }
+      },
+      "frozen_basket": {
+        "allocation_profile": "TARGET_VELOCITY_TILT",
+        "basket_hash": "56454185af96b005f7674010591258358d041dab38779acbb06e819167910e2f",
+        "basket_id": "v72_rotation_56454185af96b005f767",
+        "component_ids": [
+          "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+          "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+          "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+          "v71g6_trade_size_composition_large_clip_absorption_reversal_h60"
+        ],
+        "component_priority": [
+          "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+          "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+          "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+          "v71g6_trade_size_composition_large_clip_absorption_reversal_h60"
+        ],
+        "component_risk_units": {
+          "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60": 1,
+          "v71g2_event_cluster_hazard_cluster_release_continuation_h30": 1,
+          "v71g3_event_completion_speed_fast_volume_completion_continuation_h60": 2,
+          "v71g6_trade_size_composition_large_clip_absorption_reversal_h60": 1
+        },
+        "design_block_ids": [
+          "D1_2023_A",
+          "D1_2024_A",
+          "D1_2024_B"
+        ],
+        "held_out_block_id": "D1_2023_B",
+        "policy_version": "hydra_account_policy_v7_2_crossfit_v1",
+        "source_structural_hash": "d8ef1b3a580e2404df3f9fbc60f8a6d7027c0cbda43a707cf73a66fbf777066e",
+        "source_structure_id": "v72_static_d8ef1b3a580e2404df3f"
+      },
+      "hard_filter_passed": true,
+      "source_structure_id": "v72_static_d8ef1b3a580e2404df3f"
+    }
+  ],
+  "selected_count": 3,
+  "selection_function": "frozen_hard_filter_then_pareto_then_lexicographic_frontier_order",
+  "structure_count": 1009
+}

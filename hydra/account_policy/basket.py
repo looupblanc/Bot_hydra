@@ -334,7 +334,16 @@ def run_shared_account_episode(
             if not decision.allow:
                 skipped += 1
                 skipped_reasons[decision.reason] += 1
-                conflicts += int("CONFLICT" in decision.reason)
+                conflicts += int(
+                    "CONFLICT" in decision.reason
+                    or (
+                        basket.policy_version.startswith(
+                            "hydra_account_policy_v7_2"
+                        )
+                        and decision.reason
+                        == "MAXIMUM_SIMULTANEOUS_POSITIONS"
+                    )
+                )
                 continue
             ratio = decision.quantity / event.quantity
             position = _OpenPosition(
