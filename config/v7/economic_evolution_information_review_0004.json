@@ -1,0 +1,219 @@
+{
+  "schema": "hydra_economic_evolution_information_review_preregistration_v1",
+  "review_id": "hydra_economic_evolution_information_review_0004",
+  "created_at_utc": "2026-07-13T15:00:00+00:00",
+  "purpose": "Determine whether the absence of a 90-session pass is operational-horizon censoring or persistently insufficient target velocity, without changing any policy or consuming proof.",
+  "implementation_commit": "b9493f736a605180b48ac05a390b7c9791640dff",
+  "implementation_files": {
+    "hydra/research/economic_evolution_information_review.py": "299a6348de2d9901bf1160ec70a555c4eadd024f212c71fdb8b360b9a3700ebc",
+    "scripts/run_economic_evolution_information_review.py": "18d9ba24d5876199cbd8ddddb003071a47bf3fbbf099cb826f65011758d1f3e8"
+  },
+  "source_campaign": {
+    "campaign_id": "hydra_economic_evolution_persistent_0003_revision_01",
+    "artifact_paths": {
+      "campaign_result": "reports/economic_evolution/persistent_0003_revision_01/economic_evolution_campaign_result.json",
+      "rolling_elites": "reports/economic_evolution/persistent_0003_revision_01/rolling_combine_elite_results.jsonl",
+      "structural_sleeves": "reports/economic_evolution/persistent_0003_revision_01/structural_sleeves.jsonl",
+      "exact_components": "reports/economic_evolution/persistent_0003_revision_01/exact_component_results.jsonl",
+      "source_preregistration": "reports/economic_evolution/persistent_0003_revision_01/preregistration_copy.json",
+      "seed_archive": "reports/economic_evolution/seeds/persistent_0002_successor_seed.json"
+    },
+    "artifact_sha256": {
+      "campaign_result": "85d2b600a0ea76d4aaf3ee65dc4a6a77017fd89587708da31321cdbe12705de0",
+      "rolling_elites": "f41fb6eee71d2a1e403ca83924d4333ced88b08c4e9bbfae6787b197ba29fede",
+      "structural_sleeves": "38d34cbc157f6ce04833f2d31b9fe46ffd34d0969d2f81c7a369cac8679d9dfd",
+      "exact_components": "deecc5c5da50e8009b308c1a248696dfd65fc0578fa1498f974104ea86e000f6",
+      "source_preregistration": "5b2ff090eb0ccaec8378fc3d0cda902dc070eb5da0c75af0665519ad090cac1b",
+      "seed_archive": "bac6cfb43e4200ab691458f8ef1f7d644526e5576f27b7b48176bfa06c9e94a7"
+    },
+    "development_only": true,
+    "combine_path_count": 0,
+    "selection_outcomes_already_seen": true
+  },
+  "selection_policy": {
+    "selected_count": 5,
+    "selection_is_post_development": true,
+    "independent_evidence_claim": false,
+    "criteria": [
+      "maximum observed target progress",
+      "maximum median target progress",
+      "fastest projected target velocity",
+      "stressed median resilience",
+      "behaviorally distinct near-target path"
+    ],
+    "parameter_retuning_allowed": false,
+    "signal_mutation_allowed": false,
+    "risk_rule_mutation_allowed": false,
+    "status_inheritance_allowed": false
+  },
+  "selected_policies": [
+    {
+      "policy_id": "account_policy_child_7d5b596dd84f6dba43ccc0bf",
+      "policy_specification_hash": "8958a4fbc2b41cce2a7eaec4725d5a92064b420378a8bb793b7909ae993c3729",
+      "source_row_hash": "4577fbdaaaf13b49df512da52ddfd972441e76917f54d0ea26d871bbe7db8658",
+      "selection_role": "MAXIMUM_TARGET_PROGRESS",
+      "sleeve_runtime_hashes": {
+        "sleeve_3bfbcb93cb191c2f272c38d4": "5abfe08be92f21f6b58ade7054f34a17b957f498bf179f669813a3887b4819c4",
+        "sleeve_65bad2088913fc9fca0a145d": "df7a34a63488076cb5f5b91ce0c2bed4834f5f35946b5e5d928ca76ae4415aea",
+        "sleeve_66ae033ef4acbc5ea759661d": "17c442e8c3caa864d96249393adfb1cc533820c3f26b3b2b7ff929e7cef0724b",
+        "sleeve_f85e46cd5d5793e6b9042cdb": "8e0a63a555762cb9171bfdc6ca27044bcbb14a4892ec88451986e60dd1f124bc"
+      },
+      "source_development_metrics": {
+        "target_progress_median": 0.23442472222217797,
+        "maximum_target_progress": 0.9774972222221355,
+        "projected_days_to_target": 161.4985470115519,
+        "mll_breach_rate": 0.0,
+        "consistency_pass_rate": 0.5,
+        "median_episode_net_pnl": 2109.822499999602,
+        "stressed_target_progress_median": 0.1798159722223613,
+        "stressed_median_episode_net_pnl": 1618.3437500012515
+      }
+    },
+    {
+      "policy_id": "account_policy_child_a4de6d7888ffe5ab9e461ad2",
+      "policy_specification_hash": "ccba78b4a24c855bb1ae850bfb308fc65e10fda546d8301281a8b1e958aae173",
+      "source_row_hash": "1a02622a907c3c4176e049749e9592fefa7a3714bd91d0ab30493b6208585ac6",
+      "selection_role": "MAXIMUM_MEDIAN_TARGET_PROGRESS",
+      "sleeve_runtime_hashes": {
+        "sleeve_65bad2088913fc9fca0a145d": "df7a34a63488076cb5f5b91ce0c2bed4834f5f35946b5e5d928ca76ae4415aea",
+        "sleeve_66ae033ef4acbc5ea759661d": "17c442e8c3caa864d96249393adfb1cc533820c3f26b3b2b7ff929e7cef0724b",
+        "sleeve_f198b7a2e3c8d9f557661561": "014560701de7d39c46a6fd72d9b6b41742f8287a76c2d5375168082bfa06c131",
+        "sleeve_f85e46cd5d5793e6b9042cdb": "8e0a63a555762cb9171bfdc6ca27044bcbb14a4892ec88451986e60dd1f124bc"
+      },
+      "source_development_metrics": {
+        "target_progress_median": 0.4057277777776649,
+        "maximum_target_progress": 0.7218483333332276,
+        "projected_days_to_target": 205.8117702767784,
+        "mll_breach_rate": 0.0,
+        "consistency_pass_rate": 0.6666666666666666,
+        "median_episode_net_pnl": 3651.5499999989843,
+        "stressed_target_progress_median": 0.3616023611112307,
+        "stressed_median_episode_net_pnl": 3254.4212500010763
+      }
+    },
+    {
+      "policy_id": "account_policy_child_06ac8ff2b3e309c3e210c4d7",
+      "policy_specification_hash": "d0b1f46f7b748aabba9203d4114879a45765974f7f0d46bf41d407a775144b82",
+      "source_row_hash": "6fa99cb08b66843165b09c1929cf643b56096851a9793093385c690892575bdc",
+      "selection_role": "FASTEST_PROJECTED_TARGET_VELOCITY",
+      "sleeve_runtime_hashes": {
+        "sleeve_65bad2088913fc9fca0a145d": "df7a34a63488076cb5f5b91ce0c2bed4834f5f35946b5e5d928ca76ae4415aea",
+        "sleeve_66ae033ef4acbc5ea759661d": "17c442e8c3caa864d96249393adfb1cc533820c3f26b3b2b7ff929e7cef0724b",
+        "sleeve_f85e46cd5d5793e6b9042cdb": "8e0a63a555762cb9171bfdc6ca27044bcbb14a4892ec88451986e60dd1f124bc",
+        "sleeve_fba822e2287d699ae3498535": "7df3514a096a9b7add7200bb640fa8ea5a2a942c67645284fe28f88c85a3b7f5"
+      },
+      "source_development_metrics": {
+        "target_progress_median": 0.25216472222215736,
+        "maximum_target_progress": 0.9690327777776854,
+        "projected_days_to_target": 136.15281724974093,
+        "mll_breach_rate": 0.0,
+        "consistency_pass_rate": 0.5,
+        "median_episode_net_pnl": 2269.482499999416,
+        "stressed_target_progress_median": 0.19313763888903163,
+        "stressed_median_episode_net_pnl": 1738.2387500012846
+      }
+    },
+    {
+      "policy_id": "account_policy_child_9534f1c3aedf9026d35754ad",
+      "policy_specification_hash": "2f3655473bb560a6a7f2137f619acafabcb52a58326bc662f27b9013046d20af",
+      "source_row_hash": "0a2148e9749c639a999d989c24e785454588255f7ab370c9165c8e083db7b86e",
+      "selection_role": "STRESSED_MEDIAN_RESILIENCE",
+      "sleeve_runtime_hashes": {
+        "sleeve_56d62ae303bf865ba98c7748": "0b5e15388279b5711dffea52a813fa1496685e13f63bb60e32425d505b887b78",
+        "sleeve_65bad2088913fc9fca0a145d": "df7a34a63488076cb5f5b91ce0c2bed4834f5f35946b5e5d928ca76ae4415aea",
+        "sleeve_f198b7a2e3c8d9f557661561": "014560701de7d39c46a6fd72d9b6b41742f8287a76c2d5375168082bfa06c131",
+        "sleeve_f85e46cd5d5793e6b9042cdb": "8e0a63a555762cb9171bfdc6ca27044bcbb14a4892ec88451986e60dd1f124bc"
+      },
+      "source_development_metrics": {
+        "target_progress_median": 0.3884305555556041,
+        "maximum_target_progress": 0.5414233333333751,
+        "projected_days_to_target": 210.5070295703667,
+        "mll_breach_rate": 0.0,
+        "consistency_pass_rate": 0.625,
+        "median_episode_net_pnl": 3495.8750000004366,
+        "stressed_target_progress_median": 0.33395833333348857,
+        "stressed_median_episode_net_pnl": 3005.625000001397
+      }
+    },
+    {
+      "policy_id": "account_policy_child_9a7e901bda15207c0e7ba25d",
+      "policy_specification_hash": "3662c57afa0b6c9e2ea7b5969109a21694ad61c1cd7e7a91f90cde19a597a252",
+      "source_row_hash": "4c4430407f2fd4edfcb8cc2af5db2ec8f4636f473974a03027dbd620e4960191",
+      "selection_role": "DISTINCT_NEAR_TARGET_PATH",
+      "sleeve_runtime_hashes": {
+        "sleeve_56d62ae303bf865ba98c7748": "0b5e15388279b5711dffea52a813fa1496685e13f63bb60e32425d505b887b78",
+        "sleeve_66ae033ef4acbc5ea759661d": "17c442e8c3caa864d96249393adfb1cc533820c3f26b3b2b7ff929e7cef0724b",
+        "sleeve_958d5ade0f6a1090ba0d95aa": "5efdc1c734276cd0027f14a8c0bf05ea2c2e29354bb56cc83d06806bbd0c9549",
+        "sleeve_f85e46cd5d5793e6b9042cdb": "8e0a63a555762cb9171bfdc6ca27044bcbb14a4892ec88451986e60dd1f124bc"
+      },
+      "source_development_metrics": {
+        "target_progress_median": 0.27645027777776865,
+        "maximum_target_progress": 0.9735372222221631,
+        "projected_days_to_target": 179.06696164817365,
+        "mll_breach_rate": 0.0,
+        "consistency_pass_rate": 0.5,
+        "median_episode_net_pnl": 2488.052499999918,
+        "stressed_target_progress_median": 0.21788736111131018,
+        "stressed_median_episode_net_pnl": 1960.9862500017916
+      }
+    }
+  ],
+  "horizon_policy": {
+    "reporting_horizons_sessions": [20, 40, 60, 90],
+    "include_full_available": true,
+    "frozen_episode_start_days": [
+      19544, 19555, 19572, 19583, 19600, 19611,
+      19632, 19641, 19660, 19669, 19688, 19697,
+      19719, 19732, 19741, 19760, 19769, 19788,
+      19808, 19821, 19830, 19849, 19858, 19877
+    ],
+    "temporal_blocks": [
+      {"block_id": "B1", "start_day_inclusive": 19544, "end_day_inclusive": 19611},
+      {"block_id": "B2", "start_day_inclusive": 19632, "end_day_inclusive": 19697},
+      {"block_id": "B3", "start_day_inclusive": 19719, "end_day_inclusive": 19788},
+      {"block_id": "B4", "start_day_inclusive": 19808, "end_day_inclusive": 19877}
+    ],
+    "official_time_limit_assumed": false,
+    "operational_horizon_is_failure": false,
+    "timeout_mapping": {
+      "requested_horizon_fully_observed": "OPERATIONAL_HORIZON_NOT_REACHED",
+      "requested_horizon_not_fully_observed": "DATA_CENSORED",
+      "full_available_nonterminal": "DATA_CENSORED"
+    },
+    "same_starts_all_policies_cost_profiles_and_horizons": true,
+    "horizon_selection_after_results_allowed": false
+  },
+  "next_stage_queue_policy": {
+    "queue_is_not_validation_or_promotion": true,
+    "minimum_stressed_full_available_passes": 1,
+    "minimum_stressed_pass_blocks": 2,
+    "minimum_stressed_median_net": 0.0,
+    "maximum_base_mll_breach_rate": 0.2,
+    "maximum_stressed_mll_breach_rate": 0.2,
+    "final_confirmation_power_requirement_unchanged": 0.8,
+    "independent_confirmation_required_after_queue": true
+  },
+  "compute": {
+    "exact_worker_count": 3,
+    "mission_db_writer_count": 0,
+    "registry_writer_count": 0
+  },
+  "multiplicity": {
+    "prospective_diagnostic_comparisons": 50,
+    "global_registry_append_required_before_run": true,
+    "statistical_promotion_claim": false
+  },
+  "data_role": "DEVELOPMENT_ONLY_Q4_EXCLUDED",
+  "development_only": true,
+  "status_inheritance": false,
+  "q4_access_allowed": false,
+  "new_data_purchase_allowed": false,
+  "network_access_allowed": false,
+  "broker_or_orders_allowed": false,
+  "shadow_admission_allowed": false,
+  "proof_window_consumption_allowed": false,
+  "pre_holdout_promotion_allowed": false,
+  "paper_shadow_promotion_allowed": false,
+  "CONTRE": "La selection des cinq politiques utilise deja les resultats de developpement et les departs se chevauchent; meme un passage plein horizon ne serait qu'un diagnostic de valeur d'information.",
+  "preregistration_hash": "0543ad09783d27567de1fe966ecf6decf0b426de071a207418320de378299812"
+}
