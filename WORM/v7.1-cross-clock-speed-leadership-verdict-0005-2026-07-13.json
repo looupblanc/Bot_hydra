@@ -1,0 +1,42 @@
+{
+  "schema": "hydra_v7_1_cross_clock_speed_leadership_verdict_v1",
+  "verdict_id": "hydra_v7_1_cross_clock_speed_leadership_verdict_0005",
+  "grammar_id": "hydra_v7_1_cross_clock_speed_leadership_grammar_0005",
+  "grammar_sha256": "27a937a112dd4963402f8c12feb69cf9cd347b020ce47396cfffff0e253726c2",
+  "funnel_result_path": "reports/v7_1/discovery_0005/v71_cross_clock_speed_leadership_funnel_result.json",
+  "funnel_result_sha256": "06d9a1f5600bbe51fc516841482e406a26ab2fab49cf6e599e97311cb4a49648",
+  "tripwire_result_path": "reports/v7_1/discovery_0005/v71_cross_clock_speed_leadership_tripwire_result.json",
+  "tripwire_result_sha256": "ea7755aa5ab60f78298557da422d497d98467457a24a259ff3f3a9919048fc1d",
+  "verdict": "ARTEFACT_GEOMETRY_ONLY",
+  "raw_pass_counts": {
+    "real": "13/240",
+    "null": "45/720"
+  },
+  "NULL_RATIO": 1.1538461538461537,
+  "artefact_threshold_inclusive": 0.8,
+  "exact_binomial_one_sided_p_value": 0.7404294667980698,
+  "evidence_strength": "ARTEFACT",
+  "badge": "GEOMETRY_ONLY",
+  "badge_scope": "ALL_12_FROZEN_GRAMMAR_CANDIDATES",
+  "mechanism_class": "v71g5_cross_clock_speed_leadership",
+  "regime": "D1_2023_2024_DATE_MATCHED_BLOCKS",
+  "death_cause": "GEOMETRY_ONLY_NULL_RATIO_GTE_0_8",
+  "candidate_count": 12,
+  "walk_forward_positive_candidate_count": 2,
+  "powered_candidate_count": 0,
+  "candidate_power_audit_executed": false,
+  "candidate_nulls_executed": false,
+  "DSR_BH_executed": false,
+  "rolling_combine_executed": false,
+  "shadow_admission_authorized": false,
+  "candidate_status_inheritance": false,
+  "cemetery_feedback": {
+    "scope": "mechanism_class_x_regime_x_death_cause_only",
+    "parameter_feedback_permitted": false,
+    "candidate_outcome_feedback_to_generator_permitted": false
+  },
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "Only two D1 calendar blocks are available, but the pooled null pass rate exceeds the real pass rate; retaining the class for promotion would violate the preregistered tripwire despite possible isolated development effects."
+}
