@@ -13,7 +13,11 @@ from typing import Any, Mapping
 
 from hydra.data.budget import DatabentoBudgetConfig, cumulative_spend
 from hydra.governance.invariants import q4_access_count
-from hydra.governance.proof_registry import burned_window_ids, load_and_verify
+from hydra.governance.proof_registry import (
+    burned_window_ids,
+    load_and_verify,
+    multiplicity_trial_count,
+)
 from hydra.mission.experiment_queue import ensure_experiment_schema
 from hydra.mission.mission_state import (
     append_event,
@@ -33,10 +37,10 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_2_pareto_crossfit_controller_v1"
+CONTROLLER_SCHEMA = "hydra_v7_2_flow_impact_conversion_controller_v2"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
-CONTROLLER_CLAIM_TOKEN = "v7-2-pareto-crossfit-single-writer"
-CONTROLLER_OWNER = "v7_2_pareto_crossfit_controller"
+CONTROLLER_CLAIM_TOKEN = "v7-2-flow-impact-conversion-single-writer"
+CONTROLLER_OWNER = "v7_2_flow_impact_conversion_controller"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
 G1_RELATIVE_PATH = Path("reports/v7/phase1/g1_result.json")
 D1_TRIBUNAL_RELATIVE_PATH = Path(
@@ -219,6 +223,33 @@ V72_SEARCH_FREEZE_RELATIVE_PATH = Path(
 V72_CROSS_FIT_RELATIVE_PATH = Path(
     "reports/v7_2/crossfit_0001/v72_static_basket_crossfit_result.json"
 )
+V72_G10_GRAMMAR_RELATIVE_PATH = Path(
+    "WORM/v7.2-flow-impact-relaxation-grammar-0010-2026-07-13.json"
+)
+V72_G10_VALIDATION_ADDENDUM_RELATIVE_PATH = Path(
+    "WORM/v7.2-flow-impact-relaxation-validation-addendum-0010-2026-07-13.json"
+)
+V72_G10_TRIPWIRE_POLICY_RELATIVE_PATH = Path(
+    "WORM/v7.2-flow-impact-relaxation-tripwire-0010-2026-07-13.json"
+)
+V72_G10_POWER_FREEZE_RELATIVE_PATH = Path(
+    "WORM/v7.2-flow-impact-relaxation-power-audit-0010-2026-07-13.json"
+)
+V72_G10_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_2/discovery_0010/v72_flow_impact_relaxation_signal_manifest.json"
+)
+V72_G10_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_2/discovery_0010/v72_flow_impact_relaxation_funnel_result.json"
+)
+V72_G10_TRIPWIRE_RELATIVE_PATH = Path(
+    "reports/v7_2/discovery_0010/v72_flow_impact_relaxation_tripwire_result.json"
+)
+V72_G10_RECONCILIATION_RELATIVE_PATH = Path(
+    "reports/v7_2/discovery_0010/v72_g10_multiplicity_reconciliation.json"
+)
+V72_G10_POWER_RELATIVE_PATH = Path(
+    "reports/v7_2/discovery_0010/v72_flow_impact_relaxation_power_audit_result.json"
+)
 V72_FROZEN_HASHES = {
     str(V72_POLICY_RELATIVE_PATH): "94f4ad89a2ae2ea347f1fce4a9cb4682690652429f34e42e72edf79e03da6677",
     str(V72_SEMANTICS_RELATIVE_PATH): "08200f3009d9c0c474aa665575c0607b918097a172b7f68db1c7f7ed6ac58fbe",
@@ -227,6 +258,17 @@ V72_FROZEN_HASHES = {
     str(V72_SEARCH_WORM_RELATIVE_PATH): "9d0fccf04203d75a7d1f0648ed0ad619882f3dad06ed1f55da3f97878e8b1f98",
     str(V72_SEARCH_FREEZE_RELATIVE_PATH): "44d989263581b57c8d5d10e959f82f6089f5b3c1781799cbd6348bf2fdabdb76",
     str(V72_CROSS_FIT_RELATIVE_PATH): "26434b641cb2c908f384e35aa646a49e1f2fcd11b461cd11644ceec0d5840f8a",
+}
+V72_G10_FROZEN_HASHES = {
+    str(V72_G10_GRAMMAR_RELATIVE_PATH): "2513038d857e3599449fbe347bec1d4738ae2adfe9558d5daf4c2c26d322e1cd",
+    str(V72_G10_VALIDATION_ADDENDUM_RELATIVE_PATH): "d3f0505f036be27d46c6eaa712dc3f785f1902a71dd402a3ad4c9d591ae16421",
+    str(V72_G10_TRIPWIRE_POLICY_RELATIVE_PATH): "77f861b94cc6a190b86508c4adcc15b7e67c5e5af1d22e66e51110714f52741d",
+    str(V72_G10_POWER_FREEZE_RELATIVE_PATH): "4cb9220c242d41af1e3a5cf0d077d122eb37566cf53423100e127dc718a91004",
+    str(V72_G10_SIGNAL_RELATIVE_PATH): "480b4c3434dadf0f48f46d7434caa0e392b625f59791f391d25be6f5c398ddef",
+    str(V72_G10_FUNNEL_RELATIVE_PATH): "ebe44080d1bb953048e768c54de564dcf88789f6f0e4ff9cbd7f8225094edc87",
+    str(V72_G10_TRIPWIRE_RELATIVE_PATH): "1e6f26a2e5a8aa4175e67b403b6f1e523f4834407dbc9b27dcf689c1093f9eba",
+    str(V72_G10_RECONCILIATION_RELATIVE_PATH): "8978542d5b250c57de7c5f623b18ec9913abe8e070b6a909eec1b404c6c7264a",
+    str(V72_G10_POWER_RELATIVE_PATH): "e141def05a8e0b32459308f2b330413ec27df53334c72ad9ba1ab6741d6f809c",
 }
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
@@ -1571,7 +1613,7 @@ def _classify_v72_action(root: Path) -> dict[str, Any]:
     dominated_count = sum(
         bool(row["dominated_by_best_single_parent"]) for row in operational
     )
-    return {
+    action = {
         **dict(prior),
         "action_type": "V72_STATIC_BASKET_CROSS_FIT_NULL_DISTINCT_MECHANISM_PIVOT",
         "phase": "4",
@@ -1609,6 +1651,170 @@ def _classify_v72_action(root: Path) -> dict[str, Any]:
             "two independent blocks, so overlays and 48-start confirmation are "
             "correctly forbidden. Components are retained for future distinct "
             "mechanisms; no data, Q4, shadow or order action is authorized."
+        ),
+    }
+    if (root / V72_G10_GRAMMAR_RELATIVE_PATH).is_file():
+        return _classify_v72_g10_action(root, v72_action=action)
+    return action
+
+
+def _classify_v72_g10_action(
+    root: Path,
+    *,
+    v72_action: Mapping[str, Any],
+) -> dict[str, Any]:
+    required = (
+        (V72_G10_VALIDATION_ADDENDUM_RELATIVE_PATH, "V72_G10_VALIDATION_ADDENDUM_REQUIRED"),
+        (V72_G10_TRIPWIRE_POLICY_RELATIVE_PATH, "V72_G10_TRIPWIRE_POLICY_REQUIRED"),
+        (V72_G10_SIGNAL_RELATIVE_PATH, "V72_G10_SIGNAL_MANIFEST_REQUIRED"),
+        (V72_G10_FUNNEL_RELATIVE_PATH, "V72_G10_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V72_G10_TRIPWIRE_RELATIVE_PATH, "V72_G10_TRIPWIRE_REQUIRED"),
+        (V72_G10_RECONCILIATION_RELATIVE_PATH, "V72_G10_MULTIPLICITY_RECONCILIATION_REQUIRED"),
+        (V72_G10_POWER_FREEZE_RELATIVE_PATH, "V72_G10_POWER_FREEZE_REQUIRED"),
+        (V72_G10_POWER_RELATIVE_PATH, "V72_G10_POWER_AUDIT_REQUIRED"),
+    )
+    for path, action_type in required:
+        if not (root / path).is_file():
+            return {
+                **dict(v72_action),
+                "action_type": action_type,
+                "progressed": False,
+                "required_path": str(path),
+                "new_data_purchase_authorized": False,
+                "protected_holdout_access_authorized": False,
+                "shadow_admission_authorized": False,
+                "reason": (
+                    "The preregistered G10 conversion chain is incomplete; no "
+                    "later inference or promotion is authorized."
+                ),
+            }
+    drift = [
+        path
+        for path, expected in V72_G10_FROZEN_HASHES.items()
+        if _sha256(root / path) != expected
+    ]
+    if drift:
+        raise V7ControllerIntegrityError(
+            "V7.2 G10 frozen evidence drift: " + ",".join(drift)
+        )
+    signal = _load_json(root / V72_G10_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V72_G10_FUNNEL_RELATIVE_PATH)
+    tripwire = _load_json(root / V72_G10_TRIPWIRE_RELATIVE_PATH)
+    reconciliation = _load_json(root / V72_G10_RECONCILIATION_RELATIVE_PATH)
+    power = _load_json(root / V72_G10_POWER_RELATIVE_PATH)
+    if (
+        int(signal.get("candidate_count") or 0) != 36
+        or int(signal.get("signal_count") or 0) != 2_354
+        or signal.get("contains_outcomes_or_pnl") is not False
+    ):
+        raise V7ControllerIntegrityError("V7.2 G10 signal-manifest drift")
+    if (
+        int(funnel.get("candidate_count") or 0) != 36
+        or int(funnel.get("stage0_valid_novel_count") or 0) != 36
+        or int(funnel.get("stage1_pass_count") or 0) != 6
+        or int(funnel.get("walk_forward_positive_count") or 0) != 5
+        or int(funnel.get("SIM_EXPLOIT_survivor_count") or 0) != 4
+        or int(funnel.get("new_data_purchase_count") or 0) != 0
+        or int(funnel.get("protected_holdout_access_count_delta") or 0) != 0
+        or int(funnel.get("outbound_order_count") or 0) != 0
+    ):
+        raise V7ControllerIntegrityError("V7.2 G10 funnel drift")
+    if (
+        tripwire.get("verdict") != "GREEN_NULL_ADJUSTED_BASELINE"
+        or tripwire.get("evidence_strength") != "VERT_NET"
+        or tripwire.get("raw_pass_counts") != {
+            "real": "56/720",
+            "null": "109/2160",
+        }
+        or abs(float(tripwire.get("NULL_RATIO") or 0.0) - 0.6488095238095238)
+        > 1.0e-15
+        or bool(tripwire.get("candidate_promotion_authorized"))
+    ):
+        raise V7ControllerIntegrityError("V7.2 G10 tripwire drift")
+    if (
+        reconciliation.get("status")
+        != "ACCOUNTED_AFTER_EXECUTION_MULTIPLICITY_OMISSION_DISCLOSED"
+        or int(reconciliation.get("accounting", {}).get("delta_trials") or 0)
+        != 144
+        or int(
+            reconciliation.get("accounting", {}).get("global_N_trials_after")
+            or 0
+        )
+        != 265_091
+    ):
+        raise V7ControllerIntegrityError(
+            "V7.2 G10 multiplicity reconciliation drift"
+        )
+    if (
+        int(power.get("candidate_count") or 0) != 4
+        or dict(power.get("status_counts") or {})
+        != {"PROMISING_UNDERPOWERED": 2, "WF_POSITIVE_BUT_FRAGILE": 2}
+        or list(power.get("powered_candidate_ids") or [])
+        or bool(power.get("candidate_nulls_executed"))
+        or bool(power.get("DSR_BH_executed"))
+        or bool(power.get("rolling_combine_executed"))
+        or int(power.get("new_data_purchase_count") or 0) != 0
+        or int(power.get("protected_holdout_access_count_delta") or 0) != 0
+        or int(power.get("outbound_order_count") or 0) != 0
+    ):
+        raise V7ControllerIntegrityError("V7.2 G10 power-audit drift")
+    proof = load_and_verify(root / "mission/state/proof_registry.json")
+    current_trials = multiplicity_trial_count(proof)
+    if current_trials < 265_107 or burned_window_ids(proof) != ("Q4_2024",):
+        raise V7ControllerIntegrityError("V7.2 G10 proof-registry drift")
+    return {
+        **dict(v72_action),
+        "action_type": "V72_G10_GREEN_TRIPWIRE_UNDERPOWERED_NO_PROMOTION_DISTINCT_MECHANISM_PIVOT",
+        "phase": "4",
+        "progressed": True,
+        "walk_forward_positive_count": 29,
+        "evidence_reconciliation_accounted_count": 29,
+        "evidence_reconciliation_unaccounted_count": 0,
+        "confirmation_queue_underpowered_count": 18,
+        "confirmation_queue_fragile_retired_count": 8,
+        "g10_candidate_count": 36,
+        "g10_signal_count": 2_354,
+        "g10_stage0_valid_count": 36,
+        "g10_stage1_survivor_count": 6,
+        "g10_walk_forward_positive_count": 5,
+        "g10_SIM_EXPLOIT_count": 1,
+        "g10_SIM_EXPLOIT_survivor_count": 4,
+        "g10_tripwire_verdict": "GREEN_NULL_ADJUSTED_BASELINE",
+        "g10_tripwire_evidence_strength": "VERT_NET",
+        "g10_NULL_RATIO": 0.6488095238095238,
+        "g10_real_pass_count": "56/720",
+        "g10_null_pass_count": "109/2160",
+        "g10_multiplicity_reconciliation_delta": 144,
+        "g10_power_status_counts": {
+            "PROMISING_UNDERPOWERED": 2,
+            "WF_POSITIVE_BUT_FRAGILE": 2,
+        },
+        "g10_powered_candidate_count": 0,
+        "g10_candidate_nulls_executed": False,
+        "g10_DSR_BH_executed": False,
+        "g10_rolling_combine_executed": False,
+        "powered_candidate_count": 0,
+        "rolling_combine_promotions": 0,
+        "raw_global_N_trials": current_trials,
+        "broad_D1_generation_authorized": False,
+        "limited_structural_discovery_authorized": True,
+        "new_data_purchase_authorized": False,
+        "protected_holdout_access_authorized": False,
+        "shadow_admission_authorized": False,
+        "next_experiment_id": "hydra_v7_2_distinct_mechanism_hypothesis_review_0003",
+        "next_experiment_state": "WORM_PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+        "principal_blocker": (
+            "G10 produced four cost-2x walk-forward survivors, but none passes "
+            "the unchanged 80% candidate-specific power gate; two are fragile "
+            "and the two non-fragile candidates remain post-selection underpowered."
+        ),
+        "reason": (
+            "The delayed flow-impact grammar tested 36 frozen structures. Its "
+            "permanent tripwire was VERT_NET, but candidate-specific inference "
+            "classified two candidates PROMISING_UNDERPOWERED and two "
+            "WF_POSITIVE_BUT_FRAGILE. Candidate nulls, DSR/BH, Rolling Combine, "
+            "shadow, holdout and data purchase therefore remain unauthorized. "
+            "The perpetual factory pivots to another preregistered mechanism."
         ),
     }
 
