@@ -1,0 +1,102 @@
+{
+  "schema": "hydra_v7_1_g6_combine_research_integration_evidence_v1",
+  "recorded_at_utc": "2026-07-13T02:37:00Z",
+  "baseline_commit": "78e4a8d0fda5efec479e13be099c98cf38f16e87",
+  "integration_head": "7fabc04badbc3afef8ffad22d95d91fe45419189",
+  "controller_schema": "hydra_v7_1_falsification_controller_v7",
+  "regression": {
+    "full_pytest_passed": 725,
+    "full_pytest_failed": 0,
+    "full_pytest_seconds": 753.59,
+    "focused_new_tests_passed": 19,
+    "no_lookahead_and_ruleset_passed": 41,
+    "compileall": "GREEN",
+    "initial_isolated_runtime_mismatch": "Two governance tests failed only while the worktree lacked the authoritative untracked registry and Q4 ledger; both passed read-only against the source-of-truth runtime before the final 725/725 run."
+  },
+  "integrity": {
+    "mission_db": "ok",
+    "graveyard_db": "ok",
+    "hydra_registry_db": "ok",
+    "strategy_registry_db": "ok",
+    "governance_passed": true,
+    "governance_semantic_hash": "05810bc193e51e3c40722163a1ee3ae82fd3a8d7762c48eafa25c3a4cba1102b",
+    "governance_yaml_sha256": "3c9fd63f43037c65d79ecd688ce76bc126c42cc6eeaceb6bed8636548ffaff57",
+    "q4_access_count": 1,
+    "q4_transaction_status": "COMMITTED",
+    "q4_burned": true,
+    "proof_registry_entry_count": 28,
+    "proof_registry_chain_head": "3c458d531c0ee456c7b1962c9932321c60a106e3ab32aad2f4f5a935db2d2394",
+    "N_trials": 263814,
+    "secret_scan_hits": 0,
+    "outbound_orders": 0
+  },
+  "budget": {
+    "new_purchase_count": 0,
+    "actual_spend_usd": 87.84738838672598,
+    "remaining_usd": 37.15261161327402,
+    "hard_cap_usd": 125.0
+  },
+  "G6": {
+    "candidate_count": 6,
+    "signal_count": 1524,
+    "archive_duplicate_count": 0,
+    "stage1_survivor_count": 2,
+    "walk_forward_positive_count": 2,
+    "tripwire_verdict": "GREEN_NULL_ADJUSTED_BASELINE",
+    "tripwire_real": "22/120",
+    "tripwire_null": "20/360",
+    "tripwire_NULL_RATIO": 0.30303030303030304,
+    "tripwire_exact_binomial_p_value": 7.490770544348337e-07,
+    "power_status_counts": {
+      "PROMISING_UNDERPOWERED": 2
+    },
+    "powered_candidate_count": 0,
+    "rolling_combine_promotions": 0
+  },
+  "underpowered_combine_research": {
+    "source_underpowered_count": 16,
+    "selected_count": 5,
+    "behaviorally_distinct_family_count": 5,
+    "episode_start_count": 24,
+    "effective_nonoverlapping_block_count": 4,
+    "candidate_pass_count_primary": 0,
+    "basket_pass_count_primary": 0,
+    "validated_candidate_count": 0,
+    "highest_median_maximum_target_progress": 0.6200305555556292,
+    "highest_progress_candidate_MLL_breach_rate": 0.20833333333333334,
+    "zero_breach_candidate_median_maximum_target_progress": 0.45418888888894837,
+    "basket_median_maximum_target_progress": 0.4622972222222856,
+    "basket_MLL_breach_rate": 0.20833333333333334,
+    "scientific_status": "BOUNDED_DIAGNOSTIC_ONLY_NO_PROMOTION"
+  },
+  "evidence_reconciliation": {
+    "walk_forward_positive_total_after_G6": 22,
+    "candidate_specific_power_decisions": 20,
+    "PROMISING_UNDERPOWERED": 16,
+    "WF_POSITIVE_BUT_FRAGILE": 4,
+    "GEOMETRY_ONLY_CLASS_TOMBSTONED_NO_POWER_AUDIT": 2,
+    "unaccounted_count": 0
+  },
+  "determinism": {
+    "signal_manifest_replay_sha256": "ea883cbf7ee460b5467f0023f171e67528f696f748c09aa7c95d11a87e7db752",
+    "diagnostic_replay_sha256": "6dff583d4aa945f4e2c479b801cf6fa954e0616b8f65d32bada401797ce0c4e0"
+  },
+  "predeploy_service": {
+    "active": true,
+    "enabled": true,
+    "pid": 440852,
+    "restart_count": 0,
+    "controller_action": "V71_G5_GEOMETRY_ONLY_PIVOT_TO_NEW_CLASS",
+    "note": "The old controller remains active until this fully green integration is merged and restarted."
+  },
+  "diff_validation": [
+    "hydra/validation/v71_trade_size_composition_funnel.py",
+    "hydra/validation/v71_trade_size_composition_tripwire.py",
+    "hydra/validation/v71_trade_size_composition_power_audit.py",
+    "hydra/validation/v71_underpowered_combine_selection.py",
+    "hydra/validation/v71_underpowered_combine_diagnostic.py"
+  ],
+  "strategy_generation_diff_separate_commit": true,
+  "CONTRE": "The G6 tripwire is strong development evidence but both candidates remain underpowered; the 24 Combine starts collapse to four effective blocks and zero passes, so projected target days are extrapolations rather than validation.",
+  "next_action": "fast-forward the reviewed integration, verify authoritative budget/governance again, restart the existing service once, and confirm controller v7 with one writer"
+}
