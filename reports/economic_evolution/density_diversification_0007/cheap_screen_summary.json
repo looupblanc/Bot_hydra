@@ -1,0 +1,23 @@
+{
+  "bound_count": 44,
+  "elapsed_seconds": 0.35874966299161315,
+  "execution_cache_hit_count": 2,
+  "execution_cache_hit_rate": 0.045454545454545456,
+  "policy": {
+    "calibration_end_exclusive": "2023-07-01",
+    "calibration_start": "2023-01-01",
+    "maximum_approximate_drawdown": 4500,
+    "maximum_best_positive_event_share": 0.4,
+    "micro_batch_size": 64,
+    "minimum_opportunities": 20,
+    "require_nonnegative_half": false,
+    "screen_end_exclusive": "2024-01-01",
+    "screen_start": "2023-07-01",
+    "stress_cost_multiplier": 1.5
+  },
+  "proposal_count": 44,
+  "screens_per_second": 117.07328070990238,
+  "structural_rejection_count": 0,
+  "survivor_count": 12,
+  "unique_execution_path_count": 42
+}

@@ -1,0 +1,15 @@
+{
+  "CONTRE": "The reservation is conservative and includes development candidates that may be killed before account replay.",
+  "burned_windows": [
+    "Q4_2024"
+  ],
+  "cumulative_N_trials": 454503,
+  "delta_trials": 1875,
+  "entry_hash": "120610bf075e32f50fdd49d61e070b3c2ce50f4ab2a2ff3240b83087cf0b7b30",
+  "event_id": "hydra_economic_evolution_density_diversification_0007_multiplicity_reservation",
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "previous_N_trials": 452628,
+  "q4_access_count_delta": 0,
+  "schema": "hydra_density_diversification_multiplicity_v1"
+}
