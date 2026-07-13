@@ -1,0 +1,25 @@
+{
+  "schema": "hydra_economic_evolution_pilot_revision_v1",
+  "revision_id": "hydra_economic_evolution_pilot_0001_revision_01",
+  "issued_at_utc": "2026-07-13T10:46:00Z",
+  "base_preregistration_path": "config/v7/economic_evolution_pilot_0001.json",
+  "base_preregistration_sha256": "dced549b9df09381c2bd6108e55e680a9c8fed7d384a21d2a293a551917e3ab2",
+  "pre_outcome_abort_path": "reports/economic_evolution/pilot_0001/run_0001/pre_outcome_abort.json",
+  "pre_outcome_abort_sha256": "ea369d272070a6adf1eecdb70cd434d39a5f392106a7e3f9dcb05904717e5a7f",
+  "reason": "Stage-0 sparse calibration availability must reject only the affected frozen structures rather than aborting the campaign. No economic outcome was produced and no threshold or population changed.",
+  "implementation_commit": "592cfebf491c91d8c66ad5688d00ece7462d9d00",
+  "implementation_file_overrides": {
+    "hydra/economic_evolution/screen.py": "a00281883885c477e5cd35d94a0a2a400c711ac17f1807da9cd703c85bed3c87",
+    "hydra/research/economic_evolution_pilot.py": "bd800376561b2c408f6b00f0e6c691acecc2fe92c085e6268378d3911265fc7f"
+  },
+  "expected_effective_preregistration_hash": "593c5307a1ba441afe33baa5f9e4d984d1f073c5b2e569168d4884ca4dacb4a2",
+  "threshold_change": false,
+  "population_change": false,
+  "economic_outcome_seen_before_revision": false,
+  "multiplicity_reservation_retained": true,
+  "q4_access_allowed": false,
+  "new_data_purchase_allowed": false,
+  "broker_or_orders_allowed": false,
+  "CONTRE": "Quantile feature values were accessed in the aborted attempt; retaining the exact structural population, economic gates and data fingerprints prevents this operational repair from becoming outcome-driven tuning.",
+  "revision_hash": "9e3eb7c98fc83f99e50ba3b008e7a9b8497076256b8f311988601da1235f27f2"
+}
