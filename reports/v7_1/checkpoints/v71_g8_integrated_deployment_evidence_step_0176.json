@@ -1,0 +1,116 @@
+{
+  "schema": "hydra_v7_1_g8_integrated_deployment_evidence_v1",
+  "recorded_at_utc": "2026-07-13T04:11:26+00:00",
+  "baseline_commit": "74e1c5d4a4a8dd7aa8aeb0b0526af7babcfdcb6f",
+  "integrated_commit": "3480743fb66dfce0c9b1f2ddcdb6a9b375446707",
+  "controller_version": "hydra_v7_1_falsification_controller_v9",
+  "mission_id": "hydra_v7_1_falsification_20260712_0001",
+  "service": {
+    "name": "hydra-autonomous-mission.service",
+    "active": true,
+    "enabled": true,
+    "pid": 464375,
+    "restart_count": 0,
+    "controller_count": 1,
+    "single_writer": true,
+    "outbound_orders": 0,
+    "broker_connections": 0
+  },
+  "g8_data": {
+    "source_schema": "GLBX.MDP3/trades",
+    "source_raw_records": 47822514,
+    "source_bounded_records": 33954039,
+    "retained_es_rth_records": 16129864,
+    "derived_minute_rows": 17200,
+    "explicit_contracts": ["ESU3", "ESU4"],
+    "derived_store_sha256": "13dd79815211e8461dea2b708691c656841738d7af06c22cab7d7b7d688c0196",
+    "deterministic_across_chunk_sizes": true,
+    "outcome_columns": [],
+    "new_data_purchase_count": 0
+  },
+  "g8_funnel": {
+    "candidate_count": 6,
+    "signal_count": 2182,
+    "archive_duplicate_count": 0,
+    "within_manifest_duplicate_count": 0,
+    "stage0_valid_novel_count": 6,
+    "stage1_pass_count": 2,
+    "walk_forward_positive_count": 2,
+    "walk_forward_candidates": [
+      {
+        "candidate_id": "v71g8_intraminute_flow_back_loaded_same_sign_acceleration_continuation_h30",
+        "raw_event_count": 298,
+        "effective_independent_event_count": 190.8246221061641,
+        "stress_1_5x_mean_usd": 1.2545302013422952,
+        "stress_2x_mean_usd": -8.120469798657705,
+        "bootstrap_ci95_usd": [-54.16989795918367, 41.25749258160237],
+        "probability_positive": 0.51815,
+        "calibrated_power": 0.099,
+        "best_event_removed_net_usd": -731.7249999999967,
+        "status": "WF_POSITIVE_BUT_FRAGILE"
+      },
+      {
+        "candidate_id": "v71g8_intraminute_flow_front_loaded_flow_decay_reversal_h60",
+        "raw_event_count": 167,
+        "effective_independent_event_count": 121.87716861260425,
+        "stress_1_5x_mean_usd": 5.500149700598784,
+        "stress_2x_mean_usd": -3.874850299401205,
+        "bootstrap_ci95_usd": [-53.20878378378377, 56.87708333333334],
+        "probability_positive": 0.593,
+        "calibrated_power": 0.1447,
+        "best_event_removed_net_usd": -1049.550000000001,
+        "status": "WF_POSITIVE_BUT_FRAGILE"
+      }
+    ]
+  },
+  "g8_tripwire": {
+    "real": "10/120",
+    "null": "22/360",
+    "null_ratio": 0.7333333333333334,
+    "exact_binomial_one_sided_p_value": 0.19893546536172932,
+    "evidence_strength": "VERT_MINCE",
+    "verdict": "GREEN_NULL_ADJUSTED_BASELINE"
+  },
+  "decision": {
+    "power_status_counts": {"WF_POSITIVE_BUT_FRAGILE": 2},
+    "powered_candidate_count": 0,
+    "rolling_combine_count": 0,
+    "shadow_promotion_count": 0,
+    "paper_shadow_ready_count": 0,
+    "final_confirmation_power_requirement": 0.8,
+    "final_confirmation_power_requirement_changed": false
+  },
+  "evidence_reconciliation": {
+    "walk_forward_positive_total": 24,
+    "promising_underpowered": 16,
+    "walk_forward_positive_but_fragile": 6,
+    "geometry_only_terminal_without_power_audit": 2,
+    "accounted": 24,
+    "unaccounted": 0
+  },
+  "integrity": {
+    "full_pytest": "740/740",
+    "no_lookahead_and_ruleset": "91/91",
+    "mission_db": "ok",
+    "registry_db": "ok",
+    "graveyard_db": "ok",
+    "governance_passed": true,
+    "governance_semantic_hash": "05810bc193e51e3c40722163a1ee3ae82fd3a8d7762c48eafa25c3a4cba1102b",
+    "q4_access_count": 1,
+    "q4_status": "COMMITTED_BURNED_NO_REUSE",
+    "proof_registry_entry_count": 33,
+    "registry_n_trials": 263882,
+    "proof_chain_head": "77ac9d1337dfa7b9a4aa4da3401655c5f0ad84f7fe4333595c50a981146dc6c6",
+    "secret_scan_hits": 0
+  },
+  "budget": {
+    "new_data_purchase_count": 0,
+    "cumulative_spend_usd": 87.84738838672598,
+    "remaining_usd": 37.15261161327402
+  },
+  "snapshot_path": "mission/state/snapshots/v71_g8_pre_deploy_20260713T041003Z",
+  "current_action": "V71_G8_GREEN_THIN_FRAGILE_NO_PROMOTION",
+  "next_experiment_id": "hydra_v7_1_independent_confirmation_and_distinct_hypothesis_review_0009",
+  "next_experiment_state": "PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+  "CONTRE": "The G8 tripwire is only VERT_MINCE and both positive formulations invert from negative 2023 to positive 2024; the data support neither confirmation nor promotion, despite using a genuinely new outcome-free representation."
+}
