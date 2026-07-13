@@ -5,6 +5,7 @@ import json
 import math
 import statistics
 import time
+from collections import Counter
 from dataclasses import replace
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -52,6 +53,8 @@ def run_directional_agreement_campaign(
     """Run the outcome-frozen 0008 directional agreement campaign."""
 
     started = time.perf_counter()
+    phase_seconds: dict[str, float] = {}
+    phase_started = started
     prereg_path = Path(preregistration_path).resolve()
     prereg = load_and_verify_agreement_preregistration(prereg_path)
     root = _project_root(prereg_path)
@@ -93,7 +96,11 @@ def run_directional_agreement_campaign(
         },
     )
     _stage(state_writer, prereg, "STRUCTURAL_POPULATION_FROZEN")
+    phase_seconds["preregistration_and_population"] = (
+        time.perf_counter() - phase_started
+    )
 
+    phase_started = time.perf_counter()
     feature_build = build_or_open_turbo_feature_bundles(
         cache_root=cache_root,
         contract_map_path=contract_map_path,
@@ -109,14 +116,20 @@ def run_directional_agreement_campaign(
         feature_build.market_paths,
     )
     _stage(state_writer, prereg, "FEATURE_STORE_VERIFIED")
+    phase_seconds["feature_store_verification"] = (
+        time.perf_counter() - phase_started
+    )
 
+    phase_started = time.perf_counter()
     screen_policy = CheapScreenPolicy(**prereg["cheap_screen_policy"])
     all_sleeves = (*population.real_sleeves, *population.matched_null_sleeves)
     screen = run_ultra_cheap_screen(all_sleeves, matrices, policy=screen_policy)
     writer.write_json("cheap_screen_summary.json", screen.summary())
     writer.write_jsonl_batch("cheap_screen_results.jsonl", list(screen.rows))
     _stage(state_writer, prereg, "CHEAP_SCREEN_COMPLETE")
+    phase_seconds["cheap_economic_screen"] = time.perf_counter() - phase_started
 
+    phase_started = time.perf_counter()
     bound = _bind_selected(all_sleeves, matrices, policy=screen_policy)
     runtimes, exact_failures = _build_exact_runtimes(
         bound,
@@ -131,61 +144,75 @@ def run_directional_agreement_campaign(
     )
     writer.write_json("exact_component_failures.json", exact_failures)
     _stage(state_writer, prereg, "EXACT_COMPONENT_REPLAY_COMPLETE")
+    phase_seconds["exact_component_replay"] = time.perf_counter() - phase_started
 
+    phase_started = time.perf_counter()
     tripwire = family_tripwire(population, runtimes, prereg["component_gate"])
     writer.write_json("family_tripwire.json", tripwire)
     _stage(state_writer, prereg, "FAMILY_TRIPWIRE_COMPLETE")
+    phase_seconds["family_tripwire"] = time.perf_counter() - phase_started
 
+    phase_started = time.perf_counter()
     account_rows: list[dict[str, Any]] = []
     global_starts: tuple[int, ...] = ()
-    if tripwire["family_green"]:
-        real_ids = {row.sleeve_id for row in population.real_sleeves}
-        eligible = {
-            sleeve_id: runtime
-            for sleeve_id, runtime in runtimes.items()
-            if sleeve_id in real_ids
-            and component_pass(runtime, prereg["component_gate"])
-        }
-        frozen_policies = [
+    if (
+        tripwire["real_exact_replay_missing_count"]
+        or tripwire["null_exact_replay_missing_count"]
+    ):
+        raise DirectionalAgreementCampaignError(
+            "diagnostic account replay requires all 44 real and 44 null replays"
+        )
+    real_ids = {row.sleeve_id for row in population.real_sleeves}
+    eligible = {
+        sleeve_id: runtime
+        for sleeve_id, runtime in runtimes.items()
+        if sleeve_id in real_ids
+    }
+    frozen_policies = sorted(
+        (
             policy
             for policy in population.policies
             if set(policy.sleeve_ids).issubset(eligible)
-        ]
-        ranked = sorted(
-            frozen_policies,
-            key=lambda policy: (
-                -sum(
-                    eligible[row].cost_stress_1_5x_net
-                    for row in policy.sleeve_ids
-                ),
-                policy.structural_fingerprint,
-            ),
-        )[: int(prereg["funnel"]["maximum_account_policy_evaluations"])]
-        if ranked:
-            used = sorted({item for row in ranked for item in row.sleeve_ids})
-            common_days = _common_days([eligible[row] for row in used])
-            global_starts = select_episode_starts(
-                common_days,
-                policy=EpisodeStartPolicy(**prereg["rolling_episode_policy"]),
+        ),
+        key=lambda policy: policy.structural_fingerprint,
+    )
+    expected_policies = int(
+        prereg["structural_population"]["account_policy_count"]
+    )
+    maximum_policies = int(
+        prereg["funnel"]["maximum_account_policy_evaluations"]
+    )
+    if len(frozen_policies) != expected_policies or maximum_policies != expected_policies:
+        raise DirectionalAgreementCampaignError(
+            "all 256 frozen account policies must receive diagnostic replay"
+        )
+    used = sorted({item for row in frozen_policies for item in row.sleeve_ids})
+    common_days = _common_days([eligible[row] for row in used])
+    global_starts = select_episode_starts(
+        common_days,
+        policy=EpisodeStartPolicy(**prereg["rolling_episode_policy"]),
+    )
+    if len(global_starts) < int(prereg["account_gate"]["minimum_episode_starts"]):
+        raise DirectionalAgreementCampaignError(
+            "frozen agreement policies produced insufficient common starts"
+        )
+    for policy in frozen_policies:
+        account_rows.append(
+            evaluate_policy(
+                policy,
+                eligible,
+                global_starts=global_starts,
+                prereg=prereg,
+                family_tripwire_green=bool(tripwire["family_green"]),
             )
-            if len(global_starts) < int(
-                prereg["account_gate"]["minimum_episode_starts"]
-            ):
-                raise DirectionalAgreementCampaignError(
-                    "frozen agreement policies produced insufficient common starts"
-                )
-            for policy in ranked:
-                account_rows.append(
-                    evaluate_policy(
-                        policy,
-                        eligible,
-                        global_starts=global_starts,
-                        prereg=prereg,
-                    )
-                )
+        )
     writer.write_jsonl_batch("account_policy_results.jsonl", account_rows)
     _stage(state_writer, prereg, "ACCOUNT_POLICY_EVALUATION_COMPLETE")
+    phase_seconds["account_policy_replay"] = time.perf_counter() - phase_started
 
+    component_metrics = component_economic_metrics(
+        population, runtimes, prereg["component_gate"]
+    )
     result = final_result(
         prereg,
         population_summary=population.summary(),
@@ -196,6 +223,8 @@ def run_directional_agreement_campaign(
         account_rows=account_rows,
         global_starts=global_starts,
         elapsed_seconds=time.perf_counter() - started,
+        component_metrics=component_metrics,
+        phase_seconds=phase_seconds,
     )
     result["result_sha256"] = stable_hash(result)
     writer.write_json("directional_agreement_result.json", result)
@@ -282,6 +311,26 @@ def load_and_verify_agreement_result(
     }:
         raise DirectionalAgreementCampaignError(
             "agreement result governance drift"
+        )
+    population = result.get("population") or {}
+    component_metrics = result.get("component_economics") or {}
+    policy_metrics = result.get("account_policy_economics") or {}
+    if (
+        int(population.get("real_sleeve_count", -1)) != 44
+        or int(population.get("matched_null_sleeve_count", -1)) != 44
+        or int(result.get("exact_component_runtime_count", -1)) != 88
+        or int(result.get("exact_component_failure_count", -1)) != 0
+        or int(component_metrics.get("real_evaluated_count", -1)) != 44
+        or int(component_metrics.get("matched_null_evaluated_count", -1)) != 44
+        or int(result.get("account_policy_evaluated_count", -1)) != 256
+        or int(result.get("global_episode_start_count", -1)) != 24
+        or int(
+            policy_metrics.get("primary_rolling_combine_episode_count", -1)
+        )
+        != 6_144
+    ):
+        raise DirectionalAgreementCampaignError(
+            "agreement result is not the complete 44+44/256 diagnostic run"
         )
     return result
 
@@ -384,12 +433,54 @@ def component_pass(runtime: ExactSleeveRuntime, gate: Mapping[str, Any]) -> bool
     )
 
 
+def component_economic_metrics(
+    population,
+    runtimes: Mapping[str, ExactSleeveRuntime],
+    gate: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Report raw component economics without changing the family tripwire."""
+
+    real = [runtimes[row.sleeve_id] for row in population.real_sleeves]
+    null = [
+        runtimes[row.sleeve_id] for row in population.matched_null_sleeves
+    ]
+    return {
+        "real_evaluated_count": len(real),
+        "matched_null_evaluated_count": len(null),
+        "real_positive_after_normal_cost_count": sum(
+            row.net_pnl > 0.0 for row in real
+        ),
+        "real_positive_after_stressed_cost_count": sum(
+            row.cost_stress_1_5x_net > 0.0 for row in real
+        ),
+        "matched_null_positive_after_normal_cost_count": sum(
+            row.net_pnl > 0.0 for row in null
+        ),
+        "matched_null_positive_after_stressed_cost_count": sum(
+            row.cost_stress_1_5x_net > 0.0 for row in null
+        ),
+        "real_component_gate_winner_count": sum(
+            component_pass(row, gate) for row in real
+        ),
+        "matched_null_component_gate_winner_count": sum(
+            component_pass(row, gate) for row in null
+        ),
+        "real_stressed_net_usd": _distribution(
+            [row.cost_stress_1_5x_net for row in real]
+        ),
+        "matched_null_stressed_net_usd": _distribution(
+            [row.cost_stress_1_5x_net for row in null]
+        ),
+    }
+
+
 def evaluate_policy(
     policy: AccountPolicyGenome,
     runtimes: Mapping[str, ExactSleeveRuntime],
     *,
     global_starts: tuple[int, ...],
     prereg: Mapping[str, Any],
+    family_tripwire_green: bool,
 ) -> dict[str, Any]:
     episode_policy = EpisodeStartPolicy(**prereg["rolling_episode_policy"])
     full = evaluate_compiled_account_policy(
@@ -462,7 +553,7 @@ def evaluate_policy(
         normal.compliance_failure_count == 0
         and stress.compliance_failure_count == 0
     )
-    base_gate = bool(
+    diagnostic_gate = bool(
         hard_ok
         and normal.median_episode_net_pnl
         > float(gate["minimum_normal_median_net_usd"])
@@ -478,6 +569,7 @@ def evaluate_policy(
         <= float(gate["maximum_positive_component_share"])
         and not any(row["leave_one_out_dominates"] for row in controls)
     )
+    base_gate = bool(family_tripwire_green and diagnostic_gate)
     combine_path = bool(
         base_gate
         and stress.pass_count >= int(gate["minimum_combine_path_pass_count"])
@@ -487,15 +579,46 @@ def evaluate_policy(
         if combine_path
         else "AGREEMENT_ASSEMBLY_RESEARCH_CANDIDATE"
         if base_gate
+        else "AGREEMENT_ASSEMBLY_DIAGNOSTIC_ONLY"
+        if diagnostic_gate
         else "AGREEMENT_ASSEMBLY_RESEARCH_FAILED"
+    )
+    behavior_payload = {
+        "episode_starts": list(full.episode_start_days),
+        "controlled_base_paths": [
+            {
+                "terminal": row.terminal.value,
+                "net_pnl": round(row.net_pnl, 8),
+                "target_progress": round(row.target_progress, 10),
+                "maximum_target_progress": round(
+                    row.maximum_target_progress, 10
+                ),
+                "mll_breached": row.mll_breached,
+                "consistency_ok": row.consistency_ok,
+            }
+            for row in full.controlled_base.episodes
+        ],
+    }
+    failure_vectors = _failure_vectors(
+        full,
+        positive_blocks=positive_blocks,
+        maximum_component_share=maximum_component_share,
+        controls=controls,
+        gate=gate,
+        hard_ok=hard_ok,
+        family_tripwire_green=family_tripwire_green,
     )
     return {
         "policy": policy.to_dict(),
         "status": status,
         "validated": False,
         "development_only": True,
+        "family_tripwire_green": family_tripwire_green,
+        "diagnostic_account_gate_passed": diagnostic_gate,
         "account_research_gate_passed": base_gate,
         "combine_path_diagnostic": combine_path,
+        "behavioral_fingerprint": stable_hash(behavior_payload),
+        "failure_vectors": failure_vectors,
         "evaluation": full.to_dict(include_episodes=False),
         "temporal_blocks_1_5x": blocks,
         "positive_temporal_block_count": positive_blocks,
@@ -522,8 +645,13 @@ def final_result(
     account_rows: Sequence[Mapping[str, Any]],
     global_starts: Sequence[int],
     elapsed_seconds: float,
+    component_metrics: Mapping[str, Any] | None = None,
+    phase_seconds: Mapping[str, float] | None = None,
 ) -> dict[str, Any]:
     research = [row for row in account_rows if row["account_research_gate_passed"]]
+    diagnostic = [
+        row for row in account_rows if row["diagnostic_account_gate_passed"]
+    ]
     combine = [row for row in account_rows if row["combine_path_diagnostic"]]
     if not tripwire["family_green"]:
         status = str(tripwire["verdict"])
@@ -548,6 +676,42 @@ def final_result(
             str(row["policy"]["policy_id"]),
         ),
     )[:10]
+    policy_metrics = _aggregate_policy_metrics(
+        account_rows,
+        family_tripwire_green=bool(tripwire["family_green"]),
+    )
+    phases = {
+        str(key): float(value)
+        for key, value in (phase_seconds or {}).items()
+    }
+    research_phase_names = {
+        "feature_store_verification",
+        "cheap_economic_screen",
+        "exact_component_replay",
+        "family_tripwire",
+        "account_policy_replay",
+    }
+    research_seconds = sum(
+        value for key, value in phases.items() if key in research_phase_names
+    )
+    administrative_seconds = max(0.0, elapsed_seconds - research_seconds)
+    wall_clock = {
+        "total_seconds_to_result_assembly": elapsed_seconds,
+        "research_seconds": research_seconds,
+        "tests_and_reporting_seconds_inside_campaign": administrative_seconds,
+        "research_percent": (
+            100.0 * research_seconds / elapsed_seconds
+            if elapsed_seconds > 0.0
+            else 0.0
+        ),
+        "tests_and_reporting_percent": (
+            100.0 * administrative_seconds / elapsed_seconds
+            if elapsed_seconds > 0.0
+            else 0.0
+        ),
+        "phase_seconds": phases,
+        "full_repository_regression_is_outside_campaign_hot_loop": True,
+    }
     return {
         "schema": "hydra_directional_agreement_result_v1",
         "engine_version": AGREEMENT_ENGINE_VERSION,
@@ -563,11 +727,14 @@ def final_result(
         "exact_component_runtime_count": exact_runtime_count,
         "exact_component_failure_count": exact_failure_count,
         "family_tripwire": dict(tripwire),
+        "component_economics": dict(component_metrics or {}),
         "global_episode_start_count": len(global_starts),
         "global_episode_starts": list(global_starts),
         "account_policy_evaluated_count": len(account_rows),
+        "diagnostic_account_gate_pass_count": len(diagnostic),
         "account_research_candidate_count": len(research),
         "combine_path_diagnostic_count": len(combine),
+        "account_policy_economics": policy_metrics,
         "pre_holdout_ready_count": 0,
         "paper_shadow_ready_count": 0,
         "best_development_policies": [
@@ -600,6 +767,7 @@ def final_result(
             "outbound_order_capability": False,
         },
         "elapsed_seconds": elapsed_seconds,
+        "wall_clock_accounting": wall_clock,
         "next_action": (
             "CLASS_TOMBSTONE_AND_NEW_REPRESENTATION"
             if not tripwire["family_green"]
@@ -616,8 +784,269 @@ def final_result(
     }
 
 
+def _aggregate_policy_metrics(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    family_tripwire_green: bool,
+) -> dict[str, Any]:
+    if not rows:
+        return {
+            "primary_rolling_combine_episode_count": 0,
+            "stressed_rolling_combine_episode_count": 0,
+            "all_internal_account_episode_simulation_count": 0,
+            "policies_passing_at_least_one_combine_episode": 0,
+            "stressed_policies_passing_at_least_one_combine_episode": 0,
+            "combine_pass_probability": _distribution([]),
+            "stressed_combine_pass_probability": _distribution([]),
+            "median_target_progress_distribution": _distribution([]),
+            "maximum_target_progress": 0.0,
+            "mll_breach_rate_distribution": _distribution([]),
+            "stressed_mll_breach_rate_distribution": _distribution([]),
+            "stressed_median_episode_net_usd": _distribution([]),
+            "stressed_positive_policy_count": 0,
+            "structurally_distinct_policy_count": 0,
+            "behaviorally_distinct_policy_count": 0,
+            "failure_vector_distribution": {},
+            "economic_failure_vector_distribution": {},
+            "dominant_economic_failure": None,
+            "targeted_mutations_selected": [],
+        }
+    base = [row["evaluation"]["controlled_base"] for row in rows]
+    stress = [
+        row["evaluation"]["controlled_stress_1_5x"] for row in rows
+    ]
+    primary_episode_count = sum(int(row["episode_start_count"]) for row in base)
+    stressed_episode_count = sum(
+        int(row["episode_start_count"]) for row in stress
+    )
+    static_episode_count = sum(
+        int(row["evaluation"]["static_base"]["episode_start_count"])
+        for row in rows
+    )
+    leave_one_out_episode_count = sum(
+        len(row["matched_add_one_leave_one_out_controls"])
+        * 3
+        * int(row["evaluation"]["controlled_base"]["episode_start_count"])
+        for row in rows
+    )
+    failures = Counter(
+        value for row in rows for value in row.get("failure_vectors", ())
+    )
+    economic_failures = Counter(failures)
+    economic_failures.pop("FAMILY_TRIPWIRE_FAILED", None)
+    economic_failures.pop("NO_FAILURE_VECTOR", None)
+    dominant = (
+        sorted(economic_failures.items(), key=lambda item: (-item[1], item[0]))[0][0]
+        if economic_failures
+        else None
+    )
+    return {
+        "primary_rolling_combine_episode_count": primary_episode_count,
+        "stressed_rolling_combine_episode_count": stressed_episode_count,
+        "all_internal_account_episode_simulation_count": (
+            primary_episode_count
+            + stressed_episode_count
+            + static_episode_count
+            + leave_one_out_episode_count
+        ),
+        "policies_passing_at_least_one_combine_episode": sum(
+            int(row["pass_count"]) > 0 for row in base
+        ),
+        "stressed_policies_passing_at_least_one_combine_episode": sum(
+            int(row["pass_count"]) > 0 for row in stress
+        ),
+        "combine_pass_probability": _distribution(
+            [float(row["pass_rate"]) for row in base]
+        ),
+        "stressed_combine_pass_probability": _distribution(
+            [float(row["pass_rate"]) for row in stress]
+        ),
+        "median_target_progress_distribution": _distribution(
+            [float(row["target_progress_median"]) for row in base]
+        ),
+        "maximum_target_progress": max(
+            float(row["maximum_target_progress"]) for row in base
+        ),
+        "stressed_median_target_progress_distribution": _distribution(
+            [float(row["target_progress_median"]) for row in stress]
+        ),
+        "stressed_maximum_target_progress": max(
+            float(row["maximum_target_progress"]) for row in stress
+        ),
+        "mll_breach_rate_distribution": _distribution(
+            [float(row["mll_breach_rate"]) for row in base]
+        ),
+        "stressed_mll_breach_rate_distribution": _distribution(
+            [float(row["mll_breach_rate"]) for row in stress]
+        ),
+        "stressed_median_episode_net_usd": _distribution(
+            [float(row["median_episode_net_pnl"]) for row in stress]
+        ),
+        "stressed_positive_policy_count": sum(
+            float(row["median_episode_net_pnl"]) > 0.0 for row in stress
+        ),
+        "structurally_distinct_policy_count": len(
+            {
+                str(row["policy"]["structural_fingerprint"])
+                for row in rows
+            }
+        ),
+        "behaviorally_distinct_policy_count": len(
+            {str(row["behavioral_fingerprint"]) for row in rows}
+        ),
+        "failure_vector_distribution": dict(sorted(failures.items())),
+        "economic_failure_vector_distribution": dict(
+            sorted(economic_failures.items())
+        ),
+        "dominant_economic_failure": dominant,
+        "targeted_mutations_selected": _targeted_mutations(
+            economic_failures,
+            family_tripwire_green=family_tripwire_green,
+        ),
+    }
+
+
+def _failure_vectors(
+    evaluation,
+    *,
+    positive_blocks: int,
+    maximum_component_share: float,
+    controls: Sequence[Mapping[str, Any]],
+    gate: Mapping[str, Any],
+    hard_ok: bool,
+    family_tripwire_green: bool,
+) -> list[str]:
+    normal = evaluation.controlled_base
+    stress = evaluation.controlled_stress_1_5x
+    failures: list[str] = []
+    if not family_tripwire_green:
+        failures.append("FAMILY_TRIPWIRE_FAILED")
+    if not hard_ok:
+        failures.append("HARD_COMPLIANCE_FAILURE")
+    if normal.median_episode_net_pnl <= float(
+        gate["minimum_normal_median_net_usd"]
+    ):
+        failures.append("NORMAL_ECONOMICS_NONPOSITIVE")
+    if stress.median_episode_net_pnl <= float(
+        gate["minimum_stressed_median_net_usd"]
+    ):
+        failures.append("STRESSED_ECONOMICS_NONPOSITIVE")
+    if stress.target_progress_median < float(
+        gate["minimum_median_target_progress"]
+    ):
+        failures.append("TARGET_VELOCITY_LOW")
+    if stress.mll_breach_rate > float(gate["maximum_mll_breach_rate"]):
+        failures.append("MLL_BREACH_EXCESS")
+    if stress.consistency_pass_rate < float(
+        gate["minimum_consistency_pass_rate"]
+    ):
+        failures.append("CONSISTENCY_FAILURE")
+    if positive_blocks < int(gate["minimum_positive_temporal_blocks"]):
+        failures.append("TEMPORAL_BLOCK_INSTABILITY")
+    if maximum_component_share > float(
+        gate["maximum_positive_component_share"]
+    ):
+        failures.append("COMPONENT_CONCENTRATION")
+    if any(row["leave_one_out_dominates"] for row in controls):
+        failures.append("LEAVE_ONE_OUT_DOMINATED")
+    if stress.pass_count < int(gate["minimum_combine_path_pass_count"]):
+        failures.append("NO_COMBINE_PASS")
+    return failures or ["NO_FAILURE_VECTOR"]
+
+
+def _targeted_mutations(
+    failures: Mapping[str, int],
+    *,
+    family_tripwire_green: bool,
+) -> list[dict[str, Any]]:
+    if not family_tripwire_green:
+        dominant = (
+            sorted(failures.items(), key=lambda item: (-item[1], item[0]))[0][0]
+            if failures
+            else "NO_ECONOMIC_ENRICHMENT"
+        )
+        return [
+            {
+                "priority": 1,
+                "failure_vector": dominant,
+                "action": "LAUNCH_STRUCTURALLY_DISTINCT_0009_REPRESENTATION",
+                "same_class_parameter_rescue": False,
+                "status_inheritance": False,
+            }
+        ]
+    actions = {
+        "TARGET_VELOCITY_LOW": "ADD_COMPLEMENTARY_SESSION_OR_MARKET_SLEEVE",
+        "MLL_BREACH_EXCESS": "REDUCE_CORRELATED_CONCURRENCY_AND_BUFFER_SIZE",
+        "CONSISTENCY_FAILURE": "ADD_BOUNDED_ACCOUNT_PROFIT_LOCK",
+        "STRESSED_ECONOMICS_NONPOSITIVE": "PIVOT_TO_LOWER_TURNOVER_COMPONENTS",
+        "NORMAL_ECONOMICS_NONPOSITIVE": "REMOVE_NEGATIVE_MARGINAL_COMPONENTS",
+        "TEMPORAL_BLOCK_INSTABILITY": "ADD_PAST_ONLY_REGIME_ACTIVATION",
+        "COMPONENT_CONCENTRATION": "REPLACE_DOMINANT_SLEEVE_WITH_DIVERSIFIER",
+        "LEAVE_ONE_OUT_DOMINATED": "DROP_DOMINATED_COMPONENT",
+        "NO_COMBINE_PASS": "INCREASE_TARGET_VELOCITY_WITH_COMPLEMENTARY_EDGE",
+    }
+    selected: list[dict[str, Any]] = []
+    for failure, count in sorted(
+        failures.items(), key=lambda item: (-item[1], item[0])
+    ):
+        if failure not in actions:
+            continue
+        selected.append(
+            {
+                "priority": len(selected) + 1,
+                "failure_vector": failure,
+                "affected_policy_count": int(count),
+                "action": actions[failure],
+                "same_episode_starts_required": True,
+            }
+        )
+        if len(selected) == 3:
+            break
+    return selected
+
+
+def _distribution(values: Sequence[float]) -> dict[str, float | int | None]:
+    ordered = sorted(float(value) for value in values)
+    if not ordered:
+        return {
+            "count": 0,
+            "minimum": None,
+            "p25": None,
+            "median": None,
+            "p75": None,
+            "maximum": None,
+        }
+    return {
+        "count": len(ordered),
+        "minimum": ordered[0],
+        "p25": _linear_percentile(ordered, 0.25),
+        "median": _linear_percentile(ordered, 0.5),
+        "p75": _linear_percentile(ordered, 0.75),
+        "maximum": ordered[-1],
+    }
+
+
+def _linear_percentile(ordered: Sequence[float], quantile: float) -> float:
+    if len(ordered) == 1:
+        return float(ordered[0])
+    position = (len(ordered) - 1) * quantile
+    low = int(math.floor(position))
+    high = int(math.ceil(position))
+    if low == high:
+        return float(ordered[low])
+    weight = position - low
+    return float(ordered[low] * (1.0 - weight) + ordered[high] * weight)
+
+
 def report(result: Mapping[str, Any], prereg: Mapping[str, Any]) -> str:
     tripwire = result["family_tripwire"]
+    components = result["component_economics"]
+    policies = result["account_policy_economics"]
+    pass_distribution = policies["combine_pass_probability"]
+    progress_distribution = policies["median_target_progress_distribution"]
+    mll_distribution = policies["mll_breach_rate_distribution"]
+    stressed_net = policies["stressed_median_episode_net_usd"]
+    wall_clock = result["wall_clock_accounting"]
     against = str(result["CONTRE"]).replace(" ", "_")
     budget = prereg["budget"]
     return "\n".join(
@@ -663,6 +1092,51 @@ def report(result: Mapping[str, Any], prereg: Mapping[str, Any]) -> str:
                 f"{tripwire['null_pass_count']}/{tripwire['null_candidate_count']}; "
                 f"NULL_RATIO={tripwire['NULL_RATIO']}; "
                 f"p={tripwire['exact_one_sided_binomial_p_value']:.6g}."
+            ),
+            (
+                "- Positifs après coûts normaux / stressés 1,5x : "
+                f"{components['real_positive_after_normal_cost_count']} / "
+                f"{components['real_positive_after_stressed_cost_count']}; "
+                "nulls stressés gagnants : "
+                f"{components['matched_null_positive_after_stressed_cost_count']}."
+            ),
+            (
+                "- Épisodes Combine primaires / stressés : "
+                f"{policies['primary_rolling_combine_episode_count']} / "
+                f"{policies['stressed_rolling_combine_episode_count']}; "
+                "politiques avec ≥1 pass : "
+                f"{policies['policies_passing_at_least_one_combine_episode']}."
+            ),
+            (
+                "- Probabilité Combine médiane / meilleure : "
+                f"{pass_distribution['median']} / {pass_distribution['maximum']}; "
+                "progression médiane / maximale : "
+                f"{progress_distribution['median']} / "
+                f"{policies['maximum_target_progress']}."
+            ),
+            (
+                "- MLL breach médian / maximum : "
+                f"{mll_distribution['median']} / {mll_distribution['maximum']}; "
+                "net stressé médian : "
+                f"{stressed_net['median']} USD."
+            ),
+            (
+                "- Politiques structurelles / comportementales distinctes : "
+                f"{policies['structurally_distinct_policy_count']} / "
+                f"{policies['behaviorally_distinct_policy_count']}."
+            ),
+            (
+                "- Échec économique dominant : "
+                f"{policies['dominant_economic_failure']}; "
+                "mutations/pivot sélectionnés : "
+                f"{len(policies['targeted_mutations_selected'])}."
+            ),
+            (
+                "- Wall-clock campagne : "
+                f"{wall_clock['total_seconds_to_result_assembly']:.3f}s; "
+                f"recherche={wall_clock['research_percent']:.2f}% ; "
+                "tests/reporting="
+                f"{wall_clock['tests_and_reporting_percent']:.2f}%."
             ),
             f"- Account research candidates : {result['account_research_candidate_count']}.",
             f"- Combine paths développement : {result['combine_path_diagnostic_count']}.",

@@ -3,7 +3,9 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 from hydra.research.economic_evolution_agreement_campaign import (
+    _aggregate_policy_metrics,
     component_pass,
+    component_economic_metrics,
     family_tripwire,
     final_result,
 )
@@ -95,6 +97,59 @@ def test_null_dominance_blocks_all_account_evaluation() -> None:
     assert result["NULL_RATIO"] == 1.5
     assert result["family_green"] is False
     assert result["verdict"] == "ARTEFACT_GEOMETRY_ONLY"
+
+
+def test_component_metrics_report_all_real_and_matched_null_economics() -> None:
+    population = _population()
+    runtimes = {
+        **{f"real_{index}": _runtime(passed=index < 3) for index in range(4)},
+        **{f"null_{index}": _runtime(passed=index == 0) for index in range(4)},
+    }
+    result = component_economic_metrics(population, runtimes, _gate())
+    assert result["real_evaluated_count"] == 4
+    assert result["matched_null_evaluated_count"] == 4
+    assert result["real_positive_after_stressed_cost_count"] == 3
+    assert result["matched_null_positive_after_stressed_cost_count"] == 1
+    assert result["real_component_gate_winner_count"] == 3
+    assert result["matched_null_component_gate_winner_count"] == 1
+
+
+def test_policy_metrics_keep_red_family_diagnostics_non_promotional() -> None:
+    summary = {
+        "episode_start_count": 24,
+        "pass_count": 2,
+        "pass_rate": 2 / 24,
+        "target_progress_median": 0.4,
+        "maximum_target_progress": 1.0,
+        "mll_breach_rate": 0.0,
+        "median_episode_net_pnl": 500.0,
+    }
+    row = {
+        "policy": {"structural_fingerprint": "structure-1"},
+        "behavioral_fingerprint": "behavior-1",
+        "failure_vectors": ["FAMILY_TRIPWIRE_FAILED", "TARGET_VELOCITY_LOW"],
+        "evaluation": {
+            "static_base": dict(summary),
+            "controlled_base": dict(summary),
+            "controlled_stress_1_5x": dict(summary),
+        },
+        "matched_add_one_leave_one_out_controls": [{}, {}],
+    }
+    result = _aggregate_policy_metrics([row], family_tripwire_green=False)
+    assert result["primary_rolling_combine_episode_count"] == 24
+    assert result["all_internal_account_episode_simulation_count"] == 216
+    assert result["policies_passing_at_least_one_combine_episode"] == 1
+    assert result["behaviorally_distinct_policy_count"] == 1
+    assert result["dominant_economic_failure"] == "TARGET_VELOCITY_LOW"
+    assert result["targeted_mutations_selected"] == [
+        {
+            "priority": 1,
+            "failure_vector": "TARGET_VELOCITY_LOW",
+            "action": "LAUNCH_STRUCTURALLY_DISTINCT_0009_REPRESENTATION",
+            "same_class_parameter_rescue": False,
+            "status_inheritance": False,
+        }
+    ]
 
 
 def test_final_result_never_promotes_development_evidence() -> None:
