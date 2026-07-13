@@ -15,14 +15,14 @@ from hydra.economic_evolution.role_aware_account import (
     RoleAwarePolicyPair,
     generate_role_aware_account_population,
 )
+from hydra.economic_evolution.role_aware_account_evaluation import (
+    evaluate_role_aware_policy_pairs,
+)
 from hydra.economic_evolution.schema import stable_hash
 from hydra.economic_evolution.screen import CheapScreenPolicy, run_ultra_cheap_screen
 from hydra.economic_evolution.seed_archive import load_and_verify_seed_archive
 from hydra.features.feature_matrix import FeatureMatrix
 from hydra.propfirm.rolling_combine import EpisodeStartPolicy, select_episode_starts
-from hydra.research.economic_evolution_cross_session_campaign import (
-    evaluate_account_policy_pairs,
-)
 from hydra.research.economic_evolution_pilot import (
     _bind_selected,
     _build_exact_runtimes,
@@ -161,7 +161,7 @@ def run_role_aware_account_campaign(
         )
 
     phase_started = time.perf_counter()
-    pair_rows = evaluate_account_policy_pairs(
+    pair_rows = evaluate_role_aware_policy_pairs(
         population.pairs,
         runtimes,
         starts=starts,
