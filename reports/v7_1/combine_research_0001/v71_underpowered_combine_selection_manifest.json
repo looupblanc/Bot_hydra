@@ -1,0 +1,712 @@
+{
+  "CONTRE": "Selection is post-walk-forward and the weighted score can overstate differences among noisy candidates; the diagnostic cannot promote any candidate.",
+  "contains_combine_results": false,
+  "diagnostic_status": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+  "distinctness_rejections": [
+    {
+      "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h30",
+      "comparisons": [
+        {
+          "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h30",
+          "correlation_defined": true,
+          "daily_pnl_correlation": 0.10498227231936223,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+          "signal_timestamp_jaccard": 0.0
+        },
+        {
+          "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h30",
+          "correlation_defined": true,
+          "daily_pnl_correlation": 0.7257385138235432,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h60",
+          "signal_timestamp_jaccard": 0.2953020134228188
+        },
+        {
+          "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h30",
+          "correlation_defined": true,
+          "daily_pnl_correlation": 0.26443080126845403,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30",
+          "signal_timestamp_jaccard": 0.043373493975903614
+        }
+      ],
+      "same_family": true,
+      "too_correlated": true,
+      "too_overlapping": false
+    }
+  ],
+  "eligibility_exclusions": [
+    {
+      "candidate_id": "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+      "reason": "G3 permanent tripwire is GEOMETRY_ONLY",
+      "status": "GEOMETRY_ONLY_DIAGNOSTIC_ALREADY_COMPLETED"
+    }
+  ],
+  "eligible_count": 15,
+  "excluded_count": 1,
+  "full_score_table": [
+    {
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "information_score": 0.8071428571428572,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.9285714285714286,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.9285714285714286,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.7142857142857143,
+        "one_minus_top_event_concentration": 0.6428571428571429
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 73.19922360248448,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 11785.075,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 127.61284770323161,
+        "one_minus_top_event_concentration": 0.9708537988785779
+      }
+    },
+    {
+      "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h60",
+      "family_id": "EVENT_PARTICIPATION_STATE",
+      "information_score": 0.775,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 1.0,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 1.0,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.5,
+        "one_minus_top_event_concentration": 0.5
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 118.80492700729928,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 16276.275000000001,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 109.69638432526688,
+        "one_minus_top_event_concentration": 0.9672115463411464
+      }
+    },
+    {
+      "candidate_id": "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30",
+      "family_id": "EFFORT_WITHOUT_PROGRESS",
+      "information_score": 0.725,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.5714285714285714,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.7857142857142857,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.7857142857142857,
+        "one_minus_top_event_concentration": 0.7857142857142857
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 46.53967391304349,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 8563.300000000001,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 140.18808824240335,
+        "one_minus_top_event_concentration": 0.972316328701658
+      }
+    },
+    {
+      "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h30",
+      "family_id": "EVENT_PARTICIPATION_STATE",
+      "information_score": 0.7178571428571429,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.2857142857142857,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.8571428571428571,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.9285714285714286,
+        "one_minus_top_event_concentration": 0.9285714285714286
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 36.54889558232933,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 9100.675000000003,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 154.41087043507954,
+        "one_minus_top_event_concentration": 0.9792307472294147
+      }
+    },
+    {
+      "candidate_id": "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+      "family_id": "EVENT_STATE_TRANSITIONS",
+      "information_score": 0.6892857142857143,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.6428571428571429,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.7142857142857143,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.8571428571428571,
+        "one_minus_top_event_concentration": 0.42857142857142855
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 46.903125,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 7504.500000000001,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 148.79886871328563,
+        "one_minus_top_event_concentration": 0.9663307936838397
+      }
+    },
+    {
+      "candidate_id": "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+      "family_id": "COST_RESILIENT_LOW_TURNOVER",
+      "information_score": 0.5928571428571429,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.7857142857142857,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.6428571428571429,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.42857142857142855,
+        "one_minus_top_event_concentration": 0.21428571428571427
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 52.567481203007524,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 6991.475,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 88.67468929533229,
+        "one_minus_top_event_concentration": 0.961144593995711
+      }
+    },
+    {
+      "candidate_id": "v71g1_event_participation_state_distributed_participation_reversal_h60",
+      "family_id": "EVENT_PARTICIPATION_STATE",
+      "information_score": 0.5,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.42857142857142855,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.5714285714285714,
+        "block_stability": 0.21428571428571427,
+        "effective_independent_event_count": 0.6428571428571429,
+        "one_minus_top_event_concentration": 0.7142857142857143
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 37.950776397515526,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 6110.075,
+        "block_stability": 0.5,
+        "effective_independent_event_count": 126.06971025091285,
+        "one_minus_top_event_concentration": 0.9711209954041332
+      }
+    },
+    {
+      "candidate_id": "v71g6_trade_size_composition_large_clip_absorption_reversal_h60",
+      "family_id": "TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "information_score": 0.4535714285714286,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.7142857142857143,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.35714285714285715,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.21428571428571427,
+        "one_minus_top_event_concentration": 0.07142857142857142
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 48.53477011494251,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 4222.524999999999,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 61.261564660849565,
+        "one_minus_top_event_concentration": 0.9565127114919862
+      }
+    },
+    {
+      "candidate_id": "v71g6_trade_size_composition_large_clip_flow_onset_continuation_h60",
+      "family_id": "TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "information_score": 0.425,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.5,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.5,
+        "block_stability": 0.21428571428571427,
+        "effective_independent_event_count": 0.35714285714285715,
+        "one_minus_top_event_concentration": 0.5714285714285714
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 38.057394366197165,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 5404.149999999998,
+        "block_stability": 0.5,
+        "effective_independent_event_count": 83.69793607759323,
+        "one_minus_top_event_concentration": 0.9683596250878225
+      }
+    },
+    {
+      "candidate_id": "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+      "family_id": "EVENT_CLUSTER_HAZARD",
+      "information_score": 0.42142857142857143,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.0,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.14285714285714285,
+        "block_stability": 0.21428571428571427,
+        "effective_independent_event_count": 1.0,
+        "one_minus_top_event_concentration": 1.0
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 9.893936877076417,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 2978.0750000000016,
+        "block_stability": 0.5,
+        "effective_independent_event_count": 254.12284093897108,
+        "one_minus_top_event_concentration": 0.9827632947592059
+      }
+    },
+    {
+      "candidate_id": "v71g1_future_path_hazard_continuation_hazard_state_reversal_h30",
+      "family_id": "FUTURE_PATH_HAZARD",
+      "information_score": 0.38571428571428573,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.14285714285714285,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.21428571428571427,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.5714285714285714,
+        "one_minus_top_event_concentration": 0.2857142857142857
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 17.496965317919088,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 3026.975000000002,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 124.80125259653788,
+        "one_minus_top_event_concentration": 0.9624199949005943
+      }
+    },
+    {
+      "candidate_id": "v71g2_session_phase_event_density_afternoon_active_state_continuation_h60",
+      "family_id": "SESSION_PHASE_EVENT_DENSITY",
+      "information_score": 0.3142857142857143,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.8571428571428571,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.2857142857142857,
+        "block_stability": 0.21428571428571427,
+        "effective_independent_event_count": 0.0,
+        "one_minus_top_event_concentration": 0.0
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 69.6375,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 3899.7,
+        "block_stability": 0.5,
+        "effective_independent_event_count": 12.890096086927903,
+        "one_minus_top_event_concentration": 0.9129500252397779
+      }
+    },
+    {
+      "candidate_id": "v71g1_event_state_transitions_flow_acceleration_transition_continuation_h60",
+      "family_id": "EVENT_STATE_TRANSITIONS",
+      "information_score": 0.3,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.35714285714285715,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.42857142857142855,
+        "block_stability": 0.21428571428571427,
+        "effective_independent_event_count": 0.14285714285714285,
+        "one_minus_top_event_concentration": 0.35714285714285715
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 37.03686440677964,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 4370.349999999998,
+        "block_stability": 0.5,
+        "effective_independent_event_count": 60.558067809642175,
+        "one_minus_top_event_concentration": 0.9652114815082968
+      }
+    },
+    {
+      "candidate_id": "v71g1_event_path_geometry_geometry_transition_motif_reversal_h60",
+      "family_id": "EVENT_PATH_GEOMETRY",
+      "information_score": 0.2464285714285714,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.07142857142857142,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.0,
+        "block_stability": 0.21428571428571427,
+        "effective_independent_event_count": 0.2857142857142857,
+        "one_minus_top_event_concentration": 0.8571428571428571
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 15.2625,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 1831.5,
+        "block_stability": 0.5,
+        "effective_independent_event_count": 82.59955593437505,
+        "one_minus_top_event_concentration": 0.9745304019231266
+      }
+    },
+    {
+      "candidate_id": "v71g1_future_path_hazard_continuation_hazard_state_reversal_h60",
+      "family_id": "FUTURE_PATH_HAZARD",
+      "information_score": 0.1464285714285714,
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.21428571428571427,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.07142857142857142,
+        "block_stability": 0.21428571428571427,
+        "effective_independent_event_count": 0.07142857142857142,
+        "one_minus_top_event_concentration": 0.14285714285714285
+      },
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 22.955952380952397,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 2410.375000000002,
+        "block_stability": 0.5,
+        "effective_independent_event_count": 50.705453829887375,
+        "one_minus_top_event_concentration": 0.9579800494034338
+      }
+    }
+  ],
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "policy_path": "WORM/v7.1-underpowered-combine-research-policy-0001-2026-07-13.json",
+  "policy_sha256": "33193b3afaf662a7a2b1fe4bcdfb5f9aa2868f6afec55f365e5ea421cd1f3f88",
+  "population_reconciliation": {
+    "after_G6_accounted_count": 22,
+    "after_G6_walk_forward_positive_count": 22,
+    "before_G6_explanation": "20 walk-forward-positive candidates yielded 18 power decisions because the two G5 positives received the explicit terminal class status GEOMETRY_ONLY_CLASS_TOMBSTONED_NO_POWER_AUDIT before power audit.",
+    "candidate_ledger": [
+      {
+        "candidate_id": "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g1_event_participation_state_distributed_participation_reversal_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h30",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g1_event_path_geometry_geometry_transition_motif_reversal_h30",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "WF_POSITIVE_BUT_FRAGILE"
+      },
+      {
+        "candidate_id": "v71g1_event_path_geometry_geometry_transition_motif_reversal_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g1_event_state_transitions_flow_acceleration_transition_continuation_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g1_future_path_hazard_continuation_hazard_state_reversal_h30",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g1_future_path_hazard_continuation_hazard_state_reversal_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g2_event_cluster_hazard_cluster_release_continuation_h30",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g2_session_phase_event_density_afternoon_active_state_continuation_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g2_state_transition_coverage_recovery_or_failed_extension_continuation_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "WF_POSITIVE_BUT_FRAGILE"
+      },
+      {
+        "candidate_id": "v71g3_event_completion_speed_fast_volume_completion_continuation_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g3_signed_flow_rate_high_rate_low_progress_continuation_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "WF_POSITIVE_BUT_FRAGILE"
+      },
+      {
+        "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h30",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "WF_POSITIVE_BUT_FRAGILE"
+      },
+      {
+        "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g5_cross_clock_speed_leadership_speed_lead_flip_flow_disagreement_continuation_h60",
+        "decision_type": "CLASS_LEVEL_TRIPWIRE_TERMINAL",
+        "status": "GEOMETRY_ONLY_CLASS_TOMBSTONED_NO_POWER_AUDIT"
+      },
+      {
+        "candidate_id": "v71g5_cross_clock_speed_leadership_volume_speed_takes_lead_reversal_h60",
+        "decision_type": "CLASS_LEVEL_TRIPWIRE_TERMINAL",
+        "status": "GEOMETRY_ONLY_CLASS_TOMBSTONED_NO_POWER_AUDIT"
+      },
+      {
+        "candidate_id": "v71g6_trade_size_composition_large_clip_absorption_reversal_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      },
+      {
+        "candidate_id": "v71g6_trade_size_composition_large_clip_flow_onset_continuation_h60",
+        "decision_type": "CANDIDATE_SPECIFIC_POWER",
+        "status": "PROMISING_UNDERPOWERED"
+      }
+    ],
+    "status_counts": {
+      "GEOMETRY_ONLY_CLASS_TOMBSTONED_NO_POWER_AUDIT": 2,
+      "PROMISING_UNDERPOWERED": 16,
+      "WF_POSITIVE_BUT_FRAGILE": 4
+    },
+    "unaccounted_count": 0
+  },
+  "prochaine_action": "freeze_exact_selected_specs_and_run_24_start_diagnostic",
+  "protected_holdout_access_count_delta": 0,
+  "schema": "hydra_v7_1_underpowered_combine_selection_manifest_v1",
+  "scientific_power_gate_passed_count": 0,
+  "selected_candidates": [
+    {
+      "candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+      "comparisons_to_prior_selected": [],
+      "diagnostic_status": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+      "direction_policy": "REVERSAL",
+      "entry_exit_parameters_changed": false,
+      "family_id": "CROSS_CLOCK_FLOW_CONFIRMATION",
+      "grammar_id": "hydra_v7_1_cross_clock_flow_grammar_0004",
+      "holding_minutes": 60,
+      "information_score": 0.8071428571428572,
+      "motif": "FLOW_AND_PROGRESS_AGREEMENT",
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.9285714285714286,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.9285714285714286,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.7142857142857143,
+        "one_minus_top_event_concentration": 0.6428571428571429
+      },
+      "position_quantity": 1,
+      "prior_power_status": "PROMISING_UNDERPOWERED",
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 73.19922360248448,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 11785.075,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 127.61284770323161,
+        "one_minus_top_event_concentration": 0.9708537988785779
+      },
+      "selection_rank": 1,
+      "signal_path_hash": "f14fd905c30f02572cebc6c9aa8e450a1ece96a50ff757b3ad00e8a9a24dd146",
+      "specification_hash": "ee91025aaf7ab38bacb7540aff8282a5b28703e987eb1dd20e122106e2468b62"
+    },
+    {
+      "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h60",
+      "comparisons_to_prior_selected": [
+        {
+          "candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h60",
+          "correlation_defined": true,
+          "daily_pnl_correlation": 0.20599715225480073,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+          "signal_timestamp_jaccard": 0.0
+        }
+      ],
+      "diagnostic_status": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+      "direction_policy": "CONTINUATION",
+      "entry_exit_parameters_changed": false,
+      "family_id": "EVENT_PARTICIPATION_STATE",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "holding_minutes": 60,
+      "information_score": 0.775,
+      "motif": "PARTICIPATION_ACCELERATION",
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 1.0,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 1.0,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.5,
+        "one_minus_top_event_concentration": 0.5
+      },
+      "position_quantity": 1,
+      "prior_power_status": "PROMISING_UNDERPOWERED",
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 118.80492700729928,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 16276.275000000001,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 109.69638432526688,
+        "one_minus_top_event_concentration": 0.9672115463411464
+      },
+      "selection_rank": 2,
+      "signal_path_hash": "21d7d63ce037fc19e8ce716fc6b179483009c53f688651b4ff6f94c6be32c5cd",
+      "specification_hash": "8e76ba4f5f4ee6e9bc21a2413fa1206a329057a111eac296b36d590d69b09a71"
+    },
+    {
+      "candidate_id": "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30",
+      "comparisons_to_prior_selected": [
+        {
+          "candidate_id": "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30",
+          "correlation_defined": true,
+          "daily_pnl_correlation": 0.3398346952526573,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+          "signal_timestamp_jaccard": 0.0
+        },
+        {
+          "candidate_id": "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30",
+          "correlation_defined": true,
+          "daily_pnl_correlation": 0.3703948652517866,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h60",
+          "signal_timestamp_jaccard": 0.04220779220779221
+        }
+      ],
+      "diagnostic_status": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+      "direction_policy": "CONTINUATION",
+      "entry_exit_parameters_changed": false,
+      "family_id": "EFFORT_WITHOUT_PROGRESS",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "holding_minutes": 30,
+      "information_score": 0.725,
+      "motif": "HIGH_PATH_LOW_EFFICIENCY",
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.5714285714285714,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.7857142857142857,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.7857142857142857,
+        "one_minus_top_event_concentration": 0.7857142857142857
+      },
+      "position_quantity": 1,
+      "prior_power_status": "PROMISING_UNDERPOWERED",
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 46.53967391304349,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 8563.300000000001,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 140.18808824240335,
+        "one_minus_top_event_concentration": 0.972316328701658
+      },
+      "selection_rank": 3,
+      "signal_path_hash": "8b4c283a6e8b792384fce01cb7caea88917ac2c3b97d3f30b36f1eaa22f19aa3",
+      "specification_hash": "08bc192110ad27badb96edeb2c06e63f7d9bc81469116f887f4bf5d0634b4cf4"
+    },
+    {
+      "candidate_id": "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+      "comparisons_to_prior_selected": [
+        {
+          "candidate_id": "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+          "correlation_defined": true,
+          "daily_pnl_correlation": -0.15347788258459485,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+          "signal_timestamp_jaccard": 0.0
+        },
+        {
+          "candidate_id": "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+          "correlation_defined": true,
+          "daily_pnl_correlation": 0.08851460509658989,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h60",
+          "signal_timestamp_jaccard": 0.04946996466431095
+        },
+        {
+          "candidate_id": "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+          "correlation_defined": true,
+          "daily_pnl_correlation": -0.3754772163619282,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30",
+          "signal_timestamp_jaccard": 0.005847953216374269
+        }
+      ],
+      "diagnostic_status": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+      "direction_policy": "REVERSAL",
+      "entry_exit_parameters_changed": false,
+      "family_id": "EVENT_STATE_TRANSITIONS",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "holding_minutes": 30,
+      "information_score": 0.6892857142857143,
+      "motif": "COMPRESSION_TO_EXPANSION",
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.6428571428571429,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.7142857142857143,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.8571428571428571,
+        "one_minus_top_event_concentration": 0.42857142857142855
+      },
+      "position_quantity": 1,
+      "prior_power_status": "PROMISING_UNDERPOWERED",
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 46.903125,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 7504.500000000001,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 148.79886871328563,
+        "one_minus_top_event_concentration": 0.9663307936838397
+      },
+      "selection_rank": 4,
+      "signal_path_hash": "39a6d9e2c10bf995b214bcd48fed4d4fe4b8ab6551770248e565b85d07b81407",
+      "specification_hash": "154a331712a38e42b798cfc5aa82bd3fe163799e9fe011efc121010e278bfb57"
+    },
+    {
+      "candidate_id": "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+      "comparisons_to_prior_selected": [
+        {
+          "candidate_id": "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+          "correlation_defined": true,
+          "daily_pnl_correlation": 0.3922402437528201,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g4_cross_clock_flow_confirmation_flow_and_progress_agreement_reversal_h60",
+          "signal_timestamp_jaccard": 0.0
+        },
+        {
+          "candidate_id": "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+          "correlation_defined": true,
+          "daily_pnl_correlation": 0.354375819277157,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g1_event_participation_state_participation_acceleration_continuation_h60",
+          "signal_timestamp_jaccard": 0.21076233183856502
+        },
+        {
+          "candidate_id": "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+          "correlation_defined": true,
+          "daily_pnl_correlation": 0.2200607298265329,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g1_effort_without_progress_high_path_low_efficiency_continuation_h30",
+          "signal_timestamp_jaccard": 0.0
+        },
+        {
+          "candidate_id": "v71g1_cost_resilient_low_turnover_rare_intensity_with_progress_continuation_h60",
+          "correlation_defined": true,
+          "daily_pnl_correlation": -0.41906507929952547,
+          "daily_union_day_count": 28,
+          "other_candidate_id": "v71g1_event_state_transitions_compression_to_expansion_reversal_h30",
+          "signal_timestamp_jaccard": 0.042704626334519574
+        }
+      ],
+      "diagnostic_status": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+      "direction_policy": "CONTINUATION",
+      "entry_exit_parameters_changed": false,
+      "family_id": "COST_RESILIENT_LOW_TURNOVER",
+      "grammar_id": "hydra_v7_1_event_mechanism_grammar_0001",
+      "holding_minutes": 60,
+      "information_score": 0.5928571428571429,
+      "motif": "RARE_INTENSITY_WITH_PROGRESS",
+      "percentile_components": {
+        "STRESS_1_5X_mean_net": 0.7857142857142857,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.6428571428571429,
+        "block_stability": 0.75,
+        "effective_independent_event_count": 0.42857142857142855,
+        "one_minus_top_event_concentration": 0.21428571428571427
+      },
+      "position_quantity": 1,
+      "prior_power_status": "PROMISING_UNDERPOWERED",
+      "raw_components": {
+        "STRESS_1_5X_mean_net": 52.567481203007524,
+        "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 6991.475,
+        "block_stability": 1.0,
+        "effective_independent_event_count": 88.67468929533229,
+        "one_minus_top_event_concentration": 0.961144593995711
+      },
+      "selection_rank": 5,
+      "signal_path_hash": "977ec8a6682f751834b69e40d8cd7e20ddfaa0493aee0884cd471d028b93b0aa",
+      "specification_hash": "b4c471a6f335d47313ec1dafe5911db276a0ca48e423f2ade12b15a5aeca3dc5"
+    }
+  ],
+  "selected_count": 5,
+  "selection_id": "hydra_v7_1_underpowered_combine_selection_0001",
+  "selection_manifest_hash": "cc7679361b660efb8a1c3efaae42effaed772699d46852dff6dd55605fc22d54",
+  "shadow_promotion_authorized": false,
+  "source_underpowered_count": 16
+}
