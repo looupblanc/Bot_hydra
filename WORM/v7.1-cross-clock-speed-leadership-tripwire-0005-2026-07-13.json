@@ -1,0 +1,70 @@
+{
+  "schema": "hydra_v7_1_cross_clock_speed_leadership_tripwire_policy_v1",
+  "tripwire_id": "hydra_v7_1_cross_clock_speed_leadership_tripwire_0005",
+  "grammar_id": "hydra_v7_1_cross_clock_speed_leadership_grammar_0005",
+  "grammar_path": "WORM/v7.1-cross-clock-speed-leadership-grammar-0005-2026-07-13.json",
+  "grammar_sha256": "27a937a112dd4963402f8c12feb69cf9cd347b020ce47396cfffff0e253726c2",
+  "signal_manifest_path": "reports/v7_1/discovery_0005/v71_cross_clock_speed_leadership_signal_manifest.json",
+  "signal_manifest_sha256": "fdae549a4542eae64b86208d295794b6ce5e58f4f791ae5a7d262da0ac5b3032",
+  "stage0_stage2_result_path": "reports/v7_1/discovery_0005/v71_cross_clock_speed_leadership_funnel_result.json",
+  "stage0_stage2_result_sha256": "06d9a1f5600bbe51fc516841482e406a26ab2fab49cf6e599e97311cb4a49648",
+  "purpose": "Permanent grammar-level geometry tripwire for cross-clock relative-speed transitions. Combine passage is diagnostic only and is never candidate fitness or promotion evidence.",
+  "real_world": "unchanged_D1_ES_minute_and_event_clock_duration_features",
+  "null_worlds": [
+    "DAILY_BLOCK_SHUFFLE",
+    "VOLATILITY_MATCHED_RANDOM_WALK",
+    "YEAR_BLOCK_PERMUTATION"
+  ],
+  "seeds": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "2023_ES": 970301,
+      "2024_ES": 970401
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "2023_ES": 980301,
+      "2024_ES": 980401
+    },
+    "YEAR_BLOCK_PERMUTATION": "deterministic_year_swap"
+  },
+  "pipeline": {
+    "speed_leadership_transitions_recomputed_per_world": true,
+    "feature_and_signal_recomputation_per_world": true,
+    "real_and_null_pipeline_identical": true,
+    "event_availability_duration_and_aggressor_flow_preserved_in_price_nulls": true,
+    "cost_stress": "BASE",
+    "diagnostic_quantities": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "combine_horizon_trading_days": 20,
+    "mll_mode": "eod_level_rt_breach",
+    "maximum_mini_equivalent": 15.0,
+    "explicit_contracts": true,
+    "session_flatten": true
+  },
+  "decision": {
+    "NULL_RATIO": "pooled_null_pass_rate / real_pass_rate",
+    "artefact_threshold_inclusive": 0.8,
+    "zero_real_passes": "BLOCKED_UNDERPOWERED",
+    "ratio_at_or_above_threshold": "ARTEFACT_GEOMETRY_ONLY",
+    "ratio_below_threshold": "GREEN_NULL_ADJUSTED_BASELINE",
+    "exact_one_sided_binomial_p_value_required": true,
+    "raw_counts_required": true,
+    "evidence_strength_required": true
+  },
+  "multiplicity_reservation": {
+    "candidate_paths": 12,
+    "world_count": 4,
+    "delta_trials": 48,
+    "expected_prior_global_N_trials": 263684,
+    "expected_post_reservation_global_N_trials": 263732
+  },
+  "candidate_promotion_authorized": false,
+  "candidate_status_inheritance": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "The nulls preserve event duration and flow, so this tripwire tests their directional relation to price but only across two D1 calendar blocks and cannot establish forward persistence."
+}
