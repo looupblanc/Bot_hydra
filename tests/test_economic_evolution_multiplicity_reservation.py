@@ -25,6 +25,11 @@ def test_economic_evolution_reservation_is_hash_bound_and_idempotent(
     registry_target = tmp_path / "mission/state/proof_registry.json"
     registry_target.parent.mkdir(parents=True)
     shutil.copy2(root / "mission/state/proof_registry.json", registry_target)
+    before = load_and_verify(registry_target)
+    before_count = multiplicity_trial_count(before)
+    reservation_already_present = any(
+        row["event_id"] == EVENT_ID for row in before["entries"]
+    )
 
     first = reserve(
         project_root=tmp_path,
@@ -38,6 +43,11 @@ def test_economic_evolution_reservation_is_hash_bound_and_idempotent(
 
     assert first == second
     assert first["event_id"] == EVENT_ID
-    assert multiplicity_trial_count(registry) == EXPECTED_AFTER
+    expected_final = before_count if reservation_already_present else EXPECTED_AFTER
+    assert multiplicity_trial_count(registry) == expected_final
+    pilot_entry = next(
+        row for row in registry["entries"] if row["event_id"] == EVENT_ID
+    )
+    assert pilot_entry["multiplicity"]["cumulative_N_trials"] == EXPECTED_AFTER
     assert burned_window_ids(registry) == ("Q4_2024",)
     assert sum(row["event_id"] == EVENT_ID for row in registry["entries"]) == 1
