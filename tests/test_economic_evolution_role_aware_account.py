@@ -8,6 +8,7 @@ import pytest
 from hydra.economic_evolution.role_aware_account import (
     ROLE_AWARE_CLASS_ID,
     ROLE_ORDER,
+    RoleAwareAccountPolicyGenome,
     RoleAwareAccountPopulation,
     generate_role_aware_account_population,
 )
@@ -112,10 +113,25 @@ def test_full_preregistered_population_has_frozen_manifest() -> None:
         policy_pair_count=512,
     )
     assert population.manifest_hash == (
-        "a0f0359830f2079b9063616db18979781ef426d6ef1baceaf04857e341b2cbe7"
+        "f43aa93d75392232cb69e1a768a3856f1102adc768f5e0d27cfa7ffad347f88a"
     )
     assert population.summary()["same_membership_pair_count"] == 512
     assert population.summary()["same_risk_unit_multiset_pair_count"] == 512
+
+
+def test_role_aware_genome_is_local_and_bounded_to_six_through_eight() -> None:
+    population = generate_role_aware_account_population(
+        _seed(), campaign_id=CAMPAIGN_ID, policy_pair_count=64
+    )
+    policy = population.real_policies[0]
+    assert isinstance(policy, RoleAwareAccountPolicyGenome)
+    assert 6 <= len(policy.sleeve_ids) <= 8
+    payload = policy.to_dict()
+    payload["sleeve_ids"] = payload["sleeve_ids"][:5]
+    payload["allocation_units"] = payload["allocation_units"][:5]
+    payload.pop("structural_fingerprint")
+    with pytest.raises(ValueError, match="six to eight"):
+        RoleAwareAccountPolicyGenome(**payload)
 
 
 def test_generation_rejects_proof_consuming_or_status_inheriting_seed() -> None:

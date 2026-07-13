@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any, Mapping, Sequence
 
 from hydra.economic_evolution.schema import (
-    AccountPolicyGenome,
     EconomicRole,
     FailureDimension,
     SleeveSpec,
@@ -41,6 +40,93 @@ _ROLE_RANK = {role: index for index, role in enumerate(ROLE_ORDER)}
 
 
 @dataclass(frozen=True, slots=True)
+class RoleAwareAccountPolicyGenome:
+    """Campaign-local genome that preserves every legacy frozen schema."""
+
+    policy_id: str
+    sleeve_ids: tuple[str, ...]
+    allocation_units: tuple[int, ...]
+    maximum_simultaneous_positions: int
+    maximum_mini_equivalent: int
+    conflict_policy: str
+    daily_risk_budget: float
+    daily_profit_lock: float
+    low_mll_buffer: float
+    critical_mll_buffer: float
+    loss_streak_throttle_after: int
+    mode: str
+    source_campaign: str
+    parent_policy_ids: tuple[str, ...] = ()
+    mutation_target: FailureDimension | None = None
+    version: int = 1
+    inherited_status: None = None
+
+    def __post_init__(self) -> None:
+        if not self.policy_id or not self.source_campaign:
+            raise ValueError("policy and campaign IDs are required")
+        if not 6 <= len(self.sleeve_ids) <= 8:
+            raise ValueError("role-aware policy must contain six to eight sleeves")
+        if len(set(self.sleeve_ids)) != len(self.sleeve_ids):
+            raise ValueError("role-aware policy sleeves must be unique")
+        if len(self.allocation_units) != len(self.sleeve_ids):
+            raise ValueError("allocation units must match sleeves")
+        if any(value not in {1, 2, 3, 4} for value in self.allocation_units):
+            raise ValueError("allocation units must use the bounded discrete set")
+        if not 1 <= self.maximum_simultaneous_positions <= len(self.sleeve_ids):
+            raise ValueError("maximum simultaneous positions is inconsistent")
+        if not 1 <= self.maximum_mini_equivalent <= 15:
+            raise ValueError("maximum mini equivalent must be in [1,15]")
+        if self.conflict_policy != "FIXED_PRIORITY":
+            raise ValueError("role-aware exact executor requires fixed priority")
+        if not 0.0 < self.daily_risk_budget <= 3_000.0:
+            raise ValueError("daily risk budget must be in (0,3000]")
+        if not 0.0 < self.daily_profit_lock <= 9_000.0:
+            raise ValueError("daily profit lock must be in (0,9000]")
+        if not 0.0 < self.critical_mll_buffer <= self.low_mll_buffer <= 4_500.0:
+            raise ValueError("MLL buffer thresholds are invalid")
+        if self.loss_streak_throttle_after not in {2, 3, 4, 5}:
+            raise ValueError("loss streak throttle must use the bounded set")
+        if self.mode != "COMBINE_RESEARCH":
+            raise ValueError("role-aware campaign is Combine research only")
+        if self.parent_policy_ids:
+            raise ValueError("role-aware candidates cannot inherit parent status")
+        if self.version != 1:
+            raise ValueError("role-aware policy version must be frozen at one")
+
+    @property
+    def structural_fingerprint(self) -> str:
+        return stable_hash(self.structural_payload())
+
+    def structural_payload(self) -> dict[str, Any]:
+        return {
+            "schema": "hydra_role_aware_account_policy_v1",
+            "sleeve_ids": list(self.sleeve_ids),
+            "allocation_units": list(self.allocation_units),
+            "maximum_simultaneous_positions": self.maximum_simultaneous_positions,
+            "maximum_mini_equivalent": self.maximum_mini_equivalent,
+            "conflict_policy": self.conflict_policy,
+            "daily_risk_budget": float(self.daily_risk_budget).hex(),
+            "daily_profit_lock": float(self.daily_profit_lock).hex(),
+            "low_mll_buffer": float(self.low_mll_buffer).hex(),
+            "critical_mll_buffer": float(self.critical_mll_buffer).hex(),
+            "loss_streak_throttle_after": self.loss_streak_throttle_after,
+            "mode": self.mode,
+            "version": self.version,
+        }
+
+    def to_dict(self) -> dict[str, Any]:
+        value = asdict(self)
+        value["sleeve_ids"] = list(self.sleeve_ids)
+        value["allocation_units"] = list(self.allocation_units)
+        value["parent_policy_ids"] = list(self.parent_policy_ids)
+        value["mutation_target"] = (
+            self.mutation_target.value if self.mutation_target else None
+        )
+        value["structural_fingerprint"] = self.structural_fingerprint
+        return value
+
+
+@dataclass(frozen=True, slots=True)
 class RoleAwareComponent:
     sleeve: SleeveSpec
     net_pnl: float
@@ -66,8 +152,8 @@ class RoleAwareComponent:
 @dataclass(frozen=True, slots=True)
 class RoleAwarePolicyPair:
     pair_id: str
-    real_policy: AccountPolicyGenome
-    matched_control_policy: AccountPolicyGenome
+    real_policy: RoleAwareAccountPolicyGenome
+    matched_control_policy: RoleAwareAccountPolicyGenome
     profile: str
     membership_hash: str
 
@@ -122,11 +208,11 @@ class RoleAwareAccountPopulation:
     manifest_hash: str
 
     @property
-    def real_policies(self) -> tuple[AccountPolicyGenome, ...]:
+    def real_policies(self) -> tuple[RoleAwareAccountPolicyGenome, ...]:
         return tuple(row.real_policy for row in self.pairs)
 
     @property
-    def matched_control_policies(self) -> tuple[AccountPolicyGenome, ...]:
+    def matched_control_policies(self) -> tuple[RoleAwareAccountPolicyGenome, ...]:
         return tuple(row.matched_control_policy for row in self.pairs)
 
     def summary(self) -> dict[str, Any]:
@@ -440,7 +526,7 @@ def _role_aware_policy(
     profile: str,
     campaign_id: str,
     membership_hash: str,
-) -> AccountPolicyGenome:
+) -> RoleAwareAccountPolicyGenome:
     ordered = tuple(
         sorted(
             members,
@@ -455,7 +541,7 @@ def _role_aware_policy(
     )
     allocations, limits = _profile(len(ordered), profile)
     sleeve_ids = tuple(row.sleeve.sleeve_id for row in ordered)
-    return AccountPolicyGenome(
+    return RoleAwareAccountPolicyGenome(
         policy_id=deterministic_id(
             "role_aware_account_policy",
             {
@@ -478,11 +564,11 @@ def _role_aware_policy(
 def _permutation_control_policy(
     members: Sequence[RoleAwareComponent],
     *,
-    real_policy: AccountPolicyGenome,
+    real_policy: RoleAwareAccountPolicyGenome,
     profile: str,
     campaign_id: str,
     membership_hash: str,
-) -> AccountPolicyGenome:
+) -> RoleAwareAccountPolicyGenome:
     ordered = tuple(
         sorted(
             members,
@@ -514,7 +600,7 @@ def _permutation_control_policy(
     )
     if allocations == real_policy.allocation_units and len(set(allocations)) > 1:
         allocations = allocations[1:] + allocations[:1]
-    return AccountPolicyGenome(
+    return RoleAwareAccountPolicyGenome(
         policy_id=deterministic_id(
             "role_blind_permutation_control",
             {
@@ -589,7 +675,7 @@ def _profile(size: int, profile: str) -> tuple[tuple[int, ...], dict[str, Any]]:
     return allocations, limits
 
 
-def _account_limits(policy: AccountPolicyGenome) -> tuple[Any, ...]:
+def _account_limits(policy: RoleAwareAccountPolicyGenome) -> tuple[Any, ...]:
     return (
         policy.maximum_simultaneous_positions,
         policy.maximum_mini_equivalent,
@@ -667,6 +753,7 @@ __all__ = [
     "ROLE_AWARE_HYPOTHESIS",
     "ROLE_ORDER",
     "RoleAwareAccountPopulation",
+    "RoleAwareAccountPolicyGenome",
     "RoleAwareComponent",
     "RoleAwarePolicyPair",
     "generate_role_aware_account_population",
