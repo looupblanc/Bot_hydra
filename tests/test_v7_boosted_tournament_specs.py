@@ -46,4 +46,3 @@ def test_bounded_baskets_are_deterministic_and_require_new_components() -> None:
     assert len({row["structural_hash"] for row in first}) == 320
     assert all(set(row["component_ids"]).intersection(new_ids) for row in first)
     assert all(2 <= len(row["component_ids"]) <= 4 for row in first)
-
