@@ -1,0 +1,103 @@
+{
+  "CONTRE": "The existing D1 coverage is too short for uncensored 40/60/90-day headlines on every frozen block; V7.2 can measure leakage-free short-horizon progress, but confirmation still requires untouched or forward data.",
+  "audit_id": "hydra_v7_2_combine_semantics_audit_0001",
+  "checks": {
+    "R13_zero_server_order_capability": true,
+    "R15_zero_HYDRA_orders": true,
+    "R16_CT_boundaries": true,
+    "R1_no_official_time_limit": true,
+    "R1_target_9000": true,
+    "R2_default_mode": true,
+    "R2_distance_4500": true,
+    "R2_sensitivity_mode_available": true,
+    "R2_touch_is_breach": true,
+    "R3_optional_DLL_3000": true,
+    "R4_consistency_target_inflation": true,
+    "R5_maximum_contracts_15": true,
+    "R6_two_day_assumption_blocks_ticket": true
+  },
+  "deployment_ticket_blockers": [
+    "R2",
+    "R6",
+    "R7",
+    "R11"
+  ],
+  "legacy_TIMEOUT_rewritten_or_reinterpreted": false,
+  "legacy_evidence_mutated": false,
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "policy_path": "WORM/v7.2-pareto-crossfit-account-policy-0001-2026-07-13.json",
+  "policy_sha256": "94f4ad89a2ae2ea347f1fce4a9cb4682690652429f34e42e72edf79e03da6677",
+  "prochaine_action": "freeze_reconciled_component_bank_before_basket_results",
+  "protected_holdout_access_count_delta": 0,
+  "ruleset_as_of_date": "2026-07-12",
+  "ruleset_schema": "hydra_topstep_150k_ruleset_v7",
+  "schema": "hydra_v7_2_combine_semantics_audit_result_v1",
+  "semantic_probes": {
+    "horizon_summaries": {
+      "20": {
+        "data_censored_count": 0,
+        "episode_count": 4,
+        "mll_breached_count": 0,
+        "operational_horizon_not_reached_count": 3,
+        "target_reached_count": 1
+      },
+      "40": {
+        "data_censored_count": 0,
+        "episode_count": 4,
+        "mll_breached_count": 0,
+        "operational_horizon_not_reached_count": 3,
+        "target_reached_count": 1
+      },
+      "60": {
+        "data_censored_count": 1,
+        "episode_count": 4,
+        "mll_breached_count": 0,
+        "operational_horizon_not_reached_count": 2,
+        "target_reached_count": 1
+      },
+      "90": {
+        "data_censored_count": 3,
+        "episode_count": 4,
+        "mll_breached_count": 0,
+        "operational_horizon_not_reached_count": 0,
+        "target_reached_count": 1
+      },
+      "full_available": {
+        "data_censored_count": 3,
+        "episode_count": 4,
+        "mll_breached_count": 0,
+        "operational_horizon_not_reached_count": 0,
+        "target_reached_count": 1
+      }
+    },
+    "pass_days": 2,
+    "statuses": {
+      "breach": "MLL_BREACHED",
+      "eod_high_MFE": "OPERATIONAL_HORIZON_NOT_REACHED",
+      "full_available": "DATA_CENSORED",
+      "intraday_high_MFE": "MLL_BREACHED",
+      "operational_horizon": "OPERATIONAL_HORIZON_NOT_REACHED",
+      "passing": "TARGET_REACHED",
+      "short_data": "DATA_CENSORED"
+    }
+  },
+  "v72_observation_layer": {
+    "full_available_reported": true,
+    "profitable_survivor_is_terminal_failure": false,
+    "reporting_horizons": [
+      20,
+      40,
+      60,
+      90
+    ],
+    "statuses": [
+      "TARGET_REACHED",
+      "MLL_BREACHED",
+      "DATA_CENSORED",
+      "OPERATIONAL_HORIZON_NOT_REACHED",
+      "HARD_RULE_FAILURE"
+    ]
+  },
+  "verdict": "GREEN"
+}
