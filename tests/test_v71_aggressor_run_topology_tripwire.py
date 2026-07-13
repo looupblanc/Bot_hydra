@@ -21,6 +21,14 @@ def test_aggressor_run_tripwire_threshold_is_inclusive() -> None:
     assert ratio == pytest.approx(0.8)
 
 
+def test_aggressor_run_tripwire_zero_real_passes_is_explicitly_underpowered() -> None:
+    verdict, ratio = classify_tripwire(
+        real_passes=0, real_episodes=80, null_passes=9, null_episodes=240
+    )
+    assert verdict == "BLOCKED_UNDERPOWERED"
+    assert ratio is None
+
+
 def test_aggressor_run_null_preserves_topology_and_recomputes_price_progress() -> None:
     minute, states, _ = load_aggressor_run_topology_sources(".")
     null = build_aggressor_run_topology_null_world(

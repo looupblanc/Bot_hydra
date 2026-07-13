@@ -157,6 +157,8 @@ def run_aggressor_run_topology_tripwire(
             "record_stage1_formulation_falsification_and_no_power_audit"
             if verdict == "GREEN_NULL_ADJUSTED_BASELINE"
             else "tombstone_aggressor_run_topology_class_as_geometry_only"
+            if verdict == "ARTEFACT_GEOMETRY_ONLY"
+            else "record_stage1_formulation_falsification_and_tripwire_underpowered_without_class_tombstone"
         ),
     }
     return _write_result(result, root, Path(output_dir))
@@ -299,6 +301,8 @@ def _write_result(result: dict[str, Any], root: Path, output_dir: Path) -> dict[
     result_hash = _sha256(result_path)
     displayed = result_path.relative_to(root) if result_path.is_relative_to(root) else result_path
     report_path = destination / "v71_aggressor_run_topology_tripwire_report.md"
+    ratio = result["NULL_RATIO"]
+    ratio_text = "n/a" if ratio is None else f"{float(ratio):.6f}"
     report = "\n".join(
         [
             "# HYDRA V7.1 — Aggressor-run topology permanent tripwire",
@@ -311,7 +315,7 @@ def _write_result(result: dict[str, Any], root: Path, output_dir: Path) -> dict[
             "",
             f"- Réel: `{result['raw_pass_counts']['real']}`",
             f"- Null: `{result['raw_pass_counts']['null']}`",
-            f"- NULL_RATIO: `{result['NULL_RATIO']:.6f}`",
+            f"- NULL_RATIO: `{ratio_text}`",
             f"- Force: `{result['evidence_strength']}`",
             "",
             "## CONTRE",
