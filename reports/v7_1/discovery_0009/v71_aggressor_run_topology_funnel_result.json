@@ -1,0 +1,263 @@
+{
+  "CONTRE": "Aggressor-run topology can be contemporaneous minute-price geometry; positive development evidence cannot advance without the frozen tripwire and candidate-specific power audit.",
+  "DSR_BH_executed": false,
+  "candidate_count": 4,
+  "candidate_nulls_executed": false,
+  "candidate_results": [
+    {
+      "base_stress_1_5x": {
+        "event_count": 544,
+        "expectancy_per_trade": -64.30091911764706,
+        "net_pnl": -34979.7,
+        "positive_event_fraction": 0.4852941176470588
+      },
+      "candidate_id": "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h30",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 191,
+          "expectancy_per_trade": -22.631806282722508,
+          "net_pnl": -4322.674999999999,
+          "positive_event_fraction": 0.5130890052356021
+        },
+        {
+          "event_count": 176,
+          "expectancy_per_trade": -119.70909090909093,
+          "net_pnl": -21068.800000000003,
+          "positive_event_fraction": 0.4659090909090909
+        },
+        {
+          "event_count": 177,
+          "expectancy_per_trade": -54.1707627118644,
+          "net_pnl": -9588.224999999999,
+          "positive_event_fraction": 0.4745762711864407
+        }
+      ],
+      "family_id": "INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY",
+      "holding_minutes": 30,
+      "motif": "DOMINANT_RUN_WITH_PROGRESS",
+      "power_audit_executed": false,
+      "response_policy": "CONTINUATION",
+      "signal_count": 544,
+      "signal_path_hash": "a765ab5f17fc196f7f434b2769cbecd41f78ec06d24ca31c5247da4eb385c2d4",
+      "single_day_absolute_pnl_share": 0.1023470411422839,
+      "specification_hash": "5477dcc9dd631cf03278de69c7b20b48e1046d8e410edd7e5233c03c1c741fbd",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 258,
+        "expectancy_per_trade": -47.331976744186036,
+        "net_pnl": -12211.649999999998,
+        "positive_event_fraction": 0.5038759689922481
+      },
+      "candidate_id": "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h60",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 90,
+          "expectancy_per_trade": -5.397222222222223,
+          "net_pnl": -485.75000000000006,
+          "positive_event_fraction": 0.5444444444444444
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": 7.360714285714297,
+          "net_pnl": 618.300000000001,
+          "positive_event_fraction": 0.47619047619047616
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": -146.95476190476188,
+          "net_pnl": -12344.199999999997,
+          "positive_event_fraction": 0.4880952380952381
+        }
+      ],
+      "family_id": "INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY",
+      "holding_minutes": 60,
+      "motif": "DOMINANT_RUN_WITH_PROGRESS",
+      "power_audit_executed": false,
+      "response_policy": "CONTINUATION",
+      "signal_count": 258,
+      "signal_path_hash": "c47b2c7d788d3b1750e302b4c854e7cc9443930ceb18b1ace3ac857a922edaeb",
+      "single_day_absolute_pnl_share": 0.10629400113216471,
+      "specification_hash": "6b76b35dd68594dfb28fc1396d86f4b5eba1d08ba32a273bddae106fc1a7d31a",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 513,
+        "expectancy_per_trade": -16.379191033138405,
+        "net_pnl": -8402.525000000001,
+        "positive_event_fraction": 0.4834307992202729
+      },
+      "candidate_id": "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h30",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 180,
+          "expectancy_per_trade": -29.216666666666672,
+          "net_pnl": -5259.000000000001,
+          "positive_event_fraction": 0.5166666666666667
+        },
+        {
+          "event_count": 166,
+          "expectancy_per_trade": 20.484638554216872,
+          "net_pnl": 3400.4500000000007,
+          "positive_event_fraction": 0.4939759036144578
+        },
+        {
+          "event_count": 167,
+          "expectancy_per_trade": -39.185479041916146,
+          "net_pnl": -6543.974999999996,
+          "positive_event_fraction": 0.437125748502994
+        }
+      ],
+      "family_id": "INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY",
+      "holding_minutes": 30,
+      "motif": "DOMINANT_RUN_WITHOUT_PROGRESS",
+      "power_audit_executed": false,
+      "response_policy": "REVERSAL",
+      "signal_count": 513,
+      "signal_path_hash": "c984b484eadd71ddd421bbb7324fe47a28544edd17e10c466048cb67908c7f93",
+      "single_day_absolute_pnl_share": 0.15717537336118487,
+      "specification_hash": "daa19e3c8aaec53663790811e39cb0700149e791e1852c02cf72258af8febb78",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    },
+    {
+      "base_stress_1_5x": {
+        "event_count": 258,
+        "expectancy_per_trade": -44.618798449612406,
+        "net_pnl": -11511.650000000001,
+        "positive_event_fraction": 0.46124031007751937
+      },
+      "candidate_id": "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h60",
+      "classification": "FORMULATION_FALSIFIED",
+      "duplicate_of": null,
+      "early_fold_results": [
+        {
+          "event_count": 90,
+          "expectancy_per_trade": -80.39722222222223,
+          "net_pnl": -7235.75,
+          "positive_event_fraction": 0.4
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": -76.2702380952381,
+          "net_pnl": -6406.700000000001,
+          "positive_event_fraction": 0.4642857142857143
+        },
+        {
+          "event_count": 84,
+          "expectancy_per_trade": 25.366666666666696,
+          "net_pnl": 2130.8000000000025,
+          "positive_event_fraction": 0.5238095238095238
+        }
+      ],
+      "family_id": "INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY",
+      "holding_minutes": 60,
+      "motif": "DOMINANT_RUN_WITHOUT_PROGRESS",
+      "power_audit_executed": false,
+      "response_policy": "REVERSAL",
+      "signal_count": 258,
+      "signal_path_hash": "f61a5bdd11ab172ee2304c00174c6eeafae51eef8d56f9fdacb6a60b877184af",
+      "single_day_absolute_pnl_share": 0.11519616543557219,
+      "specification_hash": "1fe1df22ca66c15122686c14b45e0cfabd9e83553ba28a4c93d6ebfbbc5a21ec",
+      "stage0_valid_novel": true,
+      "stage1_pass": false,
+      "walk_forward": {
+        "embargo_days": 5,
+        "folds": [],
+        "pooled_expectancy_per_trade": 0.0,
+        "pooled_net_pnl": 0.0,
+        "positive_fold_count": 0,
+        "purge": "not_executed_before_stage1_pass",
+        "retained_event_count": 0
+      },
+      "walk_forward_positive": false
+    }
+  ],
+  "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+  "classification_counts": {
+    "FORMULATION_FALSIFIED": 4
+  },
+  "duplicate_rejection_count": 0,
+  "grammar_id": "hydra_v7_1_aggressor_run_topology_grammar_0009",
+  "grammar_tripwire_executed": false,
+  "new_data_purchase_count": 0,
+  "next_action": "run_preregistered_aggressor_run_topology_tripwire",
+  "outbound_order_count": 0,
+  "protected_holdout_access_count_delta": 0,
+  "raw_global_N_trials": 263886,
+  "rolling_combine_executed": false,
+  "schema": "hydra_v7_1_aggressor_run_topology_funnel_result_v1",
+  "source_audit": {
+    "dominant_run_with_progress_count": 10677,
+    "dominant_run_without_progress_count": 5901,
+    "exact_source_match_count": 17200,
+    "executable_state_count_30m": 15867,
+    "executable_state_count_60m": 14577,
+    "minute_count": 17200,
+    "session_count": 43,
+    "tied_run_count": 622,
+    "unique_dominant_run_count": 16578
+  },
+  "stage0_valid_novel_count": 4,
+  "stage1_pass_count": 0,
+  "stage1_policy": {
+    "early_fold_count": 3,
+    "maximum_single_day_absolute_pnl_share": 0.35,
+    "minimum_nonoverlapping_events": 40,
+    "minimum_positive_early_folds": 2,
+    "pooled_expectancy_min_exclusive": 0.0,
+    "stress_profile": "STRESS_1_5X"
+  },
+  "stage2_policy": {
+    "embargo_days": 5,
+    "fixed_structure_direction_horizon": true,
+    "mandatory_before_DSR_BH": true,
+    "minimum_positive_folds": 2,
+    "minimum_retained_events": 30,
+    "pooled_expectancy_min_exclusive": 0.0,
+    "purge": "candidate_holding_horizon",
+    "rolling_origin_fold_count": 4
+  },
+  "universal_raw_event_power_gate_used": false,
+  "walk_forward_positive_count": 0
+}
