@@ -25,6 +25,11 @@ from hydra.mission.economic_evolution_runtime import (
     classify_economic_evolution_action,
     verify_economic_evolution_freeze,
 )
+from hydra.mission.economic_evolution_successor_runtime import (
+    CAMPAIGN_CONFIG_RELATIVE_PATH as SUCCESSOR_CONFIG_RELATIVE_PATH,
+    EconomicEvolutionSuccessorRuntime,
+    verify_successor_freeze,
+)
 from hydra.mission.mission_state import (
     append_event,
     append_jsonl,
@@ -43,7 +48,7 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v5"
+CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v6"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-economic-evolution-single-writer"
 CONTROLLER_OWNER = "v7_economic_evolution_controller"
@@ -2301,6 +2306,11 @@ class V7FalsificationController:
             if (self.root / CAMPAIGN_CONFIG_RELATIVE_PATH).is_file()
             else None
         )
+        self._economic_successor_runtime = (
+            EconomicEvolutionSuccessorRuntime(self.root, self.paths.state_dir)
+            if (self.root / SUCCESSOR_CONFIG_RELATIVE_PATH).is_file()
+            else None
+        )
 
     def run(self) -> int:
         signal.signal(signal.SIGTERM, self._handle_signal)
@@ -2332,6 +2342,8 @@ class V7FalsificationController:
             except Exception as exc:
                 if self._economic_runtime is not None:
                     self._economic_runtime.stop()
+                if self._economic_successor_runtime is not None:
+                    self._economic_successor_runtime.stop()
                 set_kv(conn, "service_state", "V7_INTEGRITY_BLOCKED")
                 set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
                 set_kv(conn, "current_blocker", f"{type(exc).__name__}:{exc}"[:4000])
@@ -2442,6 +2454,8 @@ class V7FalsificationController:
         action = classify_v7_action(self.root)
         if self._economic_runtime is not None:
             action = self._economic_runtime.advance(action)
+        if self._economic_successor_runtime is not None:
+            action = self._economic_successor_runtime.advance(action)
         previous = get_kv(conn, "v7_current_action", {})
         step = int(get_kv(conn, "v7_step", 0)) + 1
         progress_at = utc_now_iso()
@@ -2517,6 +2531,8 @@ class V7FalsificationController:
             raise V7ControllerIntegrityError("unexpected proof-window state")
         if (self.root / CAMPAIGN_CONFIG_RELATIVE_PATH).is_file():
             verify_economic_evolution_freeze(self.root)
+        if (self.root / SUCCESSOR_CONFIG_RELATIVE_PATH).is_file():
+            verify_successor_freeze(self.root)
         return text
 
     def _checkpoint(
@@ -2584,6 +2600,14 @@ class V7FalsificationController:
             "automatic_order_capability": False,
         }
         if self._economic_runtime is not None:
+            heartbeat["economic_evolution_predecessor"] = (
+                self._economic_runtime.snapshot()
+            )
+        if self._economic_successor_runtime is not None:
+            heartbeat["economic_evolution"] = (
+                self._economic_successor_runtime.snapshot()
+            )
+        elif self._economic_runtime is not None:
             heartbeat["economic_evolution"] = self._economic_runtime.snapshot()
         return heartbeat
 
@@ -2624,6 +2648,8 @@ class V7FalsificationController:
     def _stop_cleanly(self, conn: sqlite3.Connection, reason: str) -> None:
         if self._economic_runtime is not None:
             self._economic_runtime.stop()
+        if self._economic_successor_runtime is not None:
+            self._economic_successor_runtime.stop()
         now = utc_now_iso()
         set_kv(conn, "service_state", "STOPPED_CLEANLY_V7")
         set_kv(conn, "current_phase", "STOPPED_CLEANLY")

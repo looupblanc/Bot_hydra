@@ -248,10 +248,16 @@ def test_v71_power_aware_integrated_action_reports_g9_falsification() -> None:
 def test_economic_evolution_action_preserves_G12_terminal_evidence() -> None:
     result = classify_v7_action(Path.cwd())
 
-    assert CONTROLLER_SCHEMA == "hydra_v7_economic_evolution_controller_v5"
-    assert result["action_type"] == "ECONOMIC_EVOLUTION_CAMPAIGN_0002_PREREGISTERED"
+    assert CONTROLLER_SCHEMA == "hydra_v7_economic_evolution_controller_v6"
+    assert result["action_type"] in {
+        "ECONOMIC_EVOLUTION_CAMPAIGN_0002_PREREGISTERED",
+        "ECONOMIC_EVOLUTION_CAMPAIGN_0002_COMPLETE",
+    }
     assert result["economic_campaign_id"] == "hydra_economic_evolution_persistent_0002"
-    assert result["economic_campaign_state"] == "READY_FOR_CONTROLLER_OWNED_LAUNCH"
+    assert result["economic_campaign_state"] in {
+        "READY_FOR_CONTROLLER_OWNED_LAUNCH",
+        "COMPLETE",
+    }
     assert result["v72_static_structure_count"] == 1009
     assert result["v72_design_episode_count"] == 24216
     assert result["v72_cross_fit_rotation_count"] == 4

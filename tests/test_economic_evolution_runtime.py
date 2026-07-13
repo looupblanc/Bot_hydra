@@ -25,8 +25,14 @@ def test_campaign_freeze_and_tag_are_verifiable() -> None:
     assert config["broker_or_orders_allowed"] is False
 
 
-def test_campaign_action_is_ready_without_reading_outcomes() -> None:
+def test_campaign_action_is_ready_without_reading_outcomes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     root = Path(__file__).resolve().parents[1]
+    monkeypatch.setattr(
+        "hydra.mission.economic_evolution_runtime.CAMPAIGN_OUTPUT_RELATIVE_PATH",
+        Path("reports/economic_evolution/deliberately_absent_test_output"),
+    )
     action = classify_economic_evolution_action(
         root,
         {
