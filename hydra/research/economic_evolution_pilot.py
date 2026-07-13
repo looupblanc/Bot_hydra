@@ -80,10 +80,11 @@ def run_economic_evolution_pilot(
     started_cpu = time.process_time()
     resource_before = capture_resource_snapshot()
     prereg_path = Path(preregistration_path).resolve()
-    prereg = json.loads(prereg_path.read_text(encoding="utf-8"))
+    prereg, prereg_source = _load_preregistration(prereg_path)
     _validate_preregistration(prereg, prereg_path)
     writer = AtomicResultWriter(output_dir)
     writer.write_json("preregistration_copy.json", prereg)
+    writer.write_json("preregistration_source.json", prereg_source)
 
     incremental_policy = _incremental_policy(prereg)
     calibration = calibrate_incremental_validator(
@@ -332,6 +333,55 @@ def _validate_preregistration(value: Mapping[str, Any], path: Path) -> None:
     )
     if ancestor.returncode != 0:
         raise EconomicEvolutionPilotError("implementation commit is not an ancestor")
+
+
+def _load_preregistration(path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    if raw.get("schema") != "hydra_economic_evolution_pilot_revision_v1":
+        return raw, {
+            "source_path": str(path),
+            "source_sha256": _sha256(path),
+            "revision": None,
+        }
+    revision = dict(raw)
+    revision_hash = str(revision.pop("revision_hash"))
+    if stable_hash(revision) != revision_hash:
+        raise EconomicEvolutionPilotError("pilot revision hash drift")
+    project_root = path.parents[2]
+    base_path = project_root / str(raw["base_preregistration_path"])
+    if _sha256(base_path) != str(raw["base_preregistration_sha256"]):
+        raise EconomicEvolutionPilotError("base pilot WORM hash drift")
+    effective = json.loads(base_path.read_text(encoding="utf-8"))
+    base_payload = dict(effective)
+    base_hash = str(base_payload.pop("preregistration_hash"))
+    if stable_hash(base_payload) != base_hash:
+        raise EconomicEvolutionPilotError("base pilot preregistration hash drift")
+    effective["implementation_commit"] = str(raw["implementation_commit"])
+    implementation_files = dict(effective["implementation_files"])
+    implementation_files.update(
+        {str(key): str(value) for key, value in raw["implementation_file_overrides"].items()}
+    )
+    effective["implementation_files"] = implementation_files
+    effective["revision_provenance"] = {
+        "revision_id": raw["revision_id"],
+        "reason": raw["reason"],
+        "base_preregistration_path": raw["base_preregistration_path"],
+        "base_preregistration_sha256": raw["base_preregistration_sha256"],
+        "pre_outcome_abort_path": raw["pre_outcome_abort_path"],
+        "threshold_change": False,
+        "population_change": False,
+    }
+    effective.pop("preregistration_hash", None)
+    effective_hash = stable_hash(effective)
+    if effective_hash != str(raw["expected_effective_preregistration_hash"]):
+        raise EconomicEvolutionPilotError("effective revised pilot hash drift")
+    effective["preregistration_hash"] = effective_hash
+    return effective, {
+        "source_path": str(path),
+        "source_sha256": _sha256(path),
+        "revision": raw,
+        "effective_preregistration_hash": effective_hash,
+    }
 
 
 def _verify_data_fingerprint(
