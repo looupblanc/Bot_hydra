@@ -1,0 +1,38 @@
+{
+  "schema": "hydra_economic_evolution_status_reconciliation_v1",
+  "campaign_id": "hydra_economic_evolution_pilot_0001",
+  "recorded_at_utc": "2026-07-13T10:55:00Z",
+  "source_commit": "e3362db49992c68e6c921fef21adb80d4b92da19",
+  "raw_artifacts": {
+    "pilot_result_sha256": "3da708a2f753c26d6b38f1bf60f793a1ef857d51ab9e8c8b7f1d2f331b5d343f",
+    "account_policy_results_sha256": "a8d1b9bd7921deb8ba9c9166ff4c1a6a3649310d04183a7bbc97389fc64a524b",
+    "rolling_combine_results_sha256": "fdeb6cfaa04694b49559ad83934621431063616110e3dcaf88f6ebcdf1256ece",
+    "validator_calibration_sha256": "5cfcde7efedd087d96f56340066ab37259da20e5d93742244cbf877beb35706f"
+  },
+  "observed_statuses": {
+    "development_account_policy_diagnostic_only": 150,
+    "development_account_policy_research_candidate": 0,
+    "rolling_rows_mislabeled_account_policy_research_candidate": 20,
+    "combine_path_candidate": 0
+  },
+  "reconciled_statuses": {
+    "account_policy_diagnostic_only": 150,
+    "account_policy_research_candidate": 0,
+    "combine_path_candidate": 0,
+    "pre_holdout_ready": 0,
+    "paper_shadow_ready": 0
+  },
+  "defect": "The rolling diagnostic fallback replaced every non-Combine-path status with ACCOUNT_POLICY_RESEARCH_CANDIDATE instead of preserving the development-stage status.",
+  "scientific_effect": "NONE: no threshold, metric, event, PnL, account path, selection, or promotion decision is changed.",
+  "thresholds_changed": false,
+  "outcomes_recomputed": false,
+  "raw_artifacts_modified": false,
+  "prospective_fix": {
+    "implementation": "hydra/economic_evolution/statuses.py",
+    "tests": "tests/test_economic_evolution_statuses.py",
+    "targeted_regression": "7 passed",
+    "frozen_pilot_runner_modified": false
+  },
+  "verdict": "STATUS_AGGREGATION_DEFECT_NO_SCIENTIFIC_PROMOTION",
+  "CONTRE": "The pilot remains development-only and the corrected labels do not establish any independent economic edge."
+}
