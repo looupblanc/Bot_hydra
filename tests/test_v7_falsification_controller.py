@@ -186,12 +186,12 @@ def test_v71_controller_recognizes_frozen_g2_confirmation_queue(
     assert result["shadow_admission_authorized"] is False
 
 
-def test_v71_power_aware_integrated_action_reports_g6_and_bounded_combine() -> None:
+def test_v71_power_aware_integrated_action_reports_g7_null_after_bounded_combine() -> None:
     result = _classify_v71_power_aware_action(
         Path.cwd(), prior_positive=11, g2_positive=3
     )
 
-    assert result["action_type"] == "V71_G6_GREEN_UNDERPOWERED_COMBINE_DIAGNOSTIC_COMPLETE"
+    assert result["action_type"] == "V71_G7_GEOMETRY_ONLY_NULL_COMPLETE"
     assert result["walk_forward_positive_count"] == 22
     assert result["powered_candidate_count"] == 0
     assert result["rolling_combine_promotions"] == 0
@@ -208,6 +208,14 @@ def test_v71_power_aware_integrated_action_reports_g6_and_bounded_combine() -> N
     assert result["underpowered_combine_candidate_pass_count"] == 0
     assert result["underpowered_combine_basket_pass_count"] == 0
     assert result["underpowered_combine_validated_count"] == 0
+    assert result["g7_candidate_count"] == 6
+    assert result["g7_signal_count"] == 1889
+    assert result["g7_stage1_survivor_count"] == 0
+    assert result["g7_walk_forward_positive_count"] == 0
+    assert result["g7_tripwire_verdict"] == "ARTEFACT_GEOMETRY_ONLY"
+    assert result["g7_real_pass_count"] == "5/120"
+    assert result["g7_null_pass_count"] == "17/360"
+    assert result["g7_cemetery_candidate_count"] == 6
     assert result["broad_D1_generation_authorized"] is False
     assert result["new_data_purchase_authorized"] is False
     assert result["shadow_admission_authorized"] is False

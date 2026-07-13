@@ -33,7 +33,7 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v7"
+CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v8"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-falsification-single-writer"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
@@ -152,6 +152,18 @@ V71_UNDERPOWERED_DIAGNOSTIC_RELATIVE_PATH = Path(
     "reports/v7_1/combine_research_0001/"
     "v71_underpowered_combine_diagnostic_result.json"
 )
+V71_G7_GRAMMAR_RELATIVE_PATH = Path(
+    "WORM/v7.1-flow-sign-sequence-grammar-0007-2026-07-13.json"
+)
+V71_G7_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0007/v71_flow_sign_sequence_signal_manifest.json"
+)
+V71_G7_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0007/v71_flow_sign_sequence_funnel_result.json"
+)
+V71_G7_TRIPWIRE_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0007/v71_flow_sign_sequence_tripwire_result.json"
+)
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
     str(V71_POLICY_RELATIVE_PATH): "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
@@ -181,6 +193,8 @@ V71_FROZEN_HASHES = {
     "WORM/v7.1-underpowered-combine-research-policy-0001-2026-07-13.json": "33193b3afaf662a7a2b1fe4bcdfb5f9aa2868f6afec55f365e5ea421cd1f3f88",
     "WORM/v7.1-underpowered-combine-cohort-0001-2026-07-13.json": "a2973de8e8ad11607d807b7cea5216db9f860dedff3ade815f34fd360b1c28d5",
     "WORM/v7.1-underpowered-combine-diagnostic-verdict-0001-2026-07-13.json": "7116dba7d9a50e9e109489b55f6fbef32992fd7d96e0c767270d84c127b7fa39",
+    str(V71_G7_GRAMMAR_RELATIVE_PATH): "4cb89b0e774f754037fde8a6f86703cda0047eefcd01174e1f65bb8d37fc45ab",
+    "WORM/v7.1-flow-sign-sequence-tripwire-0007-2026-07-13.json": "c7806c7ac4c512a05ca468388857419bd87a4a316967366ac8892ca38d25ff7a",
 }
 
 
@@ -999,7 +1013,7 @@ def _classify_v71_g6_action(
         ),
         "GEOMETRY_ONLY_CLASS_TOMBSTONED_NO_POWER_AUDIT": 2,
     }
-    return {
+    g6_action = {
         "action_type": "V71_G6_GREEN_UNDERPOWERED_COMBINE_DIAGNOSTIC_COMPLETE",
         "phase": "4",
         "progressed": True,
@@ -1052,6 +1066,124 @@ def _classify_v71_g6_action(
             "The authorized research-stage Combine diagnostic resolved five distinct "
             "candidates without promotion: zero candidate or basket passes, all 22 "
             "walk-forward-positive formulations explicitly accounted for, and no data purchase."
+        ),
+    }
+    if (root / V71_G7_GRAMMAR_RELATIVE_PATH).is_file():
+        return _classify_v71_g7_action(root, g6_action=g6_action)
+    return g6_action
+
+
+def _classify_v71_g7_action(
+    root: Path,
+    *,
+    g6_action: Mapping[str, Any],
+) -> dict[str, Any]:
+    required = (
+        (V71_G7_SIGNAL_RELATIVE_PATH, "V71_G7_SIGNAL_MANIFEST_REQUIRED"),
+        (V71_G7_FUNNEL_RELATIVE_PATH, "V71_G7_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V71_G7_TRIPWIRE_RELATIVE_PATH, "V71_G7_TRIPWIRE_REQUIRED"),
+    )
+    for path, action in required:
+        if not (root / path).is_file():
+            return {
+                **dict(g6_action),
+                "action_type": action,
+                "progressed": False,
+                "required_path": str(path),
+                "reason": (
+                    "The preregistered G7 flow-sign sequence must complete its "
+                    "atomic Stage 0-2 and permanent tripwire sequence."
+                ),
+            }
+    hashes = {
+        V71_G7_SIGNAL_RELATIVE_PATH: "eae86b8260596bb1ba9b8155769dfb16cb528736764ad57c194f5bdf3db48ee6",
+        V71_G7_FUNNEL_RELATIVE_PATH: "ec2570bcf75185238751815ffd259ff9e08c2ec9577e30c840ba2eaa188322ba",
+        V71_G7_TRIPWIRE_RELATIVE_PATH: "2c670ff6997eb1cfe603b1a747f53de03fc90ddb7f6a210f46325ae5c202ba43",
+    }
+    drift = [
+        str(path)
+        for path, expected in hashes.items()
+        if _sha256(root / path) != expected
+    ]
+    if drift:
+        raise V7ControllerIntegrityError(
+            "V7.1 G7 evidence drift: " + ",".join(drift)
+        )
+    signal = _load_json(root / V71_G7_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V71_G7_FUNNEL_RELATIVE_PATH)
+    tripwire = _load_json(root / V71_G7_TRIPWIRE_RELATIVE_PATH)
+    if int(signal.get("candidate_count") or 0) != 6 or int(
+        signal.get("signal_count") or 0
+    ) != 1_889:
+        raise V7ControllerIntegrityError("V7.1 G7 signal manifest drift")
+    if int(funnel.get("stage0_valid_novel_count") or 0) != 6:
+        raise V7ControllerIntegrityError("V7.1 G7 Stage 0 count drift")
+    if int(funnel.get("stage1_pass_count") or 0) != 0 or int(
+        funnel.get("walk_forward_positive_count") or 0
+    ) != 0:
+        raise V7ControllerIntegrityError("V7.1 G7 null funnel drift")
+    if tripwire.get("verdict") != "ARTEFACT_GEOMETRY_ONLY" or float(
+        tripwire.get("NULL_RATIO") or 0.0
+    ) < 0.8:
+        raise V7ControllerIntegrityError("V7.1 G7 tripwire verdict drift")
+    if tripwire.get("raw_pass_counts") != {
+        "real": "5/120",
+        "null": "17/360",
+    }:
+        raise V7ControllerIntegrityError("V7.1 G7 tripwire count drift")
+    graveyard = root / "mission/state/graveyard.db"
+    conn = sqlite3.connect(f"file:{graveyard}?mode=ro", uri=True)
+    try:
+        cemetery_count = int(
+            conn.execute(
+                "SELECT COALESCE(SUM(candidate_count),0) FROM class_tombstones "
+                "WHERE mechanism_class=? AND regime=? AND death_cause=?",
+                (
+                    "v71g7_aggressor_flow_sign_sequences",
+                    "D1_2023_2024_DEVELOPMENT_PRICE_NULLS",
+                    "GEOMETRY_ONLY_NULL_RATIO_GTE_0_8",
+                ),
+            ).fetchone()[0]
+        )
+    finally:
+        conn.close()
+    if cemetery_count != 6:
+        raise V7ControllerIntegrityError("V7.1 G7 class tombstone is absent")
+    return {
+        **dict(g6_action),
+        "action_type": "V71_G7_GEOMETRY_ONLY_NULL_COMPLETE",
+        "g7_candidate_count": 6,
+        "g7_signal_count": 1_889,
+        "g7_stage0_valid_count": 6,
+        "g7_stage1_survivor_count": 0,
+        "g7_walk_forward_positive_count": 0,
+        "g7_tripwire_verdict": "ARTEFACT_GEOMETRY_ONLY",
+        "g7_NULL_RATIO": float(tripwire["NULL_RATIO"]),
+        "g7_real_pass_count": tripwire["raw_pass_counts"]["real"],
+        "g7_null_pass_count": tripwire["raw_pass_counts"]["null"],
+        "g7_power_audit_executed": False,
+        "g7_rolling_combine_executed": False,
+        "g7_cemetery_candidate_count": cemetery_count,
+        "evidence_reconciliation_accounted_count": 22,
+        "evidence_reconciliation_unaccounted_count": 0,
+        "powered_candidate_count": 0,
+        "rolling_combine_promotions": 0,
+        "new_data_purchase_authorized": False,
+        "shadow_admission_authorized": False,
+        "next_experiment_id": (
+            "hydra_v7_1_independent_confirmation_and_distinct_hypothesis_review_0008"
+        ),
+        "next_experiment_state": "PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+        "principal_blocker": (
+            "No candidate passes the unchanged 80% power gate; G7 produced no "
+            "Stage-1 survivor and its Combine geometry is no better than null."
+        ),
+        "reason": (
+            "G7 tested six outcome-free ordinal aggressive-flow sequences. All "
+            "failed Stage 1 and the permanent tripwire classified the class "
+            "GEOMETRY_ONLY (5/120 real versus 17/360 null). The exact class is "
+            "tombstoned, no candidate was promoted, all prior 22 WF-positive "
+            "formulations remain explicitly reconciled, and no data was purchased."
         ),
     }
 
