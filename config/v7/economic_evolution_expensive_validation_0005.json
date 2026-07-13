@@ -1,0 +1,182 @@
+{
+  "schema": "hydra_economic_evolution_expensive_validation_preregistration_v1",
+  "validation_id": "hydra_economic_evolution_expensive_validation_0005",
+  "created_at_utc": "2026-07-13T15:43:44+00:00",
+  "purpose": "Test whether the single development account policy queued by review 0004 survives conservative account-level economics, 2x costs, matched controls, hierarchical DSR/BH and an 80-percent power calibration before any independent confirmation is considered.",
+  "development_only": true,
+  "data_role": "DEVELOPMENT_ONLY_Q4_EXCLUDED",
+  "status_inheritance": false,
+  "q4_access_allowed": false,
+  "new_data_purchase_allowed": false,
+  "network_access_allowed": false,
+  "broker_or_orders_allowed": false,
+  "shadow_admission_allowed": false,
+  "proof_window_consumption_allowed": false,
+  "pre_holdout_promotion_allowed": false,
+  "paper_shadow_promotion_allowed": false,
+  "implementation_commit": "72d0265bca63e81c9bc1b93d036106e94d038d2c",
+  "implementation_files": {
+    "hydra/validation/economic_evolution_expensive_validation.py": "88edacefc6e0ce2338fc3ebe7e3d4d82e6df285e8a4554b82939108b7b1acdfa",
+    "scripts/run_economic_evolution_expensive_validation.py": "187baea71cb8e54de981dcbc2262b6948677fda9269ccae6e40ea505566dbb3d"
+  },
+  "source_artifacts": {
+    "paths": {
+      "review_result": "reports/economic_evolution/information_review_0004/information_review_result.json",
+      "review_policy_results": "reports/economic_evolution/information_review_0004/policy_horizon_results.jsonl",
+      "review_preregistration": "reports/economic_evolution/information_review_0004/preregistration_copy.json",
+      "campaign_preregistration": "reports/economic_evolution/persistent_0003_revision_01/preregistration_copy.json",
+      "rolling_elites": "reports/economic_evolution/persistent_0003_revision_01/rolling_combine_elite_results.jsonl",
+      "exact_components": "reports/economic_evolution/persistent_0003_revision_01/exact_component_results.jsonl",
+      "structural_sleeves": "reports/economic_evolution/persistent_0003_revision_01/structural_sleeves.jsonl",
+      "seed_archive": "reports/economic_evolution/seeds/persistent_0002_successor_seed.json",
+      "predecessor_account_policies": "reports/economic_evolution/persistent_0002/account_policy_results.jsonl",
+      "source_account_policies": "reports/economic_evolution/persistent_0003_revision_01/account_policy_results.jsonl"
+    },
+    "sha256": {
+      "review_result": "4b116ac407cf5e0429e5e03927ac4c5e5b65117b63f446b19f83e36fd3a660cd",
+      "review_policy_results": "2e33637d60480b93d655b929aa831baca5e6cd8f16082b75e0a05feb0badba1d",
+      "review_preregistration": "a7e9107b511574f283ca8bc9f34f7121281d817ba76803cee4291cb2f8a68313",
+      "campaign_preregistration": "5b2ff090eb0ccaec8378fc3d0cda902dc070eb5da0c75af0665519ad090cac1b",
+      "rolling_elites": "f41fb6eee71d2a1e403ca83924d4333ced88b08c4e9bbfae6787b197ba29fede",
+      "exact_components": "deecc5c5da50e8009b308c1a248696dfd65fc0578fa1498f974104ea86e000f6",
+      "structural_sleeves": "38d34cbc157f6ce04833f2d31b9fe46ffd34d0969d2f81c7a369cac8679d9dfd",
+      "seed_archive": "bac6cfb43e4200ab691458f8ef1f7d644526e5576f27b7b48176bfa06c9e94a7",
+      "predecessor_account_policies": "4bd38255f6a8d0d86c50b92bc72c619336ed0ddf7dd40612dd8ad25288fe8678",
+      "source_account_policies": "1646fcd46a27b2cf4d64919617584b62891c6da3650b042e2b6022b6bd75bf67"
+    }
+  },
+  "candidate": {
+    "policy_id": "account_policy_child_9a7e901bda15207c0e7ba25d",
+    "policy_specification_hash": "3662c57afa0b6c9e2ea7b5969109a21694ad61c1cd7e7a91f90cde19a597a252",
+    "source_row_hash": "4c4430407f2fd4edfcb8cc2af5db2ec8f4636f473974a03027dbd620e4960191",
+    "selection_role": "DISTINCT_NEAR_TARGET_PATH",
+    "selection_is_post_development": true,
+    "validated_before_run": false,
+    "parameter_mutation_allowed": false,
+    "risk_rule_mutation_allowed": false,
+    "signal_mutation_allowed": false,
+    "sleeve_runtime_hashes": {
+      "sleeve_56d62ae303bf865ba98c7748": "0b5e15388279b5711dffea52a813fa1496685e13f63bb60e32425d505b887b78",
+      "sleeve_66ae033ef4acbc5ea759661d": "17c442e8c3caa864d96249393adfb1cc533820c3f26b3b2b7ff929e7cef0724b",
+      "sleeve_958d5ade0f6a1090ba0d95aa": "5efdc1c734276cd0027f14a8c0bf05ea2c2e29354bb56cc83d06806bbd0c9549",
+      "sleeve_f85e46cd5d5793e6b9042cdb": "8e0a63a555762cb9171bfdc6ca27044bcbb14a4892ec88451986e60dd1f124bc"
+    },
+    "source_review_diagnostic": {
+      "controlled_stressed_full_passes": 5,
+      "controlled_stressed_episode_starts": 24,
+      "controlled_stressed_pass_blocks": 2,
+      "controlled_stressed_mll_breaches": 0,
+      "controlled_stressed_median_net_usd": 7093.830000001515,
+      "controlled_stressed_median_target_progress": 0.7882033333335017,
+      "controlled_stressed_median_days_to_target": 128.0
+    }
+  },
+  "temporal_policy": {
+    "selection_blocks_are_not_independent_confirmation": true,
+    "no_overlapping_days_in_statistical_path": true,
+    "nonoverlapping_blocks": [
+      {
+        "block_id": "B1",
+        "start_day_inclusive": 19544,
+        "end_day_inclusive": 19611
+      },
+      {
+        "block_id": "B2",
+        "start_day_inclusive": 19632,
+        "end_day_inclusive": 19697
+      },
+      {
+        "block_id": "B3",
+        "start_day_inclusive": 19719,
+        "end_day_inclusive": 19788
+      },
+      {
+        "block_id": "B4",
+        "start_day_inclusive": 19808,
+        "end_day_inclusive": 19877
+      }
+    ]
+  },
+  "statistics_policy": {
+    "raw_global_N_trials_at_freeze": 452604,
+    "selection_family_definition": "union of exact account policies evaluated in persistent campaigns 0002 and 0003 revision 01",
+    "BH_family_size": 1278,
+    "effective_independent_trial_estimate": 1278,
+    "effective_trial_estimator": "conservative raw-family upper bound because an outcome-free aligned path matrix for all 1278 policies was not frozen",
+    "campaign_information_inflation": 1.5,
+    "campaign_inflated_trial_count": 1917,
+    "global_search_history_penalty": 19,
+    "prior_campaign_penalty": 1,
+    "DSR_N_trials": 1937,
+    "BH_FDR_q": 0.1,
+    "final_confirmation_power_minimum": 0.8,
+    "maximum_null_false_positive_rate": 0.1,
+    "minimum_useful_daily_net_usd": 50.0,
+    "effective_sample_maximum_lag": 20,
+    "bootstrap_repetitions": 5000,
+    "bootstrap_block_length_sessions": 5,
+    "bootstrap_seed": 750001,
+    "power_repetitions": 1000,
+    "power_seed": 750002,
+    "sign_null_repetitions": 5000,
+    "sign_null_block_length_sessions": 5,
+    "sign_null_seed": 750003,
+    "relevant_null_p_value_maximum": 0.05,
+    "minimum_positive_temporal_blocks": 2,
+    "maximum_MLL_breach_rate": 0.2,
+    "maximum_best_day_positive_pnl_share": 0.35,
+    "nonselected_BH_p_value": 1.0,
+    "threshold_tuning_after_results_allowed": false
+  },
+  "matched_controls": {
+    "static_account_control": true,
+    "leave_one_sleeve_out": true,
+    "all_sleeves_sign_inverted_with_costs_preserved": true,
+    "five_session_block_sign_randomization": true,
+    "simpler_policy_may_dominate_only_when_no_account_dimension_deteriorates": true
+  },
+  "cost_and_integrity_policy": {
+    "cost_multipliers": [1.0, 1.5, 2.0],
+    "two_x_positive_net_required_for_SIM_EXPLOIT_survival": true,
+    "best_day_removal_net_must_remain_positive": true,
+    "exact_shared_account_chronology": true,
+    "realized_and_unrealized_MLL": true,
+    "session_and_contract_compliance": true,
+    "execution_latency_remains_independent_confirmation_or_targeted_execution_evidence_debt": true
+  },
+  "decision_policy": {
+    "all_frozen_gates_required_for_independent_confirmation_queue": true,
+    "independent_confirmation_queue_is_not_validation_or_promotion": true,
+    "no_PRE_HOLDOUT_READY_from_this_run": true,
+    "no_PAPER_SHADOW_READY_from_this_run": true,
+    "failure_statuses": [
+      "EXPENSIVE_VALIDATION_HARD_INTEGRITY_FAILURE",
+      "EXPENSIVE_VALIDATION_SIM_EXPLOIT",
+      "EXPENSIVE_VALIDATOR_CALIBRATION_FAILURE",
+      "EXPENSIVE_VALIDATION_UNDERPOWERED",
+      "EXPENSIVE_VALIDATION_NULL_INDISTINGUISHABLE",
+      "EXPENSIVE_VALIDATION_SIMPLER_CONTROL_DOMINATES",
+      "EXPENSIVE_VALIDATION_FRAGILE_OR_UNSUPPORTED"
+    ],
+    "supported_status": "DEVELOPMENT_EXPENSIVE_VALIDATION_SUPPORTED_INDEPENDENT_CONFIRMATION_REQUIRED"
+  },
+  "multiplicity": {
+    "global_registry_append_required_before_run": true,
+    "prospective_comparisons": 24,
+    "bootstrap_draws_are_resampling_iterations_not_new_candidate_trials": true,
+    "statistical_promotion_claim": false
+  },
+  "compute": {
+    "exact_worker_count": 3,
+    "mission_db_writer_count": 0,
+    "registry_writer_count": 0
+  },
+  "next_stage": {
+    "on_all_gates_pass": "freeze an untouched independent-confirmation manifest before any data access or request",
+    "on_failure": "freeze or retire the exact policy version according to the terminal failure cause",
+    "new_data_purchase_automatic": false,
+    "q4_reuse": false
+  },
+  "CONTRE": "The policy was selected after observing the same development chronology; DSR, BH, nulls and power can only decide whether fresh confirmation is worth consuming, never provide that confirmation themselves.",
+  "preregistration_hash": "b8ae3d7baed8fe490cb0679ebe997280607f5d171329ab7d49adea9450f0154c"
+}
