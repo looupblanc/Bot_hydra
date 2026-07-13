@@ -47,8 +47,15 @@ from hydra.mission.economic_evolution_failure_runtime import (
 )
 from hydra.mission.economic_evolution_density_runtime import (
     CAMPAIGN_CONFIG_RELATIVE_PATH as DENSITY_CONFIG_RELATIVE_PATH,
+    CAMPAIGN_OUTPUT_RELATIVE_PATH as DENSITY_OUTPUT_RELATIVE_PATH,
+    CAMPAIGN_RESULT_NAME as DENSITY_RESULT_NAME,
     EconomicEvolutionDensityRuntime,
     verify_density_freeze,
+)
+from hydra.mission.economic_evolution_density_terminal_runtime import (
+    TERMINAL_VERDICT_RELATIVE_PATH as DENSITY_TERMINAL_VERDICT_RELATIVE_PATH,
+    EconomicEvolutionDensityTerminalRuntime,
+    load_and_verify_density_terminal_verdict,
 )
 from hydra.mission.mission_state import (
     append_event,
@@ -62,13 +69,16 @@ from hydra.mission.mission_state import (
     stop_requested,
     write_heartbeat,
 )
+from hydra.research.economic_evolution_density_campaign import (
+    load_and_verify_density_result,
+)
 from hydra.utils.time import utc_now_iso
 
 
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v10"
+CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v11"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-economic-evolution-single-writer"
 CONTROLLER_OWNER = "v7_economic_evolution_controller"
@@ -2351,6 +2361,13 @@ class V7FalsificationController:
             if (self.root / DENSITY_CONFIG_RELATIVE_PATH).is_file()
             else None
         )
+        self._economic_density_terminal_runtime = (
+            EconomicEvolutionDensityTerminalRuntime(
+                self.root, self.paths.state_dir
+            )
+            if (self.root / DENSITY_TERMINAL_VERDICT_RELATIVE_PATH).is_file()
+            else None
+        )
 
     def run(self) -> int:
         signal.signal(signal.SIGTERM, self._handle_signal)
@@ -2512,6 +2529,8 @@ class V7FalsificationController:
             action = self._economic_failure_review_runtime.advance(action)
         if self._economic_density_runtime is not None:
             action = self._economic_density_runtime.advance(action)
+        if self._economic_density_terminal_runtime is not None:
+            action = self._economic_density_terminal_runtime.advance(action)
         previous = get_kv(conn, "v7_current_action", {})
         step = int(get_kv(conn, "v7_step", 0)) + 1
         progress_at = utc_now_iso()
@@ -2596,7 +2615,17 @@ class V7FalsificationController:
         if (self.root / FAILURE_REVIEW_CONFIG_RELATIVE_PATH).is_file():
             verify_failure_review_freeze(self.root)
         if (self.root / DENSITY_CONFIG_RELATIVE_PATH).is_file():
-            verify_density_freeze(self.root)
+            density_config = verify_density_freeze(self.root)
+            if (self.root / DENSITY_TERMINAL_VERDICT_RELATIVE_PATH).is_file():
+                density_result = load_and_verify_density_result(
+                    self.root
+                    / DENSITY_OUTPUT_RELATIVE_PATH
+                    / DENSITY_RESULT_NAME,
+                    density_config,
+                )
+                load_and_verify_density_terminal_verdict(
+                    self.root, result=density_result
+                )
         return text
 
     def _checkpoint(
@@ -2688,6 +2717,10 @@ class V7FalsificationController:
         if self._economic_density_runtime is not None:
             heartbeat["economic_evolution_density_diversification"] = (
                 self._economic_density_runtime.snapshot()
+            )
+        if self._economic_density_terminal_runtime is not None:
+            heartbeat["economic_evolution_density_terminal"] = (
+                self._economic_density_terminal_runtime.snapshot()
             )
         return heartbeat
 
