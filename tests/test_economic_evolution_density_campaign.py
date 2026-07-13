@@ -76,6 +76,32 @@ def test_family_tripwire_reports_raw_counts_ratio_and_exact_p_value() -> None:
     assert result["thresholds_changed_after_outcome"] is False
 
 
+def test_family_tripwire_keeps_frozen_denominator_when_exact_replay_is_missing() -> None:
+    population = generate_density_diversification_population(
+        _seed(),
+        campaign_id="density-tripwire-missing-test",
+        excluded_source_sleeve_ids=(),
+        maximum_sources=6,
+        maximum_sources_per_market=2,
+        maximum_sources_per_market_session=1,
+        maximum_sources_per_market_mechanism=1,
+        policy_count=6,
+    )
+    runtimes = {
+        row.sleeve_id: _runtime(event_count=40, normal=100, stress=75)
+        for row in population.real_sleeves[:-1]
+    }
+    result = _family_tripwire(population, runtimes, _gate())
+
+    assert result["real_pass_count"] == 5
+    assert result["real_candidate_count"] == 6
+    assert result["real_exact_replay_missing_count"] == 1
+    assert result["null_candidate_count"] == 6
+    assert result["null_exact_replay_missing_count"] == 6
+    assert result["real_pass_rate"] == 5 / 6
+    assert result["null_pass_rate"] == 0.0
+
+
 def test_component_gate_requires_stressed_economics_and_concentration() -> None:
     gate = _gate()
     assert _component_pass(_runtime(event_count=30, normal=10, stress=5), gate)

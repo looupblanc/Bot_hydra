@@ -276,22 +276,22 @@ def _population(seed: Mapping[str, Any], prereg: Mapping[str, Any]):
 
 
 def _family_tripwire(population, runtimes, gate: Mapping[str, Any]) -> dict[str, Any]:
-    real = [
-        runtimes[row.sleeve_id]
-        for row in population.real_sleeves
-        if row.sleeve_id in runtimes
-    ]
-    null = [
-        runtimes[row.sleeve_id]
-        for row in population.matched_null_sleeves
-        if row.sleeve_id in runtimes
-    ]
-    real_pass = sum(_component_pass(row, gate) for row in real)
-    null_pass = sum(_component_pass(row, gate) for row in null)
-    real_rate = real_pass / max(len(real), 1)
-    null_rate = null_pass / max(len(null), 1)
+    real_ids = [row.sleeve_id for row in population.real_sleeves]
+    null_ids = [row.sleeve_id for row in population.matched_null_sleeves]
+    real_pass = sum(
+        sleeve_id in runtimes and _component_pass(runtimes[sleeve_id], gate)
+        for sleeve_id in real_ids
+    )
+    null_pass = sum(
+        sleeve_id in runtimes and _component_pass(runtimes[sleeve_id], gate)
+        for sleeve_id in null_ids
+    )
+    # A failed or missing exact replay is a failed candidate, never permission
+    # to shrink the preregistered denominator after observing outcomes.
+    real_rate = real_pass / max(len(real_ids), 1)
+    null_rate = null_pass / max(len(null_ids), 1)
     ratio = None if real_rate == 0.0 else null_rate / real_rate
-    p_value = _binomial_tail(real_pass, len(real), null_rate)
+    p_value = _binomial_tail(real_pass, len(real_ids), null_rate)
     maximum_ratio = float(gate["maximum_null_ratio"])
     family_green = bool(real_pass > 0 and ratio is not None and ratio < maximum_ratio)
     if family_green:
@@ -310,10 +310,14 @@ def _family_tripwire(population, runtimes, gate: Mapping[str, Any]) -> dict[str,
     return {
         "class_id": DENSITY_CLASS_ID,
         "real_pass_count": real_pass,
-        "real_candidate_count": len(real),
+        "real_candidate_count": len(real_ids),
+        "real_exact_replay_missing_count": len(real_ids)
+        - sum(sleeve_id in runtimes for sleeve_id in real_ids),
         "real_pass_rate": real_rate,
         "null_pass_count": null_pass,
-        "null_candidate_count": len(null),
+        "null_candidate_count": len(null_ids),
+        "null_exact_replay_missing_count": len(null_ids)
+        - sum(sleeve_id in runtimes for sleeve_id in null_ids),
         "null_pass_rate": null_rate,
         "NULL_RATIO": ratio,
         "maximum_NULL_RATIO": maximum_ratio,
