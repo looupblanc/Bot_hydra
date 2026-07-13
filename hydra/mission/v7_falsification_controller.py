@@ -33,9 +33,10 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v10"
+CONTROLLER_SCHEMA = "hydra_v7_2_pareto_crossfit_controller_v1"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
-CONTROLLER_CLAIM_TOKEN = "v7-falsification-single-writer"
+CONTROLLER_CLAIM_TOKEN = "v7-2-pareto-crossfit-single-writer"
+CONTROLLER_OWNER = "v7_2_pareto_crossfit_controller"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
 G1_RELATIVE_PATH = Path("reports/v7/phase1/g1_result.json")
 D1_TRIBUNAL_RELATIVE_PATH = Path(
@@ -197,6 +198,36 @@ V71_G9_FUNNEL_RELATIVE_PATH = Path(
 V71_G9_TRIPWIRE_RELATIVE_PATH = Path(
     "reports/v7_1/discovery_0009/v71_aggressor_run_topology_tripwire_result.json"
 )
+V72_POLICY_RELATIVE_PATH = Path(
+    "WORM/v7.2-pareto-crossfit-account-policy-0001-2026-07-13.json"
+)
+V72_SEMANTICS_RELATIVE_PATH = Path(
+    "reports/v7_2/semantics/v72_combine_semantics_audit_result.json"
+)
+V72_COMPONENT_BANK_WORM_RELATIVE_PATH = Path(
+    "WORM/v7.2-component-bank-0001-2026-07-13.json"
+)
+V72_COMPONENT_BANK_RELATIVE_PATH = Path(
+    "reports/v7_2/component_bank/v72_component_bank_result.json"
+)
+V72_SEARCH_WORM_RELATIVE_PATH = Path(
+    "WORM/v7.2-static-basket-search-0001-2026-07-13.json"
+)
+V72_SEARCH_FREEZE_RELATIVE_PATH = Path(
+    "reports/v7_2/crossfit_0001/v72_basket_search_freeze_result.json"
+)
+V72_CROSS_FIT_RELATIVE_PATH = Path(
+    "reports/v7_2/crossfit_0001/v72_static_basket_crossfit_result.json"
+)
+V72_FROZEN_HASHES = {
+    str(V72_POLICY_RELATIVE_PATH): "94f4ad89a2ae2ea347f1fce4a9cb4682690652429f34e42e72edf79e03da6677",
+    str(V72_SEMANTICS_RELATIVE_PATH): "08200f3009d9c0c474aa665575c0607b918097a172b7f68db1c7f7ed6ac58fbe",
+    str(V72_COMPONENT_BANK_WORM_RELATIVE_PATH): "36987e68a670345c890e9d7d2d060263a13f1e94928563f777dfdc572773ba4c",
+    str(V72_COMPONENT_BANK_RELATIVE_PATH): "93f02e4d41188d2def0d8532c9c74c1cfeb34ca700a3c56bc14ca12a8aaa3df8",
+    str(V72_SEARCH_WORM_RELATIVE_PATH): "9d0fccf04203d75a7d1f0648ed0ad619882f3dad06ed1f55da3f97878e8b1f98",
+    str(V72_SEARCH_FREEZE_RELATIVE_PATH): "44d989263581b57c8d5d10e959f82f6089f5b3c1781799cbd6348bf2fdabdb76",
+    str(V72_CROSS_FIT_RELATIVE_PATH): "26434b641cb2c908f384e35aa646a49e1f2fcd11b461cd11644ceec0d5840f8a",
+}
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
     str(V71_POLICY_RELATIVE_PATH): "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
@@ -257,6 +288,8 @@ class V7ControllerConfig:
 
 def classify_v7_action(project_root: str | Path) -> dict[str, Any]:
     root = Path(project_root).resolve()
+    if (root / V72_POLICY_RELATIVE_PATH).is_file():
+        return _classify_v72_action(root)
     if (root / V71_POLICY_RELATIVE_PATH).is_file():
         return _classify_v71_action(root)
     tribunal_path = root / D1_TRIBUNAL_RELATIVE_PATH
@@ -1426,6 +1459,160 @@ def _classify_v71_g9_action(
     }
 
 
+def _classify_v72_action(root: Path) -> dict[str, Any]:
+    prior = _classify_v71_action(root)
+    if prior.get("action_type") != (
+        "V71_G9_FORMULATIONS_FALSIFIED_TRIPWIRE_UNDERPOWERED"
+    ):
+        raise V7ControllerIntegrityError(
+            "V7.2 requires the terminal frozen V7.1 G9 decision"
+        )
+    sequence = (
+        (V72_POLICY_RELATIVE_PATH, "V72_POLICY_REQUIRED"),
+        (V72_SEMANTICS_RELATIVE_PATH, "V72_COMBINE_SEMANTICS_AUDIT_REQUIRED"),
+        (
+            V72_COMPONENT_BANK_WORM_RELATIVE_PATH,
+            "V72_COMPONENT_BANK_FREEZE_REQUIRED",
+        ),
+        (V72_COMPONENT_BANK_RELATIVE_PATH, "V72_COMPONENT_BANK_REQUIRED"),
+        (V72_SEARCH_WORM_RELATIVE_PATH, "V72_BASKET_SEARCH_FREEZE_REQUIRED"),
+        (V72_SEARCH_FREEZE_RELATIVE_PATH, "V72_BASKET_SEARCH_MANIFEST_REQUIRED"),
+        (V72_CROSS_FIT_RELATIVE_PATH, "V72_STATIC_BASKET_CROSS_FIT_REQUIRED"),
+    )
+    for path, action_type in sequence:
+        if not (root / path).is_file():
+            return {
+                **dict(prior),
+                "action_type": action_type,
+                "phase": "4",
+                "progressed": False,
+                "required_path": str(path),
+                "new_data_purchase_authorized": False,
+                "protected_holdout_access_authorized": False,
+                "reason": (
+                    "The leakage-safe V7.2 account-synthesis sequence is not "
+                    "complete; no later stage is authorized."
+                ),
+            }
+    drift = [
+        path
+        for path, expected in V72_FROZEN_HASHES.items()
+        if _sha256(root / path) != expected
+    ]
+    if drift:
+        raise V7ControllerIntegrityError(
+            "V7.2 frozen evidence drift: " + ",".join(drift)
+        )
+    semantics = _load_json(root / V72_SEMANTICS_RELATIVE_PATH)
+    component_bank = _load_json(root / V72_COMPONENT_BANK_RELATIVE_PATH)
+    search = _load_json(root / V72_SEARCH_FREEZE_RELATIVE_PATH)
+    cross_fit = _load_json(root / V72_CROSS_FIT_RELATIVE_PATH)
+    if (
+        semantics.get("verdict") != "GREEN"
+        or not bool(semantics.get("checks", {}).get("R1_no_official_time_limit"))
+        or bool(
+            semantics.get("v72_observation_layer", {}).get(
+                "profitable_survivor_is_terminal_failure"
+            )
+        )
+        or int(semantics.get("new_data_purchase_count") or 0) != 0
+        or int(semantics.get("protected_holdout_access_count_delta") or 0) != 0
+        or int(semantics.get("outbound_order_count") or 0) != 0
+    ):
+        raise V7ControllerIntegrityError("V7.2 Combine semantics audit drift")
+    if (
+        int(component_bank.get("source_walk_forward_positive_count") or 0)
+        != 24
+        or int(component_bank.get("unaccounted_candidate_count") or 0) != 0
+        or int(component_bank.get("primary_component_count") or 0) != 11
+        or int(component_bank.get("backup_component_count") or 0) != 4
+    ):
+        raise V7ControllerIntegrityError("V7.2 component-bank inventory drift")
+    if (
+        int(search.get("structure_count") or 0) != 1_009
+        or int(search.get("multiplicity", {}).get("raw_global_N_trials_after") or 0)
+        != 264_911
+    ):
+        raise V7ControllerIntegrityError("V7.2 basket-search freeze drift")
+    expected_status = {"BASKET_RESEARCH_FAILED": 12}
+    if (
+        cross_fit.get("verdict") != "NULL"
+        or int(cross_fit.get("structure_count") or 0) != 1_009
+        or int(cross_fit.get("cross_fit_rotation_count") or 0) != 4
+        or int(cross_fit.get("held_out_basket_evaluation_count") or 0) != 12
+        or int(cross_fit.get("cross_fit_survivor_count") or 0) != 0
+        or int(cross_fit.get("promotion_to_48_starts_count") or 0) != 0
+        or dict(cross_fit.get("status_counts") or {}) != expected_status
+        or int(cross_fit.get("risk_overlay_authorized_count") or 0) != 0
+        or int(cross_fit.get("new_data_purchase_count") or 0) != 0
+        or int(cross_fit.get("protected_holdout_access_count_delta") or 0) != 0
+        or int(cross_fit.get("outbound_order_count") or 0) != 0
+        or not bool(cross_fit.get("all_rotation_manifests_frozen_before_held_out_read"))
+        or not bool(cross_fit.get("design_and_unseen_metrics_separated"))
+    ):
+        raise V7ControllerIntegrityError("V7.2 static basket cross-fit drift")
+    held_out = list(cross_fit.get("selected_held_out_results") or [])
+    operational = list(cross_fit.get("operational_basket_results") or [])
+    unseen_pass_count = sum(
+        int(row["unseen_metrics"]["BASE"]["pass_count"]) for row in held_out
+    )
+    unseen_mll_breach_count = sum(
+        int(row["unseen_metrics"]["BASE"]["mll_breach_count"])
+        for row in held_out
+    )
+    unseen_normal_positive_count = sum(
+        float(row["unseen_metrics"]["BASE"]["net_pnl"]) > 0.0
+        for row in held_out
+    )
+    unseen_stress_positive_count = sum(
+        float(row["unseen_metrics"]["STRESS_1_5X"]["net_pnl"]) > 0.0
+        for row in held_out
+    )
+    dominated_count = sum(
+        bool(row["dominated_by_best_single_parent"]) for row in operational
+    )
+    return {
+        **dict(prior),
+        "action_type": "V72_STATIC_BASKET_CROSS_FIT_NULL_DISTINCT_MECHANISM_PIVOT",
+        "phase": "4",
+        "progressed": True,
+        "v72_component_bank_primary_count": 11,
+        "v72_component_bank_backup_count": 4,
+        "v72_economic_cluster_count": 11,
+        "v72_static_structure_count": 1_009,
+        "v72_design_episode_count": int(cross_fit["design_episode_count"]),
+        "v72_cross_fit_rotation_count": 4,
+        "v72_held_out_basket_evaluation_count": 12,
+        "v72_held_out_pass_count": unseen_pass_count,
+        "v72_held_out_mll_breach_count": unseen_mll_breach_count,
+        "v72_held_out_normal_positive_count": unseen_normal_positive_count,
+        "v72_held_out_stress_positive_count": unseen_stress_positive_count,
+        "v72_parent_dominated_count": dominated_count,
+        "v72_cross_fit_survivor_count": 0,
+        "v72_risk_overlay_executed_count": 0,
+        "v72_promotion_to_48_starts_count": 0,
+        "v72_scientific_status": "NULL_LEAKAGE_SAFE_CROSS_FIT",
+        "raw_global_N_trials": 264_911,
+        "new_data_purchase_authorized": False,
+        "protected_holdout_access_authorized": False,
+        "shadow_admission_authorized": False,
+        "next_experiment_id": "hydra_v7_2_distinct_mechanism_hypothesis_review_0002",
+        "next_experiment_state": "WORM_PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+        "principal_blocker": (
+            "The 12 design-selected baskets produced only one unseen-block pass, "
+            "seven unseen MLL breaches, no repeated operational signature across "
+            "two rotations, and nine were dominated by a single parent."
+        ),
+        "reason": (
+            "V7.2 completed four leakage-safe leave-one-block-out rotations over "
+            "1,009 preregistered static baskets. No exact basket transferred on "
+            "two independent blocks, so overlays and 48-start confirmation are "
+            "correctly forbidden. Components are retained for future distinct "
+            "mechanisms; no data, Q4, shadow or order action is authorized."
+        ),
+    }
+
+
 class V7FalsificationController:
     def __init__(self, config: V7ControllerConfig) -> None:
         if not config.no_live_trading:
@@ -1539,7 +1726,7 @@ class V7FalsificationController:
             "WHERE experiment_id=?",
             (
                 CONTROLLER_CLAIM_TOKEN,
-                "v7_falsification_controller",
+                CONTROLLER_OWNER,
                 lease_expires_at,
                 EXPERIMENT_ID,
             ),
@@ -1746,7 +1933,7 @@ class V7FalsificationController:
             "experiment_id": EXPERIMENT_ID,
             "experiment_type": "v7_falsification_perpetual",
             "status": "RUNNING",
-            "claimed_by": "v7_falsification_controller",
+            "claimed_by": CONTROLLER_OWNER,
             "lease_expires_at": lease_expires_at,
         }
 

@@ -13,6 +13,7 @@ from hydra.mission.mission_state import (
 )
 from hydra.mission.watchdog import heartbeat_status, scheduler_health
 from hydra.mission.v7_falsification_controller import (
+    CONTROLLER_SCHEMA,
     V7ControllerConfig,
     V7ControllerIntegrityError,
     V7FalsificationController,
@@ -244,6 +245,28 @@ def test_v71_power_aware_integrated_action_reports_g9_falsification() -> None:
     assert result["shadow_admission_authorized"] is False
 
 
+def test_v72_integrated_action_records_leakage_safe_crossfit_null() -> None:
+    result = classify_v7_action(Path.cwd())
+
+    assert CONTROLLER_SCHEMA == "hydra_v7_2_pareto_crossfit_controller_v1"
+    assert result["action_type"] == (
+        "V72_STATIC_BASKET_CROSS_FIT_NULL_DISTINCT_MECHANISM_PIVOT"
+    )
+    assert result["v72_static_structure_count"] == 1009
+    assert result["v72_design_episode_count"] == 24216
+    assert result["v72_cross_fit_rotation_count"] == 4
+    assert result["v72_held_out_basket_evaluation_count"] == 12
+    assert result["v72_held_out_pass_count"] == 1
+    assert result["v72_held_out_mll_breach_count"] == 7
+    assert result["v72_parent_dominated_count"] == 9
+    assert result["v72_cross_fit_survivor_count"] == 0
+    assert result["v72_risk_overlay_executed_count"] == 0
+    assert result["v72_promotion_to_48_starts_count"] == 0
+    assert result["new_data_purchase_authorized"] is False
+    assert result["protected_holdout_access_authorized"] is False
+    assert result["shadow_admission_authorized"] is False
+
+
 def test_controller_rejects_live_trading() -> None:
     with pytest.raises(V7ControllerIntegrityError):
         V7FalsificationController(V7ControllerConfig(no_live_trading=False))
@@ -342,7 +365,9 @@ def test_running_v7_controller_renews_watchdog_lease(
         heartbeat_status(controller.paths), snapshot, counts
     )
     assert health["classification"] == "HEALTHY_AND_PROGRESSING"
-    assert snapshot["current_experiment"]["claimed_by"] == "v7_falsification_controller"
+    assert snapshot["current_experiment"]["claimed_by"] == (
+        "v7_2_pareto_crossfit_controller"
+    )
     assert snapshot["broker_order_capability"] is False
     heartbeat = heartbeat_status(controller.paths).payload
     assert heartbeat["remaining_databento_budget_usd"] == 125.0
