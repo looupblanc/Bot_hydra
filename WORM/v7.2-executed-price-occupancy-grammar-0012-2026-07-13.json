@@ -1,0 +1,239 @@
+{
+  "schema": "hydra_v7_2_executed_price_occupancy_grammar_v1",
+  "grammar_id": "hydra_v7_2_executed_price_occupancy_grammar_0012",
+  "campaign_id": "hydra_v7_2_distinct_mechanism_hypothesis_review_0012",
+  "allocation_role": "DISTINCT_PRINT_PRICE_TOPOLOGY_AFTER_G11_GEOMETRY_ONLY",
+  "broad_D1_batch": false,
+  "economic_hypothesis": "The topology of executed ES volume across exact tick prices reveals realized auction congestion and release: traders defending a repeatedly occupied price or chasing the wrong side of a two-mode auction pay when the executed-price mode migrates, escapes, or is recaptured.",
+  "who_pays": "Late aggressive traders who extrapolate a rejected departure, and inventory holders anchored to a heavily occupied executed-price level that subsequently loses control of the auction.",
+  "persistence_rationale": "The class measures where exchange executions actually concentrate and revisit in tick-price space. It does not infer displayed depth, passive queue size, iceberg orders or cancellations; it is distinct from arrival timing, clip-size composition, aggressor-sign runs, event-clock completion and delayed impact relaxation.",
+  "source": {
+    "dataset": "GLBX.MDP3",
+    "schema": "trades",
+    "product": "ES",
+    "tick_size": 0.25,
+    "data_role": "DEVELOPMENT_ONLY",
+    "sources": [
+      {
+        "calendar_year": 2023,
+        "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2023-08-02_2023-09-01.dbn.zst",
+        "sha256": "d93e5c8bd657a28bff5f05560b845caa3bb04e9252882ddc2751033fedd1c468",
+        "start_ns_inclusive": 1690934400000000000,
+        "end_ns_exclusive": 1693526400000000000,
+        "instrument_id": 3445,
+        "contract": "ESU3"
+      },
+      {
+        "calendar_year": 2024,
+        "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+        "sha256": "a312d6df524205c2d1632c20f1033ecb74081c98d6608eacc1a9cdb08bcf9b63",
+        "start_ns_inclusive": 1722556800000000000,
+        "end_ns_exclusive": 1725148800000000000,
+        "instrument_id": 118,
+        "contract": "ESU4"
+      }
+    ],
+    "definitions_path": "data/cache/contract_maps/definitions_GLBX-MDP3_2023-01-01_2024-10-01_1faa319bb6354a47.dbn.zst",
+    "definitions_sha256": "a5374a723fdf442f8c5e31f98af26ff813070a61008d24e46f848df69c819dcc",
+    "rth_timezone": "America/Chicago",
+    "rth_start_inclusive": "08:30:00",
+    "rth_end_exclusive": "15:10:00",
+    "completed_minutes_only": true,
+    "raw_record_order": "exchange event timestamp then stable source order after filtering one explicit ES contract",
+    "derived_store_path": "data/cache/v7_d1/date_matched_executed_price_occupancy_v1.parquet",
+    "derived_manifest_path": "data/manifests/v7_d1_executed_price_occupancy_v1.json",
+    "transformation_version": "hydra_v7_d1_executed_price_occupancy_v1",
+    "new_data_purchase": false,
+    "protected_holdout_access": false
+  },
+  "feature_policy": {
+    "price_tick": "round each decoded ES trade price to integer quarter-point ticks before aggregation",
+    "level_volume": "sum executed trade size at each integer tick inside a completed minute",
+    "mode_tick": "level with maximum volume; ties choose the level nearest volume-weighted mean tick, then the lower tick",
+    "second_mode_tick": "highest-volume distinct level under the same deterministic tie break",
+    "mode_volume_share": "executed volume at mode_tick divided by completed-minute total volume",
+    "top_two_volume_share": "combined executed volume at the two highest-volume distinct levels divided by total volume",
+    "second_to_first_mode_ratio": "second-mode volume divided by mode volume; zero when fewer than two levels exist",
+    "occupancy_entropy": "Shannon entropy of volume shares by tick divided by log(unique_tick_count); zero for one level",
+    "unique_tick_count": "number of distinct executed quarter-point ticks",
+    "revisit_count": "number of transitions into a tick seen earlier in the same minute after at least one intervening different tick",
+    "revisit_ratio": "revisit_count divided by the number of adjacent tick transitions, with zero denominator mapped to zero",
+    "signed_flow_fraction": "buy aggressor size minus sell aggressor size divided by total trade size",
+    "mode_signed_flow_fraction": "buy minus sell aggressor size executed at mode_tick divided by volume at mode_tick",
+    "last_minus_mode_ticks": "last executed tick minus mode_tick",
+    "maximum_excursion_from_mode_ticks": "largest absolute ordered-trade excursion from mode_tick",
+    "maximum_excursion_direction": "sign of the first ordered trade attaining maximum absolute excursion from mode_tick",
+    "mode_migration_ticks": "current mode_tick minus the immediately prior contiguous completed-minute mode_tick in the same session and contract",
+    "availability": "minute_start_ns plus 60 seconds",
+    "outcomes_or_future_prices_used": false,
+    "displayed_book_or_queue_claimed": false,
+    "thresholds_learned_from_outcomes": false
+  },
+  "past_only_state_policy": {
+    "history_windows_completed_minutes_same_session": [20, 60],
+    "minimum_history_equals_window": true,
+    "current_minute_excluded_from_history": true,
+    "low_quantile": 0.2,
+    "high_quantile": 0.8,
+    "median_quantile": 0.5,
+    "concentrated_occupancy": "occupancy_entropy below its past 20th percentile AND mode_volume_share above its past 80th percentile",
+    "high_revisit": "revisit_ratio above its past 80th percentile",
+    "directional_flow": "absolute signed_flow_fraction above its past median and nonzero",
+    "material_mode_departure": "absolute last_minus_mode_ticks above its past 80th percentile and nonzero",
+    "large_mode_excursion": "maximum_excursion_from_mode_ticks above its past 80th percentile",
+    "mode_recaptured": "absolute last_minus_mode_ticks at or below its past 20th percentile",
+    "material_mode_migration": "absolute mode_migration_ticks above its past 80th percentile and nonzero",
+    "bimodal_occupancy": "top_two_volume_share above its past 80th percentile AND second_to_first_mode_ratio above its past median AND absolute second_mode_tick minus mode_tick above its past 80th percentile"
+  },
+  "mechanism_class": "V72_EXECUTED_PRICE_OCCUPANCY_TOPOLOGY",
+  "motifs": [
+    {
+      "motif": "CONCENTRATED_MODE_ESCAPE",
+      "response_policy": "CONTINUATION",
+      "definition": "concentrated_occupancy AND material_mode_departure; direction is sign(last_minus_mode_ticks)"
+    },
+    {
+      "motif": "CONCENTRATED_MODE_RECAPTURE",
+      "response_policy": "REVERSAL",
+      "definition": "concentrated_occupancy AND large_mode_excursion AND mode_recaptured AND nonzero maximum_excursion_direction; direction is opposite maximum_excursion_direction"
+    },
+    {
+      "motif": "REVISIT_PRESSURE_BREAK",
+      "response_policy": "CONTINUATION",
+      "definition": "high_revisit AND directional_flow AND material_mode_departure AND sign(last_minus_mode_ticks) equals sign(signed_flow_fraction); direction is sign(signed_flow_fraction)"
+    },
+    {
+      "motif": "REVISIT_PRESSURE_FAILURE",
+      "response_policy": "REVERSAL",
+      "definition": "high_revisit AND directional_flow AND sign(last_minus_mode_ticks) differs from sign(signed_flow_fraction), including mode recapture; direction is opposite sign(signed_flow_fraction)"
+    },
+    {
+      "motif": "MODE_MIGRATION_PERSISTENCE",
+      "response_policy": "CONTINUATION",
+      "definition": "material_mode_migration AND directional_flow AND sign(mode_migration_ticks) equals sign(signed_flow_fraction) AND mode_volume_share above its past median; direction is sign(mode_migration_ticks)"
+    },
+    {
+      "motif": "BIMODAL_AUCTION_RESOLUTION",
+      "response_policy": "CONTINUATION",
+      "definition": "bimodal_occupancy AND last executed tick lies strictly beyond the midpoint of mode_tick and second_mode_tick; direction is sign(last_tick minus that midpoint)"
+    }
+  ],
+  "history_windows": [20, 60],
+  "holding_minutes": [30, 60],
+  "candidate_ids": [
+    "v72g12_price_occupancy_concentrated_mode_escape_continuation_w20_h30",
+    "v72g12_price_occupancy_concentrated_mode_escape_continuation_w20_h60",
+    "v72g12_price_occupancy_concentrated_mode_escape_continuation_w60_h30",
+    "v72g12_price_occupancy_concentrated_mode_escape_continuation_w60_h60",
+    "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w20_h30",
+    "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w20_h60",
+    "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w60_h30",
+    "v72g12_price_occupancy_concentrated_mode_recapture_reversal_w60_h60",
+    "v72g12_price_occupancy_revisit_pressure_break_continuation_w20_h30",
+    "v72g12_price_occupancy_revisit_pressure_break_continuation_w20_h60",
+    "v72g12_price_occupancy_revisit_pressure_break_continuation_w60_h30",
+    "v72g12_price_occupancy_revisit_pressure_break_continuation_w60_h60",
+    "v72g12_price_occupancy_revisit_pressure_failure_reversal_w20_h30",
+    "v72g12_price_occupancy_revisit_pressure_failure_reversal_w20_h60",
+    "v72g12_price_occupancy_revisit_pressure_failure_reversal_w60_h30",
+    "v72g12_price_occupancy_revisit_pressure_failure_reversal_w60_h60",
+    "v72g12_price_occupancy_mode_migration_persistence_continuation_w20_h30",
+    "v72g12_price_occupancy_mode_migration_persistence_continuation_w20_h60",
+    "v72g12_price_occupancy_mode_migration_persistence_continuation_w60_h30",
+    "v72g12_price_occupancy_mode_migration_persistence_continuation_w60_h60",
+    "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w20_h30",
+    "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w20_h60",
+    "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w60_h30",
+    "v72g12_price_occupancy_bimodal_auction_resolution_continuation_w60_h60"
+  ],
+  "candidate_count": 24,
+  "bounded_parameter_alternatives_per_structure": 4,
+  "signal_policy": {
+    "decision_timestamp": "availability of the completed source minute",
+    "entry": "first explicit-contract one-minute open at or after decision timestamp",
+    "exit": "explicit-contract one-minute open exactly frozen holding_minutes after entry",
+    "overlapping_signals_per_candidate": false,
+    "session_crossing": false,
+    "contract_crossing": false,
+    "position_size": 1,
+    "online_learning": false
+  },
+  "power_plan": {
+    "source_completed_minute_count": 17200,
+    "source_session_count": 43,
+    "expected_motif_prevalence_range": [0.005, 0.15],
+    "minimum_nonoverlapping_events_stage1": 40,
+    "underpowered_action": "INSUFFICIENT_POWER_NOT_NULL",
+    "candidate_specific_power_required_after_positive_walk_forward": true
+  },
+  "cost_policy": {
+    "path": "config/v7/phase0_g0_preregistration.json",
+    "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "stage1": "STRESS_1_5X",
+    "primary_walk_forward_stress": "STRESS_1_5X",
+    "SIM_EXPLOIT_stress": "STRESS_2X"
+  },
+  "funnel": {
+    "validation_policy_path": "WORM/v7.1-hierarchical-validation-policy-2026-07-12.json",
+    "validation_policy_sha256": "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
+    "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+    "candidate_specific_power_policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673",
+    "stage0": "validity_availability_explicit_contract_novelty_nonoverlap_and_minimum_intended_sample",
+    "stage1": "unchanged_frozen_cheap_economic_screen_under_STRESS_1_5X",
+    "stage2": "four_fold_walk_forward_with_horizon_purge_five_day_embargo_and_STRESS_1_5X_costs",
+    "stage3": "occupancy_state_time_shift_direction_inversion_and_within_session_block_nulls_only_for_positive_walk_forward",
+    "stage4": "campaign_stratified_DSR_and_BH_FDR_10_percent_only_if_candidate_specific_power_is_sufficient",
+    "stage5": "rolling_Combine_is_downstream_diagnostic_and_never_search_fitness"
+  },
+  "multiplicity": {
+    "raw_global_N_trials_before": 265227,
+    "structural_candidate_trials_reserved": 24,
+    "tripwire_candidate_world_trials_reserved": 96,
+    "raw_global_N_trials_after_preregistered_reservation": 265347,
+    "campaign_inflation_factor": 1.5,
+    "campaign_effective_N_trials_after_preregistered_reservation": 180.0,
+    "candidate_power_diagnostics_reserved_separately_before_any_power_result": true,
+    "BH_FDR": 0.1,
+    "retroactive_rejudgment": false
+  },
+  "mandatory_grammar_tripwire": {
+    "policy_path": "WORM/v7.2-executed-price-occupancy-tripwire-0012-2026-07-13.json",
+    "worlds": [
+      "DAILY_BLOCK_SHUFFLE",
+      "VOLATILITY_MATCHED_RANDOM_WALK",
+      "YEAR_BLOCK_PERMUTATION"
+    ],
+    "NULL_RATIO_artefact_threshold_inclusive": 0.8,
+    "raw_counts_and_exact_binomial_test_required": true,
+    "combine_pass_rate_is_fitness": false
+  },
+  "cemetery_firewall": {
+    "feedback_scope": "mechanism_class_x_regime_x_death_cause_only",
+    "parameter_feedback_used": false,
+    "candidate_outcome_feedback_used": false,
+    "graveyard_signature_count_at_freeze": 93,
+    "excluded_classes": [
+      "ARB_INTRA_PRODUIT",
+      "PRINT_ABSORPTION_EXHAUSTION_REVERSAL",
+      "V71_EVENT_TIME_CLOCK_STATES",
+      "V71_CROSS_CLOCK_FLOW_CONFIRMATION",
+      "V71_CROSS_CLOCK_SPEED_LEADERSHIP",
+      "V71_TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "V71_AGGRESSOR_FLOW_SIGN_SEQUENCES",
+      "V71_INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+      "V71_INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY",
+      "V72_DELAYED_FLOW_IMPACT_RELAXATION",
+      "V72_INTRAMINUTE_TRADE_ARRIVAL_RENEWAL"
+    ],
+    "novelty_basis": "exact executed tick occupancy, price-level revisitation and mode migration; no claim about displayed or passive book liquidity"
+  },
+  "development_data_previously_accessed": true,
+  "this_grammar_signal_or_pnl_results_seen_before_freeze": false,
+  "candidate_status_inheritance": false,
+  "shadow_admission_authorized": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "Executed-price occupancy may only re-express realized volatility, range and current-minute direction; the two short calendar blocks may also make repeated-level states unstable. The frozen price-path tripwire, walk-forward, cost stress and candidate-specific power gate remain mandatory."
+}
