@@ -1,0 +1,69 @@
+{
+  "CONTRE": "A green software regression proves deterministic enforcement and safe integration, not an economic edge; G11 itself remains irreversibly classified GEOMETRY_ONLY.",
+  "baseline_commit": "21da2ca8c6e7e1c957eed4e4191d39b1e0f3537c",
+  "budget": {
+    "actual_spend_usd": 87.84738838672598,
+    "hard_cap_usd": 125.0,
+    "new_purchase_count_G11": 0,
+    "remaining_usd": 37.15261161327402
+  },
+  "compileall": "ok",
+  "controller_version": "hydra_v7_2_arrival_renewal_controller_v3",
+  "database_integrity": {
+    "graveyard": "ok",
+    "mission": "ok",
+    "mission_registry_copy": "ok",
+    "registry": "ok"
+  },
+  "deterministic_reference_replay": {
+    "funnel_sha256": "c1de25fbbd7ca35a96a54c661da686c64cfc2b2b4f46491640e68a7d3a88fff6",
+    "status": "identical",
+    "tripwire_sha256": "80a4c4a90fbdc4d12d5ba7694683ace5e0df3902b9f529383c8f3a0c2df6ae34"
+  },
+  "diff_validation": [
+    "hydra/validation/v72_trade_arrival_renewal_funnel.py",
+    "hydra/validation/v72_trade_arrival_renewal_tripwire.py",
+    "tests/test_v72_trade_arrival_renewal_funnel.py",
+    "tests/test_v72_trade_arrival_renewal_tripwire.py"
+  ],
+  "forbidden_committed_artifacts": 0,
+  "full_pytest": {
+    "duration_seconds": 897.25,
+    "failed": 0,
+    "passed": 780
+  },
+  "governance": {
+    "doctor_source_of_truth": "/root/hydra-bot",
+    "passed": true,
+    "protected_manifest_hash": "4d1a20ba78cfbc845e8cc6908ed0ec64d94b2b92bf2ae30dc47cd7870bcde182",
+    "semantic_hash": "05810bc193e51e3c40722163a1ee3ae82fd3a8d7762c48eafa25c3a4cba1102b",
+    "yaml_sha256": "3c9fd63f43037c65d79ecd688ce76bc126c42cc6eeaceb6bed8636548ffaff57"
+  },
+  "proof_registry": {
+    "burned_windows": [
+      "Q4_2024"
+    ],
+    "entry_count": 42,
+    "integrity": "ok",
+    "raw_global_N_trials": 265227
+  },
+  "q4": {
+    "access_count": 1,
+    "audit_status": "COMMITTED",
+    "new_access_G11": 0,
+    "transaction_count": 1
+  },
+  "ruleset_no_lookahead_q4_budget_pytest": {
+    "failed": 0,
+    "passed": 55
+  },
+  "schema": "hydra_v7_2_g11_integrated_regression_evidence_v1",
+  "secret_scan": "no_secret_pattern_found",
+  "service_restart_performed": false,
+  "status": "GREEN_FOR_INTEGRATION_NOT_YET_DEPLOYED",
+  "targeted_G11_and_controller_pytest": {
+    "failed": 0,
+    "passed": 16
+  },
+  "worktree_head": "090a91a"
+}
