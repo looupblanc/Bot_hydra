@@ -1,0 +1,20 @@
+{
+  "CONTRE": "Conservative reservation counts work that may be stopped early; this reduces power but prevents unlogged optional stopping.",
+  "burned_windows": [
+    "Q4_2024"
+  ],
+  "cumulative_N_trials": 266954,
+  "delta_trials": 1607,
+  "entry_hash": "03ea14b94129cb11f2b137d0f7121d5d3422962fd71b73c875df51e2d87c1378",
+  "event_id": "v7_boosted_dual_track_tournament_0001_multiplicity_reservation",
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "preregistration_commit": "6d45256bd37afe666907f36e7fc28e493be7dc39",
+  "previous_N_trials": 265347,
+  "prochaine_action": "build_outcome_free_boosted_feature_and_signal_manifests",
+  "q4_access_count_delta": 0,
+  "schema": "hydra_v7_boosted_multiplicity_reservation_v1",
+  "status": "RESERVED_BEFORE_ANY_BOOSTED_RESULT",
+  "worm_path": "WORM/v7-boosted-dual-track-tournament-0001-2026-07-13.json",
+  "worm_sha256": "fb99e1304b59a50a7a38a1915d64cdace4dfa4c4b8e55b0ec22ec62a24e15969"
+}
