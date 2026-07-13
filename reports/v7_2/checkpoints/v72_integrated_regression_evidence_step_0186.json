@@ -1,0 +1,64 @@
+{
+  "schema": "hydra_v7_2_integrated_regression_evidence_v1",
+  "recorded_at_utc": "2026-07-13T06:42:16Z",
+  "baseline_commit": "f9ef79028b3961206b27f945ee264d3213899164",
+  "source_head": "b2cb38298eac99e4c94207fbc0bb706afe891920",
+  "controller_version": "hydra_v7_2_pareto_crossfit_controller_v1",
+  "g9_terminal_classification": "G9_FORMULATION_FALSIFIED",
+  "component_bank": {
+    "walk_forward_positive_inventory": 24,
+    "unaccounted_candidates": 0,
+    "primary_components": 11,
+    "backups": 4,
+    "behavioral_clusters": 11
+  },
+  "static_cross_fit": {
+    "structure_count": 1009,
+    "design_episode_count": 24216,
+    "rotation_count": 4,
+    "held_out_basket_evaluation_count": 12,
+    "held_out_pass_count": 1,
+    "held_out_mll_breach_count": 7,
+    "held_out_normal_positive_count": 5,
+    "held_out_stress_1_5x_positive_count": 4,
+    "held_out_normal_net_usd": 1532.05000000383,
+    "held_out_stress_1_5x_net_usd": -3508.7499999962165,
+    "parent_dominated_count": 9,
+    "cross_fit_survivor_count": 0,
+    "risk_overlay_count": 0,
+    "promotion_to_48_starts_count": 0,
+    "verdict": "NULL_LEAKAGE_SAFE_CROSS_FIT",
+    "result_path": "reports/v7_2/crossfit_0001/v72_static_basket_crossfit_result.json",
+    "result_sha256": "26434b641cb2c908f384e35aa646a49e1f2fcd11b461cd11644ceec0d5840f8a",
+    "deterministic_rerun": true
+  },
+  "integrity": {
+    "full_pytest": "762/762",
+    "focused_no_lookahead_ruleset_q4_budget": "55/55",
+    "compileall": "ok",
+    "mission_db": "ok",
+    "registry_db": "ok",
+    "governance_semantic_hash": "05810bc193e51e3c40722163a1ee3ae82fd3a8d7762c48eafa25c3a4cba1102b",
+    "governance_yaml_sha256": "3c9fd63f43037c65d79ecd688ce76bc126c42cc6eeaceb6bed8636548ffaff57",
+    "q4_access_count": 1,
+    "q4_status": "COMMITTED_BURNED_NO_REUSE",
+    "proof_registry_entry_count": 36,
+    "registry_n_trials": 264911,
+    "proof_chain_head": "371d0d04d3eca63c4ff68c473aaa3e6eae604c8bd5121221321014382015d749",
+    "secret_scan_hits": 0,
+    "broker_orders": 0
+  },
+  "budget": {
+    "new_data_purchase_count": 0,
+    "cumulative_spend_usd": 87.84738838672598,
+    "remaining_usd": 37.15261161327402
+  },
+  "service_before_deployment": {
+    "active": true,
+    "pid": 475687,
+    "restart_count": 0,
+    "controller_version": "hydra_v7_1_falsification_controller_v10"
+  },
+  "next_action": "MERGE_PUSH_AND_RESTART_SAME_SERVICE_WITH_V72_CONTROLLER",
+  "CONTRE": "The four held-out blocks contain only ten sessions each. The null is decisive for the exact frozen basket-selection procedure, but it does not prove that every future distinct mechanism or longer untouched block is null."
+}
