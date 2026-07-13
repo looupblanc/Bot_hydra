@@ -12,6 +12,7 @@ from typing import Any, Mapping
 
 from hydra.economic_evolution.schema import stable_hash
 from hydra.governance.proof_registry import (
+    MULTIPLICITY_EVENT,
     burned_window_ids,
     load_and_verify,
     multiplicity_trial_count,
@@ -77,10 +78,12 @@ class EconomicEvolutionFailureReviewRuntime:
     def advance(self, predecessor: Mapping[str, Any]) -> dict[str, Any]:
         config = verify_failure_review_freeze(self.root)
         self._verify_predecessor(predecessor, config)
-        self._verify_static_protections()
         if self.result_path.is_file():
             result = load_and_verify_failure_review_result(self.result_path, config)
+            self._verify_static_protections(review_complete=True)
             return failure_review_action_from_result(predecessor, result)
+
+        self._verify_static_protections(review_complete=False)
 
         if self._process is not None:
             return_code = self._process.poll()
@@ -162,13 +165,29 @@ class EconomicEvolutionFailureReviewRuntime:
                 "failure-review predecessor is not the frozen 0005 underpowered path"
             )
 
-    def _verify_static_protections(self) -> None:
+    def _verify_static_protections(self, *, review_complete: bool = False) -> None:
         registry = load_and_verify(self.state_dir / "proof_registry.json")
         if burned_window_ids(registry) != ("Q4_2024",):
             raise EconomicEvolutionRuntimeError("unexpected proof-window state")
-        if multiplicity_trial_count(registry) != EXPECTED_N_TRIALS:
+        current_trials = multiplicity_trial_count(registry)
+        if not review_complete and current_trials != EXPECTED_N_TRIALS:
             raise EconomicEvolutionRuntimeError(
                 "failure-review multiplicity changed despite zero comparisons"
+            )
+        if review_complete and current_trials < EXPECTED_N_TRIALS:
+            raise EconomicEvolutionRuntimeError(
+                "failure-review multiplicity predecessor regressed"
+            )
+        review_reservations = [
+            row
+            for row in registry["entries"]
+            if row.get("event_type") == MULTIPLICITY_EVENT
+            and REVIEW_ID in str(row.get("event_id") or "")
+            and int(row.get("multiplicity", {}).get("delta_trials", 0)) != 0
+        ]
+        if review_reservations:
+            raise EconomicEvolutionRuntimeError(
+                "failure-review unexpectedly reserved multiplicity"
             )
 
     def _start_worker(self) -> None:

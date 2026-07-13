@@ -6,11 +6,13 @@ from pathlib import Path
 
 import pytest
 
+import hydra.mission.economic_evolution_failure_runtime as failure_runtime_module
 from hydra.economic_evolution.schema import stable_hash
 from hydra.governance.proof_registry import (
     GENESIS_HASH,
     MULTIPLICITY_EVENT,
     PROOF_WINDOW_EVENT,
+    append_entry,
     canonical_hash,
 )
 from hydra.mission.economic_evolution_failure_runtime import (
@@ -169,6 +171,97 @@ def test_failure_review_rejects_multiplicity_drift(tmp_path: Path) -> None:
 
     with pytest.raises(EconomicEvolutionRuntimeError, match="multiplicity"):
         runtime._verify_static_protections()
+
+
+def test_completed_failure_review_allows_later_campaign_reservation(
+    tmp_path: Path,
+) -> None:
+    proof = tmp_path / "mission/state/proof_registry.json"
+    _proof_registry(proof)
+    append_entry(
+        proof,
+        {
+            "event_id": "downstream_density_campaign_reservation",
+            "event_type": MULTIPLICITY_EVENT,
+            "recorded_at_utc": "2026-07-13T00:00:02+00:00",
+            "status": "RESERVED_AFTER_FAILURE_REVIEW",
+            "multiplicity": {
+                "previous_N_trials": EXPECTED_N_TRIALS,
+                "delta_trials": 1_875,
+                "cumulative_N_trials": EXPECTED_N_TRIALS + 1_875,
+            },
+        },
+    )
+    runtime = EconomicEvolutionFailureReviewRuntime(tmp_path, proof.parent)
+
+    runtime._verify_static_protections(review_complete=True)
+    with pytest.raises(EconomicEvolutionRuntimeError, match="multiplicity"):
+        runtime._verify_static_protections(review_complete=False)
+
+
+def test_completed_failure_review_rejects_its_own_late_reservation(
+    tmp_path: Path,
+) -> None:
+    proof = tmp_path / "mission/state/proof_registry.json"
+    _proof_registry(proof)
+    append_entry(
+        proof,
+        {
+            "event_id": f"{REVIEW_ID}_unexpected_reservation",
+            "event_type": MULTIPLICITY_EVENT,
+            "recorded_at_utc": "2026-07-13T00:00:02+00:00",
+            "status": "INVALID",
+            "multiplicity": {
+                "previous_N_trials": EXPECTED_N_TRIALS,
+                "delta_trials": 1,
+                "cumulative_N_trials": EXPECTED_N_TRIALS + 1,
+            },
+        },
+    )
+    runtime = EconomicEvolutionFailureReviewRuntime(tmp_path, proof.parent)
+
+    with pytest.raises(EconomicEvolutionRuntimeError, match="unexpectedly reserved"):
+        runtime._verify_static_protections(review_complete=True)
+
+
+def test_completed_review_advance_accepts_downstream_multiplicity_on_restart(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    state = tmp_path / "mission/state"
+    proof = state / "proof_registry.json"
+    _proof_registry(proof)
+    append_entry(
+        proof,
+        {
+            "event_id": "downstream_density_campaign_reservation",
+            "event_type": MULTIPLICITY_EVENT,
+            "recorded_at_utc": "2026-07-13T00:00:02+00:00",
+            "status": "RESERVED_AFTER_FAILURE_REVIEW",
+            "multiplicity": {
+                "previous_N_trials": EXPECTED_N_TRIALS,
+                "delta_trials": 1_875,
+                "cumulative_N_trials": EXPECTED_N_TRIALS + 1_875,
+            },
+        },
+    )
+    runtime = EconomicEvolutionFailureReviewRuntime(tmp_path, state)
+    runtime.result_path.parent.mkdir(parents=True)
+    runtime.result_path.write_text("{}", encoding="utf-8")
+    monkeypatch.setattr(
+        failure_runtime_module,
+        "verify_failure_review_freeze",
+        lambda _root: _config(),
+    )
+    monkeypatch.setattr(
+        failure_runtime_module,
+        "load_and_verify_failure_review_result",
+        lambda _path, _config_value: _result(),
+    )
+
+    action = runtime.advance(_predecessor())
+
+    assert action["action_type"] == "ECONOMIC_EVOLUTION_FAILURE_REVIEW_0006_COMPLETE"
+    assert action["economic_failure_review_multiplicity_delta"] == 0
 
 
 def test_failure_review_requires_exact_underpowered_predecessor(tmp_path: Path) -> None:
