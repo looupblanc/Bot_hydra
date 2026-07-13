@@ -1,0 +1,120 @@
+{
+  "schema": "hydra_v7_1_limited_trade_size_composition_grammar_v1",
+  "grammar_id": "hydra_v7_1_trade_size_composition_grammar_0006",
+  "allocation_role": "LIMITED_STRUCTURAL_DISCOVERY_5_PERCENT",
+  "broad_D1_batch": false,
+  "economic_hypothesis": "A past-only change in the average size and count composition of ES aggressive prints can distinguish concentrated urgent inventory transfer from distributed participation; liquidity suppliers or late aggressive followers can pay delayed continuation, while large aggressive effort that fails to move price can pay an absorption reversal.",
+  "who_pays": "Liquidity suppliers who adjust inventory after a change in aggressive clip composition, late followers who extrapolate an absorbed large-print impulse, and participants whose execution schedule persists beyond the completed signal minute.",
+  "persistence_rationale": "The state compares the completed minute with medians from the immediately preceding completed RTH session of the same explicit contract. It uses trade-size composition inside one clock and does not reuse cross-clock agreement, cross-clock speed leadership, or mini/micro divergence.",
+  "source": {
+    "product": "ES",
+    "minute_store_path": "data/cache/v7_d1/date_matched_minute_print_features_v2.parquet",
+    "minute_store_sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb",
+    "required_fields": [
+      "minute_start_ns",
+      "availability_ns",
+      "contract",
+      "calendar_year",
+      "trade_count",
+      "total_volume",
+      "signed_aggressor_volume",
+      "signed_aggressor_fraction",
+      "price_change_points",
+      "open",
+      "high",
+      "low",
+      "close"
+    ],
+    "completed_minutes_only": true,
+    "baseline": "median of average_trade_size, trade_count, and absolute signed_aggressor_fraction over the immediately preceding completed RTH session of the same explicit contract",
+    "average_trade_size": "total_volume / trade_count; rows with trade_count <= 0 are ineligible",
+    "same_contract_baseline_required": true,
+    "current_session_information_in_baseline": false
+  },
+  "mechanism_class": "V71_TRADE_SIZE_COMPOSITION_TRANSITIONS",
+  "motifs": [
+    {
+      "motif": "LARGE_CLIP_FLOW_ONSET",
+      "response_policy": "CONTINUATION",
+      "definition": "average_trade_size crosses strictly above the preceding-session median while signed_aggressor_volume is nonzero; direction is the completed minute aggressive-flow sign"
+    },
+    {
+      "motif": "LARGE_CLIP_ABSORPTION",
+      "response_policy": "REVERSAL",
+      "definition": "average_trade_size and absolute signed_aggressor_fraction are strictly above their preceding-session medians while completed-minute price change is zero or opposes nonzero aggressive flow; trigger only on state onset and reverse the aggressive-flow sign"
+    },
+    {
+      "motif": "SMALL_CLIP_PARTICIPATION_BURST",
+      "response_policy": "CONTINUATION",
+      "definition": "average_trade_size is strictly below its preceding-session median, trade_count is strictly above its preceding-session median, and completed-minute price change agrees with nonzero aggressive flow; trigger only on state onset"
+    }
+  ],
+  "holding_minutes": [
+    30,
+    60
+  ],
+  "candidate_ids": [
+    "v71g6_trade_size_composition_large_clip_flow_onset_continuation_h30",
+    "v71g6_trade_size_composition_large_clip_flow_onset_continuation_h60",
+    "v71g6_trade_size_composition_large_clip_absorption_reversal_h30",
+    "v71g6_trade_size_composition_large_clip_absorption_reversal_h60",
+    "v71g6_trade_size_composition_small_clip_participation_burst_continuation_h30",
+    "v71g6_trade_size_composition_small_clip_participation_burst_continuation_h60"
+  ],
+  "candidate_count": 6,
+  "bounded_parameter_alternatives_per_structure": 1,
+  "signal_policy": {
+    "decision_timestamp": "availability_ns of the completed source minute",
+    "entry": "first explicit-contract 1m open at or after decision timestamp",
+    "exit": "explicit-contract 1m open at entry plus frozen holding_minutes",
+    "state_onset": "current state true and immediately preceding contiguous minute in the same contract/session false",
+    "overlapping_signals_per_candidate": false,
+    "session_crossing": false,
+    "contract_crossing": false
+  },
+  "cost_policy": {
+    "path": "config/v7/phase0_g0_preregistration.json",
+    "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "primary_walk_forward_stress": "STRESS_1_5X",
+    "SIM_EXPLOIT_stress": "STRESS_2X"
+  },
+  "funnel": {
+    "stage0": "validity_novelty_nonoverlap_and_same_contract_prior_session_baseline",
+    "stage1": "frozen_existing_cheap_economic_policy",
+    "stage2": "four_fold_walk_forward_with_five_day_embargo",
+    "stage3": "hypothesis_specific_nulls_only_after_green_tripwire_and_powered_walk_forward",
+    "stage4": "campaign_DSR_BH_only_if_powered",
+    "stage5": "rolling_Combine_diagnostic_only_after_statistical_survival",
+    "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+    "candidate_specific_power_policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673"
+  },
+  "mandatory_grammar_tripwire": {
+    "policy_path": "WORM/v7.1-trade-size-composition-tripwire-0006-2026-07-13.json",
+    "worlds": [
+      "DAILY_BLOCK_SHUFFLE",
+      "VOLATILITY_MATCHED_RANDOM_WALK",
+      "YEAR_BLOCK_PERMUTATION"
+    ],
+    "NULL_RATIO_artefact_threshold_inclusive": 0.8,
+    "raw_counts_and_exact_binomial_test_required": true,
+    "combine_pass_rate_is_fitness": false
+  },
+  "cemetery_firewall": {
+    "feedback_scope": "mechanism_class_x_regime_x_death_cause_only",
+    "parameter_feedback_used": false,
+    "candidate_outcome_feedback_used": false,
+    "excluded_classes": [
+      "ARB_INTRA_PRODUIT",
+      "V71_EVENT_TIME_CLOCK_STATES",
+      "V71_CROSS_CLOCK_FLOW_CONFIRMATION",
+      "V71_CROSS_CLOCK_SPEED_LEADERSHIP"
+    ]
+  },
+  "candidate_status_inheritance": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "shadow_admission_authorized": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "The prior-session medians may mostly encode ordinary intraday activity normalization; the motif can still be a generic volatility geometry proxy, and a green development result cannot advance without the permanent grammar tripwire and candidate-specific power audit."
+}

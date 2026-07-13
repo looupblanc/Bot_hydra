@@ -1,0 +1,40 @@
+{
+  "schema": "hydra_v7_1_trade_size_composition_tripwire_policy_v1",
+  "tripwire_id": "hydra_v7_1_trade_size_composition_tripwire_0006",
+  "grammar_id": "hydra_v7_1_trade_size_composition_grammar_0006",
+  "preregistered_before_signal_generation": true,
+  "controls": [
+    "DAILY_BLOCK_SHUFFLE",
+    "VOLATILITY_MATCHED_RANDOM_WALK",
+    "YEAR_BLOCK_PERMUTATION"
+  ],
+  "daily_block_shuffle_seeds": {
+    "2023_ES": 990301,
+    "2024_ES": 990401
+  },
+  "volatility_matched_random_walk_seeds": {
+    "2023_ES": 991301,
+    "2024_ES": 991401
+  },
+  "null_recomputation_policy": "Preserve timestamps, contracts, trade_count, total_volume, and aggressor-flow fields. Recompute price-derived fields and the complete frozen grammar in every null world before identical account episodes.",
+  "real_and_null_pipeline_identical_after_world_construction": true,
+  "minimum_null_episode_count_relative_to_real": 1.0,
+  "NULL_RATIO_definition": "pass_rate(null pooled) / pass_rate(real)",
+  "artefact_threshold_inclusive": 0.8,
+  "exact_binomial_test": {
+    "alternative": "greater",
+    "null_probability": "pooled null pass rate",
+    "raw_counts_required": true
+  },
+  "evidence_labels": [
+    "VERT_MINCE",
+    "VERT_NET",
+    "ARTEFACT"
+  ],
+  "promotion_policy": "ARTEFACT_GEOMETRY_ONLY tombstones the entire exact mechanism class before candidate power, null, DSR/BH, Combine, or shadow work. GREEN_NULL_ADJUSTED_BASELINE permits power audit only for frozen walk-forward-positive candidates.",
+  "candidate_outcome_feedback_used": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "The counterfactuals preserve trade composition while changing price paths, so they test whether account passage exceeds geometry; with only two calendar blocks, even a green result remains development evidence rather than proof."
+}
