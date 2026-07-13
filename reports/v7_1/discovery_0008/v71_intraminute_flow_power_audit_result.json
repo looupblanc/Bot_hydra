@@ -1,0 +1,395 @@
+{
+  "CONTRE": "Both candidates were selected after tiny positive pooled D1 walk-forward results with negative early folds and a VERT_MINCE tripwire; this audit is selected development evidence rather than confirmation.",
+  "DSR_BH_executed": false,
+  "audit_id": "hydra_v7_1_intraminute_flow_power_audit_0001",
+  "calibrated_candidate_specific_policy_used": true,
+  "campaign_effective_N_trials_before_audit": 45.0,
+  "candidate_count": 2,
+  "candidate_nulls_executed": false,
+  "candidate_results": [
+    {
+      "DSR_BH_executed": false,
+      "best_event_removed_net": -731.7249999999967,
+      "block_bootstrap": {
+        "bootstrap_standard_error": 24.52878698557533,
+        "candidate_power_effect_usd": 12.5,
+        "confidence_interval_95": [
+          -54.16989795918367,
+          41.25749258160237
+        ],
+        "draws": 20000,
+        "estimated_null_false_positive_rate": 0.0235,
+        "minimum_useful_effect_usd": 12.5,
+        "power_at_candidate_effect": 0.099,
+        "probability_net_effect_positive": 0.51815,
+        "seed": 2499626637
+      },
+      "candidate_id": "v71g8_intraminute_flow_back_loaded_same_sign_acceleration_continuation_h30",
+      "candidate_nulls_executed": false,
+      "cost_results": {
+        "BASE": {
+          "event_count": 298,
+          "mean_net": 10.629530201342293,
+          "median_net": -35.05,
+          "net_pnl": 3167.600000000003,
+          "positive_event_fraction": 0.4697986577181208
+        },
+        "STRESS_1_5X": {
+          "event_count": 298,
+          "mean_net": 1.2545302013422952,
+          "median_net": -44.425,
+          "net_pnl": 373.850000000004,
+          "positive_event_fraction": 0.4597315436241611
+        },
+        "STRESS_2X": {
+          "event_count": 298,
+          "mean_net": -8.120469798657705,
+          "median_net": -53.8,
+          "net_pnl": -2419.899999999996,
+          "positive_event_fraction": 0.44966442953020136
+        }
+      },
+      "direction_policy": "CONTINUATION",
+      "effective_sample": {
+        "autocorrelations": [
+          0.04504327921878937,
+          -0.029263343328064306,
+          0.0672533053607322,
+          0.018414073377707934,
+          0.09494064053493628,
+          0.003176090033871641,
+          -0.050090129580880285,
+          0.05199428089723429,
+          -0.002803446977286357,
+          -0.038193104408841355
+        ],
+        "effective_independent_event_count": 190.8246221061641,
+        "maximum_autocorrelation_lag": 10,
+        "overlap_effective_events": 298.0,
+        "raw_event_count": 298,
+        "serial_dependence_factor": 1.5616433388465434,
+        "serial_effective_events": 190.8246221061641
+      },
+      "event_overlap_inflation": 1.0,
+      "family_id": "INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+      "frozen_walk_forward_positive_fold_count": 2,
+      "grammar_id": "hydra_v7_1_intraminute_flow_grammar_0008",
+      "holding_minutes": 30,
+      "motif": "BACK_LOADED_SAME_SIGN_ACCELERATION",
+      "primary_STRESS_1_5X_mean_net": 1.2545302013422952,
+      "primary_STRESS_1_5X_median_net": -44.425,
+      "principal_named_bounded_diagnostic": false,
+      "raw_event_count": 298,
+      "rolling_combine_research_eligible": false,
+      "signal_path_hash": "ab1a3a9bc11143fcc767089d75216dfebdd4ab6f1cbaa7e5d7c04851fcec0bd8",
+      "specification_hash": "9156089e1ae86ab6d6be2ae96b19fec525f913c43fbf70e7a30d4d368d0d6d01",
+      "stability": {
+        "calendar_year": {
+          "positive_count": 1,
+          "positive_fraction": 0.5,
+          "slice_count": 2,
+          "slices": {
+            "2023": {
+              "event_count": 181,
+              "mean_net": -47.53273480662984,
+              "median_net": -81.925,
+              "net_pnl": -8603.425000000001,
+              "positive_event_fraction": 0.40331491712707185
+            },
+            "2024": {
+              "event_count": 117,
+              "mean_net": 76.72884615384616,
+              "median_net": 43.075,
+              "net_pnl": 8977.275000000001,
+              "positive_event_fraction": 0.5470085470085471
+            }
+          }
+        },
+        "contract": {
+          "positive_count": 1,
+          "positive_fraction": 0.5,
+          "slice_count": 2,
+          "slices": {
+            "ESU3": {
+              "event_count": 181,
+              "mean_net": -47.53273480662984,
+              "median_net": -81.925,
+              "net_pnl": -8603.425000000001,
+              "positive_event_fraction": 0.40331491712707185
+            },
+            "ESU4": {
+              "event_count": 117,
+              "mean_net": 76.72884615384616,
+              "median_net": 43.075,
+              "net_pnl": 8977.275000000001,
+              "positive_event_fraction": 0.5470085470085471
+            }
+          }
+        },
+        "month": {
+          "positive_count": 1,
+          "positive_fraction": 0.5,
+          "slice_count": 2,
+          "slices": {
+            "2023-08": {
+              "event_count": 181,
+              "mean_net": -47.53273480662984,
+              "median_net": -81.925,
+              "net_pnl": -8603.425000000001,
+              "positive_event_fraction": 0.40331491712707185
+            },
+            "2024-08": {
+              "event_count": 117,
+              "mean_net": 76.72884615384616,
+              "median_net": 43.075,
+              "net_pnl": 8977.275000000001,
+              "positive_event_fraction": 0.5470085470085471
+            }
+          }
+        },
+        "quarter": {
+          "positive_count": 1,
+          "positive_fraction": 0.5,
+          "slice_count": 2,
+          "slices": {
+            "2023-Q3": {
+              "event_count": 181,
+              "mean_net": -47.53273480662984,
+              "median_net": -81.925,
+              "net_pnl": -8603.425000000001,
+              "positive_event_fraction": 0.40331491712707185
+            },
+            "2024-Q3": {
+              "event_count": 117,
+              "mean_net": 76.72884615384616,
+              "median_net": 43.075,
+              "net_pnl": 8977.275000000001,
+              "positive_event_fraction": 0.5470085470085471
+            }
+          }
+        }
+      },
+      "status": "WF_POSITIVE_BUT_FRAGILE",
+      "status_reasons": [
+        "STRESS_2X_mean_not_positive",
+        "best_event_removal_destroys_net"
+      ],
+      "temporal_block_count": 8,
+      "temporal_block_ids": [
+        "2023-W31",
+        "2023-W32",
+        "2023-W33",
+        "2023-W34",
+        "2023-W35",
+        "2024-W32",
+        "2024-W33",
+        "2024-W35"
+      ],
+      "top_event_concentration": 0.012503209724679203
+    },
+    {
+      "DSR_BH_executed": false,
+      "best_event_removed_net": -1049.550000000001,
+      "block_bootstrap": {
+        "bootstrap_standard_error": 29.69308765612509,
+        "candidate_power_effect_usd": 12.5,
+        "confidence_interval_95": [
+          -53.20878378378377,
+          56.87708333333334
+        ],
+        "draws": 20000,
+        "estimated_null_false_positive_rate": 0.0383,
+        "minimum_useful_effect_usd": 12.5,
+        "power_at_candidate_effect": 0.1447,
+        "probability_net_effect_positive": 0.593,
+        "seed": 2268476217
+      },
+      "candidate_id": "v71g8_intraminute_flow_front_loaded_flow_decay_reversal_h60",
+      "candidate_nulls_executed": false,
+      "cost_results": {
+        "BASE": {
+          "event_count": 167,
+          "mean_net": 14.875149700598781,
+          "median_net": -10.05,
+          "net_pnl": 2484.1499999999965,
+          "positive_event_fraction": 0.49700598802395207
+        },
+        "STRESS_1_5X": {
+          "event_count": 167,
+          "mean_net": 5.500149700598784,
+          "median_net": -19.425,
+          "net_pnl": 918.5249999999969,
+          "positive_event_fraction": 0.48502994011976047
+        },
+        "STRESS_2X": {
+          "event_count": 167,
+          "mean_net": -3.874850299401205,
+          "median_net": -28.799999999999997,
+          "net_pnl": -647.1000000000013,
+          "positive_event_fraction": 0.48502994011976047
+        }
+      },
+      "direction_policy": "REVERSAL",
+      "effective_sample": {
+        "autocorrelations": [
+          -0.10136204292699609,
+          -0.07774743701679142,
+          -0.034642833086533896,
+          0.026122505049423303,
+          0.04115030054426157,
+          -0.15713825364317985,
+          0.09336537106506053,
+          -0.10757485546188633,
+          -0.0925942753945779,
+          0.02447783769018515
+        ],
+        "effective_independent_event_count": 121.87716861260425,
+        "maximum_autocorrelation_lag": 10,
+        "overlap_effective_events": 167.0,
+        "raw_event_count": 167,
+        "serial_dependence_factor": 1.370232028697861,
+        "serial_effective_events": 121.87716861260425
+      },
+      "event_overlap_inflation": 1.0,
+      "family_id": "INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION",
+      "frozen_walk_forward_positive_fold_count": 2,
+      "grammar_id": "hydra_v7_1_intraminute_flow_grammar_0008",
+      "holding_minutes": 60,
+      "motif": "FRONT_LOADED_FLOW_DECAY",
+      "primary_STRESS_1_5X_mean_net": 5.500149700598784,
+      "primary_STRESS_1_5X_median_net": -19.425,
+      "principal_named_bounded_diagnostic": false,
+      "raw_event_count": 167,
+      "rolling_combine_research_eligible": false,
+      "signal_path_hash": "e0ce5b42ed40924b533920a0aa833df5bee52736eb25ad116af6fcc6165551d1",
+      "specification_hash": "fa4750bd145f5749821b1840dfdc37b493885a9e792da8dc4cb789c1e37e375d",
+      "stability": {
+        "calendar_year": {
+          "positive_count": 1,
+          "positive_fraction": 0.5,
+          "slice_count": 2,
+          "slices": {
+            "2023": {
+              "event_count": 101,
+              "mean_net": -34.89529702970299,
+              "median_net": -94.425,
+              "net_pnl": -3524.425000000002,
+              "positive_event_fraction": 0.44554455445544555
+            },
+            "2024": {
+              "event_count": 66,
+              "mean_net": 67.31742424242427,
+              "median_net": 68.075,
+              "net_pnl": 4442.950000000002,
+              "positive_event_fraction": 0.5454545454545454
+            }
+          }
+        },
+        "contract": {
+          "positive_count": 1,
+          "positive_fraction": 0.5,
+          "slice_count": 2,
+          "slices": {
+            "ESU3": {
+              "event_count": 101,
+              "mean_net": -34.89529702970299,
+              "median_net": -94.425,
+              "net_pnl": -3524.425000000002,
+              "positive_event_fraction": 0.44554455445544555
+            },
+            "ESU4": {
+              "event_count": 66,
+              "mean_net": 67.31742424242427,
+              "median_net": 68.075,
+              "net_pnl": 4442.950000000002,
+              "positive_event_fraction": 0.5454545454545454
+            }
+          }
+        },
+        "month": {
+          "positive_count": 1,
+          "positive_fraction": 0.5,
+          "slice_count": 2,
+          "slices": {
+            "2023-08": {
+              "event_count": 101,
+              "mean_net": -34.89529702970299,
+              "median_net": -94.425,
+              "net_pnl": -3524.425000000002,
+              "positive_event_fraction": 0.44554455445544555
+            },
+            "2024-08": {
+              "event_count": 66,
+              "mean_net": 67.31742424242427,
+              "median_net": 68.075,
+              "net_pnl": 4442.950000000002,
+              "positive_event_fraction": 0.5454545454545454
+            }
+          }
+        },
+        "quarter": {
+          "positive_count": 1,
+          "positive_fraction": 0.5,
+          "slice_count": 2,
+          "slices": {
+            "2023-Q3": {
+              "event_count": 101,
+              "mean_net": -34.89529702970299,
+              "median_net": -94.425,
+              "net_pnl": -3524.425000000002,
+              "positive_event_fraction": 0.44554455445544555
+            },
+            "2024-Q3": {
+              "event_count": 66,
+              "mean_net": 67.31742424242427,
+              "median_net": 68.075,
+              "net_pnl": 4442.950000000002,
+              "positive_event_fraction": 0.5454545454545454
+            }
+          }
+        }
+      },
+      "status": "WF_POSITIVE_BUT_FRAGILE",
+      "status_reasons": [
+        "STRESS_2X_mean_not_positive",
+        "best_event_removal_destroys_net"
+      ],
+      "temporal_block_count": 8,
+      "temporal_block_ids": [
+        "2023-W31",
+        "2023-W32",
+        "2023-W33",
+        "2023-W34",
+        "2023-W35",
+        "2024-W32",
+        "2024-W33",
+        "2024-W35"
+      ],
+      "top_event_concentration": 0.026520139556230202
+    }
+  ],
+  "false_positive_candidate_ids": [],
+  "final_confirmation_power_requirement": 0.8,
+  "fragile_candidate_ids": [
+    "v71g8_intraminute_flow_back_loaded_same_sign_acceleration_continuation_h30",
+    "v71g8_intraminute_flow_front_loaded_flow_decay_reversal_h60"
+  ],
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "powered_candidate_ids": [],
+  "prochaine_action": "classify_fragile_or_underpowered_candidates_without_promotion_and_review_next_distinct_hypothesis",
+  "protected_holdout_access_count_delta": 0,
+  "raw_global_N_trials": 263882,
+  "rolling_combine_executed": false,
+  "rolling_combine_final_confirmation_eligible_ids": [],
+  "schema": "hydra_v7_1_intraminute_flow_power_audit_result_v1",
+  "status_counts": {
+    "WF_POSITIVE_BUT_FRAGILE": 2
+  },
+  "tripwire_NULL_RATIO": 0.7333333333333334,
+  "tripwire_evidence_strength": "VERT_MINCE",
+  "tripwire_verdict": "GREEN_NULL_ADJUSTED_BASELINE",
+  "underpowered_candidate_ids": [],
+  "universal_raw_event_threshold_used": false,
+  "verdict": "GREEN"
+}
