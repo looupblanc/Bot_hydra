@@ -1,0 +1,131 @@
+{
+  "schema": "hydra_v7_1_underpowered_combine_research_policy_v1",
+  "policy_id": "hydra_v7_1_underpowered_combine_research_policy_0001",
+  "principal_amendment_path": "MISSION_CONTRACT_AMENDMENT_003_RESEARCH_STAGE_COMBINE.md",
+  "principal_amendment_sha256": "ffca7c85d685267b81abc45e33b0d74dd12b196acb1b26d54c6ddd3f50f34324",
+  "scientific_power_requirement_unchanged": 0.8,
+  "diagnostic_status": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+  "diagnostic_is_validation_or_promotion": false,
+  "combine_pass_rate_is_generation_fitness": false,
+  "source_power_audits": [
+    {
+      "path": "reports/v7_1/power_aware_0001/v71_power_aware_candidate_audit_result.json",
+      "sha256": "f0eb23117b5703b3d50823365cff7cf9d37c7faeb6ce5628ca7e6c19f04c930b"
+    },
+    {
+      "path": "reports/v7_1/discovery_0004/v71_cross_clock_flow_power_audit_result.json",
+      "sha256": "204b79bcc0f75b22351c638469f4be1bc84bfaf636d09c88e1462f2a67c62f67"
+    },
+    {
+      "path": "reports/v7_1/discovery_0006/v71_trade_size_composition_power_audit_result.json",
+      "sha256": "ab7fd3885e23943c4abd532f82902629f1a689e962ca4d8a1d7dc9869a5f32de"
+    }
+  ],
+  "population_reconciliation": {
+    "before_G6": {
+      "walk_forward_positive": 20,
+      "power_decisions": 18,
+      "PROMISING_UNDERPOWERED": 14,
+      "WF_POSITIVE_BUT_FRAGILE": 4,
+      "explicit_non_power_terminal": 2,
+      "non_power_terminal_status": "GEOMETRY_ONLY_CLASS_TOMBSTONED_NO_POWER_AUDIT",
+      "non_power_candidate_source": "G5 speed-leadership funnel",
+      "explanation": "The permanent G5 tripwire failed at class level before candidate-specific power; both walk-forward-positive formulations were explicitly tombstoned rather than lost."
+    },
+    "after_G6": {
+      "walk_forward_positive": 22,
+      "power_decisions": 20,
+      "PROMISING_UNDERPOWERED": 16,
+      "WF_POSITIVE_BUT_FRAGILE": 4,
+      "explicit_non_power_terminal": 2,
+      "unaccounted_candidate_count": 0
+    }
+  },
+  "eligibility": {
+    "required_status": "PROMISING_UNDERPOWERED",
+    "STRESS_1_5X_mean_net_must_be_positive": true,
+    "best_event_removed_net_must_be_positive": true,
+    "maximum_top_event_concentration": 0.2,
+    "hard_invalidations_absent": true,
+    "required_tripwire": "GREEN_NULL_ADJUSTED_BASELINE",
+    "GEOMETRY_ONLY_classes_excluded": true,
+    "prior_diagnostic_completed_candidates_excluded": true
+  },
+  "selection": {
+    "minimum_candidates": 3,
+    "target_candidates": 5,
+    "maximum_candidates": 5,
+    "component_percentile_weights": {
+      "STRESS_1_5X_mean_net": 0.25,
+      "effective_independent_event_count": 0.2,
+      "block_stability": 0.2,
+      "one_minus_top_event_concentration": 0.15,
+      "STRESS_1_5X_total_net_as_Topstep_progress_proxy": 0.2
+    },
+    "block_stability": "mean of positive fractions for calendar_year, month, quarter, and explicit contract",
+    "percentile_method": "stable average rank divided by eligible_population_minus_one; singleton receives one",
+    "sort": "descending weighted score then candidate_id ascending",
+    "greedy_distinctness": {
+      "maximum_per_family_id": 1,
+      "maximum_absolute_daily_PnL_correlation": 0.7,
+      "maximum_signal_timestamp_Jaccard": 0.7,
+      "comparison_cost_stress": "STRESS_1_5X",
+      "minimum_overlap_days_for_correlation": 5,
+      "insufficient_overlap_correlation_policy": "do_not_reject_but_report"
+    }
+  },
+  "episode_design": {
+    "total_start_count": 24,
+    "start_count_per_calendar_year": 12,
+    "calendar_years": [
+      2023,
+      2024
+    ],
+    "maximum_duration_trading_days": 10,
+    "minimum_observation_trading_days": 10,
+    "minimum_spacing_sessions": 1,
+    "selection_within_year": "deterministic evenly spaced block-aware starts",
+    "effective_nonoverlapping_block_count_reported": true,
+    "candidate_comparison_starts_identical": true,
+    "position_quantity": 1,
+    "product": "ES",
+    "maximum_mini_equivalent": 15,
+    "cost_stress": "STRESS_1_5X",
+    "session_flatten": true,
+    "same_bar_policy": "conservative",
+    "mll_modes": [
+      "eod_level_rt_breach",
+      "intraday_hwm"
+    ],
+    "primary_mll_mode": "eod_level_rt_breach",
+    "DLL_variants": [
+      "disabled",
+      "soft_3000"
+    ]
+  },
+  "required_metrics": [
+    "pass_rate",
+    "target_progress_p25_median_p75",
+    "MLL_breach_rate",
+    "consistency_pass_rate",
+    "projected_days_to_target",
+    "net_after_costs",
+    "account_basket_contribution"
+  ],
+  "projected_days_to_target": "maximum_duration_trading_days divided by median positive maximum target progress; null when median maximum progress is nonpositive",
+  "basket": {
+    "one_shared_account": true,
+    "components": "all selected candidates",
+    "conflict_policy": "earliest decision wins; ties use frozen selection rank; no overlapping ES position",
+    "leave_one_out_contribution": true,
+    "standalone_PnL_summation_forbidden": true
+  },
+  "status_after_diagnostic": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+  "shadow_promotion_authorized": false,
+  "candidate_nulls_or_DSR_BH_executed": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "The 24 starts overlap heavily and have few effective non-overlapping blocks; all account metrics are post-selection diagnostics and cannot satisfy the unchanged 80 percent scientific power gate."
+}
