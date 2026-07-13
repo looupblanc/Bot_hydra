@@ -1,0 +1,31 @@
+{
+  "schema": "hydra_v7_2_g10_multiplicity_reconciliation_v1",
+  "reconciliation_id": "hydra_v7_2_g10_multiplicity_reconciliation_0010",
+  "grammar_id": "hydra_v7_2_flow_impact_relaxation_grammar_0010",
+  "detected_issue": "The permanent tripwire was preregistered WORM but its 144 candidate-world evaluations were executed before their global multiplicity increment was written.",
+  "threshold_or_null_policy_changed": false,
+  "candidate_selection_changed": false,
+  "tripwire_result_rejudged": false,
+  "tripwire_result_depended_on_global_N_trials": false,
+  "tripwire_result_path": "reports/v7_2/discovery_0010/v72_flow_impact_relaxation_tripwire_result.json",
+  "tripwire_result_sha256": "1e6f26a2e5a8aa4175e67b403b6f1e523f4834407dbc9b27dcf689c1093f9eba",
+  "tripwire_policy_path": "WORM/v7.2-flow-impact-relaxation-tripwire-0010-2026-07-13.json",
+  "tripwire_policy_sha256": "77f861b94cc6a190b86508c4adcc15b7e67c5e5af1d22e66e51110714f52741d",
+  "accounting": {
+    "candidate_count": 36,
+    "world_count": 4,
+    "delta_trials": 144,
+    "global_N_trials_before": 264947,
+    "global_N_trials_after": 265091,
+    "campaign_structural_and_tripwire_trials": 180,
+    "campaign_effective_N_trials_after_reconciliation": 270.0,
+    "campaign_inflation_factor": 1.5
+  },
+  "proof_registry_event_id": "v7_2_flow_impact_relaxation_tripwire_accounting_0010",
+  "proof_registry_entry_hash": "d1bd1c3b521dee346eaddce1e217eeca94ffecc6e746af68f6d7b0db59fac055",
+  "status": "ACCOUNTED_AFTER_EXECUTION_MULTIPLICITY_OMISSION_DISCLOSED",
+  "new_data_purchase_count": 0,
+  "protected_holdout_access_count_delta": 0,
+  "outbound_order_count": 0,
+  "CONTRE": "Because the increment was not recorded before execution, this entry repairs audit completeness but cannot honestly be described as a preregistration; any later candidate inference must use the corrected campaign count."
+}
