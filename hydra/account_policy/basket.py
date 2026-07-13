@@ -211,12 +211,33 @@ def run_shared_account_episode(
         dll_triggered = False
         day_components: dict[str, float] = defaultdict(float)
         day_traded = False
-        actions: list[tuple[int, int, str, RoutedTrade]] = []
+        actions: list[tuple[int, int, int, str, RoutedTrade]] = []
         for trade in by_day.get(int(day), ()):
-            actions.append((trade.event.decision_ns, 1, trade.event.event_id, trade))
-            actions.append((trade.event.exit_ns, 0, trade.event.event_id, trade))
-        actions.sort(key=lambda item: (item[0], item[1], item[2]))
-        for timestamp, kind, event_id, trade in actions:
+            priority = _priority_index(basket, trade.component_id)
+            actions.append(
+                (
+                    trade.event.decision_ns,
+                    1,
+                    priority,
+                    trade.event.event_id,
+                    trade,
+                )
+            )
+            actions.append(
+                (
+                    trade.event.exit_ns,
+                    0,
+                    priority,
+                    trade.event.event_id,
+                    trade,
+                )
+            )
+        if basket.policy_version.startswith("hydra_account_policy_v7_2"):
+            actions.sort(key=lambda item: (item[0], item[1], item[2], item[3]))
+        else:
+            # Preserve the frozen V6 event-ID ordering for historical replay.
+            actions.sort(key=lambda item: (item[0], item[1], item[3]))
+        for timestamp, kind, _priority, event_id, trade in actions:
             if kind == 0:
                 position = open_positions.pop(event_id, None)
                 if position is None:

@@ -136,6 +136,34 @@ def test_conflict_resolution_and_shared_contract_limit_are_executable() -> None:
     assert result.maximum_mini_equivalent == 8.0
 
 
+def test_v72_simultaneous_entry_uses_frozen_component_priority() -> None:
+    low = _trade("low", "ES", 0, 100.0, start_offset=1, duration=10)
+    high = _trade("high", "ES", 0, 300.0, start_offset=1, duration=10)
+    events = {
+        "low": (replace(low, event=replace(low.event, event_id="a-sorts-first")),),
+        "high": (replace(high, event=replace(high.event, event_id="z-sorts-last")),),
+    }
+    basket = BasketPolicy(
+        policy_id="v72-priority",
+        component_ids=("low", "high"),
+        archetype="STATIC_CROSS_FIT",
+        maximum_simultaneous_positions=1,
+        component_priority=("high", "low"),
+        policy_version="hydra_account_policy_v7_2_crossfit_v1",
+    )
+
+    result = run_shared_account_episode(
+        events,
+        list(range(10)),
+        basket=basket,
+        start_day=0,
+        maximum_duration_days=10,
+    )
+
+    assert result.component_contribution == {"high": 300.0}
+    assert result.skipped_reasons == {"MAXIMUM_SIMULTANEOUS_POSITIONS": 1}
+
+
 def test_controller_profit_lock_and_daily_loss_guard_use_realized_state_only() -> None:
     profit_events = {
         "left": (
