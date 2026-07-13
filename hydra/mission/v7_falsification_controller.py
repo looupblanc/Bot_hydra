@@ -33,7 +33,7 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v9"
+CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v10"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-falsification-single-writer"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
@@ -182,11 +182,29 @@ V71_G8_TRIPWIRE_RELATIVE_PATH = Path(
 V71_G8_POWER_RELATIVE_PATH = Path(
     "reports/v7_1/discovery_0008/v71_intraminute_flow_power_audit_result.json"
 )
+V71_G9_GRAMMAR_RELATIVE_PATH = Path(
+    "WORM/v7.1-aggressor-run-topology-grammar-0009-2026-07-13.json"
+)
+V71_G9_FEATURE_MANIFEST_RELATIVE_PATH = Path(
+    "data/manifests/v7_d1_aggressor_run_topology_v1.json"
+)
+V71_G9_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0009/v71_aggressor_run_topology_signal_manifest.json"
+)
+V71_G9_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0009/v71_aggressor_run_topology_funnel_result.json"
+)
+V71_G9_TRIPWIRE_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0009/v71_aggressor_run_topology_tripwire_result.json"
+)
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
     str(V71_POLICY_RELATIVE_PATH): "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
     "WORM/v7.1-event-mechanism-grammar-0001-2026-07-12.json": "e1c8de955302da2be836bbcebf2bfedc07768b2d9b987ea32258a85a2b0caf8a",
     "WORM/v7.1-powered-promotion-minimum-2026-07-12.json": "3e0211c6a5acea81713431802fc1576da4d5be2a0cc37bf900cd02eabd68c6fa",
+    str(V71_G9_GRAMMAR_RELATIVE_PATH): "05ff83f0fbf902381371d3d840ce7393adadfa8e51d6c75e51a76c12a275bce2",
+    "WORM/v7.1-aggressor-run-topology-tripwire-0009-2026-07-13.json": "b26460dc7cf277acf68369ea244b24f7bec743d260863283ff3a711093a3318f",
+    "WORM/v7.1-aggressor-run-topology-power-audit-0001-2026-07-13.json": "b40a7d359587eeb87eb1e6910158799bf0d02b7a80562c7a26165286db08bcc6",
     str(V71_G2_GRAMMAR_RELATIVE_PATH): "ef44e6e72c42b2ed4b7228f3addbd2f182e3e51bcfb619aa4c0a2102db6d3566",
     "WORM/v7.1-opportunity-density-tripwire-0002-2026-07-12.json": "8e1b7e511f99e1f108a113bb80a69d4985d498ed9d78d2d049e9468a6afdcacf",
     str(V71_CONFIRMATION_QUEUE_RELATIVE_PATH): "23c2925253887a9b86699aac9fa71072fc28848087cb38cc9624bb78751ee0b1",
@@ -1265,7 +1283,7 @@ def _classify_v71_g8_action(
         raise V7ControllerIntegrityError("V7.1 G8 power classification drift")
     cumulative_status = dict(g7_action["cumulative_power_status_counts"])
     cumulative_status["WF_POSITIVE_BUT_FRAGILE"] = int(cumulative_status.get("WF_POSITIVE_BUT_FRAGILE", 0)) + 2
-    return {
+    g8_action = {
         **dict(g7_action),
         "action_type": "V71_G8_GREEN_THIN_FRAGILE_NO_PROMOTION",
         "walk_forward_positive_count": 24,
@@ -1304,6 +1322,106 @@ def _classify_v71_g8_action(
             "both exact versions are WF_POSITIVE_BUT_FRAGILE. No candidate, "
             "Combine, shadow, holdout or purchase was authorized, and all 24 "
             "walk-forward-positive formulations are explicitly accounted for."
+        ),
+    }
+    if (root / V71_G9_GRAMMAR_RELATIVE_PATH).is_file():
+        return _classify_v71_g9_action(root, g8_action=g8_action)
+    return g8_action
+
+
+def _classify_v71_g9_action(
+    root: Path,
+    *,
+    g8_action: Mapping[str, Any],
+) -> dict[str, Any]:
+    required = (
+        (V71_G9_FEATURE_MANIFEST_RELATIVE_PATH, "V71_G9_FEATURE_MANIFEST_REQUIRED"),
+        (V71_G9_SIGNAL_RELATIVE_PATH, "V71_G9_SIGNAL_MANIFEST_REQUIRED"),
+        (V71_G9_FUNNEL_RELATIVE_PATH, "V71_G9_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V71_G9_TRIPWIRE_RELATIVE_PATH, "V71_G9_TRIPWIRE_REQUIRED"),
+    )
+    for path, action in required:
+        if not (root / path).is_file():
+            return {
+                **dict(g8_action),
+                "action_type": action,
+                "progressed": False,
+                "required_path": str(path),
+                "reason": (
+                    "The preregistered G9 aggressor-run topology experiment must "
+                    "complete its outcome-free feature, Stage 0-2 and permanent "
+                    "tripwire chain."
+                ),
+            }
+    hashes = {
+        V71_G9_FEATURE_MANIFEST_RELATIVE_PATH: "b1151bdc493f569eda85d13983ce73df9f92cbfe9f2416fd4ac63183e251127c",
+        V71_G9_SIGNAL_RELATIVE_PATH: "f678b6049cb46ed81502f63894082aa5546ce4335054ffe630551cba8b4faaa4",
+        V71_G9_FUNNEL_RELATIVE_PATH: "65d6a30ef61c74b1e8dd3dbfc194c062ade5ea34465fac9dbdf122da87fa7623",
+        V71_G9_TRIPWIRE_RELATIVE_PATH: "8aeb2e3c1c6f88720cd9d4203d581860c4e682c6f1dc3029a32800fa1810c243",
+    }
+    drift = [str(path) for path, expected in hashes.items() if _sha256(root / path) != expected]
+    if drift:
+        raise V7ControllerIntegrityError("V7.1 G9 evidence drift: " + ",".join(drift))
+    feature = _load_json(root / V71_G9_FEATURE_MANIFEST_RELATIVE_PATH)
+    signal = _load_json(root / V71_G9_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V71_G9_FUNNEL_RELATIVE_PATH)
+    tripwire = _load_json(root / V71_G9_TRIPWIRE_RELATIVE_PATH)
+    if int(feature.get("output", {}).get("row_count") or 0) != 17_200:
+        raise V7ControllerIntegrityError("V7.1 G9 feature row count drift")
+    if int(signal.get("candidate_count") or 0) != 4 or int(signal.get("signal_count") or 0) != 1_573:
+        raise V7ControllerIntegrityError("V7.1 G9 signal manifest drift")
+    if (
+        int(funnel.get("stage0_valid_novel_count") or 0) != 4
+        or int(funnel.get("stage1_pass_count") or 0) != 0
+        or int(funnel.get("walk_forward_positive_count") or 0) != 0
+        or funnel.get("classification_counts") != {"FORMULATION_FALSIFIED": 4}
+    ):
+        raise V7ControllerIntegrityError("V7.1 G9 funnel drift")
+    if (
+        tripwire.get("verdict") != "BLOCKED_UNDERPOWERED"
+        or tripwire.get("NULL_RATIO") is not None
+        or tripwire.get("evidence_strength") != "INDETERMINE"
+        or tripwire.get("raw_pass_counts") != {"real": "0/80", "null": "9/240"}
+    ):
+        raise V7ControllerIntegrityError("V7.1 G9 tripwire drift")
+    return {
+        **dict(g8_action),
+        "action_type": "V71_G9_FORMULATIONS_FALSIFIED_TRIPWIRE_UNDERPOWERED",
+        "g9_feature_row_count": 17_200,
+        "g9_candidate_count": 4,
+        "g9_signal_count": 1_573,
+        "g9_stage0_valid_count": 4,
+        "g9_stage1_survivor_count": 0,
+        "g9_walk_forward_positive_count": 0,
+        "g9_formulation_falsified_count": 4,
+        "g9_tripwire_verdict": "BLOCKED_UNDERPOWERED",
+        "g9_tripwire_evidence_strength": "INDETERMINE",
+        "g9_NULL_RATIO": None,
+        "g9_real_pass_count": "0/80",
+        "g9_null_pass_count": "9/240",
+        "g9_power_audit_executed": False,
+        "g9_rolling_combine_executed": False,
+        "evidence_reconciliation_accounted_count": 24,
+        "evidence_reconciliation_unaccounted_count": 0,
+        "powered_candidate_count": 0,
+        "rolling_combine_promotions": 0,
+        "new_data_purchase_authorized": False,
+        "shadow_admission_authorized": False,
+        "next_experiment_id": "hydra_v7_1_D1_class_exhaustion_and_independent_evidence_decision_0010",
+        "next_experiment_state": "PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+        "principal_blocker": (
+            "No candidate passes the unchanged 80% power gate; all four G9 "
+            "formulations were negative under 1.5x costs and the class tripwire "
+            "had zero real passes, so no power or Combine promotion is lawful."
+        ),
+        "reason": (
+            "G9 tested four outcome-free trade-level aggressor-run topology "
+            "formulations on 17,200 explicit-contract ES minutes. All failed "
+            "Stage 1 under frozen 1.5x costs. The mandatory tripwire observed "
+            "0/80 real versus 9/240 null passes and is explicitly underpowered, "
+            "so the exact formulations are falsified without declaring the broad "
+            "mechanism dead. No power audit, Combine, shadow, holdout or purchase "
+            "was authorized."
         ),
     }
 

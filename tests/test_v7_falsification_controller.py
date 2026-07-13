@@ -186,12 +186,12 @@ def test_v71_controller_recognizes_frozen_g2_confirmation_queue(
     assert result["shadow_admission_authorized"] is False
 
 
-def test_v71_power_aware_integrated_action_reports_g8_fragile_after_g7_null() -> None:
+def test_v71_power_aware_integrated_action_reports_g9_falsification() -> None:
     result = _classify_v71_power_aware_action(
         Path.cwd(), prior_positive=11, g2_positive=3
     )
 
-    assert result["action_type"] == "V71_G8_GREEN_THIN_FRAGILE_NO_PROMOTION"
+    assert result["action_type"] == "V71_G9_FORMULATIONS_FALSIFIED_TRIPWIRE_UNDERPOWERED"
     assert result["walk_forward_positive_count"] == 24
     assert result["powered_candidate_count"] == 0
     assert result["rolling_combine_promotions"] == 0
@@ -225,6 +225,17 @@ def test_v71_power_aware_integrated_action_reports_g8_fragile_after_g7_null() ->
     assert result["g8_tripwire_evidence_strength"] == "VERT_MINCE"
     assert result["g8_power_status_counts"] == {"WF_POSITIVE_BUT_FRAGILE": 2}
     assert result["g8_powered_candidate_count"] == 0
+    assert result["g9_feature_row_count"] == 17200
+    assert result["g9_candidate_count"] == 4
+    assert result["g9_signal_count"] == 1573
+    assert result["g9_stage1_survivor_count"] == 0
+    assert result["g9_walk_forward_positive_count"] == 0
+    assert result["g9_formulation_falsified_count"] == 4
+    assert result["g9_tripwire_verdict"] == "BLOCKED_UNDERPOWERED"
+    assert result["g9_NULL_RATIO"] is None
+    assert result["g9_real_pass_count"] == "0/80"
+    assert result["g9_null_pass_count"] == "9/240"
+    assert result["g9_power_audit_executed"] is False
     assert result["confirmation_queue_fragile_retired_count"] == 6
     assert result["evidence_reconciliation_accounted_count"] == 24
     assert result["evidence_reconciliation_unaccounted_count"] == 0
