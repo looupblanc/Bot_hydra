@@ -1,0 +1,159 @@
+{
+  "schema": "hydra_economic_evolution_pilot_preregistration_v1",
+  "campaign_id": "hydra_economic_evolution_pilot_0001",
+  "issued_at_utc": "2026-07-13T10:45:00Z",
+  "implementation_commit": "49d0fbf816ac2918327d5b4f15b99c0acb393f46",
+  "implementation_files": {
+    "hydra/economic_evolution/account_evaluation.py": "844422dd235eec18d22166acca06b7542f1da200f8e20efb6eebc93464719c5f",
+    "hydra/economic_evolution/archive.py": "a84d061fe81d340f6780a43d7b407174e1b64157f27baf4dbe26f70fe58c5f53",
+    "hydra/economic_evolution/failure_model.py": "219068150d8f5d53041f21f92127a30a5417b496282878cbf5e3e7735a5c1b07",
+    "hydra/economic_evolution/generator.py": "7a0c4916bdfa259eeac9fec9c1cba9cb21cda89f8737372c3d1828fea9339ee2",
+    "hydra/economic_evolution/incremental_value.py": "e86cb8afbba28cb6f7cea4fc1a1ac51a40f79da3fb40e3d0be9a103b390797fa",
+    "hydra/economic_evolution/mutation.py": "bb318eebdd1d39c163ed3c4caca9a97e3d5cd296eb2f9eb38fd49d21145dfa50",
+    "hydra/economic_evolution/null_calibration.py": "8bd1dfd7cda22562616eceea95d42bc11ea12c7a3e9bb148add129d65afde16e",
+    "hydra/economic_evolution/schema.py": "398f86f4a4a60e0adff54b69083718ca27a1217854fff587b47e0f3ab42f5fb0",
+    "hydra/economic_evolution/screen.py": "7941e4cc035de4ed7bc7d8d1f3c031a77176a4f18b6c0525dbe0effd3f101b97",
+    "hydra/research/economic_evolution_pilot.py": "ff4ed2d6445097107e18e59c475b1cf01c629cad81e0c675520af29fe02cf8c4",
+    "scripts/run_economic_evolution_pilot.py": "9d0ee0bcc5c1f742232151f0634972c52753a7f06a59e290591b1f2bf00a8919"
+  },
+  "structural_population": {
+    "candidate_manifest_hash": "909d104e4a945ec788d2fbcf7b796cd556e4afbb93350be56600c1428faaa52b",
+    "parameter_neighbor_status": "DEDUPLICATED_BEFORE_REPLAY",
+    "outcome_feedback_used": false
+  },
+  "data": {
+    "role": "DEVELOPMENT_ONLY_Q4_EXCLUDED",
+    "period": [
+      "2023-01-01",
+      "2024-10-01"
+    ],
+    "feature_source_fingerprint": "1c773f5044f0f9c3bc50e67003b93a7c35ecaf8c505879fd1c20d6d03edada6c",
+    "contract_map_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+    "feature_manifest_sha256": {
+      "CL": "6255364f0334adc3f2de3b0be6e48a2bc6a6a693b4660b3ff5ac9ff83551d1b9",
+      "ES": "3d3865d6b0ccd37aafb9010025f46a8e858fac085f71ddd186ae55dbbe50859f",
+      "GC": "d0f78468ff58ade16dbd870cc24624c29578c9b557aa81d865ef3d32f557bc89",
+      "NQ": "4528e06bb4ff00aa4de14fcb90d0029a8dde5faf757e734f3b1f03118fd1dff9",
+      "RTY": "648f5707627d7ce7a0d4c56704f3a42f8dc1e7bd33d10e3a3417f9500080b5ca",
+      "YM": "ec3367ec31dacf216f2235479b5148493a615fc2c579187fe583a20b1acf2908"
+    }
+  },
+  "funnel": {
+    "raw_proposals": 50000,
+    "maximum_exact_component_replays": 600,
+    "incremental_value_evaluations": 400,
+    "maximum_component_bank": 60,
+    "structural_account_policies": 600,
+    "exact_account_policy_evaluations": 150,
+    "rolling_combine_elite_count": 20,
+    "xfa_elite_count": 5,
+    "directed_mutation_count": 20
+  },
+  "cheap_screen_policy": {
+    "calibration_start": "2023-01-01",
+    "calibration_end_exclusive": "2023-07-01",
+    "screen_start": "2023-07-01",
+    "screen_end_exclusive": "2024-01-01",
+    "minimum_opportunities": 20,
+    "stress_cost_multiplier": 1.5,
+    "maximum_best_positive_event_share": 0.4,
+    "maximum_approximate_drawdown": 4500.0,
+    "require_nonnegative_half": false,
+    "micro_batch_size": 64
+  },
+  "exact_replay_period": [
+    "2023-07-01",
+    "2024-10-01"
+  ],
+  "incremental_value_policy": {
+    "minimum_exact_events": 16,
+    "maximum_best_positive_event_share": 0.35,
+    "minimum_matched_starts": 4,
+    "minimum_independent_blocks": 4,
+    "minimum_stressed_net_uplift": 50.0,
+    "minimum_target_progress_uplift": 0.005,
+    "minimum_mll_breach_reduction": 0.05,
+    "minimum_consistency_uplift": 0.1,
+    "minimum_shared_loss_day_reduction": 0.5,
+    "maximum_net_sacrifice_for_defensive_role": 100.0,
+    "maximum_cost_increase": 50.0,
+    "minimum_positive_block_fraction": 0.75
+  },
+  "validator_calibration": {
+    "seed": 20260713,
+    "repetitions": 256,
+    "starts_per_block": 4,
+    "noise_scale": 50.0,
+    "maximum_false_positive_rate": 0.1,
+    "minimum_meaningful_effect_power": 0.8
+  },
+  "incremental_episode_policy": {
+    "maximum_starts": 4,
+    "minimum_spacing_sessions": 45,
+    "minimum_observation_sessions": 30,
+    "maximum_duration_sessions": 40,
+    "regime_balanced": false
+  },
+  "assembly_episode_policy": {
+    "maximum_starts": 8,
+    "minimum_spacing_sessions": 45,
+    "minimum_observation_sessions": 30,
+    "maximum_duration_sessions": 40,
+    "regime_balanced": false
+  },
+  "rolling_episode_policy": {
+    "maximum_starts": 24,
+    "minimum_spacing_sessions": 5,
+    "minimum_observation_sessions": 60,
+    "maximum_duration_sessions": 90,
+    "regime_balanced": true
+  },
+  "account_research_gate": {
+    "minimum_base_median_net": 0.0,
+    "minimum_stressed_median_net": 0.0,
+    "minimum_median_target_progress": 0.15,
+    "maximum_mll_breach_rate": 0.25,
+    "minimum_consistency_pass_rate": 0.5
+  },
+  "combine_path_gate": {
+    "minimum_pass_count": 1,
+    "maximum_mll_breach_rate": 0.2,
+    "minimum_stressed_median_net": 0.0,
+    "minimum_consistency_pass_rate": 0.5
+  },
+  "failure_policy": {
+    "minimum_research_events": 24,
+    "minimum_effective_blocks": 4,
+    "useful_target_progress": 0.75,
+    "maximum_acceptable_mll_breach_rate": 0.2
+  },
+  "archive_policy": {
+    "maximum_per_niche": 3,
+    "fitness_mode": "PARETO_NO_SINGLE_SCALAR",
+    "soft_diversity_caps": true
+  },
+  "compute": {
+    "host_cpu_count": 4,
+    "exact_worker_count": 3,
+    "single_writer_count": 1,
+    "report_in_hot_loop": false
+  },
+  "multiplicity": {
+    "prospective_global_reservation": 52000,
+    "campaign_specific_inflation": 1.5,
+    "expensive_DSR_BH_deferred": true
+  },
+  "statuses": {
+    "micro_edge_useful_is_validated": false,
+    "account_policy_research_candidate_is_validated": false,
+    "combine_path_candidate_is_validated": false,
+    "pre_holdout_ready_allowed_in_pilot": false,
+    "paper_shadow_ready_allowed_in_pilot": false
+  },
+  "q4_access_allowed": false,
+  "new_data_purchase_allowed": false,
+  "network_access_allowed": false,
+  "broker_or_orders_allowed": false,
+  "CONTRE": "The same development history generates, screens, assembles and diagnoses the pilot population; all resulting statuses are research-only and expensive validation plus untouched proof remain mandatory for promotion.",
+  "preregistration_hash": "d6dcff388c04eb8d3f49ad9aea592d015ecd5fc3469b2189ae2d8920c8673c19"
+}
