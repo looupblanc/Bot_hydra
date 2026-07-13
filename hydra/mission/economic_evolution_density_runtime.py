@@ -39,15 +39,15 @@ from hydra.research.economic_evolution_density_campaign import (
 
 CAMPAIGN_ID = "hydra_economic_evolution_density_diversification_0007"
 CAMPAIGN_CONFIG_RELATIVE_PATH = Path(
-    "config/v7/economic_evolution_density_diversification_0007.json"
+    "config/v7/economic_evolution_density_diversification_0007_revision_01.json"
 )
 CAMPAIGN_CONFIG_SHA256 = (
-    "447a655673ff4e44810f9c0753663ba8a11b05e32d5182c5f668c614ea6a1942"
+    "2f941ecbe79d7acb5a534e99eab5b7db0fe6885762b9e305dbebac7bcbef10c3"
 )
 CAMPAIGN_WORM_TAG = (
-    "worm/economic-evolution-density-diversification-0007-2026-07-13"
+    "worm/economic-evolution-density-diversification-0007-revision-01-2026-07-13"
 )
-CAMPAIGN_WORM_COMMIT = "802879db39598bd6562d1feb005003afc94e70d9"
+CAMPAIGN_WORM_COMMIT = "9a8b27684a4298eeb006e242a8c6baf85fc60c9d"
 CAMPAIGN_OUTPUT_RELATIVE_PATH = Path(
     "reports/economic_evolution/density_diversification_0007"
 )
