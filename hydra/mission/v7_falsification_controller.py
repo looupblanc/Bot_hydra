@@ -57,6 +57,11 @@ from hydra.mission.economic_evolution_density_terminal_runtime import (
     EconomicEvolutionDensityTerminalRuntime,
     load_and_verify_density_terminal_verdict,
 )
+from hydra.mission.economic_evolution_agreement_runtime import (
+    CAMPAIGN_CONFIG_RELATIVE_PATH as AGREEMENT_CONFIG_RELATIVE_PATH,
+    EconomicEvolutionAgreementRuntime,
+    verify_agreement_freeze,
+)
 from hydra.mission.mission_state import (
     append_event,
     append_jsonl,
@@ -78,7 +83,7 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v11"
+CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v12"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-economic-evolution-single-writer"
 CONTROLLER_OWNER = "v7_economic_evolution_controller"
@@ -2368,6 +2373,11 @@ class V7FalsificationController:
             if (self.root / DENSITY_TERMINAL_VERDICT_RELATIVE_PATH).is_file()
             else None
         )
+        self._economic_agreement_runtime = (
+            EconomicEvolutionAgreementRuntime(self.root, self.paths.state_dir)
+            if (self.root / AGREEMENT_CONFIG_RELATIVE_PATH).is_file()
+            else None
+        )
 
     def run(self) -> int:
         signal.signal(signal.SIGTERM, self._handle_signal)
@@ -2409,6 +2419,8 @@ class V7FalsificationController:
                     self._economic_failure_review_runtime.stop()
                 if self._economic_density_runtime is not None:
                     self._economic_density_runtime.stop()
+                if self._economic_agreement_runtime is not None:
+                    self._economic_agreement_runtime.stop()
                 set_kv(conn, "service_state", "V7_INTEGRITY_BLOCKED")
                 set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
                 set_kv(conn, "current_blocker", f"{type(exc).__name__}:{exc}"[:4000])
@@ -2531,6 +2543,8 @@ class V7FalsificationController:
             action = self._economic_density_runtime.advance(action)
         if self._economic_density_terminal_runtime is not None:
             action = self._economic_density_terminal_runtime.advance(action)
+        if self._economic_agreement_runtime is not None:
+            action = self._economic_agreement_runtime.advance(action)
         previous = get_kv(conn, "v7_current_action", {})
         step = int(get_kv(conn, "v7_step", 0)) + 1
         progress_at = utc_now_iso()
@@ -2626,6 +2640,8 @@ class V7FalsificationController:
                 load_and_verify_density_terminal_verdict(
                     self.root, result=density_result
                 )
+        if (self.root / AGREEMENT_CONFIG_RELATIVE_PATH).is_file():
+            verify_agreement_freeze(self.root)
         return text
 
     def _checkpoint(
@@ -2722,6 +2738,10 @@ class V7FalsificationController:
             heartbeat["economic_evolution_density_terminal"] = (
                 self._economic_density_terminal_runtime.snapshot()
             )
+        if self._economic_agreement_runtime is not None:
+            heartbeat["economic_evolution_directional_agreement"] = (
+                self._economic_agreement_runtime.snapshot()
+            )
         return heartbeat
 
     def _lease_expires_at(self) -> str:
@@ -2771,6 +2791,8 @@ class V7FalsificationController:
             self._economic_failure_review_runtime.stop()
         if self._economic_density_runtime is not None:
             self._economic_density_runtime.stop()
+        if self._economic_agreement_runtime is not None:
+            self._economic_agreement_runtime.stop()
         now = utc_now_iso()
         set_kv(conn, "service_state", "STOPPED_CLEANLY_V7")
         set_kv(conn, "current_phase", "STOPPED_CLEANLY")

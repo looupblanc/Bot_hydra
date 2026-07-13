@@ -248,7 +248,7 @@ def test_v71_power_aware_integrated_action_reports_g9_falsification() -> None:
 def test_economic_evolution_action_preserves_G12_terminal_evidence() -> None:
     result = classify_v7_action(Path.cwd())
 
-    assert CONTROLLER_SCHEMA == "hydra_v7_economic_evolution_controller_v11"
+    assert CONTROLLER_SCHEMA == "hydra_v7_economic_evolution_controller_v12"
     assert result["action_type"] in {
         "ECONOMIC_EVOLUTION_CAMPAIGN_0002_PREREGISTERED",
         "ECONOMIC_EVOLUTION_CAMPAIGN_0002_COMPLETE",

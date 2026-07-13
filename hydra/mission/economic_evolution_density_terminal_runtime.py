@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from hydra.governance.proof_registry import (
+    MULTIPLICITY_EVENT,
     burned_window_ids,
     load_and_verify,
     multiplicity_trial_count,
@@ -138,9 +139,24 @@ class EconomicEvolutionDensityTerminalRuntime:
             raise EconomicEvolutionRuntimeError(
                 "density terminal unexpected proof-window state"
             )
-        if multiplicity_trial_count(proof) != EXPECTED_N_TRIALS:
+        current_trials = multiplicity_trial_count(proof)
+        if not self.receipt_path.is_file() and current_trials != EXPECTED_N_TRIALS:
             raise EconomicEvolutionRuntimeError(
                 "density terminal multiplicity drift"
+            )
+        if self.receipt_path.is_file() and current_trials < EXPECTED_N_TRIALS:
+            raise EconomicEvolutionRuntimeError(
+                "density terminal multiplicity regressed after completion"
+            )
+        density_reservations = [
+            row
+            for row in proof["entries"]
+            if row.get("event_type") == MULTIPLICITY_EVENT
+            and (row.get("evidence") or {}).get("campaign_id") == CAMPAIGN_ID
+        ]
+        if len(density_reservations) != 1:
+            raise EconomicEvolutionRuntimeError(
+                "density terminal found a late self-attributed reservation"
             )
 
     def _write_or_verify_receipt(

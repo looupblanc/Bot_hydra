@@ -7,6 +7,10 @@ from pathlib import Path
 import pytest
 
 import hydra.mission.economic_evolution_density_terminal_runtime as terminal_module
+from hydra.governance.proof_registry import (
+    MULTIPLICITY_EVENT,
+    append_entry,
+)
 from hydra.mission.economic_evolution_density_runtime import (
     CAMPAIGN_ID,
     EXPECTED_N_TRIALS,
@@ -166,3 +170,49 @@ def test_terminal_action_cannot_promote_or_authorize_data(
     assert action["protected_holdout_access_authorized"] is False
     assert action["shadow_admission_authorized"] is False
     assert action["economic_independent_confirmation_queue_eligible_count"] == 0
+
+
+def test_completed_terminal_allows_later_campaign_reservation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path / "project"
+    state = root / "mission/state"
+    state.mkdir(parents=True)
+    shutil.copy2(
+        LIVE_STATE_ROOT / "mission/state/graveyard.db", state / "graveyard.db"
+    )
+    shutil.copy2(
+        LIVE_STATE_ROOT / "mission/state/proof_registry.json",
+        state / "proof_registry.json",
+    )
+    monkeypatch.setattr(terminal_module, "verify_density_freeze", lambda _root: {})
+    monkeypatch.setattr(
+        terminal_module,
+        "load_and_verify_density_result",
+        lambda _path, _config: _frozen_result(),
+    )
+    monkeypatch.setattr(
+        terminal_module,
+        "load_and_verify_density_terminal_verdict",
+        lambda _root, *, result: _frozen_verdict(),
+    )
+    runtime = EconomicEvolutionDensityTerminalRuntime(root, state)
+    first = runtime.advance(_predecessor())
+    append_entry(
+        state / "proof_registry.json",
+        {
+            "event_id": "downstream_agreement_reservation",
+            "event_type": MULTIPLICITY_EVENT,
+            "recorded_at_utc": "2026-07-13T20:00:00+00:00",
+            "status": "RESERVED",
+            "scientific_role": "DEVELOPMENT_ONLY",
+            "evidence": {"campaign_id": "agreement_0008"},
+            "multiplicity": {
+                "previous_N_trials": 454_503,
+                "delta_trials": 2_400,
+                "cumulative_N_trials": 456_903,
+            },
+        },
+    )
+    second = runtime.advance(_predecessor())
+    assert first == second
