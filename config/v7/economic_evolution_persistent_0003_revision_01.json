@@ -1,0 +1,210 @@
+{
+  "schema": "hydra_economic_evolution_campaign_preregistration_v1",
+  "campaign_id": "hydra_economic_evolution_persistent_0003_revision_01",
+  "issued_at_utc": "2026-07-13T13:41:00Z",
+  "implementation_commit": "190333a5838f70114339c7014d0a15eb8531e44d",
+  "implementation_files": {
+    "hydra/economic_evolution/account_evaluation.py": "844422dd235eec18d22166acca06b7542f1da200f8e20efb6eebc93464719c5f",
+    "hydra/economic_evolution/archive.py": "a84d061fe81d340f6780a43d7b407174e1b64157f27baf4dbe26f70fe58c5f53",
+    "hydra/economic_evolution/assembly.py": "c743987e75a86f0cd0d89ff3f88b82ab33579214b47170ede0cc31b5e1ea669e",
+    "hydra/economic_evolution/failure_model.py": "219068150d8f5d53041f21f92127a30a5417b496282878cbf5e3e7735a5c1b07",
+    "hydra/economic_evolution/generator.py": "7a0c4916bdfa259eeac9fec9c1cba9cb21cda89f8737372c3d1828fea9339ee2",
+    "hydra/economic_evolution/incremental_value.py": "e86cb8afbba28cb6f7cea4fc1a1ac51a40f79da3fb40e3d0be9a103b390797fa",
+    "hydra/economic_evolution/null_calibration.py": "8bd1dfd7cda22562616eceea95d42bc11ea12c7a3e9bb148add129d65afde16e",
+    "hydra/economic_evolution/parallel_screen.py": "8d2ef1d7e80586309b2d59a36afdddc50b39bd79eddf3e98119891b990dbf536",
+    "hydra/economic_evolution/policy_evolution.py": "decfe537130bf91939d11f986c4a0307a18c36f1e8e8c6dc0e135849cd392a15",
+    "hydra/economic_evolution/schema.py": "398f86f4a4a60e0adff54b69083718ca27a1217854fff587b47e0f3ab42f5fb0",
+    "hydra/economic_evolution/screen.py": "a00281883885c477e5cd35d94a0a2a400c711ac17f1807da9cd703c85bed3c87",
+    "hydra/economic_evolution/seed_archive.py": "09196105b19e4787d5dbf1ce3b2320dc39facf36611a2e25dc2b3447712b47bd",
+    "hydra/economic_evolution/statuses.py": "3915d1ec03f2378e26e432e0e7c2b9fdf603701edfc238829f78c3a16dbfef6c",
+    "hydra/research/economic_evolution_campaign.py": "fec67a8372f12f57b954dc9fa9061a2c0d35bd7929eec47d4ffc8a9fe911931c",
+    "scripts/run_economic_evolution_campaign.py": "b114514ef7dcfbd1e5810c85a2bf7a10ae3bfefd41e7a428e7a4d7f7aef9568c"
+  },
+  "constitutional_basis": {
+    "contract": "MISSION_CONTRACT.md",
+    "amendment": "MISSION_CONTRACT_AMENDMENT_004_ECONOMIC_EVOLUTION.md",
+    "amendment_tag": "worm/amendment-004-economic-evolution-2026-07-13",
+    "primary_economic_evidence": "stressed account net economics",
+    "combine_pass_rate_is_sole_fitness": false,
+    "expensive_confirmation_deferred": true
+  },
+  "successor_basis": {
+    "source_campaign": "hydra_economic_evolution_persistent_0002",
+    "source_result_path": "reports/economic_evolution/persistent_0002/economic_evolution_campaign_result.json",
+    "source_result_sha256": "cc28a45b776d8d565809c6aeef1171c95ec6167b2d235289b41bdf35b0872d9d",
+    "rolling_policy_count": 40,
+    "long_recovery_time_count": 40,
+    "combine_pass_count": 0,
+    "mll_breach_count": 0,
+    "maximum_target_progress": 0.9058377777779274,
+    "failure_directed_mutations": 200,
+    "improved_mutations": 57,
+    "principal_repair": "TARGET_VELOCITY_WITHOUT_MLL_DETERIORATION",
+    "status_inheritance": false,
+    "supersedes_preregistration_path": "config/v7/economic_evolution_persistent_0003.json",
+    "supersedes_preregistration_sha256": "2b099a484fcea563516a2fdef84fed4f6744bcf94e185725b76fc0f02bf775fa",
+    "superseded_engineering_attempts": 2,
+    "superseded_scientific_outcomes_seen": false,
+    "supersession_reason": "The frozen campaign engine rejected 25,000 raw proposals before feature, signal, PnL or account evaluation because its substantive-scale invariant requires at least 50,000."
+  },
+  "structural_population": {
+    "candidate_manifest_hash": "7106b0152499eced353958e5d176165fc3f1a4e49ce29c7a6238d7a7b9dc965a",
+    "expected_unique_sleeves": 45098,
+    "expected_seed_behavioral_overlap": 3,
+    "outcome_feedback_used_for_structural_generation": false,
+    "outcome_feedback_used_for_failure_class_selection": true,
+    "parameter_neighbor_status": "DEDUPLICATED_BEFORE_REPLAY"
+  },
+  "seed_archive": {
+    "path": "reports/economic_evolution/seeds/persistent_0002_successor_seed.json",
+    "file_sha256": "bac6cfb43e4200ab691458f8ef1f7d644526e5576f27b7b48176bfa06c9e94a7",
+    "archive_hash": "fa527742bd6ad783109fb6565de2d7be6178583eb4dbef28b0d8fc8786a255a6",
+    "development_only": true,
+    "status_inheritance": false
+  },
+  "data": {
+    "role": "DEVELOPMENT_ONLY_Q4_EXCLUDED",
+    "period": [
+      "2023-01-01",
+      "2024-10-01"
+    ],
+    "feature_source_fingerprint": "1c773f5044f0f9c3bc50e67003b93a7c35ecaf8c505879fd1c20d6d03edada6c",
+    "contract_map_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+    "feature_manifest_sha256": {
+      "CL": "6255364f0334adc3f2de3b0be6e48a2bc6a6a693b4660b3ff5ac9ff83551d1b9",
+      "ES": "3d3865d6b0ccd37aafb9010025f46a8e858fac085f71ddd186ae55dbbe50859f",
+      "GC": "d0f78468ff58ade16dbd870cc24624c29578c9b557aa81d865ef3d32f557bc89",
+      "NQ": "4528e06bb4ff00aa4de14fcb90d0029a8dde5faf757e734f3b1f03118fd1dff9",
+      "RTY": "648f5707627d7ce7a0d4c56704f3a42f8dc1e7bd33d10e3a3417f9500080b5ca",
+      "YM": "ec3367ec31dacf216f2235479b5148493a615fc2c579187fe583a20b1acf2908"
+    }
+  },
+  "funnel": {
+    "raw_proposals": 50000,
+    "maximum_exact_component_replays": 700,
+    "incremental_value_evaluations": 400,
+    "maximum_component_bank": 100,
+    "structural_account_policies": 500,
+    "failure_directed_policy_children": 800,
+    "exact_account_policy_evaluations": 1000,
+    "rolling_combine_elite_count": 60,
+    "xfa_elite_count": 15
+  },
+  "cheap_screen_policy": {
+    "calibration_start": "2023-01-01",
+    "calibration_end_exclusive": "2023-07-01",
+    "screen_start": "2023-07-01",
+    "screen_end_exclusive": "2024-01-01",
+    "minimum_opportunities": 20,
+    "stress_cost_multiplier": 1.5,
+    "maximum_best_positive_event_share": 0.4,
+    "maximum_approximate_drawdown": 4500,
+    "require_nonnegative_half": false,
+    "micro_batch_size": 64
+  },
+  "exact_replay_period": [
+    "2023-07-01",
+    "2024-10-01"
+  ],
+  "incremental_value_policy": {
+    "minimum_exact_events": 16,
+    "maximum_best_positive_event_share": 0.35,
+    "minimum_matched_starts": 4,
+    "minimum_independent_blocks": 4,
+    "minimum_stressed_net_uplift": 50,
+    "minimum_target_progress_uplift": 0.005,
+    "minimum_mll_breach_reduction": 0.05,
+    "minimum_consistency_uplift": 0.1,
+    "minimum_shared_loss_day_reduction": 0.5,
+    "maximum_net_sacrifice_for_defensive_role": 100,
+    "maximum_cost_increase": 50,
+    "minimum_positive_block_fraction": 0.75
+  },
+  "validator_calibration": {
+    "seed": 20260713,
+    "repetitions": 256,
+    "starts_per_block": 4,
+    "noise_scale": 50,
+    "maximum_false_positive_rate": 0.1,
+    "minimum_meaningful_effect_power": 0.8
+  },
+  "incremental_episode_policy": {
+    "maximum_starts": 4,
+    "minimum_spacing_sessions": 45,
+    "minimum_observation_sessions": 30,
+    "maximum_duration_sessions": 40,
+    "regime_balanced": false
+  },
+  "assembly_episode_policy": {
+    "maximum_starts": 8,
+    "minimum_spacing_sessions": 45,
+    "minimum_observation_sessions": 30,
+    "maximum_duration_sessions": 40,
+    "regime_balanced": false
+  },
+  "rolling_episode_policy": {
+    "maximum_starts": 24,
+    "minimum_spacing_sessions": 5,
+    "minimum_observation_sessions": 60,
+    "maximum_duration_sessions": 90,
+    "regime_balanced": true
+  },
+  "account_research_gate": {
+    "minimum_base_median_net": 0,
+    "minimum_stressed_median_net": 0,
+    "minimum_median_target_progress": 0.15,
+    "maximum_mll_breach_rate": 0.25,
+    "minimum_consistency_pass_rate": 0.5
+  },
+  "combine_path_gate": {
+    "minimum_pass_count": 1,
+    "maximum_mll_breach_rate": 0.2,
+    "minimum_stressed_median_net": 0,
+    "minimum_consistency_pass_rate": 0.5
+  },
+  "failure_policy": {
+    "minimum_research_events": 24,
+    "minimum_effective_blocks": 4,
+    "useful_target_progress": 0.75,
+    "maximum_acceptable_mll_breach_rate": 0.2
+  },
+  "archive_policy": {
+    "maximum_per_niche": 3,
+    "fitness_mode": "PARETO_NO_SINGLE_SCALAR",
+    "soft_diversity_caps": true
+  },
+  "compute": {
+    "host_cpu_count": 4,
+    "cheap_screen_worker_count": 3,
+    "exact_worker_count": 3,
+    "single_authoritative_mission_writer_count": 1,
+    "artifact_writer_is_not_registry_writer": true,
+    "report_in_hot_loop": false
+  },
+  "allocation": {
+    "failure_directed_mutation": 0.55,
+    "account_assembly": 0.1,
+    "new_structural_micro_edges": 0.1,
+    "multi_asset_role_synthesis": 0.1,
+    "account_controller_evolution": 0.1,
+    "novel_representation_research": 0.05
+  },
+  "multiplicity": {
+    "prospective_global_reservation": 53500,
+    "campaign_specific_inflation": 1.5,
+    "expensive_DSR_BH_deferred": true
+  },
+  "statuses": {
+    "micro_edge_useful_is_validated": false,
+    "account_policy_research_candidate_is_validated": false,
+    "combine_path_candidate_is_validated": false,
+    "pre_holdout_ready_allowed": false,
+    "paper_shadow_ready_allowed": false
+  },
+  "q4_access_allowed": false,
+  "new_data_purchase_allowed": false,
+  "network_access_allowed": false,
+  "broker_or_orders_allowed": false,
+  "CONTRE": "This revision increases only the outcome-free structural proposal count to satisfy the already-frozen engine minimum after two pre-outcome engineering rejections. It preserves every scientific gate, remains development-only, and still carries selection bias from campaign 0002.",
+  "preregistration_hash": "0724e73621cb573f6a5c94d30377c86c9134467d27cc6a0e583c5fa78f759ac2"
+}
