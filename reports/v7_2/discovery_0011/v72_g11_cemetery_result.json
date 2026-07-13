@@ -1,0 +1,23 @@
+{
+  "CONTRE": "The class-level tripwire only proves that this frozen arrival-renewal grammar does not outperform its preregistered price-null worlds; it does not prove that every possible arrival-time mechanism is dead.",
+  "candidate_count": 24,
+  "class_signature_count_after": 93,
+  "death_cause": "GEOMETRY_ONLY_NULL_RATIO_GTE_0_8",
+  "evidence_sha256": "80a4c4a90fbdc4d12d5ba7694683ace5e0df3902b9f529383c8f3a0c2df6ae34",
+  "generator_feedback_scope": [
+    "mechanism_class",
+    "regime",
+    "death_cause",
+    "candidate_count"
+  ],
+  "graveyard_integrity": "ok",
+  "indexed_object_count_after": 115578,
+  "mechanism_class": "v72g11_intraminute_trade_arrival_renewal",
+  "parameter_level_feedback_permitted": false,
+  "regime": "D1_2023_2024_DEVELOPMENT_PRICE_NULLS",
+  "schema": "hydra_v7_2_g11_class_tombstone_result_v1",
+  "signature_hash": "414f064e5ec648342b91b7afbec6e576e357af06f48301068c8da7c96b5d85ae",
+  "snapshot_before_append": "mission/state/snapshots/v72_g11_pre_tombstone_20260713T083436Z/graveyard.db",
+  "source_scope": "HYDRA_V72_G11_TRADE_ARRIVAL_RENEWAL",
+  "status": "APPENDED"
+}

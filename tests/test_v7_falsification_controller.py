@@ -245,12 +245,12 @@ def test_v71_power_aware_integrated_action_reports_g9_falsification() -> None:
     assert result["shadow_admission_authorized"] is False
 
 
-def test_v72_integrated_action_records_G10_underpowered_pivot() -> None:
+def test_v72_integrated_action_records_G11_geometry_only_pivot() -> None:
     result = classify_v7_action(Path.cwd())
 
-    assert CONTROLLER_SCHEMA == "hydra_v7_2_flow_impact_conversion_controller_v2"
+    assert CONTROLLER_SCHEMA == "hydra_v7_2_arrival_renewal_controller_v3"
     assert result["action_type"] == (
-        "V72_G10_GREEN_TRIPWIRE_UNDERPOWERED_NO_PROMOTION_DISTINCT_MECHANISM_PIVOT"
+        "V72_G11_GEOMETRY_ONLY_CLASS_TOMBSTONED_DISTINCT_MECHANISM_PIVOT"
     )
     assert result["v72_static_structure_count"] == 1009
     assert result["v72_design_episode_count"] == 24216
@@ -280,7 +280,27 @@ def test_v72_integrated_action_records_G10_underpowered_pivot() -> None:
     assert result["g10_candidate_nulls_executed"] is False
     assert result["g10_DSR_BH_executed"] is False
     assert result["g10_rolling_combine_executed"] is False
-    assert result["raw_global_N_trials"] >= 265107
+    assert result["g11_candidate_count"] == 24
+    assert result["g11_signal_count"] == 1076
+    assert result["g11_stage0_valid_count"] == 24
+    assert result["g11_insufficient_power_count"] == 15
+    assert result["g11_stage1_survivor_count"] == 2
+    assert result["g11_walk_forward_positive_count"] == 2
+    assert result["g11_SIM_EXPLOIT_survivor_count"] == 2
+    assert result["g11_tripwire_verdict"] == "ARTEFACT_GEOMETRY_ONLY"
+    assert result["g11_tripwire_evidence_strength"] == "ARTEFACT"
+    assert result["g11_NULL_RATIO"] == 2.5
+    assert result["g11_real_pass_count"] == "6/480"
+    assert result["g11_null_pass_count"] == "45/1440"
+    assert result["g11_cemetery_candidate_count"] == 24
+    assert result["g11_power_audit_executed"] is False
+    assert result["g11_candidate_nulls_executed"] is False
+    assert result["g11_DSR_BH_executed"] is False
+    assert result["g11_rolling_combine_executed"] is False
+    assert result["walk_forward_positive_count"] == 31
+    assert result["evidence_reconciliation_accounted_count"] == 31
+    assert result["evidence_reconciliation_unaccounted_count"] == 0
+    assert result["raw_global_N_trials"] >= 265227
     assert result["new_data_purchase_authorized"] is False
     assert result["protected_holdout_access_authorized"] is False
     assert result["shadow_admission_authorized"] is False
@@ -385,7 +405,7 @@ def test_running_v7_controller_renews_watchdog_lease(
     )
     assert health["classification"] == "HEALTHY_AND_PROGRESSING"
     assert snapshot["current_experiment"]["claimed_by"] == (
-        "v7_2_flow_impact_conversion_controller"
+        "v7_2_arrival_renewal_controller"
     )
     assert snapshot["broker_order_capability"] is False
     heartbeat = heartbeat_status(controller.paths).payload
