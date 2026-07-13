@@ -1,0 +1,75 @@
+{
+  "schema": "hydra_v7_1_g6_persistent_deployment_evidence_v1",
+  "recorded_at_utc": "2026-07-13T02:42:02Z",
+  "deployed_commit": "b1950816ac6d250f8fae6d5abb3115f54f300a70",
+  "origin_commit": "b1950816ac6d250f8fae6d5abb3115f54f300a70",
+  "mission_id": "hydra_v7_1_falsification_20260712_0001",
+  "service": {
+    "name": "hydra-autonomous-mission.service",
+    "active": true,
+    "enabled": true,
+    "pid": 449754,
+    "restart_count": 0,
+    "controller_version": "hydra_v7_1_falsification_controller_v7",
+    "heartbeat_age_seconds_at_check": 1.173232,
+    "v7_step": 1255,
+    "phase": "V7_PHASE_4"
+  },
+  "single_writer": {
+    "controller_process_count": 1,
+    "process_lock_pid": 449754,
+    "running_experiment_count": 1,
+    "running_experiment_id": "hydra_v7_1_falsification_20260712_0001",
+    "claim_token": "v7-falsification-single-writer",
+    "claimed_by": "v7_falsification_controller",
+    "queued_experiment_count": 0
+  },
+  "current_action": {
+    "action_type": "V71_G6_GREEN_UNDERPOWERED_COMBINE_DIAGNOSTIC_COMPLETE",
+    "walk_forward_positive_count": 22,
+    "evidence_reconciliation_accounted_count": 22,
+    "evidence_reconciliation_unaccounted_count": 0,
+    "powered_candidate_count": 0,
+    "underpowered_combine_selected_count": 5,
+    "underpowered_combine_episode_start_count": 24,
+    "underpowered_combine_effective_block_count": 4,
+    "underpowered_combine_candidate_pass_count": 0,
+    "underpowered_combine_basket_pass_count": 0,
+    "underpowered_combine_validated_count": 0,
+    "new_data_purchase_authorized": false,
+    "shadow_admission_authorized": false
+  },
+  "integrity": {
+    "mission_db": "ok",
+    "graveyard_db": "ok",
+    "hydra_registry_db": "ok",
+    "strategy_registry_db": "ok",
+    "governance_passed": true,
+    "q4_access_count": 1,
+    "q4_transaction_status": "COMMITTED",
+    "proof_registry_N_trials": 263814,
+    "burned_windows": [
+      "Q4_2024"
+    ],
+    "outbound_orders": 0,
+    "broker_connections": 0
+  },
+  "budget": {
+    "actual_spend_usd": 87.84738838672598,
+    "remaining_usd": 37.15261161327402,
+    "new_purchase_count": 0
+  },
+  "tests": {
+    "full_pytest": "725/725",
+    "focused_after_merge": "19/19",
+    "no_lookahead_and_ruleset": "41/41",
+    "compileall": "GREEN",
+    "secret_scan_hits": 0,
+    "deterministic_signal_manifest": "ea883cbf7ee460b5467f0023f171e67528f696f748c09aa7c95d11a87e7db752",
+    "deterministic_combine_diagnostic": "6dff583d4aa945f4e2c479b801cf6fa954e0616b8f65d32bada401797ce0c4e0"
+  },
+  "snapshot_path": "mission/state/snapshots/v71_g6_pre_deploy_20260713T024000Z",
+  "next_experiment_id": "hydra_v7_1_independent_confirmation_and_distinct_hypothesis_review_0007",
+  "next_experiment_state": "PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+  "CONTRE": "The persistent controller is healthy and evidence-complete, but a healthy PID is not an edge: zero candidate is powered, the bounded Combine diagnostic had zero passes, and fresh independent confirmation is still absent."
+}
