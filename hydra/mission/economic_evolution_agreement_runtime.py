@@ -43,19 +43,19 @@ from hydra.research.economic_evolution_density_campaign import (
 
 CAMPAIGN_ID = NEXT_CAMPAIGN_ID
 CAMPAIGN_CONFIG_RELATIVE_PATH = Path(
-    "config/v7/economic_evolution_directional_agreement_0008_revision_01.json"
+    "config/v7/economic_evolution_directional_agreement_0008_revision_02.json"
 )
 CAMPAIGN_CONFIG_SHA256 = (
-    "671628423d0a6e9a5a942c6dfad35c1bb86fb88815622e656e12b841d468b6e0"
+    "29dab8df0f370caf3baaf2cc9923491f16cccd9825a8c74c78f2934eda2f333c"
 )
 CAMPAIGN_PREREGISTRATION_HASH = (
-    "177e58fa07d920bcec770ee782ba4a9947d141ab6f8ad067e2b8dde4f440b7dd"
+    "e3c7126b182928c44db8c277037212f6d162448c7f8d2feb0abc56ae267688f8"
 )
 CAMPAIGN_WORM_TAG = (
-    "worm/economic-evolution-directional-agreement-0008-revision-01-2026-07-13"
+    "worm/economic-evolution-directional-agreement-0008-revision-02-2026-07-13"
 )
-CAMPAIGN_WORM_COMMIT = "64dfaafac63565517b2f99492968261b02cc6bc8"
-CAMPAIGN_IMPLEMENTATION_COMMIT = "02e97b5fd1e11ddda2da305cf1d362e88b8bf220"
+CAMPAIGN_WORM_COMMIT = "a6a3a67132f1db8d8e8a9d2508dcb04ba2edec86"
+CAMPAIGN_IMPLEMENTATION_COMMIT = "e1779adc51686919cd53192d3c38ffd7a572a22b"
 CAMPAIGN_OUTPUT_RELATIVE_PATH = Path(
     "reports/economic_evolution/directional_agreement_0008"
 )
@@ -499,6 +499,15 @@ def verify_agreement_freeze(root: str | Path) -> dict[str, Any]:
         or int(config["structural_population"]["matched_null_sleeve_count"])
         != 44
         or int(config["structural_population"]["account_policy_count"]) != 256
+        or int(config["funnel"]["maximum_account_policy_evaluations"]) != 256
+        or config["funnel"][
+            "all_frozen_account_policies_receive_diagnostic_replay"
+        ]
+        is not True
+        or config["funnel"][
+            "scientific_promotion_requires_green_family_tripwire"
+        ]
+        is not True
         or int(config["multiplicity"]["reserved_delta_trials"])
         != MULTIPLICITY_DELTA
         or int(config["budget"]["N_trials_before_reservation"])
@@ -517,6 +526,11 @@ def agreement_action_from_result(
     predecessor: Mapping[str, Any], result: Mapping[str, Any]
 ) -> dict[str, Any]:
     tripwire = result["family_tripwire"]
+    components = result["component_economics"]
+    policies = result["account_policy_economics"]
+    pass_probability = policies["combine_pass_probability"]
+    progress = policies["median_target_progress_distribution"]
+    mll = policies["mll_breach_rate_distribution"]
     return {
         **dict(predecessor),
         "action_type": "ECONOMIC_EVOLUTION_AGREEMENT_0008_COMPLETE",
@@ -546,6 +560,45 @@ def agreement_action_from_result(
         ),
         "economic_agreement_real_pass_count": int(tripwire["real_pass_count"]),
         "economic_agreement_null_pass_count": int(tripwire["null_pass_count"]),
+        "economic_agreement_positive_after_cost_count": int(
+            components["real_positive_after_normal_cost_count"]
+        ),
+        "economic_agreement_positive_after_stress_count": int(
+            components["real_positive_after_stressed_cost_count"]
+        ),
+        "economic_agreement_matched_null_winner_count": int(
+            components["matched_null_component_gate_winner_count"]
+        ),
+        "economic_agreement_rolling_combine_episode_count": int(
+            policies["primary_rolling_combine_episode_count"]
+        ),
+        "economic_agreement_policies_with_combine_pass_count": int(
+            policies["policies_passing_at_least_one_combine_episode"]
+        ),
+        "economic_agreement_median_combine_pass_probability": pass_probability[
+            "median"
+        ],
+        "economic_agreement_best_combine_pass_probability": pass_probability[
+            "maximum"
+        ],
+        "economic_agreement_median_target_progress": progress["median"],
+        "economic_agreement_maximum_target_progress": policies[
+            "maximum_target_progress"
+        ],
+        "economic_agreement_median_mll_breach_rate": mll["median"],
+        "economic_agreement_maximum_mll_breach_rate": mll["maximum"],
+        "economic_agreement_behaviorally_distinct_policy_count": int(
+            policies["behaviorally_distinct_policy_count"]
+        ),
+        "economic_agreement_failure_vector_distribution": policies[
+            "failure_vector_distribution"
+        ],
+        "economic_agreement_targeted_mutations_selected": policies[
+            "targeted_mutations_selected"
+        ],
+        "economic_agreement_wall_clock_accounting": result[
+            "wall_clock_accounting"
+        ],
         "economic_agreement_NULL_RATIO": tripwire["NULL_RATIO"],
         "economic_agreement_tripwire_verdict": tripwire["verdict"],
         "economic_agreement_tripwire_evidence_strength": tripwire[

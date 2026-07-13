@@ -50,7 +50,7 @@ def _config() -> dict:
             "account_policy_count": 256,
         },
         "funnel": {
-            "maximum_account_policy_evaluations": 160,
+            "maximum_account_policy_evaluations": 256,
             "maximum_leave_one_out_controls_per_policy": 4,
         },
         "multiplicity": {
@@ -81,18 +81,18 @@ def _predecessor() -> dict:
 def test_agreement_worm_and_population_are_frozen() -> None:
     config = load_and_verify_agreement_preregistration(
         PROJECT_ROOT
-        / "config/v7/economic_evolution_directional_agreement_0008_revision_01.json"
+        / "config/v7/economic_evolution_directional_agreement_0008_revision_02.json"
     )
     tagged = subprocess.check_output(
         [
             "git",
             "rev-parse",
-            "worm/economic-evolution-directional-agreement-0008-revision-01-2026-07-13^{commit}",
+            "worm/economic-evolution-directional-agreement-0008-revision-02-2026-07-13^{commit}",
         ],
         cwd=PROJECT_ROOT,
         text=True,
     ).strip()
-    assert tagged == "64dfaafac63565517b2f99492968261b02cc6bc8"
+    assert tagged == "a6a3a67132f1db8d8e8a9d2508dcb04ba2edec86"
     assert config["campaign_id"] == CAMPAIGN_ID
     assert config["structural_population"]["real_sleeve_count"] == 44
     assert config["structural_population"]["matched_null_sleeve_count"] == 44
@@ -145,7 +145,7 @@ def test_agreement_complete_action_never_promotes_or_authorizes_data() -> None:
             "matched_null_sleeve_count": 44,
             "account_policy_count": 256,
         },
-        "account_policy_evaluated_count": 100,
+        "account_policy_evaluated_count": 256,
         "account_research_candidate_count": 3,
         "combine_path_diagnostic_count": 1,
         "family_tripwire": {
@@ -157,12 +157,40 @@ def test_agreement_complete_action_never_promotes_or_authorizes_data() -> None:
             "real_exact_replay_missing_count": 0,
             "null_exact_replay_missing_count": 0,
         },
+        "component_economics": {
+            "real_positive_after_normal_cost_count": 18,
+            "real_positive_after_stressed_cost_count": 12,
+            "matched_null_component_gate_winner_count": 4,
+        },
+        "account_policy_economics": {
+            "primary_rolling_combine_episode_count": 6_144,
+            "policies_passing_at_least_one_combine_episode": 7,
+            "combine_pass_probability": {"median": 0.0, "maximum": 0.125},
+            "median_target_progress_distribution": {"median": 0.42},
+            "maximum_target_progress": 1.0,
+            "mll_breach_rate_distribution": {
+                "median": 0.0,
+                "maximum": 0.25,
+            },
+            "behaviorally_distinct_policy_count": 21,
+            "failure_vector_distribution": {"TARGET_VELOCITY_LOW": 200},
+            "targeted_mutations_selected": [
+                {
+                    "priority": 1,
+                    "failure_vector": "TARGET_VELOCITY_LOW",
+                    "action": "ADD_COMPLEMENTARY_SESSION_OR_MARKET_SLEEVE",
+                }
+            ],
+        },
+        "wall_clock_accounting": {"research_percent": 92.0},
         "next_action": "POWER_AUDIT_BEST_AGREEMENT_ACCOUNT_POLICIES",
     }
     action = agreement_action_from_result(_predecessor(), result)
     assert action["raw_global_N_trials"] == EXPECTED_N_TRIALS
     assert action["economic_agreement_account_research_candidate_count"] == 3
     assert action["economic_agreement_combine_path_diagnostic_count"] == 1
+    assert action["economic_agreement_rolling_combine_episode_count"] == 6_144
+    assert action["economic_agreement_best_combine_pass_probability"] == 0.125
     assert action["economic_independent_confirmation_queue_eligible_count"] == 0
     assert action["economic_pre_holdout_ready_count"] == 0
     assert action["economic_paper_shadow_ready_count"] == 0
