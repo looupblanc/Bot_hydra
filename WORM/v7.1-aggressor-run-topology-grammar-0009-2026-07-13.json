@@ -1,0 +1,127 @@
+{
+  "schema": "hydra_v7_1_limited_aggressor_run_topology_grammar_v1",
+  "grammar_id": "hydra_v7_1_aggressor_run_topology_grammar_0009",
+  "allocation_role": "LIMITED_STRUCTURAL_DISCOVERY_5_PERCENT",
+  "broad_D1_batch": false,
+  "economic_hypothesis": "The topology of consecutive same-side aggressive trades inside a completed ES minute separates order splitting that moves price from aggressive effort absorbed by passive liquidity; the former can persist while the latter can reverse after the aggressor exhausts.",
+  "who_pays": "Late followers who continue an already completed directional execution program, and aggressive participants whose dominant run failed to move the traded price because passive liquidity absorbed their urgency.",
+  "persistence_rationale": "The class uses trade-level consecutive aggressor runs in exchange-event order. It is distinct from minute-to-minute sign sequences, half-minute flow allocation, event-bar completion speed, trade-size averages, and mini/micro timing relationships.",
+  "source": {
+    "dataset": "GLBX.MDP3",
+    "schema": "trades",
+    "product": "ES",
+    "sources": [
+      {
+        "calendar_year": 2023,
+        "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2023-08-02_2023-09-01.dbn.zst",
+        "sha256": "d93e5c8bd657a28bff5f05560b845caa3bb04e9252882ddc2751033fedd1c468",
+        "start_ns_inclusive": 1690934400000000000,
+        "end_ns_exclusive": 1693526400000000000,
+        "instrument_id": 3445,
+        "contract": "ESU3"
+      },
+      {
+        "calendar_year": 2024,
+        "path": "data/cache/databento_v7_d1/GLBX-MDP3_trades_ES_MES_2024-08-01_2024-10-01.dbn.zst",
+        "sha256": "a312d6df524205c2d1632c20f1033ecb74081c98d6608eacc1a9cdb08bcf9b63",
+        "start_ns_inclusive": 1722556800000000000,
+        "end_ns_exclusive": 1725148800000000000,
+        "instrument_id": 118,
+        "contract": "ESU4"
+      }
+    ],
+    "definitions_path": "data/cache/contract_maps/definitions_GLBX-MDP3_2023-01-01_2024-10-01_1faa319bb6354a47.dbn.zst",
+    "definitions_sha256": "a5374a723fdf442f8c5e31f98af26ff813070a61008d24e46f848df69c819dcc",
+    "rth_timezone": "America/Chicago",
+    "rth_start_inclusive": "08:30:00",
+    "rth_end_exclusive": "15:10:00",
+    "completed_minutes_only": true,
+    "raw_record_order": "exchange event timestamp after filtering one explicit ES contract",
+    "derived_store_path": "data/cache/v7_d1/date_matched_aggressor_run_topology_v1.parquet",
+    "derived_manifest_path": "data/manifests/v7_d1_aggressor_run_topology_v1.json",
+    "transformation_version": "hydra_v7_d1_aggressor_run_topology_v1"
+  },
+  "feature_policy": {
+    "aggressor_codes": {"B": "buy", "A": "sell", "N": "ignored for run topology"},
+    "run": "maximal consecutive records with the same non-neutral aggressor side inside one completed minute",
+    "dominant_side": "buy when longest_buy_run > longest_sell_run; sell when longest_sell_run > longest_buy_run; ties are ineligible",
+    "price_progress": "sign(last trade price minus first trade price) in the same completed minute",
+    "availability": "minute_start_ns plus 60 seconds",
+    "thresholds_learned_from_outcomes": false,
+    "outcomes_or_future_prices_used": false
+  },
+  "mechanism_class": "V71_INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY",
+  "motifs": [
+    {
+      "motif": "DOMINANT_RUN_WITH_PROGRESS",
+      "response_policy": "CONTINUATION",
+      "definition": "the unique dominant aggressor-run side equals the nonzero completed-minute price-progress sign; direction is the dominant side"
+    },
+    {
+      "motif": "DOMINANT_RUN_WITHOUT_PROGRESS",
+      "response_policy": "REVERSAL",
+      "definition": "the unique dominant aggressor-run side differs from the completed-minute price-progress sign, including zero progress; direction is opposite the dominant side"
+    }
+  ],
+  "holding_minutes": [30, 60],
+  "candidate_ids": [
+    "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h30",
+    "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h60",
+    "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h30",
+    "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h60"
+  ],
+  "candidate_count": 4,
+  "bounded_parameter_alternatives_per_structure": 1,
+  "signal_policy": {
+    "decision_timestamp": "minute_start_ns plus 60 seconds after the complete source minute",
+    "entry": "first explicit-contract 1m open at or after decision timestamp",
+    "exit": "explicit-contract 1m open at entry plus frozen holding_minutes",
+    "overlapping_signals_per_candidate": false,
+    "session_crossing": false,
+    "contract_crossing": false
+  },
+  "cost_policy": {
+    "path": "config/v7/phase0_g0_preregistration.json",
+    "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "primary_walk_forward_stress": "STRESS_1_5X",
+    "SIM_EXPLOIT_stress": "STRESS_2X"
+  },
+  "funnel": {
+    "stage0": "validity_novelty_nonoverlap_explicit_contract_and_trade_run_source",
+    "stage1": "frozen_existing_cheap_economic_policy",
+    "stage2": "four_fold_walk_forward_with_five_day_embargo",
+    "stage3": "hypothesis_specific_nulls_only_after_green_tripwire_and_powered_walk_forward",
+    "stage4": "campaign_DSR_BH_only_if_powered",
+    "stage5": "rolling_Combine_diagnostic_only_after_statistical_survival_or_explicit_research_stage_policy",
+    "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+    "candidate_specific_power_policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673"
+  },
+  "mandatory_grammar_tripwire": {
+    "policy_path": "WORM/v7.1-aggressor-run-topology-tripwire-0009-2026-07-13.json",
+    "worlds": ["DAILY_BLOCK_SHUFFLE", "VOLATILITY_MATCHED_RANDOM_WALK", "YEAR_BLOCK_PERMUTATION"],
+    "NULL_RATIO_artefact_threshold_inclusive": 0.8,
+    "raw_counts_and_exact_binomial_test_required": true,
+    "combine_pass_rate_is_fitness": false
+  },
+  "cemetery_firewall": {
+    "feedback_scope": "mechanism_class_x_regime_x_death_cause_only",
+    "parameter_feedback_used": false,
+    "candidate_outcome_feedback_used": false,
+    "excluded_classes": [
+      "ARB_INTRA_PRODUIT",
+      "V71_EVENT_TIME_CLOCK_STATES",
+      "V71_CROSS_CLOCK_FLOW_CONFIRMATION",
+      "V71_CROSS_CLOCK_SPEED_LEADERSHIP",
+      "V71_TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "V71_AGGRESSOR_FLOW_SIGN_SEQUENCES",
+      "V71_INTRAMINUTE_AGGRESSOR_FLOW_ALLOCATION"
+    ]
+  },
+  "candidate_status_inheritance": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "shadow_admission_authorized": false,
+  "broker_or_order_capability": false,
+  "outbound_orders": 0,
+  "CONTRE": "Run dominance can still be a high-frequency restatement of contemporaneous price progress, and two development blocks cannot establish regime persistence; the unchanged tripwire, walk-forward and power gates remain mandatory."
+}

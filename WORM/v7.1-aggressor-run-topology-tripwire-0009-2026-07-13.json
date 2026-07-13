@@ -1,0 +1,30 @@
+{
+  "schema": "hydra_v7_1_aggressor_run_topology_tripwire_policy_v1",
+  "tripwire_id": "hydra_v7_1_aggressor_run_topology_tripwire_0009",
+  "grammar_path": "WORM/v7.1-aggressor-run-topology-grammar-0009-2026-07-13.json",
+  "data_seen_before_freeze": false,
+  "candidate_count": 4,
+  "real_episode_starts_per_candidate": 20,
+  "null_worlds": [
+    {"name": "DAILY_BLOCK_SHUFFLE", "seed": 7109001, "replicates": 1},
+    {"name": "VOLATILITY_MATCHED_RANDOM_WALK", "seed": 7109002, "replicates": 1},
+    {"name": "YEAR_BLOCK_PERMUTATION", "seed": 7109003, "replicates": 1}
+  ],
+  "real_pass_denominator": 80,
+  "null_pass_denominator": 240,
+  "NULL_RATIO_artefact_threshold_inclusive": 0.8,
+  "null_zero_policy": "if both pass proportions are zero classify ARTEFACT_GEOMETRY_ONLY; if real is positive and null is zero NULL_RATIO is zero",
+  "exact_test": {
+    "name": "one_sided_exact_binomial",
+    "null_probability": "observed pooled null pass proportion",
+    "alternative": "real pass proportion greater than null",
+    "evidence_labels": {"VERT_NET": "p<0.05", "VERT_MINCE": "p>=0.05 with NULL_RATIO<0.8", "ARTEFACT": "NULL_RATIO>=0.8"}
+  },
+  "fitness_prohibited": "Combine pass probability",
+  "primary_metric": "account-level net expectancy after frozen costs",
+  "no_threshold_change_after_results": true,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "outbound_orders": 0,
+  "CONTRE": "Only eighty real episodes across four candidates can yield a noisy ratio; raw counts, exact p-value, and evidence-strength label are required and a green-thin result cannot authorize promotion alone."
+}

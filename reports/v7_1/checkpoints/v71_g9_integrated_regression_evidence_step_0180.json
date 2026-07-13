@@ -1,0 +1,61 @@
+{
+  "schema": "hydra_v7_1_g9_integrated_regression_evidence_v1",
+  "recorded_at_utc": "2026-07-13T05:19:59Z",
+  "baseline_commit": "9452e2790a37a80cf0852c957a2141134e9d9ab8",
+  "source_head": "c9a2c59c3dd2cad31998b0c6798039c1e144f4b0",
+  "controller_version": "hydra_v7_1_falsification_controller_v10",
+  "g9": {
+    "terminal_classification": "G9_FORMULATION_FALSIFIED",
+    "broader_mechanism_class_tombstoned": false,
+    "expansion_allowed": false,
+    "candidate_count": 4,
+    "signal_count": 1573,
+    "stage0_valid_novel_count": 4,
+    "stage1_pass_count": 0,
+    "walk_forward_positive_count": 0,
+    "rolling_combine_count": 0,
+    "shadow_count": 0,
+    "stress_1_5x_mean_usd_per_trade_range": [-64.30091911764706, -16.3791910331384]
+  },
+  "tripwire": {
+    "real": "0/80",
+    "null": "9/240",
+    "null_ratio": null,
+    "exact_binomial_one_sided_p_value": 1.0,
+    "evidence_strength": "INDETERMINE",
+    "verdict": "BLOCKED_UNDERPOWERED"
+  },
+  "data": {
+    "source_bounded_records_approx": 33980000,
+    "derived_minute_rows": 17200,
+    "derived_store_sha256": "f7edf987c4280f467fe92bcbd9e1918774ff4fa29a607ed973ad91cc909e0039",
+    "deterministic_across_chunk_sizes": true,
+    "new_data_purchase_count": 0
+  },
+  "integrity": {
+    "full_pytest": "749/749",
+    "focused_no_lookahead_ruleset_q4_budget": "55/55",
+    "compileall": "ok",
+    "mission_db": "ok",
+    "registry_db": "ok",
+    "governance_passed": true,
+    "governance_semantic_hash": "05810bc193e51e3c40722163a1ee3ae82fd3a8d7762c48eafa25c3a4cba1102b",
+    "governance_yaml_sha256": "3c9fd63f43037c65d79ecd688ce76bc126c42cc6eeaceb6bed8636548ffaff57",
+    "q4_access_count": 1,
+    "q4_status": "COMMITTED_BURNED_NO_REUSE",
+    "proof_registry_entry_count": 35,
+    "registry_n_trials": 263902,
+    "proof_chain_head": "a3aa59cb052f89434ea9b21b35c0aeb9ca2e4b05d4e947cd82aeed150951592b",
+    "secret_scan_hits": 0,
+    "broker_orders": 0
+  },
+  "budget": {
+    "new_data_purchase_count": 0,
+    "cumulative_spend_usd": 87.84738838672598,
+    "remaining_usd": 37.15261161327402
+  },
+  "snapshot_path": "mission/state/snapshots/v71_g9_pre_deploy_20260713T043330Z.tar.gz",
+  "current_action": "V71_G9_FORMULATIONS_FALSIFIED_TRIPWIRE_UNDERPOWERED",
+  "next_action": "DEPLOY_CONTROLLER_V10_THEN_BEGIN_V72_PARETO_CROSS_FIT_ACCOUNT_SYNTHESIS",
+  "CONTRE": "The tripwire is underpowered and the four operationalizations may be too narrow; the evidence falsifies the exact frozen formulations, not every possible intraminute run-topology mechanism."
+}

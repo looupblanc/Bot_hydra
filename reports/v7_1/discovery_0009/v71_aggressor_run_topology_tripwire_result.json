@@ -1,0 +1,716 @@
+{
+  "CONTRE": "Only two D1 calendar blocks exist and the candidate conditions include completed-minute price progress; even a green tripwire cannot rescue four formulations already negative at Stage 1.",
+  "NULL_RATIO": null,
+  "N_trials": 263902,
+  "candidate_count": 4,
+  "candidate_promotion_authorized": false,
+  "combine_pass_rate_is_diagnostic_not_fitness": true,
+  "controls": {
+    "DAILY_BLOCK_SHUFFLE": {
+      "candidate_quantity_results": {
+        "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.07076347026431985,
+            "minimum_mll_buffer": -96.18917210755171,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.3437660059438818,
+            "minimum_mll_buffer": -684.5335164409771,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.2033848726329064,
+            "minimum_mll_buffer": -941.5406050276652,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -5705.721229481045,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.7917216566179801,
+            "minimum_mll_buffer": -482.04973251896445,
+            "mll_breach_count": 2,
+            "pass_count": 2,
+            "timeout_count": 1
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.42025279079676126,
+            "minimum_mll_buffer": -2094.043966426456,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -4494.077290157846,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -13488.154580315662,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.34017129867404583,
+            "minimum_mll_buffer": -337.3874546531588,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.2003558759850922,
+            "minimum_mll_buffer": -322.027098423423,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.06073724689244086,
+            "minimum_mll_buffer": -1063.3130410686135,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -5300.681210055685,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.04255656248881456,
+            "minimum_mll_buffer": -36.47824348942959,
+            "mll_breach_count": 2,
+            "pass_count": 0,
+            "timeout_count": 3
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1491659428637811,
+            "minimum_mll_buffer": -423.19602329217014,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1317.7688399968029,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -6848.68687025446,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 80,
+      "mll_breach_count": 70,
+      "mll_breach_rate": 0.875,
+      "pass_count": 3,
+      "pass_rate": 0.0375,
+      "signal_count": 1566,
+      "timeout_count": 7
+    },
+    "VOLATILITY_MATCHED_RANDOM_WALK": {
+      "candidate_quantity_results": {
+        "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.22058259436960928,
+            "minimum_mll_buffer": -248.45566601218889,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.09437078246640482,
+            "minimum_mll_buffer": -1437.7302632595238,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0966957464148477,
+            "minimum_mll_buffer": -2366.6610024070833,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -1757.8625221790862,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.1777435891075131,
+            "minimum_mll_buffer": -270.673800782155,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.18494738954795564,
+            "minimum_mll_buffer": -1016.4731559457723,
+            "mll_breach_count": 3,
+            "pass_count": 2,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.2566780330513992,
+            "minimum_mll_buffer": -2105.469645935518,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.08688235665872021,
+            "minimum_mll_buffer": -1300.8275858282868,
+            "mll_breach_count": 4,
+            "pass_count": 1,
+            "timeout_count": 0
+          }
+        },
+        "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.24380824911324694,
+            "minimum_mll_buffer": -218.2928406635474,
+            "mll_breach_count": 3,
+            "pass_count": 0,
+            "timeout_count": 2
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.2194593969225437,
+            "minimum_mll_buffer": -1141.5695578424493,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.07014213741040051,
+            "minimum_mll_buffer": -4651.433580370765,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.0789202032713834,
+            "minimum_mll_buffer": -13802.867160741502,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.11169393125031234,
+            "minimum_mll_buffer": -273.87122093659127,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.183063139473004,
+            "minimum_mll_buffer": -4123.53890792164,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -12747.07781584328,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -29994.15563168659,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 80,
+      "mll_breach_count": 72,
+      "mll_breach_rate": 0.9,
+      "pass_count": 6,
+      "pass_rate": 0.075,
+      "signal_count": 1562,
+      "timeout_count": 2
+    },
+    "YEAR_BLOCK_PERMUTATION": {
+      "candidate_quantity_results": {
+        "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -568.1500000000524,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.042937104526662495,
+            "minimum_mll_buffer": -5636.300000000338,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -13790.200000000012,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -32080.399999999994,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          }
+        },
+        "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.006891151602786406,
+            "minimum_mll_buffer": -622.5499999999884,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.006891151602789199,
+            "minimum_mll_buffer": -5745.100000000006,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.006891151602787104,
+            "minimum_mll_buffer": -15990.199999999997,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -36480.399999999994,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h30": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.033553959562468455,
+            "minimum_mll_buffer": -298.22787658759626,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.03355395956236784,
+            "minimum_mll_buffer": -3505.2850954550086,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.04348333996572506,
+            "minimum_mll_buffer": -11510.570190910046,
+            "mll_breach_count": 4,
+            "pass_count": 0,
+            "timeout_count": 1
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -27521.140381820063,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        },
+        "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h60": {
+          "1": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": -0.31255555555555553,
+            "minimum_mll_buffer": -522.0048713313008,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "2": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -4467.505271828675,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "4": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -13435.010543657321,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          },
+          "8": {
+            "compliance_failure_count": 0,
+            "episode_count": 5,
+            "median_target_progress": 0.0,
+            "minimum_mll_buffer": -31370.02108731467,
+            "mll_breach_count": 5,
+            "pass_count": 0,
+            "timeout_count": 0
+          }
+        }
+      },
+      "compliance_failure_count": 0,
+      "episode_count": 80,
+      "mll_breach_count": 70,
+      "mll_breach_rate": 0.875,
+      "pass_count": 0,
+      "pass_rate": 0.0,
+      "signal_count": 1562,
+      "timeout_count": 10
+    }
+  },
+  "diagnostic_quantities": [
+    1,
+    2,
+    4,
+    8
+  ],
+  "evidence_strength": "INDETERMINE",
+  "exact_binomial_test": {
+    "evidence_strength": "INDETERMINE",
+    "exact_binomial_one_sided_p_value": 1.0,
+    "null_episodes": 240,
+    "null_observed_rate": 0.0375,
+    "null_passes": 9,
+    "real_episodes": 80,
+    "real_passes": 0
+  },
+  "forward_gap_access_count": 0,
+  "grammar_id": "hydra_v7_1_aggressor_run_topology_grammar_0009",
+  "minute_price_progress_recomputed_in_each_null": true,
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "pooled_null": {
+    "episode_count": 240,
+    "pass_count": 9,
+    "pass_rate": 0.0375
+  },
+  "prochaine_action": "record_stage1_formulation_falsification_and_tripwire_underpowered_without_class_tombstone",
+  "proof_window_burn_delta": 0,
+  "q4_access_count_delta": 0,
+  "raw_pass_counts": {
+    "null": "9/240",
+    "real": "0/80"
+  },
+  "real": {
+    "candidate_quantity_results": {
+      "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -568.1499999998487,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -5636.300000000076,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.2744711860400832,
+          "minimum_mll_buffer": -13790.200000000012,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -32080.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.5951666666668219,
+          "minimum_mll_buffer": -622.5499999999884,
+          "mll_breach_count": 2,
+          "pass_count": 0,
+          "timeout_count": 3
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.23633333333334627,
+          "minimum_mll_buffer": -5745.100000000006,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.04279999999996895,
+          "minimum_mll_buffer": -15990.199999999997,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -36480.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h30": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.22433333333316519,
+          "minimum_mll_buffer": -108.29999999748543,
+          "mll_breach_count": 4,
+          "pass_count": 0,
+          "timeout_count": 1
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.03355395956235566,
+          "minimum_mll_buffer": -449.10000000023865,
+          "mll_breach_count": 4,
+          "pass_count": 0,
+          "timeout_count": 1
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.03355395956235566,
+          "minimum_mll_buffer": -2262.800000000163,
+          "mll_breach_count": 4,
+          "pass_count": 0,
+          "timeout_count": 1
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -3560.7999999999884,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      },
+      "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h60": {
+        "1": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": -0.18301111111105678,
+          "minimum_mll_buffer": -315.19999999995343,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "2": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.01867777777776549,
+          "minimum_mll_buffer": -1131.4000000000815,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "4": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -5040.200000000012,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        },
+        "8": {
+          "compliance_failure_count": 0,
+          "episode_count": 5,
+          "median_target_progress": 0.0,
+          "minimum_mll_buffer": -14580.399999999994,
+          "mll_breach_count": 5,
+          "pass_count": 0,
+          "timeout_count": 0
+        }
+      }
+    },
+    "compliance_failure_count": 0,
+    "episode_count": 80,
+    "mll_breach_count": 74,
+    "mll_breach_rate": 0.925,
+    "pass_count": 0,
+    "pass_rate": 0.0,
+    "signal_count": 1573,
+    "timeout_count": 6
+  },
+  "schema": "hydra_v7_1_aggressor_run_topology_tripwire_result_v1",
+  "signal_paths_allowed_to_change_with_recomputed_price_progress": true,
+  "source_audit": {
+    "dominant_run_with_progress_count": 10677,
+    "dominant_run_without_progress_count": 5901,
+    "exact_source_match_count": 17200,
+    "executable_state_count_30m": 15867,
+    "executable_state_count_60m": 14577,
+    "minute_count": 17200,
+    "session_count": 43,
+    "tied_run_count": 622,
+    "unique_dominant_run_count": 16578
+  },
+  "threshold": 0.8,
+  "trade_run_topology_invariant_in_price_nulls": true,
+  "tripwire_id": "hydra_v7_1_aggressor_run_topology_tripwire_0009",
+  "verdict": "BLOCKED_UNDERPOWERED"
+}

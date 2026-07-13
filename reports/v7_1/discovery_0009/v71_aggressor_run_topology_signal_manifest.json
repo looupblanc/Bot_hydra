@@ -1,0 +1,79 @@
+{
+  "CONTRE": "Aggressor-run topology can remain contemporaneous minute-price geometry; economic replay and the frozen null tripwire are mandatory.",
+  "archive_duplicate_count": 0,
+  "candidate_count": 4,
+  "candidate_paths": [
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h30",
+      "family_id": "INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY",
+      "holding_minutes": 30,
+      "motif": "DOMINANT_RUN_WITH_PROGRESS",
+      "response_policy": "CONTINUATION",
+      "signal_count": 544,
+      "signal_path_hash": "a765ab5f17fc196f7f434b2769cbecd41f78ec06d24ca31c5247da4eb385c2d4",
+      "specification_hash": "5477dcc9dd631cf03278de69c7b20b48e1046d8e410edd7e5233c03c1c741fbd",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g9_aggressor_run_topology_dominant_run_with_progress_continuation_h60",
+      "family_id": "INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY",
+      "holding_minutes": 60,
+      "motif": "DOMINANT_RUN_WITH_PROGRESS",
+      "response_policy": "CONTINUATION",
+      "signal_count": 258,
+      "signal_path_hash": "c47b2c7d788d3b1750e302b4c854e7cc9443930ceb18b1ace3ac857a922edaeb",
+      "specification_hash": "6b76b35dd68594dfb28fc1396d86f4b5eba1d08ba32a273bddae106fc1a7d31a",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h30",
+      "family_id": "INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY",
+      "holding_minutes": 30,
+      "motif": "DOMINANT_RUN_WITHOUT_PROGRESS",
+      "response_policy": "REVERSAL",
+      "signal_count": 513,
+      "signal_path_hash": "c984b484eadd71ddd421bbb7324fe47a28544edd17e10c466048cb67908c7f93",
+      "specification_hash": "daa19e3c8aaec53663790811e39cb0700149e791e1852c02cf72258af8febb78",
+      "within_manifest_duplicate_of": null
+    },
+    {
+      "archive_duplicate_of": null,
+      "candidate_id": "v71g9_aggressor_run_topology_dominant_run_without_progress_reversal_h60",
+      "family_id": "INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY",
+      "holding_minutes": 60,
+      "motif": "DOMINANT_RUN_WITHOUT_PROGRESS",
+      "response_policy": "REVERSAL",
+      "signal_count": 258,
+      "signal_path_hash": "f61a5bdd11ab172ee2304c00174c6eeafae51eef8d56f9fdacb6a60b877184af",
+      "specification_hash": "1fe1df22ca66c15122686c14b45e0cfabd9e83553ba28a4c93d6ebfbbc5a21ec",
+      "within_manifest_duplicate_of": null
+    }
+  ],
+  "candidates_per_family": {
+    "INTRAMINUTE_AGGRESSOR_RUN_TOPOLOGY": 4
+  },
+  "contains_outcomes_or_pnl": false,
+  "family_count": 1,
+  "grammar_id": "hydra_v7_1_aggressor_run_topology_grammar_0009",
+  "manifest_hash": "1ae3621624c98cb511f5db629ff60558c02469a6be1b3b8b0e597fafe453af6d",
+  "new_data_purchase_count": 0,
+  "outbound_order_count": 0,
+  "protected_holdout_access_count": 0,
+  "schema": "hydra_v7_1_aggressor_run_topology_signal_manifest_v1",
+  "signal_count": 1573,
+  "source_audit": {
+    "dominant_run_with_progress_count": 10677,
+    "dominant_run_without_progress_count": 5901,
+    "exact_source_match_count": 17200,
+    "executable_state_count_30m": 15867,
+    "executable_state_count_60m": 14577,
+    "minute_count": 17200,
+    "session_count": 43,
+    "tied_run_count": 622,
+    "unique_dominant_run_count": 16578
+  },
+  "within_manifest_duplicate_count": 0
+}

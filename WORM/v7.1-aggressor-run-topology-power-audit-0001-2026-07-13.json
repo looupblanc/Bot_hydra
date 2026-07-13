@@ -1,0 +1,30 @@
+{
+  "schema": "hydra_v7_1_aggressor_run_topology_power_audit_policy_v1",
+  "audit_id": "hydra_v7_1_aggressor_run_topology_power_audit_0001",
+  "grammar_path": "WORM/v7.1-aggressor-run-topology-grammar-0009-2026-07-13.json",
+  "tripwire_path": "WORM/v7.1-aggressor-run-topology-tripwire-0009-2026-07-13.json",
+  "candidate_specific_power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+  "scope": "all walk-forward-positive candidates from grammar 0009",
+  "required_metrics": [
+    "raw_event_count",
+    "effective_independent_event_count",
+    "temporal_block_count",
+    "mean_and_median_net_effect",
+    "block_bootstrap_confidence_interval",
+    "probability_net_effect_positive",
+    "year_and_temporal_fold_stability",
+    "top_event_concentration",
+    "stress_1_5x_and_2x",
+    "candidate_specific_power"
+  ],
+  "final_confirmation_power_minimum": 0.8,
+  "status_vocabulary": ["POWERED_WF_POSITIVE", "PROMISING_UNDERPOWERED", "WF_POSITIVE_BUT_FRAGILE", "WF_FALSE_POSITIVE"],
+  "fragility_hard_conditions": ["stress_2x_expectancy_nonpositive", "best_event_removal_net_nonpositive"],
+  "rolling_combine_policy": "no automatic diagnostic; only an explicit research-stage WORM cohort may authorize it",
+  "thresholds_tuned_on_candidate_results": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "shadow_admission_authorized": false,
+  "outbound_orders": 0,
+  "CONTRE": "Candidate-specific power estimated from two short development blocks can be unstable; the 80 percent confirmation gate remains unchanged and no diagnostic is validation."
+}
