@@ -103,8 +103,8 @@ class BasketPolicy:
     def __post_init__(self) -> None:
         if not self.policy_id:
             raise ValueError("policy_id must be non-empty")
-        if not 1 <= len(self.component_ids) <= 8:
-            raise ValueError("basket must contain one to eight components")
+        if not 1 <= len(self.component_ids) <= 5:
+            raise ValueError("basket must contain one to five components")
         if len(set(self.component_ids)) != len(self.component_ids):
             raise ValueError("basket components must be unique")
         if self.maximum_simultaneous_positions < 1:
