@@ -81,6 +81,13 @@ from hydra.mission.economic_evolution_cross_session_terminal_runtime import (
     EconomicEvolutionCrossSessionTerminalRuntime,
     load_and_verify_cross_session_terminal_verdict,
 )
+from hydra.mission.economic_evolution_role_aware_runtime import (
+    CAMPAIGN_CONFIG_RELATIVE_PATH as ROLE_AWARE_CONFIG_RELATIVE_PATH,
+    CAMPAIGN_OUTPUT_RELATIVE_PATH as ROLE_AWARE_OUTPUT_RELATIVE_PATH,
+    CAMPAIGN_RESULT_NAME as ROLE_AWARE_RESULT_NAME,
+    EconomicEvolutionRoleAwareRuntime,
+    verify_role_aware_freeze,
+)
 from hydra.mission.mission_state import (
     append_event,
     append_jsonl,
@@ -102,13 +109,16 @@ from hydra.research.economic_evolution_agreement_campaign import (
 from hydra.research.economic_evolution_cross_session_campaign import (
     load_and_verify_cross_session_result,
 )
+from hydra.research.economic_evolution_role_aware_campaign import (
+    load_and_verify_role_aware_result,
+)
 from hydra.utils.time import utc_now_iso
 
 
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v14"
+CONTROLLER_SCHEMA = "hydra_v7_economic_evolution_controller_v15"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-economic-evolution-single-writer"
 CONTROLLER_OWNER = "v7_economic_evolution_controller"
@@ -2426,6 +2436,13 @@ class V7FalsificationController:
             ).is_file()
             else None
         )
+        self._economic_role_aware_runtime = (
+            EconomicEvolutionRoleAwareRuntime(
+                self.root, self.paths.state_dir
+            )
+            if (self.root / ROLE_AWARE_CONFIG_RELATIVE_PATH).is_file()
+            else None
+        )
 
     def run(self) -> int:
         signal.signal(signal.SIGTERM, self._handle_signal)
@@ -2471,6 +2488,8 @@ class V7FalsificationController:
                     self._economic_agreement_runtime.stop()
                 if self._economic_cross_session_runtime is not None:
                     self._economic_cross_session_runtime.stop()
+                if self._economic_role_aware_runtime is not None:
+                    self._economic_role_aware_runtime.stop()
                 set_kv(conn, "service_state", "V7_INTEGRITY_BLOCKED")
                 set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
                 set_kv(conn, "current_blocker", f"{type(exc).__name__}:{exc}"[:4000])
@@ -2601,6 +2620,8 @@ class V7FalsificationController:
             action = self._economic_cross_session_runtime.advance(action)
         if self._economic_cross_session_terminal_runtime is not None:
             action = self._economic_cross_session_terminal_runtime.advance(action)
+        if self._economic_role_aware_runtime is not None:
+            action = self._economic_role_aware_runtime.advance(action)
         previous = get_kv(conn, "v7_current_action", {})
         step = int(get_kv(conn, "v7_step", 0)) + 1
         progress_at = utc_now_iso()
@@ -2724,6 +2745,18 @@ class V7FalsificationController:
                 load_and_verify_cross_session_terminal_verdict(
                     self.root, result=cross_session_result
                 )
+        if (self.root / ROLE_AWARE_CONFIG_RELATIVE_PATH).is_file():
+            role_aware_config = verify_role_aware_freeze(self.root)
+            role_aware_result_path = (
+                self.root
+                / ROLE_AWARE_OUTPUT_RELATIVE_PATH
+                / ROLE_AWARE_RESULT_NAME
+            )
+            if role_aware_result_path.is_file():
+                load_and_verify_role_aware_result(
+                    role_aware_result_path,
+                    role_aware_config,
+                )
         return text
 
     def _checkpoint(
@@ -2836,6 +2869,10 @@ class V7FalsificationController:
             heartbeat["economic_evolution_cross_session_terminal"] = (
                 self._economic_cross_session_terminal_runtime.snapshot()
             )
+        if self._economic_role_aware_runtime is not None:
+            heartbeat["economic_evolution_role_aware_account"] = (
+                self._economic_role_aware_runtime.snapshot()
+            )
         return heartbeat
 
     def _lease_expires_at(self) -> str:
@@ -2889,6 +2926,8 @@ class V7FalsificationController:
             self._economic_agreement_runtime.stop()
         if self._economic_cross_session_runtime is not None:
             self._economic_cross_session_runtime.stop()
+        if self._economic_role_aware_runtime is not None:
+            self._economic_role_aware_runtime.stop()
         now = utc_now_iso()
         set_kv(conn, "service_state", "STOPPED_CLEANLY_V7")
         set_kv(conn, "current_phase", "STOPPED_CLEANLY")
