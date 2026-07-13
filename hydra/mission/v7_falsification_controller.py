@@ -33,7 +33,7 @@ from hydra.utils.time import utc_now_iso
 CONTRACT_SHA256 = (
     "35cca36324e24425fbff369c2cec864c90b612508436c13902fed5901c6ad9ab"
 )
-CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v6"
+CONTROLLER_SCHEMA = "hydra_v7_1_falsification_controller_v7"
 EXPERIMENT_ID = "hydra_v7_1_falsification_20260712_0001"
 CONTROLLER_CLAIM_TOKEN = "v7-falsification-single-writer"
 G0_RELATIVE_PATH = Path("reports/v7/phase0_v2/g0_result.json")
@@ -129,6 +129,29 @@ V71_G5_TRIPWIRE_RELATIVE_PATH = Path(
     "reports/v7_1/discovery_0005/"
     "v71_cross_clock_speed_leadership_tripwire_result.json"
 )
+V71_G6_GRAMMAR_RELATIVE_PATH = Path(
+    "WORM/v7.1-trade-size-composition-grammar-0006-2026-07-13.json"
+)
+V71_G6_SIGNAL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0006/v71_trade_size_composition_signal_manifest.json"
+)
+V71_G6_FUNNEL_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0006/v71_trade_size_composition_funnel_result.json"
+)
+V71_G6_TRIPWIRE_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0006/v71_trade_size_composition_tripwire_result.json"
+)
+V71_G6_POWER_RELATIVE_PATH = Path(
+    "reports/v7_1/discovery_0006/v71_trade_size_composition_power_audit_result.json"
+)
+V71_UNDERPOWERED_SELECTION_RELATIVE_PATH = Path(
+    "reports/v7_1/combine_research_0001/"
+    "v71_underpowered_combine_selection_manifest.json"
+)
+V71_UNDERPOWERED_DIAGNOSTIC_RELATIVE_PATH = Path(
+    "reports/v7_1/combine_research_0001/"
+    "v71_underpowered_combine_diagnostic_result.json"
+)
 V71_FROZEN_HASHES = {
     "MISSION_CONTRACT_AMENDMENT_001_ORDERFLOW.md": "981523c00831fac4dee02aa9bd908be6781ecec63a2a3fa573832206ea173eeb",
     str(V71_POLICY_RELATIVE_PATH): "d745ac9ca51049ccc2f7f1f97d3593cf49231c92a8873737e350e380170f916c",
@@ -151,6 +174,13 @@ V71_FROZEN_HASHES = {
     str(V71_G5_GRAMMAR_RELATIVE_PATH): "27a937a112dd4963402f8c12feb69cf9cd347b020ce47396cfffff0e253726c2",
     "WORM/v7.1-cross-clock-speed-leadership-tripwire-0005-2026-07-13.json": "03513d2b8f9dda7bd4208581ea96d9c5ab1f8c6ca21444fc80bbfe95deb67d8d",
     "WORM/v7.1-cross-clock-speed-leadership-verdict-0005-2026-07-13.json": "d72b2f1a5b64a6e33219f6a503c36b79834254d38cb303df36805bcf1f4931d5",
+    str(V71_G6_GRAMMAR_RELATIVE_PATH): "3913324e3ab9b707461da4c32a5c4bddfa025af98c5a5f6ba942b7ae0ba7cc29",
+    "WORM/v7.1-trade-size-composition-tripwire-0006-2026-07-13.json": "c10f9b671cd6ddb0349de05673c5854e3b37776001224a40b218c0a39b39dea9",
+    "WORM/v7.1-trade-size-composition-power-audit-0001-2026-07-13.json": "00c09d4e54d977c6f28df9445019957f40cfa564ea571ecade370064bcd15922",
+    "MISSION_CONTRACT_AMENDMENT_003_RESEARCH_STAGE_COMBINE.md": "ffca7c85d685267b81abc45e33b0d74dd12b196acb1b26d54c6ddd3f50f34324",
+    "WORM/v7.1-underpowered-combine-research-policy-0001-2026-07-13.json": "33193b3afaf662a7a2b1fe4bcdfb5f9aa2868f6afec55f365e5ea421cd1f3f88",
+    "WORM/v7.1-underpowered-combine-cohort-0001-2026-07-13.json": "a2973de8e8ad11607d807b7cea5216db9f860dedff3ade815f34fd360b1c28d5",
+    "WORM/v7.1-underpowered-combine-diagnostic-verdict-0001-2026-07-13.json": "7116dba7d9a50e9e109489b55f6fbef32992fd7d96e0c767270d84c127b7fa39",
 }
 
 
@@ -786,6 +816,15 @@ def _classify_v71_g5_action(
         conn.close()
     if cemetery_count != 12:
         raise V7ControllerIntegrityError("V7.1 G5 class tombstone is absent")
+    if (root / V71_G6_GRAMMAR_RELATIVE_PATH).is_file():
+        return _classify_v71_g6_action(
+            root,
+            prior_positive=prior_positive,
+            g2_positive=g2_positive,
+            cumulative_status=cumulative_status,
+            confirmation_queue=confirmation_queue,
+            g5_cemetery_count=cemetery_count,
+        )
     return {
         "action_type": "V71_G5_GEOMETRY_ONLY_PIVOT_TO_NEW_CLASS",
         "phase": "4",
@@ -828,6 +867,191 @@ def _classify_v71_g5_action(
             "All twelve formulations are class-tombstoned; the perpetual factory "
             "must pivot to a genuinely distinct economic hypothesis without "
             "purchasing data or reusing candidate-level feedback."
+        ),
+    }
+
+
+def _classify_v71_g6_action(
+    root: Path,
+    *,
+    prior_positive: int,
+    g2_positive: int,
+    cumulative_status: Mapping[str, int],
+    confirmation_queue: Mapping[str, Any],
+    g5_cemetery_count: int,
+) -> dict[str, Any]:
+    required = (
+        (V71_G6_SIGNAL_RELATIVE_PATH, "V71_G6_SIGNAL_MANIFEST_REQUIRED"),
+        (V71_G6_FUNNEL_RELATIVE_PATH, "V71_G6_DEVELOPMENT_FUNNEL_REQUIRED"),
+        (V71_G6_TRIPWIRE_RELATIVE_PATH, "V71_G6_TRIPWIRE_REQUIRED"),
+        (V71_G6_POWER_RELATIVE_PATH, "V71_G6_POWER_AUDIT_REQUIRED"),
+        (
+            Path("MISSION_CONTRACT_AMENDMENT_003_RESEARCH_STAGE_COMBINE.md"),
+            "V71_UNDERPOWERED_COMBINE_AMENDMENT_REQUIRED",
+        ),
+        (
+            Path(
+                "WORM/v7.1-underpowered-combine-research-policy-0001-2026-07-13.json"
+            ),
+            "V71_UNDERPOWERED_COMBINE_POLICY_REQUIRED",
+        ),
+        (
+            Path("WORM/v7.1-underpowered-combine-cohort-0001-2026-07-13.json"),
+            "V71_UNDERPOWERED_COMBINE_COHORT_REQUIRED",
+        ),
+        (V71_UNDERPOWERED_SELECTION_RELATIVE_PATH, "V71_UNDERPOWERED_SELECTION_REQUIRED"),
+        (
+            V71_UNDERPOWERED_DIAGNOSTIC_RELATIVE_PATH,
+            "V71_UNDERPOWERED_COMBINE_DIAGNOSTIC_REQUIRED",
+        ),
+        (
+            Path(
+                "WORM/v7.1-underpowered-combine-diagnostic-verdict-0001-2026-07-13.json"
+            ),
+            "V71_UNDERPOWERED_COMBINE_VERDICT_REQUIRED",
+        ),
+    )
+    for path, action in required:
+        if not (root / path).is_file():
+            return {
+                "action_type": action,
+                "phase": "4",
+                "progressed": False,
+                "required_path": str(path),
+                "broad_D1_generation_authorized": False,
+                "new_data_purchase_authorized": False,
+                "shadow_admission_authorized": False,
+                "reason": (
+                    "The G6 and underpowered Combine conversion sequence must "
+                    "remain atomic before another structural action."
+                ),
+            }
+    hashes = {
+        V71_G6_SIGNAL_RELATIVE_PATH: "ea883cbf7ee460b5467f0023f171e67528f696f748c09aa7c95d11a87e7db752",
+        V71_G6_FUNNEL_RELATIVE_PATH: "c99dd8aeca6bdcb9f908f6b0b7e39f4d2cf06b8671c95b9e190a276ffef9ec67",
+        V71_G6_TRIPWIRE_RELATIVE_PATH: "c3a0a53105ed260acb83c65b42312915bb4ed6f8047f061ca34d3ada81679596",
+        V71_G6_POWER_RELATIVE_PATH: "ab7fd3885e23943c4abd532f82902629f1a689e962ca4d8a1d7dc9869a5f32de",
+        V71_UNDERPOWERED_SELECTION_RELATIVE_PATH: "6c5c324bbd22bbab4956b9cd310bc98c73ad8e1e48323cb04e08a65b92442dd1",
+        V71_UNDERPOWERED_DIAGNOSTIC_RELATIVE_PATH: "6dff583d4aa945f4e2c479b801cf6fa954e0616b8f65d32bada401797ce0c4e0",
+    }
+    drift = [
+        str(path) for path, expected in hashes.items() if _sha256(root / path) != expected
+    ]
+    if drift:
+        raise V7ControllerIntegrityError(
+            "V7.1 G6 or Combine diagnostic evidence drift: " + ",".join(drift)
+        )
+    signal = _load_json(root / V71_G6_SIGNAL_RELATIVE_PATH)
+    funnel = _load_json(root / V71_G6_FUNNEL_RELATIVE_PATH)
+    tripwire = _load_json(root / V71_G6_TRIPWIRE_RELATIVE_PATH)
+    power = _load_json(root / V71_G6_POWER_RELATIVE_PATH)
+    selection = _load_json(root / V71_UNDERPOWERED_SELECTION_RELATIVE_PATH)
+    diagnostic = _load_json(root / V71_UNDERPOWERED_DIAGNOSTIC_RELATIVE_PATH)
+    verdict = _load_json(
+        root
+        / "WORM/v7.1-underpowered-combine-diagnostic-verdict-0001-2026-07-13.json"
+    )
+    if int(signal.get("candidate_count") or 0) != 6:
+        raise V7ControllerIntegrityError("V7.1 G6 candidate count drift")
+    if int(funnel.get("walk_forward_positive_count") or 0) != 2:
+        raise V7ControllerIntegrityError("V7.1 G6 walk-forward count drift")
+    if tripwire.get("verdict") != "GREEN_NULL_ADJUSTED_BASELINE" or float(
+        tripwire.get("NULL_RATIO") or 1.0
+    ) >= 0.8:
+        raise V7ControllerIntegrityError("V7.1 G6 tripwire is not frozen GREEN")
+    if power.get("status_counts") != {"PROMISING_UNDERPOWERED": 2}:
+        raise V7ControllerIntegrityError("V7.1 G6 power status drift")
+    if power.get("powered_candidate_ids"):
+        raise V7ControllerIntegrityError("V7.1 G6 unexpectedly contains powered candidates")
+    reconciliation = dict(selection.get("population_reconciliation") or {})
+    if int(reconciliation.get("after_G6_accounted_count", 0)) != 22 or int(
+        reconciliation.get("unaccounted_count", -1)
+    ) != 0:
+        raise V7ControllerIntegrityError("V7.1 evidence reconciliation drift")
+    if int(selection.get("selected_count") or 0) != 5:
+        raise V7ControllerIntegrityError("V7.1 Combine selection count drift")
+    if (
+        diagnostic.get("scientific_status")
+        != "BOUNDED_DIAGNOSTIC_ONLY_NO_PROMOTION"
+        or int(diagnostic.get("episode_start_count") or 0) != 24
+        or int(diagnostic.get("effective_nonoverlapping_block_count") or 0) != 4
+        or int(diagnostic.get("final_power_gate_passed_count", -1)) != 0
+        or diagnostic.get("shadow_promotion_authorized") is not False
+    ):
+        raise V7ControllerIntegrityError("V7.1 Combine diagnostic status drift")
+    primary = "eod_level_rt_breach__DLL_disabled"
+    candidate_passes = sum(
+        int(row["variants"][primary]["pass_count"])
+        for row in diagnostic["candidate_results"].values()
+    )
+    basket_passes = int(diagnostic["basket"]["variants"][primary]["pass_count"])
+    if candidate_passes != 0 or basket_passes != 0:
+        raise V7ControllerIntegrityError("V7.1 diagnostic verdict pass count drift")
+    if verdict.get("verdict") != "NULL_DIAGNOSTIC_NO_PASS_NO_PROMOTION":
+        raise V7ControllerIntegrityError("V7.1 diagnostic WORM verdict drift")
+    cumulative_after_g6 = {
+        "PROMISING_UNDERPOWERED": int(
+            cumulative_status.get("PROMISING_UNDERPOWERED", 0)
+        )
+        + 2,
+        "WF_POSITIVE_BUT_FRAGILE": int(
+            cumulative_status.get("WF_POSITIVE_BUT_FRAGILE", 0)
+        ),
+        "GEOMETRY_ONLY_CLASS_TOMBSTONED_NO_POWER_AUDIT": 2,
+    }
+    return {
+        "action_type": "V71_G6_GREEN_UNDERPOWERED_COMBINE_DIAGNOSTIC_COMPLETE",
+        "phase": "4",
+        "progressed": True,
+        "walk_forward_positive_count": prior_positive + g2_positive + 2 + 2 + 2 + 2,
+        "g6_candidate_count": int(signal["candidate_count"]),
+        "g6_signal_count": int(signal["signal_count"]),
+        "g6_stage1_survivor_count": int(funnel["stage1_pass_count"]),
+        "g6_walk_forward_positive_count": int(funnel["walk_forward_positive_count"]),
+        "g6_tripwire_verdict": tripwire["verdict"],
+        "g6_NULL_RATIO": float(tripwire["NULL_RATIO"]),
+        "g6_real_pass_count": tripwire["raw_pass_counts"]["real"],
+        "g6_null_pass_count": tripwire["raw_pass_counts"]["null"],
+        "g6_power_status_counts": dict(power["status_counts"]),
+        "cumulative_power_status_counts": cumulative_after_g6,
+        "evidence_reconciliation_accounted_count": 22,
+        "evidence_reconciliation_unaccounted_count": 0,
+        "underpowered_combine_selected_count": 5,
+        "underpowered_combine_status": "PROMISING_UNDERPOWERED_COMBINE_RESEARCH",
+        "underpowered_combine_episode_start_count": 24,
+        "underpowered_combine_effective_block_count": 4,
+        "underpowered_combine_candidate_pass_count": candidate_passes,
+        "underpowered_combine_basket_pass_count": basket_passes,
+        "underpowered_combine_validated_count": 0,
+        "powered_candidate_count": 0,
+        "rolling_combine_promotions": 0,
+        "g5_cemetery_candidate_count": g5_cemetery_count,
+        "confirmation_queue_underpowered_count": int(
+            confirmation_queue["cumulative_promising_underpowered_count"]
+        )
+        + 2,
+        "confirmation_queue_fragile_retired_count": int(
+            confirmation_queue["cumulative_fragile_retired_count"]
+        ),
+        "broad_D1_generation_authorized": False,
+        "limited_structural_discovery_authorized": True,
+        "conversion_priority": 0.95,
+        "limited_discovery_allocation": 0.05,
+        "new_data_purchase_authorized": False,
+        "shadow_admission_authorized": False,
+        "next_experiment_id": (
+            "hydra_v7_1_independent_confirmation_and_distinct_hypothesis_review_0007"
+        ),
+        "next_experiment_state": "PREREGISTRATION_REQUIRED_NO_DATA_PURCHASE",
+        "principal_blocker": (
+            "No candidate passes the unchanged 80% power gate; the 24-start "
+            "Combine diagnostic has only four effective blocks and zero passes."
+        ),
+        "reason": (
+            "G6 has a VERT_NET tripwire and two nonfragile underpowered candidates. "
+            "The authorized research-stage Combine diagnostic resolved five distinct "
+            "candidates without promotion: zero candidate or basket passes, all 22 "
+            "walk-forward-positive formulations explicitly accounted for, and no data purchase."
         ),
     }
 

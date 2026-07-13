@@ -186,20 +186,28 @@ def test_v71_controller_recognizes_frozen_g2_confirmation_queue(
     assert result["shadow_admission_authorized"] is False
 
 
-def test_v71_power_aware_integrated_action_pauses_broad_D1_generation() -> None:
+def test_v71_power_aware_integrated_action_reports_g6_and_bounded_combine() -> None:
     result = _classify_v71_power_aware_action(
         Path.cwd(), prior_positive=11, g2_positive=3
     )
 
-    assert result["action_type"] == "V71_G5_GEOMETRY_ONLY_PIVOT_TO_NEW_CLASS"
-    assert result["walk_forward_positive_count"] == 20
+    assert result["action_type"] == "V71_G6_GREEN_UNDERPOWERED_COMBINE_DIAGNOSTIC_COMPLETE"
+    assert result["walk_forward_positive_count"] == 22
     assert result["powered_candidate_count"] == 0
-    assert result["g5_rolling_combine_promotions"] == 0
-    assert result["g5_candidate_count"] == 12
-    assert result["g5_walk_forward_positive_count"] == 2
-    assert result["g5_tripwire_verdict"] == "ARTEFACT_GEOMETRY_ONLY"
+    assert result["rolling_combine_promotions"] == 0
+    assert result["g6_candidate_count"] == 6
+    assert result["g6_walk_forward_positive_count"] == 2
+    assert result["g6_tripwire_verdict"] == "GREEN_NULL_ADJUSTED_BASELINE"
     assert result["g5_cemetery_candidate_count"] == 12
-    assert result["confirmation_queue_underpowered_count"] == 14
+    assert result["confirmation_queue_underpowered_count"] == 16
+    assert result["evidence_reconciliation_accounted_count"] == 22
+    assert result["evidence_reconciliation_unaccounted_count"] == 0
+    assert result["underpowered_combine_selected_count"] == 5
+    assert result["underpowered_combine_episode_start_count"] == 24
+    assert result["underpowered_combine_effective_block_count"] == 4
+    assert result["underpowered_combine_candidate_pass_count"] == 0
+    assert result["underpowered_combine_basket_pass_count"] == 0
+    assert result["underpowered_combine_validated_count"] == 0
     assert result["broad_D1_generation_authorized"] is False
     assert result["new_data_purchase_authorized"] is False
     assert result["shadow_admission_authorized"] is False
