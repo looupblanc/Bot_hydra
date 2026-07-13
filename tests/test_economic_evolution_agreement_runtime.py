@@ -80,18 +80,19 @@ def _predecessor() -> dict:
 
 def test_agreement_worm_and_population_are_frozen() -> None:
     config = load_and_verify_agreement_preregistration(
-        PROJECT_ROOT / "config/v7/economic_evolution_directional_agreement_0008.json"
+        PROJECT_ROOT
+        / "config/v7/economic_evolution_directional_agreement_0008_revision_01.json"
     )
     tagged = subprocess.check_output(
         [
             "git",
             "rev-parse",
-            "worm/economic-evolution-directional-agreement-0008-2026-07-13^{commit}",
+            "worm/economic-evolution-directional-agreement-0008-revision-01-2026-07-13^{commit}",
         ],
         cwd=PROJECT_ROOT,
         text=True,
     ).strip()
-    assert tagged == "0e67509779b291e11255134037967d5cbc966e7d"
+    assert tagged == "64dfaafac63565517b2f99492968261b02cc6bc8"
     assert config["campaign_id"] == CAMPAIGN_ID
     assert config["structural_population"]["real_sleeve_count"] == 44
     assert config["structural_population"]["matched_null_sleeve_count"] == 44

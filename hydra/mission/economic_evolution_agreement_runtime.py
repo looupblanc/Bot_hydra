@@ -43,19 +43,19 @@ from hydra.research.economic_evolution_density_campaign import (
 
 CAMPAIGN_ID = NEXT_CAMPAIGN_ID
 CAMPAIGN_CONFIG_RELATIVE_PATH = Path(
-    "config/v7/economic_evolution_directional_agreement_0008.json"
+    "config/v7/economic_evolution_directional_agreement_0008_revision_01.json"
 )
 CAMPAIGN_CONFIG_SHA256 = (
-    "707f90c2506875d751cfcb99a6db1f54c94f22012c3273cce5f9be87edc43120"
+    "671628423d0a6e9a5a942c6dfad35c1bb86fb88815622e656e12b841d468b6e0"
 )
 CAMPAIGN_PREREGISTRATION_HASH = (
-    "018185c15122e67c9ae00ffc2e03f29ec2444ea46084504de7b2c70942d86583"
+    "177e58fa07d920bcec770ee782ba4a9947d141ab6f8ad067e2b8dde4f440b7dd"
 )
 CAMPAIGN_WORM_TAG = (
-    "worm/economic-evolution-directional-agreement-0008-2026-07-13"
+    "worm/economic-evolution-directional-agreement-0008-revision-01-2026-07-13"
 )
-CAMPAIGN_WORM_COMMIT = "0e67509779b291e11255134037967d5cbc966e7d"
-CAMPAIGN_IMPLEMENTATION_COMMIT = "e5055a4f9a2a62f565fb2406d4ff0669e31d26da"
+CAMPAIGN_WORM_COMMIT = "64dfaafac63565517b2f99492968261b02cc6bc8"
+CAMPAIGN_IMPLEMENTATION_COMMIT = "02e97b5fd1e11ddda2da305cf1d362e88b8bf220"
 CAMPAIGN_OUTPUT_RELATIVE_PATH = Path(
     "reports/economic_evolution/directional_agreement_0008"
 )
