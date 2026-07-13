@@ -1,0 +1,81 @@
+{
+  "schema": "hydra_v7_1_trade_size_composition_power_audit_freeze_v1",
+  "audit_id": "hydra_v7_1_trade_size_composition_power_audit_0001",
+  "grammar_id": "hydra_v7_1_trade_size_composition_grammar_0006",
+  "source_commit": "84261a39a93bce232cd5521b2fe2e097901879d6",
+  "grammar_path": "WORM/v7.1-trade-size-composition-grammar-0006-2026-07-13.json",
+  "grammar_sha256": "3913324e3ab9b707461da4c32a5c4bddfa025af98c5a5f6ba942b7ae0ba7cc29",
+  "signal_manifest_path": "reports/v7_1/discovery_0006/v71_trade_size_composition_signal_manifest.json",
+  "signal_manifest_sha256": "ea883cbf7ee460b5467f0023f171e67528f696f748c09aa7c95d11a87e7db752",
+  "funnel_result_path": "reports/v7_1/discovery_0006/v71_trade_size_composition_funnel_result.json",
+  "funnel_result_sha256": "c99dd8aeca6bdcb9f908f6b0b7e39f4d2cf06b8671c95b9e190a276ffef9ec67",
+  "tripwire_result_path": "reports/v7_1/discovery_0006/v71_trade_size_composition_tripwire_result.json",
+  "tripwire_result_sha256": "c3a0a53105ed260acb83c65b42312915bb4ed6f8047f061ca34d3ada81679596",
+  "tripwire_verdict": "GREEN_NULL_ADJUSTED_BASELINE",
+  "tripwire_NULL_RATIO": 0.30303030303030304,
+  "power_policy_path": "WORM/v7.1-candidate-specific-power-policy-0001-2026-07-12.json",
+  "power_policy_sha256": "39f60b4e402c0a40ccc39b5429e0e2cc2dcc88a80592cd28b05c86abed616673",
+  "calibration_result_path": "reports/v7_1/power_aware_0001/v71_candidate_specific_power_calibration_result.json",
+  "calibration_result_sha256": "edd3bcdb2ec56bcef2830be7783d74df02041a57b4234b76c1c1803e40b647f5",
+  "candidate_count": 2,
+  "candidates": [
+    {
+      "candidate_id": "v71g6_trade_size_composition_large_clip_absorption_reversal_h60",
+      "family_id": "TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "motif": "LARGE_CLIP_ABSORPTION",
+      "direction_policy": "REVERSAL",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "4f5b50f1f6fa722e38b32531fa7aeeb8383b7b47eb6953edd4ac081b5d20505e",
+      "signal_path_hash": "30f4c95004e6519187e24c4879537403635244e43c9bc37ee9159691eca6a1fd",
+      "raw_signal_count": 132,
+      "frozen_walk_forward_event_count": 87,
+      "frozen_walk_forward_expectancy_STRESS_1_5X": 48.53477011494251
+    },
+    {
+      "candidate_id": "v71g6_trade_size_composition_large_clip_flow_onset_continuation_h60",
+      "family_id": "TRADE_SIZE_COMPOSITION_TRANSITIONS",
+      "motif": "LARGE_CLIP_FLOW_ONSET",
+      "direction_policy": "CONTINUATION",
+      "holding_minutes": 60,
+      "cost_horizon": "60m",
+      "specification_hash": "d2c75b72012b099ca0a355ca1f01891506b7b5027a0652116c1fa7d4ce051e71",
+      "signal_path_hash": "b3ac40aa599d759c27c593d19b2abcc611ae292659b469d169dff1ac4513a3e0",
+      "raw_signal_count": 223,
+      "frozen_walk_forward_event_count": 142,
+      "frozen_walk_forward_expectancy_STRESS_1_5X": 38.057394366197165
+    }
+  ],
+  "inference": {
+    "primary_cost_stress": "STRESS_1_5X",
+    "normal_and_elevated_costs_reported": true,
+    "temporal_blocks": "calendar_year_x_Chicago_ISO_week",
+    "bootstrap_draws": 20000,
+    "candidate_specific_power": true,
+    "universal_raw_event_threshold": false,
+    "status_vocabulary": [
+      "POWERED_WF_POSITIVE",
+      "PROMISING_UNDERPOWERED",
+      "WF_POSITIVE_BUT_FRAGILE",
+      "WF_FALSE_POSITIVE"
+    ]
+  },
+  "multiplicity_reservation": {
+    "candidate_count": 2,
+    "inferential_diagnostics_per_candidate": 4,
+    "delta_trials": 8,
+    "expected_prior_global_N_trials": 263762,
+    "expected_post_reservation_global_N_trials": 263770,
+    "campaign_structural_and_tripwire_trials_before_audit": 30,
+    "campaign_inflation_factor": 1.5,
+    "campaign_effective_N_trials_before_audit": 45.0
+  },
+  "rolling_combine_eligibility": "POWERED_WF_POSITIVE_only",
+  "candidate_nulls_executed_in_this_audit": false,
+  "DSR_BH_executed_in_this_audit": false,
+  "new_data_purchase": false,
+  "protected_holdout_access": false,
+  "status_inheritance": false,
+  "outbound_orders": 0,
+  "CONTRE": "Both candidates were selected after positive D1 walk-forward results; the audit quantifies dependence, uncertainty, cost stability and concentration but is not fresh independent proof."
+}
