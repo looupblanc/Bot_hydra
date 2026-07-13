@@ -206,6 +206,96 @@ def class_feedback(path: str | Path) -> tuple[dict[str, Any], ...]:
         conn.close()
 
 
+def append_class_tombstone(
+    path: str | Path,
+    tombstone: ClassTombstone,
+) -> dict[str, Any]:
+    """Append one class-level death signature without exposing candidate feedback."""
+
+    destination = Path(path)
+    audit_graveyard(destination)
+    if tombstone.candidate_count <= 0 or not tombstone.mechanism_class.strip():
+        raise GraveyardError("incremental tombstone is invalid")
+    conn = sqlite3.connect(destination)
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+        prior = conn.execute(
+            "SELECT mechanism_class,regime,death_cause,candidate_count,"
+            "source_scope,evidence_sha256 FROM class_tombstones "
+            "WHERE signature_hash=?",
+            (tombstone.signature_hash,),
+        ).fetchone()
+        if prior is not None:
+            expected = (
+                tombstone.mechanism_class,
+                tombstone.regime,
+                tombstone.death_cause,
+                tombstone.candidate_count,
+                tombstone.source_scope,
+                tombstone.evidence_sha256,
+            )
+            if tuple(prior) != expected:
+                raise GraveyardError(
+                    "incremental tombstone signature already exists with different evidence"
+                )
+            conn.rollback()
+            result = audit_graveyard(destination)
+            result["append_status"] = "ALREADY_PRESENT_IDENTICAL"
+            result["signature_hash"] = tombstone.signature_hash
+            return result
+        conn.execute(
+            "INSERT INTO class_tombstones("
+            "signature_hash,mechanism_class,regime,death_cause,candidate_count,"
+            "source_scope,evidence_sha256) VALUES(?,?,?,?,?,?,?)",
+            (
+                tombstone.signature_hash,
+                tombstone.mechanism_class,
+                tombstone.regime,
+                tombstone.death_cause,
+                tombstone.candidate_count,
+                tombstone.source_scope,
+                tombstone.evidence_sha256,
+            ),
+        )
+        prior_count_row = conn.execute(
+            "SELECT value FROM metadata WHERE key='incremental_tombstone_count'"
+        ).fetchone()
+        prior_count = int(prior_count_row[0]) if prior_count_row else 0
+        conn.execute(
+            "INSERT INTO metadata(key,value) VALUES(?,?) "
+            "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+            ("incremental_tombstone_count", str(prior_count + 1)),
+        )
+        prior_head_row = conn.execute(
+            "SELECT value FROM metadata WHERE key='incremental_chain_head'"
+        ).fetchone()
+        prior_head = str(prior_head_row[0]) if prior_head_row else "0" * 64
+        conn.execute(
+            "INSERT INTO metadata(key,value) VALUES(?,?) "
+            "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+            (
+                "incremental_chain_head",
+                hashlib.sha256(
+                    (
+                        prior_head
+                        + tombstone.signature_hash
+                        + tombstone.evidence_sha256
+                    ).encode("ascii")
+                ).hexdigest(),
+            ),
+        )
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+    result = audit_graveyard(destination)
+    result["append_status"] = "APPENDED"
+    result["signature_hash"] = tombstone.signature_hash
+    return result
+
+
 def canonical_mechanism_class(mechanism_class: str) -> str:
     normalized = str(mechanism_class).strip()
     return _CLASS_ALIASES.get(normalized, normalized)
@@ -402,9 +492,11 @@ def _sha256(path: str | Path) -> str:
 __all__ = [
     "ARB_INTRA_PRODUCT_CLASS",
     "ARB_INTRA_PRODUCT_DEATH_CAUSE",
+    "ClassTombstone",
     "GraveyardError",
     "SCHEMA_VERSION",
     "audit_graveyard",
+    "append_class_tombstone",
     "build_graveyard",
     "canonical_mechanism_class",
     "class_feedback",
