@@ -1,0 +1,80 @@
+{
+  "schema": "hydra_v7_2_g10_integrated_regression_evidence_v1",
+  "recorded_at_utc": "2026-07-13T07:58:40Z",
+  "baseline_commit": "0ef28b617f79ae1cc34ccb570a4033ac7c20319b",
+  "source_head": "c1d4cb3e15b8db8d802d190b94f5271ca1a75388",
+  "controller_version": "hydra_v7_2_flow_impact_conversion_controller_v2",
+  "validation_diff": [
+    "hydra/validation/v72_flow_impact_relaxation_funnel.py",
+    "hydra/validation/v72_flow_impact_relaxation_power_audit.py",
+    "hydra/validation/v72_flow_impact_relaxation_tripwire.py"
+  ],
+  "g10": {
+    "grammar_id": "hydra_v7_2_flow_impact_relaxation_grammar_0010",
+    "candidate_count": 36,
+    "stage0_valid_novel_count": 36,
+    "stage1_pass_count": 6,
+    "walk_forward_positive_count": 5,
+    "stress_2x_survivor_count": 4,
+    "sim_exploit_count": 1,
+    "tripwire_real_passes": 56,
+    "tripwire_real_trials": 720,
+    "tripwire_null_passes": 109,
+    "tripwire_null_trials": 2160,
+    "tripwire_null_ratio": 0.6488095238095238,
+    "tripwire_exact_binomial_p_value": 0.0010984337395270852,
+    "tripwire_evidence_strength": "VERT_NET",
+    "power_status_counts": {
+      "PROMISING_UNDERPOWERED": 2,
+      "WF_POSITIVE_BUT_FRAGILE": 2,
+      "POWERED_WF_POSITIVE": 0
+    },
+    "candidate_nulls_executed": false,
+    "dsr_bh_executed": false,
+    "rolling_combine_executed": false,
+    "shadow_admission_authorized": false,
+    "funnel_result_path": "reports/v7_2/discovery_0010/v72_flow_impact_relaxation_funnel_result.json",
+    "funnel_result_sha256": "ebe44080d1bb953048e768c54de564dcf88789f6f0e4ff9cbd7f8225094edc87",
+    "tripwire_result_path": "reports/v7_2/discovery_0010/v72_flow_impact_relaxation_tripwire_result.json",
+    "tripwire_result_sha256": "1e6f26a2e5a8aa4175e67b403b6f1e523f4834407dbc9b27dcf689c1093f9eba",
+    "power_result_path": "reports/v7_2/discovery_0010/v72_flow_impact_relaxation_power_audit_result.json",
+    "power_result_sha256": "e141def05a8e0b32459308f2b330413ec27df53334c72ad9ba1ab6741d6f809c"
+  },
+  "multiplicity": {
+    "raw_global_n_trials": 265107,
+    "campaign_effective_n_trials": 294.0,
+    "proof_registry_entry_count": 40,
+    "proof_chain_head": "e30fc44ed6ab8f72d57f94c69c3b638cf190e07f64431b385eb8e4c666aaa10f",
+    "late_tripwire_accounting_disclosed": true,
+    "late_tripwire_accounting_changed_tripwire_verdict": false
+  },
+  "integrity": {
+    "full_pytest": "770/770",
+    "focused_no_lookahead_ruleset_q4_budget_and_determinism": "55/55",
+    "g10_deterministic_reference_tests": "8/8",
+    "compileall": "ok",
+    "mission_db": "ok",
+    "registry_db": "ok",
+    "graveyard_db": "ok",
+    "governance_checks": "passed",
+    "governance_semantic_hash": "05810bc193e51e3c40722163a1ee3ae82fd3a8d7762c48eafa25c3a4cba1102b",
+    "governance_yaml_sha256": "3c9fd63f43037c65d79ecd688ce76bc126c42cc6eeaceb6bed8636548ffaff57",
+    "q4_access_count": 1,
+    "q4_status": "COMMITTED_BURNED_NO_REUSE",
+    "secret_scan_hits": 0,
+    "broker_orders": 0
+  },
+  "budget": {
+    "new_data_purchase_count": 0,
+    "cumulative_spend_usd": 87.84738838672598,
+    "remaining_usd": 37.15261161327402
+  },
+  "test_isolation_repair": {
+    "production_governance_code_changed": false,
+    "scientific_gate_changed": false,
+    "historical_q4_test_state_made_explicit": true,
+    "temporary_worktree_registry_dependency_removed": true
+  },
+  "next_action": "MERGE_PUSH_RESTART_SAME_SERVICE_WITH_G10_CONTROLLER_V2",
+  "CONTRE": "G10 separates real and counterfactual worlds at the class tripwire, but it spans only two calendar years and eight weekly blocks. No exact candidate reaches the frozen 80 percent power gate, so the evidence does not authorize candidate nulls, DSR/BH, Rolling Combine, shadow, holdout, or deployment."
+}
