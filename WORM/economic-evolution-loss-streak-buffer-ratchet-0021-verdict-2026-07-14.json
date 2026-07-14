@@ -1,0 +1,67 @@
+{
+  "schema": "hydra_loss_streak_buffer_ratchet_verdict_worm_v1",
+  "campaign_id": "hydra_economic_evolution_loss_streak_buffer_ratchet_0021",
+  "class_id": "LOSS_STREAK_BUFFER_RATCHET_V1",
+  "recorded_at_utc": "2026-07-14T07:11:42Z",
+  "terminal_status": "ARTEFACT_GEOMETRY_ONLY",
+  "result": {
+    "path": "reports/economic_evolution/loss_streak_buffer_ratchet_0021_revision_01/elite_robustness_result.json",
+    "file_sha256": "4fc569d74cd5633a113b660abf9b6f41f46845bac4130f193a81f634f3f7b383",
+    "semantic_hash": "20c89b4adc186d3631f2e9fdb9576aafd846e56be331a3c281367ea8636c6c86"
+  },
+  "graveyard": {
+    "path": "reports/economic_evolution/loss_streak_buffer_ratchet_0021_revision_01/graveyard_append_receipt.json",
+    "file_sha256": "25237580a1675fc013a18c3f520e54fae05297c1e884bd54e810253113c32b49",
+    "class_signature_hash": "504b65f9dcec6deca4342fa9a7a00ce149f0d4bd9b323b23b7096e6a7b9d6e0b",
+    "exact_class_tombstoned": true,
+    "candidate_count": 512,
+    "parameter_level_feedback": false
+  },
+  "family_tripwire": {
+    "real_wins": 31,
+    "matched_parent_wins": 418,
+    "ties": 63,
+    "informative_pairs": 449,
+    "NULL_RATIO": 13.483870967741936,
+    "exact_one_sided_binomial_p_value": 1.0,
+    "median_stressed_net_delta_usd": -1287.9612500012445,
+    "median_stressed_target_progress_delta": -0.14310680555569388,
+    "family_green": false
+  },
+  "account_economics": {
+    "proposal_count": 512,
+    "normal_plus_stressed_real_episode_count": 49152,
+    "normal_pass_policy_count": 0,
+    "stressed_pass_policy_count": 0,
+    "median_normal_target_progress": 0.5182794444445122,
+    "median_stressed_target_progress": 0.43201097222231977,
+    "maximum_normal_target_progress": 0.9821144444445317,
+    "median_normal_net_usd": 4664.515000000611,
+    "median_stressed_net_usd": 3888.0987500008778,
+    "maximum_mll_breach_rate": 0.0,
+    "behaviorally_distinct_policy_count": 509
+  },
+  "decision": {
+    "rescue_exact_0021_class": false,
+    "promote_any_0021_candidate": false,
+    "paper_shadow_ready_count": 0,
+    "dominant_failure": "TARGET_VELOCITY_LOW_AND_MATCHED_CONTROL_NOT_BEATEN",
+    "next_action": "RUN_FROZEN_0018_90_DAY_CENSORED_HORIZON_DIAGNOSTIC_0022",
+    "rationale": "The homogeneous ratchet class materially reduced stressed expectancy and target progress and produced no pass. Frozen 0018 parents remain positive, MLL-safe and project a median target time near 94 days normal and 103 days stressed. A preregistered 90-day censored-horizon diagnostic is the highest-information way to distinguish research-horizon censoring from a genuine velocity deficit before another behavioral mutation."
+  },
+  "technical_recovery": {
+    "original_worker_oom_before_results": true,
+    "scientific_result_from_revision_01_only": true,
+    "real_policy_batch_size": 48,
+    "scientific_semantics_changed": false
+  },
+  "governance": {
+    "proof_windows_consumed": 0,
+    "new_data_purchase_count": 0,
+    "q4_access_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "CONTRE": "The 90-day diagnostic can reveal censoring but cannot create new economic edge; longer exposure also increases subscription duration and may expose sequence risks not visible in the 60-day summaries. It must remain a development diagnostic and cannot promote any parent by itself.",
+  "verdict_hash": "b0107d1981a74c72ebbee114a1b1743cbaf4c97785a65cca620048dc2b1a7d62"
+}
