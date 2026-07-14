@@ -1,0 +1,44 @@
+{
+  "schema": "hydra_economic_hypothesis_worm_v1",
+  "hypothesis_id": "hydra_economic_evolution_coverage_union_0014_hypothesis",
+  "campaign_id": "hydra_economic_evolution_coverage_union_0014",
+  "class_id": "CROSS_MARKET_SESSION_COVERAGE_UNION_V1",
+  "issued_at_utc": "2026-07-14T02:59:19Z",
+  "parent_verdict": {
+    "path": "WORM/economic-evolution-opportunity-density-0013-verdict-2026-07-14.json",
+    "file_sha256": "8d15a45b2a27d56878193e30f0c5166f9a3c5449df40c6f51dfe768d54d3b6be",
+    "semantic_hash": "c6f23d139e012db02d66037bc0d224aec839c2d0a288f82f02b0cc86d5fca671",
+    "tag": "worm/economic-evolution-opportunity-density-0013-verdict-2026-07-14",
+    "commit": "a13a5ce6d97c82ee2ae0799dccd89e9f415523bd"
+  },
+  "economic_hypothesis": "A static union of ten to twelve positive-cost-resilient sleeves deliberately spanning distinct market/session cells should increase accepted non-overlapping opportunities and shared-account target velocity over event-count-matched market-concentrated unions under identical account risk limits, because independent session liquidity demands are paid by different participant populations.",
+  "who_pays": "Participants demanding immediacy in distinct futures market/session cells pay each sleeve edge; the account union monetizes their non-synchronous arrival rather than increasing per-signal leverage.",
+  "persistence_reason": "Session-specific hedging and inventory transfer recur structurally across products while the fixed shared-account conflict and MLL limits prevent unconstrained beta accumulation.",
+  "structural_change_from_0013": [
+    "replace contemporaneous same-direction scaling with static market/session coverage membership",
+    "increase union breadth to 10-12 sleeves while retaining one risk unit per accepted event",
+    "matched control changes membership concentration rather than confirmation graphs",
+    "no cross-market confirmation threshold and no density scaling"
+  ],
+  "mandatory_null": "Same-size membership with total source event count matched within 15 percent but concentrated in fewer market/session cells, identical account limits, starts, costs and execution semantics.",
+  "minimum_useful_effect": {
+    "median_stressed_net_delta_usd": 100.0,
+    "median_stressed_target_progress_delta": 0.01,
+    "maximum_stressed_mll_breach_deterioration": 0.02,
+    "minimum_informative_pairs": 256,
+    "maximum_NULL_RATIO": 0.8
+  },
+  "candidate_count": 512,
+  "combine_starts": 24,
+  "cost_scenarios": [
+    1.0,
+    1.5
+  ],
+  "parameter_rescue_allowed": false,
+  "status_inheritance": false,
+  "q4_access_allowed": false,
+  "new_data_purchase_allowed": false,
+  "broker_or_orders_allowed": false,
+  "CONTRE": "Broader market/session coverage can merely add more correlated beta and transaction costs. Event-count matching cannot perfectly match latent component quality, so paired uplift must remain economically large, stable and MLL-safe.",
+  "hypothesis_hash": "da7cefda50862bd033bfb245a0356072f5dae2b94e62460c17b12657f06c0274"
+}
