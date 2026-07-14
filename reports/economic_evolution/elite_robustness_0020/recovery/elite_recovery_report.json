@@ -1,0 +1,326 @@
+{
+  "CONTRE": "Selection and failure decomposition use already-observed development outcomes from 0018. They direct development mutations but are not independent confirmation and cannot justify shadow promotion.",
+  "campaign_id": "hydra_economic_evolution_complementary_sleeve_confirmation_0018",
+  "completed_at_utc": "2026-07-14T06:03:52+00:00",
+  "episode_evidence_sha256": "f06ff779748929623787e508b9792373564b8983a0aca9c6942f5412fd2706eb",
+  "episode_start_count": 36,
+  "governance": {
+    "broker_connections": 0,
+    "development_only": true,
+    "new_data_purchase_count": 0,
+    "orders": 0,
+    "proof_windows_consumed": 0,
+    "q4_access_delta": 0
+  },
+  "near_pass_policy_count": 16,
+  "normal_episode_count": 1764,
+  "passing_policy_count": 4,
+  "report_hash": "ac620b9b1ca1c054b61c8d68dd650445f08b24599163196d728e83b84463d9cd",
+  "schema": "hydra_0018_elite_recovery_report_v1",
+  "selected_policy_count": 49,
+  "selection": {
+    "maximum_progress_policy_id": "complementary_sleeve_real_934e27cdf113699834aa9443",
+    "near_pass_policy_ids": [
+      "complementary_sleeve_real_1f7cd0713b3427057b5e3b1c",
+      "complementary_sleeve_real_25b1c9914cdb98f70bbb854d",
+      "complementary_sleeve_real_407c4104ca39e772b7db6133",
+      "complementary_sleeve_real_44a9666e53a69834245c5330",
+      "complementary_sleeve_real_4549f201d5091f13d5d6c683",
+      "complementary_sleeve_real_5286a9ece54261ec69be1a33",
+      "complementary_sleeve_real_5dc6f8405182903f95532c33",
+      "complementary_sleeve_real_6ba52636957800463fccb322",
+      "complementary_sleeve_real_76e574620c1047ac2141d531",
+      "complementary_sleeve_real_7ae087ff4e4a73bb9b31b427",
+      "complementary_sleeve_real_7e5b1d95e3e129e8098b5c64",
+      "complementary_sleeve_real_b672a4d4f704eb6b08438be2",
+      "complementary_sleeve_real_c4514b00c06c0b33326d9e3b",
+      "complementary_sleeve_real_d40e3e042be54f2ff83f63f6",
+      "complementary_sleeve_real_ecb99f713952114c51173b87",
+      "complementary_sleeve_real_fe1b31442d68197b94f5f1f3"
+    ],
+    "passing_policy_ids": [
+      "complementary_sleeve_real_2a948b1b1da0eb1d07fee597",
+      "complementary_sleeve_real_809f0a9b27a86e8e11425c3d",
+      "complementary_sleeve_real_934e27cdf113699834aa9443",
+      "complementary_sleeve_real_fafd24a65de4840ff79bb047"
+    ],
+    "selected_policy_ids": [
+      "complementary_sleeve_real_0909d02250749d7d03eb2e64",
+      "complementary_sleeve_real_13ba3991283224dd61b6923b",
+      "complementary_sleeve_real_14b69a0b346aad16b01a8850",
+      "complementary_sleeve_real_1f7cd0713b3427057b5e3b1c",
+      "complementary_sleeve_real_22c8583125e74049ad86c80d",
+      "complementary_sleeve_real_24d0bcb39e0b18d4ba219958",
+      "complementary_sleeve_real_25b1c9914cdb98f70bbb854d",
+      "complementary_sleeve_real_29747ecb5841c731ec0da8c9",
+      "complementary_sleeve_real_2a948b1b1da0eb1d07fee597",
+      "complementary_sleeve_real_327a1e101864e8ca3052cfbc",
+      "complementary_sleeve_real_38924c00325d1ff7f9f335d1",
+      "complementary_sleeve_real_3ba111c9987f6dc757cf21d4",
+      "complementary_sleeve_real_407c4104ca39e772b7db6133",
+      "complementary_sleeve_real_4164540163f2518a11a3f6d0",
+      "complementary_sleeve_real_44a9666e53a69834245c5330",
+      "complementary_sleeve_real_4549f201d5091f13d5d6c683",
+      "complementary_sleeve_real_4b5d01c3cffc6fc41861945c",
+      "complementary_sleeve_real_5286a9ece54261ec69be1a33",
+      "complementary_sleeve_real_5dc6f8405182903f95532c33",
+      "complementary_sleeve_real_5e17afcd9c9705d9ccfd258a",
+      "complementary_sleeve_real_653b12f36e0ee6f855c562bb",
+      "complementary_sleeve_real_68242c47648ab50f28647aae",
+      "complementary_sleeve_real_6a03533c89d4e37fc260ba9a",
+      "complementary_sleeve_real_6ba52636957800463fccb322",
+      "complementary_sleeve_real_748a673980cca3b499139617",
+      "complementary_sleeve_real_76e574620c1047ac2141d531",
+      "complementary_sleeve_real_7a37d5d1c4e2d9290922a063",
+      "complementary_sleeve_real_7ae087ff4e4a73bb9b31b427",
+      "complementary_sleeve_real_7e5b1d95e3e129e8098b5c64",
+      "complementary_sleeve_real_7ffc8c2e51a8a68caa2b7352",
+      "complementary_sleeve_real_809f0a9b27a86e8e11425c3d",
+      "complementary_sleeve_real_92031d2e5f35dd6bf76021ba",
+      "complementary_sleeve_real_934e27cdf113699834aa9443",
+      "complementary_sleeve_real_956f97ea14ac4a64c43684fb",
+      "complementary_sleeve_real_97c5ff0806f40a153f93eb94",
+      "complementary_sleeve_real_aa2f250df025e1bc7e7791d0",
+      "complementary_sleeve_real_accf4d385ebc4071a60c8981",
+      "complementary_sleeve_real_b672a4d4f704eb6b08438be2",
+      "complementary_sleeve_real_bd494907ceb8cdd084108714",
+      "complementary_sleeve_real_be9d28079c484d07b85d22ae",
+      "complementary_sleeve_real_c4514b00c06c0b33326d9e3b",
+      "complementary_sleeve_real_c86608b5263f3a4653701bbf",
+      "complementary_sleeve_real_ca914b2004ed865253842b69",
+      "complementary_sleeve_real_d40e3e042be54f2ff83f63f6",
+      "complementary_sleeve_real_d534662f5c7d84b4b43e69da",
+      "complementary_sleeve_real_d6695ddcf43af1871961addd",
+      "complementary_sleeve_real_ecb99f713952114c51173b87",
+      "complementary_sleeve_real_fafd24a65de4840ff79bb047",
+      "complementary_sleeve_real_fe1b31442d68197b94f5f1f3"
+    ],
+    "selection_policy": {
+      "near_pass_rule": "top 16 non-passers by frozen equal-weight normalized target, stress economics, consistency, MLL safety and velocity score",
+      "outcomes_already_development_only": true,
+      "passing_policy_rule": "normal pass_count >= 1",
+      "status_inheritance": false,
+      "top_decile_rule": "intersection of top ceil(10% * 512) normal and stressed median net"
+    },
+    "selection_reasons": {
+      "complementary_sleeve_real_0909d02250749d7d03eb2e64": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_13ba3991283224dd61b6923b": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_14b69a0b346aad16b01a8850": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_1f7cd0713b3427057b5e3b1c": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_22c8583125e74049ad86c80d": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_24d0bcb39e0b18d4ba219958": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_25b1c9914cdb98f70bbb854d": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_29747ecb5841c731ec0da8c9": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_2a948b1b1da0eb1d07fee597": [
+        "PASSED_AT_LEAST_ONE_NORMAL_COMBINE_EPISODE",
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_327a1e101864e8ca3052cfbc": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_38924c00325d1ff7f9f335d1": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_3ba111c9987f6dc757cf21d4": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_407c4104ca39e772b7db6133": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_4164540163f2518a11a3f6d0": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_44a9666e53a69834245c5330": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_4549f201d5091f13d5d6c683": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_4b5d01c3cffc6fc41861945c": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_5286a9ece54261ec69be1a33": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_5dc6f8405182903f95532c33": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_5e17afcd9c9705d9ccfd258a": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_653b12f36e0ee6f855c562bb": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_68242c47648ab50f28647aae": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_6a03533c89d4e37fc260ba9a": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_6ba52636957800463fccb322": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_748a673980cca3b499139617": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_76e574620c1047ac2141d531": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_7a37d5d1c4e2d9290922a063": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_7ae087ff4e4a73bb9b31b427": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_7e5b1d95e3e129e8098b5c64": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_7ffc8c2e51a8a68caa2b7352": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_809f0a9b27a86e8e11425c3d": [
+        "PASSED_AT_LEAST_ONE_NORMAL_COMBINE_EPISODE"
+      ],
+      "complementary_sleeve_real_92031d2e5f35dd6bf76021ba": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_934e27cdf113699834aa9443": [
+        "PASSED_AT_LEAST_ONE_NORMAL_COMBINE_EPISODE",
+        "MAXIMUM_0018_TARGET_PROGRESS"
+      ],
+      "complementary_sleeve_real_956f97ea14ac4a64c43684fb": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_97c5ff0806f40a153f93eb94": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_aa2f250df025e1bc7e7791d0": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_accf4d385ebc4071a60c8981": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_b672a4d4f704eb6b08438be2": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_bd494907ceb8cdd084108714": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_be9d28079c484d07b85d22ae": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_c4514b00c06c0b33326d9e3b": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_c86608b5263f3a4653701bbf": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_ca914b2004ed865253842b69": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_d40e3e042be54f2ff83f63f6": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_d534662f5c7d84b4b43e69da": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_d6695ddcf43af1871961addd": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET"
+      ],
+      "complementary_sleeve_real_ecb99f713952114c51173b87": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ],
+      "complementary_sleeve_real_fafd24a65de4840ff79bb047": [
+        "PASSED_AT_LEAST_ONE_NORMAL_COMBINE_EPISODE"
+      ],
+      "complementary_sleeve_real_fe1b31442d68197b94f5f1f3": [
+        "TOP_DECILE_NORMAL_AND_STRESSED_MEDIAN_NET",
+        "TOP_16_MULTI_OBJECTIVE_NEAR_PASS"
+      ]
+    },
+    "top_decile_both_policy_ids": [
+      "complementary_sleeve_real_0909d02250749d7d03eb2e64",
+      "complementary_sleeve_real_13ba3991283224dd61b6923b",
+      "complementary_sleeve_real_14b69a0b346aad16b01a8850",
+      "complementary_sleeve_real_1f7cd0713b3427057b5e3b1c",
+      "complementary_sleeve_real_22c8583125e74049ad86c80d",
+      "complementary_sleeve_real_24d0bcb39e0b18d4ba219958",
+      "complementary_sleeve_real_25b1c9914cdb98f70bbb854d",
+      "complementary_sleeve_real_29747ecb5841c731ec0da8c9",
+      "complementary_sleeve_real_2a948b1b1da0eb1d07fee597",
+      "complementary_sleeve_real_327a1e101864e8ca3052cfbc",
+      "complementary_sleeve_real_38924c00325d1ff7f9f335d1",
+      "complementary_sleeve_real_3ba111c9987f6dc757cf21d4",
+      "complementary_sleeve_real_407c4104ca39e772b7db6133",
+      "complementary_sleeve_real_4164540163f2518a11a3f6d0",
+      "complementary_sleeve_real_44a9666e53a69834245c5330",
+      "complementary_sleeve_real_4549f201d5091f13d5d6c683",
+      "complementary_sleeve_real_4b5d01c3cffc6fc41861945c",
+      "complementary_sleeve_real_5286a9ece54261ec69be1a33",
+      "complementary_sleeve_real_5dc6f8405182903f95532c33",
+      "complementary_sleeve_real_5e17afcd9c9705d9ccfd258a",
+      "complementary_sleeve_real_653b12f36e0ee6f855c562bb",
+      "complementary_sleeve_real_68242c47648ab50f28647aae",
+      "complementary_sleeve_real_6a03533c89d4e37fc260ba9a",
+      "complementary_sleeve_real_6ba52636957800463fccb322",
+      "complementary_sleeve_real_748a673980cca3b499139617",
+      "complementary_sleeve_real_76e574620c1047ac2141d531",
+      "complementary_sleeve_real_7a37d5d1c4e2d9290922a063",
+      "complementary_sleeve_real_7ae087ff4e4a73bb9b31b427",
+      "complementary_sleeve_real_7e5b1d95e3e129e8098b5c64",
+      "complementary_sleeve_real_7ffc8c2e51a8a68caa2b7352",
+      "complementary_sleeve_real_92031d2e5f35dd6bf76021ba",
+      "complementary_sleeve_real_956f97ea14ac4a64c43684fb",
+      "complementary_sleeve_real_97c5ff0806f40a153f93eb94",
+      "complementary_sleeve_real_aa2f250df025e1bc7e7791d0",
+      "complementary_sleeve_real_accf4d385ebc4071a60c8981",
+      "complementary_sleeve_real_b672a4d4f704eb6b08438be2",
+      "complementary_sleeve_real_bd494907ceb8cdd084108714",
+      "complementary_sleeve_real_be9d28079c484d07b85d22ae",
+      "complementary_sleeve_real_c4514b00c06c0b33326d9e3b",
+      "complementary_sleeve_real_c86608b5263f3a4653701bbf",
+      "complementary_sleeve_real_ca914b2004ed865253842b69",
+      "complementary_sleeve_real_d40e3e042be54f2ff83f63f6",
+      "complementary_sleeve_real_d534662f5c7d84b4b43e69da",
+      "complementary_sleeve_real_d6695ddcf43af1871961addd",
+      "complementary_sleeve_real_ecb99f713952114c51173b87",
+      "complementary_sleeve_real_fe1b31442d68197b94f5f1f3"
+    ]
+  },
+  "source_pair_ledger_sha256": "e30c4c49735566735105864d0f57c2d2739ae33c4caae700227d1dfe850c0ed8",
+  "source_population_sha256": "136e2027a8eb89530e7e65f4b4bc6a88130cb3b80934f485b58c10c348f72c90",
+  "source_result_sha256": "3b5dc039a9af9826e02ef07ec7b7741978fdbde45145500004ad7ab1aae257e1",
+  "stressed_episode_count": 1764,
+  "top_decile_both_count": 46
+}
