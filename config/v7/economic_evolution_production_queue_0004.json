@@ -1,0 +1,41 @@
+{
+  "schema": "hydra_manifest_campaign_queue_v1",
+  "queue_id": "hydra_economic_evolution_production_queue_0004",
+  "issued_at_utc": "2026-07-14T02:24:47Z",
+  "supersedes": {
+    "path": "config/v7/economic_evolution_production_queue_0003.json",
+    "file_sha256": "90b24a818dec4f12226968b8fe3098653f3c95f1ae73c8d79f18e6461c864e06",
+    "semantic_hash": "af31b005e851d0d17bb7c38314520e736b05ac6475ba24841d645fe072d987b1"
+  },
+  "entries": [
+    {
+      "ordinal": 13,
+      "campaign_id": "hydra_economic_evolution_opportunity_density_0013",
+      "engine": "opportunity_density_v1",
+      "preregistration_path": "config/v7/economic_evolution_opportunity_density_0013_revision_03.json",
+      "preregistration_file_sha256": "b09b8b2c6b831a6f0b55da2c97972604370596fcc892adb5afcc14e19df730c1",
+      "preregistration_semantic_hash": "a44ac522cc6caf58aa24ee7117dce9d2691d2f41582dee1d943df3691f1ec361",
+      "worm_tag": "worm/economic-evolution-opportunity-density-0013-revision-03-2026-07-14",
+      "worm_commit": "47f8c9fa5c59bf4d50b073c0f499ce44bb719b5b",
+      "enabled": true
+    }
+  ],
+  "runtime_policy": {
+    "reload_queue_each_controller_step": true,
+    "controller_source_change_for_new_manifest": false,
+    "single_active_campaign": true,
+    "single_authoritative_mission_writer": true,
+    "maximum_deterministic_attempts": 3,
+    "auto_tombstone_failed_exact_class": true,
+    "full_repository_regression_per_campaign": false,
+    "targeted_integrity_checks_per_campaign": true
+  },
+  "governance": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "broker_or_orders_allowed": false,
+    "proof_window_consumption_allowed": false
+  },
+  "CONTRE": "Queue revision 0004 binds only the completed simulator interface. It cannot change the frozen economics or family enrichment requirement.",
+  "queue_hash": "227e8fc690732dc8cf23c26dfdb153a2fe64f83efcc9af764c5f7088d798e53e"
+}
