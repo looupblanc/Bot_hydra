@@ -8,6 +8,7 @@ from hydra.account_policy.router import (
     EntryIntent,
     RoutingDecision,
 )
+from hydra.account_policy.schema import AccountPolicyKind
 from hydra.economic_evolution.role_aware_account import (
     RoleAwareComponent,
     _eligible_membership,
@@ -115,6 +116,10 @@ class OpportunityDensityPolicy:
         """Duck-typed identifier required by the frozen account simulator."""
 
         return self.policy_id
+
+    @property
+    def kind(self) -> AccountPolicyKind:
+        return AccountPolicyKind.ADAPTIVE_CONTROLLER
 
     @property
     def source_graph(self) -> dict[str, tuple[str, ...]]:
