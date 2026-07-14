@@ -1,0 +1,41 @@
+{
+  "schema": "hydra_manifest_campaign_queue_v1",
+  "queue_id": "hydra_economic_evolution_production_queue_0002",
+  "issued_at_utc": "2026-07-14T02:18:00Z",
+  "supersedes": {
+    "path": "config/v7/economic_evolution_production_queue.json",
+    "file_sha256": "d1c2f13e091e88d2ad1a257fc8d482fa8e71b75e32796f39c6142d782ac52545",
+    "semantic_hash": "11d68faaea26da0bf1434fe16f35b217fe4e88fb619fc52b49c4c1d9d07a1112"
+  },
+  "entries": [
+    {
+      "ordinal": 13,
+      "campaign_id": "hydra_economic_evolution_opportunity_density_0013",
+      "engine": "opportunity_density_v1",
+      "preregistration_path": "config/v7/economic_evolution_opportunity_density_0013_revision_01.json",
+      "preregistration_file_sha256": "7026086d8322994ab3afa0fada84fa2ce352aab94d2dc9b8ad0e4cb4bd9d93c3",
+      "preregistration_semantic_hash": "7d13802b3536a793ab6dc52687fd8fa89cfd12b5604dc7f001e416a3f6277474",
+      "worm_tag": "worm/economic-evolution-opportunity-density-0013-revision-01-2026-07-14",
+      "worm_commit": "937ece63812b06d54e3cdbaaf061f8f65c308fd0",
+      "enabled": true
+    }
+  ],
+  "runtime_policy": {
+    "reload_queue_each_controller_step": true,
+    "controller_source_change_for_new_manifest": false,
+    "single_active_campaign": true,
+    "single_authoritative_mission_writer": true,
+    "maximum_deterministic_attempts": 3,
+    "auto_tombstone_failed_exact_class": true,
+    "full_repository_regression_per_campaign": false,
+    "targeted_integrity_checks_per_campaign": true
+  },
+  "governance": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "broker_or_orders_allowed": false,
+    "proof_window_consumption_allowed": false
+  },
+  "CONTRE": "A manifest revision resolves a software interface defect but adds no economic evidence. Campaign 0013 remains capable of a clean null and must be tombstoned without rescue if its frozen family tripwire fails.",
+  "queue_hash": "f74dbc3139794e972b9c9e553f10e81cc74df544d7b21dee09deb143acc53808"
+}
