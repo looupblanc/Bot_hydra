@@ -4,9 +4,11 @@ import multiprocessing
 import threading
 from concurrent.futures import ProcessPoolExecutor
 from contextlib import contextmanager
+from dataclasses import dataclass
 from typing import Any, Iterator, Mapping, Sequence
 
 import hydra.economic_evolution.account_coverage_sizing_evaluation as sizing_eval
+from hydra.account_policy.schema import AccountPolicyKind
 from hydra.economic_evolution.account_complementary_sleeve import (
     ComplementarySleevePolicyPair,
     route_complementary_sleeve_entry,
@@ -21,6 +23,38 @@ _PAIR_RUNTIMES: Mapping[str, ExactSleeveRuntime] = {}
 _PAIR_STARTS: tuple[int, ...] = ()
 _PAIR_EPISODE_POLICY: EpisodeStartPolicy | None = None
 _ROUTER_BIND_LOCK = threading.RLock()
+
+
+@dataclass(frozen=True, slots=True)
+class ComplementarySleeveBasketPolicy:
+    """Campaign-local basket contract; shared execution semantics are unchanged."""
+
+    policy_id: str
+    component_ids: tuple[str, ...]
+    archetype: str
+    maximum_simultaneous_positions: int
+    maximum_mini_equivalent: int
+    conflict_policy: str
+    component_priority: tuple[str, ...]
+    policy_version: str = COMPLEMENTARY_SLEEVE_POLICY_VERSION
+
+    def __post_init__(self) -> None:
+        if not self.policy_id or not 10 <= len(self.component_ids) <= 13:
+            raise ValueError("complementary basket identity or breadth is invalid")
+        if len(set(self.component_ids)) != len(self.component_ids):
+            raise ValueError("complementary basket components must be unique")
+        if self.component_priority != self.component_ids:
+            raise ValueError("complementary basket priority must be frozen")
+        if self.maximum_simultaneous_positions != 3:
+            raise ValueError("complementary basket concurrency drift")
+        if not 1 <= self.maximum_mini_equivalent <= 15:
+            raise ValueError("complementary basket contract limit is invalid")
+        if self.conflict_policy != "FIXED_PRIORITY_SAME_MARKET_EXCLUSIVE":
+            raise ValueError("complementary basket conflict policy drift")
+
+    @property
+    def kind(self) -> AccountPolicyKind:
+        return AccountPolicyKind.STATIC_BASKET
 
 
 def evaluate_complementary_sleeve_policy_pairs(
@@ -100,13 +134,18 @@ def evaluate_complementary_sleeve_policy_pair(
 def _bound_complementary_router() -> Iterator[None]:
     with _ROUTER_BIND_LOCK:
         prior = sizing_eval.route_coverage_sizing_entry
+        prior_basket = sizing_eval.CoverageUnionBasketPolicy
         sizing_eval.route_coverage_sizing_entry = (  # type: ignore[assignment]
             route_complementary_sleeve_entry
+        )
+        sizing_eval.CoverageUnionBasketPolicy = (  # type: ignore[assignment]
+            ComplementarySleeveBasketPolicy
         )
         try:
             yield
         finally:
             sizing_eval.route_coverage_sizing_entry = prior
+            sizing_eval.CoverageUnionBasketPolicy = prior_basket
 
 
 def _control_cache_key(
@@ -130,6 +169,7 @@ def _control_cache_key(
 
 __all__ = [
     "COMPLEMENTARY_SLEEVE_POLICY_VERSION",
+    "ComplementarySleeveBasketPolicy",
     "evaluate_complementary_sleeve_policy_pair",
     "evaluate_complementary_sleeve_policy_pairs",
 ]
