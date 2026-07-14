@@ -1,0 +1,95 @@
+{
+  "schema": "hydra_economic_production_terminal_persistence_v1",
+  "campaign_id": "hydra_economic_production_0024",
+  "recorded_at_utc": "2026-07-14T21:04:04Z",
+  "terminal_status": "SELECTOR_PROCEDURE_FALSIFIED",
+  "failure_code": "NO_ELIGIBLE_DESIGN_SET_CHAMPION_B4",
+  "scientific_boundary": {
+    "held_out_evaluation_count": 0,
+    "held_out_outcomes_inspected": false,
+    "headline_held_out_evidence": null,
+    "fallback_selected": false,
+    "retuning_performed": false,
+    "promotion_96_count": 0,
+    "evidence_bundle_status": "STAGING_PRESERVED_NONCONFIRMATORY",
+    "evidence_bundle_finalization_allowed": false
+  },
+  "terminal_evidence": {
+    "receipt_path": "reports/economic_evolution/economic_production_0024/selector_procedure_terminal_receipt.json",
+    "receipt_file_sha256": "bcaa8d544dafc1d475abccc9ad5f20418178aa83da728e7f1f5c88fc2d2c3969",
+    "receipt_hash": "4f91609ddabf75eedf1b78d78ca3e581a709d6ff4f485b56a7cbc01a44e48d54",
+    "verdict_path": "WORM/economic-production-kernel-0024-selector-verdict-2026-07-14.json",
+    "verdict_file_sha256": "606b2ae28eecd26fcf33974085ed63527c9b8294bcdf373603d625982d246f9d",
+    "verdict_hash": "96b8ca5d8281a7e7e65644f7d9d0f019fa4fc69e383e4389f6a0368c546766fe",
+    "verdict_commit": "59b4b4df1fcad9eae0adefcdde235d96c3ac6398",
+    "verdict_tag": "worm/economic-production-kernel-0024-selector-verdict-2026-07-14"
+  },
+  "retry_disable": {
+    "queue_path": "config/v7/economic_evolution_production_queue_0022.json",
+    "queue_file_sha256": "a3d40068fc46fbb8980b2274c4e01fa166d2c0072861ee68ef954fca0d4509c9",
+    "queue_hash": "44f541725e24b03f2ac12a24a822c7d39664c199830aa00ac21faf2b64ba101a",
+    "queue_commit": "58f50ca717301d37f290ce983ff05fc5c1d1ba53",
+    "queue_tag": "worm/economic-evolution-production-queue-0022-2026-07-14",
+    "campaign_0024_enabled": false,
+    "automatic_retry_allowed": false,
+    "evidence_finalization_allowed": false
+  },
+  "future_runtime_patch": {
+    "commit": "58f50ca717301d37f290ce983ff05fc5c1d1ba53",
+    "remote_branch_commit": "58f50ca717301d37f290ce983ff05fc5c1d1ba53",
+    "targeted_tests_passed": 63,
+    "replay_semantics_changed": false,
+    "pnl_or_mll_semantics_changed": false,
+    "profile_path": "reports/economic_evolution/economic_production_0024/serial_coordinator_profile.json",
+    "profile_file_sha256": "1e71fb729c235a672b2e22d9ddec0b3c394b48b0cf2bcac5687edfd534ee2b1c",
+    "profile_hash": "9cf33b52b0c5e953fe2070da58acbbebe49c172e1b97dfb5f874189d588ab250"
+  },
+  "persistent_service": {
+    "unit": "hydra-autonomous-mission.service",
+    "active_state": "active",
+    "sub_state": "running",
+    "pid": 2346387,
+    "controller_version": "hydra_v7_economic_evolution_controller_v17",
+    "controller_count": 1,
+    "authoritative_mission_writer_count": 1,
+    "mission_db_writer_count": 0,
+    "registry_writer_count": 0,
+    "production_research_worker_count": 0,
+    "production_evidence_writer_count": 0,
+    "systemd_restart_count": 617,
+    "runtime_state": "IDLE",
+    "runtime_campaign_id": null,
+    "runtime_worker_pid": null,
+    "manifest_state": "MANIFEST_QUEUE_AWAITING_APPEND",
+    "heartbeat_at_utc": "2026-07-14T21:03:42+00:00",
+    "heartbeat_step": 8055,
+    "process_lock_pid": 2346387
+  },
+  "mission_transition": {
+    "event_id": 3991,
+    "event_type": "V7_ACTION_TRANSITION",
+    "created_at_utc": "2026-07-14T21:02:48+00:00",
+    "action_type": "MANIFEST_ECONOMIC_CAMPAIGN_COMPLETE",
+    "manifest_state": "MANIFEST_QUEUE_AWAITING_APPEND",
+    "inherited_last_enabled_campaign_id": "hydra_economic_evolution_static_parent_basket_0023",
+    "campaign_0024_retry_started": false
+  },
+  "integrity": {
+    "mission_db_quick_check": "ok",
+    "registry_db_quick_check": "ok",
+    "graveyard_db_quick_check": "ok"
+  },
+  "governance": {
+    "q4_status": "BURNED",
+    "q4_historical_access_count": 1,
+    "q4_access_delta_campaign_0024": 0,
+    "new_data_purchase_count_campaign_0024": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "budget_spent_usd": 87.84738838672598,
+    "budget_remaining_usd": 37.15261161327402
+  },
+  "next_autonomous_action": "QUEUE_MATERIALLY_DISTINCT_MECHANISM_MANIFEST",
+  "factory_continuity": "PERSISTENT_V17_CONTROLLER_RUNNING_QUEUE_AWAITING_APPEND",
+  "persistence_hash": "729117d8295525da35f5c3d34b26a03e8f9977bcbfb9b513f47873ff1f26a98f"
+}
