@@ -1,0 +1,71 @@
+{
+  "schema": "hydra_account_timeline_hypothesis_v1",
+  "campaign_id": "hydra_economic_evolution_account_timeline_0012",
+  "class_id": "SLEEVE_VIRTUAL_PERSISTENCE_ROUTER_V1",
+  "issued_at_utc": "2026-07-14T01:10:00Z",
+  "parent_terminal_verdict": {
+    "path": "WORM/economic-evolution-account-state-router-0011-verdict-2026-07-14.json",
+    "file_sha256": "4b66f4377a213613707eb4797fd923a8a832c3523057208354bec1e0d6faffb4",
+    "semantic_hash": "b703064703fda0047afc60637cde6c9a8a32ee1522c39c86be420dfd7727ab49",
+    "verdict": "CLASS_TOMBSTONE_EXACT_GRAMMAR"
+  },
+  "economic_hypothesis": "Slow market and session regimes make a sleeve's completed virtual risk-normalized outcomes persist briefly; gating its next opportunity with its own recent outcome timeline should improve stressed account expectancy and target progress over an identical mapping to another sleeve's completed timeline without worsening MLL or consistency.",
+  "who_pays": "Inventory adjustment, hedging demand and session-specific liquidity regimes can persist across several completed opportunities, so counterparties can continue paying a frozen sleeve while its own mechanism remains aligned and stop paying when that alignment decays.",
+  "why_it_may_persist": "The proposed information is a short causal state estimate from already completed opportunities rather than a future return label. Participant inventory and liquidity conditions typically unwind more slowly than one trade while remaining short enough to avoid treating a historical role label as permanent.",
+  "structural_change_from_0011": {
+    "0011": "ROLE_LABELS_ROUTED_BY_GENERIC_ACCOUNT_STATE_THRESHOLDS",
+    "0012": "ROLE_BLIND_OWN_SLEEVE_COMPLETED_OUTCOME_TIMELINE_ROUTING",
+    "role_labels_used_by_router": false,
+    "account_state_threshold_rescue": false,
+    "parameter_neighbor_rescue": false,
+    "new_candidate_ids": true,
+    "status_inheritance": false
+  },
+  "past_only_inputs": {
+    "timeline": "LAST_SIX_COMPLETED_VIRTUAL_OUTCOMES_PER_SLEEVE",
+    "availability_rule": "TRADE_EXIT_TIMESTAMP_LESS_THAN_OR_EQUAL_TO_CURRENT_DECISION_TIMESTAMP",
+    "normalization": "NET_AFTER_COSTS_DIVIDED_BY_MAX_ABSOLUTE_FROZEN_ADVERSE_EXCURSION_OR_100_USD",
+    "minimum_history": 4,
+    "future_outcomes_available": false,
+    "accepted_trade_required_for_history": false
+  },
+  "bounded_actions": [
+    "VETO_WHEN_OWN_COMPLETED_TIMELINE_MEAN_IS_AT_OR_BELOW_MINUS_0_25",
+    "ONE_UNIT_WHILE_WARMING_UP_OR_NEUTRAL",
+    "TWO_UNITS_WHEN_OWN_COMPLETED_TIMELINE_MEAN_IS_AT_OR_ABOVE_PLUS_0_25",
+    "MAXIMUM_TWO_SIMULTANEOUS_POSITIONS",
+    "DAILY_PROFIT_LOCK",
+    "DAILY_LOSS_GUARD",
+    "CRITICAL_MLL_BUFFER_LOCK"
+  ],
+  "matched_control": {
+    "same_sleeve_membership": true,
+    "same_component_event_paths": true,
+    "same_completed_history_values": true,
+    "same_history_source_multiset": true,
+    "same_timeline_thresholds": true,
+    "same_account_limits": true,
+    "difference": "DETERMINISTIC_DERANGED_WITHIN_MEMBERSHIP_HISTORY_SOURCE_PERMUTATION",
+    "future_outcomes_available_to_router": false
+  },
+  "mandatory_falsification": {
+    "primary": "PAIRED_STRESSED_ACCOUNT_EXPECTANCY_UPLIFT",
+    "secondary": [
+      "TARGET_PROGRESS_UPLIFT",
+      "NO_MLL_BREACH_DETERIORATION",
+      "NO_CONSISTENCY_DETERIORATION"
+    ],
+    "family_tripwire_required": true,
+    "same_class_parameter_rescue_after_failure": false
+  },
+  "governance": {
+    "development_only": true,
+    "proof_windows_consumed": 0,
+    "new_data_purchase_allowed": false,
+    "q4_access_allowed": false,
+    "broker_connections_allowed": false,
+    "orders_allowed": false
+  },
+  "CONTRE": "Completed outcomes can cluster because sleeve opportunities share market beta, session timing or mechanically overlapping paths. The exact class is supported only if own-history routing beats the deranged history-source control on paired stressed economics while preserving MLL and consistency.",
+  "hypothesis_hash": "159579d714e370d4812970b6138df12692e32bc8abdc4b97fcc1ae9652a9a505"
+}
