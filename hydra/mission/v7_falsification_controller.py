@@ -112,6 +112,16 @@ from hydra.mission.economic_evolution_account_timeline_runtime import (
     EconomicEvolutionAccountTimelineRuntime,
     verify_account_timeline_freeze,
 )
+from hydra.mission.economic_evolution_account_timeline_terminal_runtime import (
+    TERMINAL_VERDICT_RELATIVE_PATH as ACCOUNT_TIMELINE_TERMINAL_VERDICT_RELATIVE_PATH,
+    EconomicEvolutionAccountTimelineTerminalRuntime,
+    load_and_verify_account_timeline_terminal_verdict,
+)
+from hydra.mission.economic_evolution_manifest_runtime import (
+    QUEUE_RELATIVE_PATH as MANIFEST_CAMPAIGN_QUEUE_RELATIVE_PATH,
+    EconomicEvolutionManifestRuntime,
+    load_and_verify_manifest_queue,
+)
 from hydra.mission.mission_state import (
     append_event,
     append_jsonl,
@@ -2505,6 +2515,20 @@ class V7FalsificationController:
             if (self.root / ACCOUNT_TIMELINE_CONFIG_RELATIVE_PATH).is_file()
             else None
         )
+        self._economic_account_timeline_terminal_runtime = (
+            EconomicEvolutionAccountTimelineTerminalRuntime(
+                self.root, self.paths.state_dir
+            )
+            if (
+                self.root / ACCOUNT_TIMELINE_TERMINAL_VERDICT_RELATIVE_PATH
+            ).is_file()
+            else None
+        )
+        self._economic_manifest_runtime = (
+            EconomicEvolutionManifestRuntime(self.root, self.paths.state_dir)
+            if (self.root / MANIFEST_CAMPAIGN_QUEUE_RELATIVE_PATH).is_file()
+            else None
+        )
 
     def run(self) -> int:
         signal.signal(signal.SIGTERM, self._handle_signal)
@@ -2556,6 +2580,8 @@ class V7FalsificationController:
                     self._economic_account_state_runtime.stop()
                 if self._economic_account_timeline_runtime is not None:
                     self._economic_account_timeline_runtime.stop()
+                if self._economic_manifest_runtime is not None:
+                    self._economic_manifest_runtime.stop()
                 set_kv(conn, "service_state", "V7_INTEGRITY_BLOCKED")
                 set_kv(conn, "current_phase", "INTEGRITY_BLOCKED")
                 set_kv(conn, "current_blocker", f"{type(exc).__name__}:{exc}"[:4000])
@@ -2696,6 +2722,10 @@ class V7FalsificationController:
             action = self._economic_account_state_terminal_runtime.advance(action)
         if self._economic_account_timeline_runtime is not None:
             action = self._economic_account_timeline_runtime.advance(action)
+        if self._economic_account_timeline_terminal_runtime is not None:
+            action = self._economic_account_timeline_terminal_runtime.advance(action)
+        if self._economic_manifest_runtime is not None:
+            action = self._economic_manifest_runtime.advance(action)
         previous = get_kv(conn, "v7_current_action", {})
         step = int(get_kv(conn, "v7_step", 0)) + 1
         progress_at = utc_now_iso()
@@ -2865,10 +2895,19 @@ class V7FalsificationController:
                 / ACCOUNT_TIMELINE_RESULT_NAME
             )
             if account_timeline_result_path.is_file():
-                load_and_verify_account_timeline_result(
+                account_timeline_result = load_and_verify_account_timeline_result(
                     account_timeline_result_path,
                     account_timeline_config,
                 )
+                if (
+                    self.root / ACCOUNT_TIMELINE_TERMINAL_VERDICT_RELATIVE_PATH
+                ).is_file():
+                    load_and_verify_account_timeline_terminal_verdict(
+                        self.root,
+                        result=account_timeline_result,
+                    )
+        if (self.root / MANIFEST_CAMPAIGN_QUEUE_RELATIVE_PATH).is_file():
+            load_and_verify_manifest_queue(self.root)
         return text
 
     def _checkpoint(
@@ -3001,6 +3040,14 @@ class V7FalsificationController:
             heartbeat["economic_evolution_account_timeline"] = (
                 self._economic_account_timeline_runtime.snapshot()
             )
+        if self._economic_account_timeline_terminal_runtime is not None:
+            heartbeat["economic_evolution_account_timeline_terminal"] = (
+                self._economic_account_timeline_terminal_runtime.snapshot()
+            )
+        if self._economic_manifest_runtime is not None:
+            heartbeat["economic_evolution_manifest_campaigns"] = (
+                self._economic_manifest_runtime.snapshot()
+            )
         return heartbeat
 
     def _lease_expires_at(self) -> str:
@@ -3060,6 +3107,8 @@ class V7FalsificationController:
             self._economic_account_state_runtime.stop()
         if self._economic_account_timeline_runtime is not None:
             self._economic_account_timeline_runtime.stop()
+        if self._economic_manifest_runtime is not None:
+            self._economic_manifest_runtime.stop()
         now = utc_now_iso()
         set_kv(conn, "service_state", "STOPPED_CLEANLY_V7")
         set_kv(conn, "current_phase", "STOPPED_CLEANLY")
