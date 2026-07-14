@@ -1,0 +1,69 @@
+{
+  "schema": "hydra_economic_hypothesis_v1",
+  "hypothesis_id": "hydra_economic_evolution_complementary_sleeve_confirmation_0018_hypothesis_revision_01",
+  "issued_at_utc": "2026-07-14T05:06:00Z",
+  "campaign_id": "hydra_economic_evolution_complementary_sleeve_confirmation_0018",
+  "class_id": "GREEN_COMPLEMENTARY_SLEEVE_48_START_CONFIRMATION_V1",
+  "source_commit": "2ba3609a3c8f07e99f27ef04ed1f10374debfc75",
+  "parent_verdict": {
+    "path": "WORM/economic-evolution-complementary-sleeve-0017-verdict-2026-07-14.json",
+    "file_sha256": "bd8f79720238a28f05b9933b5618ab99f1c336e88289f81cdabf098c2b96c460",
+    "semantic_hash": "f927308882d61c071915fb9bfa5b4481dded43d6880c658f7a0c1a4a4ad9ac0d",
+    "tag": "worm/economic-evolution-complementary-sleeve-0017-verdict-2026-07-14",
+    "commit": "7e99239496b8ceee7f341d718bdd549473ed0b37"
+  },
+  "economic_hypothesis": "The exact green 0017 policy population contains one normal-cost Combine path and broad positive stressed economics; replaying the unchanged identities on the maximum 36 preregistered block-aware starts feasible at five-session spacing should determine whether the path repeats without selecting new memberships, weights, thresholds, horizons, or denser starts after outcomes.",
+  "frozen_population": {
+    "source_campaign_id": "hydra_economic_evolution_complementary_sleeve_0017",
+    "policy_pair_count": 512,
+    "policy_manifest_hash": "6c84ababed3f8c331cbb3e892eca211510e4cc10b3b163a7701395d083835781",
+    "new_candidate_ids": false,
+    "membership_changes": false,
+    "sizing_changes": false,
+    "signal_changes": false,
+    "cost_changes": false,
+    "gate_changes": false,
+    "outcomes_seen_for_new_starts": false
+  },
+  "confirmation_design": {
+    "maximum_starts": 36,
+    "minimum_spacing_sessions": 5,
+    "minimum_observation_sessions": 60,
+    "maximum_duration_sessions": 60,
+    "normal_cost_multiplier": 1.0,
+    "stress_cost_multiplier": 1.5,
+    "worker_count": 3,
+    "same_starts_for_real_and_control": true,
+    "same_starts_for_normal_and_stress": true
+  },
+  "decision_policy": {
+    "research_confirmation_requires_at_least_one_stressed_combine_pass": true,
+    "minimum_normal_median_net_usd": 0.0,
+    "minimum_stressed_median_net_usd": 0.0,
+    "minimum_stressed_median_target_progress": 0.4,
+    "maximum_mll_breach_rate": 0.2,
+    "minimum_stressed_consistency_pass_rate": 0.5,
+    "minimum_positive_temporal_blocks": 2,
+    "maximum_positive_component_share": 0.65,
+    "minimum_matched_control_net_delta_usd": 100.0,
+    "validated_status_allowed": false,
+    "pre_holdout_ready_allowed": false,
+    "paper_shadow_ready_allowed": false
+  },
+  "falsification_rule": "If the unchanged population produces no stressed Combine path on the frozen 36 feasible starts, retain the green incremental sleeve evidence but classify the observed 0017 pass as nonrepeatable and move to the preregistered exit-representation mutation without retuning this population.",
+  "governance": {
+    "development_only": true,
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "broker_or_orders_allowed": false,
+    "status_inheritance": false
+  },
+  "CONTRE": "Thirty-six starts remain overlapping development evidence and provide fewer effective independent blocks than raw starts. Repeated paths would justify targeted research only, not validation or shadow admission.",
+  "supersedes": {
+    "path": "WORM/economic-evolution-complementary-sleeve-confirmation-0018-hypothesis-2026-07-14.json",
+    "file_sha256": "de0084fe27f29c9fc59dff6f94867af276ea7773323a0b0174f911815ccf81b5",
+    "semantic_hash": "aec5788b6b9c70e8d069ad56252f68d8ce2032ad5d5bddc0c180ccdf605faa53",
+    "reason": "Pre-result feasibility correction: the 240 common eligible sessions support at most 36 starts at the frozen five-session spacing and 60-session observation requirement. No account episode or policy outcome was produced under the infeasible 48-start manifest."
+  },
+  "hypothesis_hash": "168405f4971911ca255510913009ddad19ac34f43cdfa723a129089aca27215e"
+}
