@@ -234,6 +234,8 @@ def load_and_verify_opportunity_density_preregistration(
 ) -> dict[str, Any]:
     resolved = Path(path).resolve()
     prereg = _load_json(resolved)
+    if prereg.get("schema") == "hydra_opportunity_density_preregistration_revision_v1":
+        prereg = _resolve_preregistration_revision(resolved, prereg)
     claimed = prereg.get("preregistration_hash")
     payload = dict(prereg)
     payload.pop("preregistration_hash", None)
@@ -268,6 +270,41 @@ def load_and_verify_opportunity_density_preregistration(
                 f"opportunity-density implementation drift: {relative}"
             )
     return prereg
+
+
+def _resolve_preregistration_revision(
+    revision_path: Path,
+    revision: Mapping[str, Any],
+) -> dict[str, Any]:
+    claimed = revision.get("revision_hash")
+    revision_payload = dict(revision)
+    revision_payload.pop("revision_hash", None)
+    if claimed != stable_hash(revision_payload):
+        raise OpportunityDensityCampaignError("density revision hash drift")
+    root = _project_root(revision_path)
+    base_reference = revision.get("base_preregistration") or {}
+    base_path = root / str(base_reference.get("path") or "")
+    if _sha256(base_path) != str(base_reference.get("file_sha256") or ""):
+        raise OpportunityDensityCampaignError("density base preregistration drift")
+    base = _load_json(base_path)
+    if base.get("preregistration_hash") != base_reference.get("semantic_hash"):
+        raise OpportunityDensityCampaignError(
+            "density base preregistration semantic drift"
+        )
+    effective = dict(base)
+    effective["issued_at_utc"] = str(revision["issued_at_utc"])
+    effective["source_commit"] = str(revision["source_commit"])
+    effective["implementation_files"] = dict(revision["implementation_files"])
+    effective["preregistration_hash"] = str(
+        revision["effective_preregistration_hash"]
+    )
+    payload = dict(effective)
+    payload.pop("preregistration_hash", None)
+    if stable_hash(payload) != effective["preregistration_hash"]:
+        raise OpportunityDensityCampaignError(
+            "density effective revision semantic drift"
+        )
+    return effective
 
 
 def load_and_verify_opportunity_density_result(

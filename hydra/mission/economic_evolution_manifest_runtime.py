@@ -39,6 +39,7 @@ from hydra.research.v7_graveyard import (
 
 
 QUEUE_RELATIVE_PATH = Path("config/v7/economic_evolution_production_queue.json")
+QUEUE_REVISION_GLOB = "economic_evolution_production_queue_*.json"
 SUPPORTED_ENGINES = {"opportunity_density_v1"}
 
 
@@ -139,7 +140,7 @@ class EconomicEvolutionManifestRuntime:
     def snapshot(self) -> dict[str, Any]:
         state = self._load_runtime_state()
         return {
-            "queue_path": str(self.root / QUEUE_RELATIVE_PATH),
+            "queue_path": str(_latest_manifest_queue_path(self.root)),
             "state": (
                 "RUNNING"
                 if self._process is not None and self._process.poll() is None
@@ -655,7 +656,7 @@ class EconomicEvolutionManifestRuntime:
 
 def load_and_verify_manifest_queue(root: str | Path) -> dict[str, Any]:
     project = Path(root).resolve()
-    queue = _load_json(project / QUEUE_RELATIVE_PATH)
+    queue = _load_json(_latest_manifest_queue_path(project))
     claimed = queue.get("queue_hash")
     payload = dict(queue)
     payload.pop("queue_hash", None)
@@ -680,6 +681,17 @@ def load_and_verify_manifest_queue(root: str | Path) -> dict[str, Any]:
     ):
         raise EconomicEvolutionRuntimeError("invalid manifest campaign queue")
     return queue
+
+
+def _latest_manifest_queue_path(root: str | Path) -> Path:
+    """Return the newest immutable queue revision without rewriting a WORM file."""
+
+    project = Path(root).resolve()
+    base = project / QUEUE_RELATIVE_PATH
+    revisions = sorted(
+        (project / QUEUE_RELATIVE_PATH.parent).glob(QUEUE_REVISION_GLOB)
+    )
+    return revisions[-1] if revisions else base
 
 
 def _load_json(path: Path) -> dict[str, Any]:
