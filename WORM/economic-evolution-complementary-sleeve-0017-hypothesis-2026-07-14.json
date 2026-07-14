@@ -1,0 +1,98 @@
+{
+  "schema": "hydra_economic_evolution_hypothesis_v1",
+  "hypothesis_id": "hydra_economic_evolution_complementary_sleeve_0017_hypothesis",
+  "campaign_id": "hydra_economic_evolution_complementary_sleeve_0017",
+  "class_id": "GREEN_THREE_ZONE_COMPLEMENTARY_SLEEVE_V1",
+  "issued_at_utc": "2026-07-14T04:28:07Z",
+  "source_commit": "a109814c53b5db58f6a650a2b8da003151c30e93",
+  "parent_verdict": {
+    "path": "WORM/economic-evolution-three-zone-sizing-0016-verdict-2026-07-14.json",
+    "file_sha256": "d73f8c811164a56d3bad6981deb593e931afeebd29de668433f3f4f46c4fcb58",
+    "semantic_hash": "adce35b2ce58a900d027c74edc6dedda456b05275c89d86ed027dff8c3aa9909",
+    "tag": "worm/economic-evolution-three-zone-sizing-0016-verdict-2026-07-14",
+    "commit": "a109814c53b5db58f6a650a2b8da003151c30e93"
+  },
+  "economic_hypothesis": "The green three-zone account policies are positive and MLL-safe but stop just short of the target because opportunity coverage is insufficient; adding exactly one unused behaviorally distinct sleeve chosen by a frozen structural complementarity rule should improve stressed target velocity over the unchanged parent without increasing per-signal size, shared concurrency, or account limits.",
+  "structural_change": {
+    "parent_membership_and_signal_paths_unchanged": true,
+    "parent_policy_count": 512,
+    "one_new_child_per_parent": true,
+    "exactly_one_unused_sleeve_added": true,
+    "added_sleeve_selection_order": [
+      "new_market_indicator_descending",
+      "new_session_indicator_descending",
+      "new_role_indicator_descending",
+      "event_count_descending",
+      "behavioral_fingerprint_ascending"
+    ],
+    "outcomes_from_campaign_0016_used_in_sleeve_selection": false,
+    "real_membership_size_range": [11, 13],
+    "control_is_exact_parent_membership": true,
+    "high_zone_risk_units": 3,
+    "middle_zone_risk_units": 2,
+    "base_zone_risk_units": 1,
+    "high_zone_minimum_mll_buffer_usd": 3750.0,
+    "high_zone_minimum_remaining_target_usd": 4500.0,
+    "middle_zone_minimum_mll_buffer_usd": 3000.0,
+    "middle_zone_minimum_remaining_target_usd": 2250.0,
+    "critical_mll_buffer_usd": 750.0,
+    "daily_loss_guard_usd": 1000.0,
+    "daily_profit_lock_usd": 2250.0,
+    "maximum_simultaneous_positions": 3,
+    "maximum_mini_equivalent": 15,
+    "continuous_weight_optimization": false,
+    "threshold_grid": false,
+    "status_inheritance": false
+  },
+  "evaluation": {
+    "real_policy_count": 512,
+    "matched_control_policy_count": 512,
+    "episode_starts_per_policy": 24,
+    "cost_scenarios": [1.0, 1.5],
+    "worker_count": 3,
+    "identical_parent_signals_within_pair": true,
+    "identical_episode_starts_within_pair": true,
+    "exact_shared_account_timeline": true,
+    "realized_and_unrealized_mll": true,
+    "control_is_leave_added_sleeve_out_ablation": true,
+    "control_cache_key": "parent_membership+data+starts+cost+execution+seed+three_zone_policy",
+    "duplicate_control_recomputation_allowed": false
+  },
+  "frozen_family_gates": {
+    "minimum_policy_pairs": 512,
+    "minimum_informative_pairs": 256,
+    "minimum_stressed_median_net_delta_usd": 100.0,
+    "minimum_stressed_target_progress_delta": 0.01,
+    "maximum_stressed_mll_breach_rate_deterioration": 0.1,
+    "maximum_stressed_consistency_pass_rate_deterioration": 0.05,
+    "maximum_NULL_RATIO": 0.8,
+    "maximum_one_sided_binomial_p_value": 0.05,
+    "thresholds_changed_after_outcome": false
+  },
+  "frozen_account_research_gate": {
+    "minimum_combine_path_pass_count": 1,
+    "maximum_candidate_mll_breach_rate": 0.2,
+    "minimum_stressed_median_net_usd": 0.0,
+    "minimum_stressed_median_target_progress": 0.4,
+    "minimum_positive_temporal_blocks": 2,
+    "maximum_component_concentration": 0.65,
+    "minimum_stressed_matched_net_delta_usd": 100.0,
+    "minimum_stressed_consistency_pass_rate": 0.5,
+    "validated_status_allowed": false
+  },
+  "terminal_rules": {
+    "credible_combine_paths": "FREEZE_NEW_IDS_AND_LAUNCH_BOUNDED_48_START_CONFIRMATION_0018",
+    "green_without_combine_pass": "KEEP_GREEN_COMPONENTS_AND_CHANGE_EXIT_REPRESENTATION",
+    "tripwire_failure": "TOMBSTONE_EXACT_COMPLEMENTARY_SLEEVE_CLASS",
+    "same_class_parameter_rescue": false
+  },
+  "governance": {
+    "development_only": true,
+    "proof_windows_consumed": 0,
+    "new_data_purchase_count": 0,
+    "q4_access_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "CONTRE": "Adding a sleeve can increase activity and gross dollars while merely adding correlated costs or hidden concentration. The new sleeve is useful only if the add-one ablation improves unseen temporal blocks, stressed net and target progress without MLL or consistency deterioration.",
+  "hypothesis_hash": "9b08e14fd8a8b8a5e853564649328a2c0d73f50d0aa6b2fcff8985d2e4b24bfa"
+}
