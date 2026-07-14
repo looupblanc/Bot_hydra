@@ -1,0 +1,75 @@
+{
+  "schema": "hydra_economic_evolution_hypothesis_v1",
+  "hypothesis_id": "hydra_economic_evolution_buffer_sizing_0015_hypothesis",
+  "campaign_id": "hydra_economic_evolution_buffer_sizing_0015",
+  "class_id": "GREEN_COVERAGE_UNION_BUFFER_AWARE_SIZING_V1",
+  "issued_at_utc": "2026-07-14T03:49:00Z",
+  "source_commit": "2d6a84ad22179c8824bc4134cd64a098ec38318d",
+  "parent_verdict": {
+    "path": "WORM/economic-evolution-coverage-union-0014-verdict-2026-07-14.json",
+    "file_sha256": "9db01b49babcbe404ffc582696c859918c548f4f1279c73e28b8389c47efee87",
+    "semantic_hash": "5a85580bdc4e328b5f996a4cc664bfab65ce64247fd469e40c13ea2b2c494c2f",
+    "tag": "worm/economic-evolution-coverage-union-0014-verdict-2026-07-14",
+    "commit": "2d6a84ad22179c8824bc4134cd64a098ec38318d"
+  },
+  "economic_hypothesis": "The green cross-market/session coverage union has positive stressed account economics but insufficient target velocity; applying exactly two risk units only while the live MLL buffer is at least USD 3,000 and at least USD 2,250 remains to target should convert some paths into Combine passes, while reverting to one unit outside that state should preserve controlled MLL risk.",
+  "structural_change": {
+    "parent_membership_and_signal_paths_unchanged": true,
+    "parent_policy_count": 512,
+    "one_new_child_per_parent": true,
+    "accelerated_risk_units": 2,
+    "control_risk_units": 1,
+    "accelerate_minimum_mll_buffer_usd": 3000.0,
+    "accelerate_minimum_remaining_target_usd": 2250.0,
+    "critical_mll_buffer_usd": 750.0,
+    "daily_loss_guard_usd": 1000.0,
+    "daily_profit_lock_usd": 2250.0,
+    "maximum_simultaneous_positions": 3,
+    "maximum_mini_equivalent": 15,
+    "continuous_weight_optimization": false,
+    "threshold_grid": false,
+    "status_inheritance": false
+  },
+  "evaluation": {
+    "real_policy_count": 512,
+    "matched_control_policy_count": 512,
+    "episode_starts_per_policy": 24,
+    "cost_scenarios": [1.0, 1.5],
+    "worker_count": 3,
+    "identical_parent_membership_within_pair": true,
+    "identical_episode_starts_within_pair": true,
+    "exact_shared_account_timeline": true,
+    "realized_and_unrealized_mll": true,
+    "control_cache_key": "membership+data+starts+cost+execution+seed",
+    "duplicate_control_recomputation_allowed": false
+  },
+  "frozen_gates": {
+    "minimum_policy_pairs": 512,
+    "minimum_informative_pairs": 256,
+    "minimum_stressed_median_net_delta_usd": 100.0,
+    "minimum_stressed_target_progress_delta": 0.01,
+    "maximum_stressed_mll_breach_rate_deterioration": 0.1,
+    "maximum_stressed_consistency_pass_rate_deterioration": 0.05,
+    "maximum_NULL_RATIO": 0.8,
+    "minimum_combine_path_pass_count": 1,
+    "maximum_candidate_mll_breach_rate": 0.2,
+    "minimum_stressed_median_net_usd": 0.0,
+    "minimum_stressed_median_target_progress": 0.25,
+    "thresholds_changed_after_outcome": false
+  },
+  "terminal_rules": {
+    "credible_survivors": "FREEZE_NEW_IDS_AND_LAUNCH_TARGETED_0016",
+    "green_without_combine_pass": "KEEP_MECHANISM_RESEARCH_ONLY_AND_CHANGE_SIZING_REPRESENTATION",
+    "tripwire_failure": "TOMBSTONE_EXACT_BUFFER_SIZING_CLASS",
+    "same_class_parameter_rescue": false
+  },
+  "governance": {
+    "development_only": true,
+    "proof_windows_consumed": 0,
+    "new_data_purchase_count": 0,
+    "q4_access_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "CONTRE": "Because the parent policies are positive, larger size can mechanically raise dollars without improving edge. The experiment is useful only if exact MLL, consistency, stressed economics, and completed paths remain acceptable relative to the unchanged one-unit parents.",
+  "hypothesis_hash": "d34bef2adabb8277ef6cd5954531539e2745c8e251a8e2ddcc0cb471db5a481b"
+}
