@@ -1,0 +1,119 @@
+{
+  "schema": "hydra_manifest_campaign_verdict_worm_v1",
+  "campaign_id": "hydra_economic_evolution_static_parent_basket_0023",
+  "class_id": "FROZEN_PARENT_STATIC_ACCOUNT_SYNTHESIS_V1",
+  "recorded_at_utc": "2026-07-14T08:10:00Z",
+  "immutable": true,
+  "terminal_status": "ARTEFACT_GEOMETRY_ONLY",
+  "family_decision": "STATIC_PARENT_SYNTHESIS_FALSIFIED",
+  "source_preregistration": {
+    "path": "config/v7/economic_evolution_static_parent_basket_0023.json",
+    "file_sha256": "4319939f6b0b945a80256861f4bb90b265c97aad94e00e27e2fb82a8c28715e9",
+    "semantic_hash": "e874bb3fb3b51e3f28021111226d24eeb9c990c0403b18273d8f3a5ac9970b9b",
+    "tag": "worm/economic-evolution-static-parent-basket-0023-2026-07-14",
+    "commit": "80727e26b0b499d98c74e4686d53570a84172f60"
+  },
+  "result": {
+    "path": "reports/economic_evolution/static_parent_basket_0023/elite_robustness_result.json",
+    "file_sha256": "9c94e7fbecfa718e2c08f602fefddb3238ed06aaf86f8e2bf72cc01c8f3dff09",
+    "semantic_hash": "d214d6edf7a15f50f713e1a0421faf7c92baae1218e0e1a317ed40876fb51dd2"
+  },
+  "pair_ledger": {
+    "path": "reports/economic_evolution/static_parent_basket_0023/elite_robustness_pair_results.jsonl",
+    "file_sha256": "1dac793d1067436a4ebe88a8796f3bbbca35b805c32fef78e3e2058f2d200ecf"
+  },
+  "population": {
+    "path": "reports/economic_evolution/static_parent_basket_0023/elite_robustness_population.json",
+    "file_sha256": "af4be1cf608b23722227019e57fab4951c567909831571eaab3829810bbc3ab4",
+    "proposed": 512,
+    "deeply_evaluated": 128,
+    "behaviorally_distinct_deep_policies": 80,
+    "episode_starts": 48,
+    "normal_real_episodes": 6144,
+    "stressed_real_episodes": 6144
+  },
+  "economic_result": {
+    "normal_positive_policy_count": 128,
+    "stressed_positive_policy_count": 128,
+    "normal_policies_with_at_least_one_pass": 89,
+    "stressed_policies_with_at_least_one_pass": 74,
+    "best_normal_pass_rate": 0.1875,
+    "best_stressed_pass_rate": 0.1875,
+    "median_normal_target_progress": 0.6654465277776981,
+    "median_stressed_target_progress": 0.6066582638891017,
+    "maximum_target_progress": 1.1115255555556116,
+    "median_normal_net_usd": 5989.018749999283,
+    "median_stressed_net_usd": 5459.924375001916,
+    "median_normal_mll_breach_rate": 0.0,
+    "maximum_normal_mll_breach_rate": 0.0,
+    "maximum_stressed_mll_breach_rate": 0.0
+  },
+  "family_tripwire": {
+    "real_win_count": 49,
+    "matched_control_win_count": 34,
+    "tie_count": 45,
+    "informative_pair_count": 83,
+    "NULL_RATIO": 0.6938775510204082,
+    "exact_one_sided_binomial_p_value": 0.06192652973090072,
+    "median_stressed_net_delta_usd": -6.468750000138243,
+    "median_stressed_target_progress_delta": -0.0007187500000154223,
+    "median_stressed_mll_breach_rate_delta": 0.0,
+    "median_stressed_consistency_pass_rate_delta": 0.04166666666666663,
+    "family_green": false,
+    "failed_frozen_conditions": [
+      "exact_one_sided_binomial_p_value_above_0.05",
+      "median_stressed_net_delta_below_100_usd",
+      "median_stressed_target_progress_delta_below_0.01"
+    ]
+  },
+  "best_diagnostic_representative": {
+    "policy_id": "static_parent_basket_428d24d049c7ae3c01b95e85",
+    "behavioral_fingerprint": "7b1f53c94fea07fc48509353355f03cb9762718bb35132982d25175395f34246",
+    "lead_parent_id": "elite_robustness_child_ca668fb2e9189ee6fd0805ce",
+    "source_parent_ids": [
+      "complementary_sleeve_real_44a9666e53a69834245c5330",
+      "complementary_sleeve_real_934e27cdf113699834aa9443",
+      "complementary_sleeve_real_c4514b00c06c0b33326d9e3b",
+      "elite_robustness_child_ca668fb2e9189ee6fd0805ce"
+    ],
+    "normal_pass_count": 9,
+    "stressed_pass_count": 9,
+    "episode_start_count": 48,
+    "normal_pass_rate": 0.1875,
+    "stressed_pass_rate": 0.1875,
+    "normal_median_target_progress": 0.7861702777778232,
+    "stressed_median_target_progress": 0.7635097222222701,
+    "stressed_lead_parent_net_delta_usd": 383.5837500003254,
+    "development_diagnostic_only": true,
+    "validated": false,
+    "promotion_allowed": false
+  },
+  "temporal_blocks_stressed": {
+    "B1": {"aggregate_pass_count": 68, "aggregate_mll_breach_count": 0},
+    "B2": {"aggregate_pass_count": 79, "aggregate_mll_breach_count": 0},
+    "B3": {"aggregate_pass_count": 44, "aggregate_mll_breach_count": 0},
+    "B4": {"aggregate_pass_count": 48, "aggregate_mll_breach_count": 0}
+  },
+  "terminal_scope": {
+    "exact_class_tombstoned": true,
+    "parameter_or_membership_neighbour_rescue_allowed": false,
+    "policies_promoted_to_96_starts": 0,
+    "pre_holdout_ready_count": 0,
+    "paper_shadow_ready_count": 0,
+    "historical_evidence_deleted": false
+  },
+  "graveyard_receipt": {
+    "path": "reports/economic_evolution/static_parent_basket_0023/graveyard_append_receipt.json",
+    "file_sha256": "6d4a046446ee19d4f7bc2556a639cc3792ebe617097d05935581c51beb025c80",
+    "class_signature_hash": "d49ac29eb96ddf24cc354b630385c71630ae598c88a2b7ac2666ea80b315a7be"
+  },
+  "governance": {
+    "proof_windows_consumed": 0,
+    "new_data_purchase_count": 0,
+    "q4_access_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "CONTRE": "The best diagnostic basket reached 9/48 passes under both cost scenarios and real policies won more pairs than controls. Nevertheless, these are selected development cases inside a family whose preregistered median uplift and exact-binomial gates failed; preserving them as diagnostics must not be confused with validation.",
+  "verdict_hash": "28ad58057afcb8612fe160987f6b19af157d6c5048ba2642c626346a3fd24ba3"
+}
