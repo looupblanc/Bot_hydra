@@ -1,0 +1,84 @@
+{
+  "schema": "hydra_censored_horizon_hypothesis_worm_v1",
+  "campaign_id": "hydra_economic_evolution_censored_horizon_0022",
+  "class_id": "FROZEN_0018_CENSORED_HORIZON_DIAGNOSTIC_V1",
+  "recorded_at_utc": "2026-07-14T07:16:31Z",
+  "immutable": true,
+  "development_only": true,
+  "outcomes_seen_before_freeze": false,
+  "economic_hypothesis": "The frozen 0018 parent policies are positive and MLL-safe but their 60-session episodes censor account paths whose median projected target time is approximately 94 sessions normal and 103 sessions under stress. Replaying the identical policies and starts for 90 sessions can determine whether the bottleneck is research-horizon censoring or genuinely inadequate target velocity.",
+  "who_pays_and_why_it_may_persist": "No new payer or market edge is asserted. The underlying frozen sleeves retain their original mechanisms; this diagnostic only observes more of the same chronological account trajectory and therefore cannot validate or promote a policy by itself.",
+  "source_0021_verdict": {
+    "path": "WORM/economic-evolution-loss-streak-buffer-ratchet-0021-verdict-2026-07-14.json",
+    "file_sha256": "3b2e85cf6ba882ccadf93e1ea45cbcbc732061edf4ed233c11000a90aff068fb",
+    "semantic_hash": "b0107d1981a74c72ebbee114a1b1743cbaf4c97785a65cca620048dc2b1a7d62",
+    "tag": "worm/economic-evolution-loss-streak-buffer-ratchet-0021-verdict-2026-07-14",
+    "commit": "d3642accdbe9e591702fd09de2669e7f60b5d60c"
+  },
+  "source_elite_manifest": "WORM/economic-evolution-0018-canonical-elites-2026-07-14.json",
+  "source_elite_manifest_hash": "50513e46769bb507697d5c3017cd2d7c73768dd77b38e9e37c2e3ed00536f9b0",
+  "source_elite_manifest_file_sha256": "a096007999a1abb1dc207ecadf61bb610e7bacf53b3ed861566727aa5bb852a4",
+  "preobserved_parent_summary": {
+    "policy_count": 49,
+    "normal_median_target_progress": 0.6324308333332771,
+    "stressed_median_target_progress": 0.5789633333335158,
+    "normal_median_projected_days_to_target": 94.3815040217088,
+    "stressed_median_projected_days_to_target": 103.1387607877689,
+    "normal_maximum_mll_breach_rate": 0.0,
+    "stressed_maximum_mll_breach_rate": 0.0
+  },
+  "frozen_structure": {
+    "policy_count": 49,
+    "episode_start_count": 48,
+    "control_horizon_sessions": 60,
+    "diagnostic_horizon_sessions": 90,
+    "normal_and_stressed_real_episode_count": 4704,
+    "normal_and_stressed_control_episode_count": 4704,
+    "policy_logic_changed": false,
+    "component_membership_changed": false,
+    "risk_or_sizing_changed": false,
+    "entry_or_exit_changed": false,
+    "identical_starts": true,
+    "identical_cost_scenarios": true,
+    "new_diagnostic_ids": true,
+    "status_inheritance": false
+  },
+  "compute_allocation": {
+    "elite_exploitation": 0.7,
+    "distinct_mechanisms": 0.2,
+    "validation": 0.1
+  },
+  "family_tripwire": {
+    "minimum_policy_pairs": 49,
+    "minimum_informative_pairs": 20,
+    "minimum_stressed_median_net_delta_usd": 500.0,
+    "minimum_stressed_target_progress_delta": 0.1,
+    "maximum_stressed_mll_breach_rate_deterioration": 0.05,
+    "maximum_stressed_consistency_pass_rate_deterioration": 0.05,
+    "maximum_NULL_RATIO": 0.8,
+    "exact_one_sided_binomial_p_value": 0.05
+  },
+  "account_research_gate": {
+    "minimum_normal_median_net_usd": 0.0,
+    "minimum_stressed_median_net_usd": 0.0,
+    "minimum_median_target_progress": 0.75,
+    "maximum_mll_breach_rate": 0.2,
+    "minimum_consistency_pass_rate": 0.5,
+    "minimum_positive_temporal_blocks": 2,
+    "maximum_positive_component_share": 0.65,
+    "minimum_matched_control_net_delta_usd": 500.0,
+    "minimum_combine_path_pass_count": 1,
+    "combine_is_diagnostic_only": true
+  },
+  "falsification_rule": "If the unchanged 90-session paths do not show materially more target attainment than their identical 60-session controls, reject horizon censoring as the primary bottleneck and pivot to a genuinely distinct market or opportunity mechanism. If they do, use the result only to design a preregistered 60-session velocity repair; do not promote the unchanged parent from this development diagnostic.",
+  "proof_policy": {
+    "proof_window_consumed": false,
+    "Q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "protected_holdout_access_allowed": false,
+    "paper_shadow_ready_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "CONTRE": "Longer observation mechanically raises cumulative profit opportunities and can make the 90-day path look better without improving monthly economics. The comparison is useful only for locating censoring; subscription duration, stress resilience, temporal dependence and independent confirmation remain unresolved.",
+  "hypothesis_hash": "b84232121c4e7d7998646dd8b11340b58180dcae6212c81ea76fd73d53ce5fd0"
+}
