@@ -40,7 +40,7 @@ from hydra.research.v7_graveyard import (
 
 QUEUE_RELATIVE_PATH = Path("config/v7/economic_evolution_production_queue.json")
 QUEUE_REVISION_GLOB = "economic_evolution_production_queue_*.json"
-SUPPORTED_ENGINES = {"opportunity_density_v1"}
+SUPPORTED_ENGINES = {"opportunity_density_v1", "manifest_account_pair_v1"}
 
 
 class EconomicEvolutionManifestRuntime:
@@ -189,7 +189,11 @@ class EconomicEvolutionManifestRuntime:
         path = self.root / str(entry["preregistration_path"])
         if _sha256(path) != str(entry["preregistration_file_sha256"]):
             raise EconomicEvolutionRuntimeError("campaign manifest checksum drift")
-        config = load_and_verify_opportunity_density_preregistration(path)
+        config = (
+            load_and_verify_opportunity_density_preregistration(path)
+            if engine == "opportunity_density_v1"
+            else _load_and_verify_generic_account_pair_preregistration(path)
+        )
         if (
             config.get("preregistration_hash")
             != entry.get("preregistration_semantic_hash")
@@ -238,6 +242,8 @@ class EconomicEvolutionManifestRuntime:
         engine = str(config["runtime_manifest"]["engine"])
         if engine == "opportunity_density_v1":
             return load_and_verify_opportunity_density_result(path, config)
+        if engine == "manifest_account_pair_v1":
+            return _load_and_verify_generic_account_pair_result(path, config)
         raise EconomicEvolutionRuntimeError(f"no result loader for {engine}")
 
     def _ensure_multiplicity_reservation(
@@ -692,6 +698,102 @@ def _latest_manifest_queue_path(root: str | Path) -> Path:
         (project / QUEUE_RELATIVE_PATH.parent).glob(QUEUE_REVISION_GLOB)
     )
     return revisions[-1] if revisions else base
+
+
+def _load_and_verify_generic_account_pair_preregistration(path: Path) -> dict[str, Any]:
+    config = _load_json(path)
+    claimed = config.get("preregistration_hash")
+    payload = dict(config)
+    payload.pop("preregistration_hash", None)
+    structural = config.get("structural_population") or {}
+    runtime = config.get("runtime_manifest") or {}
+    compute = config.get("compute") or {}
+    governance = config.get("governance") or {}
+    statuses = config.get("statuses") or {}
+    data = config.get("data") or {}
+    implementation_files = config.get("implementation_files") or {}
+    if (
+        config.get("schema") != "hydra_manifest_account_pair_preregistration_v1"
+        or claimed != stable_hash(payload)
+        or not str(config.get("campaign_id") or "")
+        or not str(config.get("class_id") or "")
+        or int(structural.get("policy_pair_count", -1)) != 512
+        or int(config.get("rolling_episode_policy", {}).get("maximum_starts", -1))
+        != 24
+        or int(compute.get("account_worker_count", -1)) != 3
+        or runtime.get("engine") != "manifest_account_pair_v1"
+        or not str(runtime.get("result_schema") or "")
+        or runtime.get("controller_source_change_required") is not False
+        or not isinstance(implementation_files, dict)
+        or not implementation_files
+        or str(runtime.get("runner") or "") not in implementation_files
+        or not str(structural.get("policy_manifest_hash") or "")
+        or statuses.get("development_only") is not True
+        or statuses.get("validated_allowed") is not False
+        or statuses.get("pre_holdout_ready_allowed") is not False
+        or statuses.get("paper_shadow_ready_allowed") is not False
+        or statuses.get("status_inheritance") is not False
+        or "Q4_EXCLUDED" not in str(data.get("role") or "")
+        or governance.get("q4_access_allowed") is not False
+        or governance.get("new_data_purchase_allowed") is not False
+        or governance.get("broker_or_orders_allowed") is not False
+    ):
+        raise EconomicEvolutionRuntimeError("invalid generic account-pair manifest")
+    root = _project_root(path)
+    for relative, expected in implementation_files.items():
+        if _sha256(root / str(relative)) != str(expected):
+            raise EconomicEvolutionRuntimeError(
+                f"generic account-pair implementation drift: {relative}"
+            )
+    return config
+
+
+def _load_and_verify_generic_account_pair_result(
+    path: Path,
+    config: Mapping[str, Any],
+) -> dict[str, Any]:
+    result = _load_json(path)
+    claimed = result.get("result_sha256")
+    payload = dict(result)
+    payload.pop("result_sha256", None)
+    population = result.get("population") or {}
+    economics = result.get("account_policy_economics") or {}
+    governance = result.get("governance") or {}
+    structural = config["structural_population"]
+    expected_pairs = int(structural["policy_pair_count"])
+    expected_episodes = expected_pairs * int(
+        config["rolling_episode_policy"]["maximum_starts"]
+    )
+    if (
+        result.get("schema") != config["runtime_manifest"]["result_schema"]
+        or result.get("campaign_id") != config.get("campaign_id")
+        or result.get("class_id") != config.get("class_id")
+        or claimed != stable_hash(payload)
+        or population.get("manifest_hash") != structural.get("policy_manifest_hash")
+        or int(population.get("real_policy_count", -1)) != expected_pairs
+        or int(population.get("matched_control_policy_count", -1)) != expected_pairs
+        or int(result.get("policy_pair_evaluated_count", -1)) != expected_pairs
+        or int(economics.get("primary_rolling_combine_episode_count", -1))
+        != expected_episodes
+        or int(result.get("pre_holdout_ready_count", -1)) != 0
+        or int(result.get("paper_shadow_ready_count", -1)) != 0
+        or int(governance.get("proof_windows_consumed", -1)) != 0
+        or int(governance.get("new_data_purchase_count", -1)) != 0
+        or int(governance.get("q4_access_delta", -1)) != 0
+        or int(governance.get("broker_connections", -1)) != 0
+        or int(governance.get("orders", -1)) != 0
+    ):
+        raise EconomicEvolutionRuntimeError(
+            "generic account-pair result integrity failure"
+        )
+    return result
+
+
+def _project_root(path: Path) -> Path:
+    for parent in (path.parent, *path.parents):
+        if (parent / "pyproject.toml").is_file():
+            return parent
+    raise EconomicEvolutionRuntimeError("project root not found")
 
 
 def _load_json(path: Path) -> dict[str, Any]:
