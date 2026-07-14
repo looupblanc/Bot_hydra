@@ -1,0 +1,195 @@
+{
+  "schema": "hydra_account_state_router_preregistration_v1",
+  "campaign_id": "hydra_economic_evolution_account_state_router_0011",
+  "class_id": "ACCOUNT_STATE_CONDITIONAL_ROLE_ROUTER_V1",
+  "issued_at_utc": "2026-07-14T00:10:03Z",
+  "source_commit": "c8b7e294ecdb9a5b029fde29fdc33296e0091fb0",
+  "parent_terminal_verdict": {
+    "path": "WORM/economic-evolution-role-aware-account-0010-verdict-2026-07-13.json",
+    "file_sha256": "d269a125ecb525ae063652be07d47b90e23bb96e2ac89006f68836584596472f",
+    "semantic_hash": "dbb50e7f2a00557b13a9c2da9708ae2e16bc6b486cd9fa79f099258f05526343",
+    "tag": "worm/economic-evolution-role-aware-account-0010-verdict-2026-07-13",
+    "commit": "e8d8796c341f14e9b8a950b8ad2f3e624da2c04d"
+  },
+  "hypothesis_worm": {
+    "path": "WORM/economic-evolution-account-state-router-0011-hypothesis-2026-07-13.json",
+    "file_sha256": "7514d8caf9fdfa0262aaff521fae4d8c811271a55bbdc919cd11c23acea3e190",
+    "semantic_hash": "81324f1d148c8ac545c9c69c38b37383067c0cbfd37fbfd22e8767d38571c289",
+    "tag": "worm/economic-evolution-account-state-router-0011-hypothesis-2026-07-13",
+    "commit": "9728b7c1ab9ff99cbce0aafc99732196d445dd3f"
+  },
+  "economic_hypothesis": "On identical frozen sleeve membership, event paths, state thresholds and account limits, routing risk according to a sleeve's preregistered role and past-only account state should improve stressed expectancy and target progress over a deterministic within-membership role-label permutation without worsening MLL or consistency.",
+  "source_seed": {
+    "path": "reports/economic_evolution/seeds/persistent_0003_successor_seed.json",
+    "file_sha256": "daac8b794890974279e4e9db1a05f1d1fce4c62719ab2238a244b4e101ac9b87",
+    "archive_hash": "af0c59861eaf274e131cca400ae3c3957a73c90004833051f776ccfb2e93c460",
+    "development_only": true,
+    "proof_window_consumed": false,
+    "status_inheritance": false
+  },
+  "structural_population": {
+    "policy_pair_count": 512,
+    "component_count": 48,
+    "sleeves_per_policy": [6, 7, 8],
+    "minimum_markets": 3,
+    "minimum_sessions": 3,
+    "minimum_roles": 3,
+    "minimum_component_events": 20,
+    "component_must_be_positive_after_normal_costs": true,
+    "component_must_be_positive_after_1_5x_costs": true,
+    "same_ordered_membership_within_pair": true,
+    "same_component_event_paths_within_pair": true,
+    "same_state_thresholds_within_pair": true,
+    "same_action_and_risk_multisets_within_pair": true,
+    "same_account_limits_within_pair": true,
+    "past_only_state_inputs": true,
+    "real_role_map": "FROZEN_DEVELOPMENT_ECONOMIC_ROLE",
+    "matched_control_role_map": "DETERMINISTIC_WITHIN_MEMBERSHIP_ROLE_LABEL_PERMUTATION",
+    "continuous_weight_optimization": false,
+    "new_market_outcomes_seen_during_generation": false,
+    "same_class_0010_rescue": false,
+    "policy_manifest_hash": "da61d2638cb9d0f4e95c8dc7d6fffe73e8faed9a422f4add95767e9fc6369301"
+  },
+  "account_state_policy": {
+    "daily_loss_guard": 1000.0,
+    "daily_profit_lock": 1500.0,
+    "critical_buffer": 750.0,
+    "protect_buffer": 2250.0,
+    "accelerate_buffer": 4000.0,
+    "accelerate_remaining_target": 6000.0,
+    "loss_streak_protect_after": 2,
+    "balanced_maximum_positions": 2,
+    "accelerate_maximum_positions": 3,
+    "protect_maximum_positions": 1,
+    "accelerate_risk_units": 2,
+    "maximum_mini_equivalent": 15
+  },
+  "past_only_state_inputs": [
+    "current_realized_balance",
+    "current_MLL_floor",
+    "current_MLL_buffer",
+    "current_day_realized_PnL",
+    "consecutive_losing_days",
+    "remaining_target_distance",
+    "current_open_exposure"
+  ],
+  "state_actions": {
+    "ACCELERATE": "TWO_UNITS_FOR_ALPHA_OR_DIVERSIFIER_ROLES_UP_TO_THREE_POSITIONS",
+    "BALANCED": "ONE_UNIT_UP_TO_TWO_POSITIONS",
+    "PROTECT": "ONE_STABILIZER_OR_DIVERSIFIER_POSITION_ONLY",
+    "LOCKED": "NO_NEW_ENTRY"
+  },
+  "data": {
+    "role": "DEVELOPMENT_ONLY_Q4_EXCLUDED",
+    "period": ["2023-01-01", "2024-10-01"],
+    "feature_source_fingerprint": "1c773f5044f0f9c3bc50e67003b93a7c35ecaf8c505879fd1c20d6d03edada6c",
+    "contract_map_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+    "feature_manifest_sha256": {
+      "CL": "6255364f0334adc3f2de3b0be6e48a2bc6a6a693b4660b3ff5ac9ff83551d1b9",
+      "ES": "3d3865d6b0ccd37aafb9010025f46a8e858fac085f71ddd186ae55dbbe50859f",
+      "GC": "d0f78468ff58ade16dbd870cc24624c29578c9b557aa81d865ef3d32f557bc89",
+      "NQ": "4528e06bb4ff00aa4de14fcb90d0029a8dde5faf757e734f3b1f03118fd1dff9",
+      "RTY": "648f5707627d7ce7a0d4c56704f3a42f8dc1e7bd33d10e3a3417f9500080b5ca",
+      "YM": "ec3367ec31dacf216f2235479b5148493a615fc2c579187fe583a20b1acf2908"
+    }
+  },
+  "cheap_screen_policy": {
+    "calibration_start": "2023-01-01",
+    "calibration_end_exclusive": "2023-07-01",
+    "screen_start": "2023-07-01",
+    "screen_end_exclusive": "2024-01-01",
+    "minimum_opportunities": 20,
+    "stress_cost_multiplier": 1.5,
+    "maximum_best_positive_event_share": 0.4,
+    "maximum_approximate_drawdown": 4500,
+    "require_nonnegative_half": false,
+    "micro_batch_size": 64
+  },
+  "exact_replay_period": ["2023-07-01", "2024-10-01"],
+  "rolling_episode_policy": {
+    "maximum_starts": 24,
+    "minimum_spacing_sessions": 5,
+    "minimum_observation_sessions": 60,
+    "maximum_duration_sessions": 60,
+    "regime_balanced": true
+  },
+  "family_tripwire": {
+    "minimum_policy_pairs": 512,
+    "minimum_informative_pairs": 256,
+    "minimum_stressed_median_net_delta_usd": 100.0,
+    "minimum_stressed_target_progress_delta": 0.01,
+    "maximum_stressed_mll_breach_rate_deterioration": 0.02,
+    "maximum_stressed_consistency_pass_rate_deterioration": 0.05,
+    "maximum_NULL_RATIO": 0.8,
+    "exact_one_sided_binomial_p_value": 0.05,
+    "raw_counts_and_exact_binomial_p_value_required": true,
+    "thresholds_changed_after_outcome": false
+  },
+  "account_gate": {
+    "minimum_episode_starts": 24,
+    "minimum_normal_median_net_usd": 0.0,
+    "minimum_stressed_median_net_usd": 0.0,
+    "minimum_median_target_progress": 0.15,
+    "maximum_mll_breach_rate": 0.2,
+    "minimum_consistency_pass_rate": 0.5,
+    "minimum_positive_temporal_blocks": 2,
+    "maximum_positive_component_share": 0.65,
+    "minimum_matched_control_net_delta_usd": 100.0,
+    "minimum_combine_path_pass_count": 1,
+    "combine_is_diagnostic_only": true
+  },
+  "compute": {
+    "host_cpu_count": 4,
+    "exact_worker_count": 3,
+    "account_worker_count": 3,
+    "single_authoritative_mission_writer_count": 1,
+    "forked_workers_read_only": true,
+    "artifact_writer_is_not_registry_writer": true,
+    "report_in_hot_loop": false
+  },
+  "multiplicity": {
+    "prior_global_N_trials": 464103,
+    "prospective_comparisons": 2400,
+    "campaign_specific_inflation": 1.5,
+    "reserved_delta_trials": 3600,
+    "expected_global_N_trials_after_reservation": 467703,
+    "reservation_required_before_feature_or_outcome_access": true,
+    "global_history_retained": true,
+    "expensive_DSR_BH_executed": false
+  },
+  "budget": {
+    "actual_spend_usd": 87.84738838672598,
+    "hard_cap_usd": 125.0,
+    "remaining_usd": 37.15261161327402,
+    "new_data_purchase_count": 0
+  },
+  "statuses": {
+    "development_only": true,
+    "validated_allowed": false,
+    "pre_holdout_ready_allowed": false,
+    "paper_shadow_ready_allowed": false,
+    "status_inheritance": false
+  },
+  "governance": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "network_access_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "implementation_files": {
+    "hydra/economic_evolution/account_state_router.py": "5e9229b3b2e0e9428b4cd9896b6021369170df25d2bad16a96e91f47158b2363",
+    "hydra/economic_evolution/account_state_evaluation.py": "1b2362241cc4d073685aab5ce78fdb483be9596055777660ff4219af2af1adbf",
+    "hydra/economic_evolution/role_aware_account.py": "0aa8031dd32dfed36c91eb45ac553a9341f588368bf52dcf2ac9b3fd855757c7",
+    "hydra/economic_evolution/role_aware_account_evaluation.py": "fc434fa41bce57843585fc0c829579cb3657807ea3939c22ba6d07febb905f1e",
+    "hydra/economic_evolution/schema.py": "398f86f4a4a60e0adff54b69083718ca27a1217854fff587b47e0f3ab42f5fb0",
+    "hydra/account_policy/schema.py": "f893f884bd175260a34217905ad67e3321258e5dfd4993b7629b9932de15804a",
+    "hydra/account_policy/basket.py": "3ceaeddc45448f11a82cb54860d379708696e742526ee062f029149d2a932a81",
+    "hydra/account_policy/router.py": "82c83168b695fcf128665a3220bb4d952e926b2bca136399cbade01a25847280",
+    "hydra/economic_evolution/account_evaluation.py": "844422dd235eec18d22166acca06b7542f1da200f8e20efb6eebc93464719c5f",
+    "hydra/research/economic_evolution_account_state_campaign.py": "ae010489172d04a16fb006024d9be8f20b3950186809dd0a368c847714d58100",
+    "scripts/run_economic_evolution_account_state_campaign.py": "29521d7e328948dbc35aab95a5a47ab65d045d73fb68ca9ded2884a158649a02"
+  },
+  "falsification_rule": "If the same-membership account-state family fails any preregistered family-tripwire condition, tombstone this exact state-router class without threshold or parameter rescue and move to a structurally different account representation.",
+  "CONTRE": "The frozen component roles were assigned from development evidence and may not carry causal information. A state router also adds complexity and can manufacture target progress by taking more risk; same-membership role-permutation controls and explicit MLL/consistency non-deterioration are mandatory.",
+  "preregistration_hash": "87fd5151a47d7365bf3daea4f2f94d15ef96c8ed0231767c1ad842966260ce7a"
+}
