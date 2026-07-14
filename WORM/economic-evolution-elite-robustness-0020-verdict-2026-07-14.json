@@ -1,0 +1,75 @@
+{
+  "schema": "hydra_elite_robustness_verdict_worm_v1",
+  "campaign_id": "hydra_economic_evolution_elite_robustness_0020",
+  "class_id": "GREEN_0018_ELITE_ROBUSTNESS_EVOLUTION_V1",
+  "recorded_at_utc": "2026-07-14T06:33:00Z",
+  "terminal_status": "ARTEFACT_GEOMETRY_ONLY",
+  "result": {
+    "path": "reports/economic_evolution/elite_robustness_0020/campaign/elite_robustness_result.json",
+    "file_sha256": "d391b461878790d979f32ba3b795bec6c92353f6179786b599451aae9d910ef4",
+    "semantic_hash": "c2dd8fc40a4fba317e8ebc3db99e995547c1b7af55bf675056c0a5dd79b12206"
+  },
+  "graveyard": {
+    "path": "reports/economic_evolution/elite_robustness_0020/campaign/graveyard_append_receipt.json",
+    "file_sha256": "518dcd7d7bf96749ba74d7d072a874e58c07a9cfbff79e65c459163488be4f64",
+    "class_signature_hash": "1a8a22b03066b419b25d4d6a3e85a13782b1473fd18839f6eb53ca3ed3e93d3c",
+    "exact_class_tombstoned": true,
+    "candidate_count": 200,
+    "parameter_level_feedback": false
+  },
+  "family_tripwire": {
+    "real_wins": 26,
+    "matched_parent_wins": 110,
+    "ties": 64,
+    "informative_pairs": 136,
+    "NULL_RATIO": 4.230769230769231,
+    "exact_one_sided_binomial_p_value": 0.9999999999999803,
+    "median_stressed_net_delta_usd": -317.68124999915017,
+    "median_stressed_target_progress_delta": -0.03529791666657223,
+    "family_green": false
+  },
+  "account_economics": {
+    "proposal_count": 10240,
+    "deep_policy_count": 200,
+    "normal_plus_stressed_real_episode_count": 19200,
+    "normal_pass_policy_count": 4,
+    "stressed_pass_policy_count": 3,
+    "best_normal_pass_rate": 0.0625,
+    "best_stressed_pass_rate": 0.0625,
+    "median_normal_target_progress": 0.6002056944443636,
+    "median_stressed_target_progress": 0.5421854166668127,
+    "median_normal_net_usd": 5401.851249999272,
+    "median_stressed_net_usd": 4879.668750001314,
+    "maximum_mll_breach_rate": 0.0,
+    "behaviorally_distinct_policy_count": 160
+  },
+  "class_level_diagnostic": {
+    "strongest_mutation_family": "BUFFER_ACCELERATION",
+    "family_policy_count": 25,
+    "family_positive_parent_delta_count": 16,
+    "family_median_stressed_parent_delta_usd": 339.1412500012666,
+    "family_normal_pass_policy_count": 1,
+    "family_stressed_pass_policy_count": 1,
+    "family_best_normal_pass_rate": 0.0625,
+    "family_best_stressed_pass_rate": 0.0625,
+    "family_median_stressed_target_progress": 0.5932583333336224,
+    "use_allowed": "NEW_STRUCTURALLY_DISTINCT_CLASS_ONLY",
+    "exact_candidate_status_inheritance": false
+  },
+  "decision": {
+    "rescue_exact_0020_class": false,
+    "promote_any_0020_candidate": false,
+    "paper_shadow_ready_count": 0,
+    "next_class": "LOSS_STREAK_BUFFER_RATCHET_V1",
+    "rationale": "The heterogeneous 0020 class is falsified, while the preregistered mutation-family diagnostic identifies buffer deployment as the only class-level direction with broad positive parent uplift and a cost-stressed Combine path. The successor must use new IDs and a structurally different past-only account-state response."
+  },
+  "governance": {
+    "proof_windows_consumed": 0,
+    "new_data_purchase_count": 0,
+    "q4_access_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "CONTRE": "The positive buffer-family diagnostic was observed inside the same development campaign and is selection-biased. It justifies only a new falsifiable research class, not candidate promotion, confirmation, or shadow status.",
+  "verdict_hash": "ddd77bce61922daa3efaf70805f9d35648193716cbb8026102eeac712e099560"
+}
