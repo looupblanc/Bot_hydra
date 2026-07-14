@@ -13,6 +13,9 @@ from hydra.economic_evolution.account_loss_streak_buffer_ratchet import (
     generate_loss_streak_buffer_ratchet_population,
     route_loss_streak_buffer_ratchet_entry,
 )
+from hydra.economic_evolution.account_loss_streak_buffer_ratchet_evaluation import (
+    evaluate_loss_streak_buffer_ratchet_policy_pairs,
+)
 
 
 LOSS_STREAK_BUFFER_RATCHET_ENGINE_VERSION = (
@@ -48,6 +51,11 @@ def _patched_ratchet_campaign() -> Iterator[None]:
             base,
             "generate_elite_robustness_population",
             generate_loss_streak_buffer_ratchet_population,
+        ),
+        (
+            base,
+            "evaluate_elite_robustness_policy_pairs",
+            evaluate_loss_streak_buffer_ratchet_policy_pairs,
         ),
         (base, "_next_action", _ratchet_next_action),
         (base, "_report", _ratchet_report),
