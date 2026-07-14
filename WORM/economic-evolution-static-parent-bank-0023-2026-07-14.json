@@ -1,0 +1,123 @@
+{
+  "schema": "hydra_static_parent_bank_v1",
+  "bank_id": "hydra_static_parent_bank_0023",
+  "campaign_id": "hydra_economic_evolution_static_parent_basket_0023",
+  "recorded_at_utc": "2026-07-14T08:15:00Z",
+  "immutable": true,
+  "development_only": true,
+  "selection_outcomes_already_observed": true,
+  "source_elite_manifest": {
+    "path": "WORM/economic-evolution-0018-canonical-elites-2026-07-14.json",
+    "file_sha256": "a096007999a1abb1dc207ecadf61bb610e7bacf53b3ed861566727aa5bb852a4",
+    "semantic_hash": "50513e46769bb507697d5c3017cd2d7c73768dd77b38e9e37c2e3ed00536f9b0"
+  },
+  "source_anchor_classification": {
+    "path": "WORM/economic-evolution-elite-robustness-0020-terminal-classification-2026-07-14.json",
+    "semantic_hash": "26138540bf477386fc7a2918930bf266a86c53be5c9cd7e81bdb720496509719"
+  },
+  "selection_policy": {
+    "exact_0018_normal_passers": 4,
+    "behaviorally_distinct_0018_near_elites": 4,
+    "preserved_0020_anchor_count": 1,
+    "near_elite_ranking": [
+      "stressed_target_progress",
+      "stressed_net_economics",
+      "zero_MLL_breach",
+      "consistency",
+      "low_episode_path_correlation",
+      "low_component_overlap"
+    ],
+    "maximum_near_elite_pairwise_episode_net_correlation": 0.5499,
+    "mean_near_elite_pairwise_episode_net_correlation": 0.2847,
+    "maximum_near_elite_component_jaccard": 0.2632,
+    "parameter_clones_allowed": false
+  },
+  "primary_parent_ids": [
+    "complementary_sleeve_real_2a948b1b1da0eb1d07fee597",
+    "complementary_sleeve_real_809f0a9b27a86e8e11425c3d",
+    "complementary_sleeve_real_934e27cdf113699834aa9443",
+    "complementary_sleeve_real_fafd24a65de4840ff79bb047",
+    "complementary_sleeve_real_44a9666e53a69834245c5330",
+    "complementary_sleeve_real_7e5b1d95e3e129e8098b5c64",
+    "complementary_sleeve_real_c4514b00c06c0b33326d9e3b",
+    "complementary_sleeve_real_ecb99f713952114c51173b87"
+  ],
+  "normal_passer_ids": [
+    "complementary_sleeve_real_2a948b1b1da0eb1d07fee597",
+    "complementary_sleeve_real_809f0a9b27a86e8e11425c3d",
+    "complementary_sleeve_real_934e27cdf113699834aa9443",
+    "complementary_sleeve_real_fafd24a65de4840ff79bb047"
+  ],
+  "near_elite_ids": [
+    "complementary_sleeve_real_44a9666e53a69834245c5330",
+    "complementary_sleeve_real_7e5b1d95e3e129e8098b5c64",
+    "complementary_sleeve_real_c4514b00c06c0b33326d9e3b",
+    "complementary_sleeve_real_ecb99f713952114c51173b87"
+  ],
+  "primary_parent_fingerprints": {
+    "complementary_sleeve_real_2a948b1b1da0eb1d07fee597": "9b9aadc1165b3c52381dd29f1f6393c9d2b344854c57ed85905f1d05026e6bad",
+    "complementary_sleeve_real_809f0a9b27a86e8e11425c3d": "4d19b17e13f892068ce6f92d9437b8ff3a919bed5e8d1db58d8aff2a0f7e67b7",
+    "complementary_sleeve_real_934e27cdf113699834aa9443": "37cb2034f0050c74d4eb220c83a6dbda844f55522179190c8b81e0c133a2ca4e",
+    "complementary_sleeve_real_fafd24a65de4840ff79bb047": "abc63b2e46476977fdaa8401adae82dc244c67ee448a31279de7ec754a7e4b5a",
+    "complementary_sleeve_real_44a9666e53a69834245c5330": "fbf26b45a5ae9170eb3f1fa2581bed3cb028498e039301f02efe0b7eddf7b9a5",
+    "complementary_sleeve_real_7e5b1d95e3e129e8098b5c64": "6240799640fcff602f27b7d683bab7f072ad0ec0ca3f9e9830018199ba84aefa",
+    "complementary_sleeve_real_c4514b00c06c0b33326d9e3b": "83152228fb615236dce133f7b2a03df7045d0242816ae9a29d60b28fd4a32c95",
+    "complementary_sleeve_real_ecb99f713952114c51173b87": "5ebf77a44f034b074ebb1ac35df45aef0fda8a0a4d9eeb0e2bc09d1e9acf786d"
+  },
+  "anchor": {
+    "policy_id": "elite_robustness_child_ca668fb2e9189ee6fd0805ce",
+    "parent_policy_id": "complementary_sleeve_real_2a948b1b1da0eb1d07fee597",
+    "pair_id": "elite_robustness_pair_831f23aa2c2469a9c455bbbe",
+    "structural_fingerprint": "10e9501ee5a3656ec9fb0d0b2d71900be85ed3b9eff34bc320649f50f53a4464",
+    "behavioral_fingerprint": "a5e645d127815fd0dea7877efff4edd3a7f22771d1974d92bed995b6baa2a8b5",
+    "exact_change": {
+      "critical_buffer": 900.0,
+      "high_risk_units": 4
+    },
+    "episode_start_count": 48,
+    "normal_pass_count": 3,
+    "stressed_pass_count": 3,
+    "normal_median_target_progress": 0.7612566666667424,
+    "stressed_median_target_progress": 0.7208893055555673,
+    "normal_median_net_usd": 6851.310000000682,
+    "stressed_median_net_usd": 6488.003750000105,
+    "normal_mll_breach_rate": 0.0,
+    "stressed_mll_breach_rate": 0.0,
+    "validated": false,
+    "status_inheritance": false
+  },
+  "mutual_exclusion": [
+    [
+      "elite_robustness_child_ca668fb2e9189ee6fd0805ce",
+      "complementary_sleeve_real_2a948b1b1da0eb1d07fee597"
+    ]
+  ],
+  "frozen_replay": {
+    "starts": 48,
+    "independent_temporal_blocks": 4,
+    "normal_and_stressed_costs": true,
+    "entry_signals_changed": false,
+    "exit_signals_changed": false,
+    "market_features_changed": false,
+    "source_trade_paths_reused": true
+  },
+  "roles": {
+    "elite_robustness_child_ca668fb2e9189ee6fd0805ce": "ACCOUNT_BUFFER_ACCELERATOR",
+    "complementary_sleeve_real_2a948b1b1da0eb1d07fee597": "NORMAL_COMBINE_PASSER",
+    "complementary_sleeve_real_809f0a9b27a86e8e11425c3d": "SESSION_DIVERSIFIER",
+    "complementary_sleeve_real_934e27cdf113699834aa9443": "NORMAL_COMBINE_PASSER",
+    "complementary_sleeve_real_fafd24a65de4840ff79bb047": "CONSISTENCY_SMOOTHER",
+    "complementary_sleeve_real_44a9666e53a69834245c5330": "TARGET_VELOCITY",
+    "complementary_sleeve_real_7e5b1d95e3e129e8098b5c64": "BEHAVIORAL_DIVERSIFIER",
+    "complementary_sleeve_real_c4514b00c06c0b33326d9e3b": "TARGET_VELOCITY",
+    "complementary_sleeve_real_ecb99f713952114c51173b87": "STRESSED_ECONOMICS"
+  },
+  "governance": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "broker_or_orders_allowed": false,
+    "proof_window_consumption_allowed": false
+  },
+  "CONTRE": "All selected parents come from already observed development outcomes. Static synthesis can measure account complementarity but cannot turn this selected bank into independent validation evidence.",
+  "bank_hash": "e581cb30c20237d6fe4c515a76627695c85bf4027620fc49c6646dd9bc1014b9"
+}

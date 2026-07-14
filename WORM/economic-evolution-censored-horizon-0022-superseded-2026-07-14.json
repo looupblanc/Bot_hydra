@@ -1,0 +1,32 @@
+{
+  "schema": "hydra_economic_evolution_preresult_supersession_v1",
+  "campaign_id": "hydra_economic_evolution_censored_horizon_0022",
+  "class_id": "FROZEN_0018_CENSORED_HORIZON_DIAGNOSTIC_V1",
+  "recorded_at_utc": "2026-07-14T08:15:00Z",
+  "immutable": true,
+  "status": "SUPERSEDED_BEFORE_RESULT",
+  "source_hypothesis": {
+    "path": "WORM/economic-evolution-censored-horizon-0022-hypothesis-2026-07-14.json",
+    "file_sha256": "c0d098445190302656242d7953ac4513ce583b85f20cb48eaaa1d14adbcb3f55",
+    "semantic_hash": "b84232121c4e7d7998646dd8b11340b58180dcae6212c81ea76fd73d53ce5fd0",
+    "tag": "worm/economic-evolution-censored-horizon-0022-hypothesis-2026-07-14",
+    "commit": "ddcf31b4ca5795cb19268f3fb5041c233a80b62c"
+  },
+  "pre_result_audit": {
+    "queue_entry_created": false,
+    "multiplicity_reserved": false,
+    "feature_or_account_outcomes_seen": false,
+    "result_artifact_exists": false,
+    "proof_window_consumed": false,
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0
+  },
+  "reason": "The principal explicitly ordered the terminal 0021 branch to pivot directly to static baskets. The censored-horizon diagnostic is withdrawn before any scientific outcome and is not interpreted as a positive or negative result.",
+  "successor": {
+    "campaign_id": "hydra_economic_evolution_static_parent_basket_0023",
+    "class_id": "FROZEN_PARENT_STATIC_ACCOUNT_SYNTHESIS_V1",
+    "inherits_status": false
+  },
+  "CONTRE": "Superseding a preregistered diagnostic for a newly directed experiment sacrifices information about horizon censoring. The record is therefore explicit that 0022 produced no scientific verdict.",
+  "supersession_hash": "cb3854532fb655e028cf3bb4f58009b1981a2b073051b25cd7820eb8f9b571db"
+}
