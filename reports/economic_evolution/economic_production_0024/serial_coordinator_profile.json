@@ -1,0 +1,73 @@
+{
+  "schema": "hydra_production_serial_coordinator_profile_v1",
+  "campaign_id": "hydra_economic_production_0024",
+  "recorded_at_utc": "2026-07-14T20:58:25Z",
+  "scope": "POST_TERMINAL_CHECKPOINT_PROFILE_FUTURE_RUNTIME_ONLY",
+  "frozen_campaign_rerun": false,
+  "source_artifacts": {
+    "production_state_file_sha256": "cf9bba48a0c39b815df5c020b695c2ec11849ed2230e969ff22123629cdf6c3d",
+    "production_kpis_file_sha256": "b83354f8cbb538712595ebf83b9fa427ab379f5c877d66a42d89b377c238ea79",
+    "evidence_checkpoint_file_sha256": "60885f7135978ec10698270692c829dd909f7e507bba5025513c950cfce10d69",
+    "evidence_checkpoint_sequence": 4015,
+    "episode_cache_file_count": 1884,
+    "combine_episode_rows": 180864
+  },
+  "historical_runtime": {
+    "allocation_sample_count": 244,
+    "allocation_window_seconds": 2016.833689022984,
+    "economic_hot_fraction": 0.9720971201944995,
+    "host_cpu_fraction_four_core": 0.3475407066586504,
+    "host_cpu_cores_used_average": 1.3901628266346015,
+    "median_sample_wall_seconds": 8.637819453462726,
+    "compute_worker_count": 3,
+    "evidence_writer_count": 1
+  },
+  "primary_bottleneck": {
+    "function": "hydra.production.runtime._durable_episode_cache_count",
+    "cause": "Every checkpoint and subsequent live publish recursively reopened, parsed, and self-hash-verified every immutable episode cache.",
+    "calls_per_completed_batch": 2,
+    "measured_full_scan_seconds": [
+      4.193857125996146,
+      4.193333689006977,
+      3.8536049369722605
+    ],
+    "median_full_scan_seconds": 4.193333689006977,
+    "approximate_batch_count": 236,
+    "estimated_redundant_scan_seconds": 1979.653501611293,
+    "interpretation": "The redundant absolute recount, not replay arithmetic, explains most coordinator serialization and worker starvation in the mature-cache phase."
+  },
+  "secondary_bottleneck": {
+    "component": "single EvidenceBundle writer",
+    "measured_append_seconds_per_policy_for_96_episodes_plus_2584_daily_rows": 0.519,
+    "modified": false,
+    "reason_not_modified": "The EvidenceBundle writer defines authoritative validation, compression, partition, and checkpoint semantics; changing it was unnecessary after removing the larger counter scan."
+  },
+  "optimization": {
+    "file": "hydra/production/runtime.py",
+    "strategy": "One absolute verified scan lazily initializes a process-local total; each new immutable cache increments it only after AtomicResultWriter completes fsync and atomic rename.",
+    "existing_idempotent_cache_increments": false,
+    "crash_after_rename_before_increment_recovery": "A fresh process starts with no in-memory total and performs one absolute scan, recovering the durable file.",
+    "subsequent_lookup_benchmark_iterations": 100000,
+    "subsequent_lookup_benchmark_seconds": 0.01265,
+    "subsequent_lookup_microseconds": 0.1265,
+    "replay_semantics_changed": false,
+    "pnl_or_mll_semantics_changed": false,
+    "evidence_bundle_semantics_changed": false,
+    "cache_payload_bytes_changed": false,
+    "campaign_0024_manifest_changed": false
+  },
+  "validation": {
+    "test_file": "tests/test_economic_production_kernel.py",
+    "cases": [
+      "single absolute scan",
+      "atomic new-cache increment",
+      "idempotent existing-cache no-increment",
+      "crash-window process restart recovery"
+    ],
+    "targeted_test_status": "PASS",
+    "full_kernel_test_file_status": "17_PASSED",
+    "python_compile_status": "PASS",
+    "diff_check_status": "PASS"
+  },
+  "profile_hash": "9cf33b52b0c5e953fe2070da58acbbebe49c172e1b97dfb5f874189d588ab250"
+}

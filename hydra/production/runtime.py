@@ -14,7 +14,7 @@ from typing import Any, Mapping, Sequence
 
 import numpy as np
 
-from hydra.compute.result_writer import AtomicResultWriter
+from hydra.compute.result_writer import AtomicResultWriter, AtomicWriteReceipt
 from hydra.economic_evolution.account_evaluation import ExactSleeveRuntime
 from hydra.economic_evolution.schema import stable_hash
 from hydra.economic_evolution.screen import CheapScreenPolicy
@@ -190,6 +190,7 @@ class _ProductionRun:
         self.population_summary: dict[str, Any] = {}
         self.cache_hit_rate = 0.0
         self.feature_cache_fingerprints: dict[str, str] = {}
+        self._durable_episode_count: int | None = None
         self._allocation_last_wall = self.clock.started_wall
         self._allocation_last_hot = 0.0
         self._allocation_last_cold = 0.0
@@ -315,9 +316,7 @@ class _ProductionRun:
                     policies_proposed=len(population),
                     unique_policies_screened=len(screen_rows),
                     exact_account_replays=len(self.summaries),
-                    combine_episodes_completed=_durable_episode_cache_count(
-                        self.payload_dir
-                    ),
+                    combine_episodes_completed=self._durable_episode_total(),
                     next_action="REPLAY_FROZEN_20_40_90_HORIZONS",
                 )
                 self._run_additional_horizons(
@@ -391,7 +390,7 @@ class _ProductionRun:
                         "matched_controls_status": "PENDING_STAGE_4_NOT_EXECUTED",
                     },
                 )
-                total_episodes = _durable_episode_cache_count(self.payload_dir)
+                total_episodes = self._durable_episode_total()
                 self._publish(
                     state="ROBUSTNESS_ACTIVE",
                     stage="MATCHED_CONTROL_REPLAY",
@@ -441,18 +440,27 @@ class _ProductionRun:
                     self.payload_writer.write_json(
                         "stage4_lobo_result.json", crossfit_result
                     )
-                    stage4_metrics = [
-                        aggregate_policy_evidence(
-                            policy.to_dict(),
-                            base_rows,
-                            block_ids=block_ids,
-                            horizon="60_TRADING_DAYS",
-                        )
-                        for policy in stage3_policies
-                    ]
-                    stage4_decision = select_stage4_survivors(
-                        stage4_metrics, limit=16
+                    selector_status = str(
+                        crossfit_result["selector_decision"]["status"]
                     )
+                    if selector_status == "SELECTOR_PROCEDURE_GREEN":
+                        stage4_metrics = [
+                            aggregate_policy_evidence(
+                                policy.to_dict(),
+                                base_rows,
+                                block_ids=block_ids,
+                                horizon="60_TRADING_DAYS",
+                            )
+                            for policy in stage3_policies
+                        ]
+                        stage4_decision = select_stage4_survivors(
+                            stage4_metrics, limit=16
+                        )
+                    else:
+                        stage4_decision = _stage4_selector_gate_decision(
+                            [row.policy_id for row in stage3_policies],
+                            selector_status=selector_status,
+                        )
                     stage_decisions.append(stage4_decision)
                     self.payload_writer.write_json(
                         "stage4_halving.json", stage4_decision
@@ -642,7 +650,7 @@ class _ProductionRun:
         )
         if horizon_audit is not None:
             compact["campaign_summary"]["horizon_audit"] = dict(horizon_audit)
-        total_episodes = _durable_episode_cache_count(self.payload_dir)
+        total_episodes = self._durable_episode_total()
         # The durable caches are the counter source of truth.  Updating memory
         # before taking the KPI snapshot prevents a crash-recovered run from
         # carrying a stale delta-derived counter into its terminal result.
@@ -1820,8 +1828,7 @@ class _ProductionRun:
             sink.flush()
             summary_writer = AtomicResultWriter(summary_dir)
             for policy_id, summary, episodes in pending_summaries:
-                _write_episode_cache(
-                    self.payload_writer,
+                self._write_durable_episode_cache(
                     f"exact_episode_rows/{policy_id}.json",
                     policy_id=policy_id,
                     horizon="60_TRADING_DAYS",
@@ -1833,9 +1840,7 @@ class _ProductionRun:
                 {
                     "stage": "EXACT_REPLAY_ACTIVE",
                     "exact_account_replays": len(self.summaries),
-                    "combine_episodes_completed": _durable_episode_cache_count(
-                        self.payload_dir
-                    ),
+                    "combine_episodes_completed": self._durable_episode_total(),
                 }
             )
             sink.flush()
@@ -1848,9 +1853,7 @@ class _ProductionRun:
                 ),
                 stage="STAGE_2",
                 exact_account_replays=exact,
-                combine_episodes_completed=_durable_episode_cache_count(
-                    self.payload_dir
-                ),
+                combine_episodes_completed=self._durable_episode_total(),
                 last_completed_policy_id=(
                     str(batch[-1]["policy"]["policy_id"]) if batch else None
                 ),
@@ -1920,8 +1923,7 @@ class _ProductionRun:
                     pending_summaries.append((policy_id, summary, episodes))
                 sink.flush()
                 for policy_id, summary, episodes in pending_summaries:
-                    _write_episode_cache(
-                        self.payload_writer,
+                    self._write_durable_episode_cache(
                         f"horizon_episode_rows/{horizon}/{policy_id}.json",
                         policy_id=policy_id,
                         horizon=f"{horizon}_TRADING_DAYS",
@@ -1933,9 +1935,7 @@ class _ProductionRun:
                     {
                         "stage": "STAGE_3",
                         "horizon": horizon,
-                        "combine_episodes_completed": _durable_episode_cache_count(
-                            self.payload_dir
-                        ),
+                        "combine_episodes_completed": self._durable_episode_total(),
                     }
                 )
                 sink.flush()
@@ -1945,9 +1945,7 @@ class _ProductionRun:
                     state="ROBUSTNESS_ACTIVE",
                     stage="STAGE_3",
                     exact_account_replays=len(self.summaries),
-                    combine_episodes_completed=_durable_episode_cache_count(
-                        self.payload_dir
-                    ),
+                    combine_episodes_completed=self._durable_episode_total(),
                     next_action=f"CONTINUE_HORIZON_{horizon}",
                 )
         return completed_episode_count
@@ -2014,8 +2012,7 @@ class _ProductionRun:
                 pending.append((policy_id, episodes))
             sink.flush()
             for policy_id, episodes in pending:
-                _write_episode_cache(
-                    self.payload_writer,
+                self._write_durable_episode_cache(
                     f"{namespace}/{policy_id}.json",
                     policy_id=policy_id,
                     horizon=horizon_label,
@@ -2028,9 +2025,7 @@ class _ProductionRun:
                     "stage": namespace.upper(),
                     "completed_policy_count": completed,
                     "required_policy_count": len(policies),
-                    "combine_episodes_completed": _durable_episode_cache_count(
-                        self.payload_dir
-                    ),
+                    "combine_episodes_completed": self._durable_episode_total(),
                 }
             )
             sink.flush()
@@ -2039,9 +2034,7 @@ class _ProductionRun:
             self._publish(
                 state="ROBUSTNESS_ACTIVE",
                 stage=namespace.upper(),
-                combine_episodes_completed=_durable_episode_cache_count(
-                    self.payload_dir
-                ),
+                combine_episodes_completed=self._durable_episode_total(),
                 next_action=f"CONTINUE_{namespace.upper()}",
             )
         if len(cached) != len(policies):
@@ -2060,6 +2053,42 @@ class _ProductionRun:
             for policy in policies
             for row in cached[policy.policy_id]
         ]
+
+    def _durable_episode_total(self) -> int:
+        """Return the verified durable total without rescanning unchanged caches."""
+
+        if self._durable_episode_count is None:
+            self._durable_episode_count = _durable_episode_cache_count(
+                self.payload_dir
+            )
+        return self._durable_episode_count
+
+    def _write_durable_episode_cache(
+        self,
+        relative_path: str,
+        *,
+        policy_id: str,
+        horizon: str,
+        episodes: Sequence[Mapping[str, Any]],
+    ) -> AtomicWriteReceipt:
+        """Atomically cache rows and advance the total only for a new file.
+
+        The absolute total is initialized before the write.  If the process
+        dies after the atomic rename but before the in-memory increment, the
+        next process recovers the correct value with its one initial scan.
+        """
+
+        prior_total = self._durable_episode_total()
+        receipt = _write_episode_cache(
+            self.payload_writer,
+            relative_path,
+            policy_id=policy_id,
+            horizon=horizon,
+            episodes=episodes,
+        )
+        if not receipt.idempotent_existing:
+            self._durable_episode_count = prior_total + len(episodes)
+        return receipt
 
     def _run_expanded_horizon_set(
         self,
@@ -2258,6 +2287,14 @@ def _matched_controls_status(
 ) -> str:
     if crossfit_result is None:
         return "BASELINE_REPLAY_EXECUTED_COMPARISON_NOT_RUN_NO_SURVIVOR"
+    if (
+        crossfit_result.get("evaluation_status")
+        == "NOT_RUN_SELECTOR_PLAN_INCOMPLETE"
+    ):
+        return (
+            "BASELINE_REPLAY_EXECUTED_COMPARISON_NOT_RUN_"
+            "NO_ELIGIBLE_CHAMPION"
+        )
     return "EXECUTED"
 
 
@@ -2266,7 +2303,41 @@ def _matched_controls_payload(
 ) -> dict[str, Any]:
     if crossfit_result is None:
         return {"status": _matched_controls_status(None)}
-    return dict(crossfit_result)
+    return {
+        **dict(crossfit_result),
+        "status": _matched_controls_status(crossfit_result),
+    }
+
+
+def _stage4_selector_gate_decision(
+    policy_ids: Sequence[str],
+    *,
+    selector_status: str,
+) -> dict[str, Any]:
+    """Prevent non-GREEN selector procedures from reaching expanded replay."""
+
+    ordered = sorted({str(value) for value in policy_ids})
+    decision = {
+        "schema": "hydra_production_selector_gate_decision_v1",
+        "stage": "STAGE_4_ROBUSTNESS_CROSSFIT",
+        "input_count": len(ordered),
+        "eligible_count": 0,
+        "output_limit": 16,
+        "output_count": 0,
+        "selected_policy_ids": [],
+        "selector_status": str(selector_status),
+        "required_selector_status": "SELECTOR_PROCEDURE_GREEN",
+        "excluded": [
+            {
+                "policy_id": policy_id,
+                "reasons": [f"SELECTOR_PROCEDURE_NOT_GREEN:{selector_status}"],
+            }
+            for policy_id in ordered
+        ],
+        "development_only": True,
+    }
+    decision["decision_hash"] = stable_hash(decision)
+    return decision
 
 
 def _expanded_candidate_counts(
@@ -2289,7 +2360,7 @@ def _write_episode_cache(
     policy_id: str,
     horizon: str,
     episodes: Sequence[Mapping[str, Any]],
-) -> None:
+) -> AtomicWriteReceipt:
     payload: dict[str, Any] = {
         "schema": "hydra_production_episode_row_cache_v1",
         "policy_id": policy_id,
@@ -2297,7 +2368,7 @@ def _write_episode_cache(
         "episodes": [dict(row) for row in episodes],
     }
     payload["cache_hash"] = stable_hash(payload)
-    writer.write_json(relative_path, payload)
+    return writer.write_json(relative_path, payload)
 
 
 def _load_episode_cache(

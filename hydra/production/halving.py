@@ -27,6 +27,9 @@ HALVING_VERSION = "hydra_economic_production_halving_v1"
 CROSSFIT_VERSION = "hydra_economic_production_lobo_crossfit_v1"
 BASELINE_VERSION = "hydra_economic_production_matched_baselines_v1"
 
+FOLD_CHAMPION_FROZEN = "CHAMPION_FROZEN"
+FOLD_NO_ELIGIBLE_CHAMPION = "NO_ELIGIBLE_CHAMPION"
+
 NORMAL = "NORMAL"
 STRESSED = "STRESSED_1_5X"
 SCENARIOS = (NORMAL, STRESSED)
@@ -370,9 +373,22 @@ def build_leave_one_block_out_plan(
             minimum_block_count=len(design),
         )
         if not selection["selected_policy_ids"]:
-            raise ProductionHalvingError(
-                f"no eligible design-set champion for held-out block {held_out}"
+            folds.append(
+                {
+                    "fold_id": f"LOBO_HELD_OUT_{held_out}",
+                    "held_out_block": held_out,
+                    "design_blocks": list(design),
+                    "candidate_count": len(design_metrics),
+                    "selection_status": FOLD_NO_ELIGIBLE_CHAMPION,
+                    "selection_decision": selection,
+                    "champion_policy": None,
+                    "selected_risk_level": None,
+                    "baselines": None,
+                    "held_out_outcomes_inspected": False,
+                    "retuning_after_holdout": False,
+                }
             )
+            continue
         champion_id = str(selection["selected_policy_ids"][0])
         singleton_metrics = [
             aggregate_policy_evidence(
@@ -397,6 +413,7 @@ def build_leave_one_block_out_plan(
                 "held_out_block": held_out,
                 "design_blocks": list(design),
                 "candidate_count": len(design_metrics),
+                "selection_status": FOLD_CHAMPION_FROZEN,
                 "selection_decision": selection,
                 "champion_policy": dict(policy_by_id[champion_id]),
                 "selected_risk_level": float(
@@ -413,6 +430,16 @@ def build_leave_one_block_out_plan(
         "block_ids": list(blocks),
         "horizon": _horizon_key(horizon),
         "fold_count": len(folds),
+        "eligible_champion_fold_count": sum(
+            row["selection_status"] == FOLD_CHAMPION_FROZEN for row in folds
+        ),
+        "no_eligible_champion_fold_count": sum(
+            row["selection_status"] == FOLD_NO_ELIGIBLE_CHAMPION
+            for row in folds
+        ),
+        "all_outer_folds_selectable": all(
+            row["selection_status"] == FOLD_CHAMPION_FROZEN for row in folds
+        ),
         "folds": folds,
         "selection_unit": "TEMPORAL_BLOCK",
         "episode_starts_counted_as_independent": False,
@@ -515,11 +542,28 @@ def complete_leave_one_block_out(
     }
     if thresholds:
         defaults.update(dict(thresholds))
+    source_folds = [dict(row) for row in frozen_plan["folds"]]
+    no_champion_folds = [
+        row
+        for row in source_folds
+        if _fold_selection_status(row) == FOLD_NO_ELIGIBLE_CHAMPION
+    ]
+    if no_champion_folds:
+        return _falsified_incomplete_crossfit_result(
+            frozen_plan,
+            source_folds,
+            no_champion_folds,
+            thresholds=defaults,
+        )
+
+    # Do not materialize either evidence sequence before the plan-level
+    # eligibility preflight above.  An incomplete selector procedure is
+    # falsified without inspecting any held-out outcome or matched baseline.
     all_rows = list(candidate_episode_rows) + list(baseline_episode_rows)
     heldout_selector_rows: list[dict[str, Any]] = []
     baseline_groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
     folds: list[dict[str, Any]] = []
-    for source_fold in frozen_plan["folds"]:
+    for source_fold in source_folds:
         fold = dict(source_fold)
         held_out = str(fold["held_out_block"])
         champion = dict(fold["champion_policy"])
@@ -628,6 +672,83 @@ def complete_leave_one_block_out(
         "selector_decision": decision,
         "development_results_separate_from_design": True,
         "held_out_blocks_used_exactly_once": True,
+        "independently_confirmed": False,
+    }
+    result["result_hash"] = stable_hash(result)
+    return result
+
+
+def _fold_selection_status(fold: Mapping[str, Any]) -> str:
+    """Return a backward-compatible frozen fold selection status."""
+
+    observed = fold.get("selection_status")
+    if observed is None:
+        return (
+            FOLD_CHAMPION_FROZEN
+            if isinstance(fold.get("champion_policy"), Mapping)
+            else FOLD_NO_ELIGIBLE_CHAMPION
+        )
+    status = str(observed)
+    if status not in {FOLD_CHAMPION_FROZEN, FOLD_NO_ELIGIBLE_CHAMPION}:
+        raise ProductionHalvingError(f"unknown outer-fold selection status: {status}")
+    return status
+
+
+def _falsified_incomplete_crossfit_result(
+    frozen_plan: Mapping[str, Any],
+    source_folds: Sequence[Mapping[str, Any]],
+    no_champion_folds: Sequence[Mapping[str, Any]],
+    *,
+    thresholds: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Falsify an incomplete selector plan without reading held-out evidence."""
+
+    failed_fold_ids = [str(row["fold_id"]) for row in no_champion_folds]
+    folds: list[dict[str, Any]] = []
+    for source_fold in source_folds:
+        fold = dict(source_fold)
+        selection_status = _fold_selection_status(fold)
+        folds.append(
+            {
+                **fold,
+                "selection_status": selection_status,
+                "held_out_outcomes_inspected": False,
+                "held_out_evaluation_status": (
+                    "NOT_EVALUATED_NO_ELIGIBLE_CHAMPION"
+                    if selection_status == FOLD_NO_ELIGIBLE_CHAMPION
+                    else "SKIPPED_SELECTOR_PLAN_INCOMPLETE"
+                ),
+                "retuning_after_holdout": False,
+            }
+        )
+    decision = {
+        "status": "SELECTOR_PROCEDURE_FALSIFIED",
+        "reason_codes": [FOLD_NO_ELIGIBLE_CHAMPION],
+        "failed_fold_ids": failed_fold_ids,
+        "checks": {"champion_selected_in_every_outer_fold": False},
+        "economic_checks_computed": False,
+        "thresholds": dict(thresholds),
+        "thresholds_changed_after_results": False,
+        "family_average_p_value_used_as_sole_decision": False,
+        "development_only": True,
+    }
+    result = {
+        "schema": "hydra_production_lobo_result_v1",
+        "crossfit_version": CROSSFIT_VERSION,
+        "plan_hash": str(frozen_plan["plan_hash"]),
+        "horizon": str(frozen_plan["horizon"]),
+        "fold_count": len(folds),
+        "eligible_champion_fold_count": len(folds) - len(no_champion_folds),
+        "no_eligible_champion_fold_count": len(no_champion_folds),
+        "evaluation_status": "NOT_RUN_SELECTOR_PLAN_INCOMPLETE",
+        "folds": folds,
+        "headline_held_out_selector": None,
+        "held_out_baseline_aggregates": {},
+        "selector_decision": decision,
+        "development_results_separate_from_design": True,
+        "held_out_blocks_used_exactly_once": False,
+        "held_out_blocks_inspected": [],
+        "held_out_outcomes_inspected": False,
         "independently_confirmed": False,
     }
     result["result_hash"] = stable_hash(result)
@@ -750,7 +871,22 @@ def build_compact_outputs(
         if stage_decisions
         else []
     )
-    if confirmation_ready:
+    selector_status = str(
+        (crossfit_result or {}).get("selector_decision", {}).get("status") or ""
+    )
+    if selector_status in {
+        "SELECTOR_PROCEDURE_WEAK",
+        "SELECTOR_PROCEDURE_FALSIFIED",
+    }:
+        next_action = {
+            "action": "QUEUE_MATERIALLY_DISTINCT_MECHANISM_MANIFEST",
+            "selector_status": selector_status,
+            "static_basket_synthesis_terminated": True,
+            "manifest_required": True,
+            "q4_access_authorized": False,
+            "new_data_purchase_authorized": False,
+        }
+    elif confirmation_ready:
         next_action = {
             "action": "FREEZE_DEVELOPMENT_FINALISTS_AND_AUDIT_UNTOUCHED_DATA_AVAILABILITY",
             "candidate_ids": confirmation_ready,

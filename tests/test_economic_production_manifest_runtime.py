@@ -439,6 +439,75 @@ def test_identical_no_result_worker_exits_stop_relaunch_loop(
     )
 
 
+def test_disabled_queue_restart_persists_idle_without_worker(
+    tmp_path: Path,
+) -> None:
+    queue = {
+        "schema": "hydra_manifest_campaign_queue_v1",
+        "runtime_policy": {
+            "reload_queue_each_controller_step": True,
+            "controller_source_change_for_new_manifest": False,
+            "single_active_campaign": True,
+            "single_authoritative_mission_writer": True,
+        },
+        "governance": {
+            "q4_access_allowed": False,
+            "new_data_purchase_allowed": False,
+            "broker_or_orders_allowed": False,
+            "proof_window_consumption_allowed": False,
+        },
+        "entries": [
+            {
+                "ordinal": 1,
+                "campaign_id": "disabled-production-campaign",
+                "enabled": False,
+            }
+        ],
+    }
+    queue["queue_hash"] = stable_hash(queue)
+    _write_json(
+        tmp_path / "config/v7/economic_evolution_production_queue.json",
+        queue,
+    )
+    state_dir = tmp_path / "mission/state"
+    runtime_state_path = state_dir / "economic_evolution_manifest_runtime.json"
+    _write_json(
+        runtime_state_path,
+        {
+            "schema": "hydra_manifest_campaign_runtime_v1",
+            "state": "RUNNING",
+            "campaign_id": "disabled-production-campaign",
+            "attempts": {"completed-revision": 1},
+            "production_no_result_exits": {},
+            "production_successor_handoffs": [],
+            "worker_pid": 999_999,
+            "worker_exit_code": None,
+            "engine": PRODUCTION_ENGINE,
+            "production_state_path": "/stale/production_state.json",
+            "production_kpi_path": "/stale/production_kpis.json",
+        },
+    )
+
+    runtime = EconomicEvolutionManifestRuntime(tmp_path, state_dir)
+    action = runtime.advance({"action_type": "TERMINAL_PREDECESSOR"})
+
+    persisted = json.loads(runtime_state_path.read_text())
+    assert action["manifest_campaign_runtime_state"] == "MANIFEST_QUEUE_EMPTY"
+    assert persisted["state"] == "IDLE"
+    assert persisted["campaign_id"] is None
+    assert persisted["worker_pid"] is None
+    assert persisted["engine"] is None
+    assert persisted["production_state_path"] is None
+    assert persisted["production_kpi_path"] is None
+    assert persisted["attempts"] == {"completed-revision": 1}
+    snapshot = runtime.snapshot()
+    assert snapshot["state"] == "IDLE"
+    assert snapshot["active_campaign_id"] is None
+    assert snapshot["worker_pid"] is None
+    assert snapshot["production_research_worker_count"] == 0
+    assert snapshot["production_evidence_writer_count"] == 0
+
+
 def test_production_running_action_surfaces_live_economic_counters(
     tmp_path: Path,
 ) -> None:

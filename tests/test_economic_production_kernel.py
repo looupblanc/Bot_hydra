@@ -500,6 +500,77 @@ def test_durable_episode_counter_is_absolute_across_cache_namespaces(
     assert second == first
 
 
+def test_run_episode_counter_scans_once_then_advances_atomically_and_recovers(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rows = [{"episode": index} for index in range(4)]
+    writer = production_runtime.AtomicResultWriter(tmp_path)
+    _write_episode_cache(
+        writer,
+        "exact_episode_rows/existing.json",
+        policy_id="existing",
+        horizon="60_TRADING_DAYS",
+        episodes=rows,
+    )
+
+    original_scan = production_runtime._durable_episode_cache_count
+    scan_calls = 0
+
+    def counted_scan(payload_dir: Path) -> int:
+        nonlocal scan_calls
+        scan_calls += 1
+        return original_scan(payload_dir)
+
+    monkeypatch.setattr(
+        production_runtime, "_durable_episode_cache_count", counted_scan
+    )
+
+    run = object.__new__(_ProductionRun)
+    run.payload_dir = tmp_path
+    run.payload_writer = writer
+    run._durable_episode_count = None
+
+    assert run._durable_episode_total() == 4
+    assert run._durable_episode_total() == 4
+    assert scan_calls == 1
+
+    created = run._write_durable_episode_cache(
+        "control_60_episode_rows/new.json",
+        policy_id="new",
+        horizon="60_TRADING_DAYS",
+        episodes=rows[:2],
+    )
+    duplicate = run._write_durable_episode_cache(
+        "control_60_episode_rows/new.json",
+        policy_id="new",
+        horizon="60_TRADING_DAYS",
+        episodes=rows[:2],
+    )
+    assert created.idempotent_existing is False
+    assert duplicate.idempotent_existing is True
+    assert run._durable_episode_total() == 6
+    assert scan_calls == 1
+
+    # Model a crash after the atomic rename but before the process-local
+    # increment.  A fresh run must recover the fsynced cache with one scan.
+    _write_episode_cache(
+        writer,
+        "horizon_episode_rows/20/crash_window.json",
+        policy_id="crash_window",
+        horizon="20_TRADING_DAYS",
+        episodes=rows[:3],
+    )
+    recovered = object.__new__(_ProductionRun)
+    recovered.payload_dir = tmp_path
+    recovered.payload_writer = writer
+    recovered._durable_episode_count = None
+
+    assert recovered._durable_episode_total() == 9
+    assert recovered._durable_episode_total() == 9
+    assert scan_calls == 2
+
+
 def test_no_survivor_control_status_and_stage6_decisions_are_truthful() -> None:
     status = "BASELINE_REPLAY_EXECUTED_COMPARISON_NOT_RUN_NO_SURVIVOR"
     assert _matched_controls_payload(None) == {"status": status}

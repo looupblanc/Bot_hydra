@@ -18,6 +18,12 @@ from hydra.production.halving import (
     select_stage4_survivors,
     select_stage5_survivors,
 )
+from hydra.production.runtime import (
+    _expanded_candidate_counts,
+    _matched_controls_payload,
+    _matched_controls_status,
+    _stage4_selector_gate_decision,
+)
 
 
 BLOCKS = ("B1", "B2", "B3", "B4")
@@ -323,6 +329,147 @@ def test_lobo_plan_does_not_read_its_held_out_block_and_freezes_baselines() -> N
         (champion, runner_up), candidate_rows, **kwargs
     )
     assert original == again
+
+
+def test_lobo_plan_records_design_fold_without_eligible_champion() -> None:
+    champion = _policy("champion", ("c1", "c2"), risk=1.25, micro=5)
+    runner_up = _policy("runner_up", ("c2", "c3"), risk=1.25, micro=5)
+    candidate_rows = _full_rows(champion, net=120.0, progress=0.9) + _full_rows(
+        runner_up, net=80.0, progress=0.7
+    )
+    for row in candidate_rows:
+        if row["temporal_block"] != "B4":
+            row.update(
+                terminal_state="DATA_CENSORED",
+                target_reached=False,
+                censored_state=True,
+                days_to_target=None,
+            )
+    baseline_bank = _predeclared_baseline_bank(seeds=(11, 12, 13))
+    baseline_rows = [
+        row
+        for index, policy in enumerate(baseline_bank)
+        for row in _full_rows(policy, net=20.0 + index / 100, progress=0.4)
+    ]
+
+    plan = build_leave_one_block_out_plan(
+        (champion, runner_up),
+        candidate_rows,
+        predeclared_baseline_policies=baseline_bank,
+        baseline_design_episode_rows=baseline_rows,
+        block_ids=BLOCKS,
+        random_seeds=(11, 12, 13),
+    )
+
+    b4 = next(row for row in plan["folds"] if row["held_out_block"] == "B4")
+    assert plan["fold_count"] == 4
+    assert plan["eligible_champion_fold_count"] == 3
+    assert plan["no_eligible_champion_fold_count"] == 1
+    assert plan["all_outer_folds_selectable"] is False
+    assert b4["selection_status"] == "NO_ELIGIBLE_CHAMPION"
+    assert b4["champion_policy"] is None
+    assert b4["selected_risk_level"] is None
+    assert b4["baselines"] is None
+    assert b4["held_out_outcomes_inspected"] is False
+    assert b4["selection_decision"]["selected_policy_ids"] == []
+    assert all(
+        "NO_EVALUABLE_EPISODES" in excluded["reasons"]
+        for excluded in b4["selection_decision"]["excluded"]
+    )
+
+
+def test_incomplete_lobo_is_falsified_without_reading_any_holdout_rows() -> None:
+    champion = _policy("champion", ("c1", "c2"), risk=1.25, micro=5)
+    candidate_rows = _full_rows(champion, net=120.0, progress=0.9)
+    for row in candidate_rows:
+        if row["temporal_block"] != "B4":
+            row.update(
+                terminal_state="DATA_CENSORED",
+                target_reached=False,
+                censored_state=True,
+                days_to_target=None,
+            )
+    baseline_bank = _predeclared_baseline_bank(seeds=(11, 12, 13))
+    baseline_rows = [
+        row
+        for policy in baseline_bank
+        for row in _full_rows(policy, net=20.0, progress=0.4)
+    ]
+    plan = build_leave_one_block_out_plan(
+        (champion,),
+        candidate_rows,
+        predeclared_baseline_policies=baseline_bank,
+        baseline_design_episode_rows=baseline_rows,
+        block_ids=BLOCKS,
+        random_seeds=(11, 12, 13),
+    )
+
+    class _RowsMustNotBeRead:
+        def __iter__(self):
+            raise AssertionError("held-out evidence was inspected")
+
+    result = complete_leave_one_block_out(
+        plan,
+        _RowsMustNotBeRead(),  # type: ignore[arg-type]
+        _RowsMustNotBeRead(),  # type: ignore[arg-type]
+    )
+
+    assert result["evaluation_status"] == "NOT_RUN_SELECTOR_PLAN_INCOMPLETE"
+    assert result["selector_decision"]["status"] == "SELECTOR_PROCEDURE_FALSIFIED"
+    assert result["selector_decision"]["reason_codes"] == [
+        "NO_ELIGIBLE_CHAMPION"
+    ]
+    assert result["headline_held_out_selector"] is None
+    assert result["held_out_baseline_aggregates"] == {}
+    assert result["held_out_blocks_inspected"] == []
+    assert result["held_out_blocks_used_exactly_once"] is False
+    assert result["held_out_outcomes_inspected"] is False
+    assert all(not row["held_out_outcomes_inspected"] for row in result["folds"])
+    claimed = result["result_hash"]
+    payload = dict(result)
+    payload.pop("result_hash")
+    assert claimed == stable_hash(payload)
+
+
+def test_falsified_selector_blocks_stage4_and_uses_honest_control_status() -> None:
+    gate = _stage4_selector_gate_decision(
+        ("p2", "p1"), selector_status="SELECTOR_PROCEDURE_FALSIFIED"
+    )
+    assert gate["stage"] == "STAGE_4_ROBUSTNESS_CROSSFIT"
+    assert gate["input_count"] == 2
+    assert gate["eligible_count"] == 0
+    assert gate["output_count"] == 0
+    assert gate["selected_policy_ids"] == []
+    assert _expanded_candidate_counts((gate,)) == (0, 0)
+    claimed = gate["decision_hash"]
+    payload = dict(gate)
+    payload.pop("decision_hash")
+    assert claimed == stable_hash(payload)
+
+    crossfit = {
+        "status": "STALE_OR_MISLEADING",
+        "evaluation_status": "NOT_RUN_SELECTOR_PLAN_INCOMPLETE",
+        "selector_decision": {"status": "SELECTOR_PROCEDURE_FALSIFIED"},
+    }
+    expected_status = (
+        "BASELINE_REPLAY_EXECUTED_COMPARISON_NOT_RUN_NO_ELIGIBLE_CHAMPION"
+    )
+    assert _matched_controls_status(crossfit) == expected_status
+    assert _matched_controls_payload(crossfit)["status"] == expected_status
+
+    compact = build_compact_outputs(
+        campaign_id="campaign_0024",
+        metrics=(),
+        stage_decisions=(
+            {"selected_policy_ids": ["p1", "p2"]},
+            gate,
+        ),
+        crossfit_result=crossfit,
+        development_decisions=(),
+    )
+    recommendation = compact["next_campaign_recommendations"]["recommendation"]
+    assert recommendation["action"] == "QUEUE_MATERIALLY_DISTINCT_MECHANISM_MANIFEST"
+    assert recommendation["static_basket_synthesis_terminated"] is True
 
 
 def test_complete_lobo_uses_only_held_out_evidence_and_can_be_green() -> None:

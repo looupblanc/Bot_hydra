@@ -2119,6 +2119,15 @@ class EconomicEvolutionManifestRuntime:
     def _idle_action(
         self, predecessor: Mapping[str, Any], state: str
     ) -> dict[str, Any]:
+        if self._live_worker_pid() is not None:
+            raise EconomicEvolutionRuntimeError(
+                "manifest runtime cannot enter IDLE while a worker is live"
+            )
+        self._process = None
+        self._external_worker_pid = None
+        self._active_campaign_id = None
+        self._active_config = None
+        self._record_runtime_state("IDLE", campaign_id=None)
         return {
             **dict(predecessor),
             "manifest_campaign_runtime_state": state,
@@ -2206,7 +2215,179 @@ def load_and_verify_manifest_queue(root: str | Path) -> dict[str, Any]:
         or governance.get("proof_window_consumption_allowed") is not False
     ):
         raise EconomicEvolutionRuntimeError("invalid manifest campaign queue")
+    _verify_terminal_disable_entries(project, entries)
     return queue
+
+
+def _verify_terminal_disable_entries(
+    project: Path, entries: list[Mapping[str, Any]]
+) -> None:
+    """Fail closed on new terminal-disable receipts without breaking old queues."""
+
+    for entry in entries:
+        terminal_disable = entry.get("terminal_disable")
+        if terminal_disable is None:
+            # Historical disabled entries predate terminal-disable receipts.
+            continue
+        if entry.get("enabled") is not False or not isinstance(
+            terminal_disable, Mapping
+        ):
+            raise EconomicEvolutionRuntimeError(
+                "terminal-disable declaration is invalid"
+            )
+        _verify_terminal_disable_entry(project, entry, terminal_disable)
+
+
+def _verify_terminal_disable_entry(
+    project: Path,
+    entry: Mapping[str, Any],
+    terminal_disable: Mapping[str, Any],
+) -> None:
+    campaign_id = str(entry.get("campaign_id") or "")
+    status = str(terminal_disable.get("status") or "")
+    reason = str(terminal_disable.get("reason") or "")
+    if (
+        not campaign_id
+        or not status
+        or not reason
+        or terminal_disable.get("automatic_retry_allowed") is not False
+        or terminal_disable.get("evidence_finalization_allowed") is not False
+    ):
+        raise EconomicEvolutionRuntimeError(
+            "terminal-disable safety boundary is invalid"
+        )
+
+    receipt_path = _terminal_disable_path(
+        project, terminal_disable.get("receipt_path"), "receipt"
+    )
+    verdict_path = _terminal_disable_path(
+        project, terminal_disable.get("verdict_path"), "verdict"
+    )
+    receipt = _verify_terminal_disable_document(
+        receipt_path,
+        expected_file_sha256=terminal_disable.get("receipt_file_sha256"),
+        expected_self_hash=terminal_disable.get("receipt_hash"),
+        self_hash_key="receipt_hash",
+        label="terminal-disable receipt",
+    )
+    verdict = _verify_terminal_disable_document(
+        verdict_path,
+        expected_file_sha256=terminal_disable.get("verdict_file_sha256"),
+        expected_self_hash=terminal_disable.get("verdict_hash"),
+        self_hash_key="verdict_hash",
+        label="terminal-disable verdict",
+    )
+    if any(
+        document.get("campaign_id") != campaign_id
+        or document.get("terminal_status") != status
+        for document in (receipt, verdict)
+    ):
+        raise EconomicEvolutionRuntimeError(
+            "terminal-disable campaign or status drift"
+        )
+    if receipt.get("failure_code") != reason or verdict.get("failure_code") != reason:
+        raise EconomicEvolutionRuntimeError(
+            "terminal-disable failure-code drift"
+        )
+    expected_receipt_reference = {
+        "path": str(terminal_disable.get("receipt_path")),
+        "file_sha256": str(terminal_disable.get("receipt_file_sha256")),
+        "receipt_hash": str(terminal_disable.get("receipt_hash")),
+    }
+    if verdict.get("source_terminal_receipt") != expected_receipt_reference:
+        raise EconomicEvolutionRuntimeError(
+            "terminal-disable WORM verdict does not anchor the receipt"
+        )
+
+    tag = str(terminal_disable.get("verdict_tag") or "")
+    commit = _terminal_disable_hex(
+        terminal_disable.get("verdict_commit"), 40, "verdict commit"
+    )
+    if not tag.startswith("worm/"):
+        raise EconomicEvolutionRuntimeError("terminal-disable verdict tag is missing")
+    try:
+        tagged_commit = subprocess.check_output(
+            ["git", "rev-parse", f"{tag}^{{commit}}"],
+            cwd=project,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+        expected_commit = subprocess.check_output(
+            ["git", "rev-parse", commit],
+            cwd=project,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+        tagged_blob = subprocess.check_output(
+            ["git", "show", f"{tag}:{verdict_path.relative_to(project).as_posix()}"],
+            cwd=project,
+            stderr=subprocess.DEVNULL,
+        )
+    except (OSError, subprocess.CalledProcessError, ValueError) as exc:
+        raise EconomicEvolutionRuntimeError(
+            "terminal-disable WORM reference is invalid"
+        ) from exc
+    if tagged_commit != expected_commit or expected_commit != commit:
+        raise EconomicEvolutionRuntimeError("terminal-disable WORM tag drift")
+    if hashlib.sha256(tagged_blob).hexdigest() != str(
+        terminal_disable["verdict_file_sha256"]
+    ):
+        raise EconomicEvolutionRuntimeError(
+            "terminal-disable tagged verdict blob drift"
+        )
+
+
+def _terminal_disable_path(project: Path, value: Any, label: str) -> Path:
+    if not isinstance(value, str) or not value or Path(value).is_absolute():
+        raise EconomicEvolutionRuntimeError(
+            f"terminal-disable {label} path is invalid"
+        )
+    path = (project / value).resolve()
+    try:
+        path.relative_to(project)
+    except ValueError as exc:
+        raise EconomicEvolutionRuntimeError(
+            f"terminal-disable {label} path escapes the project root"
+        ) from exc
+    if not path.is_file():
+        raise EconomicEvolutionRuntimeError(
+            f"terminal-disable {label} is missing"
+        )
+    return path
+
+
+def _verify_terminal_disable_document(
+    path: Path,
+    *,
+    expected_file_sha256: Any,
+    expected_self_hash: Any,
+    self_hash_key: str,
+    label: str,
+) -> dict[str, Any]:
+    file_sha256 = _terminal_disable_hex(
+        expected_file_sha256, 64, f"{label} file checksum"
+    )
+    self_hash = _terminal_disable_hex(
+        expected_self_hash, 64, f"{label} self-hash"
+    )
+    if _sha256(path) != file_sha256:
+        raise EconomicEvolutionRuntimeError(f"{label} checksum drift")
+    document = _load_json(path)
+    claimed = document.get(self_hash_key)
+    payload = dict(document)
+    payload.pop(self_hash_key, None)
+    if claimed != self_hash or stable_hash(payload) != self_hash:
+        raise EconomicEvolutionRuntimeError(f"{label} self-hash drift")
+    return document
+
+
+def _terminal_disable_hex(value: Any, length: int, label: str) -> str:
+    candidate = str(value or "")
+    if len(candidate) != length or any(
+        character not in "0123456789abcdef" for character in candidate
+    ):
+        raise EconomicEvolutionRuntimeError(f"terminal-disable {label} is invalid")
+    return candidate
 
 
 def _latest_manifest_queue_path(root: str | Path) -> Path:
