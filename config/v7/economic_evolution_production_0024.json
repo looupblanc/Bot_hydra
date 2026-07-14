@@ -1,0 +1,444 @@
+{
+  "schema": "hydra_economic_production_manifest_v1",
+  "campaign_id": "hydra_economic_production_0024",
+  "class_id": "ECONOMIC_PRODUCTION_MULTI_MECHANISM_V1",
+  "created_at_utc": "2026-07-14T11:30:00Z",
+  "source_commit": "0000000000000000000000000000000000000000",
+  "implementation_files": {
+    "hydra/account_policy/basket.py": "TO_BE_COMPUTED",
+    "hydra/account_policy/router.py": "TO_BE_COMPUTED",
+    "hydra/account_policy/schema.py": "TO_BE_COMPUTED",
+    "hydra/account_policy/xfa.py": "TO_BE_COMPUTED",
+    "hydra/calibration/cost_hurdle_calibration.py": "TO_BE_COMPUTED",
+    "hydra/calibration/injected_edges.py": "TO_BE_COMPUTED",
+    "hydra/calibration/negative_controls.py": "TO_BE_COMPUTED",
+    "hydra/calibration/positive_controls.py": "TO_BE_COMPUTED",
+    "hydra/calibration/power_analysis.py": "TO_BE_COMPUTED",
+    "hydra/calibration/synthetic_markets.py": "TO_BE_COMPUTED",
+    "hydra/calibration/validator_benchmark.py": "TO_BE_COMPUTED",
+    "hydra/compute/resource_monitor.py": "TO_BE_COMPUTED",
+    "hydra/compute/result_writer.py": "TO_BE_COMPUTED",
+    "hydra/data/contract_mapping.py": "TO_BE_COMPUTED",
+    "hydra/data/multitimeframe.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/account_evaluation.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/archive.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/assembly.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/failure_model.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/generator.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/incremental_value.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/mutation.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/null_calibration.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/parallel_screen.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/policy_evolution.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/schema.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/screen.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/seed_archive.py": "TO_BE_COMPUTED",
+    "hydra/economic_evolution/statuses.py": "TO_BE_COMPUTED",
+    "hydra/evidence/__init__.py": "TO_BE_COMPUTED",
+    "hydra/evidence/bundle.py": "TO_BE_COMPUTED",
+    "hydra/evidence/schema.py": "TO_BE_COMPUTED",
+    "hydra/execution/v7_cost_model.py": "TO_BE_COMPUTED",
+    "hydra/factory/ecology_allocation.py": "TO_BE_COMPUTED",
+    "hydra/factory/elite_selection_manifest.py": "TO_BE_COMPUTED",
+    "hydra/factory/quality_diversity.py": "TO_BE_COMPUTED",
+    "hydra/factory/quality_diversity_selector_v2.py": "TO_BE_COMPUTED",
+    "hydra/features/canonical_store.py": "TO_BE_COMPUTED",
+    "hydra/features/feature_matrix.py": "TO_BE_COMPUTED",
+    "hydra/foundry/status.py": "TO_BE_COMPUTED",
+    "hydra/foundry/tournament.py": "TO_BE_COMPUTED",
+    "hydra/markets/instruments.py": "TO_BE_COMPUTED",
+    "hydra/mission/calibration_retest_execution.py": "TO_BE_COMPUTED",
+    "hydra/mission/economic_evolution_manifest_runtime.py": "TO_BE_COMPUTED",
+    "hydra/production/__init__.py": "TO_BE_COMPUTED",
+    "hydra/production/component_evidence.py": "TO_BE_COMPUTED",
+    "hydra/production/episode_evidence.py": "TO_BE_COMPUTED",
+    "hydra/production/evidence_adapter.py": "TO_BE_COMPUTED",
+    "hydra/production/halving.py": "TO_BE_COMPUTED",
+    "hydra/production/manifest.py": "TO_BE_COMPUTED",
+    "hydra/production/mll_accounting.py": "TO_BE_COMPUTED",
+    "hydra/production/policy_factory.py": "TO_BE_COMPUTED",
+    "hydra/production/replay.py": "TO_BE_COMPUTED",
+    "hydra/production/runtime.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/combine_episode.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/combine_fitness.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/intraday_mll.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/mll_variants.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/payout_cycles.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/payout_episode.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/rolling_combine.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/scaling_plan.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/topstep_150k.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/trading_day.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/xfa_consistency.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/xfa_episode.py": "TO_BE_COMPUTED",
+    "hydra/propfirm/xfa_standard.py": "TO_BE_COMPUTED",
+    "hydra/research/accelerated_context_tournament.py": "TO_BE_COMPUTED",
+    "hydra/research/economic_evolution_campaign.py": "TO_BE_COMPUTED",
+    "hydra/research/economic_evolution_pilot.py": "TO_BE_COMPUTED",
+    "hydra/research/equity_open_gap_reversal.py": "TO_BE_COMPUTED",
+    "hydra/research/qd_economic_tournament.py": "TO_BE_COMPUTED",
+    "hydra/research/rolling_combine_replay.py": "TO_BE_COMPUTED",
+    "hydra/research/turbo_exact_replay.py": "TO_BE_COMPUTED",
+    "hydra/research/turbo_feature_builder.py": "TO_BE_COMPUTED",
+    "hydra/shadow/specification.py": "TO_BE_COMPUTED",
+    "hydra/strategies/turbo_batch_fingerprint.py": "TO_BE_COMPUTED",
+    "hydra/strategies/turbo_compiler.py": "TO_BE_COMPUTED",
+    "hydra/strategies/turbo_dsl.py": "TO_BE_COMPUTED",
+    "hydra/strategies/turbo_vectorized_executor.py": "TO_BE_COMPUTED",
+    "hydra/utils/config.py": "TO_BE_COMPUTED",
+    "hydra/utils/time.py": "TO_BE_COMPUTED",
+    "hydra/validation/data_roles.py": "TO_BE_COMPUTED",
+    "hydra/validation/lockbox_guard.py": "TO_BE_COMPUTED",
+    "scripts/run_economic_production_manifest.py": "TO_BE_COMPUTED"
+  },
+  "implementation_hash_scope": "TRANSITIVE_ACTIVE_PRODUCTION_RUNTIME_CLOSURE_V1_PLUS_CONTROLLER_ROOT",
+  "development_only": true,
+  "economic_hypothesis": "Past-only regime gating, complementary session routing, causal opportunity-density activation, discrete static risk, market-role rotation, target-velocity plus defensive assembly, and bounded micro-edge filter/veto/exit assembly can improve rolling Combine target progress and stressed economics without reproducing the falsified broad static-parent family.",
+  "policy_classes": [
+    "REGIME_GATED_SLEEVES",
+    "SESSION_SPECIALIZED_ROUTING",
+    "OPPORTUNITY_DENSITY",
+    "FIXED_STATIC_RISK_FRONTIER",
+    "MARKET_ROLE_ROTATION",
+    "TARGET_VELOCITY_MLL_PROTECTION",
+    "NEW_MICRO_EDGE_ASSEMBLY"
+  ],
+  "generator": {
+    "engine": "deterministic_multi_mechanism_policy_factory_v1",
+    "seed": 240024,
+    "proposal_count": 20000,
+    "policy_component_minimum": 2,
+    "policy_component_maximum": 4,
+    "structural_deduplication": true,
+    "behavioral_deduplication": true,
+    "type_compatibility": true,
+    "cemetery_check": true,
+    "cemetery_check_scope": "CLASS_NAME_ONLY_NO_STRUCTURAL_FINGERPRINT_MATCH",
+    "neighbour_resurrection_0023": false,
+    "status_inheritance": false
+  },
+  "component_bank": {
+    "sources": {
+      "canonical_0018_elites": {
+        "path": "WORM/economic-evolution-0018-canonical-elites-2026-07-14.json",
+        "file_sha256": "a096007999a1abb1dc207ecadf61bb610e7bacf53b3ed861566727aa5bb852a4"
+      },
+      "canonical_0018_episode_evidence": {
+        "path": "reports/economic_evolution/elite_robustness_0020/recovery/elite_episode_evidence.jsonl",
+        "file_sha256": "f06ff779748929623787e508b9792373564b8983a0aca9c6942f5412fd2706eb"
+      },
+      "seed_archive": {
+        "path": "reports/economic_evolution/seeds/persistent_0003_successor_seed.json",
+        "file_sha256": "daac8b794890974279e4e9db1a05f1d1fce4c62719ab2238a244b4e101ac9b87",
+        "semantic_hash": "af0c59861eaf274e131cca400ae3c3957a73c90004833051f776ccfb2e93c460"
+      },
+      "diagnostic_0020_result": {
+        "path": "reports/economic_evolution/elite_robustness_0020/campaign/elite_robustness_result.json",
+        "file_sha256": "d391b461878790d979f32ba3b795bec6c92353f6179786b599451aae9d910ef4"
+      },
+      "diagnostic_0020_pair_ledger": {
+        "path": "reports/economic_evolution/elite_robustness_0020/campaign/elite_robustness_pair_results.jsonl",
+        "file_sha256": "9492baa7d0ffc04a84e3e62dea08f53c8a469203a819dbc0c0922d0b463ee41b"
+      },
+      "campaign_0023_diagnostic_manifest": {
+        "path": "reports/economic_evolution/static_parent_basket_0023/development_selected_diagnostic_champion_manifest.json",
+        "file_sha256": "28a3f974fa79984e57b0717ab8c35994d92c56d7e145226badd50b72545a7b0f"
+      },
+      "campaign_0023_recovery_failure": {
+        "path": "reports/economic_evolution/static_parent_basket_0023/authoritative_reconstruction_attempt_001/summary_only_nonconfirmatory.json",
+        "file_sha256": "37cebecae62289031ebb344d29eaa213629ce4eea24434671e3dcc45d963f0a6"
+      },
+      "campaign_0023_recovery_consumed_marker": {
+        "path": "reports/economic_evolution/static_parent_basket_0023/authoritative_reconstruction_attempt_001.ONE_TIME_ATTEMPT_CONSUMED.json",
+        "file_sha256": "1984f34cae00e1106f3853ee22c54befa27217fe82946a40ebc4175feee62754"
+      }
+    },
+    "primary_passing_policy_ids": [
+      "complementary_sleeve_real_2a948b1b1da0eb1d07fee597",
+      "complementary_sleeve_real_809f0a9b27a86e8e11425c3d",
+      "complementary_sleeve_real_934e27cdf113699834aa9443",
+      "complementary_sleeve_real_fafd24a65de4840ff79bb047"
+    ],
+    "primary_near_elite_policy_ids": [
+      "complementary_sleeve_real_1f7cd0713b3427057b5e3b1c",
+      "complementary_sleeve_real_25b1c9914cdb98f70bbb854d",
+      "complementary_sleeve_real_407c4104ca39e772b7db6133",
+      "complementary_sleeve_real_44a9666e53a69834245c5330"
+    ],
+    "primary_selection_role": "DEVELOPMENT_STRUCTURE_SEEDS_NOT_NEW_EVIDENCE",
+    "secondary_policy": "NON_TOMBSTONED_MICRO_EDGE_USEFUL_AND_POSITIVE_STRESSED_NET",
+    "new_micro_edges_allowed_from_cached_data": true,
+    "diagnostic_fallback_0020": {
+      "policy_id": "elite_robustness_child_ca668fb2e9189ee6fd0805ce",
+      "status": "DIAGNOSTIC_FALLBACK_ONLY",
+      "status_inheritance": false,
+      "family_verdict": "ARTEFACT_GEOMETRY_ONLY"
+      ,"component_ids": [
+        "sleeve_8af4e061229c8ce7ae335f63",
+        "sleeve_65bad2088913fc9fca0a145d",
+        "sleeve_af4b99ab534d1a577c05eb4e",
+        "sleeve_6ec77be8f984fa873b65bb3f",
+        "sleeve_39eb74b174e7bdd240520b9d",
+        "sleeve_b8e98b3a73cacb8a105a3116",
+        "sleeve_ed13bb4ba0c0975a4ef19071",
+        "sleeve_624310a1de865cef4db2f8f4",
+        "sleeve_64d6fd6dd9e5f74b920ac99b",
+        "sleeve_4de0a5d3b0ef1762cc9e4086",
+        "sleeve_c5da4b5a67abadeb7d68eabe"
+      ]
+    },
+    "campaign_0023_baseline": {
+      "policy_id": "static_parent_basket_428d24d049c7ae3c01b95e85",
+      "role": "BASELINE_ONLY",
+      "family_verdict": "STATIC_PARENT_SYNTHESIS_FALSIFIED",
+      "development_status": "DEVELOPMENT_SELECTED_DIAGNOSTIC_CHAMPION",
+      "promotion_status": null,
+      "headline_evidence_allowed": false
+    },
+    "optional_reconstructed_0023_cache": {
+      "manifest_path": "data/cache/evidence_bundles/hydra_economic_evolution_static_parent_basket_0023/manifest.json",
+      "required_status": "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION",
+      "summary_only_accepted": false,
+      "required": false
+    },
+    "fresh_compile_when_cache_absent": true,
+    "feature_recomputation_allowed": false,
+    "fresh_signal_and_trade_materialization_from_cached_features": true,
+    "market_exclusions": {
+      "GC": "NO_ELIGIBLE_COMPONENT_IN_FROZEN_0024_BANK"
+    }
+  },
+  "markets": ["CL", "ES", "NQ", "RTY", "YM"],
+  "contracts": {
+    "CL": {"mini": "CL", "micro": "MCL", "micro_per_mini": 10},
+    "ES": {"mini": "ES", "micro": "MES", "micro_per_mini": 10},
+    "NQ": {"mini": "NQ", "micro": "MNQ", "micro_per_mini": 10},
+    "RTY": {"mini": "RTY", "micro": "M2K", "micro_per_mini": 10},
+    "YM": {"mini": "YM", "micro": "MYM", "micro_per_mini": 10}
+  },
+  "timeframes": ["5m", "15m", "30m", "60m"],
+  "session_rules": {
+    "source": "FROZEN_COMPONENT_SESSION_CODE",
+    "codes": {"-1": "ALL_ELIGIBLE", "0": "OPEN", "1": "MID_SESSION", "2": "LATE_CLOSE"},
+    "same_session_enforcement": true,
+    "overnight_fabrication_allowed": false,
+    "closed_or_past_only": true
+  },
+  "episode_starts": {
+    "serious_policy_starts": 48,
+    "minimum_spacing_sessions": 3,
+    "block_aware": true,
+    "regime_balanced": true,
+    "overlapping_starts_independent": false,
+    "retuning_after_start_outcomes": false
+  },
+  "temporal_blocks": {
+    "method": "FOUR_CONTIGUOUS_BLOCKS_WITH_TEN_SESSION_EMBARGO",
+    "overlapping_starts_independent": false,
+    "contract_roll_boundaries_create_independence": false,
+    "blocks": [
+      {"block_id": "B1", "start": "2023-07-03", "end": "2023-10-05", "markets": ["CL", "ES", "NQ", "RTY", "YM"], "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"},
+      {"block_id": "B2", "start": "2023-10-27", "end": "2024-02-02", "markets": ["CL", "ES", "NQ", "RTY", "YM"], "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"},
+      {"block_id": "B3", "start": "2024-02-26", "end": "2024-05-31", "markets": ["CL", "ES", "NQ", "RTY", "YM"], "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"},
+      {"block_id": "B4", "start": "2024-06-17", "end": "2024-09-26", "markets": ["CL", "ES", "NQ", "RTY", "YM"], "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"}
+    ]
+  },
+  "costs": {
+    "normal_multiplier": 1.0,
+    "stressed_multiplier": 1.5,
+    "source_component_costs_frozen": true,
+    "retune_after_outcomes": false
+  },
+  "account_parameters": {
+    "starting_balance": 150000.0,
+    "profit_target": 9000.0,
+    "maximum_loss_limit": 4500.0,
+    "maximum_mini_equivalent": 15,
+    "maximum_simultaneous_positions": 3,
+    "consistency_rule": "TOPSTEP_150K_CONFIGURED",
+    "session_constraints": "FROZEN_SOURCE_COMPONENT",
+    "dynamic_loss_streak_ratchet": false
+  },
+  "static_risk_frontier": {
+    "normalized_levels": [0.75, 1.0, 1.25, 1.5],
+    "micro_units": [3, 4, 5, 6],
+    "continuous_optimization": false,
+    "selected_within_development_blocks": true,
+    "maximum_mini_equivalent": 15
+  },
+  "component_materialization": {
+    "calibration_period": ["2023-01-01", "2023-07-01"],
+    "exact_replay_period": ["2023-01-01", "2024-10-01"],
+    "cached_features_only": true,
+    "cache_miss_allowed": false,
+    "signal_and_trade_ledgers_required_before_account_replay": true
+  },
+  "matched_controls": {
+    "best_parent": true,
+    "equal_risk": true,
+    "random_seed_count": 5,
+    "random_seeds": [24002401, 24002402, 24002403, 24002404, 24002405],
+    "same_eligible_component_bank": true,
+    "same_episode_starts": true,
+    "campaign_0023_static_baseline_only": true
+  },
+  "null_policy": {
+    "definition": "MATCHED_STRUCTURE_FIXED_SEED_ROUTING_NULL",
+    "reuse_identical_definition": true,
+    "family_average_p_value_primary": false,
+    "development_only": true
+  },
+  "screening_policy": {
+    "stage1_is_approximate": true,
+    "stage1_outcome_claim_allowed": false,
+    "pareto_ranking": true,
+    "opaque_score": false,
+    "positive_normal_and_stressed_proxy_required": true,
+    "maximum_component_share": 0.65,
+    "minimum_opportunity_proxy": 40,
+    "exact_replay_required_for_economic_claim": true
+  },
+  "mutation_policy": {
+    "failure_guided_only": true,
+    "blind_whole_policy_mutation": false,
+    "identical_start_parent_child_delta": true,
+    "campaign_0023_neighbour_variants": false,
+    "failure_vectors": [
+      "TARGET_TOO_SLOW",
+      "INSUFFICIENT_OPPORTUNITIES",
+      "MLL_BREACH",
+      "CONSISTENCY_FAILURE",
+      "COST_FRAGILITY",
+      "TEMPORAL_INSTABILITY",
+      "COMPONENT_REDUNDANCY",
+      "SIGNAL_CONFLICT",
+      "OVER_CONCENTRATION",
+      "GOOD_COMBINE_POOR_XFA",
+      "NO_INCREMENTAL_VALUE"
+    ]
+  },
+  "successive_halving": {
+    "stage0_proposals": 20000,
+    "stage1_fast_screen_minimum": 4096,
+    "stage1_survivor_maximum": 1024,
+    "stage2_exact_replay_minimum": 512,
+    "stage2_survivor_maximum": 256,
+    "stage3_rolling_combine_maximum": 256,
+    "stage3_survivor_maximum": 64,
+    "stage4_crossfit_maximum": 64,
+    "stage4_survivor_maximum": 16,
+    "stage5_96_start_maximum": 16,
+    "stage5_survivor_maximum": 4,
+    "stage6_finalist_maximum": 4,
+    "rolling_start_count": 48,
+    "frozen_horizons": [20, 40, 60, 90],
+    "full_available_chronological_horizon": true,
+    "stress_cost_multiplier": 1.5,
+    "retuning_between_stages": false
+  },
+  "kill_policy": {
+    "tombstone_exact_class": true,
+    "lower_threshold_after_result": false,
+    "no_survivor_action": "MATERIALLY_DISTINCT_MECHANISM_NEXT_MANIFEST",
+    "failed_campaign_stops_factory": false
+  },
+  "promotion_policy": {
+    "development_only": true,
+    "minimum_normal_pass_rate": 0.10,
+    "minimum_stressed_pass_rate": 0.05,
+    "minimum_stressed_net": 0.0,
+    "maximum_mll_breach_rate": 0.10,
+    "minimum_positive_blocks": 2,
+    "maximum_block_pass_share": 0.50,
+    "maximum_component_profit_share": 0.65,
+    "paper_shadow_ready_allowed": false,
+    "independent_confirmation_required": true,
+    "status_inheritance": false
+  },
+  "evidence_bundle": {
+    "schema_version": "hydra_evidence_bundle_v1",
+    "destination": "data/cache/evidence_bundles",
+    "lightweight_manifest_path": "reports/economic_evolution/economic_production_0024/evidence_bundle_receipt.json",
+    "required_datasets": [
+      "component_signals",
+      "component_entries",
+      "component_exits",
+      "component_trades",
+      "account_policy_membership",
+      "account_daily_paths",
+      "episodes",
+      "provenance"
+    ],
+    "required_for_campaign_complete": true,
+    "atomic_finalize": true,
+    "summary_only_complete_allowed": false,
+    "large_files_git_tracked": false,
+    "reconstruction_flag": false
+  },
+  "compute_allocation": {
+    "hot_economic_loop_minimum": 0.80,
+    "cold_safety_loop_maximum": 0.10,
+    "engineering_reporting_maximum": 0.10,
+    "rolling_window_hours": 2,
+    "admin_overhead_alert_threshold": 0.20
+  },
+  "compute": {
+    "worker_count": 3,
+    "asynchronous_evidence_writer_count": 1,
+    "compute_workers_read_only": true,
+    "process_start_method": "spawn",
+    "batched_evidence_commits": true,
+    "immutable_episode_cache": true,
+    "target_cpu_utilization": 0.75,
+    "full_repository_regression_per_wave": false
+  },
+  "data": {
+    "role": "DEVELOPMENT_ONLY_Q4_EXCLUDED",
+    "period": ["2023-01-01", "2024-10-01"],
+    "feature_source_fingerprint": "1c773f5044f0f9c3bc50e67003b93a7c35ecaf8c505879fd1c20d6d03edada6c",
+    "contract_map_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+    "cached_features_only": true,
+    "feature_recalculation_allowed": false,
+    "q4_access_allowed": false,
+    "new_purchase_allowed": false
+  },
+  "runtime": {
+    "engine": "production_kernel_v1",
+    "runner": "scripts/run_economic_production_manifest.py",
+    "output_dir": "reports/economic_evolution/economic_production_0024",
+    "result_name": "economic_production_result.json",
+    "result_schema": "hydra_economic_production_result_v1",
+    "controller_source_change_required": false,
+    "worker_count": 3,
+    "asynchronous_evidence_writer_count": 1,
+    "resume_from_checkpoint": true,
+    "continuous_waves": true,
+    "compact_checkpoint_each_batch": true
+  },
+  "multiplicity": {
+    "prior_global_N_trials": 492099,
+    "prospective_comparisons": 20000,
+    "campaign_specific_inflation": 1.5,
+    "reserved_delta_trials": 30000,
+    "expected_global_N_trials_after_reservation": 522099,
+    "reservation_required_before_outcome_access": true,
+    "proof_window_consumed": false
+  },
+  "budget": {
+    "actual_spend_usd": 87.84738838672598,
+    "hard_cap_usd": 125.0,
+    "remaining_usd": 37.15261161327402,
+    "new_data_purchase_count": 0
+  },
+  "governance": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "proof_window_consumption_allowed": false,
+    "status_inheritance_allowed": false,
+    "single_authoritative_mission_writer": true,
+    "single_persistent_controller": true
+  },
+  "manifest_hash": "TO_BE_COMPUTED"
+}

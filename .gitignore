@@ -25,6 +25,7 @@ reports/mission/*_latest_summary.md
 reports/mission/governance_kernel_status.md
 reports/mission/governance_protected_manifest.json
 reports/gate_aware_remediation/dossiers/*.json
+reports/economic_evolution/**/recovery/*.jsonl
 !reports/
 !reports/*.md
 .DS_Store

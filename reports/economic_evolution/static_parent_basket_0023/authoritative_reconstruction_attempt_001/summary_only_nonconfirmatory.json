@@ -1,0 +1,71 @@
+{
+  "actual": {
+    "hash": "543088fc1b28ba9da72c6e218bc18cd035735ddbd9ca4549693aa3ad10e07163",
+    "value": {
+      "bound_count": 48,
+      "elapsed_seconds": 0.5239256450440735,
+      "execution_cache_hit_count": 1,
+      "execution_cache_hit_rate": 0.020833333333333332,
+      "policy": {
+        "calibration_end_exclusive": "2023-07-01",
+        "calibration_start": "2023-01-01",
+        "maximum_approximate_drawdown": 4500,
+        "maximum_best_positive_event_share": 0.4,
+        "micro_batch_size": 64,
+        "minimum_opportunities": 20,
+        "require_nonnegative_half": false,
+        "screen_end_exclusive": "2024-01-01",
+        "screen_start": "2023-07-01",
+        "stress_cost_multiplier": 1.5
+      },
+      "proposal_count": 48,
+      "screens_per_second": 89.70738585633899,
+      "structural_rejection_count": 0,
+      "survivor_count": 48,
+      "unique_execution_path_count": 47
+    }
+  },
+  "attempt": 1,
+  "broker_connections": 0,
+  "campaign_id": "hydra_economic_evolution_static_parent_basket_0023",
+  "evidence_status": "SUMMARY_ONLY_NONCONFIRMATORY",
+  "expected": {
+    "hash": "773dd7f0240fb63e1a0f9e3d6db8adf9a2f783463244ad3ba7b9330ca8840121",
+    "value": {
+      "bound_count": 48,
+      "elapsed_seconds": 0.3514667240087874,
+      "execution_cache_hit_count": 1,
+      "execution_cache_hit_rate": 0.020833333333333332,
+      "policy": {
+        "calibration_end_exclusive": "2023-07-01",
+        "calibration_start": "2023-01-01",
+        "maximum_approximate_drawdown": 4500,
+        "maximum_best_positive_event_share": 0.4,
+        "micro_batch_size": 64,
+        "minimum_opportunities": 20,
+        "require_nonnegative_half": false,
+        "screen_end_exclusive": "2024-01-01",
+        "screen_start": "2023-07-01",
+        "stress_cost_multiplier": 1.5
+      },
+      "proposal_count": 48,
+      "screens_per_second": 133.72531960899065,
+      "structural_rejection_count": 0,
+      "survivor_count": 48,
+      "unique_execution_path_count": 47
+    }
+  },
+  "failure": "material reconciliation failure: source_component_screen_summary",
+  "failure_type": "ReconciliationError",
+  "historical_summaries_preserved": true,
+  "material_check": "source_component_screen_summary",
+  "maximum_attempts": 1,
+  "nested_selector_0023_allowed": false,
+  "new_data_purchase_count": 0,
+  "orders": 0,
+  "q4_access_delta": 0,
+  "retry_allowed": false,
+  "schema": "hydra_campaign_0023_recovery_failure_v1",
+  "source_commit": "51201969cf0a9abf055fa03ca1104604e8efb497",
+  "traceback": "Traceback (most recent call last):\n  File \"/root/hydra-bot-0023-recovery/scripts/recover_campaign_0023_evidence_once.py\", line 863, in execute\n    assert_exact(\n  File \"/root/hydra-bot-0023-recovery/scripts/recover_campaign_0023_evidence_once.py\", line 148, in assert_exact\n    raise ReconciliationError(\nReconciliationError: material reconciliation failure: source_component_screen_summary\n"
+}

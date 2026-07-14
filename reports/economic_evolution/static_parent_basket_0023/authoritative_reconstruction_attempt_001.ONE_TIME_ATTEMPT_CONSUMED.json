@@ -1,0 +1,9 @@
+{
+  "attempt": 1,
+  "campaign_id": "hydra_economic_evolution_static_parent_basket_0023",
+  "maximum_attempts": 1,
+  "pid": 1649933,
+  "schema": "hydra_campaign_0023_recovery_attempt_marker_v1",
+  "source_commit": "51201969cf0a9abf055fa03ca1104604e8efb497",
+  "started_at_utc": "2026-07-14T11:12:44.029558+00:00"
+}
