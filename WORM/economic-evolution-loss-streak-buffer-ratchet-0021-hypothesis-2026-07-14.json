@@ -1,0 +1,92 @@
+{
+  "schema": "hydra_loss_streak_buffer_ratchet_hypothesis_worm_v1",
+  "campaign_id": "hydra_economic_evolution_loss_streak_buffer_ratchet_0021",
+  "class_id": "LOSS_STREAK_BUFFER_RATCHET_V1",
+  "recorded_at_utc": "2026-07-14T06:46:26Z",
+  "immutable": true,
+  "development_only": true,
+  "outcomes_seen_before_freeze": false,
+  "economic_hypothesis": "The frozen campaign-0018 accounts have positive normal and stressed expectancy and safe MLL paths but insufficient target velocity. Deploying four units only when both the MLL buffer and realized account progress are favorable, while ratcheting risk back to one unit after losing sequences or large daily gains, can increase cost-stressed target progress without creating a material MLL or consistency deterioration.",
+  "who_pays_and_why_it_may_persist": "The market edge remains solely in the frozen underlying sleeves. This class tests whether a deterministic past-only account-state overlay can deploy that existing edge more efficiently while preserving risk after adverse sequences; it does not claim a new market anomaly and Combine probability remains a downstream diagnostic rather than primary fitness.",
+  "source_0020_verdict": {
+    "path": "WORM/economic-evolution-elite-robustness-0020-verdict-2026-07-14.json",
+    "file_sha256": "1ee66e8bdcc26fdc0fa184739f2876cf3b09444e3c5fa56e986e00ae62ad2c75",
+    "semantic_hash": "ddd77bce61922daa3efaf70805f9d35648193716cbb8026102eeac712e099560",
+    "tag": "worm/economic-evolution-elite-robustness-0020-verdict-2026-07-14",
+    "commit": "096b46d5e4a83af5d0ffc687695fb27aad3061ab"
+  },
+  "source_elite_manifest": "WORM/economic-evolution-0018-canonical-elites-2026-07-14.json",
+  "source_elite_manifest_hash": "50513e46769bb507697d5c3017cd2d7c73768dd77b38e9e37c2e3ed00536f9b0",
+  "source_elite_manifest_file_sha256": "a096007999a1abb1dc207ecadf61bb610e7bacf53b3ed861566727aa5bb852a4",
+  "class_level_feedback_only": {
+    "observed_class": "BUFFER_ACCELERATION",
+    "observed_policy_count": 25,
+    "observed_positive_parent_delta_count": 16,
+    "observed_median_stressed_parent_delta_usd": 339.1412500012666,
+    "parameter_level_feedback_used": false,
+    "exact_0020_candidate_reused": false,
+    "status_inheritance": false
+  },
+  "frozen_structure": {
+    "proposal_count": 512,
+    "deep_policy_count": 512,
+    "unique_parent_policy_count": 49,
+    "episode_start_count": 48,
+    "normal_and_stressed_real_episode_count": 49152,
+    "high_risk_units": 4,
+    "derisked_units": 1,
+    "loss_streak_derisk_after": [1, 2, 3],
+    "middle_zone_concurrency": [1, 2],
+    "minimum_realized_progress_for_high_risk_usd": [0.0, 1000.0, 2000.0],
+    "daily_gain_derisk_threshold_usd": [1000.0, 2000.0],
+    "component_membership_changed": false,
+    "new_candidate_ids": true,
+    "matched_parent_evaluated_once_and_cached": true,
+    "identical_episode_starts_within_pair": true,
+    "blind_parameter_grid": false
+  },
+  "compute_allocation": {
+    "elite_exploitation": 0.7,
+    "distinct_mechanisms": 0.2,
+    "validation": 0.1
+  },
+  "family_tripwire": {
+    "minimum_policy_pairs": 512,
+    "minimum_informative_pairs": 128,
+    "minimum_stressed_median_net_delta_usd": 50.0,
+    "minimum_stressed_target_progress_delta": 0.005,
+    "maximum_stressed_mll_breach_rate_deterioration": 0.05,
+    "maximum_stressed_consistency_pass_rate_deterioration": 0.05,
+    "maximum_NULL_RATIO": 0.8,
+    "exact_one_sided_binomial_p_value": 0.05
+  },
+  "account_research_gate": {
+    "minimum_normal_median_net_usd": 0.0,
+    "minimum_stressed_median_net_usd": 0.0,
+    "minimum_median_target_progress": 0.6,
+    "maximum_mll_breach_rate": 0.2,
+    "minimum_consistency_pass_rate": 0.5,
+    "minimum_positive_temporal_blocks": 2,
+    "maximum_positive_component_share": 0.65,
+    "minimum_matched_control_net_delta_usd": 50.0,
+    "minimum_combine_path_pass_count": 1,
+    "combine_is_diagnostic_only": true
+  },
+  "ranking_policy": {
+    "tier_1": "positive normal and stressed expectancy, valid deterministic execution, bounded MLL, no impossible fill",
+    "tier_2": "parent uplift in stressed net and target progress, lower and median progress, consistency, MLL buffer, normal and stressed Combine diagnostics",
+    "tier_3": "funded and payout simulation only after a serious class-level survivor exists",
+    "combine_pass_probability_is_not_primary_fitness": true
+  },
+  "falsification_rule": "If this homogeneous matched-parent class fails its preregistered family tripwire, tombstone exactly LOSS_STREAK_BUFFER_RATCHET_V1 and pivot the 20 percent distinct-mechanism lane. If it passes but no account gate survives, launch a structurally distinct past-only account-state response. Do not rescue exact 0020 candidates or tune this manifest after results.",
+  "proof_policy": {
+    "proof_window_consumed": false,
+    "Q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "protected_holdout_access_allowed": false,
+    "paper_shadow_ready_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "CONTRE": "This successor is motivated by a favorable mutation-family diagnostic observed in the same selected development data. Even a green paired tripwire can therefore establish only a development research survivor; later untouched confirmation remains mandatory, and the 48 starts do not create 48 independent temporal regimes.",
+  "hypothesis_hash": "0cc5dc08dd8d3a57af852224b2d41120bc62a9ae2f82ddb3be2bd28a3672926b"
+}
