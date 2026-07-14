@@ -1,0 +1,200 @@
+{
+  "schema": "hydra_opportunity_density_preregistration_v1",
+  "campaign_id": "hydra_economic_evolution_opportunity_density_0013",
+  "class_id": "CONTEMPORANEOUS_CROSS_MARKET_OPPORTUNITY_DENSITY_V1",
+  "issued_at_utc": "2026-07-14T02:02:00Z",
+  "source_commit": "cdc1c22",
+  "parent_terminal_verdict": {
+    "path": "WORM/economic-evolution-account-timeline-0012-verdict-2026-07-14.json",
+    "file_sha256": "5baf8a668145257ccd0a62b1c40b9da1d8e586d558c97434961190085bf382fd",
+    "semantic_hash": "88ba7bcc4472019858d917b378ceafd535f413d918aa9bce3c7cd0bfb5b9960d",
+    "tag": "worm/economic-evolution-account-timeline-0012-verdict-2026-07-14",
+    "commit": "7a32217"
+  },
+  "hypothesis_worm": {
+    "path": "WORM/economic-evolution-opportunity-density-0013-hypothesis-2026-07-14.json",
+    "file_sha256": "6a5349006f36ac9fa74d083c0c497cea0b2152add63ae421c488e87ffdad2638",
+    "semantic_hash": "b77995f1203168cdca4d0fb8af0c3f52353de68516c01bc03dd4cc11bfcbe318",
+    "tag": "worm/economic-evolution-opportunity-density-0013-hypothesis-2026-07-14",
+    "commit": "8957a18"
+  },
+  "economic_hypothesis": "When independent sleeves on different futures markets emit same-direction opportunities within the preceding 60 minutes, the shared participation state should raise target velocity enough to justify exactly two risk units over a degree-matched confirmation-source permutation.",
+  "source_seed": {
+    "path": "reports/economic_evolution/seeds/persistent_0003_successor_seed.json",
+    "file_sha256": "daac8b794890974279e4e9db1a05f1d1fce4c62719ab2238a244b4e101ac9b87",
+    "archive_hash": "af0c59861eaf274e131cca400ae3c3957a73c90004833051f776ccfb2e93c460",
+    "development_only": true,
+    "proof_window_consumed": false,
+    "status_inheritance": false
+  },
+  "structural_population": {
+    "policy_pair_count": 512,
+    "component_count": 48,
+    "sleeves_per_policy": [6, 7, 8],
+    "minimum_markets": 3,
+    "minimum_sessions": 3,
+    "minimum_component_events": 20,
+    "component_must_be_positive_after_normal_costs": true,
+    "component_must_be_positive_after_1_5x_costs": true,
+    "same_ordered_membership_within_pair": true,
+    "same_component_event_paths_within_pair": true,
+    "same_graph_degree_multiset_within_pair": true,
+    "same_graph_source_multiset_within_pair": true,
+    "same_account_limits_within_pair": true,
+    "past_only_signal_observations": true,
+    "real_confirmation_graph": "SAME_DIRECTION_DIFFERENT_MARKET_SOURCES",
+    "matched_control_confirmation_graph": "DETERMINISTIC_DEGREE_MATCHED_SOURCE_PERMUTATION",
+    "continuous_weight_optimization": false,
+    "new_market_outcomes_seen_during_generation": false,
+    "same_class_0012_rescue": false,
+    "policy_manifest_hash": "d6da71b743c9d56c773e2bc8c1cfccb7e35358b0ca6e1c5caf32afa46ded2c5e"
+  },
+  "opportunity_density_policy": {
+    "trailing_signal_window_ns": 3600000000000,
+    "minimum_confirming_different_markets": 1,
+    "base_risk_units": 1,
+    "confirmed_risk_units": 2,
+    "daily_loss_guard": 1000.0,
+    "daily_profit_lock": 2250.0,
+    "critical_buffer": 750.0,
+    "maximum_simultaneous_positions": 3,
+    "maximum_mini_equivalent": 15
+  },
+  "signal_availability": {
+    "decision_timestamp_less_than_or_equal_to_current_decision": true,
+    "future_signal_or_outcome_available": false,
+    "different_market_required_for_confirmation": true,
+    "same_direction_required": true,
+    "trailing_window_minutes": 60
+  },
+  "data": {
+    "role": "DEVELOPMENT_ONLY_Q4_EXCLUDED",
+    "period": ["2023-01-01", "2024-10-01"],
+    "feature_source_fingerprint": "1c773f5044f0f9c3bc50e67003b93a7c35ecaf8c505879fd1c20d6d03edada6c",
+    "contract_map_sha256": "401ca56ebab606c3eb2cb6ed244204f264ed2894c2ee0eb2310998f9244fda",
+    "feature_manifest_sha256": {
+      "CL": "6255364f0334adc3f2de3b0be6e48a2bc6a6a693b4660b3ff5ac9ff83551d1b9",
+      "ES": "3d3865d6b0ccd37aafb9010025f46a8e858fac085f71ddd186ae55dbbe50859f",
+      "GC": "d0f78468ff58ade16dbd870cc24624c29578c9b557aa81d865ef3d32f557bc89",
+      "NQ": "4528e06bb4ff00aa4de14fcb90d0029a8dde5faf757e734f3b1f03118fd1dff9",
+      "RTY": "648f5707627d7ce7a0d4c56704f3a42f8dc1e7bd33d10e3a3417f9500080b5ca",
+      "YM": "ec3367ec31dacf216f2235479b5148493a615fc2c579187fe583a20b1acf2908"
+    }
+  },
+  "cheap_screen_policy": {
+    "calibration_start": "2023-01-01",
+    "calibration_end_exclusive": "2023-07-01",
+    "screen_start": "2023-07-01",
+    "screen_end_exclusive": "2024-01-01",
+    "minimum_opportunities": 20,
+    "stress_cost_multiplier": 1.5,
+    "maximum_best_positive_event_share": 0.4,
+    "maximum_approximate_drawdown": 4500,
+    "require_nonnegative_half": false,
+    "micro_batch_size": 64
+  },
+  "exact_replay_period": ["2023-07-01", "2024-10-01"],
+  "rolling_episode_policy": {
+    "maximum_starts": 24,
+    "minimum_spacing_sessions": 5,
+    "minimum_observation_sessions": 60,
+    "maximum_duration_sessions": 60,
+    "regime_balanced": true
+  },
+  "family_tripwire": {
+    "minimum_policy_pairs": 512,
+    "minimum_informative_pairs": 256,
+    "minimum_stressed_median_net_delta_usd": 100.0,
+    "minimum_stressed_target_progress_delta": 0.01,
+    "maximum_stressed_mll_breach_rate_deterioration": 0.02,
+    "maximum_stressed_consistency_pass_rate_deterioration": 0.05,
+    "maximum_NULL_RATIO": 0.8,
+    "exact_one_sided_binomial_p_value": 0.05,
+    "raw_counts_and_exact_binomial_p_value_required": true,
+    "thresholds_changed_after_outcome": false
+  },
+  "account_gate": {
+    "minimum_episode_starts": 24,
+    "minimum_normal_median_net_usd": 0.0,
+    "minimum_stressed_median_net_usd": 0.0,
+    "minimum_median_target_progress": 0.15,
+    "maximum_mll_breach_rate": 0.2,
+    "minimum_consistency_pass_rate": 0.5,
+    "minimum_positive_temporal_blocks": 2,
+    "maximum_positive_component_share": 0.65,
+    "minimum_matched_control_net_delta_usd": 100.0,
+    "minimum_combine_path_pass_count": 1,
+    "combine_is_diagnostic_only": true
+  },
+  "compute": {
+    "host_cpu_count": 4,
+    "exact_worker_count": 3,
+    "account_worker_count": 3,
+    "single_authoritative_mission_writer_count": 1,
+    "forked_workers_read_only": true,
+    "artifact_writer_is_not_registry_writer": true,
+    "report_in_hot_loop": false
+  },
+  "multiplicity": {
+    "prior_global_N_trials": 471303,
+    "prospective_comparisons": 2400,
+    "campaign_specific_inflation": 1.5,
+    "reserved_delta_trials": 3600,
+    "expected_global_N_trials_after_reservation": 474903,
+    "reservation_required_before_feature_or_outcome_access": true,
+    "global_history_retained": true,
+    "expensive_DSR_BH_executed": false
+  },
+  "budget": {
+    "llm_actual_spend_usd": 0.0,
+    "llm_phase_max_usd": 72.0,
+    "actual_spend_usd": 87.84738838672598,
+    "hard_cap_usd": 125.0,
+    "remaining_usd": 37.15261161327402,
+    "new_data_purchase_count": 0
+  },
+  "statuses": {
+    "development_only": true,
+    "validated_allowed": false,
+    "pre_holdout_ready_allowed": false,
+    "paper_shadow_ready_allowed": false,
+    "status_inheritance": false
+  },
+  "governance": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "network_access_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "implementation_files": {
+    "hydra/economic_evolution/account_opportunity_density.py": "27c64bab664b25c90752c20e250b923e25f5e6170c6760ed86ab33b8650378b7",
+    "hydra/economic_evolution/account_opportunity_density_evaluation.py": "06d347683a1627b1f2c6fed537e9cd4f7bd049b2dac082c9286fca8a0d68f53c",
+    "hydra/economic_evolution/role_aware_account.py": "0aa8031dd32dfed36c91eb45ac553a9341f588368bf52dcf2ac9b3fd855757c7",
+    "hydra/economic_evolution/role_aware_account_evaluation.py": "fc434fa41bce57843585fc0c829579cb3657807ea3939c22ba6d07febb905f1e",
+    "hydra/economic_evolution/schema.py": "398f86f4a4a60e0adff54b69083718ca27a1217854fff587b47e0f3ab42f5fb0",
+    "hydra/account_policy/schema.py": "f893f884bd175260a34217905ad67e3321258e5dfd4993b7629b9932de15804a",
+    "hydra/account_policy/basket.py": "3ceaeddc45448f11a82cb54860d379708696e742526ee062f029149d2a932a81",
+    "hydra/account_policy/router.py": "82c83168b695fcf128665a3220bb4d952e926b2bca136399cbade01a25847280",
+    "hydra/economic_evolution/account_evaluation.py": "844422dd235eec18d22166acca06b7542f1da200f8e20efb6eebc93464719c5f",
+    "hydra/research/economic_evolution_account_timeline_campaign.py": "593c43ea2b954712518b7336c0bf9c81b016f65674ab70ee6f2c3e0dd7cdccb5",
+    "hydra/research/economic_evolution_opportunity_density_campaign.py": "618ffd29684d501f879d5a5e561ec5b3b5305c3d87450ba61bd2171f5fbf8eca",
+    "scripts/run_economic_evolution_opportunity_density_campaign.py": "d33a06cea45c9769317ae1c6fc47c9f4b966b77d995d3039a74cdaf9c3113ac3"
+  },
+  "runtime_manifest": {
+    "engine": "opportunity_density_v1",
+    "runner": "scripts/run_economic_evolution_opportunity_density_campaign.py",
+    "output_dir": "reports/economic_evolution/opportunity_density_0013",
+    "result_name": "opportunity_density_result.json",
+    "terminal_policy": "AUTO_TOMBSTONE_EXACT_CLASS_OR_QUEUE_SURVIVORS",
+    "controller_source_change_required": false
+  },
+  "reporting": {
+    "predeployment_regression_floor": 1007,
+    "burned_window_count": 1,
+    "full_contract_schema_required": true,
+    "CONTRE_required": true
+  },
+  "falsification_rule": "If the opportunity-density family fails any frozen tripwire condition, tombstone the exact class without threshold or parameter rescue and let the manifest runtime select a structurally different successor.",
+  "CONTRE": "Different markets can share beta and clock-time clustering, so apparent confirmation may remain common geometry. Only paired uplift over the degree-matched graph permutation supports this exact class.",
+  "preregistration_hash": "01a4a574ce249bb62c959e17e6bd09cb0674358c728c161ebc6410fe5583fd79"
+}
