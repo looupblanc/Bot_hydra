@@ -1,0 +1,51 @@
+{
+  "schema": "hydra_manifest_campaign_terminal_verdict_v1",
+  "campaign_id": "hydra_economic_evolution_opportunity_density_0013",
+  "class_id": "CONTEMPORANEOUS_CROSS_MARKET_OPPORTUNITY_DENSITY_V1",
+  "issued_at_utc": "2026-07-14T02:58:27Z",
+  "source_commit": "66d8423",
+  "result": {
+    "path": "reports/economic_evolution/opportunity_density_0013/opportunity_density_result.json",
+    "file_sha256": "4c363aa19611553d7858b1e806361a69739c73d35c81e1050837ac0e1be28802",
+    "semantic_hash": "5b25b55cdc982849ee447993652bf60192dcf157a778afba0193fe546dca8ceb",
+    "scientific_status": "INSUFFICIENT_ACCOUNT_PAIR_INFORMATION",
+    "real_policy_count": 512,
+    "matched_control_count": 512,
+    "rolling_combine_episode_count": 12288,
+    "policies_with_combine_pass": 0,
+    "median_target_progress": 0.10897888888892258,
+    "maximum_target_progress": 0.5201405555556314,
+    "median_mll_breach_rate": 0.0,
+    "maximum_mll_breach_rate": 0.0,
+    "real_win_count": 82,
+    "matched_control_win_count": 35,
+    "informative_pair_count": 117,
+    "median_stressed_net_delta_usd": 14.928125000100408,
+    "median_stressed_target_progress_delta": 0.0016586805555667203
+  },
+  "terminal_decision": {
+    "verdict": "EXACT_CLASS_TOMBSTONED",
+    "dominant_failure": "INSUFFICIENT_TARGET_VELOCITY_AND_ACCOUNT_PAIR_INFORMATION",
+    "parameter_rescue_allowed": false,
+    "same_class_relaunch_allowed": false,
+    "status_inheritance_allowed": false,
+    "next_action": "PREREGISTER_STRUCTURALLY_DISTINCT_COVERAGE_UNION_ACCOUNT_0014"
+  },
+  "graveyard": {
+    "receipt_path": "reports/economic_evolution/opportunity_density_0013/graveyard_append_receipt.json",
+    "receipt_file_sha256": "3dbcd4251d25c5b116e12712d22301faffc33815881ceac224804a6efe6b9b11",
+    "class_signature_hash": "aff511a0044527a1141f8310287261568ff1dbd20cbaf34cb15bdea593465bac",
+    "class_signature_count": 101,
+    "indexed_object_count": 118228,
+    "parameter_level_feedback": false
+  },
+  "governance": {
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "proof_windows_consumed": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "CONTRE": "The family showed statistically unusual pair wins, but the preregistered economic uplift and information-count gates failed. Tombstoning may discard a weak interaction, yet retaining it would confuse statistical frequency with operational materiality.",
+  "verdict_hash": "c6f23d139e012db02d66037bc0d224aec839c2d0a288f82f02b0cc86d5fca671"
+}
