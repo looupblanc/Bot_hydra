@@ -111,3 +111,20 @@ def test_generic_manifest_rejects_runner_hash_drift(tmp_path: Path) -> None:
     (tmp_path / "scripts/runner.py").write_text("raise SystemExit(1)\n")
     with pytest.raises(EconomicEvolutionRuntimeError):
         _load_and_verify_generic_account_pair_preregistration(path)
+
+
+def test_generic_manifest_accepts_frozen_confirmation_horizon(
+    tmp_path: Path,
+) -> None:
+    path, config = _frozen_config(tmp_path)
+    config["rolling_episode_policy"] = {"maximum_starts": 48}
+    config["preregistration_hash"] = stable_hash(
+        {
+            key: value
+            for key, value in config.items()
+            if key != "preregistration_hash"
+        }
+    )
+    _write_json(path, config)
+    loaded = _load_and_verify_generic_account_pair_preregistration(path)
+    assert loaded["rolling_episode_policy"]["maximum_starts"] == 48

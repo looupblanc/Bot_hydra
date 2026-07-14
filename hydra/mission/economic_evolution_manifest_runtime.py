@@ -740,9 +740,14 @@ def _load_and_verify_generic_account_pair_preregistration(path: Path) -> dict[st
         or claimed != stable_hash(payload)
         or not str(config.get("campaign_id") or "")
         or not str(config.get("class_id") or "")
-        or int(structural.get("policy_pair_count", -1)) != 512
-        or int(config.get("rolling_episode_policy", {}).get("maximum_starts", -1))
-        != 24
+        or not 1 <= int(structural.get("policy_pair_count", -1)) <= 512
+        or not 24
+        <= int(
+            config.get("rolling_episode_policy", {}).get(
+                "maximum_starts", -1
+            )
+        )
+        <= 60
         or int(compute.get("account_worker_count", -1)) != 3
         or runtime.get("engine") != "manifest_account_pair_v1"
         or not str(runtime.get("result_schema") or "")
