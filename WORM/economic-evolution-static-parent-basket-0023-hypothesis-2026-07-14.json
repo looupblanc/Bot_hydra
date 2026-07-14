@@ -1,0 +1,86 @@
+{
+  "schema": "hydra_static_parent_basket_hypothesis_worm_v1",
+  "campaign_id": "hydra_economic_evolution_static_parent_basket_0023",
+  "class_id": "FROZEN_PARENT_STATIC_ACCOUNT_SYNTHESIS_V1",
+  "recorded_at_utc": "2026-07-14T08:30:00Z",
+  "immutable": true,
+  "development_only": true,
+  "outcomes_seen_before_freeze": false,
+  "economic_hypothesis": "A bounded consensus assembly of behaviorally distinct frozen 0018 parent sleeves can improve stressed account target velocity over its exact lead parent without changing any underlying market signal or degrading shared-account MLL safety.",
+  "who_pays_and_why_it_may_persist": "The payer hypotheses remain those of the already frozen sleeves. The new causal claim is limited to account complementarity: non-synchronous opportunity paths may use otherwise idle shared risk capacity more efficiently than any one parent while same-market conflicts and the shared contract limit remain enforced.",
+  "source_parent_bank": {
+    "path": "WORM/economic-evolution-static-parent-bank-0023-2026-07-14.json",
+    "file_sha256": "ba13be2f3c63154834c24c35b04df88f40dbe77501a9c15aa0ad8ceea191e793",
+    "semantic_hash": "e581cb30c20237d6fe4c515a76627695c85bf4027620fc49c6646dd9bc1014b9",
+    "tag": "worm/economic-evolution-static-parent-bank-0023-2026-07-14",
+    "commit": "506a084307d61144837260e9b296e4a740132419"
+  },
+  "source_elite_manifest": "WORM/economic-evolution-0018-canonical-elites-2026-07-14.json",
+  "source_elite_manifest_hash": "50513e46769bb507697d5c3017cd2d7c73768dd77b38e9e37c2e3ed00536f9b0",
+  "frozen_structure": {
+    "parent_bank_size": 9,
+    "primary_0018_parent_count": 8,
+    "preserved_0020_anchor_count": 1,
+    "source_parent_count_per_basket": [2, 3, 4],
+    "component_count_per_basket": [10, 11, 12, 13],
+    "bounded_priority_rotations_per_structure": 4,
+    "proposal_count": 512,
+    "deep_policy_pair_count": 128,
+    "episode_start_count": 48,
+    "normal_and_stressed_real_episode_count": 12288,
+    "entry_signals_changed": false,
+    "exit_signals_changed": false,
+    "feature_generation_changed": false,
+    "lead_account_risk_rules_changed": false,
+    "same_market_conflict_policy_changed": false,
+    "maximum_contract_limit_changed": false,
+    "status_inheritance": false
+  },
+  "matched_control": {
+    "definition": "Exact unchanged lead parent selected deterministically from each source-parent group by frozen stressed target progress.",
+    "identical_episode_starts": true,
+    "identical_costs": true,
+    "identical_data": true,
+    "controls_evaluated_once_and_cached": true
+  },
+  "family_tripwire": {
+    "minimum_policy_pairs": 128,
+    "minimum_informative_pairs": 32,
+    "minimum_stressed_median_net_delta_usd": 100.0,
+    "minimum_stressed_target_progress_delta": 0.01,
+    "maximum_stressed_mll_breach_rate_deterioration": 0.05,
+    "maximum_stressed_consistency_pass_rate_deterioration": 0.05,
+    "maximum_NULL_RATIO": 0.8,
+    "exact_one_sided_binomial_p_value": 0.05,
+    "at_least_two_source_parent_lineages_required_for_interpretation": true,
+    "at_least_three_positive_temporal_blocks_required_for_interpretation": true,
+    "thresholds_changed_after_outcome": false
+  },
+  "account_research_gate": {
+    "minimum_normal_median_net_usd": 0.0,
+    "minimum_stressed_median_net_usd": 0.0,
+    "minimum_stressed_median_target_progress": 0.7,
+    "maximum_mll_breach_rate": 0.1,
+    "minimum_consistency_pass_rate": 0.75,
+    "minimum_positive_temporal_blocks": 3,
+    "maximum_positive_component_share": 0.65,
+    "minimum_stressed_lead_parent_net_delta_usd": 100.0,
+    "minimum_stressed_combine_path_pass_count": 1,
+    "combine_is_diagnostic_only": true
+  },
+  "family_terminal_policy": {
+    "green": "Freeze exact survivors and preregister a separate 96-start confirmation campaign without retuning.",
+    "weak": "Preserve informative baskets without promotion and change mechanism.",
+    "falsified": "Tombstone the exact static synthesis class and do not rescue it with priority or membership neighbours."
+  },
+  "proof_policy": {
+    "proof_window_consumed": false,
+    "Q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "protected_holdout_access_allowed": false,
+    "paper_shadow_ready_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "CONTRE": "The component bank and anchor were selected after observing development outcomes, and consensus component voting can inherit common directional beta. Even a green family result remains selected development evidence and requires a separately frozen confirmation campaign.",
+  "hypothesis_hash": "5625d3880e2336d7245f7e708eda123d931d7ff14003a3b98372d18ff9692a71"
+}
