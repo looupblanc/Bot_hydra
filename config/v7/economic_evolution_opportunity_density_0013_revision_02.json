@@ -1,0 +1,50 @@
+{
+  "schema": "hydra_opportunity_density_preregistration_revision_v1",
+  "revision_id": "hydra_economic_evolution_opportunity_density_0013_revision_02",
+  "issued_at_utc": "2026-07-14T02:20:15Z",
+  "source_commit": "f9b26af6b35a53c390300460fa40e4389535caae",
+  "reason": "Pre-outcome fingerprint transcription repair: bind the exact existing contract-map SHA-256. The original WORM omitted one hexadecimal character. No data content, policy, costs, starts, thresholds, gates, or outcomes changed.",
+  "supersedes_revision": {
+    "path": "config/v7/economic_evolution_opportunity_density_0013_revision_01.json",
+    "file_sha256": "7026086d8322994ab3afa0fada84fa2ce352aab94d2dc9b8ad0e4cb4bd9d93c3",
+    "revision_hash": "e17aeef8ee3d1db1a1e9dfce8589027e0d332f51df2d15a8d72912dcb47e3043"
+  },
+  "base_preregistration": {
+    "path": "config/v7/economic_evolution_opportunity_density_0013.json",
+    "file_sha256": "add8f76980cb81a323b36c2d37b5e50797dc9747df859e4d6055423b25c191be",
+    "semantic_hash": "01a4a574ce249bb62c959e17e6bd09cb0674358c728c161ebc6410fe5583fd79"
+  },
+  "implementation_files": {
+    "hydra/economic_evolution/account_opportunity_density.py": "5f610ce48068ba3c03cb4b4147df54ddc844dd0824e55e33a9fe65cf235e6530",
+    "hydra/economic_evolution/account_opportunity_density_evaluation.py": "06d347683a1627b1f2c6fed537e9cd4f7bd049b2dac082c9286fca8a0d68f53c",
+    "hydra/economic_evolution/role_aware_account.py": "0aa8031dd32dfed36c91eb45ac553a9341f588368bf52dcf2ac9b3fd855757c7",
+    "hydra/economic_evolution/role_aware_account_evaluation.py": "fc434fa41bce57843585fc0c829579cb3657807ea3939c22ba6d07febb905f1e",
+    "hydra/economic_evolution/schema.py": "398f86f4a4a60e0adff54b69083718ca27a1217854fff587b47e0f3ab42f5fb0",
+    "hydra/account_policy/schema.py": "f893f884bd175260a34217905ad67e3321258e5dfd4993b7629b9932de15804a",
+    "hydra/account_policy/basket.py": "3ceaeddc45448f11a82cb54860d379708696e742526ee062f029149d2a932a81",
+    "hydra/account_policy/router.py": "82c83168b695fcf128665a3220bb4d952e926b2bca136399cbade01a25847280",
+    "hydra/economic_evolution/account_evaluation.py": "844422dd235eec18d22166acca06b7542f1da200f8e20efb6eebc93464719c5f",
+    "hydra/research/economic_evolution_account_timeline_campaign.py": "593c43ea2b954712518b7336c0bf9c81b016f65674ab70ee6f2c3e0dd7cdccb5",
+    "hydra/research/economic_evolution_opportunity_density_campaign.py": "e47e0b36f43b0a6fc285b7655784217f4bdc413ebc146f3f99175b0bfd30dad0",
+    "scripts/run_economic_evolution_opportunity_density_campaign.py": "d33a06cea45c9769317ae1c6fc47c9f4b966b77d995d3039a74cdaf9c3113ac3"
+  },
+  "contract_map_sha256_correction": {
+    "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+    "from": "401ca56ebab606c3eb2cb6ed244204f264ed2894c2ee0eb2310998f9244fda",
+    "to": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda"
+  },
+  "effective_preregistration_hash": "bea928729488ca0dac229caafad01ea2c8084d8ed3974afbbefb8418ae2fce68",
+  "scientific_changes": false,
+  "policy_changes": false,
+  "data_content_changes": false,
+  "cost_changes": false,
+  "start_changes": false,
+  "gate_changes": false,
+  "outcomes_seen": false,
+  "q4_access_delta": 0,
+  "new_data_purchase_count": 0,
+  "broker_connections": 0,
+  "orders": 0,
+  "CONTRE": "Correcting the fingerprint only makes the frozen campaign executable; it provides no evidence that the opportunity-density mechanism is economic.",
+  "revision_hash": "f2eb05a51d751bcfbc20d0c271fb10d840ec15eb3da6b2f788e55861f01b98b4"
+}
