@@ -12,7 +12,10 @@ from hydra.research.economic_evolution_opportunity_density_campaign import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CONFIG = ROOT / "config/v7/economic_evolution_opportunity_density_0013.json"
+CONFIG = (
+    ROOT
+    / "config/v7/economic_evolution_opportunity_density_0013_revision_01.json"
+)
 SEED = ROOT / "reports/economic_evolution/seeds/persistent_0003_successor_seed.json"
 
 
