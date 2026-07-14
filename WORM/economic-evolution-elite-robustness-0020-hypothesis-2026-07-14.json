@@ -1,0 +1,108 @@
+{
+  "schema": "hydra_elite_robustness_hypothesis_worm_v1",
+  "campaign_id": "hydra_economic_evolution_elite_robustness_0020",
+  "class_id": "GREEN_0018_ELITE_ROBUSTNESS_EVOLUTION_V1",
+  "recorded_at_utc": "2026-07-14T00:00:00+00:00",
+  "immutable": true,
+  "development_only": true,
+  "outcomes_seen_before_freeze": false,
+  "economic_hypothesis": "The frozen campaign-0018 accounts are profitable and MLL-safe but opportunity-limited; replacing low marginal sleeves, changing deterministic conflict priority, and deploying bounded extra risk only in favorable account-buffer states can increase stress-resilient target velocity without creating a material MLL deterioration.",
+  "who_pays_and_why_it_may_persist": "The underlying frozen sleeves retain their preregistered market mechanisms; this campaign tests whether unused opportunity coverage and account-path coordination recover return that was previously lost to inactive sessions, low-value turnover, and conflict ordering rather than inventing a new market anomaly.",
+  "source_elite_manifest": "WORM/economic-evolution-0018-canonical-elites-2026-07-14.json",
+  "source_elite_manifest_hash": "50513e46769bb507697d5c3017cd2d7c73768dd77b38e9e37c2e3ed00536f9b0",
+  "source_elite_manifest_file_sha256": "a096007999a1abb1dc207ecadf61bb610e7bacf53b3ed861566727aa5bb852a4",
+  "source_episode_evidence_sha256": "f06ff779748929623787e508b9792373564b8983a0aca9c6942f5412fd2706eb",
+  "known_0018_passers": [
+    "complementary_sleeve_real_2a948b1b1da0eb1d07fee597",
+    "complementary_sleeve_real_809f0a9b27a86e8e11425c3d",
+    "complementary_sleeve_real_934e27cdf113699834aa9443",
+    "complementary_sleeve_real_fafd24a65de4840ff79bb047"
+  ],
+  "preobserved_failure_decomposition": {
+    "episode_count": 144,
+    "target_reached": 4,
+    "insufficient_profit_velocity": 124,
+    "excessive_profit_concentration": 10,
+    "profitable_but_too_slow": 6,
+    "mll_breach": 0
+  },
+  "compute_allocation": {
+    "elite_exploitation": 0.7,
+    "distinct_mechanisms": 0.2,
+    "validation": 0.1
+  },
+  "proposal_policy": {
+    "proposal_count": 10240,
+    "minimum_unique_children_screened": 2048,
+    "deep_policy_count": 200,
+    "episode_start_count": 48,
+    "normal_and_stressed_real_episode_count": 19200,
+    "mutation_quotas": {
+      "OPPORTUNITY_REPLACEMENT": 5120,
+      "MARKET_SESSION_DIVERSIFIER": 2048,
+      "PRIORITY_REALLOCATION": 2048,
+      "COST_PRUNE": 384,
+      "BUFFER_ACCELERATION": 384,
+      "PROFIT_SMOOTHER": 256
+    },
+    "deep_evaluation_quotas": {
+      "OPPORTUNITY_REPLACEMENT": 80,
+      "MARKET_SESSION_DIVERSIFIER": 40,
+      "PRIORITY_REALLOCATION": 30,
+      "BUFFER_ACCELERATION": 25,
+      "PROFIT_SMOOTHER": 15,
+      "COST_PRUNE": 10
+    },
+    "blind_parameter_grid": false,
+    "new_candidate_ids": true,
+    "status_inheritance": false,
+    "matched_parent_evaluated_once_and_cached": true,
+    "identical_episode_starts_within_pair": true
+  },
+  "cheap_screen_policy": {
+    "positive_approximate_normal_economics": true,
+    "positive_approximate_stressed_economics": true,
+    "minimum_component_event_sum": 200,
+    "maximum_positive_component_share": 0.4,
+    "maximum_mini_equivalent": 15
+  },
+  "family_tripwire": {
+    "minimum_policy_pairs": 200,
+    "minimum_informative_pairs": 80,
+    "minimum_stressed_median_net_delta_usd": 50.0,
+    "minimum_stressed_target_progress_delta": 0.005,
+    "maximum_stressed_mll_breach_rate_deterioration": 0.05,
+    "maximum_stressed_consistency_pass_rate_deterioration": 0.05,
+    "maximum_NULL_RATIO": 0.8,
+    "exact_one_sided_binomial_p_value": 0.05
+  },
+  "account_research_gate": {
+    "minimum_normal_median_net_usd": 0.0,
+    "minimum_stressed_median_net_usd": 0.0,
+    "minimum_median_target_progress": 0.55,
+    "maximum_mll_breach_rate": 0.2,
+    "minimum_consistency_pass_rate": 0.5,
+    "minimum_positive_temporal_blocks": 2,
+    "maximum_positive_component_share": 0.65,
+    "minimum_matched_control_net_delta_usd": 50.0,
+    "minimum_combine_path_pass_count": 1,
+    "combine_is_diagnostic_only": true
+  },
+  "ranking_policy": {
+    "tier_1": "positive normal and stressed expectancy, no compliance failure, bounded MLL, no impossible fill",
+    "tier_2": "pass probability, lower and median target progress, target velocity, consistency, MLL buffer, normal and stressed costs",
+    "tier_3": "funded and payout simulation only after a serious Combine survivor exists",
+    "combine_pass_probability_is_not_primary_fitness": true
+  },
+  "falsification_rule": "If the matched-parent family tripwire is not green, tombstone only this exact robustness class and move the 20 percent distinct-mechanism lane forward. If green but no child improves the account gate, allocate generation 0021 to the dominant measured failure. Do not tune this manifest after results.",
+  "proof_policy": {
+    "proof_window_consumed": false,
+    "Q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "protected_holdout_access_allowed": false,
+    "paper_shadow_ready_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "CONTRE": "All children reuse development outcomes that selected the 0018 elite cohort, so even a green matched-parent result is development evidence with selection bias. A pass increase may also come from bounded sizing rather than a new edge; only stress resilience, broad start coverage, parent uplift, and later untouched confirmation can support promotion.",
+  "hypothesis_hash": "06dfa85cccea2e1bf41190430915cb1e5c436cb75619bf559ad1915ef15f6657"
+}
