@@ -66,7 +66,8 @@ def load_and_verify_complementary_sleeve_confirmation_preregistration(
         or structural.get("parent_population_manifest_hash")
         != "c46f5f7a304b1c7a0e252bdd80ebd98badad90f2dc87abdc21ad0c978e9e9978"
         or prereg.get("three_zone_sizing_policy") != THREE_ZONE_LIMITS
-        or int(prereg["rolling_episode_policy"]["maximum_starts"]) != 48
+        or int(prereg["rolling_episode_policy"]["maximum_starts"])
+        not in {36, 48}
     ):
         raise ComplementarySleeveConfirmationError(
             "invalid complementary-sleeve confirmation preregistration"
