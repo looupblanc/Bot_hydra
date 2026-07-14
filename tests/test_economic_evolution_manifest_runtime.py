@@ -14,10 +14,14 @@ from hydra.mission.economic_evolution_account_timeline_runtime import (
 )
 from hydra.mission.economic_evolution_manifest_runtime import (
     EconomicEvolutionManifestRuntime,
+    _load_and_verify_generic_account_pair_preregistration,
     load_and_verify_manifest_queue,
 )
 from hydra.research.economic_evolution_account_timeline_campaign import (
     load_and_verify_account_timeline_result,
+)
+from hydra.research.economic_evolution_coverage_union_campaign import (
+    load_and_verify_coverage_union_preregistration,
 )
 
 
@@ -76,4 +80,20 @@ def test_production_queue_does_not_authorize_proof_data_or_orders() -> None:
         "new_data_purchase_allowed": False,
         "broker_or_orders_allowed": False,
         "proof_window_consumption_allowed": False,
+    }
+
+
+def test_0014_is_a_frozen_generic_account_pair_campaign() -> None:
+    path = ROOT / "config/v7/economic_evolution_coverage_union_0014.json"
+    campaign = load_and_verify_coverage_union_preregistration(path)
+    generic = _load_and_verify_generic_account_pair_preregistration(path)
+    assert campaign == generic
+    assert campaign["structural_population"]["policy_pair_count"] == 512
+    assert campaign["rolling_episode_policy"]["maximum_starts"] == 24
+    assert campaign["runtime_manifest"]["engine"] == "manifest_account_pair_v1"
+    assert campaign["governance"] == {
+        "q4_access_allowed": False,
+        "new_data_purchase_allowed": False,
+        "network_access_allowed": False,
+        "broker_or_orders_allowed": False,
     }
