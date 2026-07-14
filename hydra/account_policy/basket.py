@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from collections import Counter, defaultdict, deque
+from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from typing import Any, Mapping, Sequence
 
@@ -204,9 +204,6 @@ def run_shared_account_episode(
     allocation: list[dict[str, Any]] = []
     daily_path: list[dict[str, Any]] = []
     shared_loss_days = 0
-    shadow_outcomes: dict[str, deque[float]] = {
-        component_id: deque(maxlen=12) for component_id in selected_ids
-    }
 
     for elapsed, day in enumerate(episode_days, start=1):
         open_positions: dict[str, _OpenPosition] = {}
@@ -242,9 +239,6 @@ def run_shared_account_episode(
             actions.sort(key=lambda item: (item[0], item[1], item[3]))
         for timestamp, kind, _priority, event_id, trade in actions:
             if kind == 0:
-                shadow_outcomes[trade.component_id].append(
-                    _normalized_completed_outcome(trade)
-                )
                 position = open_positions.pop(event_id, None)
                 if position is None:
                     continue
@@ -304,10 +298,6 @@ def run_shared_account_episode(
                     - (balance - float(rules.combine_starting_balance)),
                 ),
                 open_exposures=exposures,
-                shadow_component_outcomes=tuple(
-                    (component_id, tuple(values))
-                    for component_id, values in sorted(shadow_outcomes.items())
-                ),
             )
             intent = EntryIntent(
                 event_id=event.event_id,
@@ -536,15 +526,6 @@ def run_shared_account_episode(
         risk_allocation_path=tuple(allocation),
         daily_path=tuple(daily_path),
     )
-
-
-def _normalized_completed_outcome(trade: RoutedTrade) -> float:
-    """Normalize a completed virtual fill without exposing it before exit."""
-
-    event = trade.event
-    risk_scale = max(abs(float(event.worst_unrealized_pnl)), 100.0)
-    value = float(event.net_pnl) / risk_scale
-    return max(-3.0, min(3.0, value))
 
 
 def evaluate_account_policy(

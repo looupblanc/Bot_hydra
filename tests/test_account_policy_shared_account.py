@@ -4,7 +4,6 @@ from dataclasses import replace
 
 import pytest
 
-import hydra.account_policy.basket as basket_module
 from hydra.account_policy.basket import (
     RoutedTrade,
     evaluate_account_policy,
@@ -16,7 +15,6 @@ from hydra.account_policy.router import (
     AccountDecisionState,
     EntryIntent,
     OpenExposure,
-    RoutingDecision,
     route_entry,
 )
 from hydra.account_policy.schema import BasketPolicy, ControllerPolicy
@@ -233,39 +231,6 @@ def test_router_interface_cannot_receive_future_trade_outcome() -> None:
     )
     assert "net_pnl" not in EntryIntent.__dataclass_fields__
     assert "worst_unrealized_pnl" not in EntryIntent.__dataclass_fields__
-
-
-def test_shadow_timeline_exposes_outcome_only_after_frozen_exit(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    first = _trade("left", "ES", 0, 200.0, duration=10)
-    second = _trade("left", "ES", 0, -300.0, start_offset=20, duration=10)
-    observed: list[tuple[int, dict[str, tuple[float, ...]]]] = []
-
-    def capture(
-        intent: EntryIntent,
-        state: AccountDecisionState,
-        *,
-        policy: ControllerPolicy,
-    ) -> RoutingDecision:
-        observed.append((intent.decision_ns, state.shadow_outcome_map))
-        return RoutingDecision(False, 0, 0.0, "TEST_BLOCK", policy.controller_id)
-
-    monkeypatch.setattr(basket_module, "route_entry", capture)
-    result = run_shared_account_episode(
-        {"left": (first, second)},
-        list(range(30)),
-        basket=_basket("left"),
-        controller=_controller("left"),
-        start_day=0,
-        maximum_duration_days=30,
-    )
-
-    assert result.accepted_events == 0
-    assert len(observed) == 2
-    assert observed[0][1] == {"left": ()}
-    assert observed[1][1] == {"left": (2.0,)}
-    assert -3.0 not in observed[1][1]["left"]
 
 
 def test_parent_static_and_controller_share_identical_episode_starts() -> None:

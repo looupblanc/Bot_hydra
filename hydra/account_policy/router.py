@@ -44,13 +44,6 @@ class AccountDecisionState:
     consecutive_losing_days: int
     remaining_target: float
     open_exposures: tuple[OpenExposure, ...]
-    shadow_component_outcomes: tuple[tuple[str, tuple[float, ...]], ...] = ()
-
-    @property
-    def shadow_outcome_map(self) -> dict[str, tuple[float, ...]]:
-        """Completed, normalized virtual outcomes available at decision time."""
-
-        return dict(self.shadow_component_outcomes)
 
 
 @dataclass(frozen=True, slots=True)
