@@ -391,7 +391,7 @@ def _stage(
 
 def _project_root(path: Path) -> Path:
     for parent in (path.parent, *path.parents):
-        if (parent / "pyproject.toml").is_file():
+        if (parent / "MISSION_CONTRACT.md").is_file():
             return parent
     raise CoverageUnionCampaignError("project root not found")
 

@@ -20,7 +20,7 @@ def _write_json(path: Path, value: dict[str, object]) -> None:
 
 
 def _frozen_config(tmp_path: Path) -> tuple[Path, dict[str, object]]:
-    (tmp_path / "pyproject.toml").write_text("[project]\nname='runtime-test'\n")
+    (tmp_path / "MISSION_CONTRACT.md").write_text("test contract\n")
     runner = tmp_path / "scripts/runner.py"
     runner.parent.mkdir()
     runner.write_text("raise SystemExit(0)\n")

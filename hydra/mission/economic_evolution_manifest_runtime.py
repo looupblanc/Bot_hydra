@@ -791,7 +791,7 @@ def _load_and_verify_generic_account_pair_result(
 
 def _project_root(path: Path) -> Path:
     for parent in (path.parent, *path.parents):
-        if (parent / "pyproject.toml").is_file():
+        if (parent / "MISSION_CONTRACT.md").is_file():
             return parent
     raise EconomicEvolutionRuntimeError("project root not found")
 
