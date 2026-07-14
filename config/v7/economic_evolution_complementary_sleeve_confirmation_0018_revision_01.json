@@ -1,0 +1,223 @@
+{
+  "schema": "hydra_manifest_account_pair_preregistration_v1",
+  "campaign_id": "hydra_economic_evolution_complementary_sleeve_confirmation_0018",
+  "class_id": "GREEN_COMPLEMENTARY_SLEEVE_48_START_CONFIRMATION_V1",
+  "issued_at_utc": "2026-07-14T05:09:00Z",
+  "source_commit": "405202ea679e917a21981bbedfab952f74952cf3",
+  "parent_terminal_verdict": {
+    "path": "WORM/economic-evolution-complementary-sleeve-0017-verdict-2026-07-14.json",
+    "file_sha256": "bd8f79720238a28f05b9933b5618ab99f1c336e88289f81cdabf098c2b96c460",
+    "semantic_hash": "f927308882d61c071915fb9bfa5b4481dded43d6880c658f7a0c1a4a4ad9ac0d",
+    "tag": "worm/economic-evolution-complementary-sleeve-0017-verdict-2026-07-14",
+    "commit": "7e99239496b8ceee7f341d718bdd549473ed0b37"
+  },
+  "hypothesis_worm": {
+    "path": "WORM/economic-evolution-complementary-sleeve-confirmation-0018-hypothesis-revision-01-2026-07-14.json",
+    "file_sha256": "1cff3a92df98529868cd974558a5ec6297a09df182781809317b6caf8945eee3",
+    "semantic_hash": "168405f4971911ca255510913009ddad19ac34f43cdfa723a129089aca27215e",
+    "tag": "worm/economic-evolution-complementary-sleeve-confirmation-0018-hypothesis-revision-01-2026-07-14",
+    "commit": "8e03d8ee612054fb90985bd89639503562d2b733"
+  },
+  "economic_hypothesis": "The exact green 0017 policy population contains one normal-cost Combine path and broad positive stressed economics; replaying the unchanged identities on the maximum 36 preregistered block-aware starts feasible at five-session spacing should determine whether the path repeats without selecting new memberships, weights, thresholds, horizons, or denser starts after outcomes.",
+  "source_seed": {
+    "path": "reports/economic_evolution/seeds/persistent_0003_successor_seed.json",
+    "file_sha256": "daac8b794890974279e4e9db1a05f1d1fce4c62719ab2238a244b4e101ac9b87",
+    "archive_hash": "af0c59861eaf274e131cca400ae3c3957a73c90004833051f776ccfb2e93c460",
+    "development_only": true,
+    "proof_window_consumed": false,
+    "status_inheritance": false
+  },
+  "structural_population": {
+    "policy_pair_count": 512,
+    "component_count": 48,
+    "minimum_component_events": 20,
+    "parent_campaign_id": "hydra_economic_evolution_three_zone_sizing_0016",
+    "sizing_parent_campaign_id": "hydra_economic_evolution_buffer_sizing_0015",
+    "coverage_parent_campaign_id": "hydra_economic_evolution_coverage_union_0014",
+    "parent_population_manifest_hash": "c46f5f7a304b1c7a0e252bdd80ebd98badad90f2dc87abdc21ad0c978e9e9978",
+    "one_new_child_per_parent": true,
+    "unique_parent_edge_count": 512,
+    "exactly_one_unused_sleeve_added": true,
+    "distinct_added_sleeve_count": 5,
+    "real_membership_size_range": [
+      11,
+      13
+    ],
+    "control_is_parent_leave_added_sleeve_out": true,
+    "real_high_zone_risk_units": 3,
+    "control_high_zone_risk_units": 3,
+    "middle_zone_risk_units": 2,
+    "base_zone_risk_units": 1,
+    "same_parent_signal_paths_within_pair": true,
+    "same_account_limits_within_pair": true,
+    "continuous_weight_optimization": false,
+    "threshold_grid": false,
+    "new_market_outcomes_seen_during_generation": false,
+    "status_inheritance": false,
+    "policy_manifest_hash": "6c84ababed3f8c331cbb3e892eca211510e4cc10b3b163a7701395d083835781",
+    "population_campaign_id": "hydra_economic_evolution_complementary_sleeve_0017",
+    "new_candidate_ids": false,
+    "outcomes_seen_during_generation": false
+  },
+  "three_zone_sizing_policy": {
+    "daily_loss_guard": 1000.0,
+    "daily_profit_lock": 2250.0,
+    "critical_buffer": 750.0,
+    "high_zone_buffer": 3750.0,
+    "high_zone_remaining_target": 4500.0,
+    "middle_zone_buffer": 3000.0,
+    "middle_zone_remaining_target": 2250.0,
+    "middle_risk_units": 2,
+    "maximum_simultaneous_positions": 3,
+    "maximum_mini_equivalent": 15
+  },
+  "data": {
+    "role": "DEVELOPMENT_ONLY_Q4_EXCLUDED",
+    "period": [
+      "2023-01-01",
+      "2024-10-01"
+    ],
+    "feature_source_fingerprint": "1c773f5044f0f9c3bc50e67003b93a7c35ecaf8c505879fd1c20d6d03edada6c",
+    "contract_map_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+    "feature_manifest_sha256": {
+      "CL": "6255364f0334adc3f2de3b0be6e48a2bc6a6a693b4660b3ff5ac9ff83551d1b9",
+      "ES": "3d3865d6b0ccd37aafb9010025f46a8e858fac085f71ddd186ae55dbbe50859f",
+      "GC": "d0f78468ff58ade16dbd870cc24624c29578c9b557aa81d865ef3d32f557bc89",
+      "NQ": "4528e06bb4ff00aa4de14fcb90d0029a8dde5faf757e734f3b1f03118fd1dff9",
+      "RTY": "648f5707627d7ce7a0d4c56704f3a42f8dc1e7bd33d10e3a3417f9500080b5ca",
+      "YM": "ec3367ec31dacf216f2235479b5148493a615fc2c579187fe583a20b1acf2908"
+    }
+  },
+  "cheap_screen_policy": {
+    "calibration_start": "2023-01-01",
+    "calibration_end_exclusive": "2023-07-01",
+    "screen_start": "2023-07-01",
+    "screen_end_exclusive": "2024-01-01",
+    "minimum_opportunities": 20,
+    "stress_cost_multiplier": 1.5,
+    "maximum_best_positive_event_share": 0.4,
+    "maximum_approximate_drawdown": 4500,
+    "require_nonnegative_half": false,
+    "micro_batch_size": 64
+  },
+  "exact_replay_period": [
+    "2023-07-01",
+    "2024-10-01"
+  ],
+  "rolling_episode_policy": {
+    "maximum_starts": 36,
+    "minimum_spacing_sessions": 5,
+    "minimum_observation_sessions": 60,
+    "maximum_duration_sessions": 60,
+    "regime_balanced": true
+  },
+  "family_tripwire": {
+    "minimum_policy_pairs": 512,
+    "minimum_informative_pairs": 256,
+    "minimum_stressed_median_net_delta_usd": 100.0,
+    "minimum_stressed_target_progress_delta": 0.01,
+    "maximum_stressed_mll_breach_rate_deterioration": 0.1,
+    "maximum_stressed_consistency_pass_rate_deterioration": 0.05,
+    "maximum_NULL_RATIO": 0.8,
+    "exact_one_sided_binomial_p_value": 0.05,
+    "raw_counts_and_exact_binomial_p_value_required": true,
+    "thresholds_changed_after_outcome": false
+  },
+  "account_gate": {
+    "minimum_episode_starts": 24,
+    "minimum_normal_median_net_usd": 0.0,
+    "minimum_stressed_median_net_usd": 0.0,
+    "minimum_median_target_progress": 0.4,
+    "maximum_mll_breach_rate": 0.2,
+    "minimum_consistency_pass_rate": 0.5,
+    "minimum_positive_temporal_blocks": 2,
+    "maximum_positive_component_share": 0.65,
+    "minimum_matched_control_net_delta_usd": 100.0,
+    "minimum_combine_path_pass_count": 1,
+    "combine_is_diagnostic_only": true
+  },
+  "compute": {
+    "host_cpu_count": 4,
+    "exact_worker_count": 3,
+    "account_worker_count": 3,
+    "single_authoritative_mission_writer_count": 1,
+    "forked_workers_read_only": true,
+    "artifact_writer_is_not_registry_writer": true,
+    "report_in_hot_loop": false
+  },
+  "multiplicity": {
+    "prior_global_N_trials": 489303,
+    "prospective_comparisons": 512,
+    "campaign_specific_inflation": 1.5,
+    "reserved_delta_trials": 768,
+    "expected_global_N_trials_after_reservation": 490071,
+    "reservation_required_before_feature_or_outcome_access": true,
+    "global_history_retained": true,
+    "expensive_DSR_BH_executed": false
+  },
+  "budget": {
+    "llm_actual_spend_usd": 0.0,
+    "llm_phase_max_usd": 72.0,
+    "actual_spend_usd": 87.84738838672598,
+    "hard_cap_usd": 125.0,
+    "remaining_usd": 37.15261161327402,
+    "new_data_purchase_count": 0
+  },
+  "statuses": {
+    "development_only": true,
+    "validated_allowed": false,
+    "pre_holdout_ready_allowed": false,
+    "paper_shadow_ready_allowed": false,
+    "status_inheritance": false
+  },
+  "governance": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "network_access_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "implementation_files": {
+    "hydra/account_policy/basket.py": "3ceaeddc45448f11a82cb54860d379708696e742526ee062f029149d2a932a81",
+    "hydra/account_policy/router.py": "82c83168b695fcf128665a3220bb4d952e926b2bca136399cbade01a25847280",
+    "hydra/account_policy/schema.py": "f893f884bd175260a34217905ad67e3321258e5dfd4993b7629b9932de15804a",
+    "hydra/economic_evolution/account_complementary_sleeve.py": "52ea8e9e574bf2f222e9aa29f1fe961496ee3664f171bfde669c30bd159eedfb",
+    "hydra/economic_evolution/account_complementary_sleeve_evaluation.py": "4fa2aa50ce38c22ec343ee7bd5d32c3add06d3bb61be87ebdb871c69b1036622",
+    "hydra/economic_evolution/account_coverage_sizing.py": "d49ec7ab0948364c54dcd90fde0f412ea4647621c0acbf05bcaf2da8a9306c4a",
+    "hydra/economic_evolution/account_coverage_sizing_evaluation.py": "dff5327a82e58b9f51546733d97cad88f9c83b94f64f8515c0e2c1605d00553a",
+    "hydra/economic_evolution/account_coverage_three_zone.py": "fceaefb13979b434a471d6e2c98f5ba1c37700da3fb657f198b49e2c7a0e1979",
+    "hydra/economic_evolution/account_coverage_three_zone_evaluation.py": "c51c73f79da1fdd5c99af94f4c2c58faab8f47a2efef7b568f98446003935757",
+    "hydra/economic_evolution/account_coverage_union.py": "69d7698668d341376ac8d08c392c9a10e63b8f1d33445b738c67fefd2a3d0617",
+    "hydra/economic_evolution/account_coverage_union_evaluation.py": "e594fce44ecdc503e956f9bb81966b393c6091185fb5310395ba6222226c4c6d",
+    "hydra/economic_evolution/account_evaluation.py": "844422dd235eec18d22166acca06b7542f1da200f8e20efb6eebc93464719c5f",
+    "hydra/economic_evolution/role_aware_account.py": "0aa8031dd32dfed36c91eb45ac553a9341f588368bf52dcf2ac9b3fd855757c7",
+    "hydra/economic_evolution/role_aware_account_evaluation.py": "fc434fa41bce57843585fc0c829579cb3657807ea3939c22ba6d07febb905f1e",
+    "hydra/economic_evolution/schema.py": "398f86f4a4a60e0adff54b69083718ca27a1217854fff587b47e0f3ab42f5fb0",
+    "hydra/research/economic_evolution_account_timeline_campaign.py": "593c43ea2b954712518b7336c0bf9c81b016f65674ab70ee6f2c3e0dd7cdccb5",
+    "hydra/research/economic_evolution_complementary_sleeve_confirmation_campaign.py": "2da128056d8b0923aeb74a28c18238f03f501715275b509708c10ed2c00a7c23",
+    "hydra/research/economic_evolution_coverage_three_zone_campaign.py": "48e5434023c5b8c6c023ab36a5b46fee6a8e24ebc2491a56c8d784011a5ad88c",
+    "scripts/run_economic_evolution_complementary_sleeve_confirmation_campaign.py": "47f4a3d98de79526b8b7b81970163d9e5af7be7aee20f315e08a1b2f1e997da2"
+  },
+  "runtime_manifest": {
+    "engine": "manifest_account_pair_v1",
+    "runner": "scripts/run_economic_evolution_complementary_sleeve_confirmation_campaign.py",
+    "output_dir": "reports/economic_evolution/complementary_sleeve_confirmation_0018",
+    "result_name": "coverage_three_zone_result.json",
+    "result_schema": "hydra_coverage_three_zone_result_v1",
+    "terminal_policy": "QUEUE_TARGETED_CHILDREN_OR_FREEZE_NONREPEATABLE_PATH",
+    "controller_source_change_required": false
+  },
+  "reporting": {
+    "burned_window_count": 1,
+    "CONTRE_required": true,
+    "detailed_report_count": 1
+  },
+  "falsification_rule": "If the unchanged population produces no stressed Combine path on the frozen 36 feasible starts, retain the green incremental sleeve evidence but classify the observed 0017 pass as nonrepeatable and move to the preregistered exit-representation mutation without retuning this population.",
+  "CONTRE": "Thirty-six starts remain overlapping development evidence and provide fewer effective independent blocks than raw starts. Repeated paths would justify targeted research only, not validation or shadow admission.",
+  "supersedes": {
+    "path": "config/v7/economic_evolution_complementary_sleeve_confirmation_0018.json",
+    "file_sha256": "3466c3fe4e92ef2bbee949fe20db34b8f84f836ad75296041183ffbc27553f9c",
+    "semantic_hash": "b84c0d404492fe2dd289f6627d585c140f2b0272b4e79cb2688bf41350b41782",
+    "reason": "Pre-result feasibility correction from 48 to the maximum 36 starts supported by 240 common sessions at the unchanged five-session spacing and 60-session observation requirement. Three attempts stopped before account evaluation."
+  },
+  "preregistration_hash": "0659eef89fb5c0531b1c81b8635714b57369410dc03aa7c492799cfc99f45821"
+}
