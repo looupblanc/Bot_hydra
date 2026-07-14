@@ -1,0 +1,36 @@
+{
+  "schema": "hydra_manifest_campaign_queue_v1",
+  "queue_id": "hydra_economic_evolution_production_queue_0001",
+  "issued_at_utc": "2026-07-14T02:05:00Z",
+  "entries": [
+    {
+      "ordinal": 13,
+      "campaign_id": "hydra_economic_evolution_opportunity_density_0013",
+      "engine": "opportunity_density_v1",
+      "preregistration_path": "config/v7/economic_evolution_opportunity_density_0013.json",
+      "preregistration_file_sha256": "add8f76980cb81a323b36c2d37b5e50797dc9747df859e4d6055423b25c191be",
+      "preregistration_semantic_hash": "01a4a574ce249bb62c959e17e6bd09cb0674358c728c161ebc6410fe5583fd79",
+      "worm_tag": "worm/economic-evolution-opportunity-density-0013-2026-07-14",
+      "worm_commit": "845f82e",
+      "enabled": true
+    }
+  ],
+  "runtime_policy": {
+    "reload_queue_each_controller_step": true,
+    "controller_source_change_for_new_manifest": false,
+    "single_active_campaign": true,
+    "single_authoritative_mission_writer": true,
+    "maximum_deterministic_attempts": 3,
+    "auto_tombstone_failed_exact_class": true,
+    "full_repository_regression_per_campaign": false,
+    "targeted_integrity_checks_per_campaign": true
+  },
+  "governance": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "broker_or_orders_allowed": false,
+    "proof_window_consumption_allowed": false
+  },
+  "CONTRE": "A manifest runtime reduces engineering latency but cannot make a new economic representation valid by configuration alone. New engine plugins still require targeted code review while ordinary campaigns on an existing engine require only a frozen manifest.",
+  "queue_hash": "11d68faaea26da0bf1434fe16f35b217fe4e88fb619fc52b49c4c1d9d07a1112"
+}
