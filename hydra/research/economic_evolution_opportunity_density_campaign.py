@@ -295,6 +295,23 @@ def _resolve_preregistration_revision(
     effective["issued_at_utc"] = str(revision["issued_at_utc"])
     effective["source_commit"] = str(revision["source_commit"])
     effective["implementation_files"] = dict(revision["implementation_files"])
+    fingerprint_correction = revision.get("contract_map_sha256_correction")
+    if fingerprint_correction is not None:
+        data = dict(effective["data"])
+        if data.get("contract_map_sha256") != fingerprint_correction.get("from"):
+            raise OpportunityDensityCampaignError(
+                "density contract-map correction does not match the base"
+            )
+        corrected = str(fingerprint_correction.get("to") or "")
+        contract_map_path = root / str(
+            fingerprint_correction.get("path") or ""
+        )
+        if _sha256(contract_map_path) != corrected:
+            raise OpportunityDensityCampaignError(
+                "density corrected contract-map checksum drift"
+            )
+        data["contract_map_sha256"] = corrected
+        effective["data"] = data
     effective["preregistration_hash"] = str(
         revision["effective_preregistration_hash"]
     )
