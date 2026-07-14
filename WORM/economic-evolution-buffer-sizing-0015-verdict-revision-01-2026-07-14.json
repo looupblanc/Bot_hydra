@@ -1,0 +1,54 @@
+{
+  "schema": "hydra_economic_evolution_terminal_verdict_v1",
+  "verdict_id": "hydra_economic_evolution_buffer_sizing_0015_verdict_revision_01",
+  "issued_at_utc": "2026-07-14T04:19:00Z",
+  "campaign_id": "hydra_economic_evolution_buffer_sizing_0015",
+  "class_id": "GREEN_COVERAGE_UNION_BUFFER_AWARE_SIZING_V1",
+  "source_commit": "6f453d07183afac68f1fd24e2d65bf02a17a3c3e",
+  "supersedes": {
+    "path": "WORM/economic-evolution-buffer-sizing-0015-verdict-2026-07-14.json",
+    "file_sha256": "fb398176219277143a28ba723601590190c422ba9bedb93ece77751ba6d7ed50",
+    "reason": "The immutable predecessor used a pretty-printed JSON digest instead of the canonical stable_hash method. Its scientific content is unchanged and it remains preserved for audit."
+  },
+  "result": {
+    "path": "reports/economic_evolution/coverage_sizing_0015/coverage_sizing_result.json",
+    "file_sha256": "d6e64cba025fee757cf80947736cd4a8e6ef29f2f5b6c3c13a8404451e91b0bd",
+    "semantic_hash": "5c01a53df4ceaf08fc691442ce02ea53e83a8e776a10f4d81d99a424e1506d50",
+    "real_policy_count": 512,
+    "matched_control_policy_count": 512,
+    "rolling_combine_episode_count": 12288,
+    "normal_positive_policy_count": 512,
+    "stressed_positive_policy_count": 511,
+    "policies_with_at_least_one_combine_pass": 0,
+    "median_target_progress": 0.31359972222210003,
+    "maximum_target_progress": 0.8768499999998862,
+    "median_stressed_target_progress": 0.2683026388888967,
+    "median_mll_breach_rate": 0.0,
+    "maximum_mll_breach_rate": 0.0,
+    "account_research_candidate_count": 302,
+    "real_win_count": 482,
+    "matched_control_win_count": 1,
+    "tie_count": 29,
+    "NULL_RATIO": 0.002074688796680498,
+    "exact_one_sided_binomial_p_value": 1.9380164361372417e-143,
+    "family_tripwire": "GREEN_NULL_ADJUSTED_BASELINE"
+  },
+  "terminal_decision": {
+    "verdict": "GREEN_TARGET_VELOCITY_IMPROVED_NO_COMBINE_PASS",
+    "exact_class_tombstoned": false,
+    "same_version_mutation_allowed": false,
+    "three_zone_sizing_research_allowed": true,
+    "status_inheritance_allowed": false,
+    "next_action": "PREREGISTER_THREE_ZONE_COVERAGE_SIZING_0016"
+  },
+  "governance": {
+    "development_only": true,
+    "proof_windows_consumed": 0,
+    "new_data_purchase_count": 0,
+    "q4_access_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "CONTRE": "The two-zone sizing doubled median progress without any MLL breach, but zero completed paths means it remains a development trajectory rather than a Combine candidate. A third zone could simply create leverage-driven tail risk.",
+  "verdict_hash": "756d175c461f1bae94aa353854760d3c3c38508c47272a119dbaefbba86eabc8"
+}
