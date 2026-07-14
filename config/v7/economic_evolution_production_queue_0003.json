@@ -1,0 +1,41 @@
+{
+  "schema": "hydra_manifest_campaign_queue_v1",
+  "queue_id": "hydra_economic_evolution_production_queue_0003",
+  "issued_at_utc": "2026-07-14T02:21:31Z",
+  "supersedes": {
+    "path": "config/v7/economic_evolution_production_queue_0002.json",
+    "file_sha256": "e1923e63382d41af36122974512fecb738117a647c521b7c24cd70c2a7ec85f4",
+    "semantic_hash": "f74dbc3139794e972b9c9e553f10e81cc74df544d7b21dee09deb143acc53808"
+  },
+  "entries": [
+    {
+      "ordinal": 13,
+      "campaign_id": "hydra_economic_evolution_opportunity_density_0013",
+      "engine": "opportunity_density_v1",
+      "preregistration_path": "config/v7/economic_evolution_opportunity_density_0013_revision_02.json",
+      "preregistration_file_sha256": "ca788c9bf598f087fc6b5d342a63901a94dea23236e07bed38da484b2a4a0074",
+      "preregistration_semantic_hash": "bea928729488ca0dac229caafad01ea2c8084d8ed3974afbbefb8418ae2fce68",
+      "worm_tag": "worm/economic-evolution-opportunity-density-0013-revision-02-2026-07-14",
+      "worm_commit": "9016ab59fae75a36ff6c301ac40ef4b9e0990cfb",
+      "enabled": true
+    }
+  ],
+  "runtime_policy": {
+    "reload_queue_each_controller_step": true,
+    "controller_source_change_for_new_manifest": false,
+    "single_active_campaign": true,
+    "single_authoritative_mission_writer": true,
+    "maximum_deterministic_attempts": 3,
+    "auto_tombstone_failed_exact_class": true,
+    "full_repository_regression_per_campaign": false,
+    "targeted_integrity_checks_per_campaign": true
+  },
+  "governance": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "broker_or_orders_allowed": false,
+    "proof_window_consumption_allowed": false
+  },
+  "CONTRE": "The second queue revision repairs only an exact local data fingerprint. It contributes no economic evidence and cannot alter the frozen family tripwire.",
+  "queue_hash": "af31b005e851d0d17bb7c38314520e736b05ac6475ba24841d645fe072d987b1"
+}
