@@ -47,7 +47,6 @@ def _policy(
 
 
 def _state(
-    histories: dict[str, tuple[float, ...]] | None = None,
     **updates: object,
 ) -> AccountDecisionState:
     values: dict[str, object] = {
@@ -58,9 +57,6 @@ def _state(
         "consecutive_losing_days": 0,
         "remaining_target": 9_000.0,
         "open_exposures": (),
-        "shadow_component_outcomes": tuple(
-            sorted((histories or {}).items())
-        ),
     }
     values.update(updates)
     return AccountDecisionState(**values)  # type: ignore[arg-type]
@@ -93,18 +89,21 @@ def test_router_uses_only_completed_timeline_and_symmetric_thresholds() -> None:
     policy = _policy("real")
     warmup = route_account_timeline_entry(
         _intent(),
-        _state({COMPONENTS[0]: (0.8, 0.7, 0.6)}),
+        _state(),
         policy=policy,
+        completed_outcomes={COMPONENTS[0]: (0.8, 0.7, 0.6)},
     )
     positive = route_account_timeline_entry(
         _intent(),
-        _state({COMPONENTS[0]: (0.8, 0.7, 0.6, 0.5)}),
+        _state(),
         policy=policy,
+        completed_outcomes={COMPONENTS[0]: (0.8, 0.7, 0.6, 0.5)},
     )
     negative = route_account_timeline_entry(
         _intent(),
-        _state({COMPONENTS[0]: (-0.8, -0.7, -0.6, -0.5)}),
+        _state(),
         policy=policy,
+        completed_outcomes={COMPONENTS[0]: (-0.8, -0.7, -0.6, -0.5)},
     )
 
     assert warmup.allow and warmup.quantity == 1
@@ -129,12 +128,16 @@ def test_matched_control_reads_permuted_history_not_role_labels() -> None:
     }
 
     assert route_account_timeline_entry(
-        _intent(COMPONENTS[0]), _state(histories), policy=pair.real_policy
+        _intent(COMPONENTS[0]),
+        _state(),
+        policy=pair.real_policy,
+        completed_outcomes=histories,
     ).allow
     assert not route_account_timeline_entry(
         _intent(COMPONENTS[0]),
-        _state(histories),
+        _state(),
         policy=pair.matched_control_policy,
+        completed_outcomes=histories,
     ).allow
     assert "component_roles" not in pair.real_policy.to_dict()
 

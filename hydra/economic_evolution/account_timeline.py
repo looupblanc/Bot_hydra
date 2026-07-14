@@ -224,6 +224,7 @@ def route_account_timeline_entry(
     state: AccountDecisionState,
     *,
     policy: AccountTimelinePolicy,
+    completed_outcomes: Mapping[str, Sequence[float]],
 ) -> RoutingDecision:
     if intent.component_id not in policy.score_sources:
         return _blocked(policy, "COMPONENT_NOT_IN_FROZEN_MEMBERSHIP")
@@ -242,7 +243,7 @@ def route_account_timeline_entry(
         return _blocked(policy, "SAME_MARKET_CONFLICT")
 
     source_id = policy.score_sources[intent.component_id]
-    completed = state.shadow_outcome_map.get(source_id, ())
+    completed = completed_outcomes.get(source_id, ())
     recent = completed[-policy.lookback_completed_outcomes :]
     units = 1
     reason = "TIMELINE_WARMUP"
