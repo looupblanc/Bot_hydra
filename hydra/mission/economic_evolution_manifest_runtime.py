@@ -338,20 +338,27 @@ class EconomicEvolutionManifestRuntime:
 
     def _start_worker(self, config: Mapping[str, Any], output_dir: Path) -> None:
         campaign_id = str(config["campaign_id"])
-        attempt = self._attempts.get(campaign_id, 0)
+        attempt_key = self._attempt_key(config)
+        attempt = self._attempts.get(attempt_key, 0)
         if attempt >= 3:
             raise EconomicEvolutionRuntimeError(
-                f"{campaign_id} exhausted three deterministic attempts"
+                f"{campaign_id} manifest {config['preregistration_hash']} "
+                "exhausted three deterministic attempts"
             )
         attempt += 1
-        self._attempts[campaign_id] = attempt
+        self._attempts[attempt_key] = attempt
         runtime = config["runtime_manifest"]
         runner = (self.root / str(runtime["runner"])).resolve()
         scripts = (self.root / "scripts").resolve()
         if runner != scripts and scripts not in runner.parents:
             raise EconomicEvolutionRuntimeError("manifest runner escapes scripts")
         config_path = Path(str(config["_runtime_preregistration_path"]))
-        log_path = self.state_dir / "logs" / f"{campaign_id}.log"
+        manifest_revision = str(config["preregistration_hash"])[:12]
+        log_path = (
+            self.state_dir
+            / "logs"
+            / f"{campaign_id}.{manifest_revision}.log"
+        )
         log_path.parent.mkdir(parents=True, exist_ok=True)
         command = [
             sys.executable,
@@ -402,11 +409,13 @@ class EconomicEvolutionManifestRuntime:
         if result_path.is_file():
             return
         campaign_id = str(config["campaign_id"])
-        attempt = self._attempts.get(campaign_id, 0)
+        attempt_key = self._attempt_key(config)
+        attempt = self._attempts.get(attempt_key, 0)
+        manifest_revision = str(config["preregistration_hash"])[:12]
         quarantine = (
             self.root
             / "reports/economic_evolution/quarantine"
-            / f"{campaign_id}_attempt_{attempt:02d}"
+            / f"{campaign_id}_{manifest_revision}_attempt_{attempt:02d}"
         )
         quarantine.parent.mkdir(parents=True, exist_ok=True)
         if quarantine.exists():
@@ -414,6 +423,20 @@ class EconomicEvolutionManifestRuntime:
                 "manifest campaign quarantine path collision"
             )
         shutil.move(str(output_dir), str(quarantine))
+
+    @staticmethod
+    def _attempt_key(config: Mapping[str, Any]) -> str:
+        """Identify retries by immutable manifest, not mutable campaign label.
+
+        A technical WORM revision may keep the scientific campaign ID while
+        repairing a pre-result integration defect.  Its retry budget must not
+        erase or inherit the exhausted budget of the superseded manifest.
+        """
+
+        return (
+            f"{config['campaign_id']}:"
+            f"{config['preregistration_hash']}"
+        )
 
     def _terminalize(
         self,

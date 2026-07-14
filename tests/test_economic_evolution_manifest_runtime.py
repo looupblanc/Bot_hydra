@@ -83,6 +83,20 @@ def test_production_queue_does_not_authorize_proof_data_or_orders() -> None:
     }
 
 
+def test_manifest_retry_budget_is_scoped_to_immutable_revision() -> None:
+    original = {
+        "campaign_id": "campaign_0017",
+        "preregistration_hash": "a" * 64,
+    }
+    revision = {
+        "campaign_id": "campaign_0017",
+        "preregistration_hash": "b" * 64,
+    }
+    assert EconomicEvolutionManifestRuntime._attempt_key(original) != (
+        EconomicEvolutionManifestRuntime._attempt_key(revision)
+    )
+
+
 def test_0014_is_a_frozen_generic_account_pair_campaign() -> None:
     path = ROOT / "config/v7/economic_evolution_coverage_union_0014.json"
     campaign = load_and_verify_coverage_union_preregistration(path)
