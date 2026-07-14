@@ -1,0 +1,79 @@
+{
+  "schema": "hydra_economic_hypothesis_worm_v1",
+  "campaign_id": "hydra_economic_evolution_opportunity_density_0013",
+  "class_id": "CONTEMPORANEOUS_CROSS_MARKET_OPPORTUNITY_DENSITY_V1",
+  "issued_at_utc": "2026-07-14T01:52:00Z",
+  "parent_terminal_verdict": {
+    "path": "WORM/economic-evolution-account-timeline-0012-verdict-2026-07-14.json",
+    "file_sha256": "5baf8a668145257ccd0a62b1c40b9da1d8e586d558c97434961190085bf382fd",
+    "semantic_hash": "88ba7bcc4472019858d917b378ceafd535f413d918aa9bce3c7cd0bfb5b9960d",
+    "tag": "worm/economic-evolution-account-timeline-0012-verdict-2026-07-14",
+    "commit": "7a32217"
+  },
+  "economic_hypothesis": "When independent sleeves on different futures markets emit same-direction opportunities within the preceding 60 minutes, the shared participation state should raise target velocity enough to justify exactly two risk units, because synchronized cross-market demand is harder to explain by one sleeve's local geometry than an isolated trigger.",
+  "causal_information_set": {
+    "available_at_decision": [
+      "current frozen sleeve intent",
+      "decision timestamps and directions of other frozen sleeve intents at or before the current decision",
+      "market identity",
+      "past-only account balance, MLL buffer, daily realized PnL and open exposure"
+    ],
+    "forbidden": [
+      "future intents",
+      "future trade outcomes",
+      "exit PnL",
+      "Q4",
+      "fresh proof windows"
+    ]
+  },
+  "frozen_mechanism": {
+    "trailing_signal_window_minutes": 60,
+    "minimum_confirming_different_markets": 1,
+    "base_risk_units": 1,
+    "confirmed_risk_units": 2,
+    "maximum_simultaneous_positions": 3,
+    "maximum_mini_equivalent": 15,
+    "daily_loss_guard_usd": 1000.0,
+    "daily_profit_lock_usd": 2250.0,
+    "critical_mll_buffer_usd": 750.0,
+    "same_market_conflicts_blocked": true,
+    "continuous_weight_optimization": false
+  },
+  "matched_control": {
+    "same_ordered_membership": true,
+    "same_component_event_paths": true,
+    "same_confirmation_graph_degree_multiset": true,
+    "same_account_limits": true,
+    "difference": "DETERMINISTIC_WITHIN_MEMBERSHIP_CONFIRMATION_SOURCE_GRAPH_PERMUTATION"
+  },
+  "planned_population": {
+    "real_policy_count": 512,
+    "matched_control_policy_count": 512,
+    "component_count": 48,
+    "episode_starts_per_policy": 24,
+    "normal_and_1_5x_costs": true,
+    "worker_count": 3,
+    "new_candidate_ids": true,
+    "status_inheritance": false
+  },
+  "family_tripwire": {
+    "minimum_policy_pairs": 512,
+    "minimum_informative_pairs": 256,
+    "minimum_stressed_median_net_delta_usd": 100.0,
+    "minimum_stressed_target_progress_delta": 0.01,
+    "maximum_stressed_mll_breach_rate_deterioration": 0.02,
+    "maximum_stressed_consistency_pass_rate_deterioration": 0.05,
+    "maximum_NULL_RATIO": 0.8,
+    "exact_one_sided_binomial_p_value": 0.05
+  },
+  "falsification_rule": "If the preregistered paired family tripwire is not green, tombstone only CONTEMPORANEOUS_CROSS_MARKET_OPPORTUNITY_DENSITY_V1. Do not rescue it by changing the 60-minute window, confirmation count, risk units or thresholds after outcomes.",
+  "governance": {
+    "development_only": true,
+    "proof_windows_consumed": 0,
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "CONTRE": "Different markets can share index beta and clock-time clustering, so apparent confirmation may still be common geometry. The class is supported only if the real confirmation graph beats its degree-matched source permutation under stressed costs without unacceptable MLL or consistency deterioration.",
+  "hypothesis_hash": "b77995f1203168cdca4d0fb8af0c3f52353de68516c01bc03dd4cc11bfcbe318"
+}
