@@ -61,6 +61,7 @@ def _intent() -> EntryIntent:
 
 def test_density_router_scales_only_from_past_different_market_confirmation() -> None:
     policy = _policy()
+    assert policy.controller_id == policy.policy_id
     intent = _intent()
     observation = SignalObservation(
         component_id="b",

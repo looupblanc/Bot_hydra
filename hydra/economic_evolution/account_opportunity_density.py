@@ -111,6 +111,12 @@ class OpportunityDensityPolicy:
         return f"{self.policy_id}::BASKET"
 
     @property
+    def controller_id(self) -> str:
+        """Duck-typed identifier required by the frozen account simulator."""
+
+        return self.policy_id
+
+    @property
     def source_graph(self) -> dict[str, tuple[str, ...]]:
         return {str(key): tuple(values) for key, values in self.confirmation_sources}
 
