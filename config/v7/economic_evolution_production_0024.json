@@ -3,93 +3,93 @@
   "campaign_id": "hydra_economic_production_0024",
   "class_id": "ECONOMIC_PRODUCTION_MULTI_MECHANISM_V1",
   "created_at_utc": "2026-07-14T11:30:00Z",
-  "source_commit": "0000000000000000000000000000000000000000",
+  "source_commit": "c8145b9125ee672843d29006a3226d380982a76e",
   "implementation_files": {
-    "hydra/account_policy/basket.py": "TO_BE_COMPUTED",
-    "hydra/account_policy/router.py": "TO_BE_COMPUTED",
-    "hydra/account_policy/schema.py": "TO_BE_COMPUTED",
-    "hydra/account_policy/xfa.py": "TO_BE_COMPUTED",
-    "hydra/calibration/cost_hurdle_calibration.py": "TO_BE_COMPUTED",
-    "hydra/calibration/injected_edges.py": "TO_BE_COMPUTED",
-    "hydra/calibration/negative_controls.py": "TO_BE_COMPUTED",
-    "hydra/calibration/positive_controls.py": "TO_BE_COMPUTED",
-    "hydra/calibration/power_analysis.py": "TO_BE_COMPUTED",
-    "hydra/calibration/synthetic_markets.py": "TO_BE_COMPUTED",
-    "hydra/calibration/validator_benchmark.py": "TO_BE_COMPUTED",
-    "hydra/compute/resource_monitor.py": "TO_BE_COMPUTED",
-    "hydra/compute/result_writer.py": "TO_BE_COMPUTED",
-    "hydra/data/contract_mapping.py": "TO_BE_COMPUTED",
-    "hydra/data/multitimeframe.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/account_evaluation.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/archive.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/assembly.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/failure_model.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/generator.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/incremental_value.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/mutation.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/null_calibration.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/parallel_screen.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/policy_evolution.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/schema.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/screen.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/seed_archive.py": "TO_BE_COMPUTED",
-    "hydra/economic_evolution/statuses.py": "TO_BE_COMPUTED",
-    "hydra/evidence/__init__.py": "TO_BE_COMPUTED",
-    "hydra/evidence/bundle.py": "TO_BE_COMPUTED",
-    "hydra/evidence/schema.py": "TO_BE_COMPUTED",
-    "hydra/execution/v7_cost_model.py": "TO_BE_COMPUTED",
-    "hydra/factory/ecology_allocation.py": "TO_BE_COMPUTED",
-    "hydra/factory/elite_selection_manifest.py": "TO_BE_COMPUTED",
-    "hydra/factory/quality_diversity.py": "TO_BE_COMPUTED",
-    "hydra/factory/quality_diversity_selector_v2.py": "TO_BE_COMPUTED",
-    "hydra/features/canonical_store.py": "TO_BE_COMPUTED",
-    "hydra/features/feature_matrix.py": "TO_BE_COMPUTED",
-    "hydra/foundry/status.py": "TO_BE_COMPUTED",
-    "hydra/foundry/tournament.py": "TO_BE_COMPUTED",
-    "hydra/markets/instruments.py": "TO_BE_COMPUTED",
-    "hydra/mission/calibration_retest_execution.py": "TO_BE_COMPUTED",
-    "hydra/mission/economic_evolution_manifest_runtime.py": "TO_BE_COMPUTED",
-    "hydra/production/__init__.py": "TO_BE_COMPUTED",
-    "hydra/production/component_evidence.py": "TO_BE_COMPUTED",
-    "hydra/production/episode_evidence.py": "TO_BE_COMPUTED",
-    "hydra/production/evidence_adapter.py": "TO_BE_COMPUTED",
-    "hydra/production/halving.py": "TO_BE_COMPUTED",
-    "hydra/production/manifest.py": "TO_BE_COMPUTED",
-    "hydra/production/mll_accounting.py": "TO_BE_COMPUTED",
-    "hydra/production/policy_factory.py": "TO_BE_COMPUTED",
-    "hydra/production/replay.py": "TO_BE_COMPUTED",
-    "hydra/production/runtime.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/combine_episode.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/combine_fitness.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/intraday_mll.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/mll_variants.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/payout_cycles.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/payout_episode.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/rolling_combine.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/scaling_plan.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/topstep_150k.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/trading_day.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/xfa_consistency.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/xfa_episode.py": "TO_BE_COMPUTED",
-    "hydra/propfirm/xfa_standard.py": "TO_BE_COMPUTED",
-    "hydra/research/accelerated_context_tournament.py": "TO_BE_COMPUTED",
-    "hydra/research/economic_evolution_campaign.py": "TO_BE_COMPUTED",
-    "hydra/research/economic_evolution_pilot.py": "TO_BE_COMPUTED",
-    "hydra/research/equity_open_gap_reversal.py": "TO_BE_COMPUTED",
-    "hydra/research/qd_economic_tournament.py": "TO_BE_COMPUTED",
-    "hydra/research/rolling_combine_replay.py": "TO_BE_COMPUTED",
-    "hydra/research/turbo_exact_replay.py": "TO_BE_COMPUTED",
-    "hydra/research/turbo_feature_builder.py": "TO_BE_COMPUTED",
-    "hydra/shadow/specification.py": "TO_BE_COMPUTED",
-    "hydra/strategies/turbo_batch_fingerprint.py": "TO_BE_COMPUTED",
-    "hydra/strategies/turbo_compiler.py": "TO_BE_COMPUTED",
-    "hydra/strategies/turbo_dsl.py": "TO_BE_COMPUTED",
-    "hydra/strategies/turbo_vectorized_executor.py": "TO_BE_COMPUTED",
-    "hydra/utils/config.py": "TO_BE_COMPUTED",
-    "hydra/utils/time.py": "TO_BE_COMPUTED",
-    "hydra/validation/data_roles.py": "TO_BE_COMPUTED",
-    "hydra/validation/lockbox_guard.py": "TO_BE_COMPUTED",
-    "scripts/run_economic_production_manifest.py": "TO_BE_COMPUTED"
+    "hydra/account_policy/basket.py": "3ceaeddc45448f11a82cb54860d379708696e742526ee062f029149d2a932a81",
+    "hydra/account_policy/router.py": "82c83168b695fcf128665a3220bb4d952e926b2bca136399cbade01a25847280",
+    "hydra/account_policy/schema.py": "f893f884bd175260a34217905ad67e3321258e5dfd4993b7629b9932de15804a",
+    "hydra/account_policy/xfa.py": "65ea7483f72c068f5a60b57b65af71bb726390391c4ec54776518876f36a937e",
+    "hydra/calibration/cost_hurdle_calibration.py": "87db19949614a7bd0a68dde20b9792b98b16096b4ea139e31baff8954f40e7db",
+    "hydra/calibration/injected_edges.py": "5ebe23933e96cd1d414e29deec2aedf4fb30098380069facdfdc58a057e9584d",
+    "hydra/calibration/negative_controls.py": "53b79be2bb6ec24c2c09d3f0403b78a81a0704959101d71a98229b74c5a647f9",
+    "hydra/calibration/positive_controls.py": "d67999f5d8bb75368369dc0644dfc52e1bfa46183db7306243bab945a7f3bf32",
+    "hydra/calibration/power_analysis.py": "b94b251acaf252d3b6c0981cb5ebdbde6e8351ec27adf375421123724d8b7c95",
+    "hydra/calibration/synthetic_markets.py": "e19b286e3ec72b60ddb636db3c06c5a687ed0002e1274434c05c50e96dd3f0c5",
+    "hydra/calibration/validator_benchmark.py": "3ff9d2c70f07d689e94e32f44d7d33248166fc7d0a3fbe4d856ad2fa103a9bb0",
+    "hydra/compute/resource_monitor.py": "f57b1a368f590cc745b8adeafbded26dfc95d32511e77e5debb4c996e853735d",
+    "hydra/compute/result_writer.py": "a9b41fc6777ed52f27484a24b7ed47412f93665ed0d5adde4128bddb9e100e44",
+    "hydra/data/contract_mapping.py": "4b2ed25ec432f74906d2a2fa180a87aad154a2780c5daac46ea3f7033e3e267c",
+    "hydra/data/multitimeframe.py": "329e928f3817194051e9df63ba20feed048a209621864075fad574c28fe98d58",
+    "hydra/economic_evolution/account_evaluation.py": "844422dd235eec18d22166acca06b7542f1da200f8e20efb6eebc93464719c5f",
+    "hydra/economic_evolution/archive.py": "a84d061fe81d340f6780a43d7b407174e1b64157f27baf4dbe26f70fe58c5f53",
+    "hydra/economic_evolution/assembly.py": "c743987e75a86f0cd0d89ff3f88b82ab33579214b47170ede0cc31b5e1ea669e",
+    "hydra/economic_evolution/failure_model.py": "219068150d8f5d53041f21f92127a30a5417b496282878cbf5e3e7735a5c1b07",
+    "hydra/economic_evolution/generator.py": "7a0c4916bdfa259eeac9fec9c1cba9cb21cda89f8737372c3d1828fea9339ee2",
+    "hydra/economic_evolution/incremental_value.py": "e86cb8afbba28cb6f7cea4fc1a1ac51a40f79da3fb40e3d0be9a103b390797fa",
+    "hydra/economic_evolution/mutation.py": "bb318eebdd1d39c163ed3c4caca9a97e3d5cd296eb2f9eb38fd49d21145dfa50",
+    "hydra/economic_evolution/null_calibration.py": "8bd1dfd7cda22562616eceea95d42bc11ea12c7a3e9bb148add129d65afde16e",
+    "hydra/economic_evolution/parallel_screen.py": "8d2ef1d7e80586309b2d59a36afdddc50b39bd79eddf3e98119891b990dbf536",
+    "hydra/economic_evolution/policy_evolution.py": "decfe537130bf91939d11f986c4a0307a18c36f1e8e8c6dc0e135849cd392a15",
+    "hydra/economic_evolution/schema.py": "398f86f4a4a60e0adff54b69083718ca27a1217854fff587b47e0f3ab42f5fb0",
+    "hydra/economic_evolution/screen.py": "a00281883885c477e5cd35d94a0a2a400c711ac17f1807da9cd703c85bed3c87",
+    "hydra/economic_evolution/seed_archive.py": "09196105b19e4787d5dbf1ce3b2320dc39facf36611a2e25dc2b3447712b47bd",
+    "hydra/economic_evolution/statuses.py": "3915d1ec03f2378e26e432e0e7c2b9fdf603701edfc238829f78c3a16dbfef6c",
+    "hydra/evidence/__init__.py": "f0967da7b9ea17fbca99f5db507058e9ef386958e4047238cbc3e6205a4475f7",
+    "hydra/evidence/bundle.py": "80a86bbfccbff484d2fec268b7a03af0b6d8609935be05f4069752723a136000",
+    "hydra/evidence/schema.py": "e51b525d4c376bb2d68f88c54de7ec6796b438e3817c8bceae3db99379e64ad1",
+    "hydra/execution/v7_cost_model.py": "c1f272f6c7a648ca20b6873596994bf9617224aebc49f936f2662b368b3ca2d5",
+    "hydra/factory/ecology_allocation.py": "ffc71b5e059df80c33502061755c0a32c993361dfac448028cfa825ed0f1ed6d",
+    "hydra/factory/elite_selection_manifest.py": "22c71726d258b8431b7d742e289128ecb850390449c545c2745b9bd422278095",
+    "hydra/factory/quality_diversity.py": "1f749cd87584ce048fe80ec3573b5fa04e12fccd2d58c134920e97d58deee771",
+    "hydra/factory/quality_diversity_selector_v2.py": "65c895fe1e37d3971d79cab59db102dce28315eacda5e2a8635d0af9520201d9",
+    "hydra/features/canonical_store.py": "fce72815c15826a06cc0d5603a7cae5817c33912e1a485352d2410e0ba91b31b",
+    "hydra/features/feature_matrix.py": "ed47ff11acb92475c630cdbf1cdc33ce8303d639e2df84444fdf567dbc5a1e56",
+    "hydra/foundry/status.py": "fef3e6a92ce2fd12950e97b08b6bc38373cfaf4e97138fdae5496fe20ebb8526",
+    "hydra/foundry/tournament.py": "5fec5bd39895c6f4b85792f9f2fd74f1cb47270b1847267d6ecbb1aa0b8ce87b",
+    "hydra/markets/instruments.py": "fb2da6348eed717f280c6136ef0a239291793fc718d62c560dc9a13cc333788c",
+    "hydra/mission/calibration_retest_execution.py": "b36097fddb5e0d1f75e83aa603716d3e1c6077f5f6e873b177ed0411775e8b95",
+    "hydra/mission/economic_evolution_manifest_runtime.py": "88d8a878bdda7b0b0d7020d2584d3b27291cca2d541934fc9316254721f423ed",
+    "hydra/production/__init__.py": "651b9a63db2908034be0ab268919e8985a9a7beaf4b486b5a1a8f996844c77c4",
+    "hydra/production/component_evidence.py": "d280b662b5bfca32bbbc83c78e34aeba675271e5b4926881181f4c2909abb4ba",
+    "hydra/production/episode_evidence.py": "5d418b5287d4b9094abebd7ac2e3560a3a15bb465a1ba5758bbbc7a2c5fe1515",
+    "hydra/production/evidence_adapter.py": "7b5d44b27cb5bde2ad1e1d9843125279aea0c820539bf26dd11798a520fec043",
+    "hydra/production/halving.py": "aa2de07dffd032f6b0d7a6185092b64349ff673aca64f32297407567a930d468",
+    "hydra/production/manifest.py": "0fd2f22b3fb5e3424a1a2563700818c7ff537c61f59d34a00d6be8f740499196",
+    "hydra/production/mll_accounting.py": "5d7a16c27af8296af3611655a032edcc686077dcef676764218de0adac282465",
+    "hydra/production/policy_factory.py": "a9e76289c181de44b343b0682846b80669970ae98ebb1aa3d900d330e119db7a",
+    "hydra/production/replay.py": "4a71bba97c8c8c29c20ff24af62165a51a47807213978401e73ac4ed24863bad",
+    "hydra/production/runtime.py": "fecf649f4eaf441f09989c76c53945622f8504accde29efb8cac193e62ed9eb0",
+    "hydra/propfirm/combine_episode.py": "ba9a23d15ec73881c5aa40f393a3ff88cf524060e10154a2f4e5d327f138bc29",
+    "hydra/propfirm/combine_fitness.py": "ea2f173d9552f97f6b960cbf6ef42d322d6a7bd9a876d0cb1a2d0914890f4052",
+    "hydra/propfirm/intraday_mll.py": "f99f542aa2006c20be55ccd3b5eb4c4f8a09c4633bea824d3d784a491a69578b",
+    "hydra/propfirm/mll_variants.py": "083fea6a0698f84b20df41c901e2c96c4315f66f079bd9dd64185065395a7e51",
+    "hydra/propfirm/payout_cycles.py": "42dd356f2afbc19662802081e5a3bd6e4f56d7acecd24ae92fdd304543dfc96e",
+    "hydra/propfirm/payout_episode.py": "085be74761c5ad40071b4e7b2f18a8d7a45aa0829e80fd2d85f68a99f2a224bd",
+    "hydra/propfirm/rolling_combine.py": "de4d909699686e4a6d436f3ce1182f2cc62c4e2ac85a4fa27344d3b34fcf70f4",
+    "hydra/propfirm/scaling_plan.py": "36352d4cbab990ce81c50aab720e67ae856787a0351bcf7bd6b73472cdcbb951",
+    "hydra/propfirm/topstep_150k.py": "a81fe432b9d4a67e40ba8fedce6ec43ec890de8c8d0a895a16b3bb397c7d56dd",
+    "hydra/propfirm/trading_day.py": "bf85962ce0b8b71ef6887d599e1b45bed7f7a4e0e07532404370e9ad818c013a",
+    "hydra/propfirm/xfa_consistency.py": "3bae83a00952de233c1cadf85415cbd282286de18f76c99809090d226172fe44",
+    "hydra/propfirm/xfa_episode.py": "f9892512495a7c11695230e47bf8c639d409dd55d6bfccd8a942847395a96796",
+    "hydra/propfirm/xfa_standard.py": "4199edea9fe071df844d9da529f99741a270952a3c91949faad0fb56475380c4",
+    "hydra/research/accelerated_context_tournament.py": "528b12ffda41dbe955ffab0eb3005634a59f07fc0e2ed51ef76e5e9b7377436e",
+    "hydra/research/economic_evolution_campaign.py": "fec67a8372f12f57b954dc9fa9061a2c0d35bd7929eec47d4ffc8a9fe911931c",
+    "hydra/research/economic_evolution_pilot.py": "bd800376561b2c408f6b00f0e6c691acecc2fe92c085e6268378d3911265fc7f",
+    "hydra/research/equity_open_gap_reversal.py": "4b073499f815772b216f17cc0d32976cc2851b0654baa61405a870532f743927",
+    "hydra/research/qd_economic_tournament.py": "bb912f732a917f962de50493f6661f4edb9db07638bf98440a6d18e96a642a99",
+    "hydra/research/rolling_combine_replay.py": "e2cc03c852c272f959158747a88435d2fa7b8326ce3cc327646b26de12fde434",
+    "hydra/research/turbo_exact_replay.py": "c17779368897111b54b0564609ba752726a0715da5db23092fc9f32ef7d55521",
+    "hydra/research/turbo_feature_builder.py": "d17f06a557459ffc57a115e9a05fba1c44c0dda5384410445503dda91afab512",
+    "hydra/shadow/specification.py": "938da00db4b67977046c776d925a2121158ba1acf64ce840dcc3dc1ef6ac5744",
+    "hydra/strategies/turbo_batch_fingerprint.py": "c375b6db7ee1f5f5cfa0edf9017f2645c7c4a74883e757c14642d3a6e250aef3",
+    "hydra/strategies/turbo_compiler.py": "d29b0d626985164346aafbdea4f1640d127cb208376c817ba7f407d53bc22e28",
+    "hydra/strategies/turbo_dsl.py": "18a5ae2ddfba0165942b7a11b7c1c4f65071efd11b895ae0b6c212fb7910117c",
+    "hydra/strategies/turbo_vectorized_executor.py": "0d8846736ffbf5e34cc9f9a613fb8771b466ed0539558d81a0e8c77f2c2519e4",
+    "hydra/utils/config.py": "f5b40d2bd60d6415262f12803d2c9459416ed997f7f31a8453841bbdc4ae8ba7",
+    "hydra/utils/time.py": "9774466a7a2ca667e1006fa0ccd28c89384397118fea339736d59efe1c542edd",
+    "hydra/validation/data_roles.py": "8997ff91228f775169759abb53e4fff17e524729b2f423a86e00a55638fde228",
+    "hydra/validation/lockbox_guard.py": "a35d8207ba049e49315f09b32bfaf3d4192f3999606e9e0e7eeabb0d9412e277",
+    "scripts/run_economic_production_manifest.py": "45e610a35ae5a260e628bc73fcd23634362c6cef0298707b2e6e97ff8762cc6f"
   },
   "implementation_hash_scope": "TRANSITIVE_ACTIVE_PRODUCTION_RUNTIME_CLOSURE_V1_PLUS_CONTROLLER_ROOT",
   "development_only": true,
@@ -172,8 +172,8 @@
       "policy_id": "elite_robustness_child_ca668fb2e9189ee6fd0805ce",
       "status": "DIAGNOSTIC_FALLBACK_ONLY",
       "status_inheritance": false,
-      "family_verdict": "ARTEFACT_GEOMETRY_ONLY"
-      ,"component_ids": [
+      "family_verdict": "ARTEFACT_GEOMETRY_ONLY",
+      "component_ids": [
         "sleeve_8af4e061229c8ce7ae335f63",
         "sleeve_65bad2088913fc9fca0a145d",
         "sleeve_af4b99ab534d1a577c05eb4e",
@@ -208,18 +208,54 @@
       "GC": "NO_ELIGIBLE_COMPONENT_IN_FROZEN_0024_BANK"
     }
   },
-  "markets": ["CL", "ES", "NQ", "RTY", "YM"],
+  "markets": [
+    "CL",
+    "ES",
+    "NQ",
+    "RTY",
+    "YM"
+  ],
   "contracts": {
-    "CL": {"mini": "CL", "micro": "MCL", "micro_per_mini": 10},
-    "ES": {"mini": "ES", "micro": "MES", "micro_per_mini": 10},
-    "NQ": {"mini": "NQ", "micro": "MNQ", "micro_per_mini": 10},
-    "RTY": {"mini": "RTY", "micro": "M2K", "micro_per_mini": 10},
-    "YM": {"mini": "YM", "micro": "MYM", "micro_per_mini": 10}
+    "CL": {
+      "mini": "CL",
+      "micro": "MCL",
+      "micro_per_mini": 10
+    },
+    "ES": {
+      "mini": "ES",
+      "micro": "MES",
+      "micro_per_mini": 10
+    },
+    "NQ": {
+      "mini": "NQ",
+      "micro": "MNQ",
+      "micro_per_mini": 10
+    },
+    "RTY": {
+      "mini": "RTY",
+      "micro": "M2K",
+      "micro_per_mini": 10
+    },
+    "YM": {
+      "mini": "YM",
+      "micro": "MYM",
+      "micro_per_mini": 10
+    }
   },
-  "timeframes": ["5m", "15m", "30m", "60m"],
+  "timeframes": [
+    "5m",
+    "15m",
+    "30m",
+    "60m"
+  ],
   "session_rules": {
     "source": "FROZEN_COMPONENT_SESSION_CODE",
-    "codes": {"-1": "ALL_ELIGIBLE", "0": "OPEN", "1": "MID_SESSION", "2": "LATE_CLOSE"},
+    "codes": {
+      "-1": "ALL_ELIGIBLE",
+      "0": "OPEN",
+      "1": "MID_SESSION",
+      "2": "LATE_CLOSE"
+    },
     "same_session_enforcement": true,
     "overnight_fabrication_allowed": false,
     "closed_or_past_only": true
@@ -237,10 +273,58 @@
     "overlapping_starts_independent": false,
     "contract_roll_boundaries_create_independence": false,
     "blocks": [
-      {"block_id": "B1", "start": "2023-07-03", "end": "2023-10-05", "markets": ["CL", "ES", "NQ", "RTY", "YM"], "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"},
-      {"block_id": "B2", "start": "2023-10-27", "end": "2024-02-02", "markets": ["CL", "ES", "NQ", "RTY", "YM"], "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"},
-      {"block_id": "B3", "start": "2024-02-26", "end": "2024-05-31", "markets": ["CL", "ES", "NQ", "RTY", "YM"], "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"},
-      {"block_id": "B4", "start": "2024-06-17", "end": "2024-09-26", "markets": ["CL", "ES", "NQ", "RTY", "YM"], "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"}
+      {
+        "block_id": "B1",
+        "start": "2023-07-03",
+        "end": "2023-10-05",
+        "markets": [
+          "CL",
+          "ES",
+          "NQ",
+          "RTY",
+          "YM"
+        ],
+        "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"
+      },
+      {
+        "block_id": "B2",
+        "start": "2023-10-27",
+        "end": "2024-02-02",
+        "markets": [
+          "CL",
+          "ES",
+          "NQ",
+          "RTY",
+          "YM"
+        ],
+        "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"
+      },
+      {
+        "block_id": "B3",
+        "start": "2024-02-26",
+        "end": "2024-05-31",
+        "markets": [
+          "CL",
+          "ES",
+          "NQ",
+          "RTY",
+          "YM"
+        ],
+        "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"
+      },
+      {
+        "block_id": "B4",
+        "start": "2024-06-17",
+        "end": "2024-09-26",
+        "markets": [
+          "CL",
+          "ES",
+          "NQ",
+          "RTY",
+          "YM"
+        ],
+        "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP"
+      }
     ]
   },
   "costs": {
@@ -260,15 +344,31 @@
     "dynamic_loss_streak_ratchet": false
   },
   "static_risk_frontier": {
-    "normalized_levels": [0.75, 1.0, 1.25, 1.5],
-    "micro_units": [3, 4, 5, 6],
+    "normalized_levels": [
+      0.75,
+      1.0,
+      1.25,
+      1.5
+    ],
+    "micro_units": [
+      3,
+      4,
+      5,
+      6
+    ],
     "continuous_optimization": false,
     "selected_within_development_blocks": true,
     "maximum_mini_equivalent": 15
   },
   "component_materialization": {
-    "calibration_period": ["2023-01-01", "2023-07-01"],
-    "exact_replay_period": ["2023-01-01", "2024-10-01"],
+    "calibration_period": [
+      "2023-01-01",
+      "2023-07-01"
+    ],
+    "exact_replay_period": [
+      "2023-01-01",
+      "2024-10-01"
+    ],
     "cached_features_only": true,
     "cache_miss_allowed": false,
     "signal_and_trade_ledgers_required_before_account_replay": true
@@ -277,7 +377,13 @@
     "best_parent": true,
     "equal_risk": true,
     "random_seed_count": 5,
-    "random_seeds": [24002401, 24002402, 24002403, 24002404, 24002405],
+    "random_seeds": [
+      24002401,
+      24002402,
+      24002403,
+      24002404,
+      24002405
+    ],
     "same_eligible_component_bank": true,
     "same_episode_starts": true,
     "campaign_0023_static_baseline_only": true
@@ -331,7 +437,12 @@
     "stage5_survivor_maximum": 4,
     "stage6_finalist_maximum": 4,
     "rolling_start_count": 48,
-    "frozen_horizons": [20, 40, 60, 90],
+    "frozen_horizons": [
+      20,
+      40,
+      60,
+      90
+    ],
     "full_available_chronological_horizon": true,
     "stress_cost_multiplier": 1.5,
     "retuning_between_stages": false
@@ -344,12 +455,12 @@
   },
   "promotion_policy": {
     "development_only": true,
-    "minimum_normal_pass_rate": 0.10,
+    "minimum_normal_pass_rate": 0.1,
     "minimum_stressed_pass_rate": 0.05,
     "minimum_stressed_net": 0.0,
-    "maximum_mll_breach_rate": 0.10,
+    "maximum_mll_breach_rate": 0.1,
     "minimum_positive_blocks": 2,
-    "maximum_block_pass_share": 0.50,
+    "maximum_block_pass_share": 0.5,
     "maximum_component_profit_share": 0.65,
     "paper_shadow_ready_allowed": false,
     "independent_confirmation_required": true,
@@ -376,11 +487,11 @@
     "reconstruction_flag": false
   },
   "compute_allocation": {
-    "hot_economic_loop_minimum": 0.80,
-    "cold_safety_loop_maximum": 0.10,
-    "engineering_reporting_maximum": 0.10,
+    "hot_economic_loop_minimum": 0.8,
+    "cold_safety_loop_maximum": 0.1,
+    "engineering_reporting_maximum": 0.1,
     "rolling_window_hours": 2,
-    "admin_overhead_alert_threshold": 0.20
+    "admin_overhead_alert_threshold": 0.2
   },
   "compute": {
     "worker_count": 3,
@@ -394,7 +505,10 @@
   },
   "data": {
     "role": "DEVELOPMENT_ONLY_Q4_EXCLUDED",
-    "period": ["2023-01-01", "2024-10-01"],
+    "period": [
+      "2023-01-01",
+      "2024-10-01"
+    ],
     "feature_source_fingerprint": "1c773f5044f0f9c3bc50e67003b93a7c35ecaf8c505879fd1c20d6d03edada6c",
     "contract_map_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
     "cached_features_only": true,
@@ -440,5 +554,5 @@
     "single_authoritative_mission_writer": true,
     "single_persistent_controller": true
   },
-  "manifest_hash": "TO_BE_COMPUTED"
+  "manifest_hash": "c5f7b877039a2384378751e80cac3c4f1a5aa307e52c76fafa59abb0b27043a9"
 }
