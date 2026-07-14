@@ -1,0 +1,81 @@
+{
+  "schema": "hydra_production_selector_terminal_verdict_worm_v1",
+  "campaign_id": "hydra_economic_production_0024",
+  "class_id": "ECONOMIC_PRODUCTION_MULTI_MECHANISM_V1",
+  "recorded_at_utc": "2026-07-14T20:45:00Z",
+  "immutable": true,
+  "terminal_status": "SELECTOR_PROCEDURE_FALSIFIED",
+  "terminal_scope": "FROZEN_NESTED_SELECTOR_PROCEDURE_V1",
+  "failure_code": "NO_ELIGIBLE_DESIGN_SET_CHAMPION_B4",
+  "source_manifest": {
+    "path": "config/v7/economic_evolution_production_0024.json",
+    "file_sha256": "417c32d0e8f483f4614394433ddcbade6c919578ca05eac82a06ef2d3a53b066",
+    "semantic_hash": "c5f7b877039a2384378751e80cac3c4f1a5aa307e52c76fafa59abb0b27043a9",
+    "source_commit": "c8145b9125ee672843d29006a3226d380982a76e",
+    "tag": "worm/economic-production-kernel-0024-2026-07-14",
+    "commit": "bc58d0d96ce6829024fd9eed0a286cc8037db3fc"
+  },
+  "source_terminal_receipt": {
+    "path": "reports/economic_evolution/economic_production_0024/selector_procedure_terminal_receipt.json",
+    "file_sha256": "bcaa8d544dafc1d475abccc9ad5f20418178aa83da728e7f1f5c88fc2d2c3969",
+    "receipt_hash": "4f91609ddabf75eedf1b78d78ca3e581a709d6ff4f485b56a7cbc01a44e48d54"
+  },
+  "terminal_evidence": {
+    "policies_proposed": 20000,
+    "unique_fast_screened": 4096,
+    "exact_account_replays": 512,
+    "combine_episode_rows": 180864,
+    "stage3_horizon_policies_completed": 256,
+    "stage3_survivors": 36,
+    "matched_controls_replayed": 348,
+    "independent_temporal_blocks": 4,
+    "eligible_design_champion_by_held_out_block": {
+      "B1": 36,
+      "B2": 36,
+      "B3": 36,
+      "B4": 0
+    },
+    "held_out_evaluation_count": 0,
+    "held_out_outcomes_inspected": false,
+    "headline_held_out_evidence_complete": false,
+    "stage3_passes_all_concentrated_in_block": "B4",
+    "normal_stage3_passes": 183,
+    "stressed_stage3_passes": 168,
+    "stage3_mll_breaches": 0,
+    "behavioral_cluster_count": 30,
+    "exact_clone_pair_count": 6
+  },
+  "evidence_boundary": {
+    "evidence_status": "STAGING_PRESERVED_NONCONFIRMATORY",
+    "evidence_checkpoint_sequence": 4015,
+    "evidence_episode_rows": 180864,
+    "evidence_daily_path_rows": 4479924,
+    "evidence_bundle_finalization_allowed": false,
+    "development_evidence_only": true,
+    "independent_confirmation": false,
+    "overlapping_starts_counted_as_independent": false
+  },
+  "scope": {
+    "exact_selector_retry_allowed": false,
+    "fallback_selection_allowed": false,
+    "threshold_change_allowed": false,
+    "retuning_allowed": false,
+    "promotion_96_count": 0,
+    "promotion_144_to_192_count": 0,
+    "confirmation_ready_count": 0,
+    "paper_shadow_ready_count": 0,
+    "same_exact_policy_family_relaunch_allowed": false,
+    "individual_components_preserved": true,
+    "next_campaign_must_use_materially_distinct_mechanism": true
+  },
+  "governance": {
+    "q4_status": "BURNED",
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "budget_remaining_usd": 37.152612
+  },
+  "CONTRE": "Campaign 0024 produced strong-looking but completely B4-concentrated overlapping-start development pass counts. Because the frozen design set for held-out B4 selected no eligible champion, those counts cannot be converted into held-out evidence, a fallback champion, or a promotion.",
+  "verdict_hash": "96b8ca5d8281a7e7e65644f7d9d0f019fa4fc69e383e4389f6a0368c546766fe"
+}

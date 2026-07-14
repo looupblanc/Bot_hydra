@@ -1,0 +1,316 @@
+{
+  "schema": "hydra_economic_production_selector_terminal_receipt_v1",
+  "recorded_at_utc": "2026-07-14T20:45:00Z",
+  "campaign_id": "hydra_economic_production_0024",
+  "class_id": "ECONOMIC_PRODUCTION_MULTI_MECHANISM_V1",
+  "terminal_status": "SELECTOR_PROCEDURE_FALSIFIED",
+  "terminal_scope": "FROZEN_NESTED_SELECTOR_PROCEDURE_V1",
+  "production_runtime_state": "FAILED_CLOSED",
+  "failure_code": "NO_ELIGIBLE_DESIGN_SET_CHAMPION_B4",
+  "failure_message": "no eligible design-set champion for held-out block B4",
+  "scientific_boundary": {
+    "campaign_is_development_evidence": true,
+    "overlapping_episode_starts_are_independent_evidence": false,
+    "stage3_development_pass_rates_are_independent_confirmation": false,
+    "stage4_plan_persisted": false,
+    "held_out_evaluation_count": 0,
+    "held_out_outcomes_inspected": false,
+    "headline_held_out_evidence_complete": false,
+    "threshold_changed_after_result": false,
+    "fallback_selected": false,
+    "retuning_performed": false,
+    "family_average_p_value_used_as_sole_decision": false
+  },
+  "source_identity": {
+    "actual_git_head_at_quiescence": "a9ea4d9d69190268ccc60b42210625e8ad97c32e",
+    "origin_main_at_quiescence": "81f05ec9d7cd796ff91fd14d15760322c2924275",
+    "manifest_source_commit": "c8145b9125ee672843d29006a3226d380982a76e",
+    "manifest_path": "config/v7/economic_evolution_production_0024.json",
+    "manifest_file_sha256": "417c32d0e8f483f4614394433ddcbade6c919578ca05eac82a06ef2d3a53b066",
+    "manifest_semantic_hash": "c5f7b877039a2384378751e80cac3c4f1a5aa307e52c76fafa59abb0b27043a9",
+    "manifest_worm_tag": "worm/economic-production-kernel-0024-2026-07-14",
+    "manifest_worm_commit": "bc58d0d96ce6829024fd9eed0a286cc8037db3fc"
+  },
+  "safe_checkpoint": {
+    "path": "mission/state/snapshots/economic_production_0024_pre_crossfit_repair_20260714T202407Z",
+    "file_count": 3789,
+    "size_bytes": 554500917,
+    "inventory_algorithm": "sha256(canonical_json([{path,size_bytes,sha256}],sort_keys=true,separators=comma_colon))",
+    "inventory_sha256": "f8281e184bae98eff10b3dd6ce935e7d147c7f37112dd5c0ebd3ede3be1b744f"
+  },
+  "frozen_artifacts": {
+    "production_state": {
+      "path": "reports/economic_evolution/economic_production_0024/production_state.json",
+      "file_sha256": "cf9bba48a0c39b815df5c020b695c2ec11849ed2230e969ff22123629cdf6c3d",
+      "state_hash": "1e872484a4c9db6b3ea2d2d958b0e559a4f661c7eba2d21a0a3d43bd6aac2f55",
+      "checkpoint_sequence": 244,
+      "stage": "CONTROL_60_EPISODE_ROWS"
+    },
+    "production_kpis": {
+      "path": "reports/economic_evolution/economic_production_0024/production_kpis.json",
+      "file_sha256": "b83354f8cbb538712595ebf83b9fa427ab379f5c877d66a42d89b377c238ea79",
+      "kpi_hash": "7b99c526bf628bd41557a63f4ecaaed03a027acd28ec66297ca0c9d3933d6d37"
+    },
+    "stage2_halving": {
+      "path": "mission/state/snapshots/economic_production_0024_pre_crossfit_repair_20260714T202407Z/stage2_halving.json",
+      "file_sha256": "cc809a8cc99d69a5e659136ad6b88fc83271fcd374be2add46ed6810f341bb3f",
+      "input_count": 512,
+      "output_count": 256
+    },
+    "stage3_halving": {
+      "path": "mission/state/snapshots/economic_production_0024_pre_crossfit_repair_20260714T202407Z/stage3_halving.json",
+      "file_sha256": "f264bea52a53a47cb4b2c26d31f22adea15d156597e935bcd05e24e9539b56be",
+      "decision_hash": "555838e401f92b0dd71ca278879477676c25ef048a1a3db80cc5939778f25b84",
+      "input_count": 256,
+      "eligible_count": 36,
+      "output_count": 36
+    }
+  },
+  "evidence_bundle": {
+    "status": "STAGING_PRESERVED_NONCONFIRMATORY",
+    "contract": "HYDRA_EVIDENCE_BUNDLE_V1",
+    "finalization_allowed": false,
+    "final_bundle_exists": false,
+    "staging_path": "data/cache/evidence_bundles/.hydra_economic_production_0024.evidence-v1.staging",
+    "identity_file_sha256": "b07cf293cae98d1df7e80efd94f66e0ce521ebf66184f8f9c991b6ccad3c0cca",
+    "checkpoint_file_sha256": "60885f7135978ec10698270692c829dd909f7e507bba5025513c950cfce10d69",
+    "checkpoint_sequence": 4015,
+    "file_count": 3780,
+    "size_bytes": 216444321,
+    "inventory_algorithm": "sha256(canonical_json([{path,size_bytes,sha256}],sort_keys=true,separators=comma_colon))",
+    "inventory_sha256": "efe6831df962b4d866b68a5052ae8e5b26c86f88c50527494d8f74627b76908b",
+    "row_counts": {
+      "component_signals": 8121,
+      "component_entries": 8121,
+      "component_exits": 8121,
+      "component_trades": 8121,
+      "account_policy_membership": 2478,
+      "episodes": 180864,
+      "account_daily_paths": 4479924,
+      "provenance": 1
+    },
+    "compact_outputs_persisted": 0,
+    "preservation_reason": "The single writer persisted all completed rows, but the selector failed closed before compact outputs and atomic COMPLETE finalization. Staging is preserved byte-for-byte and is not promoted to an authoritative complete bundle."
+  },
+  "work_completed": {
+    "policies_proposed": 20000,
+    "unique_fast_screened": 4096,
+    "exact_account_replays": 512,
+    "base_60_day_episode_rows": 49152,
+    "additional_20_40_90_full_horizon_episode_rows": 98304,
+    "matched_control_60_day_episode_rows": 33408,
+    "combine_episode_rows_total": 180864,
+    "stage3_horizon_policy_count_completed": 256,
+    "stage3_survivor_count": 36,
+    "matched_control_policy_count_completed": 348,
+    "frozen_horizons_completed": [
+      "20_TRADING_DAYS",
+      "40_TRADING_DAYS",
+      "60_TRADING_DAYS",
+      "90_TRADING_DAYS",
+      "FULL_AVAILABLE_CHRONOLOGICAL_HORIZON"
+    ]
+  },
+  "temporal_blocks": {
+    "independent_block_count": 4,
+    "method": "FOUR_CONTIGUOUS_BLOCKS_WITH_TEN_SESSION_EMBARGO",
+    "overlapping_starts_independent": false,
+    "contract_roll_boundaries_create_independence": false,
+    "blocks": [
+      {
+        "block_id": "B1",
+        "start": "2023-07-03",
+        "end": "2023-10-05",
+        "markets": ["CL", "ES", "NQ", "RTY", "YM"]
+      },
+      {
+        "block_id": "B2",
+        "start": "2023-10-27",
+        "end": "2024-02-02",
+        "markets": ["CL", "ES", "NQ", "RTY", "YM"]
+      },
+      {
+        "block_id": "B3",
+        "start": "2024-02-26",
+        "end": "2024-05-31",
+        "markets": ["CL", "ES", "NQ", "RTY", "YM"]
+      },
+      {
+        "block_id": "B4",
+        "start": "2024-06-17",
+        "end": "2024-09-26",
+        "markets": ["CL", "ES", "NQ", "RTY", "YM"]
+      }
+    ]
+  },
+  "outer_fold_preflight": {
+    "status": "DETERMINISTIC_POST_FAILURE_AUDIT_ONLY_NOT_HELD_OUT_RESULTS",
+    "candidate_count_per_fold": 36,
+    "folds": [
+      {
+        "held_out_block": "B1",
+        "design_blocks": ["B2", "B3", "B4"],
+        "eligible_count": 36,
+        "diagnostic_design_champion": "economic_policy_3503e080269e2e1e99e7beef",
+        "selected_risk_level": 1.5,
+        "selection_decision_hash": "b735b0708f8c2785cfbb4474c88e6b844c1b65bd37fdcdaf141277944acd628e",
+        "held_out_outcomes_inspected": false
+      },
+      {
+        "held_out_block": "B2",
+        "design_blocks": ["B1", "B3", "B4"],
+        "eligible_count": 36,
+        "diagnostic_design_champion": "economic_policy_e1f1537c198af5970530c017",
+        "selected_risk_level": 1.25,
+        "selection_decision_hash": "aeb8f8eaf39b9574a55c2292216bd356f8686fc4cd6c78b390e9caa6c15b1521",
+        "held_out_outcomes_inspected": false
+      },
+      {
+        "held_out_block": "B3",
+        "design_blocks": ["B1", "B2", "B4"],
+        "eligible_count": 36,
+        "diagnostic_design_champion": "economic_policy_3503e080269e2e1e99e7beef",
+        "selected_risk_level": 1.5,
+        "selection_decision_hash": "1ec4d2bfdd75dd165ff5f5af35ab1211f9c99a27db2934049c41c913a392250a",
+        "held_out_outcomes_inspected": false
+      },
+      {
+        "held_out_block": "B4",
+        "design_blocks": ["B1", "B2", "B3"],
+        "eligible_count": 0,
+        "diagnostic_design_champion": null,
+        "selected_risk_level": null,
+        "selection_decision_hash": "f66a7a6d8925e84db7013ecee7fd2e0b759bb30e4b06195f15011e8296389c3e",
+        "exclusion_counts": {
+          "NO_EVALUABLE_EPISODES": 36,
+          "EXCESSIVE_COMPONENT_DOMINATION": 21
+        },
+        "held_out_outcomes_inspected": false
+      }
+    ]
+  },
+  "development_diagnostics_not_headline_evidence": {
+    "stage3_60_day": {
+      "normal": {
+        "episode_count": 1728,
+        "pass_count": 183,
+        "median_target_progress": 0.11594166666666084,
+        "median_net_usd": 1043.4749999999476,
+        "mll_breach_count": 0
+      },
+      "stressed_1_5x": {
+        "episode_count": 1728,
+        "pass_count": 168,
+        "median_target_progress": 0.10017777777777358,
+        "median_net_usd": 901.5999999999622,
+        "mll_breach_count": 0
+      },
+      "median_candidate_pass_rate_normal": 0.10416666666666667,
+      "median_candidate_pass_rate_stressed": 0.10416666666666667,
+      "maximum_candidate_pass_rate_normal": 0.125,
+      "maximum_candidate_pass_rate_stressed": 0.125,
+      "all_passes_concentrated_in_block": "B4"
+    },
+    "block_diagnostics": {
+      "B1": {
+        "normal_passes": 0,
+        "stressed_passes": 0,
+        "normal_median_target_progress": 0.07720416666664662,
+        "stressed_median_target_progress": 0.06362500000001294,
+        "mll_breaches": 0
+      },
+      "B2": {
+        "normal_passes": 0,
+        "stressed_passes": 0,
+        "normal_median_target_progress": 0.04409305555553228,
+        "stressed_median_target_progress": 0.03936333333333217,
+        "mll_breaches": 0
+      },
+      "B3": {
+        "normal_passes": 0,
+        "stressed_passes": 0,
+        "normal_median_target_progress": 0.15429055555554483,
+        "stressed_median_target_progress": 0.1470663888888893,
+        "mll_breaches": 0
+      },
+      "B4": {
+        "normal_passes": 183,
+        "stressed_passes": 168,
+        "normal_median_target_progress": 0.500945555555534,
+        "stressed_median_target_progress": 0.47532833333334,
+        "mll_breaches": 0
+      }
+    }
+  },
+  "behavioral_clustering": {
+    "status": "POSTHOC_DIAGNOSTIC_ONLY_NO_SELECTION_RESCUE",
+    "method": "Exact canonical account-outcome path fingerprint at 60 trading days, excluding policy identity; sleeve membership summarized separately.",
+    "input_policy_count": 36,
+    "exact_account_behavior_cluster_count": 30,
+    "cluster_size_distribution": [2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "exact_clone_pairs": [
+      ["economic_policy_2fefd429accab03806e6250d", "economic_policy_e35ae68c037709267d0a1802"],
+      ["economic_policy_4b57845bcae596c2ce52fb17", "economic_policy_9a859af7e1cbb645e973823a"],
+      ["economic_policy_518ade1b81df3c9fba5db737", "economic_policy_d6085407b3fbbfaea2967aee"],
+      ["economic_policy_54fff81a77950f5e1f12b29c", "economic_policy_a7df8bbd3423150d89c51956"],
+      ["economic_policy_5a6b1902cb3a30b723113c38", "economic_policy_98c774377fed93e16d11bd27"],
+      ["economic_policy_69dce7a25376e2a0a65e2ff8", "economic_policy_7e8d187d18fbd2e8a5aaeeac"]
+    ],
+    "unique_sleeve_membership_count": 7,
+    "sleeve_membership_size_distribution": [16, 7, 6, 4, 1, 1, 1],
+    "primary_policy_retained_per_cluster": 0,
+    "reason_no_primary_retained": "The selector procedure is falsified before held-out evaluation; clustering cannot manufacture an eligible champion."
+  },
+  "matched_controls": {
+    "status": "BASELINE_REPLAY_COMPLETE_COMPARISON_NOT_EXECUTED_NO_CHAMPION",
+    "interpretation": "Descriptive development summaries only; no survivor-versus-control held-out comparison exists.",
+    "best_parent": {
+      "policy_count": 276,
+      "normal_pass_count": 1,
+      "stressed_pass_count": 1,
+      "normal_mll_breach_count": 43,
+      "stressed_mll_breach_count": 60
+    },
+    "equal_risk": {
+      "policy_count": 12,
+      "normal_pass_count": 0,
+      "stressed_pass_count": 0,
+      "normal_mll_breach_count": 39,
+      "stressed_mll_breach_count": 40
+    },
+    "matched_random": {
+      "policy_count": 60,
+      "normal_pass_count": 10,
+      "stressed_pass_count": 9,
+      "normal_mll_breach_count": 62,
+      "stressed_mll_breach_count": 62
+    }
+  },
+  "promotion_and_retry": {
+    "promotion_96_count": 0,
+    "promotion_144_to_192_count": 0,
+    "confirmation_ready_count": 0,
+    "paper_shadow_ready_count": 0,
+    "exact_selector_retry_allowed": false,
+    "evidence_bundle_finalization_allowed": false,
+    "same_exact_policy_family_relaunch_allowed": false,
+    "individual_components_preserved": true,
+    "next_action": "QUEUE_MATERIALLY_DISTINCT_MECHANISM_MANIFEST"
+  },
+  "governance": {
+    "q4_historical_access_count": 1,
+    "q4_status": "BURNED",
+    "q4_access_delta_campaign_0024": 0,
+    "new_data_purchase_count_campaign_0024": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "budget_spent_usd": 87.847388,
+    "budget_remaining_usd": 37.152612,
+    "mission_db_integrity": "ok",
+    "registry_db_integrity": "ok",
+    "graveyard_db_integrity": "ok",
+    "governance_protected_manifest_sha256": "5ded7cc548d274c57bf8454e760da9cdcdfcb04f4437c29b19b9e0cf3fbc6c99"
+  },
+  "CONTRE": "The 183 normal and 168 stressed Stage-3 passes are overlapping-start development diagnostics concentrated entirely in B4. They are neither held-out selector evidence nor independent confirmation and cannot authorize a fallback champion or promotion.",
+  "receipt_hash": "4f91609ddabf75eedf1b78d78ca3e581a709d6ff4f485b56a7cbc01a44e48d54"
+}
