@@ -1,0 +1,51 @@
+{
+  "schema": "hydra_v73_nested_selector_preflight_blocker_v1",
+  "recorded_at_utc": "2026-07-14T10:25:13Z",
+  "requested_campaign": "HYDRA_V7_3_NESTED_SELECTOR_VALIDATION",
+  "status": "BLOCKED_BEFORE_SELECTOR_OUTCOMES",
+  "blocking_condition": "AUTHORITATIVE_CAMPAIGN_0023_COMPONENT_EVENT_LEDGER_MISSING",
+  "scientific_reason": "The selector requires immutable per-component events. Rebuilding them from cached feature matrices would recalculate calibration thresholds, signals, entries, exits, PnL, excursions, and timestamps, contrary to the frozen sprint contract.",
+  "source_audit": {
+    "campaign_0023_preregistration_sha256": "4319939f6b0b945a80256861f4bb90b265c97aad94e00e27e2fb82a8c28715e9",
+    "exact_component_results_sha256": "c4f84d5af9b9ee4fc90d93cd616db321ee9bd6c2352b2ffb1afc5a0d4f0608b0",
+    "exact_component_metadata_rows": 48,
+    "declared_component_event_count": 3778,
+    "persisted_component_event_count": 0,
+    "pair_results_sha256": "1dac793d1067436a4ebe88a8796f3bbbca35b805c32fef78e3e2058f2d200ecf",
+    "pair_result_rows": 128,
+    "persisted_episode_arrays": 0,
+    "population_sha256": "af4be1cf608b23722227019e57fab4951c567909831571eaab3829810bbc3ab4",
+    "result_sha256": "9c94e7fbecfa718e2c08f602fefddb3238ed06aaf86f8e2bf72cc01c8f3dff09",
+    "safe_checkpoint_sha256": "52ffa449a946986135df8cf143bb3580f348faee3e1d27158deded8f4fd49a95",
+    "historical_exact_component_files_scanned": 28,
+    "historical_exact_component_rows_scanned": 2513,
+    "historical_rows_with_events": 0,
+    "behavioral_trade_ledgers_scanned": 8,
+    "matching_component_specification_hashes": 0
+  },
+  "completed_without_outcome_access": {
+    "campaign_0023_values_verified": true,
+    "campaign_0023_terminal_persistence_written": true,
+    "diagnostic_champion_status_frozen": "DEVELOPMENT_SELECTED_DIAGNOSTIC_CHAMPION",
+    "safe_checkpoint_verified": true,
+    "leakage_free_fold_compiler_implemented": true,
+    "fold_candidate_structure_count": 80,
+    "outer_fold_count": 4,
+    "held_out_selector_results_viewed": false,
+    "campaign_0024_queued": false
+  },
+  "governance": {
+    "new_data_purchase_count": 0,
+    "q4_access_delta": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "second_controller_created": false,
+    "second_writer_created": false,
+    "implicit_event_reconstruction_enabled": false
+  },
+  "required_resolution": [
+    "Supply an authoritative pre-existing immutable 48-runtime/3778-event ledger with complete provenance.",
+    "Or explicitly authorize a one-time deterministic reconstruction as an exception to the no-recalculation instruction; it would remain development-only and would be reconciled exactly against all 48 metadata rows before selection."
+  ],
+  "persistent_mission_action": "KEEP_EXISTING_CONTROLLER_RUNNING; DO_NOT_QUEUE_SELECTOR_UNTIL_LEDGER_AUTHORITY_IS_RESOLVED"
+}

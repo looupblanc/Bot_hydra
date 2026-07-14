@@ -1,0 +1,22 @@
+{
+  "basket_confirmation_ready": false,
+  "independent_evidence": false,
+  "manifest_hash": "e838f37351a14bc72edab044662734b163fbc1bc9ef0e7376f3442ba63f975fc",
+  "may_inherit_promotion": false,
+  "mll_breach_rate": 0.0,
+  "normal_episode_count": 48,
+  "normal_pass_count": 9,
+  "normal_pass_rate": 0.1875,
+  "normal_target_progress_median": 0.7861702777778232,
+  "paper_shadow_ready": false,
+  "policy_id": "static_parent_basket_428d24d049c7ae3c01b95e85",
+  "promotion_status_inherited": false,
+  "schema": "hydra_v73_development_diagnostic_champion_manifest_v1",
+  "source_campaign_terminal_verdict": "STATIC_PARENT_SYNTHESIS_FALSIFIED",
+  "status": "DEVELOPMENT_SELECTED_DIAGNOSTIC_CHAMPION",
+  "stressed_episode_count": 48,
+  "stressed_pass_count": 9,
+  "stressed_pass_rate": 0.1875,
+  "stressed_target_progress_median": 0.7635097222222701,
+  "validated": false
+}

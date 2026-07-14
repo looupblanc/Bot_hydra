@@ -447,6 +447,44 @@ class EconomicEvolutionManifestRuntime:
     ) -> dict[str, Any]:
         tripwire = result["family_tripwire"]
         if bool(tripwire["family_green"]):
+            if config.get("class_id") == "NESTED_STATIC_BASKET_SELECTOR_PROCEDURE_V1":
+                final = result.get("final_development") or {}
+                confirmation_ready = list(
+                    final.get("basket_confirmation_ready") or []
+                )
+                if result.get("development_only") is not True or result.get(
+                    "independently_confirmed"
+                ) is not False:
+                    raise EconomicEvolutionRuntimeError(
+                        "nested selector GREEN escaped development-only status"
+                    )
+                if result.get("account_policy_economics", {}).get(
+                    "targeted_mutations_selected"
+                ) != []:
+                    raise EconomicEvolutionRuntimeError(
+                        "nested selector GREEN cannot launch neighboring mutations"
+                    )
+                return {
+                    **dict(action),
+                    "manifest_campaign_terminal_state": (
+                        "SELECTOR_GREEN_DEVELOPMENT_FINALISTS_FROZEN"
+                    ),
+                    "manifest_campaign_confirmation_ready_count": len(
+                        confirmation_ready
+                    ),
+                    "manifest_campaign_independently_confirmed": False,
+                    "manifest_campaign_parameter_neighbour_mutation_allowed": False,
+                    "next_experiment_id": (
+                        "INDEPENDENT_CONFIRMATION_DATA_AVAILABILITY_AUDIT"
+                        if confirmation_ready
+                        else "NESTED_SELECTOR_GREEN_FINALISTS_PRESERVED"
+                    ),
+                    "next_experiment_state": (
+                        "BASKET_CONFIRMATION_READY_DEVELOPMENT_ONLY"
+                        if confirmation_ready
+                        else "AWAITING_INDEPENDENT_CONFIRMATION_AUTHORITY"
+                    ),
+                }
             return {
                 **dict(action),
                 "manifest_campaign_terminal_state": "SURVIVORS_REQUIRE_NEXT_MANIFEST",
