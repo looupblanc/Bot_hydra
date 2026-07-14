@@ -1,0 +1,48 @@
+{
+  "schema": "hydra_economic_evolution_terminal_verdict_v1",
+  "verdict_id": "hydra_economic_evolution_coverage_union_0014_verdict",
+  "issued_at_utc": "2026-07-14T03:47:00Z",
+  "campaign_id": "hydra_economic_evolution_coverage_union_0014",
+  "class_id": "CROSS_MARKET_SESSION_COVERAGE_UNION_V1",
+  "source_commit": "20e71eb46aa12821fd74d7431b478b87921f2a70",
+  "result": {
+    "path": "reports/economic_evolution/coverage_union_0014/coverage_union_result.json",
+    "file_sha256": "2a5951fd6487ec945b6df98909f0d66f57c7e5ab8e6b08f2dec4efdd843e24fe",
+    "semantic_hash": "61a4170a308a3eb744d083e546bbdc0c880b6a7245cd99ee1acda42efa64f00b",
+    "real_policy_count": 512,
+    "matched_control_policy_count": 512,
+    "rolling_combine_episode_count": 12288,
+    "normal_positive_policy_count": 512,
+    "stressed_positive_policy_count": 512,
+    "policies_with_at_least_one_combine_pass": 0,
+    "median_target_progress": 0.1587263888890197,
+    "maximum_target_progress": 0.4888877777779158,
+    "median_mll_breach_rate": 0.0,
+    "maximum_mll_breach_rate": 0.0,
+    "account_research_candidate_count": 110,
+    "real_win_count": 290,
+    "matched_control_win_count": 107,
+    "tie_count": 115,
+    "NULL_RATIO": 0.3689655172413793,
+    "exact_one_sided_binomial_p_value": 6.6487296697262884e-21,
+    "family_tripwire": "GREEN_NULL_ADJUSTED_BASELINE"
+  },
+  "terminal_decision": {
+    "verdict": "MECHANISM_RESEARCH_ELITE_TARGET_VELOCITY_LIMITED",
+    "exact_class_tombstoned": false,
+    "same_version_mutation_allowed": false,
+    "downstream_sizing_research_allowed": true,
+    "status_inheritance_allowed": false,
+    "next_action": "PREREGISTER_BUFFER_AWARE_COVERAGE_SIZING_0015"
+  },
+  "governance": {
+    "development_only": true,
+    "proof_windows_consumed": 0,
+    "new_data_purchase_count": 0,
+    "q4_access_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "CONTRE": "The green paired enrichment establishes incremental development economics, not a Combine-capable policy. Zero complete passes and a 48.89% maximum progress path mean downstream sizing can still fail through MLL, consistency, or cost stress.",
+  "verdict_hash": "5a85580bdc4e328b5f996a4cc664bfab65ce64247fd469e40c13ea2b2c494c2f"
+}
