@@ -54,6 +54,18 @@ def load_and_validate_production_manifest(path: str | Path) -> dict[str, Any]:
         raise ProductionManifestError("production manifest hash drift")
     if manifest.get("schema") != PRODUCTION_MANIFEST_SCHEMA:
         raise ProductionManifestError("unsupported production manifest schema")
+    if manifest.get("campaign_mode") == "ACTIVE_RISK_POOL":
+        from hydra.production.active_risk_manifest import (
+            ActiveRiskManifestError,
+            validate_active_risk_manifest,
+        )
+
+        try:
+            validate_active_risk_manifest(manifest, manifest_path=resolved)
+        except ActiveRiskManifestError as exc:
+            raise ProductionManifestError(str(exc)) from exc
+        _validate_component_bank(manifest, resolved.parents[2])
+        return manifest
     if manifest.get("campaign_mode") == "PORTFOLIO_FIRST":
         from hydra.production.portfolio_manifest import (
             PortfolioManifestError,

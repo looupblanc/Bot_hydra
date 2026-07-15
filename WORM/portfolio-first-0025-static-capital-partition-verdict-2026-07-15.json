@@ -1,0 +1,80 @@
+{
+  "schema": "hydra_portfolio_static_partition_terminal_verdict_worm_v1",
+  "campaign_id": "hydra_portfolio_first_combine_to_payout_0025",
+  "class_id": "PORTFOLIO_FIRST_COMBINE_TO_PAYOUT_V1",
+  "recorded_at_utc": "2026-07-15T04:52:20Z",
+  "immutable": true,
+  "terminal_status": "STATIC_CAPITAL_PARTITION_TOO_SLOW",
+  "terminal_scope": "FROZEN_PORTFOLIO_FIRST_STATIC_BOOK_CONSTRUCTION",
+  "failure_code": "STATIC_CAPITAL_PARTITION_TOO_SLOW",
+  "source_manifest": {
+    "path": "config/v7/portfolio_first_combine_to_payout_0025.json",
+    "file_sha256": "bd582bb9308354baee7080aa603aae4f7853bde182106234577ef56bfc65d578",
+    "semantic_hash": "36a0768e41541d27c9e8c557a2e192fe3d6b622b4053b1fc362fe1c5c8ef59c4",
+    "source_commit": "1d9d8455a614914e9e4f7d753e6421425166a59b",
+    "tag": "worm/portfolio-first-combine-to-payout-0025-revision-01-2026-07-15",
+    "commit": "4e25495694d0ddc1baf27b0df497c6f3787b1e08"
+  },
+  "source_terminal_receipt": {
+    "path": "reports/economic_evolution/portfolio_first_combine_to_payout_0025/static_capital_partition_terminal_receipt.json",
+    "file_sha256": "70416a2877b344699fb79137269e817229ea20c171f87255d30171d328bd58cd",
+    "receipt_hash": "dd658983972d9e1401b7e291416b71e8614ff303542615151cb2028839c3139b"
+  },
+  "terminal_evidence": {
+    "frozen_sleeves": 18,
+    "book_pairs_generated": 20000,
+    "exact_account_replays": 2000,
+    "stage3_books": 256,
+    "normal_stage3_episodes": 12288,
+    "stressed_stage3_episodes": 12288,
+    "normal_combine_passes": 0,
+    "stressed_combine_passes": 0,
+    "xfa_transitions": 0,
+    "mll_breaches": 0,
+    "normal_median_target_progress": 0.12487805555556325,
+    "stressed_median_target_progress": 0.11635388888889348,
+    "observed_duration_median_trading_days": 27,
+    "observed_duration_maximum_trading_days": 52,
+    "stage3_censored_episode_count": 24576
+  },
+  "evidence_boundary": {
+    "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+    "bundle_complete": true,
+    "bundle_manifest_sha256": "b17cc46d3963fad2b5b6110a340d426850530a1ee0972001d685e2493476a780",
+    "bundle_content_sha256": "6675d085ed8a1a99b5c37e1fe49bfa18362aeeb879b372e4c476674b13a5acae",
+    "evidence_episode_rows": 38528,
+    "evidence_daily_path_rows": 1387008,
+    "development_evidence_only": true,
+    "independent_confirmation": false,
+    "overlapping_starts_counted_as_independent": false
+  },
+  "identity_boundary": {
+    "trades_pnl_costs_mll_target_progress_identity_failures": 0,
+    "inactive_sleeve_invariance_failures": 0,
+    "nonoverlap_conservation_failures": 0,
+    "inactive_sleeves_reserve_risk": false,
+    "actual_stop_risk_available": false,
+    "consistency_reporting_defect_repaired": true,
+    "consistency_repair_changed_economic_outcomes": false
+  },
+  "scope": {
+    "static_book_retry_allowed": false,
+    "neighboring_static_book_variants_allowed": false,
+    "source_sleeves_killed": false,
+    "source_sleeves_preserved": 18,
+    "active_risk_pool_campaign_allowed": true,
+    "active_pool_confirmation_candidate_count": 0,
+    "paper_shadow_ready_count": 0,
+    "next_campaign_must_change_account_governor_mechanism": true
+  },
+  "governance": {
+    "q4_status": "BURNED",
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "budget_remaining_usd": 37.152612
+  },
+  "CONTRE": "This verdict terminates only the static capital-partition construction. It neither validates nor erases any sleeve and authorizes only the already-scoped bounded active-risk-pool experiment on immutable ledgers.",
+  "verdict_hash": "e852796dd19eb041912d8cfe0a6625fdf07d5c4f64d48f32fce0095ec8faa2b1"
+}

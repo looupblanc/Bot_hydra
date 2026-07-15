@@ -1,0 +1,140 @@
+{
+  "schema": "hydra_portfolio_static_partition_terminal_receipt_v1",
+  "recorded_at_utc": "2026-07-15T04:52:20Z",
+  "campaign_id": "hydra_portfolio_first_combine_to_payout_0025",
+  "class_id": "PORTFOLIO_FIRST_COMBINE_TO_PAYOUT_V1",
+  "terminal_status": "STATIC_CAPITAL_PARTITION_TOO_SLOW",
+  "terminal_scope": "FROZEN_PORTFOLIO_FIRST_STATIC_BOOK_CONSTRUCTION",
+  "failure_code": "STATIC_CAPITAL_PARTITION_TOO_SLOW",
+  "failure_message": "Positive low-MLL static books did not reach the Combine target within the available block-censored chronology.",
+  "scientific_boundary": {
+    "development_evidence_only": true,
+    "independent_confirmation": false,
+    "overlapping_starts_counted_as_independent": false,
+    "all_censored_paths_treated_as_mll_failures": false,
+    "threshold_changed_after_result": false,
+    "static_book_retry_allowed": false,
+    "source_sleeves_killed": false,
+    "source_sleeves_preserved": 18
+  },
+  "source_identity": {
+    "actual_git_head_at_terminalization": "787222de7114d97df6430a2df65bb6068378021c",
+    "origin_main_at_terminalization": "81f05ec9d7cd796ff91fd14d15760322c2924275",
+    "manifest_source_commit": "1d9d8455a614914e9e4f7d753e6421425166a59b",
+    "manifest_path": "config/v7/portfolio_first_combine_to_payout_0025.json",
+    "manifest_file_sha256": "bd582bb9308354baee7080aa603aae4f7853bde182106234577ef56bfc65d578",
+    "manifest_semantic_hash": "36a0768e41541d27c9e8c557a2e192fe3d6b622b4053b1fc362fe1c5c8ef59c4",
+    "manifest_worm_tag": "worm/portfolio-first-combine-to-payout-0025-revision-01-2026-07-15",
+    "manifest_worm_commit": "4e25495694d0ddc1baf27b0df497c6f3787b1e08"
+  },
+  "safe_checkpoint": {
+    "path": "mission/state/snapshots/portfolio_0025_failed_seal_pre_repair_20260715T042700Z.tar.gz",
+    "sha256": "faaf91f559a34c9d13cf53189ddca34c1bc959d19c19d28f3dafa5d43724f0e6"
+  },
+  "evidence_bundle": {
+    "status": "COMPLETE",
+    "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+    "reconstruction_flag": false,
+    "bundle_path": "data/cache/evidence_bundles/hydra_portfolio_first_combine_to_payout_0025.evidence-v1",
+    "manifest_sha256": "b17cc46d3963fad2b5b6110a340d426850530a1ee0972001d685e2493476a780",
+    "bundle_content_sha256": "6675d085ed8a1a99b5c37e1fe49bfa18362aeeb879b372e4c476674b13a5acae",
+    "finalized_at_utc": "2026-07-15T04:41:23.141175Z",
+    "episode_rows": 38528,
+    "daily_path_rows": 1387008,
+    "component_signal_rows": 2052,
+    "component_trade_rows": 2052,
+    "validator_repair_receipt_path": "reports/economic_evolution/portfolio_first_combine_to_payout_0025/evidence_validator_repair_receipt.json",
+    "validator_repair_receipt_sha256": "d93c32755373f80c11acb5e1cab6f285ae907dd64bc223a6bf4d10981dda1cb3",
+    "economic_replay_recomputed_during_repair": false,
+    "economic_outcomes_changed_during_repair": false
+  },
+  "work_completed": {
+    "frozen_sleeves": 18,
+    "book_pairs_generated": 20000,
+    "exact_account_replays": 2000,
+    "stage3_books": 256,
+    "stage3_normal_episodes": 12288,
+    "stage3_stressed_episodes": 12288,
+    "authoritative_episode_rows_total": 38528,
+    "normal_combine_passes": 0,
+    "stressed_combine_passes": 0,
+    "xfa_transitions": 0,
+    "first_payouts": 0,
+    "mll_breaches": 0,
+    "normal_median_target_progress": 0.12487805555556325,
+    "stressed_median_target_progress": 0.11635388888889348,
+    "normal_median_net_usd": 1123.9025000000693,
+    "stressed_median_net_usd": 1047.1850000000413
+  },
+  "horizon_audit": {
+    "requested_horizon_trading_days": 90,
+    "observed_duration_minimum": 1,
+    "observed_duration_p25": 12,
+    "observed_duration_median": 27,
+    "observed_duration_p75": 42,
+    "observed_duration_maximum": 52,
+    "stage3_censored_episode_count": 24576,
+    "positive_progress_linear_projection_active_days_median": 108.6,
+    "positive_progress_linear_projection_calendar_days_median": 289.2,
+    "projection_role": "DIAGNOSTIC_NOT_SURVIVAL_ESTIMATE"
+  },
+  "identity_and_dilution_audit": {
+    "single_sleeve_cases": 864,
+    "trade_pnl_cost_mll_target_progress_failures": 0,
+    "inactive_sleeve_invariance_failures": 0,
+    "nonoverlapping_pair_conservation_passes": 48,
+    "nonoverlapping_pair_conservation_failures": 0,
+    "legacy_consistency_indicator_disagreements": 307,
+    "legacy_consistency_indicator_repaired": true,
+    "consistency_indicator_repair_changes_pass_pnl_or_mll": false,
+    "inactive_sleeves_reserve_risk": false,
+    "static_dilution_allocation_defect_found": false,
+    "actual_stop_risk_available": false,
+    "routing_risk_measure_for_successor": "DECLARED_NOMINAL_RISK_UTILISATION"
+  },
+  "observed_account_utilisation": {
+    "maximum_mini_equivalent_median": 0.4,
+    "maximum_mini_equivalent_p75": 0.5,
+    "maximum_mini_equivalent_maximum": 0.9,
+    "configured_maximum_mini_equivalent": 15.0,
+    "median_contract_cap_utilisation": 0.02666666666666667,
+    "median_mll_buffer_usd": 3636.03,
+    "signal_timestamp_active_sleeve_distribution": {
+      "zero": 0.85964,
+      "one": 0.12882,
+      "two": 0.01134,
+      "three_or_more": 0.000197
+    }
+  },
+  "conflict_accounting": {
+    "signals_emitted": 986630,
+    "signals_accepted": 955674,
+    "signals_rejected": 30956,
+    "rejection_rate": 0.031375,
+    "same_market_conflict_rejections": 30956,
+    "size_reductions": 0,
+    "contract_limit_rejections": 0,
+    "mll_risk_rejections": 0,
+    "normal_foregone_realized_pnl_ex_post_per_episode": 130.11,
+    "stressed_foregone_realized_pnl_ex_post_per_episode": 127.41,
+    "counterfactual_role": "POSTHOC_DIAGNOSTIC_NOT_GUARANTEED_REALIZABLE_PNL"
+  },
+  "promotion_and_next_action": {
+    "promotion_96_count": 0,
+    "active_pool_confirmation_candidate_count": 0,
+    "paper_shadow_ready_count": 0,
+    "static_book_neighbor_retry_allowed": false,
+    "all_18_sleeve_evidence_bundles_preserved": true,
+    "next_action": "APPEND_ACTIVE_RISK_POOL_TARGET_VELOCITY_MANIFEST"
+  },
+  "governance": {
+    "q4_status": "BURNED",
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "budget_remaining_usd": 37.152612
+  },
+  "CONTRE": "Zero observed MLL breaches and positive median net do not establish target velocity. The static construction is terminal, while the eighteen immutable sleeves remain valid development inputs for one bounded causal active-risk-pool experiment.",
+  "receipt_hash": "dd658983972d9e1401b7e291416b71e8614ff303542615151cb2028839c3139b"
+}
