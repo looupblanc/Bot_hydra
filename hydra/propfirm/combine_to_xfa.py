@@ -893,6 +893,7 @@ def _run_xfa_path(
 
         payout_gross = 0.0
         payout_net = 0.0
+        payout_executed = False
         if payout_eligible and balance > 0.0:
             payout_gross = min(balance * rules.payout_fraction, payout_cap)
             if payout_gross >= rules.minimum_payout - 1e-12:
@@ -911,6 +912,7 @@ def _run_xfa_path(
                 total_profit_cycle = 0.0
                 best_day_cycle = 0.0
                 cycle_start_balance = balance
+                payout_executed = True
 
         ledger.append(
             {
@@ -934,7 +936,7 @@ def _run_xfa_path(
                     consistency_ratio if math.isfinite(consistency_ratio) else None
                 ),
                 "payout_eligible": payout_eligible,
-                "payout_requested": payout_gross > 0.0,
+                "payout_requested": payout_executed,
                 "gross_payout": payout_gross,
                 "trader_net_payout": payout_net,
                 "payout_cycles": cycles,

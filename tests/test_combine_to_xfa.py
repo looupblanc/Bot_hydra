@@ -329,6 +329,42 @@ def test_standard_later_payout_cycle_requires_new_positive_profit() -> None:
     assert result.xfa_standard.daily_ledger[-1]["payout_requested"] is True
 
 
+def test_subminimum_eligible_amount_is_not_recorded_as_a_payout_request() -> None:
+    days = tuple(range(20260701, 20260709))
+    xfa_pnls = (150.0, 150.0, 150.0, 150.0, -600.0, 150.0)
+    events = {
+        "alpha": (
+            _trade("alpha", "ES", days[0], 4_500.0),
+            _trade("alpha", "ES", days[1], 4_500.0),
+            *tuple(
+                _trade("alpha", "ES", day, pnl)
+                for day, pnl in zip(days[2:], xfa_pnls, strict=True)
+            ),
+        )
+    }
+
+    result = run_combine_to_xfa_episode(
+        events,
+        days,
+        basket=_basket("alpha"),
+        combine_profile=_profile("combine"),
+        xfa_profile=_profile("xfa"),
+        start_day=days[0],
+        combine_horizon_days=2,
+        xfa_horizon_days=6,
+    )
+
+    assert result.xfa_standard is not None
+    assert result.xfa_standard.payout_cycles == 0
+    assert result.xfa_standard.gross_payout == 0.0
+    assert result.xfa_standard.daily_ledger[-1]["payout_eligible"] is True
+    assert result.xfa_standard.daily_ledger[-1]["payout_requested"] is False
+    assert sum(
+        bool(row.get("payout_requested"))
+        for row in result.xfa_standard.daily_ledger
+    ) == result.xfa_standard.payout_cycles
+
+
 def test_payout_on_last_observed_day_is_not_post_payout_survival() -> None:
     days = tuple(range(20260701, 20260708))
     events = {

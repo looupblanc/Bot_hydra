@@ -1,0 +1,79 @@
+{
+  "campaign_id": "hydra_active_risk_pool_target_velocity_0026",
+  "classification": "TECHNICAL_XFA_PAYOUT_REQUEST_MARKER_DEFECT",
+  "failed_checkpoint": {
+    "error": "XFA_STANDARD XFA payout cardinality drift",
+    "last_completed_policy_id": "active_pool_3505bdb6ea787dbcbf270f88",
+    "production_state_file_sha256": "fc24a1184678bfb02b97eb38b55c8ec80d31c2e37431ab0619fe4f9b212aedca",
+    "production_state_hash": "95a9295be6578140697fd3c6838264747829c40cd64ae8dcff063b001a0f962e",
+    "production_state_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026/production_state.json",
+    "stage": "ACTIVE_POOL_STAGE_3_48_STARTS",
+    "state": "FAILED_CLOSED"
+  },
+  "pre_repair_provenance": {
+    "manifest_file_sha256": "4cddc721a3ea84eef68679e280831c0cd73d5efe6bd1fb37d459a30b6d47a02f",
+    "manifest_hash": "e11bfb4ce548ae69aa19e08a1905f1b11cf15b69bb7bbf45eb0e11d1188905ff",
+    "manifest_path": "config/v7/active_risk_pool_target_velocity_0026.json",
+    "source_commit": "4cd791e7eb1d00f1b82414c3d17c30e99b23ff4e",
+    "staging_checkpoint_sha256": "6dbe7c209810fbc3b675490fcb60074d556f009286f388c46fae8306945195ad",
+    "staging_identity_sha256": "f41583733abb7532c61f6cf98bb589519297b62b019d153623ba0cbcf6700dd3"
+  },
+  "recorded_at_utc": "2026-07-15T07:38:00Z",
+  "repair_record_hash": "1dfec94478da3c2ab9b00a822fd2b3e9563110ae1cb1fc9ff25118849de3234c",
+  "repair_scope": {
+    "candidate_or_policy_change_allowed": false,
+    "existing_valid_batch_reuse_allowed": true,
+    "implementation_files": [
+      "hydra/propfirm/combine_to_xfa.py"
+    ],
+    "manifest_threshold_change_allowed": false,
+    "recompute_scope": "ONLY_THE_DIVERGENT_STAGE3_BATCH_AND_SUBSEQUENT_UNFINISHED_BATCHES",
+    "targeted_test": "tests/test_combine_to_xfa.py::test_subminimum_eligible_amount_is_not_recorded_as_a_payout_request"
+  },
+  "reproduction": {
+    "cache_file_sha256": "facfc313f1c0a908abda246b47d1f235a4009754073383e0cf08a4fae579b65e",
+    "cache_path": "data/cache/economic_production/hydra_active_risk_pool_target_velocity_0026/stage3_active_batches/batch_000001.json",
+    "executed_trader_net_payout_usd_for_false_markers": 0.0,
+    "false_request_markers": 6,
+    "mismatched_standard_paths": 4,
+    "policy_id": "active_pool_013e6cbe6670a1368ba806f9",
+    "subminimum_gross_payouts_usd": [
+      53.32,
+      11.35,
+      53.32,
+      11.35,
+      97.23,
+      98.525
+    ]
+  },
+  "root_cause": {
+    "corrected_semantics": "TRUE_ONLY_WHEN_A_PAYOUT_WAS_EXECUTED_AND_CYCLE_INCREMENTED",
+    "economic_state_mutated_by_defect": false,
+    "field": "XFA daily_ledger.payout_requested",
+    "minimum_payout_usd": 125.0,
+    "old_semantics": "TRUE_WHEN_COMPUTED_GROSS_PAYOUT_WAS_POSITIVE_EVEN_BELOW_MINIMUM_PAYOUT"
+  },
+  "safety": {
+    "broker_connections": 0,
+    "live_trading": false,
+    "new_data_purchase_count": 0,
+    "orders": 0,
+    "q4_access_delta": 0
+  },
+  "schema": "hydra_technical_evidence_repair_receipt_v1",
+  "scientific_status": "NO_ECONOMIC_VERDICT_CHANGE",
+  "unaffected_fields": [
+    "source_signals",
+    "entries",
+    "exits",
+    "trade_paths",
+    "Combine PnL",
+    "Combine costs",
+    "Combine target progress",
+    "Combine MLL",
+    "Combine consistency",
+    "candidate ranking",
+    "halving thresholds",
+    "risk governor"
+  ]
+}
