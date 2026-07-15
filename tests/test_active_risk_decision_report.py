@@ -839,6 +839,15 @@ def _fixture(tmp_path: Path) -> dict[str, Path]:
         "risk_utilisation": _aggregate_utilisation(candidates),
         "suppression": _aggregate_suppression(candidates),
         "horizon_frontier": _aggregate_horizons(candidates),
+        # Includes frozen Stage-4/5 increments absent from the Stage-3 caches.
+        "xfa_paths_started": 6,
+        "xfa_standard_paths": 6,
+        "xfa_consistency_paths": 6,
+        "first_payouts": 12,
+        "payout_cycles": 12,
+        "trader_net_payout": 6_000.0,
+        "post_payout_survival_count": 12,
+        "post_payout_survival_rate": 1.0,
     }
     evidence_receipt = _seal_test_evidence_bundle(
         tmp_path,
@@ -944,9 +953,11 @@ def test_streaming_report_covers_blocks_controls_xfa_and_clusters(tmp_path: Path
     assert static_delta["target_progress_median"] == pytest.approx(0.10)
     assert candidate["control_deltas"]["matched_random_priority"]["exposure_matching"]["matched"]
 
-    normal_standard = report["xfa_lifecycle"]["normal"]["standard"]
-    normal_consistency = report["xfa_lifecycle"]["normal"]["consistency"]
-    stressed_standard = report["xfa_lifecycle"]["stressed"]["standard"]
+    stage3_lifecycle = report["stage3_xfa_lifecycle"]
+    assert stage3_lifecycle["scope"].startswith("STAGE3_ONLY")
+    normal_standard = stage3_lifecycle["normal"]["standard"]
+    normal_consistency = stage3_lifecycle["normal"]["consistency"]
+    stressed_standard = stage3_lifecycle["stressed"]["standard"]
     assert normal_standard["combine_attempts"] == 96
     assert normal_standard["xfa_paths_started"] == 2
     assert normal_standard["first_payouts"] == 2
@@ -973,6 +984,20 @@ def test_streaming_report_covers_blocks_controls_xfa_and_clusters(tmp_path: Path
         == 9.375
     )
     assert report["integrity"]["full_pass_xfa_lifecycle_bijection_valid"] is True
+    global_lifecycle = report["campaign_wide_sealed_xfa_lifecycle_totals"]
+    assert global_lifecycle["scope"] == "CAMPAIGN_WIDE_SEALED_STAGE3_STAGE4_STAGE5"
+    assert global_lifecycle["totals"]["xfa_paths_started"] == 6
+    assert global_lifecycle["totals"]["xfa_paths_started"] > sum(
+        stage3_lifecycle[scenario]["standard"]["xfa_paths_started"]
+        for scenario in ("normal", "stressed")
+    )
+    assert global_lifecycle["totals"]["first_payouts"] == 12
+    assert global_lifecycle["optional_path_and_survival_breakdown"] == {
+        "xfa_standard_paths": 6,
+        "xfa_consistency_paths": 6,
+        "post_payout_survival_count": 12,
+        "post_payout_survival_rate": 1.0,
+    }
     assert (
         report["production_context"]["source"]
         == "DEEP_VERIFIED_EVIDENCE_BUNDLE_AND_TERMINAL_SNAPSHOTS"
@@ -989,6 +1014,9 @@ def test_streaming_report_covers_blocks_controls_xfa_and_clusters(tmp_path: Path
     assert canonical_hash(checked) == claimed
     markdown = render_markdown(report)
     assert "Expected trader payout" in markdown
+    assert "Stage-3-only XFA lifecycle" in markdown
+    assert "Campaign-wide sealed XFA lifecycle totals" in markdown
+    assert "not one realizable combined trader path" in markdown
     assert "overlapping rolling episode starts are not independent" in markdown
     assert "B1" in markdown
     assert "candidate-a" in markdown

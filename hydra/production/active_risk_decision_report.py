@@ -3022,6 +3022,179 @@ def _validate_sealed_stage3_aggregates(
     )
 
 
+def _sealed_campaign_wide_lifecycle_totals(
+    economic: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Expose final-result lifecycle totals without treating paths as additive alpha."""
+
+    def required_count(field_name: str) -> int:
+        value = economic.get(field_name)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise ActiveRiskDecisionReportError(
+                f"sealed campaign-wide lifecycle {field_name} is not a "
+                "non-negative integer"
+            )
+        return int(value)
+
+    totals = {
+        "xfa_paths_started": required_count("xfa_paths_started"),
+        "first_payouts": required_count("first_payouts"),
+        "payout_cycles": required_count("payout_cycles"),
+        "trader_net_payout": _required_float(
+            economic.get("trader_net_payout"),
+            label="sealed campaign-wide lifecycle trader net payout",
+        ),
+    }
+    if totals["trader_net_payout"] < 0.0:
+        raise ActiveRiskDecisionReportError(
+            "sealed campaign-wide lifecycle trader net payout is negative"
+        )
+    optional: dict[str, Any] = {}
+    for field_name in (
+        "xfa_standard_paths",
+        "xfa_consistency_paths",
+        "post_payout_survival_count",
+    ):
+        if field_name in economic and economic[field_name] is not None:
+            optional[field_name] = required_count(field_name)
+    if economic.get("post_payout_survival_rate") is not None:
+        survival_rate = _required_float(
+            economic["post_payout_survival_rate"],
+            label="sealed campaign-wide lifecycle post-payout survival rate",
+        )
+        if not 0.0 <= survival_rate <= 1.0:
+            raise ActiveRiskDecisionReportError(
+                "sealed campaign-wide lifecycle post-payout survival rate is "
+                "outside [0, 1]"
+            )
+        optional["post_payout_survival_rate"] = survival_rate
+    for field_name in ("xfa_standard_paths", "xfa_consistency_paths"):
+        if field_name in optional and optional[field_name] != totals["xfa_paths_started"]:
+            raise ActiveRiskDecisionReportError(
+                f"sealed campaign-wide lifecycle {field_name} does not match "
+                "XFA transitions"
+            )
+    alternative_path_count = (
+        int(optional.get("xfa_standard_paths", totals["xfa_paths_started"]))
+        + int(optional.get("xfa_consistency_paths", totals["xfa_paths_started"]))
+    )
+    if totals["first_payouts"] > alternative_path_count:
+        raise ActiveRiskDecisionReportError(
+            "sealed campaign-wide lifecycle first payouts exceed alternative paths"
+        )
+    if "post_payout_survival_count" in optional:
+        survival_count = int(optional["post_payout_survival_count"])
+        if survival_count > totals["first_payouts"]:
+            raise ActiveRiskDecisionReportError(
+                "sealed campaign-wide lifecycle post-payout survival count exceeds "
+                "first payouts"
+            )
+        if "post_payout_survival_rate" in optional:
+            expected_rate = (
+                survival_count / alternative_path_count
+                if alternative_path_count
+                else 0.0
+            )
+            _assert_close(
+                optional["post_payout_survival_rate"],
+                expected_rate,
+                label="sealed campaign-wide lifecycle post-payout survival rate",
+            )
+    return {
+        "scope": "CAMPAIGN_WIDE_SEALED_STAGE3_STAGE4_STAGE5",
+        "source": (
+            "FINAL_RESULT_ECONOMIC_RESULTS_IDENTICAL_TO_DEEP_VERIFIED_"
+            "EVIDENCE_BUNDLE_CAMPAIGN_SUMMARY"
+        ),
+        "rederived_from_stage3_cache": False,
+        "paths_are_alternative_not_additive": True,
+        "aggregate_path_semantics": (
+            "FIRST_PAYOUTS_PAYOUT_CYCLES_AND_TRADER_NET_PAYOUT_ARE_SEALED_"
+            "SUMS_ACROSS_STANDARD_AND_CONSISTENCY_DIAGNOSTIC_ALTERNATIVES_"
+            "AND_ARE_NOT_ONE_REALIZABLE_COMBINED_TRADER_PATH"
+        ),
+        "totals": totals,
+        "optional_path_and_survival_breakdown": optional,
+        "optional_breakdown_status": (
+            "AVAILABLE_IN_SEALED_CAMPAIGN_SUMMARY"
+            if optional
+            else "UNAVAILABLE_NOT_PERSISTED_IN_SEALED_CAMPAIGN_SUMMARY"
+        ),
+    }
+
+
+def _validate_campaign_lifecycle_contains_stage3(
+    *,
+    campaign_wide: Mapping[str, Any],
+    stage3: Mapping[str, Any],
+) -> None:
+    totals = campaign_wide["totals"]
+    stage3_normal = stage3["normal"]
+    stage3_stressed = stage3["stressed"]
+    for scenario, values in (
+        ("normal", stage3_normal),
+        ("stressed", stage3_stressed),
+    ):
+        standard_paths = int(values["standard"]["xfa_paths_started"])
+        consistency_paths = int(values["consistency"]["xfa_paths_started"])
+        if standard_paths != consistency_paths:
+            raise ActiveRiskDecisionReportError(
+                f"Stage-3 {scenario} alternative XFA path coverage drift"
+            )
+    stage3_xfa_paths = sum(
+        int(values["standard"]["xfa_paths_started"])
+        for values in (stage3_normal, stage3_stressed)
+    )
+    stage3_first_payouts = sum(
+        int(values[path]["first_payouts"])
+        for values in (stage3_normal, stage3_stressed)
+        for path in PATHS
+    )
+    stage3_payout_cycles = sum(
+        int(values[path]["payout_cycles"])
+        for values in (stage3_normal, stage3_stressed)
+        for path in PATHS
+    )
+    stage3_trader_net = sum(
+        _required_float(
+            values[path]["trader_net_payout"],
+            label=f"Stage-3 {path} trader net payout",
+        )
+        for values in (stage3_normal, stage3_stressed)
+        for path in PATHS
+    )
+    stage3_comparable = {
+        "xfa_paths_started": stage3_xfa_paths,
+        "first_payouts": stage3_first_payouts,
+        "payout_cycles": stage3_payout_cycles,
+        "trader_net_payout": stage3_trader_net,
+    }
+    for field_name, stage3_value in stage3_comparable.items():
+        campaign_value = _required_float(
+            totals[field_name],
+            label=f"campaign-wide lifecycle {field_name}",
+        )
+        if campaign_value + 1e-8 < float(stage3_value):
+            raise ActiveRiskDecisionReportError(
+                f"sealed campaign-wide lifecycle {field_name} undercounts Stage-3"
+            )
+    optional = campaign_wide["optional_path_and_survival_breakdown"]
+    for path, field_name in (
+        ("standard", "xfa_standard_paths"),
+        ("consistency", "xfa_consistency_paths"),
+    ):
+        if field_name not in optional:
+            continue
+        stage3_path_count = sum(
+            int(values[path]["xfa_paths_started"])
+            for values in (stage3_normal, stage3_stressed)
+        )
+        if int(optional[field_name]) < stage3_path_count:
+            raise ActiveRiskDecisionReportError(
+                f"sealed campaign-wide lifecycle {field_name} undercounts Stage-3"
+            )
+
+
 def build_active_risk_decision_report(
     *,
     manifest_path: Path,
@@ -3269,12 +3442,15 @@ def build_active_risk_decision_report(
                 )
                 lifecycle[scenario][lifecycle_path].add_path(value)
                 candidate_lifecycle[scenario][lifecycle_path].add_path(value)
-        compact["xfa_lifecycle"] = {
-            scenario: {
-                name: candidate_lifecycle[scenario][name].to_dict()
-                for name in PATHS
-            }
-            for scenario in SCENARIOS
+        compact["stage3_xfa_lifecycle"] = {
+            "scope": "STAGE3_ONLY_48_STARTS_FULL_CHRONOLOGICAL_HORIZON",
+            **{
+                scenario: {
+                    name: candidate_lifecycle[scenario][name].to_dict()
+                    for name in PATHS
+                }
+                for scenario in SCENARIOS
+            },
         }
 
         projected_signatures = _stage3_projected_signatures(row, manifest)
@@ -3399,6 +3575,37 @@ def build_active_risk_decision_report(
             candidate["policy_id"]
         )
     candidates.sort(key=lambda row: str(row["policy_id"]))
+    stage3_xfa_lifecycle = {
+        "scope": "STAGE3_ONLY_48_STARTS_FULL_CHRONOLOGICAL_HORIZON",
+        "source": "STAGE3_CACHES_REDERIVED_AND_EVIDENCE_BUNDLE_BOUND",
+        "paths_are_alternative_not_additive": True,
+        "probability_reporting": {
+            "unconditional_lower_bound": (
+                "ALL_FULL_HORIZON_COMBINE_ATTEMPTS_WITH_CENSORED_OR_ZERO_"
+                "OBSERVATION_PATHS_CONTRIBUTING_NO_UNOBSERVED_SUCCESS"
+            ),
+            "evaluable_only": (
+                "EXCLUDES_DATA_CENSORED_COMBINE_ATTEMPTS_AND_ZERO_"
+                "OBSERVATION_OR_UNRESOLVED_DATA_CENSORED_XFA_PATHS;A_"
+                "FIRST_PAYOUT_OBSERVED_BEFORE_LATER_CENSORING_REMAINS_A_"
+                "KNOWN_FIRST_PAYOUT;COMPLETE_LIFECYCLE_EXPECTATIONS_AND_"
+                "POST_PAYOUT_SURVIVAL_EXCLUDE_LATER_CENSORING"
+            ),
+        },
+        "normal": {
+            path: lifecycle["normal"][path].to_dict() for path in PATHS
+        },
+        "stressed": {
+            path: lifecycle["stressed"][path].to_dict() for path in PATHS
+        },
+    }
+    campaign_wide_lifecycle = _sealed_campaign_wide_lifecycle_totals(
+        authoritative_chain["economic_results"]
+    )
+    _validate_campaign_lifecycle_contains_stage3(
+        campaign_wide=campaign_wide_lifecycle,
+        stage3=stage3_xfa_lifecycle,
+    )
 
     report = {
         "schema": REPORT_SCHEMA,
@@ -3436,6 +3643,8 @@ def build_active_risk_decision_report(
             "full_pass_xfa_lifecycle_bijection_valid": True,
             "authoritative_xfa_source_path_profile_rule_hashes_valid": True,
             "xfa_horizon_chronology_and_event_accounting_valid": True,
+            "stage3_and_campaign_wide_lifecycle_scopes_separated": True,
+            "campaign_wide_lifecycle_totals_sealed_and_final_result_bound": True,
         },
         "production_context": production_context,
         "funnel": {
@@ -3503,29 +3712,8 @@ def build_active_risk_decision_report(
             ),
         },
         "candidates": candidates,
-        "xfa_lifecycle": {
-            "scope": "STAGE3_48_STARTS_FULL_CHRONOLOGICAL_HORIZON",
-            "paths_are_alternative_not_additive": True,
-            "probability_reporting": {
-                "unconditional_lower_bound": (
-                    "ALL_FULL_HORIZON_COMBINE_ATTEMPTS_WITH_CENSORED_OR_ZERO_"
-                    "OBSERVATION_PATHS_CONTRIBUTING_NO_UNOBSERVED_SUCCESS"
-                ),
-                "evaluable_only": (
-                    "EXCLUDES_DATA_CENSORED_COMBINE_ATTEMPTS_AND_ZERO_"
-                    "OBSERVATION_OR_UNRESOLVED_DATA_CENSORED_XFA_PATHS;A_"
-                    "FIRST_PAYOUT_OBSERVED_BEFORE_LATER_CENSORING_REMAINS_A_"
-                    "KNOWN_FIRST_PAYOUT;COMPLETE_LIFECYCLE_EXPECTATIONS_AND_"
-                    "POST_PAYOUT_SURVIVAL_EXCLUDE_LATER_CENSORING"
-                ),
-            },
-            "normal": {
-                path: lifecycle["normal"][path].to_dict() for path in PATHS
-            },
-            "stressed": {
-                path: lifecycle["stressed"][path].to_dict() for path in PATHS
-            },
-        },
+        "stage3_xfa_lifecycle": stage3_xfa_lifecycle,
+        "campaign_wide_sealed_xfa_lifecycle_totals": campaign_wide_lifecycle,
         "posthoc_behavioral_clustering": clustering,
         "known_interpretation_limits": [
             "All evidence is development-only and is not independent confirmation.",
@@ -3534,7 +3722,8 @@ def build_active_risk_decision_report(
             "Risk utilisation covers NORMAL canonical 90-day decision events and declared nominal charges only; it is not time-weighted actual stop-risk or duty cycle.",
             "Exposure signatures are outcome-agnostic duty/exposure matching evidence, not risk utilisation.",
             "Foregone realized PnL is ex-post diagnostic and was never a routing input.",
-            "Standard and Consistency XFA paths are alternatives and must not be added as realizable payout.",
+            "Detailed XFA path probabilities and survival curves are Stage-3-only because Stage-4/5 raw lifecycle caches are not consumed by this report.",
+            "Campaign-wide XFA totals are sealed final-result diagnostics covering Stage 3+4+5; Standard and Consistency are alternatives, so their payout observations must not be interpreted as one realizable combined payout.",
             "Control block comparisons are limited to persisted net and target-progress medians because raw block-level control paths are absent from the control schema.",
             "Behavioral clusters use canonical account paths and routing decisions, not source signal/trade ledgers; they are deterministic post-hoc reporting groups and never alter frozen promotions.",
         ],
@@ -3687,7 +3876,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
             f"- Signals emitted / accepted / rejected: {report['suppression_and_foregone_pnl']['signals_emitted']} / {report['suppression_and_foregone_pnl']['signals_accepted']} / {report['suppression_and_foregone_pnl']['signals_rejected']}.",
             f"- Foregone realized PnL, ex-post diagnostic only: {_money(report['suppression_and_foregone_pnl']['foregone_realized_pnl_ex_post'])}.",
             "",
-            "## XFA lifecycle — paths reported separately",
+            "## Stage-3-only XFA lifecycle — paths reported separately",
             "",
             "| Cost | Path | Combine attempts | XFA paths | First payouts | First-payout / attempt lower bound | First-payout / evaluable lifecycle | Expected trader payout / attempt lower bound | Post-payout survival evaluable |",
             "|---|---|---:|---:|---:|---:|---:|---:|---:|",
@@ -3695,7 +3884,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     )
     for scenario in SCENARIOS:
         for path in PATHS:
-            value = report["xfa_lifecycle"][scenario][path]
+            value = report["stage3_xfa_lifecycle"][scenario][path]
             lower = value["unconditional_lower_bound"]
             evaluable = value["evaluable_only"]
             lines.append(
@@ -3706,6 +3895,40 @@ def render_markdown(report: Mapping[str, Any]) -> str:
                 f"{_money(lower['expected_trader_payout_per_combine_attempt'])} | "
                 f"{_percent(evaluable['post_payout_survival_probability_conditional_on_evaluable_first_payout'])} |"
             )
+    campaign_lifecycle = report["campaign_wide_sealed_xfa_lifecycle_totals"]
+    campaign_totals = campaign_lifecycle["totals"]
+    lines.extend(
+        [
+            "",
+            "## Campaign-wide sealed XFA lifecycle totals — Stage 3+4+5",
+            "",
+            (
+                "These are final-result totals sealed in the EvidenceBundle campaign "
+                "summary. First payouts, payout cycles, and trader payout are sums "
+                "across the alternative Standard and Consistency diagnostic paths; "
+                "they are not one realizable combined trader path."
+            ),
+            "",
+            "| XFA transitions | First-payout observations | Payout-cycle observations | Trader payout observations |",
+            "|---:|---:|---:|---:|",
+            (
+                f"| {campaign_totals['xfa_paths_started']} | "
+                f"{campaign_totals['first_payouts']} | "
+                f"{campaign_totals['payout_cycles']} | "
+                f"{_money(campaign_totals['trader_net_payout'])} |"
+            ),
+        ]
+    )
+    optional = campaign_lifecycle["optional_path_and_survival_breakdown"]
+    if optional:
+        lines.extend(
+            [
+                "",
+                "Optional sealed breakdown: `"
+                + json.dumps(optional, sort_keys=True, separators=(",", ":"))
+                + "`.",
+            ]
+        )
     lines.extend(
         [
             "",
