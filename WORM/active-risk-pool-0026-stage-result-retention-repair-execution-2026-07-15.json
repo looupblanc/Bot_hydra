@@ -1,0 +1,66 @@
+{
+  "schema": "hydra_technical_repair_execution_receipt_v1",
+  "campaign_id": "hydra_active_risk_pool_target_velocity_0026",
+  "classification": "TECHNICAL_STAGE_RESULT_RETENTION_AND_EVIDENCE_BACKPRESSURE_DEFECT",
+  "executed_at_utc": "2026-07-15T08:31:41Z",
+  "repair_commit": "988999af3d31017e70c6b487a4cef18849bdbd11",
+  "revised_manifest": {
+    "path": "config/v7/active_risk_pool_target_velocity_0026_revision_02.json",
+    "file_sha256": "5cc52c6770946deb2ce0cadcf8f0f9be6d88c943183ca54909999109f5dfc6da",
+    "manifest_hash": "db52ec45979beed05e3fa4128c4c54fc252d87c899dfd0f434647eab351b2005",
+    "worm_tag": "worm/active-risk-pool-target-velocity-0026-revision-02-2026-07-15",
+    "worm_commit": "582e7e3923778f78a6e809cb1132b64f0b3e4ec0"
+  },
+  "revised_queue": {
+    "path": "config/v7/economic_evolution_production_queue_0025.json",
+    "file_sha256": "f0cb6be5a17b90a920a796db7aae8b09f0188e1b11ddb3a6df24350191be3bc8",
+    "queue_hash": "367d2313cca42837eb6672307fefbbb68d29dbc83b7e1a3f84f55d23f6a87d31",
+    "deployment_commit": "6bbf3a03717307d6141de5b28fcd1ae9fc460990"
+  },
+  "preserved_revision_01_evidence": {
+    "quarantine_root": "reports/economic_evolution/quarantine/hydra_active_risk_pool_target_velocity_0026_backpressure_repair_20260715T0821Z",
+    "staging_identity_sha256": "0dae6b2276e03f35d217786326bf951d1e577093fcfb7162a4fd3cbf186dfef6",
+    "staging_checkpoint_sha256": "fa3cbee1dd130748856af4db6f9543dc9f2fbd31f4c8896ed2deebcd51d9de94",
+    "valid_stage3_cache_batches_reused": 6,
+    "economic_cache_deleted": false,
+    "economic_cache_recomputed": false
+  },
+  "first_post_repair_batch": {
+    "path": "data/cache/economic_production/hydra_active_risk_pool_target_velocity_0026/stage3_active_batches/batch_000006.json",
+    "file_sha256": "21e14c68636ff08526e38f526b1d6a25875f6742e36d78978d30263a65f74069",
+    "rows_hash": "88d26363e45eeb05ac8dd026e5b7de782fd17f3e29b8f8adac4c2541b28f435e",
+    "policy_id": "active_pool_01c079a772652c2b7ee70f4b",
+    "episode_rows": 480,
+    "xfa_lifecycle_rows": 84,
+    "durably_flushed_before_next_result": true
+  },
+  "runtime_validation": {
+    "service": "hydra-autonomous-mission.service",
+    "service_main_pid": 3248184,
+    "runner_pid": 3248875,
+    "controller_count": 1,
+    "evidence_writer_count": 1,
+    "compute_workers": 3,
+    "service_restart_count_after_deployment": 0,
+    "memory_growth_bounded_after_first_new_batch": true,
+    "swap_growth_after_stage3_resume": false,
+    "targeted_tests": "43_PASSED"
+  },
+  "scientific_guards": {
+    "economic_hypothesis_changed": false,
+    "candidate_selection_changed": false,
+    "promotion_thresholds_changed": false,
+    "governor_population_changed": false,
+    "governor_grammar_changed": false,
+    "sleeve_bank_changed": false,
+    "starts_blocks_or_horizons_changed": false,
+    "costs_changed": false,
+    "combine_or_xfa_rules_changed": false,
+    "multiplicity_delta": 0,
+    "q4_access_delta": 0,
+    "data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "execution_receipt_hash": "c1caf89aeb9c8ae291cd21d97ce45ed3e5e579b37c3f2931e88a3900dd0c0990"
+}
