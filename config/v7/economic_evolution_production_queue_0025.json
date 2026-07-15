@@ -172,17 +172,17 @@
       "ordinal": 26,
       "campaign_id": "hydra_active_risk_pool_target_velocity_0026",
       "engine": "production_kernel_v1",
-      "manifest_path": "config/v7/active_risk_pool_target_velocity_0026_revision_01.json",
-      "manifest_file_sha256": "b272ea0d88e95911be025611ee48330a3e70594787e91664105455afdf7f55c0",
-      "manifest_semantic_hash": "077ec2ef6d61837e8e0357564fdc672eccfa4754452bc3aabcf6f62c1453dc29",
-      "worm_tag": "worm/active-risk-pool-target-velocity-0026-revision-01-2026-07-15",
-      "worm_commit": "29ff8563e3cb98918df357416c5af22952287a78",
+      "manifest_path": "config/v7/active_risk_pool_target_velocity_0026_revision_02.json",
+      "manifest_file_sha256": "5cc52c6770946deb2ce0cadcf8f0f9be6d88c943183ca54909999109f5dfc6da",
+      "manifest_semantic_hash": "db52ec45979beed05e3fa4128c4c54fc252d87c899dfd0f434647eab351b2005",
+      "worm_tag": "worm/active-risk-pool-target-velocity-0026-revision-02-2026-07-15",
+      "worm_commit": "582e7e3923778f78a6e809cb1132b64f0b3e4ec0",
       "enabled": true,
       "technical_repair": {
-        "revision": 1,
-        "classification": "TECHNICAL_XFA_PAYOUT_REQUEST_MARKER_DEFECT",
-        "repair_record_path": "WORM/active-risk-pool-0026-xfa-cardinality-repair-2026-07-15.json",
-        "repair_record_file_sha256": "b4e06713c6f9c9cc47e20436b23d7ae80983b8f635289d70fa6caed1d2543d6c",
+        "revision": 2,
+        "classification": "TECHNICAL_STAGE_RESULT_RETENTION_AND_EVIDENCE_BACKPRESSURE_DEFECT",
+        "repair_record_path": "WORM/active-risk-pool-0026-stage-result-retention-repair-2026-07-15.json",
+        "repair_record_file_sha256": "e84897d2a714802d9c4cf2538ba0f6b7f84809183df0a8ac4724b64e7b8f2857",
         "economic_hypothesis_changed": false,
         "thresholds_or_population_changed": false,
         "additional_multiplicity_reserved": false
@@ -206,5 +206,5 @@
     "proof_window_consumption_allowed": false
   },
   "CONTRE": "This queue revision keeps scientific campaign 0026 unchanged and deploys one WORM technical repair for an XFA payout-request evidence marker. The governor population, sleeves, seeds, starts, horizons, costs, thresholds, controls, multiplicity and Combine economics remain frozen. It grants no new campaign, retry after scientific failure, Q4 access, data purchase, broker connection, orders, live trading, retuning or independent-confirmation claim.",
-  "queue_hash": "9b0f731ccea9a88502fb48468aefa4c4b7a5b13ae78f36b044a1e57db541576d"
+  "queue_hash": "367d2313cca42837eb6672307fefbbb68d29dbc83b7e1a3f84f55d23f6a87d31"
 }
