@@ -153,6 +153,17 @@ def run_production_manifest(
 ) -> dict[str, Any]:
     """Run/resume the evidence-first production funnel; never terminalize early."""
 
+    manifest = load_and_validate_production_manifest(manifest_path)
+    if manifest.get("campaign_mode") == "PORTFOLIO_FIRST":
+        from hydra.production.portfolio_runtime import run_portfolio_first_manifest
+
+        return run_portfolio_first_manifest(
+            manifest_path,
+            contract_map_path=contract_map_path,
+            cache_root=cache_root,
+            stop_after=stop_after,
+        )
+
     return _ProductionRun(
         manifest_path=Path(manifest_path),
         contract_map_path=Path(contract_map_path),

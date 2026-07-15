@@ -54,6 +54,21 @@ def load_and_validate_production_manifest(path: str | Path) -> dict[str, Any]:
         raise ProductionManifestError("production manifest hash drift")
     if manifest.get("schema") != PRODUCTION_MANIFEST_SCHEMA:
         raise ProductionManifestError("unsupported production manifest schema")
+    if manifest.get("campaign_mode") == "PORTFOLIO_FIRST":
+        from hydra.production.portfolio_manifest import (
+            PortfolioManifestError,
+            validate_portfolio_manifest,
+        )
+
+        try:
+            validate_portfolio_manifest(manifest, manifest_path=resolved)
+        except PortfolioManifestError as exc:
+            raise ProductionManifestError(str(exc)) from exc
+        # Portfolio-first reuses the exact 0024 immutable component source.
+        # The specialized sleeve contract does not replace verification of the
+        # authoritative component-bank files and their campaign provenance.
+        _validate_component_bank(manifest, resolved.parents[2])
+        return manifest
     campaign_id = str(manifest.get("campaign_id") or "")
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", campaign_id):
         raise ProductionManifestError("unsafe or empty production campaign identity")
