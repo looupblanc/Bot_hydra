@@ -6,7 +6,7 @@
   "policy_classes": [
     "PORTFOLIO_FIRST_COMBINE_TO_PAYOUT_V1"
   ],
-  "source_commit": "1d9d845e98d4250b26c5f5037d12362d617f0d19",
+  "source_commit": "1d9d8455a614914e9e4f7d753e6421425166a59b",
   "created_at_utc": "2026-07-15T02:19:14Z",
   "economic_hypothesis": "A chronological shared-account book of independently profitable, behaviorally distinct, immutable sleeves can improve expected trader payout per new Combine attempt while respecting one shared MLL, consistency, exposure, session, conflict, and Combine-to-XFA lifecycle contract; a sleeve need not pass alone to contribute economically.",
   "development_only": true,
@@ -2203,5 +2203,5 @@
     "reservation_required_before_outcome_access": true,
     "proof_window_consumed": false
   },
-  "manifest_hash": "182c760710ae4355c9bd8ad7ef40887f24c70d5ba407794cc8605bb3e4f49a42"
+  "manifest_hash": "36a0768e41541d27c9e8c557a2e192fe3d6b622b4053b1fc362fe1c5c8ef59c4"
 }
