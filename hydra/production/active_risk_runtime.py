@@ -747,6 +747,13 @@ class ActiveRiskPoolRun(PortfolioFirstRun):
                 output.extend(_compact_metric(row) for row in rows)
                 if sink is not None and include_evidence:
                     self._append_stage_rows(sink, stage, index, rows)
+                    if stage in {"stage3", "stage4", "stage5"}:
+                        # Exact multi-horizon rows are intentionally large.  A
+                        # completed batch is the durable backpressure boundary:
+                        # do not retain several copied daily paths while the
+                        # single EvidenceBundle writer catches up.
+                        sink.flush()
+                del cached, rows
             else:
                 missing.append((index, batch))
         if missing:
@@ -766,19 +773,36 @@ class ActiveRiskPoolRun(PortfolioFirstRun):
                 initializer=_set_worker_state,
                 initargs=worker_args,
             ) as pool:
-                futures = {
-                    pool.submit(
+                pending_batches = iter(missing)
+                futures: dict[Any, int] = {}
+
+                def submit_next_batch() -> bool:
+                    try:
+                        index, batch = next(pending_batches)
+                    except StopIteration:
+                        return False
+                    future = pool.submit(
                         _active_batch_worker,
                         [row.to_dict() for row in batch],
                         tuple(horizons),
                         include_stress,
                         include_evidence,
                         lifecycle,
-                    ): index
-                    for index, batch in missing
-                }
-                for completed, future in enumerate(as_completed(futures), start=1):
-                    index = futures[future]
+                    )
+                    futures[future] = index
+                    return True
+
+                for _ in range(min(3, len(missing))):
+                    submit_next_batch()
+
+                completed = 0
+                total_missing = len(missing)
+                while futures:
+                    # Snapshot only the bounded in-flight set.  Popping the
+                    # yielded Future is essential: Future retains its result,
+                    # and a Stage-3 result can be hundreds of MB.
+                    future = next(as_completed(tuple(futures)))
+                    index = futures.pop(future)
                     rows = future.result()
                     payload = {
                         "schema": "hydra_active_risk_stage_batch_v1",
@@ -791,8 +815,11 @@ class ActiveRiskPoolRun(PortfolioFirstRun):
                     )
                     if sink is not None and include_evidence:
                         self._append_stage_rows(sink, stage, index, rows)
+                        if stage in {"stage3", "stage4", "stage5"}:
+                            sink.flush()
                     output.extend(_compact_metric(row) for row in rows)
-                    if completed % 4 == 0 or completed == len(missing):
+                    completed += 1
+                    if completed % 4 == 0 or completed == total_missing:
                         normal = prior_normal + _scenario_episode_total(output, "normal")
                         stressed = prior_stressed + _scenario_episode_total(output, "stressed")
                         # Stage 1 is approximate and Stage 2 is superseded for
@@ -835,6 +862,8 @@ class ActiveRiskPoolRun(PortfolioFirstRun):
                             next_action=f"CONTINUE_{stage.upper()}_ECONOMIC_REPLAY",
                         )
                         hot_started = time.perf_counter()
+                    del payload, rows, future
+                    submit_next_batch()
             self.clock.hot_seconds += max(time.perf_counter() - hot_started, 0.0)
         ordered = sorted(output, key=lambda row: str(row["policy_id"]))
         if len(ordered) != len(policies):

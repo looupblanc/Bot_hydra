@@ -1,0 +1,71 @@
+{
+  "schema": "hydra_technical_runtime_repair_receipt_v1",
+  "campaign_id": "hydra_active_risk_pool_target_velocity_0026",
+  "classification": "TECHNICAL_STAGE_RESULT_RETENTION_AND_EVIDENCE_BACKPRESSURE_DEFECT",
+  "recorded_at_utc": "2026-07-15T08:17:38Z",
+  "scientific_status": "NO_ECONOMIC_SEMANTICS_CHANGE",
+  "failed_closed": false,
+  "pre_repair_checkpoint": {
+    "state": "ROBUSTNESS_ACTIVE",
+    "stage": "ACTIVE_POOL_STAGE3",
+    "checkpoint_sequence": 13,
+    "combine_episodes_completed": 6624,
+    "normal_episodes_completed": 3312,
+    "stressed_episodes_completed": 3312,
+    "stage3_cache_batch_count": 6,
+    "last_completed_policy_id": "active_pool_01642afda15d8c9a3f5a00d7",
+    "production_state_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_01/production_state.json",
+    "production_state_file_sha256": "d7101263174be7481a5ebe22345a15131a49be0969d9e614ad99cbcde045fab1",
+    "production_state_hash": "3b61ba16d523924ba6df01269f033ca96d522b633d040921d8b693492eefd76d"
+  },
+  "root_cause": {
+    "implementation_file": "hydra/production/active_risk_runtime.py",
+    "old_file_sha256": "720204cd078141935f2109bcd2aa9f63c946e2d5bdac34b2d69af698729410bb",
+    "new_file_sha256": "d8cb01f2922a9c9d3e83ddb98869f4b9fedd8c17444b1052c109fbcbcce3448a",
+    "future_retention": "THE_STAGE_FUTURE_MAP_RETAINED_EVERY_COMPLETED_FUTURE_AND_ITS_LARGE_EXACT_RESULT_UNTIL_STAGE_EXIT",
+    "writer_backpressure": "THE_UNBOUNDED_ASYNCHRONOUS_EVIDENCE_QUEUE_COULD_RETAIN_MULTIPLE_COPIES_OF_LARGE_DAILY_PATHS",
+    "economic_state_mutated_by_defect": false,
+    "observed_effect": "MEMORY_AND_SWAP_GROWTH_PREVENTING_BOUNDED_COMPLETION"
+  },
+  "repair_scope": {
+    "bounded_in_flight_batches": 3,
+    "completed_future_removed_before_NEXT_RESULT": true,
+    "heavy_stage_evidence_flush_boundary": "ONE_DURABLE_BATCH",
+    "cached_batch_ids_unchanged": true,
+    "cached_rows_and_hashes_unchanged": true,
+    "candidate_or_policy_change_allowed": false,
+    "manifest_threshold_change_allowed": false,
+    "governor_grammar_change_allowed": false,
+    "sleeve_bank_change_allowed": false,
+    "episode_horizon_change_allowed": false,
+    "account_rule_change_allowed": false,
+    "recompute_scope": "UNFINISHED_STAGE3_BATCHES_ONLY; SIX_VALID_CACHED_BATCHES_REUSED",
+    "targeted_tests": [
+      "tests/test_active_risk_runtime.py",
+      "tests/test_combine_to_xfa.py",
+      "tests/test_economic_production_manifest_runtime.py"
+    ],
+    "targeted_test_result": "43_PASSED"
+  },
+  "unchanged_economic_fields": [
+    "manifest economic hypothesis",
+    "promotion thresholds",
+    "governor population and fingerprints",
+    "sleeve bank and immutable ledgers",
+    "episode starts and temporal blocks",
+    "episode horizons",
+    "normal and stressed costs",
+    "Combine and XFA account rules",
+    "risk routing decisions",
+    "matched-control definitions",
+    "random seeds"
+  ],
+  "safety": {
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "live_trading": false
+  },
+  "repair_record_hash": "d970a67ee385c8516473c06a4481bc95d9c63dd3aaedf6fe3a857f80dccf6e54"
+}
