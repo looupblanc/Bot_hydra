@@ -1,0 +1,34 @@
+{
+  "schema": "hydra_portfolio_first_prelaunch_checkpoint_v1",
+  "checkpointed_at_utc": "2026-07-15T01:17:45Z",
+  "git_head": "30c0810aea6d824249a35e2ec943980a7053ff99",
+  "origin_main": "81f05ec9d7cd796ff91fd14d15760322c2924275",
+  "branch": "mission/v7-falsification",
+  "service": {
+    "unit": "hydra-autonomous-mission.service",
+    "active": true,
+    "pid": 2346387,
+    "controller_version": "V17",
+    "controller_count": 1,
+    "writer_count": 1,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "durable_runtime_state": "MANIFEST_QUEUE_AWAITING_APPEND",
+  "campaign_0024_terminal_status": "SELECTOR_PROCEDURE_FALSIFIED",
+  "campaign_0024_retry_allowed": false,
+  "mission_db_integrity": "ok",
+  "registry_integrity": "ok",
+  "graveyard_integrity": "ok",
+  "checksums": {
+    "mission/state/hydra_mission.db": "b3dd103bc3c21fcff5523ed7ee701e15663d2f40e243cff55447058ca7c341f5",
+    "mission/state/hydra_registry.db": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mission/state/graveyard.db": "3b2a32cf0ee2ba474bf53be895b95da6e3b0768d77c73b28681e7fa5a2bd101a",
+    "config/v7/economic_evolution_production_queue_0022.json": "a3d40068fc46fbb8980b2274c4e01fa166d2c0072861ee68ef954fca0d4509c9"
+  },
+  "q4_access_authorized": false,
+  "new_data_purchase_authorized": false,
+  "live_trading_authorized": false,
+  "purpose": "Freeze the authoritative mission immediately before implementing and launching the portfolio-first Combine-to-payout factory.",
+  "preexisting_uncommitted_engineering_excluded_from_checkpoint_commit": true
+}
