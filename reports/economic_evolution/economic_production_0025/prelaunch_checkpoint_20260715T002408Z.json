@@ -1,0 +1,69 @@
+{
+  "schema": "hydra_economic_production_prelaunch_checkpoint_v1",
+  "campaign_id": "hydra_economic_production_0025",
+  "recorded_at_utc": "2026-07-15T00:24:08Z",
+  "checkpoint_scope": "LIGHTWEIGHT_PRE_IMPLEMENTATION_DURABLE_REFERENCES",
+  "git": {
+    "head": "7c5c633614394e056550720e8ebb93ebb365cd48",
+    "origin_main": "81f05ec9d7cd796ff91fd14d15760322c2924275",
+    "origin_mission_branch": "7c5c633614394e056550720e8ebb93ebb365cd48",
+    "preexisting_dirty_tracked_files": {
+      "reports/data_access/data_access_ledger.jsonl": "0a960c02876fd054ebe0217485dba11ed57e5039b8146b2256f23ab809ce49cb",
+      "reports/data_budget/databento_budget_summary.md": "c210230a627c25652c02a9407d0d062d378f8cee825cae97dded1da409456ad8",
+      "reports/data_budget/databento_spend_ledger.jsonl": "57bdc0ccab4842901ec25aa3e4e37654ee711184a1a0e2987d9b42376ef29a34"
+    }
+  },
+  "persistent_service": {
+    "unit": "hydra-autonomous-mission.service",
+    "active_state": "active",
+    "sub_state": "running",
+    "pid": 2346387,
+    "controller_version": "hydra_v7_economic_evolution_controller_v17",
+    "controller_count": 1,
+    "authoritative_mission_writer_count": 1,
+    "production_worker_count": 0,
+    "production_evidence_writer_count": 0,
+    "runtime_state": "IDLE",
+    "manifest_state": "MANIFEST_QUEUE_AWAITING_APPEND"
+  },
+  "campaign_0024_terminal_boundary": {
+    "status": "SELECTOR_PROCEDURE_FALSIFIED",
+    "failure_code": "NO_ELIGIBLE_DESIGN_SET_CHAMPION_B4",
+    "receipt_file_sha256": "bcaa8d544dafc1d475abccc9ad5f20418178aa83da728e7f1f5c88fc2d2c3969",
+    "receipt_hash": "4f91609ddabf75eedf1b78d78ca3e581a709d6ff4f485b56a7cbc01a44e48d54",
+    "verdict_file_sha256": "606b2ae28eecd26fcf33974085ed63527c9b8294bcdf373603d625982d246f9d",
+    "verdict_hash": "96b8ca5d8281a7e7e65644f7d9d0f019fa4fc69e383e4389f6a0368c546766fe",
+    "automatic_retry_allowed": false,
+    "threshold_mutation_allowed": false,
+    "held_out_outcomes_inspected": false
+  },
+  "manifest_queue": {
+    "path": "config/v7/economic_evolution_production_queue_0022.json",
+    "file_sha256": "a3d40068fc46fbb8980b2274c4e01fa166d2c0072861ee68ef954fca0d4509c9",
+    "queue_hash": "44f541725e24b03f2ac12a24a822c7d39664c199830aa00ac21faf2b64ba101a",
+    "campaign_0024_enabled": false,
+    "campaign_0025_present": false
+  },
+  "integrity": {
+    "mission_db_quick_check": "ok",
+    "registry_db_quick_check": "ok",
+    "graveyard_db_quick_check": "ok",
+    "campaign_0024_evidence_status": "STAGING_PRESERVED_NONCONFIRMATORY",
+    "campaign_0024_staging_identity_sha256": "b07cf293cae98d1df7e80efd94f66e0ce521ebf66184f8f9c991b6ccad3c0cca",
+    "campaign_0024_staging_checkpoint_sha256": "60885f7135978ec10698270692c829dd909f7e507bba5025513c950cfce10d69",
+    "campaign_0024_staging_checkpoint_sequence": 4015,
+    "campaign_0024_staging_file_count": 3780,
+    "campaign_0024_staging_size_bytes": 216444321,
+    "campaign_0024_staging_episode_rows": 180864
+  },
+  "governance": {
+    "q4_status": "BURNED",
+    "q4_historical_access_count": 1,
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "budget_remaining_usd": 37.15261161327402
+  },
+  "checkpoint_hash": "b69b64647f61b1bf311f309465412f0395c7f2e9e4d24f09a1d00afdfc135df6"
+}
