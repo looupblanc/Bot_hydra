@@ -1,0 +1,60 @@
+{
+  "schema": "hydra_candidate_graduation_checkpoint_v1",
+  "checkpoint_id": "candidate_graduation_prelaunch_20260715T003647Z",
+  "created_at_utc": "2026-07-15T00:36:47Z",
+  "mission_id": "HYDRA_V7_PERSISTENT_FALSIFICATION_MISSION",
+  "git": {
+    "head": "1c9cb2552312967b4a95e9cb0b6fd6cceced9042",
+    "origin_main": "81f05ec9d7cd796ff91fd14d15760322c2924275",
+    "origin_mission_branch": "1c9cb2552312967b4a95e9cb0b6fd6cceced9042",
+    "branch": "mission/v7-falsification"
+  },
+  "service": {
+    "unit": "hydra-autonomous-mission.service",
+    "active_state": "active",
+    "sub_state": "running",
+    "pid": 2346387,
+    "controller_version": "hydra_v7_economic_evolution_controller_v17",
+    "controller_count": 1,
+    "authoritative_writer_count": 1,
+    "production_worker_count": 0,
+    "heartbeat_at_utc": "2026-07-15T00:36:47+00:00",
+    "heartbeat_step": 8763,
+    "process_lock": "mission/state/hydra_mission.lock",
+    "process_lock_state": "HELD_BY_AUTHORITATIVE_CONTROLLER",
+    "manifest_runtime_state": "MANIFEST_QUEUE_AWAITING_APPEND"
+  },
+  "integrity": {
+    "mission_db": "ok",
+    "registry_db": "ok",
+    "graveyard_db": "ok"
+  },
+  "campaign_0024": {
+    "terminal_status": "SELECTOR_PROCEDURE_FALSIFIED",
+    "automatic_retry_allowed": false,
+    "evidence_finalization_allowed": false,
+    "terminal_receipt_sha256": "bcaa8d544dafc1d475abccc9ad5f20418178aa83da728e7f1f5c88fc2d2c3969",
+    "selector_verdict_sha256": "606b2ae28eecd26fcf33974085ed63527c9b8294bcdf373603d625982d246f9d",
+    "queue_sha256": "a3d40068fc46fbb8980b2274c4e01fa166d2c0072861ee68ef954fca0d4509c9"
+  },
+  "safety": {
+    "q4_historical_access_count": 1,
+    "protected_holdout_access_authorized": false,
+    "new_data_purchase_authorized": false,
+    "remaining_data_budget_usd": 37.15261161327402,
+    "broker_connections": 0,
+    "outbound_orders": 0
+  },
+  "preserved_user_work": {
+    "reports/data_access/data_access_ledger.jsonl": "0a960c02876fd054ebe0217485dba11ed57e5039b8146b2256f23ab809ce49cb",
+    "reports/data_budget/databento_budget_summary.md": "c210230a627c25652c02a9407d0d062d378f8cee825cae97dded1da409456ad8",
+    "reports/data_budget/databento_spend_ledger.jsonl": "57bdc0ccab4842901ec25aa3e4e37654ee711184a1a0e2987d9b42376ef29a34"
+  },
+  "transition": {
+    "superseded_unlaunched_work": "HYDRA_CAMPAIGN_0025_REGIME_ACTIVATION",
+    "new_objective": "CANDIDATE_GRADUATION_AND_COMBINE_TO_XFA_TRANSITION",
+    "broad_grammar_generation_allowed_before_cohort": false,
+    "family_failure_may_erase_candidate_evidence": false
+  },
+  "checkpoint_payload_sha256": "b1f2a9c1919e898e325a408b2c26287fd5d15ef43cbfffd210ad8f1335bb3dbc"
+}
