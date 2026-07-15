@@ -1,0 +1,43 @@
+{
+  "cache_policy": {
+    "market_features_or_source_signals_recomputed": false,
+    "remaining_stage3_batches_unfinished": true,
+    "stage1_cache_reused_unchanged": true,
+    "stage2_cache_reused_unchanged": true,
+    "stage3_batch_000000_reused_after_cardinality_validation": true,
+    "stage3_batch_000001_recompute_required": true
+  },
+  "campaign_id": "hydra_active_risk_pool_target_velocity_0026",
+  "classification": "TECHNICAL_XFA_PAYOUT_REQUEST_MARKER_DEFECT",
+  "executed_at_utc": "2026-07-15T07:45:00Z",
+  "execution_receipt_hash": "3fa0a686e192b06348d71a2d9de9f3b4f0d385083a6a73dabac05010a63cd28f",
+  "quarantine": {
+    "divergent_batch": "stage3_batch_000001_pre_repair.json",
+    "divergent_batch_sha256": "facfc313f1c0a908abda246b47d1f235a4009754073383e0cf08a4fae579b65e",
+    "evidence_checkpoint_sha256": "6dbe7c209810fbc3b675490fcb60074d556f009286f388c46fae8306945195ad",
+    "evidence_identity_sha256": "f41583733abb7532c61f6cf98bb589519297b62b019d153623ba0cbcf6700dd3",
+    "evidence_staging": "evidence_staging_pre_repair",
+    "root": "reports/economic_evolution/quarantine/hydra_active_risk_pool_target_velocity_0026_xfa_marker_repair_20260715T0745Z"
+  },
+  "repair_commit": "8f3c953f4906d0e5a8d576e662b96d5b76d14cf9",
+  "revised_manifest_file_sha256": "b272ea0d88e95911be025611ee48330a3e70594787e91664105455afdf7f55c0",
+  "revised_manifest_hash": "077ec2ef6d61837e8e0357564fdc672eccfa4754452bc3aabcf6f62c1453dc29",
+  "revised_manifest_path": "config/v7/active_risk_pool_target_velocity_0026_revision_01.json",
+  "revised_queue_file_sha256": "1a88f20632dfc65052a04630af7f9e9be4bb2fe58770d1ba1e21c5a2b3ee093c",
+  "revised_queue_hash": "9b0f731ccea9a88502fb48468aefa4c4b7a5b13ae78f36b044a1e57db541576d",
+  "revised_queue_path": "config/v7/economic_evolution_production_queue_0025.json",
+  "schema": "hydra_technical_repair_execution_receipt_v1",
+  "scientific_guards": {
+    "broker_connections": 0,
+    "candidate_selection_changed": false,
+    "combine_economics_changed": false,
+    "costs_changed": false,
+    "data_purchase_count": 0,
+    "multiplicity_delta": 0,
+    "orders": 0,
+    "population_changed": false,
+    "q4_access_delta": 0,
+    "starts_or_blocks_changed": false,
+    "thresholds_changed": false
+  }
+}
