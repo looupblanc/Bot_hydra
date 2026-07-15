@@ -1,0 +1,201 @@
+{
+  "schema": "hydra_manifest_campaign_queue_v1",
+  "queue_id": "hydra_economic_evolution_production_queue_0024",
+  "issued_at_utc": "2026-07-15T06:20:00Z",
+  "supersedes": {
+    "path": "config/v7/economic_evolution_production_queue_0023.json",
+    "file_sha256": "f422db91ab67674c2529eda46e166bfdb83df2f1e9c2009e2d63549fd4124caf",
+    "semantic_hash": "5677bbdbfe3e3fb6edc23309ad4ad01551f2da16466d0db78cb2a8b894c04939"
+  },
+  "entries": [
+    {
+      "ordinal": 13,
+      "campaign_id": "hydra_economic_evolution_opportunity_density_0013",
+      "engine": "opportunity_density_v1",
+      "preregistration_path": "config/v7/economic_evolution_opportunity_density_0013_revision_03.json",
+      "preregistration_file_sha256": "b09b8b2c6b831a6f0b55da2c97972604370596fcc892adb5afcc14e19df730c1",
+      "preregistration_semantic_hash": "a44ac522cc6caf58aa24ee7117dce9d2691d2f41582dee1d943df3691f1ec361",
+      "worm_tag": "worm/economic-evolution-opportunity-density-0013-revision-03-2026-07-14",
+      "worm_commit": "47f8c9fa5c59bf4d50b073c0f499ce44bb719b5b",
+      "enabled": true
+    },
+    {
+      "ordinal": 14,
+      "campaign_id": "hydra_economic_evolution_coverage_union_0014",
+      "engine": "manifest_account_pair_v1",
+      "preregistration_path": "config/v7/economic_evolution_coverage_union_0014.json",
+      "preregistration_file_sha256": "af8f0300d86930e2c64c77249cf65b5b5415701923bb87e871ec5c9fe01c2e85",
+      "preregistration_semantic_hash": "027ff78998ebfe3df7242081a3a849bc0605c36a08ddcdc78fc515f265b7e658",
+      "worm_tag": "worm/economic-evolution-coverage-union-0014-2026-07-14",
+      "worm_commit": "1eca2bb195f42e73a6b06534163c7159cb05acc0",
+      "enabled": true
+    },
+    {
+      "ordinal": 15,
+      "campaign_id": "hydra_economic_evolution_buffer_sizing_0015",
+      "engine": "manifest_account_pair_v1",
+      "preregistration_path": "config/v7/economic_evolution_buffer_sizing_0015.json",
+      "preregistration_file_sha256": "cfe94fe571ccbea6e808e8c44bf67ece61c67472e9e6aa019c000333a6e7e1b6",
+      "preregistration_semantic_hash": "593c727a93b54aed68472528ea718de4bb5453a9614c84b5e95b7c3dd8048fd7",
+      "worm_tag": "worm/economic-evolution-buffer-sizing-0015-2026-07-14",
+      "worm_commit": "1fdae0a7d093ce3e4b290c44bc01d4601dcb34dc",
+      "enabled": true
+    },
+    {
+      "ordinal": 16,
+      "campaign_id": "hydra_economic_evolution_three_zone_sizing_0016",
+      "engine": "manifest_account_pair_v1",
+      "preregistration_path": "config/v7/economic_evolution_three_zone_sizing_0016.json",
+      "preregistration_file_sha256": "3f6d7463259099b2242aaf882d532273e667eecfe98a2723eb687c11d70c85f5",
+      "preregistration_semantic_hash": "ce76117c6ec58a4fe8769fcd55dc0715360f08fe082f761fd18e86ad8d8649a0",
+      "worm_tag": "worm/economic-evolution-three-zone-sizing-0016-2026-07-14",
+      "worm_commit": "4a26cc5db7e6ed88b01daa4207cb30886e7866e7",
+      "enabled": true
+    },
+    {
+      "ordinal": 17,
+      "campaign_id": "hydra_economic_evolution_complementary_sleeve_0017",
+      "engine": "manifest_account_pair_v1",
+      "preregistration_path": "config/v7/economic_evolution_complementary_sleeve_0017_revision_01.json",
+      "preregistration_file_sha256": "fa31ac983dc1b0d5361328988aaf4e6a359ce9f240084ddeb71dafcd69ffdb45",
+      "preregistration_semantic_hash": "b4097648a8e7f1d235b65ef1b4c15eacd1544973d37f87cb59f60b957b7a52e8",
+      "worm_tag": "worm/economic-evolution-complementary-sleeve-0017-revision-01-2026-07-14",
+      "worm_commit": "0bbbaedb45962f22e4344e937b30336efe3a297c",
+      "enabled": true
+    },
+    {
+      "ordinal": 18,
+      "campaign_id": "hydra_economic_evolution_complementary_sleeve_confirmation_0018",
+      "engine": "manifest_account_pair_v1",
+      "preregistration_path": "config/v7/economic_evolution_complementary_sleeve_confirmation_0018_revision_01.json",
+      "preregistration_file_sha256": "b756efe71332d3770f2e54585e18c7c4a3be0709d458c0368785eb6910316756",
+      "preregistration_semantic_hash": "0659eef89fb5c0531b1c81b8635714b57369410dc03aa7c492799cfc99f45821",
+      "worm_tag": "worm/economic-evolution-complementary-sleeve-confirmation-0018-revision-01-2026-07-14",
+      "worm_commit": "7d16999fdedde97e73b17c4b73429acca526e65c",
+      "enabled": true
+    },
+    {
+      "ordinal": 19,
+      "campaign_id": "hydra_economic_evolution_partial_runner_0019",
+      "engine": "manifest_account_pair_v1",
+      "preregistration_path": "config/v7/economic_evolution_partial_runner_0019_revision_01.json",
+      "preregistration_file_sha256": "45434dd3f3950611009e063bddc01ee56f827b68a576bedd899a73a4b2ee7b52",
+      "preregistration_semantic_hash": "48b7887635046b91e68d6214946a84e04a4bb24e90aaff478f64fc85d73b800f",
+      "worm_tag": "worm/economic-evolution-partial-runner-0019-revision-01-2026-07-14",
+      "worm_commit": "c4cc4dac56800750624ad22af022bd2986c6649f",
+      "enabled": true
+    },
+    {
+      "ordinal": 20,
+      "campaign_id": "hydra_economic_evolution_elite_robustness_0020",
+      "engine": "manifest_account_pair_v1",
+      "preregistration_path": "config/v7/economic_evolution_elite_robustness_0020_revision_01.json",
+      "preregistration_file_sha256": "457f7f6daa503f109c855c7dc833deb6fc431b452bc77fe31a65ecf1dc7e8524",
+      "preregistration_semantic_hash": "0ff4626db461be710ceef378f4b04ba1c0a2d13fcff748152b2676524fd6f36a",
+      "worm_tag": "worm/economic-evolution-elite-robustness-0020-revision-01-2026-07-14",
+      "worm_commit": "a740e3918ac4b0c6f8110d788c3caa97224172e7",
+      "enabled": true
+    },
+    {
+      "ordinal": 21,
+      "campaign_id": "hydra_economic_evolution_loss_streak_buffer_ratchet_0021",
+      "engine": "manifest_account_pair_v1",
+      "preregistration_path": "config/v7/economic_evolution_loss_streak_buffer_ratchet_0021_revision_01.json",
+      "preregistration_file_sha256": "d9a0aa21f4563ab1b4aa15df46d163b3c1d92ccf5fb0f7fadb26b77e1090d739",
+      "preregistration_semantic_hash": "091289b35adfa23d5eac2ce36b084e36663b77e144d1a3b71f53350f5e6128f6",
+      "worm_tag": "worm/economic-evolution-loss-streak-buffer-ratchet-0021-revision-01-2026-07-14",
+      "worm_commit": "0db0fc72c52e4d71482049925a1fe8cf2c1e4bb0",
+      "enabled": true
+    },
+    {
+      "ordinal": 23,
+      "campaign_id": "hydra_economic_evolution_static_parent_basket_0023",
+      "engine": "manifest_account_pair_v1",
+      "preregistration_path": "config/v7/economic_evolution_static_parent_basket_0023.json",
+      "preregistration_file_sha256": "4319939f6b0b945a80256861f4bb90b265c97aad94e00e27e2fb82a8c28715e9",
+      "preregistration_semantic_hash": "e874bb3fb3b51e3f28021111226d24eeb9c990c0403b18273d8f3a5ac9970b9b",
+      "worm_tag": "worm/economic-evolution-static-parent-basket-0023-2026-07-14",
+      "worm_commit": "80727e26b0b499d98c74e4686d53570a84172f60",
+      "enabled": true
+    },
+    {
+      "ordinal": 24,
+      "campaign_id": "hydra_economic_production_0024",
+      "engine": "production_kernel_v1",
+      "manifest_path": "config/v7/economic_evolution_production_0024.json",
+      "manifest_file_sha256": "417c32d0e8f483f4614394433ddcbade6c919578ca05eac82a06ef2d3a53b066",
+      "manifest_semantic_hash": "c5f7b877039a2384378751e80cac3c4f1a5aa307e52c76fafa59abb0b27043a9",
+      "worm_tag": "worm/economic-production-kernel-0024-2026-07-14",
+      "worm_commit": "bc58d0d96ce6829024fd9eed0a286cc8037db3fc",
+      "enabled": false,
+      "terminal_disable": {
+        "status": "SELECTOR_PROCEDURE_FALSIFIED",
+        "reason": "NO_ELIGIBLE_DESIGN_SET_CHAMPION_B4",
+        "receipt_path": "reports/economic_evolution/economic_production_0024/selector_procedure_terminal_receipt.json",
+        "receipt_file_sha256": "bcaa8d544dafc1d475abccc9ad5f20418178aa83da728e7f1f5c88fc2d2c3969",
+        "receipt_hash": "4f91609ddabf75eedf1b78d78ca3e581a709d6ff4f485b56a7cbc01a44e48d54",
+        "verdict_path": "WORM/economic-production-kernel-0024-selector-verdict-2026-07-14.json",
+        "verdict_file_sha256": "606b2ae28eecd26fcf33974085ed63527c9b8294bcdf373603d625982d246f9d",
+        "verdict_hash": "96b8ca5d8281a7e7e65644f7d9d0f019fa4fc69e383e4389f6a0368c546766fe",
+        "verdict_tag": "worm/economic-production-kernel-0024-selector-verdict-2026-07-14",
+        "verdict_commit": "59b4b4df1fcad9eae0adefcdde235d96c3ac6398",
+        "automatic_retry_allowed": false,
+        "evidence_finalization_allowed": false
+      }
+    },
+    {
+      "ordinal": 25,
+      "campaign_id": "hydra_portfolio_first_combine_to_payout_0025",
+      "engine": "production_kernel_v1",
+      "manifest_path": "config/v7/portfolio_first_combine_to_payout_0025.json",
+      "manifest_file_sha256": "bd582bb9308354baee7080aa603aae4f7853bde182106234577ef56bfc65d578",
+      "manifest_semantic_hash": "36a0768e41541d27c9e8c557a2e192fe3d6b622b4053b1fc362fe1c5c8ef59c4",
+      "worm_tag": "worm/portfolio-first-combine-to-payout-0025-revision-01-2026-07-15",
+      "worm_commit": "4e25495694d0ddc1baf27b0df497c6f3787b1e08",
+      "enabled": false,
+      "terminal_disable": {
+        "status": "STATIC_CAPITAL_PARTITION_TOO_SLOW",
+        "reason": "STATIC_CAPITAL_PARTITION_TOO_SLOW",
+        "receipt_path": "reports/economic_evolution/portfolio_first_combine_to_payout_0025/static_capital_partition_terminal_receipt.json",
+        "receipt_file_sha256": "70416a2877b344699fb79137269e817229ea20c171f87255d30171d328bd58cd",
+        "receipt_hash": "dd658983972d9e1401b7e291416b71e8614ff303542615151cb2028839c3139b",
+        "verdict_path": "WORM/portfolio-first-0025-static-capital-partition-verdict-2026-07-15.json",
+        "verdict_file_sha256": "b67ec28aff4db81c6b8a03abf87ef2715c784f384fa11123975054681c523b18",
+        "verdict_hash": "e852796dd19eb041912d8cfe0a6625fdf07d5c4f64d48f32fce0095ec8faa2b1",
+        "verdict_tag": "worm/portfolio-first-0025-static-capital-partition-verdict-2026-07-15",
+        "verdict_commit": "4cd791e7eb1d00f1b82414c3d17c30e99b23ff4e",
+        "automatic_retry_allowed": false,
+        "evidence_finalization_allowed": false
+      }
+    },
+    {
+      "ordinal": 26,
+      "campaign_id": "hydra_active_risk_pool_target_velocity_0026",
+      "engine": "production_kernel_v1",
+      "manifest_path": "config/v7/active_risk_pool_target_velocity_0026.json",
+      "manifest_file_sha256": "4cddc721a3ea84eef68679e280831c0cd73d5efe6bd1fb37d459a30b6d47a02f",
+      "manifest_semantic_hash": "e11bfb4ce548ae69aa19e08a1905f1b11cf15b69bb7bbf45eb0e11d1188905ff",
+      "worm_tag": "worm/active-risk-pool-target-velocity-0026-2026-07-15",
+      "worm_commit": "8e44fa79251c28f55276b632c1d4835c0a7fc355",
+      "enabled": true
+    }
+  ],
+  "runtime_policy": {
+    "reload_queue_each_controller_step": true,
+    "controller_source_change_for_new_manifest": false,
+    "single_active_campaign": true,
+    "single_authoritative_mission_writer": true,
+    "maximum_deterministic_attempts": 3,
+    "auto_tombstone_failed_exact_class": true,
+    "full_repository_regression_per_campaign": false,
+    "targeted_integrity_checks_per_campaign": true
+  },
+  "governance": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "broker_or_orders_allowed": false,
+    "proof_window_consumption_allowed": false
+  },
+  "CONTRE": "This append-only queue revision seals portfolio-first campaign 0025 as STATIC_CAPITAL_PARTITION_TOO_SLOW and appends one frozen active-risk-pool and target-velocity development campaign. It grants no retry of 0025, new market grammar, sleeve-signal mutation, Q4 access, data purchase, broker connection, order capability, proof-window consumption, live trading, status inheritance, retuning, or independent-confirmation claim.",
+  "queue_hash": "280add91863aaeaa9ebdb486336be8566e800b16eef1c263fd8e980688b4fefa"
+}
