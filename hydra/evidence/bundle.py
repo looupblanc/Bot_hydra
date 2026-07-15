@@ -141,6 +141,19 @@ def _kahan_add(state: dict[str, Any], field: str, value: float) -> None:
     state[field] = updated
 
 
+def _kahan_add_mapping(
+    state: dict[str, Any], field: str, key: str, value: float
+) -> None:
+    values = state[field]
+    compensations = state[f"{field}_compensation"]
+    current = float(values.get(key, 0.0))
+    compensation = float(compensations.get(key, 0.0))
+    adjusted = value - compensation
+    updated = current + adjusted
+    compensations[key] = (updated - current) - adjusted
+    values[key] = updated
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -1151,6 +1164,8 @@ def _validate_relational_contract(
                 "daily_pnl_compensation": 0.0,
                 "costs": 0.0,
                 "costs_compensation": 0.0,
+                "component_attribution": {},
+                "component_attribution_compensation": {},
                 "minimum_mll_buffer": math.inf,
                 "final_trading_day": "",
                 "final_row": None,
@@ -1159,6 +1174,13 @@ def _validate_relational_contract(
         aggregate["row_count"] += 1
         _kahan_add(aggregate, "daily_pnl", float(row["daily_pnl"]))
         _kahan_add(aggregate, "costs", float(row["costs"]))
+        for component_id, value in row["component_attribution"].items():
+            _kahan_add_mapping(
+                aggregate,
+                "component_attribution",
+                str(component_id),
+                float(value),
+            )
         aggregate["minimum_mll_buffer"] = min(
             float(aggregate["minimum_mll_buffer"]),
             float(row["minimum_mll_buffer"]),
@@ -1228,14 +1250,27 @@ def _validate_relational_contract(
         if not _close(
             math.fsum(
                 float(value)
-                for value in final_row["component_attribution"].values()
+                for value in aggregate["component_attribution"].values()
             ),
             episode["net_pnl"],
             tolerance=PNL_ABS_TOLERANCE,
         ):
             raise IncompleteEvidenceBundle(
-                f"episode {key} terminal component attribution disagrees with net_pnl"
+                f"episode {key} cumulative component attribution disagrees with net_pnl"
             )
+        episode_contribution = episode.get("component_contribution")
+        if isinstance(episode_contribution, Mapping):
+            observed_contribution = aggregate["component_attribution"]
+            for component_id in set(episode_contribution) | set(observed_contribution):
+                if not _close(
+                    observed_contribution.get(component_id, 0.0),
+                    episode_contribution.get(component_id, 0.0),
+                    tolerance=PNL_ABS_TOLERANCE,
+                ):
+                    raise IncompleteEvidenceBundle(
+                        f"episode {key} cumulative component attribution "
+                        "disagrees with episode contribution"
+                    )
         _validate_terminal_economics(key, episode)
 
     reconstruction_flags: set[bool] = set()

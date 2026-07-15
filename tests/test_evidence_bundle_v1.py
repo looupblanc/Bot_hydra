@@ -658,6 +658,45 @@ def test_component_attribution_requires_known_members_and_terminal_reconciliatio
     writer.close()
 
 
+def test_multiday_component_attribution_reconciles_cumulatively(
+    tmp_path: Path,
+) -> None:
+    records = _records()
+    paths: list[dict[str, object]] = []
+    for episode in records["episodes"]:
+        episode["duration_trading_days"] = 2
+        episode["days_to_target"] = 2.0
+    for original in records["account_daily_paths"]:
+        net = float(original["daily_pnl"])
+        costs = float(original["costs"])
+        first = dict(original)
+        first["daily_pnl"] = net / 2.0
+        first["realized_pnl"] = net / 2.0
+        first["equity"] = 50_000.0 + net / 2.0
+        first["mll"] = float(first["equity"]) - 2_000.0
+        first["target_progress"] = 0.5
+        first["costs"] = costs / 2.0
+        first["component_attribution"] = {COMPONENT_ID: net / 2.0}
+
+        second = dict(original)
+        second["trading_day"] = "2024-01-03"
+        second["daily_pnl"] = net / 2.0
+        second["costs"] = costs / 2.0
+        second["component_attribution"] = {COMPONENT_ID: net / 2.0}
+        paths.extend((first, second))
+    records["account_daily_paths"] = paths
+
+    writer = EvidenceBundleWriter.create(tmp_path, _identity())
+    _populate_records(writer, records)
+    receipt = writer.finalize(
+        evidence_status="FRESH_DEVELOPMENT_EVIDENCE",
+        lightweight_manifest_path=tmp_path / "receipt.json",
+    )
+    writer.close()
+
+    assert receipt.dataset_row_counts["account_daily_paths"] == 4
+
+
 def test_provenance_checksums_are_bound_to_identity(tmp_path: Path) -> None:
     writer = EvidenceBundleWriter.create(tmp_path, _identity())
     records = _records()

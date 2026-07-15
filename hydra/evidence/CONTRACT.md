@@ -58,6 +58,10 @@ both the closing `mll_buffer` (`equity - mll`) and the lowest intraday
 `minimum_mll_buffer`; the episode minimum reconciles against the latter, so an
 intraday excursion is never disguised as an end-of-day balance. Terminal classifications
 must agree with observed progress, MLL buffer, censoring, and days to target.
+`component_attribution` on an account daily row is that day's incremental
+realized attribution. Its component-wise sum over the complete episode path
+must reconcile to the episode contribution and net PnL; a quiet terminal day
+is therefore allowed to carry an empty attribution object.
 It then writes the
 content-addressed manifest and atomically renames staging to the final immutable
 directory. The default final payload permissions are read-only.
