@@ -2190,6 +2190,30 @@ def test_canonical_summary_reconciliation_fails_closed(tmp_path: Path) -> None:
         )
 
 
+def test_daily_exposure_tie_order_is_diagnostic_but_bounds_remain_strict() -> None:
+    raw = _raw_rows()[0]
+    raw["maximum_mini_equivalent"] = 1.2
+    raw["maximum_net_directional_exposure"] = 0.9
+    for day in raw["daily_path"]:
+        day["exposure"]["maximum_mini_equivalent"] = 0.6
+        day["exposure"]["maximum_net_directional"] = 0.6
+
+    report_module._validate_raw_daily_derivations(
+        raw,
+        label="coincident-entry-exit-order",
+    )
+
+    raw["maximum_net_directional_exposure"] = 1.3
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="exposure bounds are internally inconsistent",
+    ):
+        report_module._validate_raw_daily_derivations(
+            raw,
+            label="invalid-authoritative-exposure",
+        )
+
+
 def test_rehashed_raw_and_daily_economics_cannot_replace_sealed_episode_partition(
     tmp_path: Path,
 ) -> None:

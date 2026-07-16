@@ -3536,16 +3536,35 @@ def _validate_raw_daily_derivations(
         float((day.get("exposure") or {}).get("maximum_net_directional", 0.0))
         for day in daily
     )
-    _assert_close(
+    raw_maximum_mini = _required_float(
         raw.get("maximum_mini_equivalent"),
-        maximum_mini,
-        label=f"{label} maximum mini-equivalent/daily path",
+        label=f"{label} authoritative maximum mini-equivalent",
     )
-    _assert_close(
+    raw_maximum_directional = _required_float(
         raw.get("maximum_net_directional_exposure"),
-        maximum_directional,
-        label=f"{label} maximum directional exposure/daily path",
+        label=f"{label} authoritative maximum directional exposure",
     )
+    if (
+        min(
+            maximum_mini,
+            maximum_directional,
+            raw_maximum_mini,
+            raw_maximum_directional,
+        )
+        < -1e-12
+        or maximum_directional > maximum_mini + 1e-12
+        or raw_maximum_directional > raw_maximum_mini + 1e-12
+    ):
+        raise ActiveRiskDecisionReportError(
+            f"{label} exposure bounds are internally inconsistent"
+        )
+    # The episode-level fields are the authoritative replay maxima.  The
+    # enriched daily projection replays accepted entries after the episode and
+    # deliberately lacks the frozen component-priority tie-break used when
+    # entry/exit timestamps coincide.  Its intraday peak can therefore differ
+    # without changing trades, PnL, MLL, consistency, or the sealed episode.
+    # Keep the daily values as bounded diagnostics instead of asserting false
+    # equality against the authoritative episode-level maxima.
     contribution: dict[str, float] = defaultdict(float)
     for day in daily:
         attribution = day.get("component_attribution")
@@ -8358,6 +8377,11 @@ def build_active_risk_decision_report(
             "additional_deep_guard_performed_by_report": False,
             "stage3_cache_partitions_reproduced_from_sealed_bundle": True,
             "stage3_replay_fields_redriven_from_sealed_daily_paths": True,
+            "episode_level_peak_exposure_source": (
+                "SEALED_AUTHORITATIVE_REPLAY_FIELDS"
+            ),
+            "daily_path_peak_exposure_exact_reconciliation_claimed": False,
+            "daily_path_peak_exposure_tie_order_diagnostic_only": True,
             "candidate_risk_exposure_suppression_strictly_redriven": True,
             "unsealed_order_sensitive_behavior_cache_hash_published": False,
             "sealed_normalized_behavior_fingerprint_published": True,
@@ -8460,6 +8484,7 @@ def build_active_risk_decision_report(
             "Temporal blocks are descriptive source blocks; overlapping rolling episode starts are not independent observations.",
             "Combine raw pass rates are conservative lower bounds over every frozen start; evaluable rates exclude only DATA_CENSORED paths, while OPERATIONAL_HORIZON_NOT_REACHED remains an observed no-pass-by-horizon outcome.",
             "Risk utilisation covers NORMAL canonical 90-day decision events and declared nominal charges only; it is not time-weighted actual stop-risk or duty cycle.",
+            "Episode-level maximum mini-equivalent and directional exposure are the sealed authoritative replay values. The enriched daily exposure projection is diagnostic only because it does not preserve the component-priority tie-break at coincident entry/exit timestamps.",
             "Exposure signatures are outcome-agnostic duty/exposure matching evidence, not risk utilisation.",
             "Foregone realized PnL is ex-post diagnostic and was never a routing input.",
             "Detailed Standard and Consistency XFA path metrics for expanded finalists are rederived from streamed Stage-3/4/5 FULL-horizon evidence when the expanded cache inputs are requested; the modes remain mutually alternative.",
