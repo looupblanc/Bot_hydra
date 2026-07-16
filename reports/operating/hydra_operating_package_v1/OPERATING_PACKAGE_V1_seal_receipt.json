@@ -1,0 +1,32 @@
+{
+  "artifacts": {
+    "OPERATING_PACKAGE_V1.json": {
+      "relative_path": "OPERATING_PACKAGE_V1.json",
+      "sha256": "8f546bb4f529ade5c97cf8bb7b742039e227f426962a4d9928f808bced821822",
+      "size_bytes": 151443
+    },
+    "OPERATING_PACKAGE_V1.md": {
+      "relative_path": "OPERATING_PACKAGE_V1.md",
+      "sha256": "b1b4f90e084d8a858b0912977f962612bef973e769d23fdd369b80c7329e23fb",
+      "size_bytes": 4358
+    }
+  },
+  "book_count": 6,
+  "broker_connections": 0,
+  "manifest_hash": "9fd671d43127004d9ab11d82a42f07a71e9d846e559b1317c53c488dd1bc0d87",
+  "manifest_path": "reports/operating/hydra_operating_package_v1/OPERATING_PACKAGE_V1.json",
+  "manifest_sha256": "8f546bb4f529ade5c97cf8bb7b742039e227f426962a4d9928f808bced821822",
+  "outbound_orders": 0,
+  "paper_shadow_ready": false,
+  "publication_contract": {
+    "immutable": true,
+    "manifest_and_report_written_before_receipt": true,
+    "receipt_is_commit_marker": true
+  },
+  "receipt_hash": "4d28a0e4011898a97962a5a3e82aa93985aa014977ea711fc936a83e9b083fb9",
+  "report_path": "reports/operating/hydra_operating_package_v1/OPERATING_PACKAGE_V1.md",
+  "report_sha256": "b1b4f90e084d8a858b0912977f962612bef973e769d23fdd369b80c7329e23fb",
+  "schema": "hydra_operating_package_v1_seal_receipt",
+  "sealed_at_utc": "2026-07-16T21:41:08.211916+00:00",
+  "source_commit": "ec7a341169ed80c6e3cee1f9b67a300c05eca5b5"
+}
