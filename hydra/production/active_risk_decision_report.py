@@ -19,6 +19,7 @@ import statistics
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
+from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Iterable, Mapping, Sequence
@@ -48,6 +49,12 @@ from hydra.production.active_risk_report_seal import (
 )
 from hydra.production.episode_evidence import _convert_episode
 from hydra.propfirm.combine_to_xfa import official_rule_snapshot_2026_07_15
+from hydra.propfirm.xfa_payout_events import (
+    CANONICAL_PAYOUT_EVENT_SCHEMA,
+    PayoutPathReconciliation,
+    XfaPayoutEventError,
+    reconcile_payout_path,
+)
 
 
 REPORT_SCHEMA = "hydra_active_risk_decision_report_v1"
@@ -1646,6 +1653,7 @@ def _validate_xfa_payout_ledger(
             )
         expected_gross = 0.0
         expected_net = 0.0
+        candidate_gross = 0.0
         execute = False
         if eligible and pre_payout_balance > 0.0:
             candidate_gross = min(pre_payout_balance * rules.payout_fraction, cap)
@@ -1657,14 +1665,40 @@ def _validate_xfa_payout_ledger(
             raise ActiveRiskDecisionReportError(
                 f"{label} payout request timing drift"
             )
+        observed_gross = _required_float(
+            row.get("gross_payout", 0.0),
+            label=f"{label} daily gross payout",
+        )
+        observed_net = _required_float(
+            row.get("trader_net_payout", 0.0),
+            label=f"{label} daily trader payout",
+        )
+        legacy_subminimum_marker = bool(
+            not execute
+            and eligible
+            and 0.0 < candidate_gross < rules.minimum_payout
+            and math.isclose(
+                observed_gross,
+                candidate_gross,
+                rel_tol=1e-10,
+                abs_tol=1e-8,
+            )
+            and math.isclose(observed_net, 0.0, abs_tol=1e-12)
+            and math.isclose(
+                closing,
+                pre_payout_balance,
+                rel_tol=1e-10,
+                abs_tol=1e-8,
+            )
+        )
         _assert_close(
             expected_gross,
-            row.get("gross_payout", 0.0),
+            0.0 if legacy_subminimum_marker else observed_gross,
             label=f"{label} daily gross payout",
         )
         _assert_close(
             expected_net,
-            row.get("trader_net_payout", 0.0),
+            observed_net,
             label=f"{label} daily trader payout",
         )
         _assert_close(
@@ -1779,10 +1813,13 @@ def _validate_xfa_path_accounting(
     path: Mapping[str, Any],
     *,
     label: str,
+    policy_id: str,
+    scenario: str,
+    combine_start_id: int,
     combine_end_day: int,
     xfa_start_day: int | None,
     rule_snapshot: Mapping[str, Any],
-) -> None:
+) -> PayoutPathReconciliation:
     def nonnegative_int(value: Any, *, field_name: str) -> int:
         if isinstance(value, bool) or not isinstance(value, int) or value < 0:
             raise ActiveRiskDecisionReportError(
@@ -1897,14 +1934,18 @@ def _validate_xfa_path_accounting(
             raise ActiveRiskDecisionReportError(f"{label} first-payout day drift")
     elif int(first_payout_day) != expected_first_day:
         raise ActiveRiskDecisionReportError(f"{label} first-payout day drift")
-    gross = sum(_float(row.get("gross_payout")) for row in ledger)
-    trader = sum(_float(row.get("trader_net_payout")) for row in ledger)
-    _assert_close(gross, path.get("gross_payout"), label=f"{label} gross payout")
-    _assert_close(
-        trader,
-        path.get("trader_net_payout"),
-        label=f"{label} trader net payout",
-    )
+    try:
+        payout_reconciliation = reconcile_payout_path(
+            path,
+            policy_id=policy_id,
+            scenario=scenario,
+            combine_start_id=combine_start_id,
+            allow_legacy_subminimum_marker=True,
+        )
+    except XfaPayoutEventError as exc:
+        raise ActiveRiskDecisionReportError(
+            f"{label} canonical payout-event reconciliation failed: {exc}"
+        ) from exc
     expected_post_days = (
         len(ledger) - (payout_indices[-1] + 1) if payout_indices else 0
     )
@@ -2028,6 +2069,7 @@ def _validate_xfa_path_accounting(
         ) != int(path["end_day"]):
             raise ActiveRiskDecisionReportError(f"{label} ledger chronology drift")
     _validate_xfa_payout_ledger(path, label=label)
+    return payout_reconciliation
 
 
 @dataclass
@@ -2046,6 +2088,10 @@ class LifecyclePathAccumulator:
     evaluable_payout_cycles: int = 0
     first_payout_evaluable_observed_cycles: int = 0
     trader_net_payout: float = 0.0
+    canonical_gross_payout: float = 0.0
+    canonical_payout_event_count: int = 0
+    legacy_subminimum_marker_count: int = 0
+    legacy_subminimum_marker_gross: float = 0.0
     evaluable_trader_net_payout: float = 0.0
     first_payout_evaluable_observed_payout: float = 0.0
     post_payout_survived: int = 0
@@ -2072,7 +2118,12 @@ class LifecyclePathAccumulator:
         self.combine_attempts += 1
         self.combine_censored_attempts += int(censored)
 
-    def add_path(self, path: Mapping[str, Any]) -> None:
+    def add_path(
+        self,
+        path: Mapping[str, Any],
+        *,
+        payout_reconciliation: PayoutPathReconciliation,
+    ) -> None:
         self.xfa_paths_started += 1
         terminal = str(path.get("terminal") or "")
         self.terminal_distribution[terminal] += 1
@@ -2083,7 +2134,7 @@ class LifecyclePathAccumulator:
         self.zero_observation_paths += int(not observed)
         self.xfa_censored_paths += int(censored)
         self.evaluable_xfa_paths += int(evaluable)
-        eligible = bool(path.get("payout_eligible"))
+        eligible = payout_reconciliation.first_payout_count == 1
         self.closure_before_first_payout_count += int(
             not eligible
             and terminal
@@ -2093,16 +2144,24 @@ class LifecyclePathAccumulator:
         self.first_payout_evaluable_xfa_paths += int(first_payout_evaluable)
         self.first_payouts += int(eligible)
         self.evaluable_first_payouts += int(eligible and first_payout_evaluable)
-        cycles = int(path.get("payout_cycles", 0))
+        cycles = len(payout_reconciliation.payout_events)
         self.payout_cycles_by_started_path.append(float(cycles))
         if terminal in {"MLL_BREACHED", "HARD_RULE_FAILURE", "INACTIVITY_RISK"}:
             self.payout_cycles_before_observed_closure.append(float(cycles))
         if censored:
             self.payout_cycles_on_censored_paths.append(float(cycles))
-        payout = _required_float(
-            path.get("trader_net_payout"), label="XFA trader net payout"
-        )
+        payout = payout_reconciliation.canonical_trader_net_payout
         self.payout_cycles += cycles
+        self.canonical_gross_payout += (
+            payout_reconciliation.canonical_gross_payout
+        )
+        self.canonical_payout_event_count += cycles
+        self.legacy_subminimum_marker_count += (
+            payout_reconciliation.legacy_subminimum_marker_count
+        )
+        self.legacy_subminimum_marker_gross += (
+            payout_reconciliation.legacy_subminimum_marker_gross
+        )
         self.evaluable_payout_cycles += cycles if evaluable else 0
         self.first_payout_evaluable_observed_cycles += (
             cycles if first_payout_evaluable else 0
@@ -2281,6 +2340,22 @@ class LifecyclePathAccumulator:
             "terminal_distribution": dict(sorted(self.terminal_distribution.items())),
             "evaluable_first_payouts": self.evaluable_first_payouts,
             "payout_cycles": self.payout_cycles,
+            "canonical_payout_event_schema": CANONICAL_PAYOUT_EVENT_SCHEMA,
+            "canonical_payout_event_count": self.canonical_payout_event_count,
+            "canonical_gross_payout": self.canonical_gross_payout,
+            "legacy_raw_daily_gross_including_subminimum_markers": (
+                self.canonical_gross_payout + self.legacy_subminimum_marker_gross
+            ),
+            "legacy_subminimum_marker_count": (
+                self.legacy_subminimum_marker_count
+            ),
+            "legacy_subminimum_marker_gross": (
+                self.legacy_subminimum_marker_gross
+            ),
+            "legacy_marker_semantics": (
+                "ELIGIBLE_CANDIDATE_BELOW_MINIMUM_NOT_REQUESTED_NOT_PAID;"
+                "EXCLUDED_FROM_CANONICAL_PAYOUT_EVENTS_AND_DERIVED_TOTALS"
+            ),
             "payout_cycles_by_path": {
                 "all_started_paths": _distribution(
                     self.payout_cycles_by_started_path
@@ -2320,6 +2395,7 @@ class LifecyclePathAccumulator:
 
 @dataclass
 class CampaignLifecycleAuditAccumulator:
+    finalist_ids: frozenset[str] = field(default_factory=frozenset)
     transition_stages: dict[tuple[str, str, int], str] = field(default_factory=dict)
     full_episode_stages: dict[tuple[str, str, int], str] = field(default_factory=dict)
     path_keys: set[tuple[str, str, int, str]] = field(default_factory=set)
@@ -2331,6 +2407,17 @@ class CampaignLifecycleAuditAccumulator:
     )
     stage_full_episode_counts: Counter[str] = field(default_factory=Counter)
     stage_transition_counts: Counter[str] = field(default_factory=Counter)
+    canonical_event_fingerprints: set[str] = field(default_factory=set)
+    legacy_marker_path_keys: set[tuple[str, str, int, str]] = field(
+        default_factory=set
+    )
+    legacy_marker_policy_ids: set[str] = field(default_factory=set)
+    legacy_marker_gross_distribution: Counter[str] = field(
+        default_factory=Counter
+    )
+    legacy_marker_path_arithmetic: list[dict[str, Any]] = field(
+        default_factory=list
+    )
 
     def add_full_episode(self, row: Mapping[str, Any], *, stage: str) -> None:
         policy_id = str(row.get("policy_id") or "")
@@ -2433,9 +2520,12 @@ class CampaignLifecycleAuditAccumulator:
                     f"duplicate lifecycle alternative path key {path_key}"
                 )
             self.path_keys.add(path_key)
-            _validate_xfa_path_accounting(
+            payout_reconciliation = _validate_xfa_path_accounting(
                 value,
                 label=f"sealed campaign lifecycle {key} {path}",
+                policy_id=policy_id,
+                scenario=scenario,
+                combine_start_id=start_day,
                 combine_end_day=int(validated["combine_end_day"]),
                 xfa_start_day=(
                     None
@@ -2444,7 +2534,51 @@ class CampaignLifecycleAuditAccumulator:
                 ),
                 rule_snapshot=validated["rule_snapshot"],
             )
-            self.lifecycle[scenario][path].add_path(value)
+            for event in payout_reconciliation.payout_events:
+                if event.event_fingerprint in self.canonical_event_fingerprints:
+                    raise ActiveRiskDecisionReportError(
+                        "duplicate canonical payout-event fingerprint"
+                    )
+                self.canonical_event_fingerprints.add(event.event_fingerprint)
+            if payout_reconciliation.legacy_subminimum_marker_count:
+                self.legacy_marker_path_keys.add(
+                    (policy_id, scenario, start_day, expected_name)
+                )
+                self.legacy_marker_policy_ids.add(policy_id)
+                self.legacy_marker_gross_distribution.update(
+                    _canonical_decimal_key(value)
+                    for value in (
+                        payout_reconciliation.legacy_subminimum_marker_amounts
+                    )
+                )
+                self.legacy_marker_path_arithmetic.append(
+                    {
+                        "policy_id": policy_id,
+                        "scenario": scenario,
+                        "combine_start_id": start_day,
+                        "xfa_path": expected_name,
+                        "raw_daily_gross_including_nonexecuted_marker": (
+                            payout_reconciliation.canonical_gross_payout
+                            + payout_reconciliation.legacy_subminimum_marker_gross
+                        ),
+                        "minus_nonexecuted_subminimum_marker_gross": (
+                            payout_reconciliation.legacy_subminimum_marker_gross
+                        ),
+                        "equals_executed_canonical_gross_payout": (
+                            payout_reconciliation.canonical_gross_payout
+                        ),
+                        "canonical_trader_net_payout": (
+                            payout_reconciliation.canonical_trader_net_payout
+                        ),
+                        "canonical_payout_event_count": len(
+                            payout_reconciliation.payout_events
+                        ),
+                    }
+                )
+            self.lifecycle[scenario][path].add_path(
+                value,
+                payout_reconciliation=payout_reconciliation,
+            )
 
     def to_dict(self) -> dict[str, Any]:
         transitions = len(self.transition_stages)
@@ -2463,6 +2597,34 @@ class CampaignLifecycleAuditAccumulator:
             for scenario in SCENARIOS
             for path in PATHS
         )
+        canonical_events = sum(
+            self.lifecycle[scenario][path].canonical_payout_event_count
+            for scenario in SCENARIOS
+            for path in PATHS
+        )
+        legacy_marker_count = sum(
+            self.lifecycle[scenario][path].legacy_subminimum_marker_count
+            for scenario in SCENARIOS
+            for path in PATHS
+        )
+        legacy_marker_gross = sum(
+            self.lifecycle[scenario][path].legacy_subminimum_marker_gross
+            for scenario in SCENARIOS
+            for path in PATHS
+        )
+        canonical_gross = sum(
+            self.lifecycle[scenario][path].canonical_gross_payout
+            for scenario in SCENARIOS
+            for path in PATHS
+        )
+        if canonical_events != payout_cycles:
+            raise ActiveRiskDecisionReportError(
+                "canonical payout-event count differs from payout cycles"
+            )
+        if not 0 <= first_payouts <= paths:
+            raise ActiveRiskDecisionReportError(
+                "first-payout count exceeds unique alternative paths"
+            )
         trader_cash = sum(
             self.lifecycle[scenario][path].trader_net_payout
             for scenario in SCENARIOS
@@ -2480,6 +2642,53 @@ class CampaignLifecycleAuditAccumulator:
             "alternative_path_count": paths,
             "first_payout_path_observation_count": first_payouts,
             "payout_cycle_observation_count": payout_cycles,
+            "canonical_payout_event_schema": CANONICAL_PAYOUT_EVENT_SCHEMA,
+            "canonical_payout_event_count": canonical_events,
+            "canonical_gross_payout": canonical_gross,
+            "legacy_subminimum_marker_count": legacy_marker_count,
+            "legacy_subminimum_marker_gross": legacy_marker_gross,
+            "legacy_raw_daily_gross_including_subminimum_markers": (
+                canonical_gross + legacy_marker_gross
+            ),
+            "canonical_gross_arithmetic_bridge": {
+                "raw_daily_gross_including_nonexecuted_legacy_markers": (
+                    canonical_gross + legacy_marker_gross
+                ),
+                "minus_nonexecuted_subminimum_marker_gross": legacy_marker_gross,
+                "equals_executed_canonical_gross_payout": canonical_gross,
+            },
+            "legacy_subminimum_marker_gross_distribution": dict(
+                sorted(self.legacy_marker_gross_distribution.items())
+            ),
+            "legacy_subminimum_marker_affected_path_keys": [
+                {
+                    "policy_id": policy_id,
+                    "scenario": scenario,
+                    "combine_start_id": start_day,
+                    "xfa_path": path,
+                }
+                for policy_id, scenario, start_day, path in sorted(
+                    self.legacy_marker_path_keys
+                )
+            ],
+            "legacy_subminimum_marker_affected_policy_ids": sorted(
+                self.legacy_marker_policy_ids
+            ),
+            "legacy_subminimum_marker_path_arithmetic": sorted(
+                self.legacy_marker_path_arithmetic,
+                key=lambda row: (
+                    row["policy_id"],
+                    row["scenario"],
+                    row["combine_start_id"],
+                    row["xfa_path"],
+                ),
+            ),
+            "legacy_subminimum_marker_affected_finalist_ids": sorted(
+                self.legacy_marker_policy_ids & set(self.finalist_ids)
+            ),
+            "canonical_payout_event_unique_fingerprint_count": len(
+                self.canonical_event_fingerprints
+            ),
             "trader_90_percent_split_cash_observations_before_fees_tax": trader_cash,
             "post_payout_survival_observation_count": survival,
             "stage_full_episode_counts": dict(sorted(self.stage_full_episode_counts.items())),
@@ -2490,6 +2699,9 @@ class CampaignLifecycleAuditAccumulator:
             "full_pass_lifecycle_bijection_proved": True,
             "exactly_two_alternative_paths_per_transition_proved": True,
             "path_key_uniqueness_proved": True,
+            "first_payout_uniqueness_per_path_proved": True,
+            "canonical_event_to_summary_reconciliation_proved": True,
+            "standard_consistency_alternatives_kept_separate": True,
             "official_rule_snapshot_exact": True,
             "payout_eligibility_amount_and_reset_reexecuted_from_daily_ledger": True,
             "by_scenario_and_path": {
@@ -2503,14 +2715,19 @@ class CampaignLifecycleAuditAccumulator:
 
 
 def _stream_sealed_campaign_lifecycle(
-    bundle_path: Path, bundle_manifest: Mapping[str, Any]
+    bundle_path: Path,
+    bundle_manifest: Mapping[str, Any],
+    *,
+    finalist_ids: Iterable[str] = (),
 ) -> dict[str, Any]:
     files = bundle_manifest.get("files")
     if not isinstance(files, Mapping):
         raise ActiveRiskDecisionReportError(
             "verified EvidenceBundle lacks episode partitions"
         )
-    accumulator = CampaignLifecycleAuditAccumulator()
+    accumulator = CampaignLifecycleAuditAccumulator(
+        finalist_ids=frozenset(str(value) for value in finalist_ids)
+    )
     relevant_partition_count = 0
     for relative_path, details in sorted(files.items()):
         if (
@@ -2567,6 +2784,12 @@ def _stream_sealed_campaign_lifecycle(
     result = accumulator.to_dict()
     result["episode_partition_count"] = relevant_partition_count
     return result
+
+
+def _canonical_decimal_key(value: float) -> str:
+    """Stable human-auditable key for an exact payout-marker distribution."""
+
+    return format(Decimal(str(float(value))).normalize(), "f")
 
 
 def _summary_view(summary: Mapping[str, Any]) -> dict[str, Any]:
@@ -4099,7 +4322,9 @@ def _production_context(
         set(frontier_ids),
     )
     sealed_campaign_lifecycle_audit = _stream_sealed_campaign_lifecycle(
-        bundle_path, verified_bundle
+        bundle_path,
+        verified_bundle,
+        finalist_ids=frontier_ids,
     )
     state_counter_values = {
         field_name: required_counter(state, field_name, label="production state")
@@ -5796,17 +6021,23 @@ class ExpandedFinalistRawAccumulator:
                         f"expanded finalist {self.policy_id} {stage} {path} "
                         "requested XFA horizon drift"
                     )
-                _validate_xfa_path_accounting(
+                payout_reconciliation = _validate_xfa_path_accounting(
                     value,
                     label=(
                         f"expanded finalist {self.policy_id} {stage} "
                         f"{scenario} {path}"
                     ),
+                    policy_id=self.policy_id,
+                    scenario=scenario,
+                    combine_start_id=start_day,
                     combine_end_day=combine_end_day,
                     xfa_start_day=xfa_start_day,
                     rule_snapshot=sealed_lifecycle["rule_snapshot"],
                 )
-                self.lifecycle[scenario][path].add_path(value)
+                self.lifecycle[scenario][path].add_path(
+                    value,
+                    payout_reconciliation=payout_reconciliation,
+                )
 
     def _canonical_scenario_result(self, scenario: str) -> dict[str, Any]:
         """Re-derive one cumulative 90-day finalist summary from raw episodes."""
@@ -7351,6 +7582,9 @@ def _sealed_campaign_wide_lifecycle_totals(
             "full_pass_lifecycle_bijection_proved",
             "exactly_two_alternative_paths_per_transition_proved",
             "path_key_uniqueness_proved",
+            "first_payout_uniqueness_per_path_proved",
+            "canonical_event_to_summary_reconciliation_proved",
+            "standard_consistency_alternatives_kept_separate",
             "official_rule_snapshot_exact",
             "payout_eligibility_amount_and_reset_reexecuted_from_daily_ledger",
         )
@@ -7380,6 +7614,28 @@ def _sealed_campaign_wide_lifecycle_totals(
         "first_payouts_above_transition_count_can_be_expected": True,
         "duplicate_transition_inflation_detected": False,
         "duplicate_transition_verdict_basis": audit_proof_status,
+        "legacy_subminimum_marker_count": (
+            int(sealed_episode_audit.get("legacy_subminimum_marker_count", 0))
+            if sealed_episode_audit is not None
+            else None
+        ),
+        "legacy_subminimum_marker_gross": (
+            _required_float(
+                sealed_episode_audit.get("legacy_subminimum_marker_gross", 0.0),
+                label="legacy subminimum marker gross",
+            )
+            if sealed_episode_audit is not None
+            else None
+        ),
+        "legacy_subminimum_marker_affected_finalist_ids": (
+            list(
+                sealed_episode_audit.get(
+                    "legacy_subminimum_marker_affected_finalist_ids", ()
+                )
+            )
+            if sealed_episode_audit is not None
+            else None
+        ),
         "semantics": (
             "ONE_UNIQUE_COMBINE_TO_XFA_TRANSITION_FANS_OUT_TO_TWO_MUTUALLY_"
             "EXCLUSIVE_DIAGNOSTIC_PATHS;FIRST_PAYOUTS_COUNT_SUCCESSFUL_PATH_"
@@ -7816,15 +8072,24 @@ def build_active_risk_decision_report(
                     raise ActiveRiskDecisionReportError(
                         f"candidate {policy_id} {lifecycle_path} XFA requested horizon drift"
                     )
-                _validate_xfa_path_accounting(
+                payout_reconciliation = _validate_xfa_path_accounting(
                     value,
                     label=f"candidate {policy_id} {scenario} {lifecycle_path}",
+                    policy_id=policy_id,
+                    scenario=scenario,
+                    combine_start_id=start_day,
                     combine_end_day=combine_end_day,
                     xfa_start_day=xfa_start_day,
                     rule_snapshot=sealed_lifecycle["rule_snapshot"],
                 )
-                lifecycle[scenario][lifecycle_path].add_path(value)
-                candidate_lifecycle[scenario][lifecycle_path].add_path(value)
+                lifecycle[scenario][lifecycle_path].add_path(
+                    value,
+                    payout_reconciliation=payout_reconciliation,
+                )
+                candidate_lifecycle[scenario][lifecycle_path].add_path(
+                    value,
+                    payout_reconciliation=payout_reconciliation,
+                )
         compact["stage3_xfa_lifecycle"] = {
             "scope": "STAGE3_ONLY_48_STARTS_FULL_CHRONOLOGICAL_HORIZON",
             **{

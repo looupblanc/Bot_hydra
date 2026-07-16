@@ -891,12 +891,27 @@ def _run_xfa_path(
         else:
             raise ValueError(f"unsupported XFA path: {path}")
 
+        # Keep the eligibility calculation separate from an executed payout.
+        # A balance may be eligible while the amount allowed by the 50%-of-
+        # balance rule remains below the frozen minimum.  Such an amount is a
+        # candidate only: it is neither requested nor paid, and therefore must
+        # never appear in ``gross_payout``.
+        payout_balance_fraction_limit = 0.0
+        payout_candidate_gross = 0.0
+        payout_gross_request = 0.0
         payout_gross = 0.0
         payout_net = 0.0
         payout_executed = False
+        payout_floor_before = floor
         if payout_eligible and balance > 0.0:
-            payout_gross = min(balance * rules.payout_fraction, payout_cap)
-            if payout_gross >= rules.minimum_payout - 1e-12:
+            payout_balance_fraction_limit = balance * rules.payout_fraction
+            payout_candidate_gross = min(
+                payout_balance_fraction_limit,
+                payout_cap,
+            )
+            if payout_candidate_gross >= rules.minimum_payout - 1e-12:
+                payout_gross_request = payout_candidate_gross
+                payout_gross = payout_gross_request
                 payout_net = payout_gross * rules.trader_profit_split
                 if first_payout_day is None:
                     first_payout_day = elapsed
@@ -936,9 +951,26 @@ def _run_xfa_path(
                     consistency_ratio if math.isfinite(consistency_ratio) else None
                 ),
                 "payout_eligible": payout_eligible,
+                "payout_eligibility_timestamp": (
+                    int(day) if payout_eligible else None
+                ),
+                "eligible_account_balance": (
+                    opening_balance + day_pnl if payout_eligible else None
+                ),
+                "payout_balance_fraction_limit": payout_balance_fraction_limit,
+                "payout_account_size_cap": payout_cap,
+                "payout_candidate_gross": payout_candidate_gross,
+                "gross_payout_request": payout_gross_request,
                 "payout_requested": payout_executed,
                 "gross_payout": payout_gross,
+                "payout_split": rules.trader_profit_split,
                 "trader_net_payout": payout_net,
+                "payout_costs_or_fees": 0.0,
+                "pre_payout_balance": opening_balance + day_pnl,
+                "post_payout_balance": balance,
+                "mll_before_payout": payout_floor_before,
+                "mll_after_payout": floor,
+                "payout_reset_marker": payout_executed,
                 "payout_cycles": cycles,
                 "post_payout_mll_locked_at_zero": cycles > 0,
                 "scaling_limit_frozen_for_session": True,

@@ -1512,6 +1512,9 @@ def test_campaign_lifecycle_exact_transition_path_payout_semantics() -> None:
         "full_pass_lifecycle_bijection_proved": True,
         "exactly_two_alternative_paths_per_transition_proved": True,
         "path_key_uniqueness_proved": True,
+        "first_payout_uniqueness_per_path_proved": True,
+        "canonical_event_to_summary_reconciliation_proved": True,
+        "standard_consistency_alternatives_kept_separate": True,
         "official_rule_snapshot_exact": True,
         "payout_eligibility_amount_and_reset_reexecuted_from_daily_ledger": True,
         "by_scenario_and_path": {
@@ -1624,6 +1627,9 @@ def test_campaign_lifecycle_rejects_summary_raw_total_corruption() -> None:
         "full_pass_lifecycle_bijection_proved": True,
         "exactly_two_alternative_paths_per_transition_proved": True,
         "path_key_uniqueness_proved": True,
+        "first_payout_uniqueness_per_path_proved": True,
+        "canonical_event_to_summary_reconciliation_proved": True,
+        "standard_consistency_alternatives_kept_separate": True,
         "official_rule_snapshot_exact": True,
         "payout_eligibility_amount_and_reset_reexecuted_from_daily_ledger": True,
     }

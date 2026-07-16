@@ -359,6 +359,11 @@ def test_subminimum_eligible_amount_is_not_recorded_as_a_payout_request() -> Non
     assert result.xfa_standard.gross_payout == 0.0
     assert result.xfa_standard.daily_ledger[-1]["payout_eligible"] is True
     assert result.xfa_standard.daily_ledger[-1]["payout_requested"] is False
+    assert result.xfa_standard.daily_ledger[-1]["gross_payout"] == 0.0
+    assert result.xfa_standard.daily_ledger[-1]["gross_payout_request"] == 0.0
+    assert 0.0 < result.xfa_standard.daily_ledger[-1][
+        "payout_candidate_gross"
+    ] < RuleSnapshot().minimum_payout
     assert sum(
         bool(row.get("payout_requested"))
         for row in result.xfa_standard.daily_ledger
