@@ -49,6 +49,68 @@ def _array(root: Path, name: str, value: np.ndarray) -> dict[str, object]:
     }
 
 
+def _report_evidence_contract(
+    *, verification: str = "TWO_PREREGISTERED_DEEP_GUARDS_REUSED"
+) -> dict[str, object]:
+    value: dict[str, object] = {
+        "path": "/repo/data/cache/evidence_bundles/campaign.evidence-v1",
+        "manifest_sha256": "1" * 64,
+        "bundle_content_sha256": "2" * 64,
+        "dataset_row_counts": {"episodes": 152_064, "provenance": 1},
+        "verification": verification,
+    }
+    if verification == "TWO_PREREGISTERED_DEEP_GUARDS_REUSED":
+        value.update(
+            {
+                "preregistered_deep_guard_count": 2,
+                "additional_deep_guard_performed_by_report": False,
+            }
+        )
+    return value
+
+
+def _matches_report_evidence_contract(value: dict[str, object]) -> bool:
+    return binding_loader_module._report_evidence_contract_matches(
+        value,
+        path="/repo/data/cache/evidence_bundles/campaign.evidence-v1",
+        manifest_sha256="1" * 64,
+        bundle_content_sha256="2" * 64,
+        dataset_row_counts={"episodes": 152_064, "provenance": 1},
+    )
+
+
+def test_report_evidence_contract_accepts_exact_deep_guard_forms() -> None:
+    assert _matches_report_evidence_contract(_report_evidence_contract())
+    assert _matches_report_evidence_contract(
+        _report_evidence_contract(verification="DEEP_VERIFIED")
+    )
+
+
+def test_report_evidence_contract_rejects_any_nonexact_guard_contract() -> None:
+    current = _report_evidence_contract()
+    mutations = []
+    for key, value in (
+        ("path", "/repo/data/cache/evidence_bundles/other.evidence-v1"),
+        ("manifest_sha256", "3" * 64),
+        ("bundle_content_sha256", "4" * 64),
+        ("dataset_row_counts", {"episodes": 152_063, "provenance": 1}),
+        ("verification", "DEEP_VERIFIED"),
+        ("preregistered_deep_guard_count", 1),
+        ("additional_deep_guard_performed_by_report", True),
+    ):
+        mutations.append({**current, key: value})
+    mutations.append({**current, "unrecognized_provenance_claim": True})
+    mutations.append(
+        {
+            key: value
+            for key, value in current.items()
+            if key != "preregistered_deep_guard_count"
+        }
+    )
+
+    assert all(not _matches_report_evidence_contract(row) for row in mutations)
+
+
 def _fixture(tmp_path: Path) -> tuple[Path, dict[str, object], Path]:
     campaign_id = "hydra_active_risk_pool_target_velocity_0026"
     source_campaign = "hydra_economic_evolution_source_test_0001"

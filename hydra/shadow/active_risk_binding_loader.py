@@ -106,6 +106,40 @@ def _evidence_bundle_content_hash(value: Mapping[str, Any]) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def _report_evidence_contract_matches(
+    value: Mapping[str, Any],
+    *,
+    path: str,
+    manifest_sha256: str,
+    bundle_content_sha256: str,
+    dataset_row_counts: object,
+) -> bool:
+    """Accept only the two exact, already-verified report contracts.
+
+    Older sealed reports recorded the verification result directly as
+    ``DEEP_VERIFIED``.  The decision-grade report deliberately reuses the two
+    preregistered deep guards instead of performing a third full traversal.
+    Both forms bind the same immutable bundle identity; accepting the latter
+    must not turn into a permissive subset comparison.
+    """
+
+    common = {
+        "path": path,
+        "manifest_sha256": manifest_sha256,
+        "bundle_content_sha256": bundle_content_sha256,
+        "dataset_row_counts": dataset_row_counts,
+    }
+    legacy = {**common, "verification": "DEEP_VERIFIED"}
+    preregistered_guards_reused = {
+        **common,
+        "verification": "TWO_PREREGISTERED_DEEP_GUARDS_REUSED",
+        "preregistered_deep_guard_count": 2,
+        "additional_deep_guard_performed_by_report": False,
+    }
+    observed = dict(value)
+    return observed == legacy or observed == preregistered_guards_reused
+
+
 def _json(path: Path, *, label: str) -> dict[str, Any]:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
@@ -973,13 +1007,6 @@ def build_active_risk_package_from_sealed_selection(
     )
     identity_path = evidence_bundle_path / "identity.json"
     identity = _json(identity_path, label="EvidenceBundle identity")
-    receipt_comparison = {
-        "path": str(evidence_bundle_path),
-        "manifest_sha256": evidence_manifest_sha256,
-        "bundle_content_sha256": observed_bundle_hash,
-        "dataset_row_counts": evidence_manifest.get("dataset_row_counts"),
-        "verification": "DEEP_VERIFIED",
-    }
     if (
         evidence_receipt.get("campaign_id") != campaign.get("campaign_id")
         or evidence_manifest_sha256
@@ -997,7 +1024,13 @@ def build_active_risk_package_from_sealed_selection(
         or evidence_receipt.get("bundle_content_sha256") != observed_bundle_hash
         or evidence_receipt.get("dataset_row_counts")
         != evidence_manifest.get("dataset_row_counts")
-        or dict(report_evidence) != receipt_comparison
+        or not _report_evidence_contract_matches(
+            report_evidence,
+            path=str(evidence_bundle_path),
+            manifest_sha256=evidence_manifest_sha256,
+            bundle_content_sha256=observed_bundle_hash,
+            dataset_row_counts=evidence_manifest.get("dataset_row_counts"),
+        )
         or report_evidence_provenance.get("manifest_sha256")
         != evidence_manifest_sha256
         or report_evidence_provenance.get("bundle_content_sha256")
