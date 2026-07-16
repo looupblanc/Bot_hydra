@@ -1,0 +1,62 @@
+{
+  "schema": "hydra_active_risk_development_terminal_verdict_worm_v1",
+  "campaign_id": "hydra_active_risk_pool_target_velocity_0026",
+  "class_id": "ACTIVE_RISK_POOL_TARGET_VELOCITY_V1",
+  "recorded_at_utc": "2026-07-16T15:13:43Z",
+  "immutable": true,
+  "terminal_status": "ACTIVE_POOL_CONFIRMATION_CANDIDATES_DEVELOPMENT_ONLY",
+  "terminal_scope": "FROZEN_STAGE3_STAGE4_STAGE5_DECISION_AND_NO_ORDER_FORWARD_EXPORT",
+  "failure_code": "DECISION_REPORT_SELECTION_AND_FORWARD_PACKAGES_SEALED",
+  "source_manifest": {
+    "path": "config/v7/active_risk_pool_target_velocity_0026_revision_02.json",
+    "file_sha256": "5cc52c6770946deb2ce0cadcf8f0f9be6d88c943183ca54909999109f5dfc6da",
+    "semantic_hash": "db52ec45979beed05e3fa4128c4c54fc252d87c899dfd0f434647eab351b2005",
+    "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11",
+    "tag": "worm/active-risk-pool-target-velocity-0026-revision-02-2026-07-15",
+    "commit": "582e7e3923778f78a6e809cb1132b64f0b3e4ec0"
+  },
+  "source_terminal_receipt": {
+    "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/development_terminal_receipt.json",
+    "file_sha256": "e1af26de5a3693eca3273654f821bcd2bec4e0b1a5420e3b89c3bd95dcd81f22",
+    "receipt_hash": "b1d1a5f52b037d3e9a6d724f28d98ea958f50a28f7891250d7f8ba766b0236a4"
+  },
+  "decision_boundary": {
+    "decision_report_hash": "f74bc6a842915ad53149e6d8adcbf4daab94556f567e014ed7175ac480293bcd",
+    "decision_report_seal_receipt_hash": "6e9108735371b3bb9ca3565a225fbd5518b00080eaf9036050e0b3957e438bf3",
+    "selection_manifest_hash": "114097f2e659a1fd50223fdd0758ef6f2a44776ff4fc4f6a1b48b87152730dd4",
+    "selection_seal_receipt_hash": "b3308b15bc22d3c2571e023a14acf3442c04eee38c8be9aa4f4e9e406b3eafab",
+    "primary_book_count": 5,
+    "backup_book_count": 1,
+    "forward_shadow_package_count": 6,
+    "forward_status": "FORWARD_SHADOW_CANDIDATE",
+    "paper_shadow_ready_count": 0,
+    "fresh_post_freeze_bar_count": 0
+  },
+  "xfa_boundary": {
+    "combine_to_xfa_transition_count": 25019,
+    "alternative_xfa_path_count": 50038,
+    "unique_first_payout_count": 48922,
+    "standard_and_consistency_are_alternative_not_additive": true,
+    "executed_payout_events_changed_by_reconciliation": false,
+    "combine_evidence_changed_by_reconciliation": false
+  },
+  "scope": {
+    "automatic_campaign_retry_allowed": false,
+    "neighboring_active_pool_variants_allowed": false,
+    "finalists_mutable": false,
+    "independent_confirmation_claimed": false,
+    "paper_shadow_ready_assigned": false,
+    "append_only_forward_observation_allowed_after_genuine_post_freeze_bars": true,
+    "next_state": "MANIFEST_QUEUE_AWAITING_APPEND"
+  },
+  "governance": {
+    "q4_status": "BURNED",
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "remaining_budget_usd": 37.152612
+  },
+  "CONTRE": "This WORM verdict terminalizes only automatic replay of the completed development campaign. It preserves six immutable no-order forward candidates, makes no independent-confirmation claim, and authorizes no new campaign, Q4 access, data purchase, broker connectivity, orders, PAPER_SHADOW_READY, or live trading.",
+  "verdict_hash": "d99c82e808e3da9336a17b8344f52c7a1838af2af389beed83fee08fe7b2daf1"
+}

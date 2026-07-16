@@ -1,0 +1,156 @@
+{
+  "schema": "hydra_active_risk_development_terminal_receipt_v1",
+  "recorded_at_utc": "2026-07-16T15:13:43Z",
+  "campaign_id": "hydra_active_risk_pool_target_velocity_0026",
+  "class_id": "ACTIVE_RISK_POOL_TARGET_VELOCITY_V1",
+  "terminal_status": "ACTIVE_POOL_CONFIRMATION_CANDIDATES_DEVELOPMENT_ONLY",
+  "terminal_scope": "FROZEN_STAGE3_STAGE4_STAGE5_DECISION_AND_NO_ORDER_FORWARD_EXPORT",
+  "failure_code": "DECISION_REPORT_SELECTION_AND_FORWARD_PACKAGES_SEALED",
+  "scientific_boundary": {
+    "development_evidence_only": true,
+    "independent_confirmation": false,
+    "paper_shadow_ready_assigned": false,
+    "candidate_logic_mutated_after_freeze": false,
+    "combine_paths_replayed_after_freeze": false,
+    "automatic_campaign_retry_allowed": false,
+    "new_broad_search_authorized": false
+  },
+  "source_identity": {
+    "actual_git_head_at_terminalization": "81d3c6c66be31df0e3f7538f933ebdb85ad9d66b",
+    "manifest_source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11",
+    "manifest_path": "config/v7/active_risk_pool_target_velocity_0026_revision_02.json",
+    "manifest_file_sha256": "5cc52c6770946deb2ce0cadcf8f0f9be6d88c943183ca54909999109f5dfc6da",
+    "manifest_semantic_hash": "db52ec45979beed05e3fa4128c4c54fc252d87c899dfd0f434647eab351b2005",
+    "manifest_worm_tag": "worm/active-risk-pool-target-velocity-0026-revision-02-2026-07-15",
+    "manifest_worm_commit": "582e7e3923778f78a6e809cb1132b64f0b3e4ec0"
+  },
+  "terminal_result": {
+    "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/economic_production_result.json",
+    "file_sha256": "3272b63d93cb4a831252b2f5042e309397cd01f4ef72184e6d52a15a4775de00",
+    "result_hash": "ececeff6fc4a254e0df20d4d9e6e94793bf03308fc72431449de4e93e898e39d",
+    "status": "COMPLETE"
+  },
+  "evidence_bundle": {
+    "receipt_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/evidence_bundle_receipt.json",
+    "receipt_file_sha256": "bbb41d7de53e8bda765b9104196bdb885d5bd78e8c57052c9167ae160a9c45df",
+    "status": "COMPLETE",
+    "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+    "reconstruction_flag": false,
+    "manifest_sha256": "4c4dfc02165eadb75c196361e1464e75a3ba638ccaab6e57c4771480aa9111f5",
+    "bundle_content_sha256": "4e4d667c1c5909a3431feed77e21f8f8761c88ba6e172f1afd857752f889946a",
+    "episode_rows": 152064,
+    "account_daily_path_rows": 4236224
+  },
+  "decision_report": {
+    "json_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/decision_report_revision_02.json",
+    "json_sha256": "49215da42312ea823b3cbb6acffb1fa7d5ffb06748c4fc615c3e1fc198bade87",
+    "markdown_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/decision_report_revision_02.md",
+    "markdown_sha256": "b0edf35066da3cef93b1568611e3c715ee03e8dc247ca1356faf5ace068d6782",
+    "seal_receipt_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/decision_report_revision_02_seal_receipt.json",
+    "seal_receipt_file_sha256": "fffb3900c49394c57fb40706558b73cfd5f588f6d703d7a108e7cba7d0ec6828",
+    "report_hash": "f74bc6a842915ad53149e6d8adcbf4daab94556f567e014ed7175ac480293bcd",
+    "seal_receipt_hash": "6e9108735371b3bb9ca3565a225fbd5518b00080eaf9036050e0b3957e438bf3",
+    "sealed_at_utc": "2026-07-16T15:00:41.760398Z"
+  },
+  "xfa_reconciliation": {
+    "combine_to_xfa_transition_count": 25019,
+    "alternative_xfa_path_count": 50038,
+    "unique_first_payout_count": 48922,
+    "canonical_payout_event_count": 149254,
+    "standard_first_payout_count": 24600,
+    "consistency_first_payout_count": 24322,
+    "legacy_subminimum_marker_count": 1201,
+    "legacy_subminimum_marker_path_count": 656,
+    "legacy_subminimum_marker_gross_usd": 58963.36875,
+    "executed_payout_events_changed": false,
+    "combine_evidence_changed": false,
+    "standard_and_consistency_are_alternative_not_additive": true
+  },
+  "selection": {
+    "manifest_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/frozen_book_selection_revision_02.json",
+    "manifest_file_sha256": "6f730df71e74208df66770538f4033b805a9f45b6d06e91e330e7074d2b2d423",
+    "selection_manifest_hash": "114097f2e659a1fd50223fdd0758ef6f2a44776ff4fc4f6a1b48b87152730dd4",
+    "seal_receipt_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/frozen_book_selection_revision_02_seal_receipt.json",
+    "seal_receipt_file_sha256": "50239398b7920cf3fe8794d58e6ceadd37baae27fd92ee45fd80a59e5f18282e",
+    "seal_receipt_hash": "b3308b15bc22d3c2571e023a14acf3442c04eee38c8be9aa4f4e9e406b3eafab",
+    "primary_count": 5,
+    "backup_count": 1,
+    "one_representative_per_behavioral_cluster": true,
+    "selected_policy_ids": [
+      "active_pool_070e391c7586ba1fac2f5494",
+      "active_pool_186a4177401aab223b0a21fa",
+      "active_pool_14e275fa8d869c28b1f27f78",
+      "active_pool_2287bfb0b1c6f07930150102",
+      "active_pool_2377af7025aadf9aaf456a7e",
+      "active_pool_014dffb40e99814612d78c51"
+    ]
+  },
+  "forward_shadow": {
+    "status": "FORWARD_SHADOW_CANDIDATE",
+    "package_count": 6,
+    "fresh_post_freeze_bar_count": 0,
+    "append_only_observation_state": "AWAITING_GENUINE_POST_FREEZE_BAR",
+    "broker_connectivity": false,
+    "outbound_order_capability": false,
+    "packages": [
+      {
+        "policy_id": "active_pool_070e391c7586ba1fac2f5494",
+        "selection_role": "PRIMARY",
+        "package_hash": "4ca3ac09e3bdab9695e04ccda4308fce9442a35972550646be9aaf95ed6e1145",
+        "receipt_hash": "f39ee52701724c989fa0af2baad43f4472bf219e05cbf050199a89c844a865f4",
+        "receipt_file_sha256": "c1c4dac621d31adfdfd8cd1e63cb7b57e101f6c3402307fd5e6a68599f281850",
+        "freeze_timestamp_utc": "2026-07-16T15:05:36.652933Z"
+      },
+      {
+        "policy_id": "active_pool_186a4177401aab223b0a21fa",
+        "selection_role": "PRIMARY",
+        "package_hash": "efa5cdc55ba286ad5b826f56e1fada38f818ab9982782c0a1a2cd867a0e0c225",
+        "receipt_hash": "5315a74f2699775991b2ee2632c673809f355a10a4c645e44edc497f9bc66d0e",
+        "receipt_file_sha256": "ea366cc40584dbc835659fc1bfa923103dc7915bcdd82d34f33afb80d89b019a",
+        "freeze_timestamp_utc": "2026-07-16T15:05:45.664691Z"
+      },
+      {
+        "policy_id": "active_pool_14e275fa8d869c28b1f27f78",
+        "selection_role": "PRIMARY",
+        "package_hash": "5d957832d3f76fdd8da87ff14db4f3ee05143e9b250aaa413bf645def97c8492",
+        "receipt_hash": "f723bd5e62cb53cb80897359160e45130ac6d5bb11383fcf3058b601e42aaaec",
+        "receipt_file_sha256": "5d5df8c8838176825db5578e1a62a8011f65d407b880d822c4d162972b2846b7",
+        "freeze_timestamp_utc": "2026-07-16T15:05:54.980185Z"
+      },
+      {
+        "policy_id": "active_pool_2287bfb0b1c6f07930150102",
+        "selection_role": "PRIMARY",
+        "package_hash": "88049ca68f653f397353a017330f2ce32a4839fd984d912e342b039c4ad9b70a",
+        "receipt_hash": "fe826bdc1ecf82e15cf6d4c5a5ef13f66520f7feba12511aa5648389fa8a6f75",
+        "receipt_file_sha256": "d70baa1074c93bdc87c2dd458b9e55493d101e875705ef44613f0c5ee754a3ed",
+        "freeze_timestamp_utc": "2026-07-16T15:06:04.395596Z"
+      },
+      {
+        "policy_id": "active_pool_2377af7025aadf9aaf456a7e",
+        "selection_role": "PRIMARY",
+        "package_hash": "70bcca5d4b42dade5c7b8bc682ce564e0a61695f787a0fc0380cae13d215d04c",
+        "receipt_hash": "38b1bba55ebc7c94c3bfe78813976351428872f629575187c6e21735f1bb7250",
+        "receipt_file_sha256": "050ba31f6330cc65136976903bb65382d82b94a63ee1cefb40e6abd0c26be972",
+        "freeze_timestamp_utc": "2026-07-16T15:06:13.390284Z"
+      },
+      {
+        "policy_id": "active_pool_014dffb40e99814612d78c51",
+        "selection_role": "BACKUP",
+        "package_hash": "fbc57d0acf0140e491d475390741a3fc3869aca91d1bbc5002f693c5f361b72e",
+        "receipt_hash": "5aae3ad1edf0cf29e577ffc2fa1f1ab5bc69dd2424b2456d9b96426266aeefe4",
+        "receipt_file_sha256": "a66e0509a0f3888d0dac9aa3c38a7eeb32928f0d67de326885eb70480388dd8d",
+        "freeze_timestamp_utc": "2026-07-16T15:06:22.608387Z"
+      }
+    ]
+  },
+  "governance": {
+    "q4_status": "BURNED",
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "remaining_budget_usd": 37.152612
+  },
+  "CONTRE": "This terminal receipt freezes development-only candidates and no-order forward packages. It neither claims independent confirmation nor authorizes automatic replay, a neighboring campaign, Q4 access, data purchase, broker connectivity, orders, PAPER_SHADOW_READY, or live trading.",
+  "receipt_hash": "b1d1a5f52b037d3e9a6d724f28d98ea958f50a28f7891250d7f8ba766b0236a4"
+}
