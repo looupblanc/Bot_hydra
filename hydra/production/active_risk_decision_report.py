@@ -4986,7 +4986,14 @@ def _runtime_behavior_fingerprint_from_raw(
                         int(decision.get("quantity", 0)),
                         str(decision.get("decision_status") or ""),
                     ]
-                    for decision in _canonical_daily_routing(raw)
+                    # The legacy runtime fingerprint was created directly
+                    # from AccountPolicyEpisode.risk_allocation_path.  The
+                    # enriched daily projection contains the same decision
+                    # multiset, but its diagnostic sort deliberately lacks
+                    # the component-priority tie-break for coincident
+                    # timestamps.  Reconstruct the legacy hash from its exact
+                    # persisted causal source, not from that derived order.
+                    for decision in list(raw.get("risk_allocation_path") or ())
                 ],
             }
         )

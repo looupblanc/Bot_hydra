@@ -35,6 +35,11 @@ from hydra.propfirm.combine_to_xfa import (
     _zero_observation_xfa_path,
     official_rule_snapshot_2026_07_15,
 )
+from hydra.propfirm.xfa_payout_events import (
+    CANONICAL_PAYOUT_RECONCILIATION_SCHEMA,
+    CanonicalPayoutEvent,
+    PayoutPathReconciliation,
+)
 
 
 CAMPAIGN = "hydra_active_risk_pool_target_velocity_0026"
@@ -1578,6 +1583,64 @@ def test_legacy_frontier_behavior_hash_must_match_raw_runtime_merge(
         )
 
 
+def test_runtime_behavior_hash_preserves_persisted_causal_routing_order() -> None:
+    raw = next(
+        value
+        for value in _raw_rows()
+        if value["scenario"] == "NORMAL"
+        and value["horizon_label"] == "90_TRADING_DAYS"
+    )
+    persisted_routing = list(reversed(raw["risk_allocation_path"]))
+    raw["risk_allocation_path"] = persisted_routing
+
+    expected = canonical_hash(
+        {
+            "normal": [
+                {
+                    "start": int(raw["start_day"]),
+                    "terminal": "PASSED",
+                    "accepted": int(raw["accepted_events"]),
+                    "skipped": int(raw["skipped_events"]),
+                    "quantity_path": [
+                        [
+                            str(decision["event_id"]),
+                            int(decision["quantity"]),
+                            str(decision["decision_status"]),
+                        ]
+                        for decision in persisted_routing
+                    ],
+                }
+            ],
+            "stressed": [],
+        }
+    )
+    diagnostic_projection_order = canonical_hash(
+        {
+            "normal": [
+                {
+                    "start": int(raw["start_day"]),
+                    "terminal": "PASSED",
+                    "accepted": int(raw["accepted_events"]),
+                    "skipped": int(raw["skipped_events"]),
+                    "quantity_path": [
+                        [
+                            str(decision["event_id"]),
+                            int(decision["quantity"]),
+                            str(decision["decision_status"]),
+                        ]
+                        for decision in report_module._canonical_daily_routing(raw)
+                    ],
+                }
+            ],
+            "stressed": [],
+        }
+    )
+
+    actual = report_module._runtime_behavior_fingerprint_from_raw([raw])
+    assert actual == expected
+    assert actual != diagnostic_projection_order
+
+
 def test_campaign_lifecycle_rejects_duplicate_full_episode_key() -> None:
     accumulator = report_module.CampaignLifecycleAuditAccumulator()
     episode = _sealed_full_pass_episode()
@@ -1814,6 +1877,9 @@ def test_streaming_report_covers_blocks_controls_xfa_and_clusters(tmp_path: Path
         "first_payout_observations_are_combine_to_xfa_transitions": False,
         "first_payouts_above_transition_count_can_be_expected": True,
         "duplicate_transition_inflation_detected": False,
+        "legacy_subminimum_marker_count": 0,
+        "legacy_subminimum_marker_gross": 0.0,
+        "legacy_subminimum_marker_affected_finalist_ids": [],
         "duplicate_transition_verdict_basis": (
             "PROVED_FROM_DEEP_VERIFIED_EPISODE_PARTITIONS"
         ),
@@ -2785,6 +2851,9 @@ def test_xfa_zero_observation_requires_complete_censor_identity() -> None:
         report_module._validate_xfa_path_accounting(
             path,
             label="zero-observation",
+            policy_id="active_pool_test_zero_observation",
+            scenario="NORMAL",
+            combine_start_id=19_900,
             combine_end_day=19_999,
             xfa_start_day=None,
             rule_snapshot=official_rule_snapshot_2026_07_15().to_dict(),
@@ -2800,6 +2869,9 @@ def test_xfa_start_must_follow_combine_end() -> None:
         report_module._validate_xfa_path_accounting(
             path,
             label="chronology",
+            policy_id="active_pool_test_chronology",
+            scenario="NORMAL",
+            combine_start_id=19_900,
             combine_end_day=20_000,
             xfa_start_day=20_000,
             rule_snapshot=official_rule_snapshot_2026_07_15().to_dict(),
@@ -2818,6 +2890,9 @@ def test_xfa_daily_ledger_must_be_strictly_chronological() -> None:
         report_module._validate_xfa_path_accounting(
             path,
             label="chronology",
+            policy_id="active_pool_test_ledger_chronology",
+            scenario="NORMAL",
+            combine_start_id=19_900,
             combine_end_day=19_999,
             xfa_start_day=20_000,
             rule_snapshot=official_rule_snapshot_2026_07_15().to_dict(),
@@ -2831,11 +2906,17 @@ def test_xfa_payout_eligibility_cannot_be_more_permissive_than_rules() -> None:
     ledger[0]["payout_eligible"] = True
     with pytest.raises(
         ActiveRiskDecisionReportError,
-        match="payout eligibility is more permissive than frozen rules",
+        match=(
+            "canonical payout-event reconciliation failed: "
+            "XFA payout request timing drift"
+        ),
     ):
         report_module._validate_xfa_path_accounting(
             path,
             label="permissive-payout",
+            policy_id="active_pool_test_permissive_payout",
+            scenario="NORMAL",
+            combine_start_id=19_900,
             combine_end_day=19_999,
             xfa_start_day=20_000,
             rule_snapshot=official_rule_snapshot_2026_07_15().to_dict(),
@@ -2855,6 +2936,9 @@ def test_xfa_pre_payout_mll_floor_cannot_be_artificially_relaxed() -> None:
         report_module._validate_xfa_path_accounting(
             path,
             label="relaxed-mll",
+            policy_id="active_pool_test_relaxed_mll",
+            scenario="NORMAL",
+            combine_start_id=19_900,
             combine_end_day=19_999,
             xfa_start_day=20_000,
             rule_snapshot=official_rule_snapshot_2026_07_15().to_dict(),
@@ -2880,6 +2964,9 @@ def test_xfa_terminal_row_must_be_final_and_match_path_terminal() -> None:
         report_module._validate_xfa_path_accounting(
             path,
             label="post-mortem",
+            policy_id="active_pool_test_terminal_chronology",
+            scenario="NORMAL",
+            combine_start_id=19_900,
             combine_end_day=19_999,
             xfa_start_day=20_000,
             rule_snapshot=official_rule_snapshot_2026_07_15().to_dict(),
@@ -2895,6 +2982,9 @@ def test_xfa_zero_observation_account_state_must_match_rule_snapshot() -> None:
     report_module._validate_xfa_path_accounting(
         valid,
         label="valid-zero-observation",
+        policy_id="active_pool_test_valid_zero_observation",
+        scenario="NORMAL",
+        combine_start_id=19_900,
         combine_end_day=19_999,
         xfa_start_day=None,
         rule_snapshot=rules,
@@ -2912,6 +3002,9 @@ def test_xfa_zero_observation_account_state_must_match_rule_snapshot() -> None:
         report_module._validate_xfa_path_accounting(
             path,
             label="zero-observation",
+            policy_id="active_pool_test_invalid_zero_observation",
+            scenario="NORMAL",
+            combine_start_id=19_900,
             combine_end_day=19_999,
             xfa_start_day=None,
             rule_snapshot=rules,
@@ -2934,6 +3027,9 @@ def test_xfa_source_rule_failure_reconciles_one_fatal_unclassified_event() -> No
     report_module._validate_xfa_path_accounting(
         path,
         label="fatal-source-event",
+        policy_id="active_pool_test_fatal_source_event",
+        scenario="NORMAL",
+        combine_start_id=19_900,
         combine_end_day=19_999,
         xfa_start_day=20_000,
         rule_snapshot=official_rule_snapshot_2026_07_15().to_dict(),
@@ -3018,6 +3114,61 @@ def test_halving_output_count_and_selected_ids_must_reconcile(tmp_path: Path) ->
         )
 
 
+def _synthetic_payout_reconciliation(
+    *,
+    policy_id: str,
+    scenario: str,
+    combine_start_id: int,
+    payout_cycles: int,
+    trader_net_payout: float,
+) -> PayoutPathReconciliation:
+    events: list[CanonicalPayoutEvent] = []
+    if payout_cycles:
+        net_per_cycle = trader_net_payout / payout_cycles
+        gross_per_cycle = net_per_cycle / 0.9
+        pre_payout_balance = gross_per_cycle / 0.5
+        for cycle in range(1, payout_cycles + 1):
+            events.append(
+                CanonicalPayoutEvent.create(
+                    policy_id=policy_id,
+                    scenario=scenario,
+                    combine_start_id=combine_start_id,
+                    xfa_path="XFA_STANDARD",
+                    payout_cycle=cycle,
+                    eligibility_timestamp=combine_start_id + cycle * 5,
+                    eligible_account_balance=pre_payout_balance,
+                    gross_payout_request=gross_per_cycle,
+                    balance_fraction_limit=gross_per_cycle,
+                    account_size_payout_cap=5_000.0,
+                    payout_split=0.9,
+                    trader_net_payout=net_per_cycle,
+                    costs_or_fees=0.0,
+                    pre_payout_balance=pre_payout_balance,
+                    post_payout_balance=pre_payout_balance - gross_per_cycle,
+                    mll_before_payout=0.0,
+                    mll_after_payout=0.0,
+                    reset_marker=True,
+                )
+            )
+    return PayoutPathReconciliation(
+        schema=CANONICAL_PAYOUT_RECONCILIATION_SCHEMA,
+        policy_id=policy_id,
+        scenario=scenario,
+        combine_start_id=str(combine_start_id),
+        xfa_path="XFA_STANDARD",
+        payout_events=tuple(events),
+        legacy_subminimum_marker_amounts=(),
+        legacy_subminimum_marker_count=0,
+        legacy_subminimum_marker_gross=0.0,
+        canonical_gross_payout=sum(
+            event.gross_payout_request for event in events
+        ),
+        canonical_trader_net_payout=sum(
+            event.trader_net_payout for event in events
+        ),
+    )
+
+
 def test_lifecycle_censoring_and_missing_buffer_are_not_coerced() -> None:
     accumulator = report_module.LifecyclePathAccumulator()
     accumulator.add_combine_episode(
@@ -3036,7 +3187,14 @@ def test_lifecycle_censoring_and_missing_buffer_are_not_coerced() -> None:
             "post_payout_survived": False,
             "post_payout_censored": False,
             "minimum_mll_buffer": None,
-        }
+        },
+        payout_reconciliation=_synthetic_payout_reconciliation(
+            policy_id="active_pool_accumulator_zero_observation",
+            scenario="NORMAL",
+            combine_start_id=20_000,
+            payout_cycles=0,
+            trader_net_payout=0.0,
+        ),
     )
     value = accumulator.to_dict()
     assert value["zero_observation_xfa_paths"] == 1
@@ -3076,7 +3234,14 @@ def test_lifecycle_censoring_and_missing_buffer_are_not_coerced() -> None:
             "post_payout_censored": True,
             "minimum_mll_buffer": 2500.0,
             "first_payout_day": 5,
-        }
+        },
+        payout_reconciliation=_synthetic_payout_reconciliation(
+            policy_id="active_pool_accumulator_payout_then_censored",
+            scenario="NORMAL",
+            combine_start_id=20_100,
+            payout_cycles=1,
+            trader_net_payout=900.0,
+        ),
     )
     observed = payout_then_censored.to_dict()["evaluable_only"]
     assert observed["first_payout_probability_per_evaluable_lifecycle_attempt"] == 1.0
@@ -3116,7 +3281,14 @@ def test_lifecycle_censoring_and_missing_buffer_are_not_coerced() -> None:
             "post_payout_censored": False,
             "minimum_mll_buffer": 0.0,
             "first_payout_day": 5,
-        }
+        },
+        payout_reconciliation=_synthetic_payout_reconciliation(
+            policy_id="active_pool_accumulator_observed_closure",
+            scenario="NORMAL",
+            combine_start_id=20_200,
+            payout_cycles=2,
+            trader_net_payout=1_800.0,
+        ),
     )
     closure_distribution = observed_closure.to_dict()["payout_cycles_by_path"]
     assert closure_distribution["before_observed_account_closure"]["count"] == 1
