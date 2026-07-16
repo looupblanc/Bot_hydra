@@ -943,6 +943,46 @@ def _assert_close(actual: Any, expected: Any, *, label: str) -> None:
         )
 
 
+def _nested_evidence_equal(left: Any, right: Any) -> bool:
+    """Compare cached diagnostic trees with the frozen numeric tolerance."""
+
+    if isinstance(left, Mapping) or isinstance(right, Mapping):
+        return bool(
+            isinstance(left, Mapping)
+            and isinstance(right, Mapping)
+            and set(left) == set(right)
+            and all(
+                _nested_evidence_equal(left[key], right[key]) for key in left
+            )
+        )
+    if isinstance(left, (list, tuple)) or isinstance(right, (list, tuple)):
+        return bool(
+            isinstance(left, (list, tuple))
+            and isinstance(right, (list, tuple))
+            and len(left) == len(right)
+            and all(
+                _nested_evidence_equal(a, b)
+                for a, b in zip(left, right, strict=True)
+            )
+        )
+    if isinstance(left, bool) or isinstance(right, bool):
+        return left is right
+    if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+        if isinstance(left, int) and isinstance(right, int):
+            return left == right
+        return bool(
+            math.isfinite(float(left))
+            and math.isfinite(float(right))
+            and math.isclose(
+                float(left),
+                float(right),
+                rel_tol=1e-10,
+                abs_tol=1e-8,
+            )
+        )
+    return left == right
+
+
 def _quantile(values: Sequence[float], probability: float) -> float | None:
     if not values:
         return None
@@ -3319,11 +3359,15 @@ def _candidate_controls(
         raise ActiveRiskDecisionReportError(
             f"candidate {policy_id} random-control exposure signature is absent"
         )
-    if dict(candidate_signature) != dict(candidate.get("exposure_signature") or {}):
+    if not _nested_evidence_equal(
+        candidate_signature, candidate.get("exposure_signature") or {}
+    ):
         raise ActiveRiskDecisionReportError(
             f"candidate {policy_id} exposure-signature linkage drift"
         )
-    if dict(control_signature) != dict(random_control.get("exposure_signature") or {}):
+    if not _nested_evidence_equal(
+        control_signature, random_control.get("exposure_signature") or {}
+    ):
         raise ActiveRiskDecisionReportError(
             f"candidate {policy_id} random-control signature linkage drift"
         )
@@ -4004,7 +4048,9 @@ def _candidate_summary(
     derived_diagnostics = _derive_canonical_account_diagnostics(canonical_raw)
     for field_name, derived in derived_diagnostics.items():
         cached = row.get(field_name)
-        if not isinstance(cached, Mapping) or dict(cached) != derived:
+        if not isinstance(cached, Mapping) or not _nested_evidence_equal(
+            cached, derived
+        ):
             raise ActiveRiskDecisionReportError(
                 f"candidate {policy_id} cached {field_name} diverges from "
                 "sealed canonical daily paths"

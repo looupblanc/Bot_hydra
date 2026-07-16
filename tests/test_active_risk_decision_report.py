@@ -2214,6 +2214,27 @@ def test_daily_exposure_tie_order_is_diagnostic_but_bounds_remain_strict() -> No
         )
 
 
+def test_cached_diagnostic_float_reduction_uses_frozen_tolerance() -> None:
+    cached = {
+        "count": 12,
+        "foregone_realized_pnl_ex_post": 133_617.31499999634,
+        "status": {"AVAILABLE": False},
+    }
+    rederived = {
+        "count": 12,
+        "foregone_realized_pnl_ex_post": 133_617.31499999630,
+        "status": {"AVAILABLE": False},
+    }
+    assert report_module._nested_evidence_equal(cached, rederived)
+    assert report_module._nested_evidence_equal(
+        {"time_weighted_exposure": 3_097_133_815_551.5376},
+        {"time_weighted_exposure": 3_097_133_815_551.5370},
+    )
+
+    rederived["foregone_realized_pnl_ex_post"] += 1e-4
+    assert not report_module._nested_evidence_equal(cached, rederived)
+
+
 def test_rehashed_raw_and_daily_economics_cannot_replace_sealed_episode_partition(
     tmp_path: Path,
 ) -> None:
