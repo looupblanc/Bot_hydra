@@ -95,6 +95,7 @@ def ensure_current_contract_map(
     budget: DatabentoBudgetConfig,
     cache_root: str | Path,
     minimum_reserve_usd: float = 30.0,
+    maximum_incremental_cost_usd: float | None = None,
     dataset: str = "GLBX.MDP3",
     schema: str = "ohlcv-1m",
 ) -> CurrentContractMapReceipt:
@@ -170,6 +171,13 @@ def ensure_current_contract_map(
                 stype_in="instrument_id",
             )
         )
+        if (
+            maximum_incremental_cost_usd is not None
+            and estimate > float(maximum_incremental_cost_usd) + 1e-12
+        ):
+            raise DatabentoBudgetError(
+                "Current definitions exceed the bounded incremental-cost authorization."
+            )
         projected, actual = enforce_budget(budget, estimate)
         if budget.hard_cap_usd - (actual + estimate) < minimum_reserve_usd:
             raise DatabentoBudgetError(

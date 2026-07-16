@@ -2726,6 +2726,7 @@ class V7FalsificationController:
             action = self._economic_account_timeline_terminal_runtime.advance(action)
         if self._economic_manifest_runtime is not None:
             action = self._economic_manifest_runtime.advance(action)
+        action = self._advance_operating_package_forward(conn, action)
         previous = get_kv(conn, "v7_current_action", {})
         step = int(get_kv(conn, "v7_step", 0)) + 1
         progress_at = utc_now_iso()
@@ -2775,6 +2776,277 @@ class V7FalsificationController:
             )
             set_kv(conn, "v7_latest_checkpoint", checkpoint)
         write_heartbeat(self.paths, self._heartbeat(conn, action=action))
+
+    def _advance_operating_package_forward(
+        self,
+        conn: sqlite3.Connection,
+        action: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        """Run one bounded append-only tick inside the existing V17 writer.
+
+        This is not a campaign engine and does not create a worker/controller.
+        It is deliberately dormant until the immutable Operating Package V1
+        exists.  Market-data and forward-evidence writes then happen
+        synchronously under the existing process lock, with no broker/order
+        capability and a campaign-wide $10 acquisition ceiling above the
+        pre-activation budget baseline.
+        """
+
+        package_path = (
+            self.root
+            / "reports/operating/hydra_operating_package_v1/"
+            "OPERATING_PACKAGE_V1.json"
+        )
+        package_receipt_path = package_path.with_name(
+            "OPERATING_PACKAGE_V1_seal_receipt.json"
+        )
+        if not package_path.is_file() or not package_receipt_path.is_file():
+            return dict(action)
+        now = datetime.now(timezone.utc)
+        raw_due = get_kv(conn, "operating_forward_next_check_at_utc", None)
+        if raw_due:
+            due = datetime.fromisoformat(
+                str(raw_due).replace("Z", "+00:00")
+            ).astimezone(timezone.utc)
+            if due > now:
+                return {
+                    **dict(action),
+                    "operating_package_forward": {
+                        "state": str(
+                            get_kv(
+                                conn,
+                                "operating_forward_status",
+                                "WAITING_FOR_NEXT_APPEND_TICK",
+                            )
+                        ),
+                        "next_check_at_utc": due.isoformat(),
+                        "broker_connections": 0,
+                        "outbound_orders": 0,
+                    },
+                }
+
+        from hydra.operating.package_v1 import (
+            verify_operating_package_seal,
+        )
+        from hydra.shadow.active_risk_forward_processor import (
+            ActiveRiskForwardProcessorError,
+            run_active_risk_forward_processor,
+        )
+        from hydra.shadow.databento_forward_feed import (
+            run_databento_forward_update,
+        )
+        from hydra.validation.lockbox_guard import (
+            DataAccessRecord,
+            append_access_record,
+            current_commit,
+        )
+
+        try:
+            verify_operating_package_seal(
+                package_path.parent,
+                project_root=self.root,
+            )
+        except Exception as exc:
+            raise V7ControllerIntegrityError(
+                f"operating-package integrity failure: {exc}"
+            ) from exc
+        package = json.loads(package_path.read_text(encoding="utf-8"))
+        binding = dict(package["forward_data_binding"])
+        authorization = dict(package["data_acquisition_authorization"])
+        update_binding = dict(binding["latest_update"])
+        initial_incremental = float(update_binding["incremental_spend_usd"])
+        initial_remaining = float(update_binding["remaining_budget_usd"])
+        budget = DatabentoBudgetConfig()
+        initial_cumulative = float(budget.hard_cap_usd) - initial_remaining
+        budget_baseline = initial_cumulative - initial_incremental
+
+        _estimated, actual_before = cumulative_spend(
+            self.root / budget.ledger_path
+        )
+        acquisition_spend = max(0.0, float(actual_before) - budget_baseline)
+        maximum_incremental = float(
+            authorization["maximum_total_incremental_spend_usd"]
+        )
+        minimum_reserve = float(
+            authorization["minimum_remaining_budget_reserve_usd"]
+        )
+        remaining_acquisition_authority = max(
+            0.0, maximum_incremental - acquisition_spend
+        )
+        active_boundary = self.root / str(
+            binding["active_risk_boundary"]["path"]
+        )
+        ingestion_boundary = self.root / str(
+            binding["ingestion_boundary"]["path"]
+        )
+        state_root = self.paths.state_dir / "operating_package_v1_forward"
+        update_root = state_root / "append_update"
+        processor_path = state_root / "processor_result.json"
+        try:
+            result = run_databento_forward_update(
+                update_root,
+                boundary_manifest_path=ingestion_boundary,
+                boundary_manifest_sha256=str(
+                    binding["ingestion_boundary"]["sha256"]
+                ),
+                state_dir=self.root / "shadow/state",
+                contract_map_dir=self.root / "data/cache/contract_maps",
+                budget=budget,
+                code_commit=_git_head(self.root),
+                minimum_reserve_usd=minimum_reserve,
+                maximum_incremental_cost_usd=remaining_acquisition_authority,
+                now=now,
+            )
+            incremental = float(result["incremental_databento_spend_usd"])
+            if incremental > 0.0:
+                marker = (
+                    "operating-package-v1 append-only forward acquisition; "
+                    f"result_hash={result['result_hash']}"
+                )
+                access_path = self.root / (
+                    "reports/data_access/data_access_ledger.jsonl"
+                )
+                already = access_path.is_file() and any(
+                    marker in line
+                    for line in access_path.read_text(encoding="utf-8").splitlines()
+                )
+                if not already:
+                    append_access_record(
+                        DataAccessRecord(
+                            code_commit=current_commit(),
+                            process_id=os.getpid(),
+                            timestamp_utc=utc_now_iso(),
+                            period_accessed=(
+                                f"{result['query']['start']}:"
+                                f"{result['query']['end']}"
+                            ),
+                            data_role=(
+                                "POST_FREEZE_APPEND_ONLY_FORWARD_EVIDENCE"
+                            ),
+                            requesting_module=(
+                                "hydra.mission.v7_falsification_controller"
+                            ),
+                            candidate_ids=sorted(
+                                str(row["policy_id"])
+                                for row in package["books"]
+                            ),
+                            reason_for_access=marker,
+                            freeze_manifest_hash=str(
+                                package["manifest_hash"]
+                            ),
+                            parameters_mutable=False,
+                        )
+                    )
+            processor = run_active_risk_forward_processor(
+                repository_root=self.root,
+                boundary_manifest_path=active_boundary,
+                boundary_manifest_sha256=str(
+                    binding["active_risk_boundary"]["sha256"]
+                ),
+                forward_store_path=(
+                    self.root / "shadow/state/forward_data/forward_bars.db"
+                ),
+                state_dir=self.root / "shadow/state",
+                observed_at=now,
+            )
+            signals = int(processor["signals_emitted"])
+            virtual_fills = int(processor["virtual_fills_created"])
+            account_mutations = int(processor["account_mutations"])
+            if (
+                int(processor.get("broker_connections", -1)) != 0
+                or int(processor.get("outbound_orders", -1)) != 0
+                or int(processor.get("q4_access_delta", -1)) != 0
+                or signals != 0
+                or virtual_fills != 0
+                or account_mutations != 0
+            ):
+                raise V7ControllerIntegrityError(
+                    "unproven forward processor escaped its fail-closed contract"
+                )
+            _atomic_json(processor_path, processor)
+            suggested = datetime.fromisoformat(
+                str(result["next_check_at_utc"]).replace("Z", "+00:00")
+            ).astimezone(timezone.utc)
+            next_check = max(suggested, now + timedelta(minutes=10))
+            status = str(processor["scientific_conclusion"])
+            set_kv(conn, "operating_forward_status", status)
+            set_kv(
+                conn,
+                "operating_forward_next_check_at_utc",
+                next_check.isoformat(),
+            )
+            set_kv(conn, "operating_forward_last_update", result)
+            set_kv(conn, "operating_forward_last_processor", processor)
+            append_event(
+                conn,
+                "OPERATING_PACKAGE_FORWARD_TICK",
+                {
+                    "package_manifest_hash": package["manifest_hash"],
+                    "update_result_hash": result["result_hash"],
+                    "processor_result_hash": processor["result_hash"],
+                    "fresh_bars": int(result["fresh_forward_bars_processed"]),
+                    "events_appended": int(processor["events_appended"]),
+                    "signals": signals,
+                    "fills": virtual_fills,
+                    "account_mutations": account_mutations,
+                    "incremental_spend_usd": incremental,
+                    "remaining_acquisition_authority_usd": max(
+                        0.0,
+                        remaining_acquisition_authority - incremental,
+                    ),
+                    "broker_connections": 0,
+                    "outbound_orders": 0,
+                },
+            )
+            return {
+                **dict(action),
+                "operating_package_forward": {
+                    "state": status,
+                    "fresh_bars": int(result["fresh_forward_bars_processed"]),
+                    "events_appended": int(processor["events_appended"]),
+                    "signals_emitted": signals,
+                    "virtual_fills": virtual_fills,
+                    "account_mutations": account_mutations,
+                    "remaining_budget_usd": float(
+                        result["remaining_databento_budget_usd"]
+                    ),
+                    "next_check_at_utc": next_check.isoformat(),
+                    "broker_connections": 0,
+                    "outbound_orders": 0,
+                },
+            }
+        except (ActiveRiskForwardProcessorError, V7ControllerIntegrityError):
+            raise
+        except Exception as exc:
+            next_check = now + timedelta(minutes=30)
+            error = f"{type(exc).__name__}:{exc}"[:4000]
+            set_kv(conn, "operating_forward_status", "BOUNDED_TICK_FAILED")
+            set_kv(conn, "operating_forward_last_error", error)
+            set_kv(
+                conn,
+                "operating_forward_next_check_at_utc",
+                next_check.isoformat(),
+            )
+            append_event(
+                conn,
+                "OPERATING_PACKAGE_FORWARD_TICK_FAILED",
+                {
+                    "error": error,
+                    "next_check_at_utc": next_check.isoformat(),
+                    "broker_connections": 0,
+                    "outbound_orders": 0,
+                },
+            )
+            return {
+                **dict(action),
+                "operating_package_forward": {
+                    "state": "BOUNDED_TICK_FAILED",
+                    "error": error,
+                    "next_check_at_utc": next_check.isoformat(),
+                    "broker_connections": 0,
+                    "outbound_orders": 0,
+                },
+            }
 
     def _verify_constitution(self) -> str:
         contract = self.root / "MISSION_CONTRACT.md"
@@ -3198,6 +3470,13 @@ def _atomic_text(path: Path, content: str) -> None:
         os.replace(temporary, path)
     finally:
         temporary.unlink(missing_ok=True)
+
+
+def _atomic_json(path: Path, payload: Mapping[str, Any]) -> None:
+    _atomic_text(
+        path,
+        json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
+    )
 
 
 __all__ = [

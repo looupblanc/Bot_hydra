@@ -1,0 +1,423 @@
+{
+  "automatic_order_capability": false,
+  "available_end_utc": "2026-07-16T12:54:34.250710+00:00",
+  "boundary_manifest_path": "/root/hydra-bot/mission/state/forward_feed_manifests/active_risk_0026_ingestion.json",
+  "boundary_manifest_sha256": "a4153f4be902dd240ec05ee7a959fee0d6a473cb608e1984d2304ec23fb6bd13",
+  "broker_connections": 0,
+  "candidate_heartbeats_published": 0,
+  "checked_at_utc": "2026-07-16T20:54:33.856207+00:00",
+  "code_commit": "387f0d742ddd4a4f9d56443af1b37e1e888b5310",
+  "contract_resolution": {
+    "as_of_utc": "2026-07-16T12:54:34.250709+00:00",
+    "contracts": [
+      {
+        "active_end": "2026-07-17T00:00:00+00:00",
+        "active_start": "2026-06-23T00:00:00+00:00",
+        "contract": "CLQ6",
+        "expiry_date": "2026-07-21",
+        "instrument_id": "362315",
+        "map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "map_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "point_value": 1000.0,
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "root": "CL",
+        "tick_size": 0.01
+      },
+      {
+        "active_end": "2026-07-17T00:00:00+00:00",
+        "active_start": "2026-06-19T00:00:00+00:00",
+        "contract": "ESU6",
+        "expiry_date": "2026-09-18",
+        "instrument_id": "42140870",
+        "map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "map_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "point_value": 50.0,
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "root": "ES",
+        "tick_size": 0.25
+      },
+      {
+        "active_end": "2026-07-17T00:00:00+00:00",
+        "active_start": "2026-06-19T00:00:00+00:00",
+        "contract": "M2KU6",
+        "expiry_date": "2026-09-18",
+        "instrument_id": "42004428",
+        "map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "map_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "point_value": 5.0,
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "root": "M2K",
+        "tick_size": 0.1
+      },
+      {
+        "active_end": "2026-07-17T00:00:00+00:00",
+        "active_start": "2026-06-19T00:00:00+00:00",
+        "contract": "MCLQ6",
+        "expiry_date": "2026-07-20",
+        "instrument_id": "42026511",
+        "map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "map_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "point_value": 100.0,
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "root": "MCL",
+        "tick_size": 0.01
+      },
+      {
+        "active_end": "2026-07-17T00:00:00+00:00",
+        "active_start": "2026-06-19T00:00:00+00:00",
+        "contract": "MESU6",
+        "expiry_date": "2026-09-18",
+        "instrument_id": "42003239",
+        "map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "map_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "point_value": 5.0,
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "root": "MES",
+        "tick_size": 0.25
+      },
+      {
+        "active_end": "2026-07-17T00:00:00+00:00",
+        "active_start": "2026-06-19T00:00:00+00:00",
+        "contract": "MNQU6",
+        "expiry_date": "2026-09-18",
+        "instrument_id": "42004800",
+        "map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "map_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "point_value": 2.0,
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "root": "MNQ",
+        "tick_size": 0.25
+      },
+      {
+        "active_end": "2026-07-17T00:00:00+00:00",
+        "active_start": "2026-06-19T00:00:00+00:00",
+        "contract": "MYMU6",
+        "expiry_date": "2026-09-18",
+        "instrument_id": "42004247",
+        "map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "map_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "point_value": 0.5,
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "root": "MYM",
+        "tick_size": 1.0
+      },
+      {
+        "active_end": "2026-07-17T00:00:00+00:00",
+        "active_start": "2026-06-19T00:00:00+00:00",
+        "contract": "NQU6",
+        "expiry_date": "2026-09-18",
+        "instrument_id": "42004177",
+        "map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "map_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "point_value": 20.0,
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "root": "NQ",
+        "tick_size": 0.25
+      },
+      {
+        "active_end": "2026-07-17T00:00:00+00:00",
+        "active_start": "2026-06-19T00:00:00+00:00",
+        "contract": "RTYU6",
+        "expiry_date": "2026-09-18",
+        "instrument_id": "42001851",
+        "map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "map_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "point_value": 50.0,
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "root": "RTY",
+        "tick_size": 0.1
+      },
+      {
+        "active_end": "2026-07-17T00:00:00+00:00",
+        "active_start": "2026-06-19T00:00:00+00:00",
+        "contract": "YMU6",
+        "expiry_date": "2026-09-18",
+        "instrument_id": "42003638",
+        "map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "map_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "point_value": 5.0,
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "root": "YM",
+        "tick_size": 1.0
+      }
+    ],
+    "inspected_maps": [
+      {
+        "file_sha256": "2ac275f4043ef210afa092be8e7f6676c0409c6e2ec5e41a01aecb37427f3815",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_VOLUME_RANK_V1",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_01ba149449a494a7.json",
+        "roll_map_hash": "01ba149449a494a7a118884813abe10de8845c215b7390dbfbfa9d9dff89de13",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "GC",
+          "MGC"
+        ]
+      },
+      {
+        "file_sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+        "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "CL",
+          "ES",
+          "M2K",
+          "MCL",
+          "MES",
+          "MNQ",
+          "MYM",
+          "NQ",
+          "RTY",
+          "YM"
+        ]
+      },
+      {
+        "file_sha256": "9126ebb8b957b14bb6cb93a90b729e36bff23087f1276865e6a4917630079a2b",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DEFINITIONS",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_500ac1ef6c622950.json",
+        "roll_map_hash": "500ac1ef6c622950b38058516be52aa0a9b7b64ab3cddb255c41188dc831e662",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "CL",
+          "ES",
+          "GC",
+          "M2K",
+          "MCL",
+          "MES",
+          "MGC",
+          "MNQ",
+          "MYM",
+          "NQ",
+          "RTY",
+          "YM"
+        ]
+      },
+      {
+        "file_sha256": "1e6b52bf168a6043588ecbb5236bc1e6556ef95d9f4f5fa3eb9fb50fa9510828",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_5a3c27d84490981c.json",
+        "roll_map_hash": "5a3c27d84490981c6052c530114a0fcaee98caf4ac1d9c87b354cddda1d2d3e2",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "CL",
+          "MCL",
+          "MNQ",
+          "MYM",
+          "YM"
+        ]
+      },
+      {
+        "file_sha256": "ab4b2ec892067bcd8237d938dae33d1762cb2a1c7c2fd5fe6292431727603892",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_5ecc8fc9bdfb6dde.json",
+        "roll_map_hash": "5ecc8fc9bdfb6dde21e079ebdccfc42fe27f9b0414daa820418b73a7524b76c0",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "CL",
+          "MCL",
+          "MNQ",
+          "MYM",
+          "YM"
+        ]
+      },
+      {
+        "file_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        "roll_map_hash": "705ce6fe27bac7dea9cb9d492413a5112bb60765c66aa75d03f9711bef348208",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "CL",
+          "ES",
+          "GC",
+          "M2K",
+          "MCL",
+          "MES",
+          "MGC",
+          "MNQ",
+          "MYM",
+          "NQ",
+          "RTY",
+          "YM"
+        ]
+      },
+      {
+        "file_sha256": "b44e650837656791bf17344634aefcc822eed25ac02429836f26cb7492e1f0ae",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DEFINITIONS",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_a23ca08d3b3a3210.json",
+        "roll_map_hash": "a23ca08d3b3a32102069c08ae5da428c4b018eaa2446e4f5c292aca332e14179",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "ES",
+          "MES",
+          "MNQ",
+          "NQ"
+        ]
+      },
+      {
+        "error": "ValueError:roll_map_hash_mismatch",
+        "map_type": "RULE_BASED_CME_EQUITY_INDEX_QUARTERLY_PROXY",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_b06fb4d6f3cfdc72.json",
+        "status": "INVALID_OUT_OF_SCOPE",
+        "symbols": [
+          "ES",
+          "MES",
+          "MNQ",
+          "NQ"
+        ]
+      },
+      {
+        "file_sha256": "8e8bc968ab584239af181a5aa0c7e988041ae28ed820ce9d1465617bbb75f6f2",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_b64d13a4e0b1994f.json",
+        "roll_map_hash": "b64d13a4e0b1994f1581642504792c42edbde5b74db82a496e6a9678ccf85169",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "CL",
+          "MCL",
+          "MNQ",
+          "MYM",
+          "YM"
+        ]
+      },
+      {
+        "file_sha256": "79dc3859fb137372f05af126534d164b4d5c0301db03b7e54b845e470d796ed8",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_d645ef3e4cfd3fbb.json",
+        "roll_map_hash": "d645ef3e4cfd3fbb29174510cc0e38dd9b8af400cd83188c0a3ff08fb0bf4990",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "CL",
+          "MCL",
+          "MNQ",
+          "MYM",
+          "YM"
+        ]
+      },
+      {
+        "file_sha256": "eacb7d89e9a6e0eda37d92dca5a80a28372422a20cb74470c1aba86535386667",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DEFINITIONS",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_ecee1e2e1a91511b.json",
+        "roll_map_hash": "ecee1e2e1a91511b5bee5dd8fcf49a22ef07bc5e2d6ccc01d9ffb0ad4dec2d90",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "ES",
+          "MES",
+          "MNQ",
+          "NQ"
+        ]
+      },
+      {
+        "file_sha256": "0edb79313a85b1502685785bd98b83b65a253e22940520c5ad91b4cecb126264",
+        "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DEFINITIONS",
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_eddda493c5fdaaa9.json",
+        "roll_map_hash": "eddda493c5fdaaa91dfabbfcd6b1e07eab9a4e0d26961a58468e59fa69eaed98",
+        "status": "INSPECTED_EXPLICIT",
+        "symbols": [
+          "ES",
+          "MES",
+          "MNQ",
+          "NQ"
+        ]
+      }
+    ],
+    "missing_roots": [],
+    "next_action": null,
+    "ready": true,
+    "reason": "exact_dated_explicit_contracts_resolved",
+    "required_roots": [
+      "CL",
+      "ES",
+      "M2K",
+      "MCL",
+      "MES",
+      "MNQ",
+      "MYM",
+      "NQ",
+      "RTY",
+      "YM"
+    ],
+    "status": "READY",
+    "unsafe_roll_roots": []
+  },
+  "cumulative_databento_spend_usd": 87.84778850525598,
+  "current_contract_map": {
+    "definition_download_status": "DOWNLOADED",
+    "definition_path": "/root/hydra-bot/data/cache/contract_maps/forward_definitions/definitions_61ca0be07d8342f7c014.dbn.zst",
+    "definition_sha256": "af218c58efd9c6af1eab2cd5a2d6f1ee35e3ae62f865db9ea8b447ee525189b8",
+    "explicit_contracts": {
+      "CL": "CLQ6",
+      "ES": "ESU6",
+      "M2K": "M2KU6",
+      "MCL": "MCLQ6",
+      "MES": "MESU6",
+      "MNQ": "MNQU6",
+      "MYM": "MYMU6",
+      "NQ": "NQU6",
+      "RTY": "RTYU6",
+      "YM": "YMU6"
+    },
+    "incremental_spend_usd": 0.00040011853,
+    "path": "/root/hydra-bot/data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_4c02d82f7d544cab.json",
+    "roll_map_hash": "4c02d82f7d544cab570b1a14f412ab3c98d0acc113bc1865bd66f96ff684d050",
+    "roots": [
+      "CL",
+      "ES",
+      "M2K",
+      "MCL",
+      "MES",
+      "MNQ",
+      "MYM",
+      "NQ",
+      "RTY",
+      "YM"
+    ],
+    "sha256": "6872cfea20a2ddb66e65a6ad392c7fc703deac14e964912958732b98fdabf059"
+  },
+  "duplicates_ignored": 0,
+  "forward_store": {
+    "bar_count": 0,
+    "exists": false,
+    "latest_completed_bar_at_utc": null,
+    "missing_bar_count": 0,
+    "schema": "hydra_forward_bar_store_v1"
+  },
+  "fresh_forward_bars_processed": 0,
+  "heartbeat_paths": {},
+  "incremental_databento_spend_usd": 0.00040011853,
+  "market_state": "OPEN",
+  "next_check_at_utc": "2026-07-16T20:56:33.856207+00:00",
+  "outbound_orders": 0,
+  "paper_shadow_ready": 0,
+  "protected_reserve_usd": 25.0,
+  "q4_access_delta": 0,
+  "query": {
+    "data_path": null,
+    "data_sha256": null,
+    "end": "2026-07-16T12:54:34.250710+00:00",
+    "official_estimated_cost_usd": 0.0,
+    "official_record_count": 0,
+    "raw_symbols": [
+      "CLQ6",
+      "ESU6",
+      "M2KU6",
+      "MCLQ6",
+      "MESU6",
+      "MNQU6",
+      "MYMU6",
+      "NQU6",
+      "RTYU6",
+      "YMU6"
+    ],
+    "start": "2026-07-16T15:05:36.652933+00:00"
+  },
+  "remaining_databento_budget_usd": 37.15221149474402,
+  "result_hash": "32a48e6d90a6abb4ce01b722864763ccd7d8bbc5dd07f399dd0b71b7a404a9b3",
+  "schema": "hydra_databento_delayed_forward_update_v1",
+  "scientific_conclusion": "WAITING_FOR_FIRST_POST_FREEZE_FORWARD_BAR",
+  "session_calendar_manifest_path": "/root/hydra-bot/shadow/state/forward_data/manifests/calendar_362038bc9cb2b004.json",
+  "session_calendar_manifest_sha256": "4577399395d58c57a6af7c77cb830b6d3a51926633323ec52f15cc48c49eac8d",
+  "source_authorization_manifest_path": "/root/hydra-bot/shadow/state/forward_data/manifests/source_8b1fffbca4b887b7.json",
+  "source_authorization_manifest_sha256": "e761bf4c1677d206c9c9076a5438b2de5f1530d3ade0894383957660e466d140"
+}

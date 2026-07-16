@@ -127,6 +127,10 @@ def run_databento_forward_update(
     map_receipt: dict[str, Any] | None = None
     definitions_spend = 0.0
     if not resolution.ready:
+        if maximum_incremental_cost_usd <= 0.0:
+            raise DatabentoBudgetError(
+                "No incremental authority remains for a required contract-map refresh."
+            )
         # A multi-week lookback prevents the symbology API from clipping the
         # current segment's start to the request boundary.  That preserves the
         # observed roll date instead of mistaking today's request end for a
@@ -146,6 +150,7 @@ def run_databento_forward_update(
             budget=budget,
             cache_root=Path(contract_map_dir) / "forward_definitions",
             minimum_reserve_usd=minimum_reserve_usd,
+            maximum_incremental_cost_usd=maximum_incremental_cost_usd,
             dataset=DATASET,
             schema=SCHEMA,
         )

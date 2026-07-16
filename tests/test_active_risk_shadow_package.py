@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -33,6 +34,18 @@ from hydra.shadow.active_risk_binding_loader import (
     seal_active_risk_shadow_export,
     verify_active_risk_shadow_export,
 )
+from hydra.shadow.active_risk_forward_boundary import (
+    ActiveRiskForwardBoundaryError,
+    build_active_risk_forward_boundary,
+    validate_active_risk_forward_boundary,
+)
+from hydra.shadow.active_risk_forward_processor import (
+    ActiveRiskForwardProcessorError,
+    run_active_risk_forward_processor,
+)
+from hydra.shadow.contract_resolver import ContractResolution, ResolvedContract
+from hydra.shadow.forward_bar_store import ForwardBar, ForwardBarStore
+from hydra.shadow.forward_feed_manifest import write_manifest
 from hydra.research.turbo_feature_builder import FEATURE_BUNDLE_VERSION, FEATURE_DAG_HASH
 
 
@@ -145,9 +158,11 @@ def _signal_bindings(
     }
 
 
-def _policy(ids: tuple[str, ...]) -> ActiveRiskPoolPolicy:
+def _policy(
+    ids: tuple[str, ...], *, policy_id: str = "active_pool_test_finalist"
+) -> ActiveRiskPoolPolicy:
     return ActiveRiskPoolPolicy(
-        policy_id="active_pool_test_finalist",
+        policy_id=policy_id,
         component_priority=ids,
         nominal_risk_charge_per_mini=tuple((row, 250.0) for row in ids),
         maximum_concurrent_sleeves=4,
@@ -346,10 +361,10 @@ def _rehash_selection_chain(
     return hashlib.sha256(payload).hexdigest()
 
 
-def _build():
+def _build(*, policy_id: str = "active_pool_test_finalist"):
     specs, records, components = _sources()
     bindings = _signal_bindings(specs, records)
-    policy = _policy(tuple(specs))
+    policy = _policy(tuple(specs), policy_id=policy_id)
     declaration, selection, selection_sha = _selection_chain(
         policy, specs, records
     )
@@ -874,4 +889,203 @@ def test_builder_rejects_missing_frozen_numeric_signal_binding() -> None:
             selection_seal_receipt_hash="a" * 64,
             frozen_finalist_declaration=declaration,
             selection_manifest=selection,
+        )
+
+
+def _six_forward_packages(tmp_path: Path) -> list[Path]:
+    paths = []
+    for index in range(6):
+        _policy_value, _specs, _records, _components, package = _build(
+            policy_id=f"active_pool_forward_{index:02d}"
+        )
+        machine, _dossier = write_shadow_package(
+            package, tmp_path / "forward_exports" / package.candidate_id
+        )
+        paths.append(machine)
+    return paths
+
+
+def _forward_resolution(roots: tuple[str, ...]) -> ContractResolution:
+    suffix = {"ES": "U6", "MES": "U6", "NQ": "U6", "MNQ": "U6", "CL": "Q6", "MCL": "Q6"}
+    contracts = tuple(
+        ResolvedContract(
+            root=root,
+            contract=f"{root}{suffix[root]}",
+            instrument_id=str(index + 1),
+            active_start="2026-07-01T00:00:00+00:00",
+            active_end="2026-08-01T00:00:00+00:00",
+            expiry_date="2026-09-30T00:00:00+00:00",
+            tick_size=0.25,
+            point_value=1.0,
+            map_path="fixture_roll_map.json",
+            map_sha256="1" * 64,
+            roll_map_hash="2" * 64,
+        )
+        for index, root in enumerate(roots)
+    )
+    return ContractResolution(
+        status="READY",
+        as_of_utc="2026-07-15T12:04:00+00:00",
+        required_roots=roots,
+        contracts=contracts,
+        missing_roots=(),
+        unsafe_roll_roots=(),
+        reason="exact_dated_explicit_contracts_resolved",
+        next_action=None,
+        inspected_maps=(),
+    )
+
+
+def test_active_risk_forward_boundary_binds_exactly_six_packages(
+    tmp_path: Path,
+) -> None:
+    packages = _six_forward_packages(tmp_path)
+    manifest = build_active_risk_forward_boundary(
+        repository_root=tmp_path,
+        package_paths=packages,
+        created_at=datetime(2026, 7, 15, 12, 10, tzinfo=timezone.utc),
+    )
+
+    validate_active_risk_forward_boundary(manifest, repository_root=tmp_path)
+    assert manifest["candidate_count"] == 6
+    assert manifest["market_data_purchase_authorized"] is False
+    assert manifest["q4_access_authorized"] is False
+    assert manifest["outbound_orders"] == 0
+    assert all(
+        row["required_roots"] == ["CL", "ES", "MCL", "MES", "MNQ", "NQ"]
+        for row in manifest["candidates"]
+    )
+
+    changed = json.loads(json.dumps(manifest))
+    changed["candidates"][0]["package_sha256"] = "f" * 64
+    changed.pop("manifest_hash")
+    changed["manifest_hash"] = stable_hash(changed)
+    with pytest.raises(ActiveRiskForwardBoundaryError, match="package bytes drifted"):
+        validate_active_risk_forward_boundary(changed, repository_root=tmp_path)
+
+
+def test_active_risk_forward_processor_persists_only_warmup_no_action_events(
+    tmp_path: Path,
+) -> None:
+    packages = _six_forward_packages(tmp_path)
+    manifest = build_active_risk_forward_boundary(
+        repository_root=tmp_path,
+        package_paths=packages,
+        created_at=datetime(2026, 7, 15, 12, 10, tzinfo=timezone.utc),
+    )
+    boundary = write_manifest(tmp_path / "mission/state/active_boundary.json", manifest)
+    boundary_sha = hashlib.sha256(boundary.read_bytes()).hexdigest()
+    roots = tuple(manifest["candidates"][0]["required_roots"])
+    resolution = _forward_resolution(roots)
+    store_path = tmp_path / "shadow/state/forward_data/forward_bars.db"
+    store = ForwardBarStore(store_path)
+    observed = datetime(2026, 7, 15, 12, 11, tzinfo=timezone.utc)
+    with store.writer(writer_id="fixture_read_only_feed") as writer:
+        starts = [datetime(2026, 7, 15, 12, 1, tzinfo=timezone.utc)] + [
+            datetime(2026, 7, 15, 12, 2, tzinfo=timezone.utc)
+            + timedelta(minutes=index)
+            for index in range(8)
+        ]
+        for minute_index, start in enumerate(starts, start=1):
+            for root in roots:
+                contract = resolution.contract_for(root).contract
+                writer.append(
+                    ForwardBar(
+                        source_id="fixture_forward_source",
+                        root=root,
+                        contract=contract,
+                        timeframe="1m",
+                        bar_start_at_utc=start,
+                        bar_close_at_utc=start + timedelta(minutes=1),
+                        availability_at_utc=start + timedelta(minutes=1),
+                        open=100.0,
+                        high=101.0,
+                        low=99.0,
+                        close=100.5,
+                        volume=10.0,
+                        source_sequence=minute_index,
+                    ),
+                    observed_at=observed,
+                    resolution=resolution,
+                )
+
+    result = run_active_risk_forward_processor(
+        repository_root=tmp_path,
+        boundary_manifest_path=boundary,
+        boundary_manifest_sha256=boundary_sha,
+        forward_store_path=store_path,
+        state_dir=tmp_path / "shadow/state",
+        observed_at=observed,
+    )
+
+    assert result["candidate_count"] == 6
+    assert result["events_appended"] == 48
+    assert result["signals_emitted"] == 0
+    assert result["virtual_fills_created"] == 0
+    assert result["account_mutations"] == 0
+    for candidate in result["candidates"]:
+        ledger = Path(candidate["ledger_path"])
+        events = [json.loads(line) for line in ledger.read_text().splitlines()]
+        assert len(events) == 8
+        event = events[0]
+        assert event["decision_at_utc"] == "2026-07-15T12:03:00+00:00"
+        assert event["decision_status"] == "WARMUP_PENDING"
+        assert event["causal_warmup"]["pre_freeze_rows_used"] == 0
+        assert event["frozen_feature_contract"][
+            "online_feature_equivalence_proven"
+        ] is False
+        assert event["signal"]["emitted"] is False
+        assert event["fill"]["created"] is False
+        assert event["account"]["mutated"] is False
+        assert event["safety"]["outbound_orders"] == 0
+        assert event["safety"]["broker_connections"] == 0
+        latest = events[-1]
+        assert latest["decision_at_utc"] == "2026-07-15T12:10:00+00:00"
+        assert all(
+            latest["closed_bar_resampling"]["5m"][root][
+                "complete_bar_count"
+            ]
+            == 1
+            for root in roots
+        )
+        assert all(
+            event["closed_bar_resampling"]["5m"][root][
+                "complete_bar_count"
+            ]
+            == 0
+            for root in roots
+        )
+
+    repeated = run_active_risk_forward_processor(
+        repository_root=tmp_path,
+        boundary_manifest_path=boundary,
+        boundary_manifest_sha256=boundary_sha,
+        forward_store_path=store_path,
+        state_dir=tmp_path / "shadow/state",
+        observed_at=observed,
+    )
+    assert repeated["events_appended"] == 0
+    assert repeated["signals_emitted"] == 0
+
+    tampered_ledger = Path(result["candidates"][0]["ledger_path"])
+    tampered_rows = [
+        json.loads(line) for line in tampered_ledger.read_text().splitlines()
+    ]
+    tampered_rows[-1]["signal"]["emitted"] = True
+    tampered_rows[-1].pop("event_hash")
+    tampered_rows[-1]["event_hash"] = stable_hash(tampered_rows[-1])
+    tampered_ledger.write_text(
+        "".join(json.dumps(row, sort_keys=True) + "\n" for row in tampered_rows),
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        ActiveRiskForwardProcessorError, match="safety contract drift"
+    ):
+        run_active_risk_forward_processor(
+            repository_root=tmp_path,
+            boundary_manifest_path=boundary,
+            boundary_manifest_sha256=boundary_sha,
+            forward_store_path=store_path,
+            state_dir=tmp_path / "shadow/state",
+            observed_at=observed,
         )

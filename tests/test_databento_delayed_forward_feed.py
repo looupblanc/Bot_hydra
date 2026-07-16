@@ -9,9 +9,12 @@ from types import SimpleNamespace
 import pandas as pd
 import pytest
 
-from hydra.data.budget import DatabentoBudgetConfig
+from hydra.data.budget import DatabentoBudgetConfig, DatabentoBudgetError
 from hydra.data.contract_mapping import ContractInfo, RollMap
-from hydra.data.current_contract_map import build_current_roll_map
+from hydra.data.current_contract_map import (
+    build_current_roll_map,
+    ensure_current_contract_map,
+)
 from hydra.shadow.databento_forward_feed import run_databento_forward_update
 from hydra.shadow.activation import audit_zero_order_surface
 from hydra.shadow.forward_feed_manifest import (
@@ -205,6 +208,40 @@ def test_current_roll_map_uses_aware_bounds_and_definition_history() -> None:
     )
     assert roll_map.contracts[0].contract == "MYMU6"
     assert roll_map.contracts[0].instrument_id == "42004247"
+
+
+def test_current_contract_definitions_respect_local_incremental_cap(
+    tmp_path: Path,
+) -> None:
+    class Symbology:
+        def resolve(self, *, stype_in: str, **_kwargs: object) -> dict:
+            if stype_in == "continuous":
+                return {"result": {"MYM.c.0": [{"s": "42004247"}]}}
+            return {"result": {"42004247": [{"s": "MYMU6"}]}}
+
+    class Metadata:
+        @staticmethod
+        def get_cost(**_kwargs: object) -> float:
+            return 0.02
+
+    fake = SimpleNamespace(symbology=Symbology(), metadata=Metadata())
+    budget = DatabentoBudgetConfig(
+        hard_cap_usd=100.0,
+        safety_ceiling_usd=98.0,
+        ledger_path=str(tmp_path / "budget.jsonl"),
+        summary_path=str(tmp_path / "budget.md"),
+    )
+    with pytest.raises(DatabentoBudgetError, match="bounded incremental-cost"):
+        ensure_current_contract_map(
+            fake,
+            roots=["MYM"],
+            start="2026-07-01T00:00:00Z",
+            end="2026-07-16T00:00:00Z",
+            budget=budget,
+            cache_root=tmp_path / "definitions",
+            maximum_incremental_cost_usd=0.01,
+        )
+    assert not (tmp_path / "budget.jsonl").exists()
 
 
 def test_forward_feed_code_surface_has_no_order_or_broker_adapter() -> None:

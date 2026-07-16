@@ -1,0 +1,132 @@
+{
+  "broker_connections": 0,
+  "candidate_count": 6,
+  "candidates": [
+    {
+      "candidate_id": "active_pool_014dffb40e99814612d78c51",
+      "configuration_hash": "fbc57d0acf0140e491d475390741a3fc3869aca91d1bbc5002f693c5f361b72e",
+      "configuration_path": "/root/hydra-bot/reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_014dffb40e99814612d78c51/shadow_package.json",
+      "configuration_sha256": "826065f082b652d2875e35490ec1bbd64b765c4408aaba6561d1b268c649798f",
+      "freeze_timestamp_utc": "2026-07-16T15:06:22.608387Z",
+      "required_roots": [
+        "CL",
+        "ES",
+        "M2K",
+        "MCL",
+        "MES",
+        "MNQ",
+        "MYM",
+        "NQ",
+        "RTY",
+        "YM"
+      ],
+      "stale_data_seconds": 180
+    },
+    {
+      "candidate_id": "active_pool_070e391c7586ba1fac2f5494",
+      "configuration_hash": "4ca3ac09e3bdab9695e04ccda4308fce9442a35972550646be9aaf95ed6e1145",
+      "configuration_path": "/root/hydra-bot/reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_070e391c7586ba1fac2f5494/shadow_package.json",
+      "configuration_sha256": "d116d966e0b8f420d87c64ec0e9f6f680d983eaa0bbfbe7f0a144bb29aeb62c5",
+      "freeze_timestamp_utc": "2026-07-16T15:05:36.652933Z",
+      "required_roots": [
+        "CL",
+        "ES",
+        "M2K",
+        "MCL",
+        "MES",
+        "MNQ",
+        "MYM",
+        "NQ",
+        "RTY",
+        "YM"
+      ],
+      "stale_data_seconds": 180
+    },
+    {
+      "candidate_id": "active_pool_14e275fa8d869c28b1f27f78",
+      "configuration_hash": "5d957832d3f76fdd8da87ff14db4f3ee05143e9b250aaa413bf645def97c8492",
+      "configuration_path": "/root/hydra-bot/reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_14e275fa8d869c28b1f27f78/shadow_package.json",
+      "configuration_sha256": "4ff70fd9b0f4158533a7163a4b74bc6f8d09f63702f541b1ee71beb674aa8b2b",
+      "freeze_timestamp_utc": "2026-07-16T15:05:54.980185Z",
+      "required_roots": [
+        "CL",
+        "ES",
+        "M2K",
+        "MCL",
+        "MES",
+        "MNQ",
+        "MYM",
+        "NQ",
+        "RTY",
+        "YM"
+      ],
+      "stale_data_seconds": 180
+    },
+    {
+      "candidate_id": "active_pool_186a4177401aab223b0a21fa",
+      "configuration_hash": "efa5cdc55ba286ad5b826f56e1fada38f818ab9982782c0a1a2cd867a0e0c225",
+      "configuration_path": "/root/hydra-bot/reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_186a4177401aab223b0a21fa/shadow_package.json",
+      "configuration_sha256": "e9810adcb11706315065957172225cbecb4c7fbb72db993137335d4862dbfa91",
+      "freeze_timestamp_utc": "2026-07-16T15:05:45.664691Z",
+      "required_roots": [
+        "CL",
+        "ES",
+        "M2K",
+        "MCL",
+        "MES",
+        "MNQ",
+        "MYM",
+        "NQ",
+        "RTY",
+        "YM"
+      ],
+      "stale_data_seconds": 180
+    },
+    {
+      "candidate_id": "active_pool_2287bfb0b1c6f07930150102",
+      "configuration_hash": "88049ca68f653f397353a017330f2ce32a4839fd984d912e342b039c4ad9b70a",
+      "configuration_path": "/root/hydra-bot/reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_2287bfb0b1c6f07930150102/shadow_package.json",
+      "configuration_sha256": "905e088524162af6401214a03bb636c9612d48878830dbfd1489684d7b587c1c",
+      "freeze_timestamp_utc": "2026-07-16T15:06:04.395596Z",
+      "required_roots": [
+        "CL",
+        "ES",
+        "M2K",
+        "MCL",
+        "MES",
+        "MNQ",
+        "MYM",
+        "NQ",
+        "RTY",
+        "YM"
+      ],
+      "stale_data_seconds": 180
+    },
+    {
+      "candidate_id": "active_pool_2377af7025aadf9aaf456a7e",
+      "configuration_hash": "70bcca5d4b42dade5c7b8bc682ce564e0a61695f787a0fc0380cae13d215d04c",
+      "configuration_path": "/root/hydra-bot/reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_2377af7025aadf9aaf456a7e/shadow_package.json",
+      "configuration_sha256": "756a6ac53c688117f53b7077ea4787796a164d09399fe25301ea28c46bf8e185",
+      "freeze_timestamp_utc": "2026-07-16T15:06:13.390284Z",
+      "required_roots": [
+        "CL",
+        "ES",
+        "M2K",
+        "MCL",
+        "MES",
+        "MNQ",
+        "MYM",
+        "NQ",
+        "RTY",
+        "YM"
+      ],
+      "stale_data_seconds": 180
+    }
+  ],
+  "created_at_utc": "2026-07-16T20:53:57.562208+00:00",
+  "forward_only": true,
+  "manifest_hash": "2f9dec58b92cb4016fefdb8f803f5942dd1cee9cb0f884a95c702061e692061a",
+  "outbound_orders": 0,
+  "pre_freeze_backfill_prohibited": true,
+  "schema": "hydra_shadow_forward_boundary_manifest_v1"
+}

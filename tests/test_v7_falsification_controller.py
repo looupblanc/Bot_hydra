@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -42,6 +43,24 @@ def test_classification_waits_for_atomic_tribunal(tmp_path: Path) -> None:
 
     assert result["action_type"] == "D1_CANDIDATE_TRIBUNAL_PENDING"
     assert result["progressed"] is False
+
+
+def test_operating_forward_waits_for_receipt_commit_marker(tmp_path: Path) -> None:
+    package = (
+        tmp_path
+        / "reports/operating/hydra_operating_package_v1/OPERATING_PACKAGE_V1.json"
+    )
+    package.parent.mkdir(parents=True)
+    package.write_text("{}\n", encoding="utf-8")
+    action = {"action_type": "MANIFEST_QUEUE_AWAITING_APPEND", "phase": "4"}
+
+    observed = V7FalsificationController._advance_operating_package_forward(
+        SimpleNamespace(root=tmp_path),
+        None,
+        action,
+    )
+
+    assert observed == action
 
 
 def test_null_tribunal_pivots_at_class_level(tmp_path: Path) -> None:
