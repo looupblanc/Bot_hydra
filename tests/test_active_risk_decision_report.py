@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import json
 import statistics
 from collections import Counter, defaultdict
@@ -144,15 +145,28 @@ def _raw_rows() -> list[dict[str, object]]:
                 consistency_ok = index % 4 != 1
                 net_pnl = progress * 9000.0
                 total_cost = 20.0
+                source_prefix = f"sleeve:{scenario}:{horizon_label}:{start}"
+                stress_suffix = (
+                    ":portfolio_cost_stress_1_5x"
+                    if scenario == "STRESSED_1_5X"
+                    else ""
+                )
                 routing = [
                     {
-                        "event_id": f"{scenario}:{horizon_label}:{start}:entry-a",
+                        "event_id": f"{source_prefix}:entry-a{stress_suffix}",
                         "component_id": "sleeve",
                         "decision_ns": start * 86_400_000_000_000 + 1,
                         "exit_ns": start * 86_400_000_000_000 + 2,
                         "allow": True,
                         "accepted": True,
+                        "emitted": True,
+                        "rejected": False,
+                        "size_reduced": False,
                         "mini_equivalent": 2.0,
+                        "base_quantity": 2,
+                        "requested_quantity": 2,
+                        "scaling_factor": 1.0,
+                        "foregone_realized_pnl_ex_post": 0.0,
                         "risk_before": {
                             "utilisation": 0.0,
                             "active_sleeve_count": 0,
@@ -165,13 +179,20 @@ def _raw_rows() -> list[dict[str, object]]:
                         "decision_status": "ACCEPTED",
                     },
                     {
-                        "event_id": f"{scenario}:{horizon_label}:{start}:entry-b",
+                        "event_id": f"{source_prefix}:entry-b{stress_suffix}",
                         "component_id": "sleeve",
                         "decision_ns": start * 86_400_000_000_000 + 3,
                         "exit_ns": start * 86_400_000_000_000 + 4,
                         "allow": True,
                         "accepted": True,
+                        "emitted": True,
+                        "rejected": False,
+                        "size_reduced": False,
                         "mini_equivalent": 1.0,
+                        "base_quantity": 1,
+                        "requested_quantity": 1,
+                        "scaling_factor": 1.0,
+                        "foregone_realized_pnl_ex_post": 0.0,
                         "risk_before": {
                             "utilisation": 0.5,
                             "active_sleeve_count": 1,
@@ -181,7 +202,7 @@ def _raw_rows() -> list[dict[str, object]]:
                             "active_sleeve_count": 2,
                         },
                         "quantity": 1,
-                        "decision_status": "SIZE_REDUCED",
+                        "decision_status": "ACCEPTED",
                     },
                 ]
                 output.append({
@@ -308,17 +329,88 @@ def _summary_from_rows(rows: list[dict[str, object]]) -> dict[str, object]:
 
 
 def _xfa_path(*, path: str, net: float, start_day: int) -> dict[str, object]:
-    ledger = [
-        {
-            "session_day": start_day + index,
-            "accepted_events": 8 if index == 0 else 0,
-            "skipped_events": 2 if index == 0 else 0,
-            "payout_requested": index == 9,
-            "gross_payout": net / 0.9 if index == 9 else 0.0,
-            "trader_net_payout": net if index == 9 else 0.0,
-        }
-        for index in range(120)
-    ]
+    rules = official_rule_snapshot_2026_07_15()
+    qualifying_days = 5 if path == "XFA_STANDARD" else 3
+    gross = net / rules.trader_profit_split
+    pre_payout_balance = gross / rules.payout_fraction
+    day_profit = pre_payout_balance / qualifying_days
+    balance = 0.0
+    floor = rules.xfa_starting_floor
+    ledger: list[dict[str, object]] = []
+    winning_days = 0
+    traded_days_cycle = 0
+    total_profit_cycle = 0.0
+    best_day_cycle = 0.0
+    cycle_start_balance = balance
+    cycles = 0
+    minimum_buffer = balance - floor
+    for index in range(120):
+        opening = balance
+        floor_open = floor
+        traded = index < qualifying_days
+        pnl = day_profit if traded else 0.0
+        if traded:
+            traded_days_cycle += 1
+            winning_days += int(pnl >= rules.xfa_standard_winning_day_minimum)
+        total_profit_cycle += pnl
+        best_day_cycle = max(best_day_cycle, pnl)
+        ratio = (
+            best_day_cycle / total_profit_cycle
+            if total_profit_cycle > 0.0 and best_day_cycle > 0.0
+            else None
+        )
+        balance += pnl
+        floor = min(
+            0.0,
+            max(floor, balance - rules.maximum_loss_limit),
+        )
+        minimum_buffer = min(minimum_buffer, balance - floor)
+        eligible = (
+            winning_days >= rules.xfa_standard_winning_days
+            if path == "XFA_STANDARD"
+            else traded_days_cycle >= rules.xfa_consistency_traded_days
+            and total_profit_cycle > 0.0
+            and ratio is not None
+            and ratio <= rules.xfa_consistency_limit + 1e-12
+        )
+        execute = eligible and index == qualifying_days - 1
+        day_gross = gross if execute else 0.0
+        day_net = net if execute else 0.0
+        if execute:
+            balance -= day_gross
+            floor = 0.0
+            cycles += 1
+            winning_days = 0
+            traded_days_cycle = 0
+            total_profit_cycle = 0.0
+            best_day_cycle = 0.0
+            cycle_start_balance = balance
+            minimum_buffer = min(minimum_buffer, balance - floor)
+        ledger.append(
+            {
+                "session_day": start_day + index,
+                "opening_balance": opening,
+                "closing_balance": balance,
+                "mll_floor_open": floor_open,
+                "mll_floor_close": floor,
+                "day_pnl": pnl,
+                "worst_intraday_equity": min(opening, opening + pnl),
+                "traded": traded,
+                "accepted_events": 1 if traded else 0,
+                "skipped_events": 0,
+                "winning_days_in_cycle": winning_days,
+                "traded_days_in_cycle": traded_days_cycle,
+                "profit_since_payout": balance - cycle_start_balance,
+                "consistency_ratio_before_reset": ratio,
+                "payout_eligible": eligible,
+                "payout_requested": execute,
+                "gross_payout": day_gross,
+                "trader_net_payout": day_net,
+                "payout_cycles": cycles,
+                "post_payout_mll_locked_at_zero": cycles > 0,
+                "terminal": None,
+            }
+        )
     value: dict[str, object] = {
         "path": path,
         "terminal": "SURVIVED_HORIZON",
@@ -327,30 +419,30 @@ def _xfa_path(*, path: str, net: float, start_day: int) -> dict[str, object]:
         "end_day": start_day + 119,
         "requested_horizon_days": 120,
         "observed_days": 120,
-        "traded_days": 10,
-        "event_count": 10,
-        "accepted_event_count": 8,
-        "skipped_event_count": 2,
+        "traded_days": qualifying_days,
+        "event_count": qualifying_days,
+        "accepted_event_count": qualifying_days,
+        "skipped_event_count": 0,
         "payout_eligible": True,
         "payout_cycles": 1,
         "gross_payout": net / 0.9,
         "trader_net_payout": net,
-        "first_payout_day": 10,
+        "first_payout_day": qualifying_days,
         "post_payout_survived": True,
         "post_payout_censored": False,
-        "post_payout_observed_days": 110,
-        "ending_balance": 3000.0,
+        "post_payout_observed_days": 120 - qualifying_days,
+        "ending_balance": balance,
         "ending_mll_floor": 0.0,
-        "minimum_mll_buffer": 2500.0,
-        "qualifying_winning_days": 5,
-        "maximum_consistency_ratio": 0.35,
+        "minimum_mll_buffer": minimum_buffer,
+        "qualifying_winning_days": qualifying_days,
+        "maximum_consistency_ratio": 1.0,
         "maximum_mini_equivalent": 3.0,
         "total_cost": 100.0,
-        "skipped_reasons": {"CONFLICT": 2},
+        "skipped_reasons": {},
         "component_contribution": {"sleeve": net},
         "daily_ledger": ledger,
         "calendar_inactivity_auditable": True,
-        "payout_request_policy": "FIRST_ELIGIBLE_DAY_PER_CYCLE",
+        "payout_request_policy": "EARLIEST_ELIGIBLE_END_OF_DAY",
         "payout_path_selected_from_outcomes": False,
     }
     value["path_hash"] = canonical_hash(
@@ -363,7 +455,10 @@ def _lifecycle(
     *, policy_id: str, scenario: str, combine_start: int, net: float
 ) -> dict[str, object]:
     xfa_start = combine_start + 20
-    profile = FrozenRiskProfile(profile_id=f"{policy_id}:XFA_PROFILE")
+    profile = FrozenRiskProfile(
+        profile_id=f"{policy_id}:XFA_PROFILE",
+        maximum_simultaneous_positions=1,
+    )
     value: dict[str, object] = {
         "schema": ACTIVE_RISK_XFA_EVIDENCE_SCHEMA,
         "lifecycle_version": LIFECYCLE_VERSION,
@@ -430,15 +525,22 @@ def _candidate(policy_id: str) -> dict[str, object]:
     derived_diagnostics = report_module._derive_canonical_account_diagnostics(
         [value for value in raw if value["horizon_label"] == "90_TRADING_DAYS"]
     )
+    runtime_behavior_fingerprint = (
+        report_module._runtime_behavior_fingerprint_from_raw(
+            [
+                value
+                for value in raw
+                if value["horizon_label"] == "90_TRADING_DAYS"
+            ]
+        )
+    )
     return {
         "schema": "hydra_active_risk_policy_metric_v1",
         "policy_id": policy_id,
         "structural_fingerprint": canonical_hash(
             {"policy_id": policy_id, "kind": "structure"}
         ),
-        "actual_account_behavior_fingerprint": canonical_hash(
-            {"policy_id": policy_id, "kind": "behavior"}
-        ),
+        "actual_account_behavior_fingerprint": runtime_behavior_fingerprint,
         "normal": normal,
         "stressed": stressed,
         "horizons": horizons,
@@ -460,7 +562,46 @@ def _candidate(policy_id: str) -> dict[str, object]:
                 net=450.0,
             ),
         ],
+        "xfa_paths_started": 2,
+        "xfa_standard_paths": 2,
+        "xfa_consistency_paths": 2,
+        "first_payouts": 4,
+        "payout_cycles": 4,
+        "trader_net_payout": 2025.0,
+        "post_payout_survival_count": 4,
+        "post_payout_survival_rate": 1.0,
     }
+
+
+def _sealed_full_pass_episode(
+    *, policy_id: str = "candidate-a", scenario: str = "NORMAL"
+) -> dict[str, object]:
+    manifest = {
+        "temporal_blocks": {
+            "blocks": [
+                {
+                    "block_id": f"B{month}",
+                    "start": date(2023, month, 1).isoformat(),
+                    "end": (
+                        date(2023, month + 1, 1) - timedelta(days=1)
+                        if month < 12
+                        else date(2023, 12, 31)
+                    ).isoformat(),
+                }
+                for month in range(1, 5)
+            ]
+        }
+    }
+    episodes, _daily_rows = _evidence_rows(_candidate(policy_id), manifest)
+    selected = [
+        row
+        for row in episodes
+        if row["cost_scenario"] == scenario
+        and row["horizon"] == "FULL_CHRONOLOGICAL_HORIZON"
+        and row["target_reached"] is True
+    ]
+    assert len(selected) == 1
+    return json.loads(json.dumps(selected[0]))
 
 
 def _control(policy_id: str, *, target: float = 0.20) -> dict[str, object]:
@@ -527,8 +668,10 @@ def _seal_test_evidence_bundle(
     economic_results: dict[str, object],
     stage_decisions: list[dict[str, object]],
     candidates: list[dict[str, object]],
+    frontier_candidates: list[dict[str, object]] | None = None,
+    bundle_root_name: str = "_active_risk_report_bundle",
 ) -> dict[str, object]:
-    shared_root = tmp_path.parent / "_active_risk_report_bundle"
+    shared_root = tmp_path.parent / bundle_root_name
     shared_receipt_path = shared_root / "evidence_bundle_receipt.json"
     if shared_receipt_path.is_file():
         return json.loads(shared_receipt_path.read_text(encoding="utf-8"))
@@ -575,74 +718,137 @@ def _seal_test_evidence_bundle(
             "allow_additional_episode_keys": True,
         },
     }
-    signal = {
-        "campaign_id": CAMPAIGN,
-        "component_id": component_id,
-        "signal_id": "signal-001",
-        "event_time": "2023-01-02T14:30:00Z",
-        "market": "NQ",
-        "contract": "NQH3",
-        "timeframe": "1m",
-        "signal": 1,
-        "sizing": 1.0,
-        "stop": 10990.0,
-        "target": 11020.0,
-        "veto": False,
-        "component_role": "TARGET_VELOCITY",
+    source_events: dict[str, dict[str, object]] = {}
+    for raw in candidates[0]["evidence_raw"]:
+        routing = raw["risk_allocation_path"]
+        assert isinstance(routing, list) and routing
+        per_event_net = float(raw["net_pnl"]) / len(routing)
+        for decision in routing:
+            routed_id = str(decision["event_id"])
+            source_id = routed_id.removesuffix(
+                ":portfolio_cost_stress_1_5x"
+            )
+            event = {
+                "trade_id": source_id,
+                "quantity": int(decision["base_quantity"]),
+                "net_pnl": per_event_net,
+                "start_day": int(raw["start_day"]),
+            }
+            prior = source_events.get(source_id)
+            if prior is not None:
+                assert prior == event
+            source_events[source_id] = event
+    signals: list[dict[str, object]] = []
+    entries: list[dict[str, object]] = []
+    exits: list[dict[str, object]] = []
+    trades: list[dict[str, object]] = []
+    for source_id, event in sorted(source_events.items()):
+        event_date = (
+            date(1970, 1, 1) + timedelta(days=int(event["start_day"]))
+        ).isoformat()
+        entry_time = f"{event_date}T14:30:00Z"
+        exit_time = f"{event_date}T15:00:00Z"
+        quantity = int(event["quantity"])
+        net_pnl = float(event["net_pnl"])
+        signals.append(
+            {
+                "campaign_id": CAMPAIGN,
+                "component_id": component_id,
+                "signal_id": f"signal:{source_id}",
+                "event_time": f"{event_date}T14:29:00Z",
+                "market": "NQ",
+                "contract": "NQH3",
+                "timeframe": "1m",
+                "signal": 1,
+                "sizing": float(quantity),
+                "stop": 10990.0,
+                "target": 11020.0,
+                "veto": False,
+                "component_role": "TARGET_VELOCITY",
+            }
+        )
+        entries.append(
+            {
+                "campaign_id": CAMPAIGN,
+                "component_id": component_id,
+                "trade_id": source_id,
+                "entry_time": entry_time,
+                "market": "NQ",
+                "contract": "NQH3",
+                "side": "LONG",
+                "quantity": quantity,
+                "entry_price": 11000.0,
+                "sizing": float(quantity),
+                "stop_price": 10990.0,
+                "target_price": 11020.0,
+            }
+        )
+        exits.append(
+            {
+                "campaign_id": CAMPAIGN,
+                "component_id": component_id,
+                "trade_id": source_id,
+                "exit_time": exit_time,
+                "exit_price": 11005.0,
+                "exit_reason": "TARGET_HORIZON_EXIT",
+            }
+        )
+        trades.append(
+            {
+                "campaign_id": CAMPAIGN,
+                "component_id": component_id,
+                "trade_id": source_id,
+                "entry_time": entry_time,
+                "exit_time": exit_time,
+                "market": "NQ",
+                "contract": "NQH3",
+                "side": "LONG",
+                "quantity": quantity,
+                "entry_price": 11000.0,
+                "exit_price": 11005.0,
+                "gross_pnl": net_pnl,
+                "costs": 0.0,
+                "net_pnl": net_pnl,
+            }
+        )
+    candidate_by_id = {
+        str(candidate["policy_id"]): candidate for candidate in candidates
     }
-    entry = {
-        "campaign_id": CAMPAIGN,
-        "component_id": component_id,
-        "trade_id": "trade-001",
-        "entry_time": "2023-01-02T14:31:00Z",
-        "market": "NQ",
-        "contract": "NQH3",
-        "side": "LONG",
-        "quantity": 1.0,
-        "entry_price": 11000.0,
-        "sizing": 1.0,
-        "stop_price": 10990.0,
-        "target_price": 11020.0,
-    }
-    exit_row = {
-        "campaign_id": CAMPAIGN,
-        "component_id": component_id,
-        "trade_id": "trade-001",
-        "exit_time": "2023-01-02T15:00:00Z",
-        "exit_price": 11005.0,
-        "exit_reason": "TARGET_HORIZON_EXIT",
-    }
-    trade = {
-        "campaign_id": CAMPAIGN,
-        "component_id": component_id,
-        "trade_id": "trade-001",
-        "entry_time": entry["entry_time"],
-        "exit_time": exit_row["exit_time"],
-        "market": entry["market"],
-        "contract": entry["contract"],
-        "side": entry["side"],
-        "quantity": entry["quantity"],
-        "entry_price": entry["entry_price"],
-        "exit_price": exit_row["exit_price"],
-        "gross_pnl": 25.0,
-        "costs": 2.5,
-        "net_pnl": 22.5,
-    }
-    memberships = [
-        {
-            "campaign_id": CAMPAIGN,
+    memberships = []
+    for policy_id in policy_ids:
+        active_risk_policy = {
+            "schema": "hydra_active_risk_pool_policy_v1",
+            "policy_version": "hydra_active_risk_pool_governor_v1",
             "policy_id": policy_id,
-            "component_id": component_id,
-            "risk_allocation": 1.0,
-            "component_role": "TARGET_VELOCITY",
+            "structural_fingerprint": candidate_by_id[policy_id][
+                "structural_fingerprint"
+            ],
+            "component_priority": [component_id],
+            "nominal_risk_charge_per_mini": {component_id: 2_250.0},
+            "same_instrument_conflict_rule": "ALLOW_SAME_DIRECTION",
+            "static_risk_tier": 1.0,
+            "maximum_concurrent_sleeves": 1,
+            "maximum_mini_equivalent": 15,
+            "future_outcome_fields_used": False,
+            "outbound_order_capability": False,
         }
-        for policy_id in policy_ids
-    ]
+        memberships.append(
+            {
+                "campaign_id": CAMPAIGN,
+                "policy_id": policy_id,
+                "component_id": component_id,
+                "risk_allocation": 1.0,
+                "component_role": "TARGET_VELOCITY",
+                "inactive_sleeve_reserves_risk": False,
+                "underlying_signal_mutated": False,
+                "active_risk_policy": active_risk_policy,
+            }
+        )
     records = {
-        "component_signals": [signal],
-        "component_entries": [entry],
-        "component_exits": [exit_row],
-        "component_trades": [trade],
+        "component_signals": signals,
+        "component_entries": entries,
+        "component_exits": exits,
+        "component_trades": trades,
         "account_policy_membership": memberships,
         "provenance": [
             {
@@ -681,7 +887,19 @@ def _seal_test_evidence_bundle(
     writer.write_compact_output("campaign_summary", economic_results)
     writer.write_compact_output("failure_vectors", [])
     writer.write_compact_output(
-        "pareto_archive", {"stage_decisions": stage_decisions}
+        "pareto_archive",
+        {
+            "schema": "hydra_active_risk_pareto_archive_v1",
+            "campaign_id": CAMPAIGN,
+            "frontier": [
+                candidate
+                for candidate in (frontier_candidates or candidates)
+                if candidate["policy_id"]
+                in set(stage_decisions[-1]["selected_policy_ids"])
+            ],
+            "stage_decisions": stage_decisions,
+            "opaque_score_used": False,
+        },
     )
     writer.write_compact_output(
         "next_campaign_recommendations",
@@ -694,7 +912,12 @@ def _seal_test_evidence_bundle(
     return receipt.to_dict()
 
 
-def _fixture(tmp_path: Path) -> dict[str, Path]:
+def _fixture(
+    tmp_path: Path,
+    *,
+    tamper_finalist_frontier_consistency: bool = False,
+    tamper_finalist_frontier_behavior: bool = False,
+) -> dict[str, Path]:
     manifest_path = tmp_path / "manifest.json"
     stage3 = tmp_path / "stage3"
     controls_path = tmp_path / "matched_controls.json"
@@ -708,6 +931,58 @@ def _fixture(tmp_path: Path) -> dict[str, Path]:
     manifest = {
         "campaign_id": CAMPAIGN,
         "source_commit": SOURCE_COMMIT,
+        "sleeve_bank": {
+            "member_count": 1,
+            "members": [
+                {
+                    "sleeve_id": "sleeve",
+                    "immutable_fingerprint": canonical_hash(
+                        {"component_id": "sleeve"}
+                    ),
+                    "behavioral_fingerprint": canonical_hash(
+                        {"component_id": "sleeve", "behavior": 1}
+                    ),
+                    "signal_ledger_sha256": "1" * 64,
+                    "trade_ledger_sha256": "2" * 64,
+                    "market": "NQ",
+                    "contract": "NQH3",
+                    "timeframe": "1m",
+                    "session": "OPEN",
+                    "source_campaign": "synthetic_source",
+                    "role": "TARGET_VELOCITY",
+                    "sleeve_specification": {
+                        "sleeve_id": "sleeve",
+                        "version": 1,
+                        "market": "NQ",
+                    },
+                }
+            ],
+        },
+        "costs": {
+            "normal_multiplier": 1.0,
+            "stressed_multiplier": 1.5,
+        },
+        "account_parameters": {
+            "starting_balance": 150_000.0,
+            "profit_target": 9_000.0,
+            "maximum_loss_limit": 4_500.0,
+            "maximum_mini_equivalent": 15,
+        },
+        "lifecycle": {
+            "rule_snapshot": official_rule_snapshot_2026_07_15().to_dict(),
+            "standard_and_consistency_both_evaluated": True,
+            "books_frozen_before_outcomes": True,
+        },
+        "successive_halving": {
+            "frozen_horizons": [20, 40, 60, 90, "FULL"],
+            "xfa_profile_projection": {
+                "profile_version": "hydra_combine_to_xfa_v1",
+                "clip_to_official_scaling_plan": True,
+                "same_market_exclusive": True,
+                "active_pool_combine_only_controls_applied": False,
+                "selected_after_combine_outcome": False,
+            },
+        },
         "episode_starts": {"serious_policy_starts": 48},
         "temporal_blocks": {
             "blocks": [
@@ -812,9 +1087,11 @@ def _fixture(tmp_path: Path) -> dict[str, Path]:
         "exact_account_replays": 1_024,
         "stage3_policy_count": 2,
         "production_counters": {
-            "combine_episodes_completed": 960,
-            "normal_episodes_completed": 480,
-            "stressed_episodes_completed": 480,
+            # Account attempts count policy/start/scenario once.  The bundle
+            # persists five horizon rows per Stage-3 attempt (960 rows).
+            "combine_episodes_completed": 192,
+            "normal_episodes_completed": 96,
+            "stressed_episodes_completed": 96,
         },
         "identity_audit": {"passed": True},
         "matched_controls": controls,
@@ -839,22 +1116,48 @@ def _fixture(tmp_path: Path) -> dict[str, Path]:
         "risk_utilisation": _aggregate_utilisation(candidates),
         "suppression": _aggregate_suppression(candidates),
         "horizon_frontier": _aggregate_horizons(candidates),
-        # Includes frozen Stage-4/5 increments absent from the Stage-3 caches.
-        "xfa_paths_started": 6,
-        "xfa_standard_paths": 6,
-        "xfa_consistency_paths": 6,
-        "first_payouts": 12,
-        "payout_cycles": 12,
-        "trader_net_payout": 6_000.0,
-        "post_payout_survival_count": 12,
+        # The synthetic sealed bundle contains Stage-3 episode partitions only.
+        "xfa_paths_started": 4,
+        "xfa_standard_paths": 4,
+        "xfa_consistency_paths": 4,
+        "first_payouts": 8,
+        "payout_cycles": 8,
+        "trader_net_payout": 4_050.0,
+        "post_payout_survival_count": 8,
         "post_payout_survival_rate": 1.0,
+        "development_finalist_ids": ["candidate-a"],
+        "confirmation_ready_candidate_ids": ["candidate-a"],
     }
+    frontier_candidates: list[dict[str, object]] | None = None
+    bundle_root_name = "_active_risk_report_bundle"
+    if tamper_finalist_frontier_consistency or tamper_finalist_frontier_behavior:
+        frontier_candidates = json.loads(json.dumps(candidates))
+        finalist = frontier_candidates[0]
+        if tamper_finalist_frontier_consistency:
+            normal_horizon = finalist["horizons"]["normal"]["90_TRADING_DAYS"]
+            normal_horizon["consistency_ok_count"] = int(
+                normal_horizon["consistency_ok_count"]
+            ) - 1
+            normal_horizon["consistency_rate"] = (
+                int(normal_horizon["consistency_ok_count"])
+                / int(normal_horizon["episode_count"])
+            )
+            finalist["normal"] = dict(normal_horizon)
+        if tamper_finalist_frontier_behavior:
+            finalist["actual_account_behavior_fingerprint"] = "f" * 64
+        bundle_root_name = (
+            "_active_risk_report_bundle_frontier_behavior_tamper"
+            if tamper_finalist_frontier_behavior
+            else "_active_risk_report_bundle_frontier_tamper"
+        )
     evidence_receipt = _seal_test_evidence_bundle(
         tmp_path,
         manifest_path=manifest_path,
         economic_results=economic_results,
         stage_decisions=stage_decisions,
         candidates=candidates,
+        frontier_candidates=frontier_candidates,
+        bundle_root_name=bundle_root_name,
     )
     bundle_path = Path(str(evidence_receipt["bundle_path"]))
     production_state = {
@@ -867,9 +1170,9 @@ def _fixture(tmp_path: Path) -> dict[str, Path]:
         "policies_proposed": 20_000,
         "unique_policies_screened": 4_096,
         "exact_account_replays": 1_024,
-        "combine_episodes_completed": 960,
-        "normal_episodes_completed": 480,
-        "stressed_episodes_completed": 480,
+        "combine_episodes_completed": 192,
+        "normal_episodes_completed": 96,
+        "stressed_episodes_completed": 96,
         "evidence_final_path": str(bundle_path),
         "evidence_bundle_path": str(bundle_path),
         "evidence_bundle_manifest_sha256": evidence_receipt["manifest_sha256"],
@@ -889,6 +1192,13 @@ def _fixture(tmp_path: Path) -> dict[str, Path]:
         "matched_controls": controls,
         "evidence_bundle": evidence_receipt,
         "evidence_verification_manifest_sha256": evidence_receipt["manifest_sha256"],
+        "sealed_result_recovery": {
+            "preregistered_deep_guard_count": 2,
+            "additional_deep_guard_performed": False,
+            "deep_guard_completion_proof": (
+                "EXACT_POST_GUARD_FAILED_CLOSED_COUNTER_ASSERTION"
+            ),
+        },
         "autonomous_next_action": {"action": "QUEUE_FROZEN_NEXT_ACTION"},
     }
     final_result["result_hash"] = canonical_hash(final_result)
@@ -910,6 +1220,489 @@ def test_canonical_hash_matches_runtime_stable_hash() -> None:
     assert canonical_hash(value) == stable_hash(value)
 
 
+def test_report_reuses_preregistered_guards_without_third_deep_scan() -> None:
+    source = inspect.getsource(report_module._production_context)
+    assert "verify_evidence_bundle(bundle_path, deep=False)" in source
+    assert "deep=True" not in source
+
+
+def test_cumulative_behavior_clustering_covers_exact_eight_by_192_path() -> None:
+    """Exercise the full 48+48+96 path without heavy EvidenceBundle I/O."""
+
+    candidate_ids = [f"finalist-{index}" for index in range(8)]
+
+    def observation(
+        candidate_index: int, scenario: str, start: int
+    ) -> report_module.ExpandedBehaviorObservation:
+        stage = "stage3" if start < 48 else "stage4" if start < 96 else "stage5"
+        family = {
+            0: "family-01",
+            1: "family-01",
+            2: "family-23",
+            3: "family-23",
+            4: "family-4",
+            5: "family-5",
+            6: "family-67",
+            7: "family-67" if start < 96 else "family-7-stage5",
+        }[candidate_index]
+        tiny_delta = 0.002 if candidate_index == 3 else 0.0
+        stage5_divergence = 0.8 if candidate_index == 7 and start >= 96 else 0.0
+        scenario_delta = 0.03 if scenario == "stressed" else 0.0
+        varying = (start % 17) / 100.0
+        feature_values = (
+            0.20 + varying + tiny_delta + stage5_divergence,
+            0.35 + varying / 2.0 + tiny_delta + stage5_divergence,
+            0.60 - scenario_delta + varying / 3.0 + tiny_delta,
+            0.80 - varying / 4.0,
+            float(start % 5 != 0),
+        )
+        terminal_code = int(candidate_index == 7 and start >= 96)
+        route = (
+            scenario,
+            start,
+            family,
+            f"source:{family}:{scenario}:{start}",
+            2,
+            1,
+            "SIZE_REDUCED" if start % 7 == 0 else "ACCEPTED",
+        )
+        admitted = (
+            scenario,
+            start,
+            family,
+            f"trade:{family}:{scenario}:{start}",
+            1,
+        )
+        exact_payload = {
+            "stage": stage,
+            "scenario": scenario,
+            "start": start,
+            "full_trajectory_digest": canonical_hash(
+                [feature_values, terminal_code, route, admitted]
+            ),
+            "routing_and_suppression": route,
+            "admitted_trade_and_contribution": admitted,
+            "admitted_trade_account_contribution": feature_values[0],
+        }
+        return report_module.ExpandedBehaviorObservation(
+            scenario=scenario,
+            start_day=start,
+            stage=stage,
+            exact_row_hash=canonical_hash(exact_payload),
+            feature_values=feature_values,
+            terminal_code=terminal_code,
+            routing_tuples=frozenset({route}),
+            admitted_trade_tuples=frozenset({admitted}),
+        )
+
+    observations: dict[
+        str, dict[tuple[str, int], report_module.ExpandedBehaviorObservation]
+    ] = {}
+    for candidate_index, candidate_id in enumerate(candidate_ids):
+        ordered = [
+            observation(candidate_index, scenario, start)
+            for scenario in ("normal", "stressed")
+            for start in range(192)
+        ]
+        if candidate_index == 1:
+            ordered.reverse()
+        observations[candidate_id] = {
+            (row.scenario, row.start_day): row for row in ordered
+        }
+
+    expected_stage_counts = {
+        "stage3": {"normal": 48, "stressed": 48},
+        "stage4": {"normal": 48, "stressed": 48},
+        "stage5": {"normal": 96, "stressed": 96},
+    }
+    profiles = {
+        candidate_id: report_module._cumulative_behavior_profile(
+            rows, declared_stage_start_counts=expected_stage_counts
+        )
+        for candidate_id, rows in observations.items()
+    }
+    assert sum(
+        profile["public"]["observation_count"] for profile in profiles.values()
+    ) == 3_072
+    for profile in profiles.values():
+        assert profile["public"]["per_scenario_observation_count"] == {
+            "normal": 192,
+            "stressed": 192,
+        }
+        assert profile["public"]["stage_start_counts"] == expected_stage_counts
+        assert profile["public"]["observation_count"] == 384
+
+    fingerprint = "authoritative_raw_account_trade_behavior_fingerprint"
+    assert profiles["finalist-0"]["public"][fingerprint] == profiles[
+        "finalist-1"
+    ]["public"][fingerprint]
+    assert profiles["finalist-2"]["public"][fingerprint] != profiles[
+        "finalist-3"
+    ]["public"][fingerprint]
+    assert profiles["finalist-6"]["public"][fingerprint] != profiles[
+        "finalist-7"
+    ]["public"][fingerprint]
+
+    stage3_six = {
+        key: row
+        for key, row in observations["finalist-6"].items()
+        if row.stage == "stage3"
+    }
+    stage3_seven = {
+        key: row
+        for key, row in observations["finalist-7"].items()
+        if row.stage == "stage3"
+    }
+    assert report_module._cumulative_behavior_profile(stage3_six)["public"][
+        fingerprint
+    ] == report_module._cumulative_behavior_profile(stage3_seven)["public"][
+        fingerprint
+    ]
+
+    candidates = {
+        candidate_id: {
+            "stressed": {
+                "pass_rate": 0.10,
+                "target_progress_p25": 0.40,
+                "net_total": 1_000.0 - index,
+                "mll_breach_rate": 0.0,
+            }
+        }
+        for index, candidate_id in enumerate(candidate_ids)
+    }
+    clustering = report_module._cumulative_behavior_clusters(profiles, candidates)
+    assert clustering["full_192_start_contract_satisfied"] is True
+    assert clustering["cluster_count"] == 6
+    assert clustering["pairwise_diagnostic_count"] == 28
+    assert clustering["expected_pairwise_diagnostic_count"] == 28
+    assert clustering["pairwise_coverage_complete"] is True
+    assert clustering[
+        "complete_link_partition_rederived_from_published_pairwise"
+    ] is True
+    assert clustering["pairwise_diagnostics"] == sorted(
+        clustering["pairwise_diagnostics"],
+        key=lambda row: (row["left_policy_id"], row["right_policy_id"]),
+    )
+    assert canonical_hash(clustering["pairwise_diagnostics"]) == clustering[
+        "pairwise_diagnostics_sha256"
+    ]
+    report_module._validate_cumulative_behavior_clustering_payload(
+        clustering, expected_candidate_ids=candidate_ids
+    )
+    assert {
+        frozenset(row["member_ids"]) for row in clustering["clusters"]
+    } == {
+        frozenset({"finalist-0", "finalist-1"}),
+        frozenset({"finalist-2", "finalist-3"}),
+        frozenset({"finalist-4"}),
+        frozenset({"finalist-5"}),
+        frozenset({"finalist-6"}),
+        frozenset({"finalist-7"}),
+    }
+    assert len(
+        {profile["public"][fingerprint] for profile in profiles.values()}
+    ) == 7
+    account_same_routes_different = report_module._cumulative_behavior_similarity(
+        profiles["finalist-4"], profiles["finalist-5"]
+    )
+    assert account_same_routes_different[0] == pytest.approx(1.0)
+    assert account_same_routes_different[1] == pytest.approx(0.0)
+    assert account_same_routes_different[3] < 0.90
+    assert account_same_routes_different[4] < 0.90
+    assert account_same_routes_different[5] is False
+
+    hash_tamper = json.loads(json.dumps(clustering))
+    hash_tamper["pairwise_diagnostics"][0][
+        "account_vector_correlation"
+    ] -= 0.01
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="pairwise diagnostics hash drift",
+    ):
+        report_module._validate_cumulative_behavior_clustering_payload(
+            hash_tamper, expected_candidate_ids=candidate_ids
+        )
+
+    partition_tamper = json.loads(json.dumps(clustering))
+    joined_pair = next(
+        row
+        for row in partition_tamper["pairwise_diagnostics"]
+        if (row["left_policy_id"], row["right_policy_id"])
+        == ("finalist-0", "finalist-1")
+    )
+    joined_pair["routing_jaccard"] = 0.0
+    joined_pair["similar"] = False
+    partition_tamper["pairwise_diagnostics_sha256"] = canonical_hash(
+        partition_tamper["pairwise_diagnostics"]
+    )
+    split_groups = report_module._complete_link_groups_from_pairwise(
+        candidate_ids, partition_tamper["pairwise_diagnostics"]
+    )
+    assert ["finalist-0"] in split_groups
+    assert ["finalist-1"] in split_groups
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="published complete-link partition drift",
+    ):
+        report_module._validate_cumulative_behavior_clustering_payload(
+            partition_tamper, expected_candidate_ids=candidate_ids
+        )
+
+
+def test_episode_dataset_accounting_separates_attempts_from_horizon_rows() -> None:
+    bundle = {
+        "dataset_row_counts": {"episodes": 152_064},
+        "files": {
+            "stage2": {
+                "kind": "dataset_partition",
+                "dataset": "episodes",
+                "batch_id": "active:stage2-eliminated:000000:episodes",
+                "row_count": 6_144,
+            },
+            "stage3": {
+                "kind": "dataset_partition",
+                "dataset": "episodes",
+                "batch_id": "active:stage3:000000:episodes",
+                "row_count": 122_880,
+            },
+            "stage4": {
+                "kind": "dataset_partition",
+                "dataset": "episodes",
+                "batch_id": "active:stage4:000000:episodes",
+                "row_count": 15_360,
+            },
+            "stage5": {
+                "kind": "dataset_partition",
+                "dataset": "episodes",
+                "batch_id": "active:stage5:000000:episodes",
+                "row_count": 7_680,
+            },
+        },
+    }
+    accounting = report_module._episode_dataset_accounting(
+        bundle, canonical_attempt_count=35_328
+    )
+    assert accounting["canonical_account_episode_attempts"] == 35_328
+    assert accounting["persisted_multi_horizon_episode_rows"] == 152_064
+    assert accounting["per_stage"]["stage5"][
+        "derived_canonical_account_attempts"
+    ] == 1_536
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="canonical attempt counter diverges",
+    ):
+        report_module._episode_dataset_accounting(
+            bundle, canonical_attempt_count=152_064
+        )
+
+
+def test_campaign_lifecycle_exact_transition_path_payout_semantics() -> None:
+    proof = {
+        "combine_to_xfa_transition_count": 25_019,
+        "alternative_path_count": 50_038,
+        "first_payout_path_observation_count": 48_922,
+        "payout_cycle_observation_count": 149_254,
+        "trader_90_percent_split_cash_observations_before_fees_tax": (
+            288_381_857.41232216
+        ),
+        "post_payout_survival_observation_count": 47_000,
+        "transition_key_uniqueness_proved": True,
+        "full_episode_key_uniqueness_proved": True,
+        "zero_inter_stage_overlap_proved": True,
+        "full_pass_lifecycle_bijection_proved": True,
+        "exactly_two_alternative_paths_per_transition_proved": True,
+        "path_key_uniqueness_proved": True,
+        "official_rule_snapshot_exact": True,
+        "payout_eligibility_amount_and_reset_reexecuted_from_daily_ledger": True,
+        "by_scenario_and_path": {
+            "normal": {"standard": {}, "consistency": {}},
+            "stressed": {"standard": {}, "consistency": {}},
+        },
+    }
+    lifecycle = report_module._sealed_campaign_wide_lifecycle_totals(
+        {
+            "xfa_paths_started": 25_019,
+            "first_payouts": 48_922,
+            "payout_cycles": 149_254,
+            "trader_net_payout": 288_381_857.41232216,
+        },
+        sealed_episode_audit=proof,
+    )
+    audit = lifecycle["transition_and_alternative_path_audit"]
+    assert audit["combine_to_xfa_transition_count"] == 25_019
+    assert audit["expected_standard_plus_consistency_path_count"] == 50_038
+    assert audit["first_payout_path_observation_count"] == 48_922
+    assert audit["alternative_paths_without_observed_first_payout"] == 1_116
+    assert audit["first_payout_observations_are_combine_to_xfa_transitions"] is False
+    assert audit["duplicate_transition_inflation_detected"] is False
+    assert audit["duplicate_transition_verdict_basis"] == (
+        "PROVED_FROM_DEEP_VERIFIED_EPISODE_PARTITIONS"
+    )
+    assert audit["probability_denominator_status"].startswith("AVAILABLE_BY_COST")
+
+
+def test_rehashed_finalist_frontier_cannot_diverge_from_expanded_raw_metrics(
+    tmp_path: Path,
+) -> None:
+    paths = _fixture(tmp_path, tamper_finalist_frontier_consistency=True)
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="sealed frontier/raw consistency_ok_count drift",
+    ):
+        build_active_risk_decision_report(
+            manifest_path=paths["manifest"],
+            stage3_cache_dir=paths["stage3"],
+            matched_controls_path=paths["controls"],
+            halving_dir=paths["halving"],
+            expected_stage3_count=2,
+        )
+
+
+def test_legacy_frontier_behavior_hash_must_match_raw_runtime_merge(
+    tmp_path: Path,
+) -> None:
+    paths = _fixture(tmp_path, tamper_finalist_frontier_behavior=True)
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="legacy frontier behavior fingerprint cannot be rederived",
+    ):
+        build_active_risk_decision_report(
+            manifest_path=paths["manifest"],
+            stage3_cache_dir=paths["stage3"],
+            matched_controls_path=paths["controls"],
+            halving_dir=paths["halving"],
+            expected_stage3_count=2,
+        )
+
+
+def test_campaign_lifecycle_rejects_duplicate_full_episode_key() -> None:
+    accumulator = report_module.CampaignLifecycleAuditAccumulator()
+    episode = _sealed_full_pass_episode()
+    accumulator.add_full_episode(episode, stage="stage3")
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="duplicate or inter-stage FULL episode",
+    ):
+        accumulator.add_full_episode(episode, stage="stage3")
+
+
+def test_campaign_lifecycle_rejects_inter_stage_overlap() -> None:
+    accumulator = report_module.CampaignLifecycleAuditAccumulator()
+    episode = _sealed_full_pass_episode()
+    accumulator.add_full_episode(episode, stage="stage3")
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match=r"stage3/stage4",
+    ):
+        accumulator.add_full_episode(episode, stage="stage4")
+
+
+def test_campaign_lifecycle_rejects_missing_alternative_path() -> None:
+    accumulator = report_module.CampaignLifecycleAuditAccumulator()
+    episode = _sealed_full_pass_episode()
+    lifecycle = episode["active_risk_pool_lifecycle"]
+    assert isinstance(lifecycle, dict)
+    lifecycle.pop("consistency")
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="lifecycle evidence is incomplete: consistency",
+    ):
+        accumulator.add_full_episode(episode, stage="stage3")
+
+
+def test_campaign_lifecycle_rejects_summary_raw_total_corruption() -> None:
+    proof = {
+        "combine_to_xfa_transition_count": 2,
+        "alternative_path_count": 2,
+        "first_payout_path_observation_count": 2,
+        "payout_cycle_observation_count": 2,
+        "trader_90_percent_split_cash_observations_before_fees_tax": 1_350.0,
+        "post_payout_survival_observation_count": 2,
+        "transition_key_uniqueness_proved": True,
+        "full_episode_key_uniqueness_proved": True,
+        "zero_inter_stage_overlap_proved": True,
+        "full_pass_lifecycle_bijection_proved": True,
+        "exactly_two_alternative_paths_per_transition_proved": True,
+        "path_key_uniqueness_proved": True,
+        "official_rule_snapshot_exact": True,
+        "payout_eligibility_amount_and_reset_reexecuted_from_daily_ledger": True,
+    }
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="summary lifecycle counts diverge from episode proof",
+    ):
+        report_module._sealed_campaign_wide_lifecycle_totals(
+            {
+                "xfa_paths_started": 1,
+                "first_payouts": 2,
+                "payout_cycles": 2,
+                "trader_net_payout": 1_350.0,
+            },
+            sealed_episode_audit=proof,
+        )
+
+
+def test_trade_attribution_is_bound_to_sealed_source_quantity_and_pnl() -> None:
+    raw = next(
+        row
+        for row in _candidate("candidate-a")["evidence_raw"]
+        if row["scenario"] == "NORMAL"
+        and row["horizon_label"] == "90_TRADING_DAYS"
+    )
+    decisions = raw["risk_allocation_path"]
+    assert isinstance(decisions, list)
+    source_index = {
+        ("sleeve", str(decision["event_id"])): {
+            "quantity": int(decision["base_quantity"]),
+            "gross_pnl": float(raw["net_pnl"]) / len(decisions),
+            "costs": 0.0,
+            "net_pnl": float(raw["net_pnl"]) / len(decisions),
+        }
+        for decision in decisions
+    }
+    attribution = report_module._trade_attribution_from_routing(
+        raw,
+        component_trade_index=source_index,
+        label="synthetic trade audit",
+    )
+    assert sum(attribution["component_pnl"].values()) == pytest.approx(
+        raw["net_pnl"]
+    )
+    first_key = next(iter(source_index))
+    source_index[first_key]["quantity"] = int(source_index[first_key]["quantity"]) + 1
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="base/source quantity drift",
+    ):
+        report_module._trade_attribution_from_routing(
+            raw,
+            component_trade_index=source_index,
+            label="synthetic trade audit",
+        )
+
+
+def test_temporal_block_contract_and_nonoverlap_fail_closed() -> None:
+    manifest = {
+        "campaign_id": CAMPAIGN,
+        "temporal_blocks": {
+            "blocks": [
+                {
+                    "block_id": f"B{index}",
+                    "start": f"2023-0{index}-01",
+                    "end": f"2023-0{index}-28",
+                    "markets": ["NQ"],
+                    "contract_separation": "EXPLICIT",
+                }
+                for index in range(1, 5)
+            ]
+        },
+    }
+    report_module._block_specs(manifest)
+    manifest["temporal_blocks"]["blocks"][1]["start"] = "2023-01-15"
+    with pytest.raises(ActiveRiskDecisionReportError, match="source blocks overlap"):
+        report_module._block_specs(manifest)
+
+
 def test_streaming_report_covers_blocks_controls_xfa_and_clusters(tmp_path: Path) -> None:
     paths = _fixture(tmp_path)
     report = build_active_risk_decision_report(
@@ -922,6 +1715,15 @@ def test_streaming_report_covers_blocks_controls_xfa_and_clusters(tmp_path: Path
 
     assert report["integrity"]["stage3_validated_policy_count"] == 2
     assert report["integrity"]["exact_48_starts_per_scenario_and_policy"] is True
+    accounting = report["production_context"]["episode_dataset_accounting"]
+    assert accounting["canonical_account_episode_attempts"] == 192
+    assert accounting["persisted_multi_horizon_episode_rows"] == 960
+    assert accounting["per_stage"]["stage3"] == {
+        "partition_count": 2,
+        "persisted_episode_rows": 960,
+        "frozen_horizon_multiplicity": 5,
+        "derived_canonical_account_attempts": 192,
+    }
     normal_90 = report["horizon_distributions"]["normal"]["90_TRADING_DAYS"]
     assert normal_90["pass_rate_raw_lower_bound"] == pytest.approx(2 / 96)
     assert normal_90["pass_rate_evaluable"] == pytest.approx(2 / 96)
@@ -969,7 +1771,7 @@ def test_streaming_report_covers_blocks_controls_xfa_and_clusters(tmp_path: Path
     )
     assert (
         normal_standard["days_to_first_payout"]["evaluable_only"]["median"]
-        == 10.0
+        == 5.0
     )
     assert (
         normal_consistency["unconditional_lower_bound"][
@@ -984,23 +1786,66 @@ def test_streaming_report_covers_blocks_controls_xfa_and_clusters(tmp_path: Path
         == 9.375
     )
     assert report["integrity"]["full_pass_xfa_lifecycle_bijection_valid"] is True
+    assert report["integrity"][
+        "expanded_finalist_decision_metrics_rederived_from_raw_caches"
+    ] is True
     global_lifecycle = report["campaign_wide_sealed_xfa_lifecycle_totals"]
     assert global_lifecycle["scope"] == "CAMPAIGN_WIDE_SEALED_STAGE3_STAGE4_STAGE5"
-    assert global_lifecycle["totals"]["xfa_paths_started"] == 6
-    assert global_lifecycle["totals"]["xfa_paths_started"] > sum(
+    assert global_lifecycle["totals"]["xfa_paths_started"] == 4
+    assert global_lifecycle["totals"]["xfa_paths_started"] == sum(
         stage3_lifecycle[scenario]["standard"]["xfa_paths_started"]
         for scenario in ("normal", "stressed")
     )
-    assert global_lifecycle["totals"]["first_payouts"] == 12
+    assert global_lifecycle["totals"]["first_payouts"] == 8
+    assert global_lifecycle["transition_and_alternative_path_audit"] == {
+        "combine_to_xfa_transition_count": 4,
+        "alternative_path_multiplier": 2,
+        "expected_standard_plus_consistency_path_count": 8,
+        "first_payout_path_observation_count": 8,
+        "alternative_paths_without_observed_first_payout": 0,
+        "transition_to_alternative_path_identity_valid": True,
+        "first_payout_observations_within_alternative_path_bound": True,
+        "first_payout_observations_are_combine_to_xfa_transitions": False,
+        "first_payouts_above_transition_count_can_be_expected": True,
+        "duplicate_transition_inflation_detected": False,
+        "duplicate_transition_verdict_basis": (
+            "PROVED_FROM_DEEP_VERIFIED_EPISODE_PARTITIONS"
+        ),
+        "semantics": (
+            "ONE_UNIQUE_COMBINE_TO_XFA_TRANSITION_FANS_OUT_TO_TWO_MUTUALLY_"
+            "EXCLUSIVE_DIAGNOSTIC_PATHS;FIRST_PAYOUTS_COUNT_SUCCESSFUL_PATH_"
+            "OBSERVATIONS_NOT_UNIQUE_TRANSITIONS_OR_SIMULTANEOUS_REALIZABLE_"
+            "PAYOUTS"
+        ),
+        "probability_denominator_status": (
+            "AVAILABLE_BY_COST_SCENARIO_AND_PREDECLARED_PATH_FROM_DEEP_"
+            "VERIFIED_EPISODE_PARTITIONS"
+        ),
+    }
+    sealed_proof = global_lifecycle["sealed_episode_lifecycle_proof"]
+    assert sealed_proof["full_episode_count"] == 192
+    assert sealed_proof["combine_to_xfa_transition_count"] == 4
+    assert sealed_proof["alternative_path_count"] == 8
+    assert sealed_proof["stage_full_episode_counts"] == {"stage3": 192}
+    assert sealed_proof["zero_inter_stage_overlap_proved"] is True
+    assert (
+        sealed_proof[
+            "payout_eligibility_amount_and_reset_reexecuted_from_daily_ledger"
+        ]
+        is True
+    )
+    assert sealed_proof["by_scenario_and_path"]["normal"]["standard"][
+        "combine_attempts"
+    ] == 96
     assert global_lifecycle["optional_path_and_survival_breakdown"] == {
-        "xfa_standard_paths": 6,
-        "xfa_consistency_paths": 6,
-        "post_payout_survival_count": 12,
+        "xfa_standard_paths": 4,
+        "xfa_consistency_paths": 4,
+        "post_payout_survival_count": 8,
         "post_payout_survival_rate": 1.0,
     }
     assert (
         report["production_context"]["source"]
-        == "DEEP_VERIFIED_EVIDENCE_BUNDLE_AND_TERMINAL_SNAPSHOTS"
+        == "TWO_PREREGISTERED_DEEP_GUARDS_REUSED_PLUS_REPORT_RELATIONAL_REDERIVATION"
     )
 
     clustering = report["posthoc_behavioral_clustering"]
@@ -1009,6 +1854,123 @@ def test_streaming_report_covers_blocks_controls_xfa_and_clusters(tmp_path: Path
     assert clustering["clusters"][0]["member_ids"] == ["candidate-a", "candidate-b"]
     assert clustering["promotion_or_selection_effect"] is False
 
+    expanded = report["expanded_development_finalists"]
+    assert expanded["finalist_count"] == 1
+    assert expanded["expanded_matched_controls_status"] == (
+        "192_CONTROL_SUPERIORITY_NOT_ESTABLISHED"
+    )
+    finalist = expanded["rows"][0]
+    assert finalist["policy_id"] == "candidate-a"
+    assert finalist["starts_per_scenario"] == 48
+    assert finalist["effective_independent_source_block_count"] == 4
+    assert finalist["expanded_exact_account_behavior_cluster"] == (
+        "expanded_exact_account_cluster_01"
+    )
+    assert finalist["expanded_economic_behavior_cluster"].startswith(
+        "expanded_economic_behavior_"
+    )
+    assert finalist["legacy_frontier_behavior_fingerprint_rederived_exactly"] is True
+    assert finalist["cumulative_account_trade_behavior"][
+        "authoritative_raw_account_trade_behavior_fingerprint"
+    ] == finalist["sealed_cumulative_account_behavior_fingerprint"]
+    assert finalist["cumulative_account_trade_behavior"][
+        "per_scenario_observation_count"
+    ] == {"normal": 48, "stressed": 48}
+    assert expanded["cumulative_192_economic_behavior_cluster_count"] == 1
+    assert finalist["stage3_matched_control_deltas"]["scope"] == (
+        "STAGE3_ONLY_48_MATCHED_STARTS"
+    )
+    assert finalist["stage3_matched_control_deltas"][
+        "matched_starts_per_scenario"
+    ] == 48
+    assert finalist["stage3_matched_control_deltas"]["expanded_192_status"] == (
+        "192_CONTROL_SUPERIORITY_NOT_ESTABLISHED"
+    )
+    relational = finalist["normal"]["expanded_raw_relational_validation"]
+    assert relational["decision_metrics_match"] is True
+    assert relational["status"] == (
+        "EXACTLY_REDERIVED_FROM_STAGE3_STAGE4_STAGE5_RAW_CACHES"
+    )
+    assert relational[
+        "target_progress_distribution_exact_rederived"
+    ]["count"] == 48
+    assert relational["days_to_target_distribution_exact_rederived"]["count"] == 1
+    assert finalist["normal"]["consistency_ok_count"] == 36
+    coverage = finalist["source_block_coverage_exact"]
+    assert coverage["common_covered_block_ids"] == ["B1", "B2", "B3", "B4"]
+    raw_risk = finalist["risk_utilisation_exact_rederived"]
+    assert raw_risk["by_scenario"]["normal"]["observation_count"] == 192
+    assert raw_risk["by_scenario"]["stressed"]["observation_count"] == 192
+    assert raw_risk["total_all_scenarios"]["observation_count"] == 384
+    raw_suppression = finalist["suppression_exact_rederived"]
+    assert raw_suppression["by_scenario"]["normal"]["signals_emitted"] == 96
+    assert raw_suppression["by_scenario"]["stressed"]["signals_emitted"] == 96
+    assert raw_suppression["by_scenario_and_component"]["normal"]["sleeve"][
+        "signals_emitted"
+    ] == 96
+    trade_concentration = finalist["stressed"]["concentration"][
+        "trade_concentration"
+    ]
+    assert trade_concentration["selection_gate_auditable"] is True
+    assert trade_concentration["accepted_account_trade_observation_count"] == 96
+    assert trade_concentration["unique_immutable_source_trade_count"] == 96
+    assert trade_concentration["positive_source_trade_profit_denominator"] > 0.0
+    assert finalist["stressed"]["day_concentration_exact"][
+        "maximum_positive_session_day_aggregate_share"
+    ] > 0.0
+    assert set(finalist["stressed"]["market_attribution"]) == {"NQ"}
+    assert finalist["stressed"]["concentration"][
+        "maximum_market_positive_profit_share"
+    ] == 1.0
+    stressed_component = finalist["component_contribution_exact_rederived"][
+        "stressed"
+    ]
+    assert stressed_component["scope"] == (
+        "COMBINE_CANONICAL_90_DAY_STAGE3_STAGE4_STAGE5_ONLY;"
+        "XFA_COMPONENT_ATTRIBUTION_NOT_AGGREGATED"
+    )
+    assert stressed_component["additive_account_net_reconciliation"] is True
+    assert stressed_component["total"] == pytest.approx(
+        stressed_component["account_net_pnl_total"]
+    )
+    assert finalist["stressed"]["component_attribution_scope"] == (
+        stressed_component["scope"]
+    )
+    assert finalist["stressed"][
+        "component_attribution_additive_account_net_reconciliation"
+    ] is True
+    assert "XFA component attribution is not aggregated" in report[
+        "known_interpretation_limits"
+    ][-1]
+
+    frozen = report["frozen_finalist_policy_specs"]
+    assert frozen["finalist_count"] == 1
+    frozen_policy = frozen["policy_specs"][0]
+    assert frozen_policy["policy_id"] == "candidate-a"
+    assert frozen_policy["membership_row_count"] == 1
+    assert frozen_policy["membership_rows_all_contain_identical_policy"] is True
+    assert frozen_policy["active_risk_policy"]["policy_version"] == (
+        "hydra_active_risk_pool_governor_v1"
+    )
+    frozen_sleeve = frozen_policy["membership"][0]
+    assert frozen_sleeve["behavioral_fingerprint"]
+    assert frozen_sleeve["signal_ledger_sha256"] == "1" * 64
+    assert frozen_sleeve["trade_ledger_sha256"] == "2" * 64
+    assert frozen_sleeve["market"] == "NQ"
+    assert frozen_sleeve["contract"] == "NQH3"
+    assert frozen_sleeve["timeframe"] == "1m"
+    assert frozen_sleeve["session"] == "OPEN"
+    assert frozen_sleeve["source_campaign"] == "synthetic_source"
+    assert frozen_policy["combine_book"]["book"] == "COMBINE_BOOK"
+    assert frozen_policy["xfa_standard_book"]["book"] == "XFA_STANDARD_BOOK"
+    assert frozen_policy["xfa_consistency_book"]["book"] == (
+        "XFA_CONSISTENCY_BOOK"
+    )
+    assert frozen_policy["xfa_standard_book"]["xfa_profile"]["fingerprint"]
+    assert frozen_policy["xfa_standard_book"]["rule_snapshot"] == (
+        official_rule_snapshot_2026_07_15().to_dict()
+    )
+
     checked = dict(report)
     claimed = checked.pop("report_hash")
     assert canonical_hash(checked) == claimed
@@ -1016,10 +1978,28 @@ def test_streaming_report_covers_blocks_controls_xfa_and_clusters(tmp_path: Path
     assert "Expected trader payout" in markdown
     assert "Stage-3-only XFA lifecycle" in markdown
     assert "Campaign-wide sealed XFA lifecycle totals" in markdown
+    assert "Expanded development finalists" in markdown
+    assert "192 attempts versus 960 multi-horizon rows" in markdown
     assert "not one realizable combined trader path" in markdown
     assert "overlapping rolling episode starts are not independent" in markdown
     assert "B1" in markdown
     assert "candidate-a" in markdown
+
+
+def test_explicit_finalist_cardinality_fails_closed(tmp_path: Path) -> None:
+    paths = _fixture(tmp_path)
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="development finalist count is 1, expected 8",
+    ):
+        build_active_risk_decision_report(
+            manifest_path=paths["manifest"],
+            stage3_cache_dir=paths["stage3"],
+            matched_controls_path=paths["controls"],
+            halving_dir=paths["halving"],
+            expected_stage3_count=2,
+            expected_finalist_count=8,
+        )
 
 
 def test_hash_validated_terminal_result_and_state_supply_current_context(tmp_path: Path) -> None:
@@ -1040,7 +2020,9 @@ def test_hash_validated_terminal_result_and_state_supply_current_context(tmp_pat
         production_state_path=state_path,
     )
     context = report["production_context"]
-    assert context["source"] == "DEEP_VERIFIED_EVIDENCE_BUNDLE_AND_TERMINAL_SNAPSHOTS"
+    assert context["source"] == (
+        "TWO_PREREGISTERED_DEEP_GUARDS_REUSED_PLUS_REPORT_RELATIONAL_REDERIVATION"
+    )
     assert context["production_state_available"] is True
     assert context["identity_audit_status"] == "PASS"
     assert context["current_production_funnel"]["governor_proposals_generated"] == 20_000
@@ -1109,6 +2091,33 @@ def test_xfa_profile_fingerprint_corruption_fails_closed(tmp_path: Path) -> None
     lifecycle["source_lifecycle_sha256"] = canonical_hash(lifecycle)
     _reseal_batch(cache, payload)
     with pytest.raises(ActiveRiskDecisionReportError, match="profile fingerprint drift"):
+        build_active_risk_decision_report(
+            manifest_path=paths["manifest"],
+            stage3_cache_dir=paths["stage3"],
+            matched_controls_path=paths["controls"],
+            halving_dir=paths["halving"],
+            expected_stage3_count=2,
+        )
+
+
+def test_valid_but_different_xfa_profile_fails_frozen_book_binding(
+    tmp_path: Path,
+) -> None:
+    paths = _fixture(tmp_path)
+    cache = paths["stage3"] / "batch_000000.json"
+    payload = json.loads(cache.read_text(encoding="utf-8"))
+    lifecycle = payload["rows"][0]["lifecycle_rows"][0]
+    profile = lifecycle["xfa_profile"]
+    profile["risk_multiplier"] = 1.15
+    profile.pop("fingerprint")
+    profile["fingerprint"] = canonical_hash(profile)
+    lifecycle["xfa_profile_projection"]["risk_multiplier"] = 1.15
+    _reseal_lifecycle(lifecycle)
+    _reseal_batch(cache, payload)
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="XFA profile differs from the frozen finalist books",
+    ):
         build_active_risk_decision_report(
             manifest_path=paths["manifest"],
             stage3_cache_dir=paths["stage3"],
@@ -1764,6 +2773,68 @@ def test_xfa_daily_ledger_must_be_strictly_chronological() -> None:
         )
 
 
+def test_xfa_payout_eligibility_cannot_be_more_permissive_than_rules() -> None:
+    path = _xfa_path(path="XFA_STANDARD", net=900.0, start_day=20_000)
+    ledger = path["daily_ledger"]
+    assert isinstance(ledger, list)
+    ledger[0]["payout_eligible"] = True
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="payout eligibility is more permissive than frozen rules",
+    ):
+        report_module._validate_xfa_path_accounting(
+            path,
+            label="permissive-payout",
+            combine_end_day=19_999,
+            xfa_start_day=20_000,
+            rule_snapshot=official_rule_snapshot_2026_07_15().to_dict(),
+        )
+
+
+def test_xfa_pre_payout_mll_floor_cannot_be_artificially_relaxed() -> None:
+    path = _xfa_path(path="XFA_STANDARD", net=900.0, start_day=20_000)
+    ledger = path["daily_ledger"]
+    assert isinstance(ledger, list)
+    ledger[0]["mll_floor_close"] = -4_500.0
+    ledger[1]["mll_floor_open"] = -4_500.0
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="end-of-day trailing MLL floor",
+    ):
+        report_module._validate_xfa_path_accounting(
+            path,
+            label="relaxed-mll",
+            combine_end_day=19_999,
+            xfa_start_day=20_000,
+            rule_snapshot=official_rule_snapshot_2026_07_15().to_dict(),
+        )
+
+
+def test_xfa_terminal_row_must_be_final_and_match_path_terminal() -> None:
+    path = _xfa_path(path="XFA_STANDARD", net=900.0, start_day=20_000)
+    ledger = path["daily_ledger"]
+    assert isinstance(ledger, list)
+    ledger[10]["terminal"] = "MLL_BREACHED"
+    path.update(
+        {
+            "terminal": "MLL_BREACHED",
+            "terminal_reason": "synthetic_midstream_terminal",
+            "post_payout_survived": False,
+        }
+    )
+    with pytest.raises(
+        ActiveRiskDecisionReportError,
+        match="terminal row/path chronology drift",
+    ):
+        report_module._validate_xfa_path_accounting(
+            path,
+            label="post-mortem",
+            combine_end_day=19_999,
+            xfa_start_day=20_000,
+            rule_snapshot=official_rule_snapshot_2026_07_15().to_dict(),
+        )
+
+
 def test_xfa_zero_observation_account_state_must_match_rule_snapshot() -> None:
     frozen_rules = official_rule_snapshot_2026_07_15()
     rules = frozen_rules.to_dict()
@@ -1798,11 +2869,14 @@ def test_xfa_zero_observation_account_state_must_match_rule_snapshot() -> None:
 
 def test_xfa_source_rule_failure_reconciles_one_fatal_unclassified_event() -> None:
     path = _xfa_path(path="XFA_STANDARD", net=900.0, start_day=20_000)
+    ledger = path["daily_ledger"]
+    assert isinstance(ledger, list)
+    ledger[-1]["terminal"] = "HARD_RULE_FAILURE"
     path.update(
         {
             "terminal": "HARD_RULE_FAILURE",
             "terminal_reason": "source_contract_limit_violation",
-            "event_count": 11,
+            "event_count": 6,
             "post_payout_survived": False,
         }
     )
@@ -1917,6 +2991,12 @@ def test_lifecycle_censoring_and_missing_buffer_are_not_coerced() -> None:
     assert value["zero_observation_xfa_paths"] == 1
     assert value["minimum_mll_buffer"]["missing_count"] == 1
     assert value["minimum_mll_buffer"]["all_nonmissing_paths"]["count"] == 0
+    assert value["payout_cycles_by_path"]["all_started_paths"]["count"] == 1
+    assert value["payout_cycles_by_path"]["on_censored_paths"]["count"] == 1
+    assert (
+        value["payout_cycles_by_path"]["before_observed_account_closure"]["count"]
+        == 0
+    )
     assert (
         value["evaluable_only"]["denominators"][
             "xfa_paths_excluding_censored_or_zero_observation"
@@ -1962,6 +3042,35 @@ def test_lifecycle_censoring_and_missing_buffer_are_not_coerced() -> None:
         ]
         is None
     )
+    payout_then_censored_value = payout_then_censored.to_dict()
+    assert (
+        payout_then_censored_value["payout_cycles_by_path"]["on_censored_paths"][
+            "median"
+        ]
+        == 1.0
+    )
+
+    observed_closure = report_module.LifecyclePathAccumulator()
+    observed_closure.add_combine_episode(
+        {"terminal_classification": "TARGET_REACHED", "passed": True}
+    )
+    observed_closure.add_path(
+        {
+            "terminal": "MLL_BREACHED",
+            "observed_days": 20,
+            "payout_eligible": True,
+            "payout_cycles": 2,
+            "trader_net_payout": 1800.0,
+            "post_payout_survived": False,
+            "post_payout_censored": False,
+            "minimum_mll_buffer": 0.0,
+            "first_payout_day": 5,
+        }
+    )
+    closure_distribution = observed_closure.to_dict()["payout_cycles_by_path"]
+    assert closure_distribution["before_observed_account_closure"]["count"] == 1
+    assert closure_distribution["before_observed_account_closure"]["median"] == 2.0
+    assert closure_distribution["on_censored_paths"]["count"] == 0
 
 
 def test_same_economics_with_different_routed_trades_split_clusters() -> None:
@@ -2052,12 +3161,16 @@ def test_cli_defaults_use_revision_02_manifest_and_report_directory(
         / "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02"
         / "matched_controls.json"
     )
+    assert build["stage4_cache_dir"].name == "stage4_active_batches"
+    assert build["stage5_cache_dir"].name == "stage5_active_batches"
     assert build["final_result_path"] == (
         tmp_path
         / "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02"
         / "economic_production_result.json"
     )
     assert build["production_state_path"].name == "production_state.json"
+    assert build["expected_finalist_starts_per_scenario"] == 192
+    assert build["expected_finalist_count"] == 8
     written = captured["write"]
     assert isinstance(written, dict)
     assert written["json_path"].parent.name == (

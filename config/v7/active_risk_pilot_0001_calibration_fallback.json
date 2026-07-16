@@ -1,0 +1,20 @@
+{
+  "allowed_sleeve_row_sha256": {
+    "sleeve_39eb74b174e7bdd240520b9d": "f0e94d979f08e4edb188bd9cf922db6247b2d13b514d931f47e65402e5ab31f9",
+    "sleeve_3ba7422174d7e5b1c2a01d58": "104dbc22123d1a8c219a752d3b9acaede2ef5b80689a092baf07817ae09c6386",
+    "sleeve_5c45e73e41fac686c67a0443": "0c97067e481c227688855deee61d6aaca1733fddd5dae36505074cebc3e2f1b0",
+    "sleeve_617236bb4c8b7cca8a472bac": "51f86c709c97811a481877783204afb18237f66d80a24eb1883111b07d25f282",
+    "sleeve_624310a1de865cef4db2f8f4": "755b50d19ae9ee8e4e1c5fed4e383b1926b063aa9f28beb0aba61116c7852745",
+    "sleeve_65bad2088913fc9fca0a145d": "ab8fe49d3791a8d40e29a8c4a7dc9e920e2699002451694a8dace3b0c05eff35",
+    "sleeve_e017bb45b0937aef46657631": "493569891e1dcaa977122414e753ccffc32727ff8c49fa699eae87085ee0ce76"
+  },
+  "exact_replay_file_sha256": "4d7a0fbcbd0918b9dfc4ce7fb3b299ead6b976b484c0418f9835de6b1f88536c",
+  "exact_replay_path": "reports/economic_evolution/account_state_router_0011/cheap_screen_results.jsonl",
+  "fallback_reason": "ORIGINAL_CHEAP_SCREEN_LEDGER_NOT_PERSISTED",
+  "future_directory_discovery_prohibited": true,
+  "manifest_hash": "206833efb589be56649d6685e01bfebc23f1d62d120a99a4c252d5c9cd270395",
+  "outcome_fields_used": false,
+  "schema": "hydra_pilot_0001_calibration_fallback_v1",
+  "source_campaign": "hydra_economic_evolution_pilot_0001",
+  "threshold_identity_required": true
+}
