@@ -1,0 +1,26 @@
+{
+  "artifacts": {
+    "decision_report_revision_02.json": {
+      "relative_path": "decision_report_revision_02.json",
+      "sha256": "49215da42312ea823b3cbb6acffb1fa7d5ffb06748c4fc615c3e1fc198bade87",
+      "size_bytes": 36538596
+    },
+    "decision_report_revision_02.md": {
+      "relative_path": "decision_report_revision_02.md",
+      "sha256": "b0edf35066da3cef93b1568611e3c715ee03e8dc247ca1356faf5ace068d6782",
+      "size_bytes": 48740
+    }
+  },
+  "campaign_id": "hydra_active_risk_pool_target_velocity_0026",
+  "publication_contract": {
+    "artifacts_written_atomically_before_receipt": true,
+    "immutable": true,
+    "receipt_is_commit_marker": true
+  },
+  "receipt_hash": "6e9108735371b3bb9ca3565a225fbd5518b00080eaf9036050e0b3957e438bf3",
+  "report_hash": "f74bc6a842915ad53149e6d8adcbf4daab94556f567e014ed7175ac480293bcd",
+  "report_revision": "revision_02",
+  "report_schema": "hydra_active_risk_decision_report_v1",
+  "schema_version": "hydra_active_risk_decision_report_seal_v1",
+  "sealed_at_utc": "2026-07-16T15:00:41.760398Z"
+}

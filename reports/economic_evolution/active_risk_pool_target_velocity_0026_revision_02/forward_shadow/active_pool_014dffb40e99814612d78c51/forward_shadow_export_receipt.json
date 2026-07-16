@@ -1,0 +1,38 @@
+{
+  "artifacts": {
+    "binding_audit.json": {
+      "relative_path": "binding_audit.json",
+      "sha256": "261ad22ef5586893ff56e22f0fbab646f9acb331cb3d05fab823bc72655b2e0a",
+      "size_bytes": 23187
+    },
+    "shadow_package.json": {
+      "relative_path": "shadow_package.json",
+      "sha256": "826065f082b652d2875e35490ec1bbd64b765c4408aaba6561d1b268c649798f",
+      "size_bytes": 651748
+    },
+    "shadow_package.md": {
+      "relative_path": "shadow_package.md",
+      "sha256": "d232b9a03a6a6284c99367f88c08489d57d287d2fef0d7ef456dc46f504c1a82",
+      "size_bytes": 482
+    }
+  },
+  "binding_audit_hash": "6ed6a186c1b18c5145da1245e247239805842c1e40f03012bf65658a99509e57",
+  "freeze_timestamp_utc": "2026-07-16T15:06:22.608387Z",
+  "package_hash": "fbc57d0acf0140e491d475390741a3fc3869aca91d1bbc5002f693c5f361b72e",
+  "policy_id": "active_pool_014dffb40e99814612d78c51",
+  "publication_contract": {
+    "immutable": true,
+    "package_and_audit_written_before_receipt": true,
+    "receipt_is_commit_marker": true
+  },
+  "receipt_hash": "5aae3ad1edf0cf29e577ffc2fa1f1ab5bc69dd2424b2456d9b96426266aeefe4",
+  "safety": {
+    "broker_connectivity": false,
+    "new_data_purchase_authorized": false,
+    "outbound_order_capability": false,
+    "paper_shadow_ready": false,
+    "q4_access_authorized": false
+  },
+  "schema": "hydra_active_risk_forward_shadow_export_seal_v1",
+  "status": "FORWARD_SHADOW_CANDIDATE"
+}

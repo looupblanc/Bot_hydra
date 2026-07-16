@@ -1,0 +1,27 @@
+{
+  "artifact": {
+    "relative_path": "frozen_book_selection_revision_02.json",
+    "sha256": "6f730df71e74208df66770538f4033b805a9f45b6d06e91e330e7074d2b2d423",
+    "size_bytes": 395888
+  },
+  "campaign_id": "hydra_active_risk_pool_target_velocity_0026",
+  "publication_contract": {
+    "immutable": true,
+    "receipt_is_commit_marker": true,
+    "selection_written_atomically_before_receipt": true
+  },
+  "receipt_hash": "b3308b15bc22d3c2571e023a14acf3442c04eee38c8be9aa4f4e9e406b3eafab",
+  "schema": "hydra_frozen_book_selection_seal_v1",
+  "sealed_at_utc": "2026-07-16T15:01:13.049590Z",
+  "selection_manifest_hash": "114097f2e659a1fd50223fdd0758ef6f2a44776ff4fc4f6a1b48b87152730dd4",
+  "source_decision_report": {
+    "json_sha256": "49215da42312ea823b3cbb6acffb1fa7d5ffb06748c4fc615c3e1fc198bade87",
+    "report_hash": "f74bc6a842915ad53149e6d8adcbf4daab94556f567e014ed7175ac480293bcd",
+    "report_json_name": "decision_report_revision_02.json",
+    "seal_receipt_hash": "6e9108735371b3bb9ca3565a225fbd5518b00080eaf9036050e0b3957e438bf3",
+    "seal_receipt_name": "decision_report_revision_02_seal_receipt.json",
+    "seal_receipt_sha256": "fffb3900c49394c57fb40706558b73cfd5f588f6d703d7a108e7cba7d0ec6828",
+    "sealed_at_utc": "2026-07-16T15:00:41.760398Z",
+    "verified_before_selection": true
+  }
+}
