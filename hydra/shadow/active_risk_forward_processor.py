@@ -3,10 +3,11 @@
 The processor consumes only canonical closed 1-minute bars already present in
 ``forward_bars.db``.  It never fetches data and never submits an order.  The
 current adapter proves post-freeze bar identity, closed-bar resampling and the
-frozen feature/binding contract.  Exact online feature/signal equivalence has
-not yet been established, so every persisted decision remains fail-closed:
-either ``WARMUP_PENDING`` or ``SIGNAL_ENGINE_NOT_PROVEN_FAIL_CLOSED`` with zero
-signals, fills and account mutation.
+frozen feature/binding contract.  Before an exact sealed F0 equivalence proof
+exists it does not consume a bar or advance an evidence ledger.  A
+present-but-invalid proof is an integrity error, while an absent proof is an
+ordinary fail-closed waiting state with zero signals, fills and account
+mutation.
 """
 
 from __future__ import annotations
@@ -61,6 +62,8 @@ def run_active_risk_forward_processor(
     forward_store_path: str | Path,
     state_dir: str | Path,
     observed_at: datetime,
+    equivalence_proof_path: str | Path | None = None,
+    operating_package_manifest_hash: str | None = None,
 ) -> dict[str, Any]:
     """Process all unseen complete post-freeze decision minutes once."""
 
@@ -85,6 +88,25 @@ def run_active_risk_forward_processor(
         )
         for row in package_rows
     }
+    equivalence = _verified_equivalence_or_none(
+        root,
+        equivalence_proof_path=equivalence_proof_path,
+        operating_package_manifest_hash=operating_package_manifest_hash,
+        expected_package_ids=tuple(sorted(packages)),
+        boundary_manifest_sha256=str(boundary_manifest_sha256),
+    )
+    if equivalence is None:
+        return _f0_pending_result(
+            root=root,
+            state_root=state_root,
+            store_path=store_path,
+            observed=observed,
+            boundary_path=boundary_path,
+            boundary_manifest_sha256=str(boundary_manifest_sha256),
+            package_rows=package_rows,
+            packages=packages,
+        )
+    equivalence_proof_hash = str(equivalence["proof_hash"])
     all_roots = tuple(
         sorted(
             {
@@ -123,6 +145,9 @@ def run_active_risk_forward_processor(
             candidate_id=candidate_id,
             package_hash=package.package_hash,
             freeze_timestamp_utc=package.freeze_timestamp_utc,
+        )
+        _require_f0_bound_event_ledger(
+            existing, equivalence_proof_hash=equivalence_proof_hash
         )
         last_decision = (
             _utc(existing[-1]["decision_at_utc"]) if existing else None
@@ -187,11 +212,11 @@ def run_active_risk_forward_processor(
                     "feature_dag_hash": FEATURE_DAG_HASH,
                     "binding_count": len(reconstructed.frozen_signal_bindings),
                     "threshold_recalibration_performed": False,
-                    "online_feature_equivalence_proven": False,
-                    "reason": (
-                        "EXACT_ONLINE_FEATURE_SIGNAL_AND_SESSION_EQUIVALENCE_"
-                        "NOT_YET_PROVEN"
+                    "online_feature_equivalence_proven": True,
+                    "online_offline_equivalence_proof_hash": (
+                        equivalence_proof_hash
                     ),
+                    "reason": "ONLINE_OFFLINE_EQUIVALENCE_PROVEN",
                 },
                 "signal": {
                     "evaluated": False,
@@ -267,6 +292,9 @@ def run_active_risk_forward_processor(
     result: dict[str, Any] = {
         "schema": RESULT_SCHEMA,
         "processor_version": PROCESSOR_VERSION,
+        "f0_status": "ONLINE_OFFLINE_EQUIVALENCE_PROVEN",
+        "online_offline_equivalence_proven": True,
+        "online_offline_equivalence_proof_hash": equivalence_proof_hash,
         "scientific_conclusion": conclusion,
         "observed_at_utc": observed.isoformat(),
         "boundary_manifest_path": str(boundary_path),
@@ -285,6 +313,218 @@ def run_active_risk_forward_processor(
     }
     result["result_hash"] = stable_hash(result)
     return result
+
+
+def _verified_equivalence_or_none(
+    root: Path,
+    *,
+    equivalence_proof_path: str | Path | None,
+    operating_package_manifest_hash: str | None,
+    expected_package_ids: Sequence[str],
+    boundary_manifest_sha256: str,
+) -> dict[str, Any] | None:
+    """Return a fully verified F0 proof, or ``None`` when it is not published.
+
+    Absence is an ordinary fail-closed state.  Once a proof file exists, any
+    parse, binding, mismatch or hash failure is an integrity error; it must not
+    be downgraded to another waiting state.
+    """
+
+    if equivalence_proof_path is None:
+        return None
+    proof_path = _inside(
+        root, equivalence_proof_path, label="online/offline equivalence proof"
+    )
+    if not proof_path.is_file():
+        return None
+    manifest_hash = str(operating_package_manifest_hash or "")
+    if len(manifest_hash) != 64:
+        raise ActiveRiskForwardProcessorError(
+            "operating-package manifest hash is required for F0 verification"
+        )
+    try:
+        from hydra.shadow.active_risk_online_equivalence import (
+            ActiveRiskOnlineEquivalenceError,
+            verify_active_risk_online_equivalence_proof,
+        )
+    except ImportError as exc:
+        raise ActiveRiskForwardProcessorError(
+            "online/offline equivalence verifier is unavailable"
+        ) from exc
+    try:
+        verified = verify_active_risk_online_equivalence_proof(
+            proof_path,
+            repository_root=root,
+            expected_package_manifest_hash=manifest_hash,
+            expected_package_ids=tuple(expected_package_ids),
+            expected_boundary_manifest_sha256=str(boundary_manifest_sha256),
+        )
+    except (OSError, ValueError, ActiveRiskOnlineEquivalenceError) as exc:
+        raise ActiveRiskForwardProcessorError(
+            f"online/offline equivalence proof integrity failure: {exc}"
+        ) from exc
+    if (
+        verified.get("status") != "ONLINE_OFFLINE_EQUIVALENCE_PROVEN"
+        or not str(verified.get("proof_hash") or "")
+    ):
+        raise ActiveRiskForwardProcessorError(
+            "online/offline equivalence proof did not authorize F0"
+        )
+    return dict(verified)
+
+
+def _f0_pending_result(
+    *,
+    root: Path,
+    state_root: Path,
+    store_path: Path,
+    observed: datetime,
+    boundary_path: Path,
+    boundary_manifest_sha256: str,
+    package_rows: Sequence[Mapping[str, Any]],
+    packages: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Describe the F0 gate without consuming a bar or advancing a ledger."""
+
+    candidates: list[dict[str, Any]] = []
+    total_preexisting = 0
+    for row in package_rows:
+        candidate_id = str(row["candidate_id"])
+        package = packages[candidate_id].package
+        ledger_path = _ledger_path(root, state_root, package.observability)
+        existing = _validate_event_ledger(
+            ledger_path,
+            candidate_id=candidate_id,
+            package_hash=package.package_hash,
+            freeze_timestamp_utc=package.freeze_timestamp_utc,
+        )
+        _require_legacy_pre_f0_warmup_only(existing)
+        total_preexisting += len(existing)
+        candidates.append(
+            {
+                "candidate_id": candidate_id,
+                "freeze_timestamp_utc": package.freeze_timestamp_utc,
+                "required_roots": [str(value) for value in row["required_roots"]],
+                "post_freeze_bar_count": 0,
+                "complete_decision_minute_count": 0,
+                "events_preexisting": len(existing),
+                "events_appended": 0,
+                "latest_decision_at_utc": (
+                    existing[-1]["decision_at_utc"] if existing else None
+                ),
+                "latest_status": "F0_EQUIVALENCE_REQUIRED_FAIL_CLOSED",
+                "ledger_path": str(ledger_path),
+                "legacy_pre_f0_warmup_events_bound": len(existing),
+                "legacy_pre_f0_event_chain_tip": (
+                    existing[-1]["event_hash"] if existing else None
+                ),
+                "signals_emitted": 0,
+                "virtual_fills_created": 0,
+                "account_mutations": 0,
+            }
+        )
+    result: dict[str, Any] = {
+        "schema": RESULT_SCHEMA,
+        "processor_version": PROCESSOR_VERSION,
+        "f0_status": "ONLINE_OFFLINE_EQUIVALENCE_PENDING",
+        "online_offline_equivalence_proven": False,
+        "online_offline_equivalence_proof_hash": None,
+        "scientific_conclusion": "F0_EQUIVALENCE_REQUIRED_FAIL_CLOSED",
+        "observed_at_utc": observed.isoformat(),
+        "boundary_manifest_path": str(boundary_path),
+        "boundary_manifest_sha256": boundary_manifest_sha256,
+        "forward_store": {
+            "schema": STORE_SCHEMA,
+            "exists": store_path.is_file(),
+            "inspection_status": "NOT_CONSUMED_BEFORE_F0",
+            "sqlite_integrity": None,
+            "eligible_bar_count": None,
+        },
+        "candidate_count": len(candidates),
+        "candidates": candidates,
+        "events_preexisting": total_preexisting,
+        "events_appended": 0,
+        "signals_emitted": 0,
+        "virtual_fills_created": 0,
+        "account_mutations": 0,
+        "broker_connections": 0,
+        "outbound_orders": 0,
+        "q4_access_delta": 0,
+        "market_data_purchase_delta_usd": 0.0,
+    }
+    result["result_hash"] = stable_hash(result)
+    return result
+
+
+def _require_legacy_pre_f0_warmup_only(
+    rows: Sequence[Mapping[str, Any]],
+) -> None:
+    """Accept only the already-durable v1 zero-action warmup prefix.
+
+    Eight events per book were durably appended by the original warmup adapter
+    before the F0 receipt gate was deployed.  They are retained as immutable
+    provenance and may seed causal warmup, but they never authorize an action
+    and are never silently migrated or rewritten.
+    """
+
+    for row in rows:
+        if (
+            row.get("schema") != EVENT_SCHEMA
+            or row.get("processor_version") != PROCESSOR_VERSION
+            or row.get("decision_status") != "WARMUP_PENDING"
+            or (row.get("causal_warmup") or {}).get(
+                "market_data_warmup_complete"
+            )
+            is not False
+            or (row.get("frozen_feature_contract") or {}).get(
+                "online_feature_equivalence_proven"
+            )
+            is not False
+            or (row.get("signal") or {}).get("evaluated") is not False
+            or (row.get("signal") or {}).get("emitted") is not False
+            or (row.get("fill") or {}).get("evaluated") is not False
+            or (row.get("fill") or {}).get("created") is not False
+            or (row.get("account") or {}).get("mutated") is not False
+        ):
+            raise ActiveRiskForwardProcessorError(
+                "pre-F0 ledger is not an immutable zero-action warmup prefix"
+            )
+
+
+def _require_f0_bound_event_ledger(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    equivalence_proof_hash: str,
+) -> None:
+    """Bind the legacy warmup prefix and every later row to one F0 proof."""
+
+    seen_f0 = False
+    for row in rows:
+        feature = row.get("frozen_feature_contract") or {}
+        legacy = (
+            row.get("decision_status") == "WARMUP_PENDING"
+            and feature.get("online_feature_equivalence_proven") is False
+            and (row.get("causal_warmup") or {}).get(
+                "market_data_warmup_complete"
+            )
+            is False
+        )
+        if legacy:
+            if seen_f0:
+                raise ActiveRiskForwardProcessorError(
+                    "legacy pre-F0 warmup event appears after an F0-bound event"
+                )
+            _require_legacy_pre_f0_warmup_only((row,))
+            continue
+        seen_f0 = True
+        if (
+            feature.get("online_feature_equivalence_proven") is not True
+            or feature.get("online_offline_equivalence_proof_hash")
+            != equivalence_proof_hash
+        ):
+            raise ActiveRiskForwardProcessorError(
+                "forward event is not bound to the verified F0 proof"
+            )
 
 
 def _read_verified_bars(

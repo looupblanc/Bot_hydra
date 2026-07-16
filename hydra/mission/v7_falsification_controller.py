@@ -2882,6 +2882,37 @@ class V7FalsificationController:
         state_root = self.paths.state_dir / "operating_package_v1_forward"
         update_root = state_root / "append_update"
         processor_path = state_root / "processor_result.json"
+        equivalence_proof_path = (
+            self.paths.state_dir
+            / "operating_package_v1_parity"
+            / "online_offline_equivalence_receipt.json"
+        )
+        equivalence_proof: dict[str, Any] | None = None
+        if equivalence_proof_path.is_file():
+            try:
+                from hydra.shadow.active_risk_online_equivalence import (
+                    verify_active_risk_online_equivalence_proof,
+                )
+
+                equivalence_proof = dict(
+                    verify_active_risk_online_equivalence_proof(
+                        equivalence_proof_path,
+                        repository_root=self.root,
+                        expected_package_manifest_hash=str(
+                            package["manifest_hash"]
+                        ),
+                        expected_package_ids=tuple(
+                            sorted(str(row["policy_id"]) for row in package["books"])
+                        ),
+                        expected_boundary_manifest_sha256=str(
+                            binding["active_risk_boundary"]["sha256"]
+                        ),
+                    )
+                )
+            except Exception as exc:
+                raise V7ControllerIntegrityError(
+                    f"online/offline equivalence proof integrity failure: {exc}"
+                ) from exc
         try:
             result = run_databento_forward_update(
                 update_root,
@@ -2948,21 +2979,16 @@ class V7FalsificationController:
                 ),
                 state_dir=self.root / "shadow/state",
                 observed_at=now,
+                equivalence_proof_path=equivalence_proof_path,
+                operating_package_manifest_hash=str(package["manifest_hash"]),
             )
             signals = int(processor["signals_emitted"])
             virtual_fills = int(processor["virtual_fills_created"])
             account_mutations = int(processor["account_mutations"])
-            if (
-                int(processor.get("broker_connections", -1)) != 0
-                or int(processor.get("outbound_orders", -1)) != 0
-                or int(processor.get("q4_access_delta", -1)) != 0
-                or signals != 0
-                or virtual_fills != 0
-                or account_mutations != 0
-            ):
-                raise V7ControllerIntegrityError(
-                    "unproven forward processor escaped its fail-closed contract"
-                )
+            processor_proof_hash = _validate_operating_forward_processor_gate(
+                processor,
+                equivalence_proof=equivalence_proof,
+            )
             _atomic_json(processor_path, processor)
             suggested = datetime.fromisoformat(
                 str(result["next_check_at_utc"]).replace("Z", "+00:00")
@@ -2984,6 +3010,10 @@ class V7FalsificationController:
                     "package_manifest_hash": package["manifest_hash"],
                     "update_result_hash": result["result_hash"],
                     "processor_result_hash": processor["result_hash"],
+                    "f0_status": processor["f0_status"],
+                    "online_offline_equivalence_proof_hash": (
+                        processor_proof_hash
+                    ),
                     "fresh_bars": int(result["fresh_forward_bars_processed"]),
                     "events_appended": int(processor["events_appended"]),
                     "signals": signals,
@@ -3002,6 +3032,10 @@ class V7FalsificationController:
                 **dict(action),
                 "operating_package_forward": {
                     "state": status,
+                    "f0_status": processor["f0_status"],
+                    "online_offline_equivalence_proof_hash": (
+                        processor_proof_hash
+                    ),
                     "fresh_bars": int(result["fresh_forward_bars_processed"]),
                     "events_appended": int(processor["events_appended"]),
                     "signals_emitted": signals,
@@ -3412,6 +3446,57 @@ class V7FalsificationController:
 
 def run_v7_controller(config: V7ControllerConfig) -> int:
     return V7FalsificationController(config).run()
+
+
+def _validate_operating_forward_processor_gate(
+    processor: Mapping[str, Any],
+    *,
+    equivalence_proof: Mapping[str, Any] | None,
+) -> str | None:
+    """Enforce F0 and zero-order safety independently of economic counters."""
+
+    signals = int(processor.get("signals_emitted", -1))
+    fills = int(processor.get("virtual_fills_created", -1))
+    account_mutations = int(processor.get("account_mutations", -1))
+    events_appended = int(processor.get("events_appended", -1))
+    processor_f0_proven = bool(
+        processor.get("online_offline_equivalence_proven") is True
+        and processor.get("f0_status") == "ONLINE_OFFLINE_EQUIVALENCE_PROVEN"
+    )
+    proof_hash = (
+        None
+        if equivalence_proof is None
+        else str(equivalence_proof.get("proof_hash") or "")
+    )
+    processor_proof_hash = processor.get(
+        "online_offline_equivalence_proof_hash"
+    )
+    safety_drift = (
+        int(processor.get("broker_connections", -1)) != 0
+        or int(processor.get("outbound_orders", -1)) != 0
+        or int(processor.get("q4_access_delta", -1)) != 0
+        or min(signals, fills, account_mutations, events_appended) < 0
+    )
+    f0_binding_drift = (
+        (equivalence_proof is None and processor_f0_proven)
+        or (
+            equivalence_proof is not None
+            and (
+                not processor_f0_proven
+                or not proof_hash
+                or processor_proof_hash != proof_hash
+            )
+        )
+    )
+    pre_f0_action = equivalence_proof is None and any(
+        value != 0
+        for value in (events_appended, signals, fills, account_mutations)
+    )
+    if safety_drift or f0_binding_drift or pre_f0_action:
+        raise V7ControllerIntegrityError(
+            "forward processor escaped its F0 or zero-order safety contract"
+        )
+    return None if processor_proof_hash is None else str(processor_proof_hash)
 
 
 def _verify_database_integrity(conn: sqlite3.Connection) -> None:

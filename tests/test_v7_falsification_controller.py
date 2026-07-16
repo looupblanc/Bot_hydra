@@ -18,6 +18,7 @@ from hydra.mission.v7_falsification_controller import (
     V7ControllerConfig,
     V7ControllerIntegrityError,
     V7FalsificationController,
+    _validate_operating_forward_processor_gate,
     _classify_v71_power_aware_action,
     classify_v7_action,
 )
@@ -61,6 +62,83 @@ def test_operating_forward_waits_for_receipt_commit_marker(tmp_path: Path) -> No
     )
 
     assert observed == action
+
+
+def _forward_processor_gate_row(**overrides: object) -> dict[str, object]:
+    row: dict[str, object] = {
+        "f0_status": "ONLINE_OFFLINE_EQUIVALENCE_PENDING",
+        "online_offline_equivalence_proven": False,
+        "online_offline_equivalence_proof_hash": None,
+        "signals_emitted": 0,
+        "virtual_fills_created": 0,
+        "account_mutations": 0,
+        "events_appended": 0,
+        "broker_connections": 0,
+        "outbound_orders": 0,
+        "q4_access_delta": 0,
+    }
+    row.update(overrides)
+    return row
+
+
+def test_operating_forward_gate_forbids_actions_before_f0() -> None:
+    assert (
+        _validate_operating_forward_processor_gate(
+            _forward_processor_gate_row(), equivalence_proof=None
+        )
+        is None
+    )
+    with pytest.raises(V7ControllerIntegrityError, match="F0"):
+        _validate_operating_forward_processor_gate(
+            _forward_processor_gate_row(signals_emitted=1),
+            equivalence_proof=None,
+        )
+    with pytest.raises(V7ControllerIntegrityError, match="F0"):
+        _validate_operating_forward_processor_gate(
+            _forward_processor_gate_row(events_appended=1),
+            equivalence_proof=None,
+        )
+
+
+def test_operating_forward_gate_allows_virtual_actions_only_with_bound_f0() -> None:
+    proof_hash = "a" * 64
+    observed = _validate_operating_forward_processor_gate(
+        _forward_processor_gate_row(
+            f0_status="ONLINE_OFFLINE_EQUIVALENCE_PROVEN",
+            online_offline_equivalence_proven=True,
+            online_offline_equivalence_proof_hash=proof_hash,
+            signals_emitted=2,
+            virtual_fills_created=1,
+            account_mutations=1,
+        ),
+        equivalence_proof={"proof_hash": proof_hash},
+    )
+    assert observed == proof_hash
+
+    with pytest.raises(V7ControllerIntegrityError, match="F0"):
+        _validate_operating_forward_processor_gate(
+            _forward_processor_gate_row(
+                f0_status="ONLINE_OFFLINE_EQUIVALENCE_PROVEN",
+                online_offline_equivalence_proven=True,
+                online_offline_equivalence_proof_hash="b" * 64,
+            ),
+            equivalence_proof={"proof_hash": proof_hash},
+        )
+
+
+def test_operating_forward_gate_never_allows_orders_broker_or_q4() -> None:
+    proof_hash = "a" * 64
+    for field in ("outbound_orders", "broker_connections", "q4_access_delta"):
+        with pytest.raises(V7ControllerIntegrityError, match="zero-order"):
+            _validate_operating_forward_processor_gate(
+                _forward_processor_gate_row(
+                    f0_status="ONLINE_OFFLINE_EQUIVALENCE_PROVEN",
+                    online_offline_equivalence_proven=True,
+                    online_offline_equivalence_proof_hash=proof_hash,
+                    **{field: 1},
+                ),
+                equivalence_proof={"proof_hash": proof_hash},
+            )
 
 
 def test_null_tribunal_pivots_at_class_level(tmp_path: Path) -> None:

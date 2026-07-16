@@ -41,6 +41,8 @@ from hydra.shadow.active_risk_forward_boundary import (
 )
 from hydra.shadow.active_risk_forward_processor import (
     ActiveRiskForwardProcessorError,
+    EVENT_SCHEMA,
+    PROCESSOR_VERSION,
     run_active_risk_forward_processor,
 )
 from hydra.shadow.contract_resolver import ContractResolution, ResolvedContract
@@ -964,7 +966,7 @@ def test_active_risk_forward_boundary_binds_exactly_six_packages(
         validate_active_risk_forward_boundary(changed, repository_root=tmp_path)
 
 
-def test_active_risk_forward_processor_persists_only_warmup_no_action_events(
+def test_active_risk_forward_processor_does_not_consume_bars_before_f0(
     tmp_path: Path,
 ) -> None:
     packages = _six_forward_packages(tmp_path)
@@ -1019,42 +1021,62 @@ def test_active_risk_forward_processor_persists_only_warmup_no_action_events(
     )
 
     assert result["candidate_count"] == 6
-    assert result["events_appended"] == 48
+    assert result["f0_status"] == "ONLINE_OFFLINE_EQUIVALENCE_PENDING"
+    assert result["online_offline_equivalence_proven"] is False
+    assert result["scientific_conclusion"] == "F0_EQUIVALENCE_REQUIRED_FAIL_CLOSED"
+    assert result["events_appended"] == 0
     assert result["signals_emitted"] == 0
     assert result["virtual_fills_created"] == 0
     assert result["account_mutations"] == 0
+    assert result["forward_store"] == {
+        "schema": "hydra_forward_bar_store_v1",
+        "exists": True,
+        "inspection_status": "NOT_CONSUMED_BEFORE_F0",
+        "sqlite_integrity": None,
+        "eligible_bar_count": None,
+    }
     for candidate in result["candidates"]:
         ledger = Path(candidate["ledger_path"])
-        events = [json.loads(line) for line in ledger.read_text().splitlines()]
-        assert len(events) == 8
-        event = events[0]
-        assert event["decision_at_utc"] == "2026-07-15T12:03:00+00:00"
-        assert event["decision_status"] == "WARMUP_PENDING"
-        assert event["causal_warmup"]["pre_freeze_rows_used"] == 0
-        assert event["frozen_feature_contract"][
-            "online_feature_equivalence_proven"
-        ] is False
-        assert event["signal"]["emitted"] is False
-        assert event["fill"]["created"] is False
-        assert event["account"]["mutated"] is False
-        assert event["safety"]["outbound_orders"] == 0
-        assert event["safety"]["broker_connections"] == 0
-        latest = events[-1]
-        assert latest["decision_at_utc"] == "2026-07-15T12:10:00+00:00"
-        assert all(
-            latest["closed_bar_resampling"]["5m"][root][
-                "complete_bar_count"
-            ]
-            == 1
-            for root in roots
+        assert not ledger.exists()
+        assert candidate["events_appended"] == 0
+        assert candidate["latest_status"] == "F0_EQUIVALENCE_REQUIRED_FAIL_CLOSED"
+
+    legacy_candidate = result["candidates"][0]
+    legacy_boundary = next(
+        row
+        for row in manifest["candidates"]
+        if row["candidate_id"] == legacy_candidate["candidate_id"]
+    )
+    legacy_ledger = Path(legacy_candidate["ledger_path"])
+    legacy_ledger.parent.mkdir(parents=True, exist_ok=True)
+    legacy_decision = (
+        datetime.fromisoformat(
+            str(legacy_candidate["freeze_timestamp_utc"]).replace("Z", "+00:00")
         )
-        assert all(
-            event["closed_bar_resampling"]["5m"][root][
-                "complete_bar_count"
-            ]
-            == 0
-            for root in roots
-        )
+        + timedelta(minutes=1)
+    ).isoformat()
+    legacy_event = {
+        "schema": EVENT_SCHEMA,
+        "processor_version": PROCESSOR_VERSION,
+        "candidate_id": legacy_candidate["candidate_id"],
+        "package_hash": legacy_boundary["package_hash"],
+        "freeze_timestamp_utc": legacy_candidate["freeze_timestamp_utc"],
+        "decision_at_utc": legacy_decision,
+        "decision_status": "WARMUP_PENDING",
+        "causal_warmup": {"market_data_warmup_complete": False},
+        "frozen_feature_contract": {
+            "online_feature_equivalence_proven": False
+        },
+        "signal": {"evaluated": False, "emitted": False},
+        "fill": {"evaluated": False, "created": False},
+        "account": {"mutated": False},
+        "safety": {"outbound_orders": 0, "broker_connections": 0},
+        "previous_event_hash": "0" * 64,
+    }
+    legacy_event["event_hash"] = stable_hash(legacy_event)
+    legacy_ledger.write_text(
+        json.dumps(legacy_event, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
     repeated = run_active_risk_forward_processor(
         repository_root=tmp_path,
@@ -1065,21 +1087,26 @@ def test_active_risk_forward_processor_persists_only_warmup_no_action_events(
         observed_at=observed,
     )
     assert repeated["events_appended"] == 0
+    assert repeated["events_preexisting"] == 1
     assert repeated["signals_emitted"] == 0
+    rebound = next(
+        row
+        for row in repeated["candidates"]
+        if row["candidate_id"] == legacy_candidate["candidate_id"]
+    )
+    assert rebound["events_preexisting"] == 1
+    assert rebound["latest_decision_at_utc"] == legacy_decision
+    assert rebound["legacy_pre_f0_event_chain_tip"] == legacy_event["event_hash"]
 
-    tampered_ledger = Path(result["candidates"][0]["ledger_path"])
-    tampered_rows = [
-        json.loads(line) for line in tampered_ledger.read_text().splitlines()
-    ]
-    tampered_rows[-1]["signal"]["emitted"] = True
-    tampered_rows[-1].pop("event_hash")
-    tampered_rows[-1]["event_hash"] = stable_hash(tampered_rows[-1])
-    tampered_ledger.write_text(
-        "".join(json.dumps(row, sort_keys=True) + "\n" for row in tampered_rows),
-        encoding="utf-8",
+    legacy_event["signal"]["emitted"] = True
+    legacy_event.pop("event_hash")
+    legacy_event["event_hash"] = stable_hash(legacy_event)
+    legacy_ledger.write_text(
+        json.dumps(legacy_event, sort_keys=True) + "\n", encoding="utf-8"
     )
     with pytest.raises(
-        ActiveRiskForwardProcessorError, match="safety contract drift"
+        ActiveRiskForwardProcessorError,
+        match="safety contract drift|pre-F0 ledger",
     ):
         run_active_risk_forward_processor(
             repository_root=tmp_path,
