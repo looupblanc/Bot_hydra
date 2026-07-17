@@ -1,0 +1,51 @@
+{
+  "schema": "hydra_mission_lightweight_checkpoint_v1",
+  "checkpoint_id": "decisive-feasibility-microstructure-0030-preflight-20260717T234300Z",
+  "timestamp_utc": "2026-07-17T23:43:00Z",
+  "mission_id": "HYDRA-V7-FALSIFICATION",
+  "git_head": "81fbd922a09d8872c89d3777b4daa15f6b034ca4",
+  "origin_main": "81f05ec9d7cd796ff91fd14d15760322c2924275",
+  "service": {
+    "unit": "hydra-autonomous-mission.service",
+    "active_state": "failed",
+    "sub_state": "failed",
+    "result": "timeout",
+    "main_pid": 0,
+    "manual_authoritative_writer_pid": 239226,
+    "manual_writer_purpose": "fast-pass-0029-revision05-evidence-bundle-finalization",
+    "controller_count": 0,
+    "writer_count": 1
+  },
+  "mission_db": {
+    "path": "mission/state/hydra_mission.db",
+    "integrity_check": "ok",
+    "sha256": "1021463216a2278d7f942a9b90311f904dd8d762828c4346324ac1238870a2f3"
+  },
+  "campaign_0029": {
+    "campaign_id": "hydra_fast_pass_factory_0029",
+    "terminal_scientific_status": "FAST_PASS_FACTORY_DATA_REPRESENTATION_LIMITED",
+    "economic_evidence_regeneration_allowed": false,
+    "manifest_path": "config/v7/fast_pass_factory_0029_revision_05.json",
+    "manifest_sha256": "8a2b730c37d6dbe8a5bdf341dce91455966a4d204dd8f0f63669efc4d653432e",
+    "terminal_recovery_payload_path": "reports/economic_evolution/fast_pass_factory_0029_revision_05/terminal_recovery_payload.json",
+    "terminal_recovery_payload_sha256": "63d1e074ada79b14e8cd1df41df5b30c01881a13db0d6b7611a7814b38eba43a",
+    "production_state_sha256": "6c3ed236058e5b18f73a7b734689eb6bed8974d14408dcefe61f2d3b607e28b5",
+    "production_kpis_sha256": "a899bbd0b24b5b4ca68ef0388998b318593668a64d2f9e94e2cce932e97521bf",
+    "evidence_bundle_finalization": "RUNNING"
+  },
+  "data_governance": {
+    "q4_access_allowed": false,
+    "new_purchase_before_phase_a": false,
+    "maximum_initial_microstructure_spend_usd": 10.0,
+    "minimum_budget_reserve_usd": 25.0,
+    "remaining_hard_cap_budget_usd": 37.14710039645801,
+    "spend_ledger_sha256": "5ae1a39728f9aecf59b7c25d0f572840b998de236069c7df1610e586b645e98b",
+    "access_ledger_sha256": "799b0cb3e72fa4a2eca4e0aafb16ffe512217e585f8651084b60bb0da724d0c4"
+  },
+  "safety": {
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "live_trading_allowed": false,
+    "phase_a_consumes_immutable_0029_ledgers_only": true
+  }
+}
