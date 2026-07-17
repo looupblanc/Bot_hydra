@@ -28,6 +28,7 @@ FAST_PASS_TECHNICAL_REVISION_ID = "hydra_fast_pass_factory_0029_revision_01"
 FAST_PASS_TECHNICAL_REVISION_02_ID = "hydra_fast_pass_factory_0029_revision_02"
 FAST_PASS_TECHNICAL_REVISION_03_ID = "hydra_fast_pass_factory_0029_revision_03"
 FAST_PASS_TECHNICAL_REVISION_04_ID = "hydra_fast_pass_factory_0029_revision_04"
+FAST_PASS_TECHNICAL_REVISION_05_ID = "hydra_fast_pass_factory_0029_revision_05"
 FAST_PASS_ORIGINAL_MANIFEST_HASH = (
     "47465e3c7ee39c76660fb57b83db709c799d11ba22b1a49b9cac01dd437a31ec"
 )
@@ -698,6 +699,8 @@ def _technical_revision_output(manifest: Mapping[str, Any]) -> str:
             "reports/economic_evolution/fast_pass_factory_0029_revision_03",
         FAST_PASS_TECHNICAL_REVISION_04_ID:
             "reports/economic_evolution/fast_pass_factory_0029_revision_04",
+        FAST_PASS_TECHNICAL_REVISION_05_ID:
+            "reports/economic_evolution/fast_pass_factory_0029_revision_05",
     }
     try:
         return outputs[str(revision_id)]
@@ -721,6 +724,7 @@ def _validate_technical_repair(
         FAST_PASS_TECHNICAL_REVISION_02_ID,
         FAST_PASS_TECHNICAL_REVISION_03_ID,
         FAST_PASS_TECHNICAL_REVISION_04_ID,
+        FAST_PASS_TECHNICAL_REVISION_05_ID,
     } or not isinstance(repair, Mapping):
         raise FastPassManifestError("fast-pass technical repair contract missing")
     receipt_ref = repair.get("repair_receipt")
@@ -798,6 +802,21 @@ def _validate_technical_repair(
             "revision_output_dir":
                 "reports/economic_evolution/fast_pass_factory_0029_revision_04",
         },
+        FAST_PASS_TECHNICAL_REVISION_05_ID: {
+            "classification":
+                "TECHNICAL_TERMINAL_EVIDENCE_RELATIONAL_VALIDATION_MEMORY_REDUNDANCY_DEFECT",
+            "scientific_status":
+                "RESTORES_SINGLE_AUTHORITATIVE_DEEP_VALIDATION_AND_BOUNDED_FINALIZATION",
+            "resume_scope": "REUSE_COMPLETE_STAGING_FINALIZATION_ONLY",
+            "supersedes_manifest_hash":
+                "410cb480e6ecc1b7e895a8c69017d4f6c3aa0cc23bb880129c465661f774af40",
+            "supersedes_manifest_file_sha256":
+                "3c450fe8fb2f8e72f452cab9e65e6b8284cbd8585ae1391a88a162875f3c2515",
+            "supersedes_output_dir":
+                "reports/economic_evolution/fast_pass_factory_0029_revision_04",
+            "revision_output_dir":
+                "reports/economic_evolution/fast_pass_factory_0029_revision_05",
+        },
     }
     contract = revision_contracts[str(revision_id)]
     expected_flags = (
@@ -828,6 +847,7 @@ def _validate_technical_repair(
     if revision_id in {
         FAST_PASS_TECHNICAL_REVISION_03_ID,
         FAST_PASS_TECHNICAL_REVISION_04_ID,
+        FAST_PASS_TECHNICAL_REVISION_05_ID,
     }:
         expected_flags = bool(
             expected_flags
@@ -855,6 +875,7 @@ def _validate_technical_repair(
         FAST_PASS_TECHNICAL_REVISION_02_ID,
         FAST_PASS_TECHNICAL_REVISION_03_ID,
         FAST_PASS_TECHNICAL_REVISION_04_ID,
+        FAST_PASS_TECHNICAL_REVISION_05_ID,
     }:
         _validate_repair_semantic_allowlist(manifest, repair, root)
 
