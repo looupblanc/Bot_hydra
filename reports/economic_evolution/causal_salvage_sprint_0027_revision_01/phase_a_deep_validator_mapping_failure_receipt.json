@@ -1,0 +1,43 @@
+{
+  "schema": "hydra_causal_salvage_phase_a_deep_validator_mapping_failure_v1",
+  "campaign_id": "hydra_causal_salvage_sprint_0027",
+  "source_commit": "3875dc3b",
+  "failure_stage": "PHASE_A_EVIDENCE_BUNDLE_DEEP_FINALIZE",
+  "failure": "account path mll_buffer disagrees with equity minus mll",
+  "account_daily_path_count": 294704,
+  "mismatching_row_count": 4610,
+  "nonzero_unrealized_row_count": 4610,
+  "mismatching_zero_unrealized_row_count": 0,
+  "root_cause": "Evidence adapter mapped equity to realized balance while MLL buffer correctly used realized balance plus unrealized PnL.",
+  "bounded_repair": {
+    "equity_mapping": "balance_plus_unrealized_pnl",
+    "mll_or_economic_semantics_changed": false,
+    "validator_relaxed": false,
+    "all_other_deep_account_path_invariants_prechecked": true,
+    "remaining_account_path_invariant_mismatch_count_after_mapping": 0
+  },
+  "unaffected_evidence": [
+    "signals",
+    "entries",
+    "exits",
+    "trades",
+    "account_episode_outcomes",
+    "PnL",
+    "costs",
+    "target_progress",
+    "MLL",
+    "consistency",
+    "component_attribution"
+  ],
+  "failed_staging_preserved": true,
+  "failed_staging_archive": "data/cache/economic_production/hydra_causal_salvage_sprint_0027/failed_seal_attempt_002",
+  "recovery_output": "reports/economic_evolution/causal_salvage_sprint_0027_revision_02",
+  "phase_b_authorized": false,
+  "safety": {
+    "q4_access_count_delta": 0,
+    "data_purchase_usd": 0.0,
+    "broker_connections": 0,
+    "orders": 0,
+    "xfa_paths_started": 0
+  }
+}

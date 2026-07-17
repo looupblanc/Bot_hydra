@@ -398,21 +398,23 @@ def test_explicit_future_censor_wins_over_completed_requested_duration() -> None
         episode = record["episode"]
         episode["terminal"] = "TIMEOUT"
         episode["terminal_reason"] = CENSORED_FUTURE_COVERAGE
-        episode["net_pnl"] = 100.0
-        episode["target_progress"] = 100.0 / 9_000.0
+        episode["net_pnl"] = 90.0
+        episode["target_progress"] = 90.0 / 9_000.0
         episode["days_to_target"] = None
         episode["consistency_ok"] = True
         episode["best_day_concentration"] = 0.0
-        episode["component_contribution"] = {SLEEVE_ID: 100.0}
+        episode["component_contribution"] = {SLEEVE_ID: 90.0}
         day = episode["daily_path"][0]
         day["balance"] = 150_100.0
-        day["day_pnl"] = 100.0
+        day["mll_floor"] = 145_600.0
+        day["mll_buffer"] = 4_490.0
+        day["day_pnl"] = 90.0
         day["realized_pnl"] = 100.0
-        day["unrealized_pnl"] = 0.0
-        day["target_progress"] = 100.0 / 9_000.0
+        day["unrealized_pnl"] = -10.0
+        day["target_progress"] = 90.0 / 9_000.0
         day["consistency"] = 1.0
         day["consistency_ok"] = False
-        day["component_attribution"] = {SLEEVE_ID: 100.0}
+        day["component_attribution"] = {SLEEVE_ID: 90.0}
 
     evidence = materialize_causal_salvage_evidence(
         identity=_identity(),
@@ -434,4 +436,8 @@ def test_explicit_future_censor_wins_over_completed_requested_duration() -> None
         row["consistency_representation_source"]
         == "TERMINAL_REALIZED_ACCOUNT_PATH"
         for row in episodes
+    )
+    assert all(
+        row["equity"] == 150_090.0
+        for row in evidence.records["account_daily_paths"]
     )

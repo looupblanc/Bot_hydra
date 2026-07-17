@@ -1090,7 +1090,11 @@ def _episode_ledgers(
                 "realized_pnl": float(raw_day["realized_pnl"]),
                 "unrealized_pnl": float(raw_day["unrealized_pnl"]),
                 "daily_pnl": float(raw_day["day_pnl"]),
-                "equity": float(raw_day["balance"]),
+                # EvidenceBundle ``equity`` is the marked account value, not
+                # the realized cash balance.  This distinction is observable
+                # only on an explicitly censored open path.
+                "equity": float(raw_day["balance"])
+                + float(raw_day["unrealized_pnl"]),
                 "mll": float(raw_day["mll_floor"]),
                 "mll_buffer": float(raw_day["mll_buffer"]),
                 "minimum_mll_buffer": float(raw_day["minimum_mll_buffer"]),
