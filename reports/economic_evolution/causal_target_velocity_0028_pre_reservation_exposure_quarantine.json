@@ -1,0 +1,61 @@
+{
+  "schema": "hydra_causal_target_velocity_pre_reservation_exposure_quarantine_v1",
+  "campaign_id": "hydra_causal_target_velocity_0028",
+  "created_at_utc": "2026-07-17T06:16:51Z",
+  "source_commit": "362990a65304742232a4c34015b77708d20a4241",
+  "classification": "PRE_RESERVATION_DIAGNOSTIC_OUTCOME_EXPOSURE_QUARANTINED",
+  "cause": "A local runtime-performance probe evaluated ten deterministic structural candidates before the campaign multiplicity reservation existed.",
+  "exposed_candidate_count": 10,
+  "exposed_candidates": [
+    {
+      "candidate_id": "hazard_19dd046c83e0c09f7098420e",
+      "structural_fingerprint": "19dd046c83e0c09f7098420ec516175f466f96814e55d3389eae0e6945ba0bcf"
+    },
+    {
+      "candidate_id": "hazard_2305648fecbae524598d49f3",
+      "structural_fingerprint": "2305648fecbae524598d49f3633976e369dadfe2926a762dd31db0b2970a3e64"
+    },
+    {
+      "candidate_id": "hazard_4717152bf5f1a9eea1c9fbfd",
+      "structural_fingerprint": "4717152bf5f1a9eea1c9fbfd446a3b1bfdfac8fac401f07e4c1ff72a25c4c686"
+    },
+    {
+      "candidate_id": "hazard_5316eca9da150c30fcd04aba",
+      "structural_fingerprint": "5316eca9da150c30fcd04abaa46e44da269e9b1bdb848aca2a7f90edf244674c"
+    },
+    {
+      "candidate_id": "hazard_61d6d7638e2a9264e9244cac",
+      "structural_fingerprint": "61d6d7638e2a9264e9244cac79265fc69014204cc571843aeeb074cfd56ee443"
+    },
+    {
+      "candidate_id": "hazard_7c8d5dbe5abf39c504075051",
+      "structural_fingerprint": "7c8d5dbe5abf39c5040750519312318c2dbab7aef5cca5bfd88f023c0fcf81de"
+    },
+    {
+      "candidate_id": "hazard_8c0587178913099350c13892",
+      "structural_fingerprint": "8c0587178913099350c13892e6724aee668bdabab1bfb65c6804b2d6d5c2f213"
+    },
+    {
+      "candidate_id": "hazard_b4ef63f0c09849e3cb874fd1",
+      "structural_fingerprint": "b4ef63f0c09849e3cb874fd1e6757522273745d8644f42e68febd81af43a1466"
+    },
+    {
+      "candidate_id": "hazard_d9aa8846a24f56daa882b5ba",
+      "structural_fingerprint": "d9aa8846a24f56daa882b5ba7e9634aa268bbe0d209c97b9bdd9da3e73b41e60"
+    },
+    {
+      "candidate_id": "hazard_f410dd0f49b6cf209ae6cedf",
+      "structural_fingerprint": "f410dd0f49b6cf209ae6cedffb4828ee952133019149d38e3f532d31535fb2d2"
+    }
+  ],
+  "corrective_action": {
+    "exclude_all_listed_fingerprints_from_campaign_0028": true,
+    "use_observed_outcomes_to_modify_manifest_or_thresholds": false,
+    "use_observed_outcomes_to_modify_engine": false,
+    "replacement_proposals_are_structural_only": true,
+    "reservation_still_required_before_any_nonquarantined_outcome_access": true,
+    "campaign_output_directory_touched": false
+  },
+  "economic_evidence_status": "NON_PROMOTIONAL_EXCLUDED",
+  "receipt_hash": "aac4364905148afbf39c4f8924a209a010e74715d4382a5e8e312bbc34ec227c"
+}
