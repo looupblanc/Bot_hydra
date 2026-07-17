@@ -1,0 +1,16 @@
+{
+  "campaign_id": "hydra_causal_salvage_sprint_0027",
+  "causal_component_replay_seconds": 97.31226202298421,
+  "clock": "time.perf_counter_monotonic",
+  "economic_replay_seconds": 124.12885283096693,
+  "economic_replay_wall_clock_fraction": 0.2624186538076807,
+  "non_economic_wall_clock_seconds": 348.8895512720337,
+  "phase_a_evaluation_seconds": 26.81659080798272,
+  "phase_a_evidence_seal_seconds": 344.57680804806296,
+  "phase_b_evidence_seal_seconds": 0.0,
+  "phase_b_stage_evaluation_seconds": {},
+  "schema": "hydra_causal_salvage_runtime_allocation_v1",
+  "scientific_checkpoint_hashes_affected": false,
+  "scope": "CURRENT_COORDINATOR_PROCESS",
+  "total_wall_clock_seconds": 473.01840410300065
+}

@@ -1,0 +1,27 @@
+{
+  "campaign_id": "hydra_causal_salvage_sprint_0027",
+  "component_checkpoint_hash": "7215c9315bed24a26de8fb02a671fec7d17f7eca88aa23ebd33d75b9410bd78f",
+  "forward_activation_authorized": false,
+  "manifest_sha256": "5568d14809c6cb03846d45cd1ea98e22d674fc2d64a0ac3700ca533a71f034f7",
+  "phase_a_checkpoint_hash": "2afa4a28a7f02123bc943b1c96de2a337b2f2b5c49df9e654efe5e79f1c455a3",
+  "phase_b_summary_hash": null,
+  "promotion_authorized": false,
+  "reason": "the preregistered Phase-A economic gate did not pass",
+  "result_hash": "dda580f364026059f0b3ba32425a002b08f802687825856a0af3cb17edbf8cd8",
+  "runtime_version": "hydra_causal_salvage_runtime_v1",
+  "safety": {
+    "broker_connections": 0,
+    "controller_version_changed": false,
+    "database_writes": 0,
+    "live_trading": false,
+    "market_data_purchase_delta_usd": 0.0,
+    "new_service_created": false,
+    "orders": 0,
+    "q4_access_count_delta": 0,
+    "registry_writes": 0,
+    "xfa_paths_started": 0
+  },
+  "schema": "hydra_causal_salvage_result_v1",
+  "status": "CAUSAL_SALVAGE_GATE_FALSIFIED",
+  "xfa_paths_started": 0
+}

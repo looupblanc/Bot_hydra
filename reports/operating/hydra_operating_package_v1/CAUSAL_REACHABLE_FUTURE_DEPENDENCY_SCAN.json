@@ -1,0 +1,307 @@
+{
+  "blocking_finding_count": 0,
+  "blocking_findings": [],
+  "classification_counts": {
+    "KNOWN_CALENDAR_INFORMATION": 1,
+    "LOOKAHEAD_DEFECT": 0,
+    "OUTCOME_LABEL_ONLY": 5,
+    "UNRESOLVED": 0
+  },
+  "coverage": [
+    {
+      "finding_count": 5,
+      "functions": [
+        "build_or_open_turbo_feature_bundles",
+        "_market_arrays"
+      ],
+      "module_path": "hydra/research/turbo_feature_builder.py",
+      "module_sha256": "d17f06a557459ffc57a115e9a05fba1c44c0dda5384410445503dda91afab512",
+      "rationale": "Builds the exact feature matrices consumed by every frozen sleeve.",
+      "role": "FEATURE_CONSTRUCTION"
+    },
+    {
+      "finding_count": 0,
+      "functions": [
+        "FrozenSleeveDecisionKernel.eligible",
+        "CausalSleeveStreamingKernel.step",
+        "CausalSleeveStreamingKernel._resolve_open_exit_boundary",
+        "CausalSleeveStreamingKernel._resolve_pending_entry_boundary",
+        "CausalSleeveStreamingKernel._mark_open_position",
+        "CausalSleeveStreamingKernel._complete_open",
+        "CausalSleeveStreamingKernel._censor_pending",
+        "CausalSleeveStreamingKernel._censor_open",
+        "replay_causal_sleeve_batch",
+        "replay_causal_sleeve_streaming",
+        "iter_causal_bar_records",
+        "_completed_trajectory",
+        "_censored_trajectory",
+        "_signal_evidence",
+        "_initial_unrealized",
+        "_next_executable_boundary",
+        "_record_matches_pending_path"
+      ],
+      "module_path": "hydra/research/causal_sleeve_replay.py",
+      "module_sha256": "821467378b61cf31e16c73e04f4a9e44ee907de4eb42519ef12e761c2b8677f1",
+      "rationale": "The sole sleeve decision loop and its post-decision causal fill materializer.",
+      "role": "CAUSAL_SLEEVE_DECISION_AND_OUTCOME"
+    },
+    {
+      "finding_count": 0,
+      "functions": [
+        "active_risk_utilisation",
+        "route_active_risk_pool_entry",
+        "_maximum_admissible_declared_risk"
+      ],
+      "module_path": "hydra/account_policy/active_risk_pool.py",
+      "module_sha256": "a4ac4b8ae87fff29b7764836ea0002de1b0fabd994e9dd8999ef166261e132ab",
+      "rationale": "Makes the frozen entry admission, sizing, and conflict decisions.",
+      "role": "ACTIVE_RISK_GOVERNOR"
+    },
+    {
+      "finding_count": 0,
+      "functions": [
+        "run_causal_shared_account_episode",
+        "evaluate_causal_account_policy",
+        "_force_liquidate_at_current_bound",
+        "_live_equity",
+        "_open_unrealized"
+      ],
+      "module_path": "hydra/account_policy/causal_active_pool_replay.py",
+      "module_sha256": "c41878290cffdd5af8ffa273950e861a1fa7e2cbcb22314c1e02162c6fb83587",
+      "rationale": "Advances marks, MLL, governor state and realized PnL in availability order.",
+      "role": "CAUSAL_ACTIVE_POOL_ACCOUNT_REPLAY"
+    },
+    {
+      "finding_count": 0,
+      "functions": [
+        "route_entry",
+        "static_route_entry"
+      ],
+      "module_path": "hydra/account_policy/router.py",
+      "module_sha256": "82c83168b695fcf128665a3220bb4d952e926b2bca136399cbade01a25847280",
+      "rationale": "Defines the account-state contract consumed by the active-risk governor.",
+      "role": "BASE_ACCOUNT_ROUTER"
+    },
+    {
+      "finding_count": 1,
+      "functions": [
+        "select_episode_starts",
+        "evaluate_rolling_combine"
+      ],
+      "module_path": "hydra/propfirm/rolling_combine.py",
+      "module_sha256": "de4d909699686e4a6d436f3ce1182f2cc62c4e2ac85a4fa27344d3b34fcf70f4",
+      "rationale": "Selects starts and invokes account episodes without retuning.",
+      "role": "EPISODE_SELECTION_AND_REPLAY"
+    },
+    {
+      "finding_count": 0,
+      "functions": [
+        "advance_intraday_floor",
+        "advance_end_of_day_floor"
+      ],
+      "module_path": "hydra/propfirm/mll_variants.py",
+      "module_sha256": "083fea6a0698f84b20df41c901e2c96c4315f66f079bd9dd64185065395a7e51",
+      "rationale": "Advances the frozen loss-limit floor from chronological account state.",
+      "role": "MLL_FLOOR_RULES"
+    }
+  ],
+  "created_at_utc": "2026-07-17T04:01:36.287705Z",
+  "findings": [
+    {
+      "classification": "KNOWN_CALENDAR_INFORMATION",
+      "column": 32,
+      "function": "select_episode_starts",
+      "line": 111,
+      "module_path": "hydra/propfirm/rolling_combine.py",
+      "primitive": "FORWARD_INDEX_ACCESS",
+      "rationale": "The positive offset selects the next boundary in an already materialized eligible-session partition; it reads no price or outcome.",
+      "rule_id": "episode-start-block-edge",
+      "source": "edges[block + 1]"
+    },
+    {
+      "classification": "OUTCOME_LABEL_ONLY",
+      "column": 4,
+      "function": "_market_arrays",
+      "line": 200,
+      "module_path": "hydra/research/turbo_feature_builder.py",
+      "primitive": "NEGATIVE_SHIFT",
+      "rationale": "Exit timestamp/price and continuity shifts construct evaluation labels; they are not safe decision inputs.",
+      "rule_id": "turbo-future-label-shifts",
+      "source": "next_timestamp = groups[\"timestamp\"].shift(-1)"
+    },
+    {
+      "classification": "OUTCOME_LABEL_ONLY",
+      "column": 4,
+      "function": "_market_arrays",
+      "line": 201,
+      "module_path": "hydra/research/turbo_feature_builder.py",
+      "primitive": "NEXT_ROW_EXECUTION_PRICE",
+      "rationale": "The legacy matrix column is retained as an outcome oracle but the causal decision/materialization path never loads it.",
+      "rule_id": "turbo-next-row-entry-price",
+      "source": "entry_price = groups[\"close\"].shift(-1)"
+    },
+    {
+      "classification": "OUTCOME_LABEL_ONLY",
+      "column": 8,
+      "function": "_market_arrays",
+      "line": 221,
+      "module_path": "hydra/research/turbo_feature_builder.py",
+      "primitive": "NEGATIVE_SHIFT",
+      "rationale": "Exit timestamp/price and continuity shifts construct evaluation labels; they are not safe decision inputs.",
+      "rule_id": "turbo-future-label-shifts",
+      "source": "exit_timestamp = groups[\"timestamp\"].shift(-(horizon + 1))"
+    },
+    {
+      "classification": "OUTCOME_LABEL_ONLY",
+      "column": 8,
+      "function": "_market_arrays",
+      "line": 222,
+      "module_path": "hydra/research/turbo_feature_builder.py",
+      "primitive": "NEGATIVE_SHIFT",
+      "rationale": "Exit timestamp/price and continuity shifts construct evaluation labels; they are not safe decision inputs.",
+      "rule_id": "turbo-future-label-shifts",
+      "source": "exit_price = groups[\"close\"].shift(-(horizon + 1))"
+    },
+    {
+      "classification": "OUTCOME_LABEL_ONLY",
+      "column": 8,
+      "function": "_market_arrays",
+      "line": 228,
+      "module_path": "hydra/research/turbo_feature_builder.py",
+      "primitive": "FORWARD_LABEL_REFERENCE",
+      "rationale": "The forward move array is an economic outcome label at construction time.",
+      "rule_id": "turbo-forward-label-output",
+      "source": "arrays[f\"forward_move__{horizon}\"]"
+    }
+  ],
+  "frozen_inventory": {
+    "book_count": 6,
+    "packages": [
+      {
+        "candidate_id": "active_pool_014dffb40e99814612d78c51",
+        "file_sha256": "826065f082b652d2875e35490ec1bbd64b765c4408aaba6561d1b268c649798f",
+        "freeze_timestamp_utc": "2026-07-16T15:06:22.608387Z",
+        "package_hash": "fbc57d0acf0140e491d475390741a3fc3869aca91d1bbc5002f693c5f361b72e",
+        "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_014dffb40e99814612d78c51/shadow_package.json"
+      },
+      {
+        "candidate_id": "active_pool_070e391c7586ba1fac2f5494",
+        "file_sha256": "d116d966e0b8f420d87c64ec0e9f6f680d983eaa0bbfbe7f0a144bb29aeb62c5",
+        "freeze_timestamp_utc": "2026-07-16T15:05:36.652933Z",
+        "package_hash": "4ca3ac09e3bdab9695e04ccda4308fce9442a35972550646be9aaf95ed6e1145",
+        "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_070e391c7586ba1fac2f5494/shadow_package.json"
+      },
+      {
+        "candidate_id": "active_pool_14e275fa8d869c28b1f27f78",
+        "file_sha256": "4ff70fd9b0f4158533a7163a4b74bc6f8d09f63702f541b1ee71beb674aa8b2b",
+        "freeze_timestamp_utc": "2026-07-16T15:05:54.980185Z",
+        "package_hash": "5d957832d3f76fdd8da87ff14db4f3ee05143e9b250aaa413bf645def97c8492",
+        "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_14e275fa8d869c28b1f27f78/shadow_package.json"
+      },
+      {
+        "candidate_id": "active_pool_186a4177401aab223b0a21fa",
+        "file_sha256": "e9810adcb11706315065957172225cbecb4c7fbb72db993137335d4862dbfa91",
+        "freeze_timestamp_utc": "2026-07-16T15:05:45.664691Z",
+        "package_hash": "efa5cdc55ba286ad5b826f56e1fada38f818ab9982782c0a1a2cd867a0e0c225",
+        "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_186a4177401aab223b0a21fa/shadow_package.json"
+      },
+      {
+        "candidate_id": "active_pool_2287bfb0b1c6f07930150102",
+        "file_sha256": "905e088524162af6401214a03bb636c9612d48878830dbfd1489684d7b587c1c",
+        "freeze_timestamp_utc": "2026-07-16T15:06:04.395596Z",
+        "package_hash": "88049ca68f653f397353a017330f2ce32a4839fd984d912e342b039c4ad9b70a",
+        "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_2287bfb0b1c6f07930150102/shadow_package.json"
+      },
+      {
+        "candidate_id": "active_pool_2377af7025aadf9aaf456a7e",
+        "file_sha256": "756a6ac53c688117f53b7077ea4787796a164d09399fe25301ea28c46bf8e185",
+        "freeze_timestamp_utc": "2026-07-16T15:06:13.390284Z",
+        "package_hash": "70bcca5d4b42dade5c7b8bc682ce564e0a61695f787a0fc0380cae13d215d04c",
+        "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_2377af7025aadf9aaf456a7e/shadow_package.json"
+      }
+    ],
+    "sleeve_count": 18,
+    "sleeve_ids": [
+      "sleeve_0d5f4ce40cc3e8f002657965",
+      "sleeve_1488a965163f4de09bca7cf3",
+      "sleeve_352b3dd8e17fd32021bf837b",
+      "sleeve_39eb74b174e7bdd240520b9d",
+      "sleeve_3ba7422174d7e5b1c2a01d58",
+      "sleeve_454819bd8caec8581b6016d2",
+      "sleeve_4de0a5d3b0ef1762cc9e4086",
+      "sleeve_57125a2989d8eac29398af60",
+      "sleeve_5c45e73e41fac686c67a0443",
+      "sleeve_5c79759104e5765769be23ea",
+      "sleeve_617236bb4c8b7cca8a472bac",
+      "sleeve_624310a1de865cef4db2f8f4",
+      "sleeve_64d6fd6dd9e5f74b920ac99b",
+      "sleeve_65bad2088913fc9fca0a145d",
+      "sleeve_7ecd76490fa9fb34e1af5820",
+      "sleeve_8af4e061229c8ce7ae335f63",
+      "sleeve_c5da4b5a67abadeb7d68eabe",
+      "sleeve_e017bb45b0937aef46657631"
+    ]
+  },
+  "git_commit": "aeeb02f3ad25d6f86128c92ecd40c22331cc3576",
+  "rules": [
+    {
+      "classification": "OUTCOME_LABEL_ONLY",
+      "function": "_market_arrays",
+      "module_path": "hydra/research/turbo_feature_builder.py",
+      "primitive": "NEXT_ROW_EXECUTION_PRICE",
+      "rationale": "The legacy matrix column is retained as an outcome oracle but the causal decision/materialization path never loads it.",
+      "rule_id": "turbo-next-row-entry-price",
+      "source_pattern": ".*"
+    },
+    {
+      "classification": "OUTCOME_LABEL_ONLY",
+      "function": "_market_arrays",
+      "module_path": "hydra/research/turbo_feature_builder.py",
+      "primitive": "NEGATIVE_SHIFT",
+      "rationale": "Exit timestamp/price and continuity shifts construct evaluation labels; they are not safe decision inputs.",
+      "rule_id": "turbo-future-label-shifts",
+      "source_pattern": ".*"
+    },
+    {
+      "classification": "OUTCOME_LABEL_ONLY",
+      "function": "_market_arrays",
+      "module_path": "hydra/research/turbo_feature_builder.py",
+      "primitive": "FORWARD_LABEL_REFERENCE",
+      "rationale": "The forward move array is an economic outcome label at construction time.",
+      "rule_id": "turbo-forward-label-output",
+      "source_pattern": ".*"
+    },
+    {
+      "classification": "KNOWN_CALENDAR_INFORMATION",
+      "function": "select_episode_starts",
+      "module_path": "hydra/propfirm/rolling_combine.py",
+      "primitive": "FORWARD_INDEX_ACCESS",
+      "rationale": "The positive offset selects the next boundary in an already materialized eligible-session partition; it reads no price or outcome.",
+      "rule_id": "episode-start-block-edge",
+      "source_pattern": ".*"
+    }
+  ],
+  "safety": {
+    "book_mutations": 0,
+    "broker_connections": 0,
+    "data_purchase_usd": 0.0,
+    "engine_files_modified": 0,
+    "market_data_files_read": 0,
+    "orders": 0,
+    "post_freeze_bars_read": 0,
+    "q4_access_count": 0
+  },
+  "scan_hash": "edb7b458f77864685420fc1e986e74c49c87e9a1f434acd44d3f231fadb24b03",
+  "schema": "hydra_causal_reachable_future_dependency_scan_v1",
+  "scope_policy": {
+    "blocking_classifications": [
+      "LOOKAHEAD_DEFECT",
+      "UNRESOLVED"
+    ],
+    "kind": "EXPLICIT_REACHABLE_FUNCTION_ALLOWLIST",
+    "repository_wide_scan": false,
+    "rule_requirement": "EXACT_MODULE_FUNCTION_PRIMITIVE_WITH_RATIONALE",
+    "unrelated_modules_scanned": 0
+  },
+  "status": "CAUSAL_REACHABLE_SCAN_PASS"
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "hydra_causal_salvage_post_gate_action_checkpoint_v1",
+  "created_at_utc": "2026-07-17T04:09:14Z",
+  "campaign_id": "hydra_causal_salvage_sprint_0027",
+  "causal_salvage_status": "CAUSAL_SALVAGE_GATE_FALSIFIED",
+  "causal_salvage_result_hash": "dda580f364026059f0b3ba32425a002b08f802687825856a0af3cb17edbf8cd8",
+  "operating_package_v1_status": "RETRACTED_DEVELOPMENT_EVIDENCE_CONTAMINATED",
+  "clean_sleeve_bank_status": "POSITIVE_BUT_INSUFFICIENT_TARGET_VELOCITY",
+  "clean_positive_stressed_sleeve_count_at_frozen_90_day_gate": 17,
+  "clean_combine_finalist_count": 0,
+  "phase_b_authorized": false,
+  "phase_b_policy_screen_count": 0,
+  "xfa_authorized": false,
+  "xfa_path_count": 0,
+  "persistent_service": {
+    "unit": "hydra-autonomous-mission.service",
+    "controller_version": "hydra_v7_economic_evolution_controller_v17",
+    "pid": 2944445,
+    "state": "RUNNING_V7_FALSIFICATION",
+    "manifest_runtime_state": "IDLE",
+    "queue_state": "MANIFEST_QUEUE_AWAITING_APPEND",
+    "authoritative_queue": "config/v7/economic_evolution_production_queue_0026.json"
+  },
+  "next_campaign": {
+    "scope": "ONE_MATERIALLY_DISTINCT_CAUSAL_DISCOVERY_CAMPAIGN",
+    "mechanism": "TARGET_BEFORE_ADVERSE_EXCURSION_HAZARD_AND_OPPORTUNITY_DENSITY",
+    "same_causal_engine_required": true,
+    "existing_clean_sleeves_used_as_controls": true,
+    "broad_grammar_allowed": false,
+    "current_state": "AWAITING_MINIMAL_SHARED_RUNNER_EXTENSION_AND_WORM_MANIFEST",
+    "reason_not_appended": "No currently registered production engine expresses the narrow causal mechanism without falling back to contaminated or noncausal execution paths.",
+    "controller_change_required": false,
+    "new_service_required": false,
+    "new_database_required": false
+  },
+  "safety": {
+    "q4_access_delta": 0,
+    "market_data_purchase_delta_usd": 0.0,
+    "broker_connections": 0,
+    "orders": 0,
+    "remaining_data_budget_usd": 37.147100396458015
+  }
+}

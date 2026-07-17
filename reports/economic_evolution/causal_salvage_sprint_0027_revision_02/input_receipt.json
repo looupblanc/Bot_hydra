@@ -1,0 +1,88 @@
+{
+  "campaign_id": "hydra_causal_salvage_sprint_0027",
+  "checkpoint_hash": "5763048ca9c5b5cb35983c087554d295e0f1e5a4444b658f52b3bf598c04e4d3",
+  "contamination_receipt_path": "reports/operating/hydra_operating_package_v1/F0_SINGLE_SOURCE_ENGINE_PARITY_CONTAMINATION_RECEIPT.json",
+  "contamination_receipt_sha256": "784c33cb4b25fb30e638c3447de301feaa040242d9e920d20045f2ca394e2b25",
+  "legacy_roles_used_for_selection": false,
+  "live_head": "aeeb02f3ad25d6f86128c92ecd40c22331cc3576",
+  "manifest_sha256": "5568d14809c6cb03846d45cd1ea98e22d674fc2d64a0ac3700ca533a71f034f7",
+  "operating_manifest_path": "reports/operating/hydra_operating_package_v1/OPERATING_PACKAGE_V1.json",
+  "operating_manifest_sha256": "8f546bb4f529ade5c97cf8bb7b742039e227f426962a4d9928f808bced821822",
+  "package_count": 6,
+  "packages": [
+    {
+      "candidate_id": "active_pool_014dffb40e99814612d78c51",
+      "file_sha256": "826065f082b652d2875e35490ec1bbd64b765c4408aaba6561d1b268c649798f",
+      "legacy_operating_role_ignored": "BACKUP_BOOK",
+      "package_hash": "fbc57d0acf0140e491d475390741a3fc3869aca91d1bbc5002f693c5f361b72e",
+      "package_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_014dffb40e99814612d78c51/shadow_package.json"
+    },
+    {
+      "candidate_id": "active_pool_070e391c7586ba1fac2f5494",
+      "file_sha256": "d116d966e0b8f420d87c64ec0e9f6f680d983eaa0bbfbe7f0a144bb29aeb62c5",
+      "legacy_operating_role_ignored": "RESERVE_ALTERNATIVE_BOOK",
+      "package_hash": "4ca3ac09e3bdab9695e04ccda4308fce9442a35972550646be9aaf95ed6e1145",
+      "package_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_070e391c7586ba1fac2f5494/shadow_package.json"
+    },
+    {
+      "candidate_id": "active_pool_14e275fa8d869c28b1f27f78",
+      "file_sha256": "4ff70fd9b0f4158533a7163a4b74bc6f8d09f63702f541b1ee71beb674aa8b2b",
+      "legacy_operating_role_ignored": "SAFETY_BOOK",
+      "package_hash": "5d957832d3f76fdd8da87ff14db4f3ee05143e9b250aaa413bf645def97c8492",
+      "package_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_14e275fa8d869c28b1f27f78/shadow_package.json"
+    },
+    {
+      "candidate_id": "active_pool_186a4177401aab223b0a21fa",
+      "file_sha256": "e9810adcb11706315065957172225cbecb4c7fbb72db993137335d4862dbfa91",
+      "legacy_operating_role_ignored": "CORE_BOOK",
+      "package_hash": "efa5cdc55ba286ad5b826f56e1fada38f818ab9982782c0a1a2cd867a0e0c225",
+      "package_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_186a4177401aab223b0a21fa/shadow_package.json"
+    },
+    {
+      "candidate_id": "active_pool_2287bfb0b1c6f07930150102",
+      "file_sha256": "905e088524162af6401214a03bb636c9612d48878830dbfd1489684d7b587c1c",
+      "legacy_operating_role_ignored": "DIVERSIFIER_BOOK",
+      "package_hash": "88049ca68f653f397353a017330f2ce32a4839fd984d912e342b039c4ad9b70a",
+      "package_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_2287bfb0b1c6f07930150102/shadow_package.json"
+    },
+    {
+      "candidate_id": "active_pool_2377af7025aadf9aaf456a7e",
+      "file_sha256": "756a6ac53c688117f53b7077ea4787796a164d09399fe25301ea28c46bf8e185",
+      "legacy_operating_role_ignored": "RESERVE_ALTERNATIVE_BOOK",
+      "package_hash": "70bcca5d4b42dade5c7b8bc682ce564e0a61695f787a0fc0380cae13d215d04c",
+      "package_path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_2377af7025aadf9aaf456a7e/shadow_package.json"
+    }
+  ],
+  "preregistered_source_commit": "890f1c389527a49be7a67e634a02d78a675dae6c",
+  "runtime_version": "hydra_causal_salvage_runtime_v1",
+  "safety": {
+    "broker_connections": 0,
+    "controller_version_changed": false,
+    "database_writes": 0,
+    "live_trading": false,
+    "market_data_purchase_delta_usd": 0.0,
+    "new_service_created": false,
+    "orders": 0,
+    "q4_access_count_delta": 0,
+    "registry_writes": 0,
+    "xfa_paths_started": 0
+  },
+  "schema": "hydra_causal_salvage_checkpoint_v1",
+  "sleeve_count": 18,
+  "stage": "FROZEN_INPUTS_VERIFIED",
+  "temporal_contract": {
+    "block_count": 4,
+    "block_ids": [
+      "B1",
+      "B2",
+      "B3",
+      "B4"
+    ],
+    "block_method": "FOUR_CONTIGUOUS_BLOCKS_WITH_TEN_SESSION_EMBARGO",
+    "overlapping_starts_independent": false,
+    "path": "config/v7/active_risk_pool_target_velocity_0026_revision_02.json",
+    "sha256": "5cc52c6770946deb2ce0cadcf8f0f9be6d88c943183ca54909999109f5dfc6da",
+    "source": "PACKAGE_PROVENANCE_BOUND_CAMPAIGN_MANIFEST",
+    "temporal_contract_hash": "6085fb872869e61879c3ee392a7ca75d319a85985139c20fc820d5585dc9f42e"
+  }
+}
