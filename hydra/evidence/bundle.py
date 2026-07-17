@@ -966,16 +966,16 @@ def _validate_relational_contract(
         "component_exits": {},
         "component_trades": {},
     }
-    signal_keys: set[tuple[str, str]] = set()
+    signal_rows: dict[tuple[str, str], Mapping[str, Any]] = {}
     components_with_signals: set[str] = set()
     for row in records["component_signals"]:
         component_id = str(row["component_id"])
         if component_id not in component_ids:
             raise IncompleteEvidenceBundle("signal references an unknown component")
         key = (component_id, str(row["signal_id"]))
-        if key in signal_keys:
+        if key in signal_rows:
             raise IncompleteEvidenceBundle(f"duplicate component signal: {key}")
-        signal_keys.add(key)
+        signal_rows[key] = row
         components_with_signals.add(component_id)
     missing_component_signals = component_ids - components_with_signals
     if missing_component_signals:
@@ -992,14 +992,38 @@ def _validate_relational_contract(
             if key in component_trade_rows[dataset]:
                 raise IncompleteEvidenceBundle(f"duplicate {dataset} trade key: {key}")
             component_trade_rows[dataset][key] = row
-    if not (
-        set(component_trade_rows["component_entries"])
-        == set(component_trade_rows["component_exits"])
-        == set(component_trade_rows["component_trades"])
-    ):
+    entry_keys = set(component_trade_rows["component_entries"])
+    exit_keys = set(component_trade_rows["component_exits"])
+    trade_keys = set(component_trade_rows["component_trades"])
+    if exit_keys != trade_keys or not trade_keys <= entry_keys:
         raise IncompleteEvidenceBundle(
-            "entry, exit, and chronological trade ledgers do not reconcile exactly"
+            "exit and chronological trade ledgers must reconcile exactly and "
+            "every trade must have an entry"
         )
+    orphan_entry_keys = entry_keys - trade_keys
+    for key in orphan_entry_keys:
+        entry = component_trade_rows["component_entries"][key]
+        signal = signal_rows.get(key)
+        if signal is None:
+            raise IncompleteEvidenceBundle(
+                f"orphan component entry has no corresponding signal: {key}"
+            )
+        # A causal position may be filled before the immutable input range
+        # ends and then lack a future exit bar.  Preserve that real entry, but
+        # permit no other relaxation of the entry/exit/trade invariant.
+        if (
+            signal.get("outcome_status") != "CENSORED_FUTURE_COVERAGE"
+            or signal.get("fill_time") in {None, ""}
+            or signal.get("trade_materialized") is not False
+            or entry.get("outcome_status") != "CENSORED_FUTURE_COVERAGE"
+            or entry.get("trade_materialized") is not False
+            or entry.get("open_position_unresolved") is not True
+            or entry.get("entry_time") != signal.get("fill_time")
+        ):
+            raise IncompleteEvidenceBundle(
+                "entry without exit/trade is allowed only for an exactly linked "
+                f"filled causal censor: {key}"
+            )
     for dataset, keyed_rows in component_trade_rows.items():
         represented_components = {key[0] for key in keyed_rows}
         missing_components = component_ids - represented_components

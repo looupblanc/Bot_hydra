@@ -19,6 +19,19 @@ from hydra.mission.experiment_queue import (
 from hydra.mission.mission_state import connect_state, get_kv, mission_paths, set_kv
 
 
+@pytest.fixture(autouse=True)
+def _freeze_external_q4_ledger_state(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep these controller unit tests independent of the live access ledger.
+
+    The scenarios below model the post-one-shot state explicitly in their
+    temporary mission database.  Repository-level append-only forward records
+    are mutable operational state and must not make an isolated queue test
+    fail before it can exercise the behavior under test.
+    """
+
+    monkeypatch.setattr("hydra.mission.controller.q4_access_count", lambda: 1)
+
+
 def _controller(tmp_path: Path) -> tuple[AutonomousMissionController, object]:
     paths = mission_paths(str(tmp_path / "state"))
     conn = connect_state(paths)

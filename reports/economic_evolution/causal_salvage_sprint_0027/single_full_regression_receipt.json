@@ -1,0 +1,38 @@
+{
+  "schema": "hydra_causal_salvage_single_full_regression_receipt_v1",
+  "command": "PYTHONPATH=. .venv/bin/pytest -q",
+  "completed_once": true,
+  "repeat_full_regression_prohibited_for_this_sprint": true,
+  "elapsed_seconds": 2044.06,
+  "passed": 1527,
+  "failed": 7,
+  "warnings": 4,
+  "causal_salvage_failures": 0,
+  "failure_classification": "TEST_ISOLATION_DEFECT_FROM_REPOSITORY_GLOBAL_Q4_LEDGER",
+  "failure_scope": [
+    "tests/test_account_level_v6_mission.py",
+    "tests/test_combine_first_v5_mission.py"
+  ],
+  "root_cause": {
+    "repository_global_q4_access_count_observed": 9,
+    "true_historical_q4_one_shot_count": 1,
+    "forward_append_only_rows_misclassified_by_legacy_date_rule": 8,
+    "production_controller_modified": false,
+    "economic_or_execution_semantics_affected": false
+  },
+  "targeted_reconciliation": {
+    "action": "isolate the external ledger dependency in the two unit-test modules",
+    "production_code_modified": false,
+    "combined_targeted_command": "PYTHONPATH=. .venv/bin/pytest -q tests/test_causal_salvage_engine.py tests/test_causal_active_pool_accounting.py tests/test_causal_reachable_scan.py tests/test_causal_salvage_adapter.py tests/test_evidence_bundle_v1.py tests/test_account_level_v6_mission.py tests/test_combine_first_v5_mission.py",
+    "passed": 64,
+    "failed": 0,
+    "elapsed_seconds": 6.29
+  },
+  "status": "SINGLE_FULL_REGRESSION_COMPLETED_KNOWN_FAILURES_RECONCILED_TARGETED",
+  "safety": {
+    "q4_access_count_delta": 0,
+    "data_purchase_usd": 0.0,
+    "broker_connections": 0,
+    "orders": 0
+  }
+}

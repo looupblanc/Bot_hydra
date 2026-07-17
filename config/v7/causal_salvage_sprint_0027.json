@@ -1,0 +1,111 @@
+{
+  "schema": "hydra_causal_salvage_sprint_manifest_v1",
+  "campaign_id": "hydra_causal_salvage_sprint_0027",
+  "mission_id": "HYDRA-V7-PERSISTENT",
+  "status_at_preregistration": "PREREGISTERED_BEFORE_CLEAN_ECONOMIC_OUTCOMES",
+  "hypothesis": "The eighteen frozen sleeves and active-risk-pool architecture may retain economically useful Combine target velocity after removing future-coverage eligibility and non-causal entry/exit pricing.",
+  "source_commit": "890f1c389527a49be7a67e634a02d78a675dae6c",
+  "created_at_utc": "2026-07-17T01:31:25Z",
+  "retracted_package": {
+    "package_id": "OPERATING_PACKAGE_V1",
+    "terminal_status": "RETRACTED_DEVELOPMENT_EVIDENCE_CONTAMINATED",
+    "manifest_sha256": "8f546bb4f529ade5c97cf8bb7b742039e227f426962a4d9928f808bced821822",
+    "contamination_receipt_sha256": "784c33cb4b25fb30e638c3447de301feaa040242d9e920d20045f2ca394e2b25",
+    "preserve_all_source_artifacts": true,
+    "inherit_economic_status": false
+  },
+  "causal_repairs": {
+    "eligibility": {
+      "decision_inputs": "PAST_OR_CURRENT_AVAILABLE_FEATURES_ONLY",
+      "future_label_availability_used": false,
+      "missing_outcome": "CENSORED_FUTURE_COVERAGE"
+    },
+    "fill_policy": {
+      "policy_id": "CAUSAL_NEXT_TRADABLE_OPEN_V1",
+      "signal_time": "COMPLETED_BAR_T_AVAILABILITY_TIME",
+      "decision_time": "BAR_T_AVAILABILITY_TIME",
+      "order_submit_time": "DECISION_TIME",
+      "earliest_executable_time": "NEXT_EXPECTED_ONE_MINUTE_BAR",
+      "entry_reference": "NEXT_TRADABLE_BAR_OPEN",
+      "exit_reference": "FROZEN_HOLDING_HORIZON_BAR_OPEN",
+      "normal_slippage_basis": "FROZEN_V7_HOLDING_HORIZON_SCHEDULE",
+      "normal_slippage_resolution_key": "HOLDING_BARS_PLUS_M_SUFFIX",
+      "normal_slippage_ticks_per_side_by_current_horizon": {
+        "5m": 1.0,
+        "15m": 1.0,
+        "30m": 0.75,
+        "60m": 0.75
+      },
+      "stressed_slippage_multiplier": 1.5,
+      "slippage": "FROZEN_DISCRETE_ADVERSE_SLIPPAGE_PER_SIDE",
+      "commission": "FROZEN_V7_ROUND_TURN_COMMISSION",
+      "cost_configuration_path": "config/v7/phase0_g0_preregistration.json",
+      "cost_configuration_sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+      "missing_or_noncontiguous_fill": "CENSORED_FUTURE_COVERAGE",
+      "interpolation_allowed": false
+    }
+  },
+  "economic_contract": {
+    "development_start": "2023-01-01",
+    "development_end_exclusive": "2024-10-01",
+    "component_count": 18,
+    "former_book_reference_count": 6,
+    "cost_scenarios": ["NORMAL", "STRESSED_1_5X"],
+    "phase_a_starts": 48,
+    "phase_a_primary_horizon_trading_days": 90,
+    "phase_a_additional_horizons_trading_days": [20, 40, 60],
+    "full_available_horizon": true,
+    "xfa_deferred": true,
+    "former_books_have_selection_advantage": false
+  },
+  "salvage_gate": {
+    "minimum_economically_defensible_sleeves": 4,
+    "sleeve_positive_stressed_net_required": true,
+    "hard_causality_defects_allowed": 0,
+    "diagnostic_book_route_a": {
+      "minimum_normal_passes_out_of_48": 3,
+      "minimum_stressed_passes_out_of_48": 2
+    },
+    "diagnostic_book_route_b": {
+      "minimum_median_target_progress": 0.60,
+      "positive_stressed_net_required": true,
+      "maximum_mll_breach_rate": 0.10
+    }
+  },
+  "phase_b": {
+    "reuse_existing_manifests_only": true,
+    "stage_1_maximum_fast_screens": 4096,
+    "stage_2_maximum_exact_replays": 512,
+    "stage_3_maximum_policies": 64,
+    "stage_3_starts": 48,
+    "stage_4_maximum_policies": 8,
+    "stage_4_starts": 96,
+    "stage_5_maximum_policies": 4,
+    "stage_5_starts": 192,
+    "one_primary_per_behavior_cluster": true,
+    "mutation_allowed": false,
+    "retuning_allowed": false
+  },
+  "clean_advancement_gate": {
+    "minimum_normal_passes": 2,
+    "minimum_stressed_passes": 2,
+    "positive_stressed_net_required": true,
+    "maximum_mll_breach_rate": 0.10,
+    "minimum_contributing_blocks": 2,
+    "maximum_single_block_pass_share": 0.67,
+    "maximum_single_sleeve_profit_share": 0.60,
+    "maximum_best_day_profit_share": 0.50,
+    "complete_causal_evidence_bundle_required": true
+  },
+  "safety": {
+    "controller_version_change": false,
+    "new_service": false,
+    "new_database": false,
+    "new_registry_writer": false,
+    "q4_access": false,
+    "data_purchase": false,
+    "broker_connection": false,
+    "orders": false,
+    "live_trading": false
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "hydra_causal_salvage_pre_change_checkpoint_v1",
+  "created_at_utc": "2026-07-17T01:31:25Z",
+  "git_head": "890f1c389527a49be7a67e634a02d78a675dae6c",
+  "upstream_head": "890f1c389527a49be7a67e634a02d78a675dae6c",
+  "service": {
+    "name": "hydra-autonomous-mission.service",
+    "active_state": "active",
+    "sub_state": "running",
+    "pid": 2944445,
+    "controller_version": "V17"
+  },
+  "package_id": "OPERATING_PACKAGE_V1",
+  "previous_terminal_status": "DEVELOPMENT_EVIDENCE_CONTAMINATED_FAIL_CLOSED",
+  "new_terminal_status": "RETRACTED_DEVELOPMENT_EVIDENCE_CONTAMINATED",
+  "package_manifest_sha256": "8f546bb4f529ade5c97cf8bb7b742039e227f426962a4d9928f808bced821822",
+  "contamination_receipt_sha256": "784c33cb4b25fb30e638c3447de301feaa040242d9e920d20045f2ca394e2b25",
+  "raw_artifacts_preserved": true,
+  "former_economic_evidence_promotional": false,
+  "q4_access_delta": 0,
+  "broker_connections": 0,
+  "orders": 0
+}

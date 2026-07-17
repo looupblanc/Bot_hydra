@@ -431,6 +431,27 @@ def test_trade_ledgers_must_reconcile_fields_and_economics(
     writer.close()
 
 
+def test_orphan_entry_without_exact_filled_causal_censor_fails_closed(
+    tmp_path: Path,
+) -> None:
+    writer = EvidenceBundleWriter.create(tmp_path, _identity())
+    records = _records()
+    orphan = dict(records["component_entries"][0])
+    orphan["trade_id"] = "orphan_entry"
+    records["component_entries"].append(orphan)
+    _populate_records(writer, records)
+
+    with pytest.raises(
+        IncompleteEvidenceBundle,
+        match="orphan component entry has no corresponding signal",
+    ):
+        writer.finalize(
+            evidence_status="FRESH_DEVELOPMENT_EVIDENCE",
+            lightweight_manifest_path=tmp_path / "receipt.json",
+        )
+    writer.close()
+
+
 def test_target_reached_rejects_economically_inconsistent_daily_path(
     tmp_path: Path,
 ) -> None:
