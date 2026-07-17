@@ -1,0 +1,55 @@
+{
+  "authority": {
+    "authoritative_writer_count": 1,
+    "broker_connection": false,
+    "controller_count": 1,
+    "controller_version": "V17",
+    "initial_data_purchase": false,
+    "live_trading": false,
+    "new_controller_version": false,
+    "new_database": false,
+    "new_service": false,
+    "orders": false,
+    "persistent_service": "hydra-autonomous-mission.service",
+    "q4_access": false
+  },
+  "budget": {
+    "actual_spend_usd": 87.85289960354199,
+    "hard_cap_usd": 125.0,
+    "protected_reserve_usd": 25.0,
+    "remaining_usd": 37.14710039645801
+  },
+  "campaign_id": "hydra_fast_pass_factory_0029",
+  "created_at_utc": "2026-07-17T11:30:00Z",
+  "frozen_evaluation": {
+    "design_blocks": [
+      "B1",
+      "B2"
+    ],
+    "full_coverage_10d_starts": 24,
+    "full_coverage_20d_starts": 12,
+    "full_coverage_5d_starts": 52,
+    "held_out_development_blocks": [
+      "B3",
+      "B4"
+    ],
+    "threshold_changes_after_outcomes_allowed": false
+  },
+  "manifest": {
+    "file_sha256": "6ea725cf5538efa50c8b0e8ab5be8b80fdea1674f0f8e08fb556284e849f531c",
+    "path": "config/v7/fast_pass_factory_0029.json",
+    "semantic_hash": "47465e3c7ee39c76660fb57b83db709c799d11ba22b1a49b9cac01dd437a31ec"
+  },
+  "receipt_hash": "ec14b473bdf7e499f06975c725fb644e2bf5866e326d50bb858b592d39c4e0ec",
+  "schema": "hydra_fast_pass_factory_preregistration_v1",
+  "source_commit": "6a527945b20e31a8d9761b9fa605f232cff8a9b6",
+  "status": "PREREGISTERED_NO_OUTCOMES_INSPECTED",
+  "terminal_predecessor": {
+    "campaign_id": "hydra_causal_target_velocity_0028",
+    "reference_status": "LOW_VELOCITY_CAUSAL_REFERENCE_BANK",
+    "retry_or_retune_allowed": false,
+    "status": "CAUSAL_TARGET_VELOCITY_INCONCLUSIVE_COVERAGE_LIMITED",
+    "terminal_result_path": "reports/economic_evolution/causal_target_velocity_0028_revision_02/economic_production_result.json",
+    "terminal_result_sha256": "10c0fd04e031c89985c71e97edd615746afa997f3d45891352621329fbae5b23"
+  }
+}
