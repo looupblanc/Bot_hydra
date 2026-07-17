@@ -93,6 +93,16 @@ def test_sealed_preflight_accepts_only_anchored_kpi_repair(tmp_path) -> None:
         "scientific_status": "NO_ECONOMIC_SEMANTICS_CHANGE",
         "repair_scope": {"completed_stage3_batch_recomputed": False},
         "multiplicity": {"multiplicity_delta": 0},
+        "preserved_preflight": {
+            "path": (
+                "reports/economic_evolution/causal_target_velocity_0028/"
+                "preflight/risk_frontier_preflight_result.json"
+            ),
+            "file_sha256": "c" * 64,
+            "result_hash": "d" * 64,
+            "manifest_sha256": old_sha,
+            "recomputed": False,
+        },
     }
     receipt["repair_record_hash"] = stable_hash(receipt)
     receipt_path = tmp_path / "repair.json"
@@ -121,6 +131,8 @@ def test_sealed_preflight_accepts_only_anchored_kpi_repair(tmp_path) -> None:
 
     assert _sealed_preflight_manifest_is_compatible(
         existing_manifest_sha256=old_sha,
+        existing_result_file_sha256="c" * 64,
+        existing_result_hash="d" * 64,
         current_manifest_sha256="b" * 64,
         manifest=manifest,
         root=tmp_path,
@@ -128,6 +140,8 @@ def test_sealed_preflight_accepts_only_anchored_kpi_repair(tmp_path) -> None:
     manifest["technical_repair"]["completed_evidence_recomputed"] = True
     assert not _sealed_preflight_manifest_is_compatible(
         existing_manifest_sha256=old_sha,
+        existing_result_file_sha256="c" * 64,
+        existing_result_hash="d" * 64,
         current_manifest_sha256="b" * 64,
         manifest=manifest,
         root=tmp_path,

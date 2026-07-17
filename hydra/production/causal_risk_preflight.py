@@ -200,6 +200,8 @@ def run_causal_risk_preflight(
                 existing_manifest_sha256=str(
                     existing.get("manifest_sha256") or ""
                 ),
+                existing_result_file_sha256=_sha256(existing_path),
+                existing_result_hash=str(existing.get("result_hash") or ""),
                 current_manifest_sha256=_sha256(manifest_file),
                 manifest=manifest,
                 root=root,
@@ -440,6 +442,8 @@ def run_causal_risk_preflight(
 def _sealed_preflight_manifest_is_compatible(
     *,
     existing_manifest_sha256: str,
+    existing_result_file_sha256: str,
+    existing_result_hash: str,
     current_manifest_sha256: str,
     manifest: Mapping[str, Any],
     root: Path,
@@ -467,6 +471,9 @@ def _sealed_preflight_manifest_is_compatible(
         return False
     receipt_core = dict(receipt)
     claimed_receipt_hash = receipt_core.pop("repair_record_hash", None)
+    preserved_preflight = receipt.get("preserved_preflight")
+    if not isinstance(preserved_preflight, Mapping):
+        return False
     return bool(
         repair.get("classification")
         == "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT"
@@ -489,6 +496,17 @@ def _sealed_preflight_manifest_is_compatible(
         )
         is False
         and receipt.get("multiplicity", {}).get("multiplicity_delta") == 0
+        and preserved_preflight.get("path")
+        == (
+            "reports/economic_evolution/causal_target_velocity_0028/"
+            "preflight/risk_frontier_preflight_result.json"
+        )
+        and preserved_preflight.get("file_sha256")
+        == existing_result_file_sha256
+        and preserved_preflight.get("result_hash") == existing_result_hash
+        and preserved_preflight.get("manifest_sha256")
+        == existing_manifest_sha256
+        and preserved_preflight.get("recomputed") is False
     )
 
 
