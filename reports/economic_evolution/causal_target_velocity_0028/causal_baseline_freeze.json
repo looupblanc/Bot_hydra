@@ -1,0 +1,85 @@
+{
+  "schema": "hydra_causal_target_velocity_baseline_freeze_v1",
+  "campaign_id": "hydra_causal_target_velocity_0028",
+  "created_at_utc": "2026-07-17T05:20:48Z",
+  "source_commit": "5c71311ad6b6ef70ade44351bf9edd7768883769",
+  "operating_package_v1_status": "RETRACTED_DEVELOPMENT_EVIDENCE_CONTAMINATED",
+  "causal_salvage_status": "CAUSAL_SALVAGE_GATE_FALSIFIED",
+  "causal_salvage_result_hash": "dda580f364026059f0b3ba32425a002b08f802687825856a0af3cb17edbf8cd8",
+  "source_artifacts": {
+    "phase_a_results": {
+      "path": "reports/economic_evolution/causal_salvage_sprint_0027_revision_02/phase_a_results.json",
+      "file_sha256": "6edf8b982e8f3dd5868f853ab2ee4739b9ef85826b025405b8e4b2bb61ae5c0e"
+    },
+    "causal_salvage_result": {
+      "path": "reports/economic_evolution/causal_salvage_sprint_0027_revision_02/causal_salvage_result.json",
+      "file_sha256": "3abe76b0f6caef909ca4efb46fad47355230ca64392819f68f123fea5ee19bf5"
+    },
+    "operating_package_v1_retraction": {
+      "path": "reports/operating/hydra_operating_package_v1/OPERATING_PACKAGE_V1_RETRACTION_RECEIPT.json",
+      "file_sha256": "002499fa4c95b1d12c0b2c6d8ebccc0617ab84961edfbca33b079ca50ba9beb5"
+    }
+  },
+  "clean_evidence": {
+    "evaluated_sleeve_count": 18,
+    "positive_stressed_sleeve_count_at_frozen_90_day_gate": 17,
+    "normal_combine_pass_count": 0,
+    "stressed_combine_pass_count": 0,
+    "former_book_count": 6,
+    "former_book_pass_count_all_horizons": 0,
+    "best_former_book_full_horizon_stressed_target_progress_median": 0.06557888888889607,
+    "mll_breach_count": 0,
+    "stressed_minimum_mll_buffer_median_usd": 4396.6975,
+    "worst_stressed_minimum_mll_buffer_usd": 1869.725,
+    "former_b4_pass_concentration_present": false,
+    "phase_b_authorized": false,
+    "xfa_authorized": false,
+    "forward_authorized": false
+  },
+  "component_status": "LOW_VELOCITY_CAUSAL_COMPONENTS",
+  "positive_component_ids": [
+    "sleeve_0d5f4ce40cc3e8f002657965",
+    "sleeve_1488a965163f4de09bca7cf3",
+    "sleeve_352b3dd8e17fd32021bf837b",
+    "sleeve_39eb74b174e7bdd240520b9d",
+    "sleeve_3ba7422174d7e5b1c2a01d58",
+    "sleeve_454819bd8caec8581b6016d2",
+    "sleeve_4de0a5d3b0ef1762cc9e4086",
+    "sleeve_57125a2989d8eac29398af60",
+    "sleeve_5c45e73e41fac686c67a0443",
+    "sleeve_5c79759104e5765769be23ea",
+    "sleeve_624310a1de865cef4db2f8f4",
+    "sleeve_64d6fd6dd9e5f74b920ac99b",
+    "sleeve_65bad2088913fc9fca0a145d",
+    "sleeve_7ecd76490fa9fb34e1af5820",
+    "sleeve_8af4e061229c8ce7ae335f63",
+    "sleeve_c5da4b5a67abadeb7d68eabe",
+    "sleeve_e017bb45b0937aef46657631"
+  ],
+  "negative_or_unstable_diagnostic_ids": [
+    "sleeve_617236bb4c8b7cca8a472bac"
+  ],
+  "inheritance": {
+    "pass_status_inherited": false,
+    "promotion_status_inherited": false,
+    "former_book_retry_allowed": false,
+    "former_book_retuning_allowed": false
+  },
+  "risk_frontier_preflight": {
+    "normalized_levels": [0.75, 1.0, 1.25, 1.5],
+    "thresholds_frozen_before_results": true,
+    "minimum_normal_passes": 3,
+    "minimum_stressed_passes": 2,
+    "positive_stressed_net_required": true,
+    "maximum_mll_breach_rate": 0.1,
+    "maximum_campaign_compute_fraction": 0.1,
+    "neighboring_multiplier_search_allowed": false
+  },
+  "safety": {
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "xfa_before_clean_combine_survivors_allowed": false
+  }
+}
