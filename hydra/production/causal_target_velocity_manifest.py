@@ -263,12 +263,19 @@ def _validate_hazard_labels(manifest: Mapping[str, Any]) -> None:
 def _validate_search_space(manifest: Mapping[str, Any]) -> None:
     search = _mapping(manifest, "search_space")
     markets = set(str(value) for value in search.get("markets") or ())
+    reference_map = {
+        str(key): str(value)
+        for key, value in _mapping(search, "cross_asset_reference_map").items()
+    }
     timeframes = set(str(value) for value in search.get("timeframes") or ())
     sessions = set(str(value) for value in search.get("sessions") or ())
     mechanisms = set(str(value) for value in search.get("mechanisms") or ())
     if (
         not markets
         or not markets.issubset(_ALLOWED_MARKETS)
+        or set(reference_map) != markets
+        or not set(reference_map.values()).issubset(markets)
+        or any(market == reference for market, reference in reference_map.items())
         or not _REQUIRED_TIMEFRAMES.issubset(timeframes)
         or not _REQUIRED_SESSIONS.issubset(sessions)
         or mechanisms != _REQUIRED_MECHANISMS

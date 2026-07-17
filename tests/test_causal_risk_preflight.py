@@ -1,0 +1,81 @@
+from __future__ import annotations
+
+import pytest
+
+from hydra.production.causal_risk_preflight import (
+    CausalRiskPreflightError,
+    executable_micro_quantity,
+    risk_scale_gate,
+    scale_causal_trajectory,
+)
+from hydra.propfirm.combine_episode import TradePathEvent
+from hydra.research.causal_sleeve_replay import CausalTradeMark, CausalTradeTrajectory
+
+
+def _trajectory() -> CausalTradeTrajectory:
+    event = TradePathEvent(
+        event_id="sleeve:test:1",
+        decision_ns=120,
+        exit_ns=180,
+        session_day=1,
+        net_pnl=10.0,
+        gross_pnl=12.0,
+        worst_unrealized_pnl=-4.0,
+        best_unrealized_pnl=15.0,
+        quantity=1,
+        mini_equivalent=0.1,
+    )
+    return CausalTradeTrajectory(
+        component_id="sleeve:test",
+        market="MES",
+        side=1,
+        event=event,
+        marks=(
+            CausalTradeMark(
+                availability_time_ns=180,
+                worst_unrealized_pnl=-4.0,
+                best_unrealized_pnl=15.0,
+                current_unrealized_pnl=10.0,
+            ),
+        ),
+        initial_unrealized_pnl=-2.0,
+    )
+
+
+def test_normalized_frontier_has_exact_whole_micro_mapping() -> None:
+    assert [executable_micro_quantity(level) for level in (0.75, 1, 1.25, 1.5)] == [3, 4, 5, 6]
+    with pytest.raises(CausalRiskPreflightError):
+        executable_micro_quantity(1.1)
+
+
+def test_trajectory_scaling_preserves_causal_identity_and_scales_economics() -> None:
+    source = _trajectory()
+    scaled = scale_causal_trajectory(source, executable_quantity_multiplier=5)
+    assert scaled.event.event_id == source.event.event_id
+    assert scaled.event.decision_ns == source.event.decision_ns
+    assert scaled.event.exit_ns == source.event.exit_ns
+    assert scaled.event.quantity == 5
+    assert scaled.event.mini_equivalent == pytest.approx(0.5)
+    assert scaled.event.net_pnl == pytest.approx(50.0)
+    assert scaled.event.gross_pnl == pytest.approx(60.0)
+    assert scaled.marks[0].worst_unrealized_pnl == pytest.approx(-20.0)
+    assert scaled.marks[0].current_unrealized_pnl == pytest.approx(50.0)
+    assert scaled.initial_unrealized_pnl == pytest.approx(-10.0)
+
+
+def test_risk_gate_requires_both_cost_scenarios_and_positive_stress() -> None:
+    base = {
+        "preflight_policy_id": "pass",
+        "normal": {"pass_count": 3, "mll_breach_rate": 0.10},
+        "stressed": {"pass_count": 2, "net_total": 1.0, "mll_breach_rate": 0.10},
+    }
+    result = risk_scale_gate([base])
+    assert result["status"] == "RISK_SCALE_ONLY_SURVIVORS_FOUND"
+    assert result["survivor_ids"] == ["pass"]
+    failed = {
+        **base,
+        "preflight_policy_id": "failed",
+        "stressed": {"pass_count": 2, "net_total": 0.0, "mll_breach_rate": 0.10},
+    }
+    result = risk_scale_gate([failed])
+    assert result["status"] == "RISK_SCALE_ONLY_FALSIFIED"

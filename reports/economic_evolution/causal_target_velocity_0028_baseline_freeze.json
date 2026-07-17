@@ -1,5 +1,6 @@
 {
   "schema": "hydra_causal_target_velocity_baseline_freeze_v1",
+  "storage_role": "PRE_RESERVATION_BASELINE_OUTSIDE_CAMPAIGN_OUTPUT",
   "campaign_id": "hydra_causal_target_velocity_0028",
   "created_at_utc": "2026-07-17T05:20:48Z",
   "source_commit": "5c71311ad6b6ef70ade44351bf9edd7768883769",

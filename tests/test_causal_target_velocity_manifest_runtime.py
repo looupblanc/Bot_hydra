@@ -128,7 +128,14 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
             "censored_state": "CENSORED_FUTURE_COVERAGE",
         },
         "search_space": {
-            "markets": ["CL", "ES", "NQ", "RTY", "YM", "GC"],
+            "markets": ["CL", "ES", "NQ", "RTY", "YM"],
+            "cross_asset_reference_map": {
+                "CL": "ES",
+                "ES": "NQ",
+                "NQ": "ES",
+                "RTY": "ES",
+                "YM": "ES",
+            },
             "timeframes": ["1m", "5m", "15m", "30m", "60m"],
             "sessions": ["OVERNIGHT", "SESSION_OPEN", "INTRADAY", "CLOSE"],
             "mechanisms": [
