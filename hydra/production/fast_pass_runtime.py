@@ -30,7 +30,7 @@ from dataclasses import asdict, replace
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from statistics import median
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Iterable, Iterator, Mapping, Sequence
 
 import numpy as np
 
@@ -326,6 +326,50 @@ def _hazard_signal_decision_ns(row: Any) -> int:
             "hazard event lacks canonical decision_time_ns"
         )
     return int(value)
+
+
+class _EpisodeEvidenceRecordStream:
+    """Deterministically replay immutable episode receipts without materializing them.
+
+    EvidenceBundle finalization iterates the account evidence twice: once to freeze
+    identity/coverage and once to append canonical datasets.  Keeping every decoded
+    episode and daily path alive across both passes made campaign 0029 consume more
+    memory than the host and spend most of its time swapping.  This sized,
+    re-iterable view preserves the exact receipt order while bounding memory to one
+    receipt at a time.
+    """
+
+    def __init__(
+        self,
+        *,
+        payload_dir: Path,
+        receipts: Sequence[Mapping[str, Any]],
+        expected_record_count: int,
+    ) -> None:
+        self._payload_dir = payload_dir.resolve()
+        self._receipts = tuple(dict(receipt) for receipt in receipts)
+        self._expected_record_count = int(expected_record_count)
+        if not self._receipts or self._expected_record_count <= 0:
+            raise FastPassRuntimeError(
+                "terminal episode record stream cannot be empty"
+            )
+
+    def __len__(self) -> int:
+        return self._expected_record_count
+
+    def __iter__(self) -> Iterator[dict[str, Any]]:
+        observed = 0
+        for receipt in self._receipts:
+            for value in _read_episode_receipt(self._payload_dir, receipt):
+                if value.get("episode") is None:
+                    continue
+                observed += 1
+                yield value
+        if observed != self._expected_record_count:
+            raise FastPassRuntimeError(
+                "terminal episode record stream count drift: "
+                f"expected={self._expected_record_count} observed={observed}"
+            )
 
 
 class _FastPassRun:
@@ -2170,20 +2214,19 @@ class _FastPassRun:
         coverage_inventory = self._seal_coverage_exclusion_inventory(sprint_rows)
         diversity = self._seal_diversity_audit(bank)
         policies: dict[str, Any] = {}
-        records: list[dict[str, Any]] = []
+        episode_receipts: list[dict[str, Any]] = []
         for row in sprint_rows:
             policy_id = str(row["policy_id"])
             policy = row.get("policy") or row.get("governor_policy")
             if not isinstance(policy, Mapping):
                 raise FastPassRuntimeError(f"missing executable policy: {policy_id}")
             policies[policy_id] = dict(policy)
-            records.extend(
-                value
-                for value in _read_episode_receipt(
-                    self.payload_dir, row["episode_evidence"]
-                )
-                if value.get("episode") is not None
-            )
+            episode_receipts.append(dict(row["episode_evidence"]))
+        records = _EpisodeEvidenceRecordStream(
+            payload_dir=self.payload_dir,
+            receipts=episode_receipts,
+            expected_record_count=int(coverage_inventory["executed_episode_count"]),
+        )
         exact_replays = self._reconstruct_bank(union_bank)
         required_components = {
             str(component_id)

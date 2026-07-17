@@ -13,6 +13,7 @@ from hydra.mission.economic_evolution_manifest_runtime import (
 )
 from hydra.production import fast_pass_runtime as runtime
 from hydra.production.fast_pass_runtime import (
+    _EpisodeEvidenceRecordStream,
     FastPassRuntimeError,
     _block_summary,
     _FastPassRun,
@@ -121,6 +122,54 @@ def test_diversity_signal_key_uses_canonical_causal_decision_time() -> None:
     assert _hazard_signal_decision_ns(event) == 123_456_789
     with pytest.raises(FastPassRuntimeError, match="decision_time_ns"):
         _hazard_signal_decision_ns(SimpleNamespace(decision_ns=123_456_789))
+
+
+def test_terminal_episode_records_are_reiterable_and_memory_bounded(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    batches = {
+        "first": [
+            {"episode": {"episode_id": "one"}},
+            {"episode": None, "coverage_status": "DATA_CENSORED"},
+        ],
+        "second": [{"episode": {"episode_id": "two"}}],
+    }
+    calls: list[str] = []
+
+    def read_receipt(_base: Path, receipt: dict[str, object]) -> list[dict]:
+        key = str(receipt["key"])
+        calls.append(key)
+        return list(batches[key])
+
+    monkeypatch.setattr(runtime, "_read_episode_receipt", read_receipt)
+    records = _EpisodeEvidenceRecordStream(
+        payload_dir=tmp_path,
+        receipts=[{"key": "first"}, {"key": "second"}],
+        expected_record_count=2,
+    )
+
+    assert len(records) == 2
+    assert [row["episode"]["episode_id"] for row in records] == ["one", "two"]
+    assert [row["episode"]["episode_id"] for row in records] == ["one", "two"]
+    assert calls == ["first", "second", "first", "second"]
+
+
+def test_terminal_episode_record_stream_rejects_count_drift(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        runtime,
+        "_read_episode_receipt",
+        lambda *_args: [{"episode": {"episode_id": "one"}}],
+    )
+    records = _EpisodeEvidenceRecordStream(
+        payload_dir=tmp_path,
+        receipts=[{"key": "only"}],
+        expected_record_count=2,
+    )
+
+    with pytest.raises(FastPassRuntimeError, match="record stream count drift"):
+        list(records)
 
 
 def test_tier_gate_uses_held_out_development_not_design_results() -> None:
