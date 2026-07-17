@@ -1,0 +1,129 @@
+{
+  "campaign_id": "hydra_fast_pass_factory_0029",
+  "classification": "TECHNICAL_BLOCK_SUMMARY_SCHEMA_READER_DEFECT",
+  "code_repair": {
+    "canonical_reader": "_block_summary",
+    "new_manifest_validator_sha256": "9257547e32fafd8503728a18bc364436dafd0d31e9b1a4ddf4620360758592a1",
+    "new_runtime_file_sha256": "ec7f3fde620a4cef1f4dfa64b287baeb6e88279e38ec5c042b65c2f96b254a83",
+    "old_manifest_validator_sha256": "df43a30897ba8fd78891982c932caf80d127a8bbae48c78e84f0defb01b8e610",
+    "old_runtime_file_sha256": "497f695b3b2e6bef9d8ad81fd35a08138b1ad8797beeea22fb855a17f2bfa472",
+    "read_key": "by_block",
+    "repair_commit": "ea7f79ed5700fbbec1864bd349d3ffd248d1ff73"
+  },
+  "failed_closed_checkpoint": {
+    "causal_executable_bank_size": 120,
+    "combine_episodes_completed": 284220,
+    "exact_account_replays": 2500,
+    "exact_books": 0,
+    "failure_message": "'summaries_by_block'",
+    "failure_type": "KeyError",
+    "file_sha256": "7df5c3b7d0e34f56be55a291e96f3f06b09ee90ece4e54b422d4e387752da61c",
+    "path": "reports/economic_evolution/fast_pass_factory_0029_revision_01/production_state.json",
+    "policies_proposed": 50000,
+    "stage": "WAVE_1_BOOK_CONTROLS_SPRINT_ACTIVE",
+    "state": "FAILED_CLOSED",
+    "state_hash": "f8d66483e5d2ffd6961dac40c76a2c2af25991914a53e25c5ca8c33a8081441d",
+    "unique_policies_screened": 10000
+  },
+  "multiplicity": {
+    "existing_reserved_delta_trials": 150000,
+    "multiplicity_delta": 0,
+    "new_reservation_required": false,
+    "reservation_file_sha256": "e16dcb8ad58af669a7c44988d9549d13e780b017d8aaf50fe798e41a7dac2689",
+    "reservation_path": "reports/economic_evolution/hydra_fast_pass_factory_0029_multiplicity_reservation.json"
+  },
+  "preserved_frozen_evidence": {
+    "bank_tier_file_exists": false,
+    "book_control_sprint_batches": {
+      "file_count": 338,
+      "inventory_hash": "2c10217fdd633567f34b7fb00534f7d38844090ca82d393a0c9855eed3a58ea1",
+      "row_count": 1350
+    },
+    "book_sprint_batches": {
+      "file_count": 259,
+      "inventory_hash": "02ce2cd5790a79fb43e33e550bf54de19d7ffee5f78df54f50e65083dffa9bb5",
+      "row_count": 1034
+    },
+    "causal_executable_bank": {
+      "bank_hash": "4adc7adaa172301d66f3c0111f17526dd3a839aac4dfcef1e65b47f2e9c2545c",
+      "entry_count": 120,
+      "file_sha256": "5ce108c595d4b0be46fadc470191b655d3658ded89f79161aed782a8cc1336b1",
+      "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_01/causal_executable_bank.json"
+    },
+    "combine_episode_count": 284220,
+    "marginal_book_proposals": {
+      "file_sha256": "11daa5c5cb94a2f8f977b433732711a4398382b5e70b1971a1c4028e3b931943",
+      "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_01/marginal_book_proposals.jsonl",
+      "row_count": 1000
+    },
+    "marginal_decision_file_exists": false,
+    "normal_episode_count": 142110,
+    "sleeve_sprint_batches": {
+      "file_count": 30,
+      "inventory_hash": "8a50a6a697be4ae383699150cb54cbcb4586bb15d96d8350533f29beabb0dac9",
+      "row_count": 120
+    },
+    "stage1_halving": {
+      "file_sha256": "6770b0d5df6e42636b38ad071be5a4f2af4b75af8b7f8718592747ede338b066",
+      "input_count": 10000,
+      "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_01/stage1_halving.json",
+      "selected_count": 2500,
+      "selection_hash": "16b7481dc64a197d5f68af4875048825a478b562bf1f1af6e711c064e0860683"
+    },
+    "stage2_batches": {
+      "file_count": 625,
+      "inventory_hash": "84a423ad7fbbe8eacbca04822c16b01a9098f7d60cc3b783ad996ff8d73ad6f6",
+      "row_count": 2500
+    },
+    "stressed_episode_count": 142110
+  },
+  "recorded_at_utc": "2026-07-17T13:11:24.392569Z",
+  "repair_record_hash": "4562cf51b130579e39fc38fa972b74d12b7fb80c32dd604daddc9eaedae92bce",
+  "root_cause": {
+    "consumer_schema_key": "summaries_by_block",
+    "defect": "Level-2 temporal cross-fit aggregator requested a nonexistent legacy alias after all sprint/control rows were already persisted",
+    "economic_decisions_or_account_paths_affected": false,
+    "lookahead_or_accounting_defect": false,
+    "producer_schema_key": "by_block"
+  },
+  "safety": {
+    "broker_connections": 0,
+    "data_purchase_count_delta": 0,
+    "orders": 0,
+    "q4_access_delta": 0
+  },
+  "schema": "hydra_technical_runtime_repair_receipt_v1",
+  "scientific_status": "RESTORES_CANONICAL_BY_BLOCK_CONTROL_AGGREGATION",
+  "scope_guards": {
+    "candidate_population_or_selection_changed": false,
+    "completed_sprint_and_controls_reused_unchanged": true,
+    "completed_stage0_stage1_stage2_reused_unchanged": true,
+    "costs_slippage_or_account_rules_changed": false,
+    "episode_starts_or_horizons_changed": false,
+    "new_xfa_work_started": false,
+    "resume_scope": "REUSE_SEALED_STAGE0_STAGE1_STAGE2_SPRINT_AND_CONTROLS_AGGREGATE_ONLY",
+    "risk_threshold_or_control_changed": false,
+    "scientific_hypothesis_changed": false,
+    "sprint_or_control_evidence_recomputed": false,
+    "stage0_stage1_stage2_evidence_recomputed": false
+  },
+  "superseded_revision": {
+    "manifest_file_sha256": "a10a667055da7a62bec2e5718b14823c2fdfeb7b2640e924bafca28d2dcbc2f4",
+    "manifest_hash": "4e6a2feff9ea16ce866330e760ad05afd48b79f6aef207e16fadb1d9f2c6c882",
+    "manifest_path": "config/v7/fast_pass_factory_0029_revision_01.json",
+    "worm_commit": "6bf40732d844329c56b2dab52be32f5948bcdc37",
+    "worm_tag": "worm/fast-pass-factory-0029-quality-identity-repair-2026-07-17"
+  },
+  "validation": {
+    "canonical_block_views_checked": 4768,
+    "persisted_rows_checked": 2384,
+    "required_blocks": [
+      "B3",
+      "B4"
+    ],
+    "result": "CANONICAL_BY_BLOCK_AGGREGATION_PROVEN",
+    "targeted_test_command": "PYTHONPATH=. .venv/bin/pytest -q tests/test_fast_pass_runtime_contract.py tests/test_fast_pass_runtime_helpers.py tests/test_fast_pass_manifest.py",
+    "targeted_tests_failed": 0,
+    "targeted_tests_passed": 33
+  }
+}
