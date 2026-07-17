@@ -1,0 +1,76 @@
+{
+  "archive": {
+    "archive_path": "data/cache/evidence_bundles/.hydra_fast_pass_factory_0029.evidence-v1.revision04-staging-archived-20260717T231132Z",
+    "atomic_same_filesystem_rename": true,
+    "byte_count": 580103255,
+    "checkpoint_sha256": "8bbd98067cf2d5e877ae542559c6de7496feebca3af4c9460631c519c95b994e",
+    "file_count": 1146,
+    "identity_sha256": "449a9a7cb4f74821d9eb4d7b911aafc78cb5c814b20b8d4b61d3366038ab7782",
+    "original_staging_path": "data/cache/evidence_bundles/.hydra_fast_pass_factory_0029.evidence-v1.staging",
+    "preserved_read_only_evidence": true
+  },
+  "campaign_id": "hydra_fast_pass_factory_0029",
+  "classification": "TECHNICAL_STAGING_IDENTITY_REVISION_MISMATCH",
+  "decision": {
+    "economic_recompute_allowed": false,
+    "in_place_migration_rejected": true,
+    "recovery_method": "ARCHIVE_REVISION04_STAGING_THEN_CANONICAL_REVISION05_RESERIALIZATION",
+    "reason": "The canonical writer seals provenance parts, payload hashes, compact outputs and checkpoint receipts together. Rewriting them in place would weaken the audit chain; a fresh serialization preserves writer invariants.",
+    "revision05_manifest_path": "config/v7/fast_pass_factory_0029_revision_05.json",
+    "revision05_manifest_sha256": "8a2b730c37d6dbe8a5bdf341dce91455966a4d204dd8f0f63669efc4d653432e",
+    "revision05_manifest_hash": "3b1f7e4fe881a1de07c86584740bc19c2b79b248b287a146d96bc83bb71b0562"
+  },
+  "economic_evidence": {
+    "account_daily_path_count": 4173440,
+    "combine_episode_count": 553674,
+    "component_count": 180,
+    "economic_results_changed": false,
+    "normal_episode_count": 276837,
+    "policy_count": 5031,
+    "stressed_episode_count": 276837
+  },
+  "identity_audit": {
+    "changed_identity_fields": [
+      "source_commit",
+      "configuration_sha256"
+    ],
+    "expected_revision05_configuration_sha256": "9bb57c010b89724074520706dfdd99692f0700b1ac2ca0de8900e8ce1f5cf656",
+    "expected_revision05_identity_sha256": "348cffe8382feff29b080f70a8f62204671e07c21eeebd122755ec2a1ada92ce",
+    "revision04_configuration_sha256": "d6d399a881fcd87b8a6562bb3aa420264340fb401ee1b10f6c32cba5bae5f864",
+    "revision04_source_commit": "322480e97fa500150bfbe60c3b314f32bc61445f",
+    "revision05_source_commit": "90df9ca657434d812705996e0c3d097c0e55aa33",
+    "unchanged_component_fingerprints": 180,
+    "unchanged_expected_episode_keys": 276837,
+    "unchanged_policy_fingerprints": 5031
+  },
+  "provenance_audit": {
+    "changed_immutable_checksum_fields": [
+      "configuration",
+      "manifest",
+      "terminal_recovery_payload"
+    ],
+    "other_immutable_checksums_unchanged": 6121,
+    "revision05_campaign_summary_sha256_expected": "094c7252ee4ae902b9483a5b569f98a5e3363587d55090870322bb98278d0557",
+    "revision05_terminal_recovery_payload_hash": "749765ab39856a16acf8258d89a54aaff16ba6b67655d0c8e91524b5eed4aeae"
+  },
+  "recorded_at_utc": "2026-07-17T23:11:32Z",
+  "safety": {
+    "broker_connections": 0,
+    "data_purchase_count_delta": 0,
+    "orders": 0,
+    "q4_access_delta": 0,
+    "service_stopped_for_single_writer_recovery": true
+  },
+  "schema": "hydra_technical_runtime_recovery_checkpoint_v1",
+  "scientific_status": "ECONOMIC_RESULT_UNCHANGED_TECHNICAL_RESERIALIZATION_PENDING",
+  "scope_guards": {
+    "account_rules_changed": false,
+    "candidate_population_changed": false,
+    "costs_or_slippage_changed": false,
+    "economic_episode_replay": false,
+    "episode_order_changed": false,
+    "episode_starts_or_horizons_changed": false,
+    "manifest_semantics_changed": false,
+    "selection_or_threshold_changed": false
+  }
+}
