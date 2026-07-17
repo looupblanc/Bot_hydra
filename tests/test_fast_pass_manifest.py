@@ -25,6 +25,9 @@ from hydra.production.manifest import (
 from hydra.propfirm.combine_to_xfa import official_rule_snapshot_2026_07_15
 
 
+ROOT = Path(__file__).resolve().parents[1]
+
+
 def _write(path: Path, value: str) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(value, encoding="utf-8")
@@ -485,6 +488,18 @@ def test_fast_pass_manifest_is_accepted_by_stable_production_schema(
 
     assert load_and_validate_production_manifest(path) == expected
     validate_fast_pass_manifest(expected, manifest_path=path)
+
+
+def test_terminal_validation_recovery_revision_is_valid_and_finalization_only() -> None:
+    path = ROOT / "config/v7/fast_pass_factory_0029_revision_05.json"
+
+    manifest = load_and_validate_production_manifest(path)
+
+    assert manifest["revision_id"] == "hydra_fast_pass_factory_0029_revision_05"
+    assert manifest["technical_repair"]["resume_scope"] == (
+        "REUSE_COMPLETE_STAGING_FINALIZATION_ONLY"
+    )
+    assert manifest["technical_repair"]["terminal_economic_evidence_recomputed"] is False
 
 
 @pytest.mark.parametrize(
