@@ -1829,9 +1829,16 @@ def _economic_marks(
                 worst = min(float(terminal_net), float(barrier_mark))
                 best = float(terminal_net)
             elif barrier_outcome == HazardOutcome.FAVORABLE_FIRST:
-                # Preserve the conservative pre-target adverse extreme (the
-                # stop was not touched), but cap upside at the filled target.
-                best = max(float(terminal_net), float(barrier_mark))
+                # The resting target closes the position at first touch.  The
+                # terminal bar's favorable extreme therefore cannot enter the
+                # account path after that fill.  Preserve its adverse extreme
+                # conservatively as potentially pre-fill, but include the
+                # executed terminal value in both bounds.  In particular, when
+                # the bar gaps completely through the target, its adverse
+                # extreme is itself beyond the target and both bounds collapse
+                # to the realized terminal value instead of becoming inverted.
+                worst = min(float(worst), float(terminal_net))
+                best = float(terminal_net)
         marks.append(
             CausalTradeMark(
                 availability_time_ns=int(availability[index]),

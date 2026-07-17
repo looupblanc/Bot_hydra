@@ -191,6 +191,48 @@ def test_same_bar_touch_is_ambiguous_and_adverse_first() -> None:
     assert event.maximum_favorable_excursion_r == 0.0
 
 
+def test_favorable_gap_through_excludes_post_fill_terminal_bar_extremes() -> None:
+    for direction in (1, -1):
+        source = _matrix()
+        arrays = {
+            name: np.array(value, copy=True)
+            for name, value in source.arrays.items()
+        }
+        arrays["feature__past_return_60"][45] = 0.01 * direction
+        gap_price = 101.0 if direction > 0 else 99.0
+        for field in ("bar_open", "bar_high", "bar_low", "bar_close"):
+            arrays[field][47] = gap_price
+        matrix = FeatureMatrix(
+            root=source.root,
+            manifest=source.manifest,
+            arrays=arrays,
+        )
+        calibrated = _calibrated(matrix)
+        intents = discover_intents_batch(
+            calibrated,
+            matrix,
+            evaluation_start_ns=40 * MINUTE,
+            evaluation_end_exclusive_ns=70 * MINUTE,
+        )
+
+        events = observe_outcomes(calibrated, matrix, intents)
+
+        assert len(events) == 1
+        event = events[0]
+        assert event.direction == direction
+        assert event.outcome == HazardOutcome.FAVORABLE_FIRST
+        assert event.normal_net_pnl is not None
+        assert event.stressed_net_pnl is not None
+        for marks, terminal_net in (
+            (event.normal_marks, event.normal_net_pnl),
+            (event.stressed_marks, event.stressed_net_pnl),
+        ):
+            terminal = marks[-1]
+            assert terminal.current_unrealized_pnl == terminal_net
+            assert terminal.worst_unrealized_pnl == terminal_net
+            assert terminal.best_unrealized_pnl == terminal_net
+
+
 def test_timeframe_is_an_executable_completed_bar_gate_in_batch_and_stream() -> None:
     matrix = _matrix()
     trigger = matrix.array("feature__past_participation").copy()
