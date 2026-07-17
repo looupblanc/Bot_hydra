@@ -11,7 +11,12 @@ from hydra.mission.economic_evolution_manifest_runtime import (
     EconomicEvolutionManifestRuntime,
 )
 from hydra.production import fast_pass_runtime as runtime
-from hydra.production.fast_pass_runtime import _FastPassRun, _exposure_match_audit
+from hydra.production.fast_pass_runtime import (
+    FastPassRuntimeError,
+    _block_summary,
+    _FastPassRun,
+    _exposure_match_audit,
+)
 
 
 def _summary(*, passes: int, net: float, progress: float = 0.1) -> dict[str, object]:
@@ -96,6 +101,16 @@ def _run() -> _FastPassRun:
     }
     run.state = {"state": "FINALIZING"}
     return run
+
+
+def test_block_control_aggregation_uses_canonical_by_block_schema() -> None:
+    canonical = {"by_block": {"B3": {"NORMAL": {"5": {"pass_count": 1}}}}}
+
+    assert _block_summary(canonical, "B3") == {
+        "NORMAL": {"5": {"pass_count": 1}}
+    }
+    with pytest.raises(FastPassRuntimeError, match="canonical by_block"):
+        _block_summary({"summaries_by_block": canonical["by_block"]}, "B3")
 
 
 def test_tier_gate_uses_held_out_development_not_design_results() -> None:

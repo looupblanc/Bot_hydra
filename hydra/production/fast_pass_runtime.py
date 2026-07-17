@@ -305,6 +305,18 @@ def read_fast_pass_status(manifest_path: str | Path) -> dict[str, Any]:
     return {"state": state, "kpis": kpis}
 
 
+def _block_summary(row: Mapping[str, Any], block: str) -> dict[str, Any]:
+    """Read the canonical per-block sprint summary without schema aliases."""
+
+    by_block = row.get("by_block")
+    if not isinstance(by_block, Mapping):
+        raise FastPassRuntimeError("canonical by_block sprint summary missing")
+    summary = by_block.get(block)
+    if not isinstance(summary, Mapping):
+        raise FastPassRuntimeError(f"sprint block summary missing: {block}")
+    return dict(summary)
+
+
 class _FastPassRun:
     def __init__(
         self,
@@ -1649,14 +1661,10 @@ class _FastPassRun:
                     {
                         "block": block,
                         "selection_role": "HELD_OUT_DEVELOPMENT",
-                        "source": dict(
-                            source["summaries_by_block"][block]
-                        ),
-                        "equal_risk": dict(
-                            equal["summaries_by_block"][block]
-                        ),
-                        "exposure_matched_random": dict(
-                            random_row["summaries_by_block"][block]
+                        "source": _block_summary(source, block),
+                        "equal_risk": _block_summary(equal, block),
+                        "exposure_matched_random": _block_summary(
+                            random_row, block
                         ),
                         "policy_frozen_before_block_outcomes": True,
                     }
@@ -1688,7 +1696,6 @@ class _FastPassRun:
             f"wave_{wave:02d}/book_level2_controls.jsonl", output
         )
         return output
-
     def _evaluate_sprint_specs(
         self,
         wave: int,
