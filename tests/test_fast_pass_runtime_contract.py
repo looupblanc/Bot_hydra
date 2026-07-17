@@ -4,6 +4,7 @@ import json
 import time
 from datetime import UTC, datetime
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -16,6 +17,7 @@ from hydra.production.fast_pass_runtime import (
     _block_summary,
     _FastPassRun,
     _exposure_match_audit,
+    _hazard_signal_decision_ns,
 )
 
 
@@ -111,6 +113,14 @@ def test_block_control_aggregation_uses_canonical_by_block_schema() -> None:
     }
     with pytest.raises(FastPassRuntimeError, match="canonical by_block"):
         _block_summary({"summaries_by_block": canonical["by_block"]}, "B3")
+
+
+def test_diversity_signal_key_uses_canonical_causal_decision_time() -> None:
+    event = SimpleNamespace(decision_time_ns=123_456_789)
+
+    assert _hazard_signal_decision_ns(event) == 123_456_789
+    with pytest.raises(FastPassRuntimeError, match="decision_time_ns"):
+        _hazard_signal_decision_ns(SimpleNamespace(decision_ns=123_456_789))
 
 
 def test_tier_gate_uses_held_out_development_not_design_results() -> None:

@@ -26,6 +26,7 @@ FAST_PASS_CLASS_ID = "FIVE_DAY_COMBINE_QUALITY_DIVERSITY_MARGINAL_BOOK_V1"
 FAST_PASS_RUNTIME_VERSION = "hydra_fast_pass_factory_runtime_v1"
 FAST_PASS_TECHNICAL_REVISION_ID = "hydra_fast_pass_factory_0029_revision_01"
 FAST_PASS_TECHNICAL_REVISION_02_ID = "hydra_fast_pass_factory_0029_revision_02"
+FAST_PASS_TECHNICAL_REVISION_03_ID = "hydra_fast_pass_factory_0029_revision_03"
 FAST_PASS_ORIGINAL_MANIFEST_HASH = (
     "47465e3c7ee39c76660fb57b83db709c799d11ba22b1a49b9cac01dd437a31ec"
 )
@@ -692,6 +693,8 @@ def _technical_revision_output(manifest: Mapping[str, Any]) -> str:
             "reports/economic_evolution/fast_pass_factory_0029_revision_01",
         FAST_PASS_TECHNICAL_REVISION_02_ID:
             "reports/economic_evolution/fast_pass_factory_0029_revision_02",
+        FAST_PASS_TECHNICAL_REVISION_03_ID:
+            "reports/economic_evolution/fast_pass_factory_0029_revision_03",
     }
     try:
         return outputs[str(revision_id)]
@@ -713,6 +716,7 @@ def _validate_technical_repair(
     if revision_id not in {
         FAST_PASS_TECHNICAL_REVISION_ID,
         FAST_PASS_TECHNICAL_REVISION_02_ID,
+        FAST_PASS_TECHNICAL_REVISION_03_ID,
     } or not isinstance(repair, Mapping):
         raise FastPassManifestError("fast-pass technical repair contract missing")
     receipt_ref = repair.get("repair_receipt")
@@ -758,6 +762,22 @@ def _validate_technical_repair(
             "revision_output_dir":
                 "reports/economic_evolution/fast_pass_factory_0029_revision_02",
         },
+        FAST_PASS_TECHNICAL_REVISION_03_ID: {
+            "classification":
+                "TECHNICAL_DIVERSITY_DECISION_FIELD_ADAPTER_DEFECT",
+            "scientific_status":
+                "RESTORES_CANONICAL_DECISION_TIME_DIVERSITY_AUDIT",
+            "resume_scope":
+                "REUSE_SEALED_ALL_ECONOMIC_EVIDENCE_FINALIZATION_ONLY",
+            "supersedes_manifest_hash":
+                "5907af0925ce8958200a96e5497edce2ccc7fda22d3b8e39da70cbc384fbccd5",
+            "supersedes_manifest_file_sha256":
+                "4d402cd3484bb17b0585260f2c58c856647baef61f453b81184a73f2bf9f5e7c",
+            "supersedes_output_dir":
+                "reports/economic_evolution/fast_pass_factory_0029_revision_02",
+            "revision_output_dir":
+                "reports/economic_evolution/fast_pass_factory_0029_revision_03",
+        },
     }
     contract = revision_contracts[str(revision_id)]
     expected_flags = (
@@ -785,6 +805,15 @@ def _validate_technical_repair(
             and repair.get("sprint_or_control_evidence_recomputed") is False
             and repair.get("completed_sprint_and_controls_reused_unchanged") is True
         )
+    if revision_id == FAST_PASS_TECHNICAL_REVISION_03_ID:
+        expected_flags = bool(
+            expected_flags
+            and repair.get("sprint_or_control_evidence_recomputed") is False
+            and repair.get("completed_sprint_and_controls_reused_unchanged") is True
+            and repair.get("terminal_economic_evidence_recomputed") is False
+            and repair.get("completed_all_economic_evidence_reused_unchanged")
+            is True
+        )
     if (
         not expected_flags
         or receipt_ref.get("file_sha256") != _sha256(receipt_path)
@@ -799,7 +828,10 @@ def _validate_technical_repair(
         or receipt.get("multiplicity", {}).get("multiplicity_delta") != 0
     ):
         raise FastPassManifestError("fast-pass technical repair provenance drift")
-    if revision_id == FAST_PASS_TECHNICAL_REVISION_02_ID:
+    if revision_id in {
+        FAST_PASS_TECHNICAL_REVISION_02_ID,
+        FAST_PASS_TECHNICAL_REVISION_03_ID,
+    }:
         _validate_repair_semantic_allowlist(manifest, repair, root)
 
 

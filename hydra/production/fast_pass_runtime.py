@@ -317,6 +317,17 @@ def _block_summary(row: Mapping[str, Any], block: str) -> dict[str, Any]:
     return dict(summary)
 
 
+def _hazard_signal_decision_ns(row: Any) -> int:
+    """Return the canonical causal decision timestamp for diversity keys."""
+
+    value = getattr(row, "decision_time_ns", None)
+    if value is None:
+        raise FastPassRuntimeError(
+            "hazard event lacks canonical decision_time_ns"
+        )
+    return int(value)
+
+
 class _FastPassRun:
     def __init__(
         self,
@@ -2431,7 +2442,9 @@ class _FastPassRun:
         signatures: dict[str, dict[str, Any]] = {}
         for component_id, replay in replays.items():
             events = tuple(replay.normal_events)
-            signal_keys = {int(row.decision_ns) for row in replay.events}
+            signal_keys = {
+                _hazard_signal_decision_ns(row) for row in replay.events
+            }
             trade_keys = {str(row.event_id) for row in events}
             daily: dict[int, float] = defaultdict(float)
             for row in events:
