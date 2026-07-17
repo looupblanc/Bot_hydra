@@ -1,0 +1,96 @@
+{
+  "schema": "hydra_technical_runtime_repair_execution_receipt_v1",
+  "campaign_id": "hydra_causal_target_velocity_0028",
+  "classification": "TECHNICAL_RESUME_COUNTER_BOUNDARY_CORRECTION_EXECUTED",
+  "recorded_at_utc": "2026-07-17T09:28:21Z",
+  "scientific_status": "NO_ECONOMIC_SEMANTICS_CHANGE",
+  "resume_boundary": {
+    "failed_state_file_sha256": "af874f166895c92e1cc83db9ec6f9eb9b34cd87bc17126287bea56bf1d9ff7ab",
+    "failed_state_hash": "19b88a9412f6c2762f3279d6d940937e34f88c139df910ad2ca546a66ffd36d4",
+    "failed_checkpoint_sequence": 363,
+    "failed_counter_value": 1188,
+    "migration_state_file_sha256": "7e27dca073010ec01e1426982fc13e729e25a8dda5932f8a37adfd5f0316c902",
+    "migration_state_hash": "6d1566e40998d9e0fed429df8f4b3f27957f72337678530f321548e2067df722",
+    "migration_kpi_file_sha256": "c43e2b8a0fb87c56cb1b629b50685f47a764d138d6517f9d6640d2de411f4058",
+    "migration_kpi_hash": "57422e672515786a54c974335251dfd3c2266b148a3adbc4ab966ba22ebf26ae",
+    "resume_point": "STAGE_3_COMPLETE_BEFORE_CACHED_STAGE4_ADOPTION",
+    "verified_stage3_counter": 1188,
+    "verified_stage4_counter": 1210,
+    "stage4_batch_inventory_sha256": "6ed24e5033d79bf34b944447542b1e8c3b207372abaea434cddf890a7e123bb1",
+    "stage4_batches_recomputed": false,
+    "economic_outcomes_changed": false
+  },
+  "terminal_state": {
+    "state": "COMPLETE",
+    "stage": "CAMPAIGN_COMPLETE",
+    "checkpoint_sequence": 375,
+    "combine_episodes_completed": 1210,
+    "next_action": "PRESERVE_CLEAN_CAUSAL_SLEEVES_COVERAGE_LIMITED",
+    "production_state_path": "reports/economic_evolution/causal_target_velocity_0028_revision_02/production_state.json",
+    "production_state_file_sha256": "a266c8d43a24dcc517f7f6d03e5ca0634a4e5c30d7ec436d594493f1b5878804",
+    "production_state_hash": "c950c2c5e0c4296be28cc1780b6d398d2d7cd8ddd5e2f1d5696027a8941d5dac",
+    "production_kpi_path": "reports/economic_evolution/causal_target_velocity_0028_revision_02/production_kpis.json",
+    "production_kpi_file_sha256": "412a2767ad5dac1d1614de4f70b44334551a16dc9bb6be2ca2151f6825b26add",
+    "production_kpi_hash": "40eb4334dc0ed86c1290bd513d96876501ce87ae2065e525441dea3dc560d169"
+  },
+  "sealed_evidence": {
+    "economic_result_path": "reports/economic_evolution/causal_target_velocity_0028_revision_02/economic_production_result.json",
+    "economic_result_file_sha256": "10c0fd04e031c89985c71e97edd615746afa997f3d45891352621329fbae5b23",
+    "economic_result_hash": "56b8e167440f20ec4caec83ad7c952463f86db0a1def5b195ec5872fbd9cf074",
+    "evidence_receipt_path": "reports/economic_evolution/causal_target_velocity_0028_revision_02/evidence_bundle_receipt.json",
+    "evidence_receipt_file_sha256": "ca2e7f2fcc97dfcd6cf3d2fbaa2237538c62681b3054cdfdede36771325a002f",
+    "bundle_content_sha256": "08ab661f2af2597d02e90a583d1e67dfe2f4dabdf19ab05f788e49f4ab02660a",
+    "bundle_manifest_sha256": "2803ac420c08f47fd0a97664231bc08a63e56ae01f4b24914486dbc1d69f2984",
+    "dataset_row_counts": {
+      "account_daily_paths": 191124,
+      "account_policy_membership": 250,
+      "component_entries": 31689,
+      "component_exits": 31431,
+      "component_signals": 31719,
+      "component_trades": 31431,
+      "episodes": 1210,
+      "provenance": 1
+    },
+    "deep_verification_status": "COMPLETE"
+  },
+  "scientific_result": {
+    "status": "CAUSAL_TARGET_VELOCITY_INCONCLUSIVE_COVERAGE_LIMITED",
+    "terminal_reason": "FULL_COVERAGE_START_LIMIT_PREVENTED_96_START_EXPANSION",
+    "proposals_generated": 20000,
+    "event_screen_attempts": 4096,
+    "executable_event_screens": 2628,
+    "exact_sleeve_replays": 206,
+    "rolling_combine_policies": 175,
+    "causal_active_pool_books": 16,
+    "rolling_90d_normal_passes": 0,
+    "rolling_90d_stressed_passes": 0,
+    "promoted_96_count": 0,
+    "xfa_paths_started": 0,
+    "autonomous_next_action": "PRESERVE_CLEAN_CAUSAL_SLEEVES_COVERAGE_LIMITED"
+  },
+  "deployment": {
+    "manifest_path": "config/v7/causal_target_velocity_0028_revision_02.json",
+    "manifest_file_sha256": "3b88a7c38712b7e6a6a58ba216aca0506b41b2ff8f6322976fa0acdd1cf1522b",
+    "manifest_hash": "f6354a02669a078fbfbcc2abbb6a18d322ef1fb7996ad3653870ad70680ea017",
+    "queue_path": "config/v7/economic_evolution_production_queue_0029.json",
+    "queue_file_sha256": "56a7d1c9195ca49b16ec66e8d03646302ac63fa070af15bf9681053abf1986e0",
+    "live_head": "780f95b4a4bb2542d5b27e26b0fa68b9d8e9df04",
+    "service": "hydra-autonomous-mission.service",
+    "controller_version": "V17",
+    "persistent_service_active_after_campaign": true
+  },
+  "multiplicity": {
+    "existing_reservation_event_id": "hydra_causal_target_velocity_0028_multiplicity_reservation",
+    "existing_cumulative_trials": 612109,
+    "new_reservation_required": false,
+    "multiplicity_delta": 0
+  },
+  "safety": {
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "live_trading": false
+  },
+  "execution_record_hash": "a07064bacc9c15eaf804e2c74bdd7fdf7c3c18752662bedc40ecd3b418065369"
+}
