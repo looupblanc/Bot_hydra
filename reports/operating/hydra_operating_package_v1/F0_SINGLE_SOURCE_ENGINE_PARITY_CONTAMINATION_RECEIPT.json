@@ -1,0 +1,573 @@
+{
+  "authorization": {
+    "authorization_receipt_path": "mission/state/operating_package_v1_parity/online_offline_equivalence_receipt.json",
+    "authorization_receipt_written": false,
+    "f1_authorized": false,
+    "online_offline_equivalence_proven": false,
+    "post_freeze_backlog_activation_authorized": false
+  },
+  "created_at_utc": "2026-07-17T00:30:21.325090Z",
+  "development_contamination": {
+    "economic_impact": "NOT_IDENTIFIABLE_WITHOUT_FABRICATING_OUTCOMES_FOR_CAUSAL_ONLY_SIGNALS",
+    "entry_availability_defect": {
+      "affected_legacy_entry_count": 2052,
+      "classification": "AVAILABILITY_SEMANTICS_MISMATCH",
+      "finding": "the legacy entry price is the next-row close while the event is labeled at decision_ns; exact technical reproduction is not an availability-safe forward fill",
+      "labeled_time": "decision_ns",
+      "price_available_at": "decision_ns_plus_one_minute",
+      "price_source": "groups[close].shift(-1)"
+    },
+    "first_divergence_trace_count": 5,
+    "forensic_event_count": 21,
+    "forensics_file_sha256": "87a499f8acf6489668d75826cdffd2d6776398c96b45e50f35db1dfd8df2fb1f",
+    "forensics_path": "reports/operating/hydra_operating_package_v1/F0_ROOT_CAUSE_FORENSICS.json",
+    "found": true,
+    "future_outcome_field": "forward_move__holding_events",
+    "future_outcome_use": "signal eligibility mask requires np.isfinite(forward)",
+    "material": true,
+    "overall_classification": "DEVELOPMENT_LOOKAHEAD_DEFECT",
+    "root_causes": [
+      {
+        "causal_reason": "legacy signal eligibility depends on the future exit row remaining in the same contiguous segment",
+        "classifications": [
+          "DEVELOPMENT_LOOKAHEAD_DEFECT",
+          "SESSION_BOUNDARY_MISMATCH"
+        ],
+        "first_causal_field": "horizon_available",
+        "legacy_value_source": "np.isfinite(forward_move__holding_events)",
+        "mismatch_count": 9,
+        "primary_classification": "DEVELOPMENT_LOOKAHEAD_DEFECT",
+        "scheduled_boundary_count": 5,
+        "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d",
+        "unpredictable_gap_count": 4
+      },
+      {
+        "causal_reason": "legacy signal eligibility depends on the future exit row remaining in the same contiguous segment",
+        "classifications": [
+          "SESSION_BOUNDARY_MISMATCH"
+        ],
+        "first_causal_field": "horizon_available",
+        "legacy_value_source": "np.isfinite(forward_move__holding_events)",
+        "mismatch_count": 3,
+        "primary_classification": "SESSION_BOUNDARY_MISMATCH",
+        "scheduled_boundary_count": 3,
+        "sleeve_id": "sleeve_65bad2088913fc9fca0a145d",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "causal_reason": "legacy signal eligibility depends on the future exit row remaining in the same contiguous segment",
+        "classifications": [
+          "DEVELOPMENT_LOOKAHEAD_DEFECT"
+        ],
+        "first_causal_field": "horizon_available",
+        "legacy_value_source": "np.isfinite(forward_move__holding_events)",
+        "mismatch_count": 1,
+        "primary_classification": "DEVELOPMENT_LOOKAHEAD_DEFECT",
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_7ecd76490fa9fb34e1af5820",
+        "unpredictable_gap_count": 1
+      },
+      {
+        "causal_reason": "legacy signal eligibility depends on the future exit row remaining in the same contiguous segment",
+        "classifications": [
+          "SESSION_BOUNDARY_MISMATCH"
+        ],
+        "first_causal_field": "horizon_available",
+        "legacy_value_source": "np.isfinite(forward_move__holding_events)",
+        "mismatch_count": 6,
+        "primary_classification": "SESSION_BOUNDARY_MISMATCH",
+        "scheduled_boundary_count": 6,
+        "sleeve_id": "sleeve_c5da4b5a67abadeb7d68eabe",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "causal_reason": "legacy signal eligibility depends on the future exit row remaining in the same contiguous segment",
+        "classifications": [
+          "DEVELOPMENT_LOOKAHEAD_DEFECT",
+          "SESSION_BOUNDARY_MISMATCH"
+        ],
+        "first_causal_field": "horizon_available",
+        "legacy_value_source": "np.isfinite(forward_move__holding_events)",
+        "mismatch_count": 2,
+        "primary_classification": "DEVELOPMENT_LOOKAHEAD_DEFECT",
+        "scheduled_boundary_count": 1,
+        "sleeve_id": "sleeve_e017bb45b0937aef46657631",
+        "unpredictable_gap_count": 1
+      }
+    ],
+    "unpredictable_gap_events": [
+      {
+        "decision_at_utc": "2023-03-14T19:30:00Z",
+        "market": "YM"
+      },
+      {
+        "decision_at_utc": "2023-03-15T19:40:00Z",
+        "market": "YM"
+      },
+      {
+        "decision_at_utc": "2023-06-16T15:52:00Z",
+        "market": "CL"
+      },
+      {
+        "decision_at_utc": "2023-09-13T19:30:00Z",
+        "market": "YM"
+      },
+      {
+        "decision_at_utc": "2024-03-13T19:35:00Z",
+        "market": "NQ"
+      },
+      {
+        "decision_at_utc": "2024-09-18T19:20:00Z",
+        "market": "YM"
+      }
+    ],
+    "unpredictable_gap_exclusion_count": 6
+  },
+  "f0_subcontracts": {
+    "F0-A": {
+      "authorizable": false,
+      "entries": 2052,
+      "exits": 2052,
+      "legacy_component_mismatch_count": 0,
+      "name": "DEVELOPMENT_DECISION_COMPATIBILITY",
+      "raw_to_feature_status": "BYTE_EXACT",
+      "scientific_compatibility": "FAILED_CAUSAL_AVAILABILITY",
+      "signals": 2052,
+      "status": "LEGACY_COMPONENT_COMPATIBILITY_EXACT_BUT_SCIENTIFICALLY_CONTAMINATED",
+      "trades": 2052
+    },
+    "F0-B": {
+      "authorizable": false,
+      "name": "FORWARD_STREAMING_EQUIVALENCE",
+      "status": "NOT_RUN_CONTAMINATED_PACKAGE"
+    },
+    "F0-C": {
+      "authorizable": false,
+      "name": "ACCOUNT_STATE_EQUIVALENCE",
+      "status": "NOT_RUN_CONTAMINATED_PACKAGE"
+    }
+  },
+  "fill_models": {
+    "DEVELOPMENT_FILL_MODEL": {
+      "causal_forward_authorization": false,
+      "costs": "FROZEN_DEVELOPMENT_COMPONENT_COSTS",
+      "entry": "FROZEN_FEATURE_MATRIX_NEXT_ROW_CLOSE",
+      "entry_price_availability": "ONE_MINUTE_AFTER_LABELED_DECISION_TIME",
+      "exit": "FROZEN_HORIZON_CLOSE",
+      "fill_policy_hash": "6d840dff2004f9976452ba8224c8c4f539e12dde879f43326513003e4808e623",
+      "fill_policy_id": "DEVELOPMENT_FILL_MODEL",
+      "legacy_entry_time_label": "DECISION_TIME",
+      "scope": "DEVELOPMENT_COMPATIBILITY_ONLY",
+      "version": "hydra_development_fill_model_legacy_v1"
+    },
+    "FORWARD_CONSERVATIVE_FILL_MODEL": {
+      "availability_safe": true,
+      "deterministic": true,
+      "entry": "NEXT_BAR_OPEN_PLUS_EXACTLY_ONE_ADVERSE_TICK",
+      "entry_slippage_ticks": 1,
+      "exit": "FROZEN_SLEEVE_EXIT_MINUS_EXACTLY_ONE_ADVERSE_TICK",
+      "exit_slippage_ticks": 1,
+      "fill_policy_hash": "77b53399932b436ec520371e3bb3a1c4748dc737b4f5d8f958bc178bb523c910",
+      "fill_policy_id": "FORWARD_CONSERVATIVE_FILL_MODEL",
+      "real_order_submission": false,
+      "same_bar_ambiguity": "ADVERSE_PATH",
+      "scope": "ZERO_ORDER_APPEND_ONLY_FORWARD_OBSERVATION",
+      "version": "hydra_forward_conservative_fill_model_v1"
+    },
+    "models_required_to_match_each_other": false
+  },
+  "immutable_packages": [
+    {
+      "candidate_id": "active_pool_014dffb40e99814612d78c51",
+      "file_sha256": "826065f082b652d2875e35490ec1bbd64b765c4408aaba6561d1b268c649798f",
+      "freeze_timestamp_utc": "2026-07-16T15:06:22.608387Z",
+      "package_hash": "fbc57d0acf0140e491d475390741a3fc3869aca91d1bbc5002f693c5f361b72e",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_014dffb40e99814612d78c51/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    },
+    {
+      "candidate_id": "active_pool_070e391c7586ba1fac2f5494",
+      "file_sha256": "d116d966e0b8f420d87c64ec0e9f6f680d983eaa0bbfbe7f0a144bb29aeb62c5",
+      "freeze_timestamp_utc": "2026-07-16T15:05:36.652933Z",
+      "package_hash": "4ca3ac09e3bdab9695e04ccda4308fce9442a35972550646be9aaf95ed6e1145",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_070e391c7586ba1fac2f5494/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    },
+    {
+      "candidate_id": "active_pool_14e275fa8d869c28b1f27f78",
+      "file_sha256": "4ff70fd9b0f4158533a7163a4b74bc6f8d09f63702f541b1ee71beb674aa8b2b",
+      "freeze_timestamp_utc": "2026-07-16T15:05:54.980185Z",
+      "package_hash": "5d957832d3f76fdd8da87ff14db4f3ee05143e9b250aaa413bf645def97c8492",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_14e275fa8d869c28b1f27f78/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    },
+    {
+      "candidate_id": "active_pool_186a4177401aab223b0a21fa",
+      "file_sha256": "e9810adcb11706315065957172225cbecb4c7fbb72db993137335d4862dbfa91",
+      "freeze_timestamp_utc": "2026-07-16T15:05:45.664691Z",
+      "package_hash": "efa5cdc55ba286ad5b826f56e1fada38f818ab9982782c0a1a2cd867a0e0c225",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_186a4177401aab223b0a21fa/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    },
+    {
+      "candidate_id": "active_pool_2287bfb0b1c6f07930150102",
+      "file_sha256": "905e088524162af6401214a03bb636c9612d48878830dbfd1489684d7b587c1c",
+      "freeze_timestamp_utc": "2026-07-16T15:06:04.395596Z",
+      "package_hash": "88049ca68f653f397353a017330f2ce32a4839fd984d912e342b039c4ad9b70a",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_2287bfb0b1c6f07930150102/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    },
+    {
+      "candidate_id": "active_pool_2377af7025aadf9aaf456a7e",
+      "file_sha256": "756a6ac53c688117f53b7077ea4787796a164d09399fe25301ea28c46bf8e185",
+      "freeze_timestamp_utc": "2026-07-16T15:06:13.390284Z",
+      "package_hash": "70bcca5d4b42dade5c7b8bc682ce564e0a61695f787a0fc0380cae13d215d04c",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_2377af7025aadf9aaf456a7e/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    }
+  ],
+  "mismatch_counts": {
+    "affected_book_count": 6,
+    "affected_sleeve_count": 5,
+    "books": [
+      {
+        "account_compatibility": "NOT_EVALUABLE_WITHOUT_FABRICATING_21_TRADE_OUTCOMES",
+        "candidate_id": "active_pool_014dffb40e99814612d78c51",
+        "causal_signal_mismatch_count": 21,
+        "timeline_affected": true
+      },
+      {
+        "account_compatibility": "NOT_EVALUABLE_WITHOUT_FABRICATING_21_TRADE_OUTCOMES",
+        "candidate_id": "active_pool_070e391c7586ba1fac2f5494",
+        "causal_signal_mismatch_count": 21,
+        "timeline_affected": true
+      },
+      {
+        "account_compatibility": "NOT_EVALUABLE_WITHOUT_FABRICATING_21_TRADE_OUTCOMES",
+        "candidate_id": "active_pool_14e275fa8d869c28b1f27f78",
+        "causal_signal_mismatch_count": 21,
+        "timeline_affected": true
+      },
+      {
+        "account_compatibility": "NOT_EVALUABLE_WITHOUT_FABRICATING_21_TRADE_OUTCOMES",
+        "candidate_id": "active_pool_186a4177401aab223b0a21fa",
+        "causal_signal_mismatch_count": 21,
+        "timeline_affected": true
+      },
+      {
+        "account_compatibility": "NOT_EVALUABLE_WITHOUT_FABRICATING_21_TRADE_OUTCOMES",
+        "candidate_id": "active_pool_2287bfb0b1c6f07930150102",
+        "causal_signal_mismatch_count": 21,
+        "timeline_affected": true
+      },
+      {
+        "account_compatibility": "NOT_EVALUABLE_WITHOUT_FABRICATING_21_TRADE_OUTCOMES",
+        "candidate_id": "active_pool_2377af7025aadf9aaf456a7e",
+        "causal_signal_mismatch_count": 21,
+        "timeline_affected": true
+      }
+    ],
+    "causal_signal_total": 21,
+    "legacy_component_replay": 0,
+    "legacy_lower_bound_total": 4062,
+    "replicated_book_comparison_total": 126,
+    "sleeves": [
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 39,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_0d5f4ce40cc3e8f002657965",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 116,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_1488a965163f4de09bca7cf3",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 49,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_352b3dd8e17fd32021bf837b",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 9,
+        "causal_signal_mismatch_count": 9,
+        "legacy_signal_count": 187,
+        "scheduled_boundary_count": 5,
+        "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d",
+        "unpredictable_gap_count": 4
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 123,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_3ba7422174d7e5b1c2a01d58",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 144,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_454819bd8caec8581b6016d2",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 89,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_4de0a5d3b0ef1762cc9e4086",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 96,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_57125a2989d8eac29398af60",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 137,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_5c45e73e41fac686c67a0443",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 29,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_5c79759104e5765769be23ea",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 91,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_617236bb4c8b7cca8a472bac",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 106,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_624310a1de865cef4db2f8f4",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 76,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_64d6fd6dd9e5f74b920ac99b",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 3,
+        "causal_signal_mismatch_count": 3,
+        "legacy_signal_count": 120,
+        "scheduled_boundary_count": 3,
+        "sleeve_id": "sleeve_65bad2088913fc9fca0a145d",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 1,
+        "causal_signal_mismatch_count": 1,
+        "legacy_signal_count": 74,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_7ecd76490fa9fb34e1af5820",
+        "unpredictable_gap_count": 1
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 0,
+        "causal_signal_mismatch_count": 0,
+        "legacy_signal_count": 73,
+        "scheduled_boundary_count": 0,
+        "sleeve_id": "sleeve_8af4e061229c8ce7ae335f63",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 6,
+        "causal_signal_mismatch_count": 6,
+        "legacy_signal_count": 317,
+        "scheduled_boundary_count": 6,
+        "sleeve_id": "sleeve_c5da4b5a67abadeb7d68eabe",
+        "unpredictable_gap_count": 0
+      },
+      {
+        "additional_signal_count_without_future_outcome_mask": 2,
+        "causal_signal_mismatch_count": 2,
+        "legacy_signal_count": 186,
+        "scheduled_boundary_count": 1,
+        "sleeve_id": "sleeve_e017bb45b0937aef46657631",
+        "unpredictable_gap_count": 1
+      }
+    ]
+  },
+  "operating_package_manifest_hash": "9fd671d43127004d9ab11d82a42f07a71e9d846e559b1317c53c488dd1bc0d87",
+  "packages": [
+    {
+      "candidate_id": "active_pool_014dffb40e99814612d78c51",
+      "file_sha256": "826065f082b652d2875e35490ec1bbd64b765c4408aaba6561d1b268c649798f",
+      "freeze_timestamp_utc": "2026-07-16T15:06:22.608387Z",
+      "package_hash": "fbc57d0acf0140e491d475390741a3fc3869aca91d1bbc5002f693c5f361b72e",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_014dffb40e99814612d78c51/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    },
+    {
+      "candidate_id": "active_pool_070e391c7586ba1fac2f5494",
+      "file_sha256": "d116d966e0b8f420d87c64ec0e9f6f680d983eaa0bbfbe7f0a144bb29aeb62c5",
+      "freeze_timestamp_utc": "2026-07-16T15:05:36.652933Z",
+      "package_hash": "4ca3ac09e3bdab9695e04ccda4308fce9442a35972550646be9aaf95ed6e1145",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_070e391c7586ba1fac2f5494/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    },
+    {
+      "candidate_id": "active_pool_14e275fa8d869c28b1f27f78",
+      "file_sha256": "4ff70fd9b0f4158533a7163a4b74bc6f8d09f63702f541b1ee71beb674aa8b2b",
+      "freeze_timestamp_utc": "2026-07-16T15:05:54.980185Z",
+      "package_hash": "5d957832d3f76fdd8da87ff14db4f3ee05143e9b250aaa413bf645def97c8492",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_14e275fa8d869c28b1f27f78/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    },
+    {
+      "candidate_id": "active_pool_186a4177401aab223b0a21fa",
+      "file_sha256": "e9810adcb11706315065957172225cbecb4c7fbb72db993137335d4862dbfa91",
+      "freeze_timestamp_utc": "2026-07-16T15:05:45.664691Z",
+      "package_hash": "efa5cdc55ba286ad5b826f56e1fada38f818ab9982782c0a1a2cd867a0e0c225",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_186a4177401aab223b0a21fa/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    },
+    {
+      "candidate_id": "active_pool_2287bfb0b1c6f07930150102",
+      "file_sha256": "905e088524162af6401214a03bb636c9612d48878830dbfd1489684d7b587c1c",
+      "freeze_timestamp_utc": "2026-07-16T15:06:04.395596Z",
+      "package_hash": "88049ca68f653f397353a017330f2ce32a4839fd984d912e342b039c4ad9b70a",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_2287bfb0b1c6f07930150102/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    },
+    {
+      "candidate_id": "active_pool_2377af7025aadf9aaf456a7e",
+      "file_sha256": "756a6ac53c688117f53b7077ea4787796a164d09399fe25301ea28c46bf8e185",
+      "freeze_timestamp_utc": "2026-07-16T15:06:13.390284Z",
+      "package_hash": "70bcca5d4b42dade5c7b8bc682ce564e0a61695f787a0fc0380cae13d215d04c",
+      "path": "reports/economic_evolution/active_risk_pool_target_velocity_0026_revision_02/forward_shadow/active_pool_2377af7025aadf9aaf456a7e/shadow_package.json",
+      "sleeve_count": 18,
+      "source_commit": "988999af3d31017e70c6b487a4cef18849bdbd11"
+    }
+  ],
+  "prior_restart_and_order_results": {
+    "checks": {
+      "checkpoint_hash": true,
+      "contiguous_bar": true,
+      "contract_roll": true,
+      "duplicate_rejected": true,
+      "first_bar": true,
+      "late_rejected": true,
+      "missing_interval_rejected": true,
+      "out_of_order_rejected": true,
+      "session_transition": true
+    },
+    "full_18_binding_restart_reconciliation": "NOT_SEALED_BEFORE_BOUNDED_STOP",
+    "mismatch_count": 0,
+    "restart_checkpoint_resume": "TARGETED_REGRESSION_PASS",
+    "status": "PASS"
+  },
+  "provenance": {
+    "audit_file_sha256": "5d1788d695ed45cefb011f6aa4abee47f5a1993ac9da91b867481c35f352caa6",
+    "audit_path": "reports/operating/hydra_operating_package_v1/online_offline_equivalence_audit.json",
+    "audit_proof_hash": "a9bbaf74d080024001ad733511df942c05807fe768d9d5d6a61b481b744f7210",
+    "forensics_file_sha256": "87a499f8acf6489668d75826cdffd2d6776398c96b45e50f35db1dfd8df2fb1f",
+    "forensics_path": "reports/operating/hydra_operating_package_v1/F0_ROOT_CAUSE_FORENSICS.json",
+    "git_commit": "d5936ee5ce42f94b01e4ee2d6aeef9c1b4c28a57",
+    "operating_manifest_file_sha256": "8f546bb4f529ade5c97cf8bb7b742039e227f426962a4d9928f808bced821822",
+    "operating_manifest_path": "reports/operating/hydra_operating_package_v1/OPERATING_PACKAGE_V1.json",
+    "operating_package_hash": "9fd671d43127004d9ab11d82a42f07a71e9d846e559b1317c53c488dd1bc0d87",
+    "source_files": [
+      {
+        "path": "hydra/research/rolling_combine_replay.py",
+        "sha256": "e2cc03c852c272f959158747a88435d2fa7b8326ce3cc327646b26de12fde434"
+      },
+      {
+        "path": "hydra/research/turbo_feature_builder.py",
+        "sha256": "d17f06a557459ffc57a115e9a05fba1c44c0dda5384410445503dda91afab512"
+      },
+      {
+        "path": "hydra/shadow/active_risk_online_equivalence.py",
+        "sha256": "453f21e92eb24e300e2e7504b3bf7ba502945d575d6be263d0afb0acc34ddb8d"
+      },
+      {
+        "path": "hydra/shadow/f0_single_source_parity.py",
+        "sha256": "59071f1888ab7392ab8330215aa781b94a0e9617b6870c93b5fabc2c28c9e0ba"
+      },
+      {
+        "path": "scripts/finalize_f0_single_source_parity.py",
+        "sha256": "5ba25c2ff3b022f5ce71ac01dfb5df0ee3bd34f33f93801a3cb9822cd9372784"
+      }
+    ]
+  },
+  "quarantine": {
+    "action": "FAIL_CLOSED_NO_FORWARD_ECONOMIC_ACTIVATION",
+    "affected_book_ids": [
+      "active_pool_014dffb40e99814612d78c51",
+      "active_pool_070e391c7586ba1fac2f5494",
+      "active_pool_14e275fa8d869c28b1f27f78",
+      "active_pool_186a4177401aab223b0a21fa",
+      "active_pool_2287bfb0b1c6f07930150102",
+      "active_pool_2377af7025aadf9aaf456a7e"
+    ],
+    "affected_sleeve_ids": [
+      "sleeve_39eb74b174e7bdd240520b9d",
+      "sleeve_65bad2088913fc9fca0a145d",
+      "sleeve_7ecd76490fa9fb34e1af5820",
+      "sleeve_c5da4b5a67abadeb7d68eabe",
+      "sleeve_e017bb45b0937aef46657631"
+    ],
+    "development_evidence_deleted": false,
+    "frozen_manifests_modified": false,
+    "status_inheritance_allowed": false
+  },
+  "receipt_hash": "d6c52ed16fb3310ccb61f8b2505ca046d7c0154a0b2e5877a9e1f79a6b76c3e7",
+  "receipt_scope": "FAIL_CLOSED_F0_CONTAMINATION_CLASSIFICATION;NOT_FORWARD_AUTHORIZATION",
+  "safety": {
+    "broker_connections": 0,
+    "frozen_book_mutations": 0,
+    "orders": 0,
+    "post_freeze_backlog_records_processed": 0,
+    "post_freeze_price_records_read": 0,
+    "q4_access_count": 0,
+    "receipt_finalizer_market_data_purchase_usd": 0.0
+  },
+  "schema": "hydra_f0_single_source_parity_receipt_v1",
+  "status": "DEVELOPMENT_EVIDENCE_CONTAMINATED",
+  "technical_oracle": {
+    "fabricated": false,
+    "reason": "a causal per-bar account oracle cannot be derived for the frozen books without choosing outcomes for the 21 causal-only signals",
+    "status": "NOT_GENERATED_CONTAMINATED_PACKAGE"
+  }
+}
