@@ -34,6 +34,10 @@ from hydra.production import (
     load_and_validate_production_manifest,
     load_and_verify_production_result,
 )
+from hydra.production.causal_target_velocity_manifest import (
+    CAUSAL_TARGET_VELOCITY_ENGINE,
+    load_and_validate_causal_target_velocity_manifest,
+)
 from hydra.research.economic_evolution_opportunity_density_campaign import (
     load_and_verify_opportunity_density_preregistration,
     load_and_verify_opportunity_density_result,
@@ -55,7 +59,11 @@ SUPPORTED_ENGINES = {
     "opportunity_density_v1",
     "manifest_account_pair_v1",
     PRODUCTION_ENGINE,
+    CAUSAL_TARGET_VELOCITY_ENGINE,
 }
+PRODUCTION_LIKE_ENGINES = frozenset(
+    {PRODUCTION_ENGINE, CAUSAL_TARGET_VELOCITY_ENGINE}
+)
 _PRODUCTION_RESUMABLE_STATES = {
     "STARTING",
     "POPULATION_FROZEN",
@@ -178,7 +186,7 @@ class EconomicEvolutionManifestRuntime:
                             action, config, result, output_dir
                         )
                         continue
-                    if _engine(config) == PRODUCTION_ENGINE:
+                    if _is_production_like(config):
                         repeated = self._record_production_no_result_exit(
                             config,
                             output_dir,
@@ -248,7 +256,7 @@ class EconomicEvolutionManifestRuntime:
         production_kpis: dict[str, Any] | None = None
         production_state_path: str | None = None
         production_kpi_path: str | None = None
-        if self._active_config is not None and _engine(self._active_config) == PRODUCTION_ENGINE:
+        if self._active_config is not None and _is_production_like(self._active_config):
             output_dir, _ = self._paths(self._active_config)
             production_state_path = str(output_dir / PRODUCTION_STATE_NAME)
             production_kpi_path = str(output_dir / PRODUCTION_KPI_NAME)
@@ -270,13 +278,13 @@ class EconomicEvolutionManifestRuntime:
             "production_research_worker_count": (
                 3
                 if self._active_config is not None
-                and _engine(self._active_config) == PRODUCTION_ENGINE
+                and _is_production_like(self._active_config)
                 else 0
             ),
             "production_evidence_writer_count": (
                 1
                 if self._active_config is not None
-                and _engine(self._active_config) == PRODUCTION_ENGINE
+                and _is_production_like(self._active_config)
                 else 0
             ),
             "authoritative_mission_writer_count": 1,
@@ -337,21 +345,25 @@ class EconomicEvolutionManifestRuntime:
             raise EconomicEvolutionRuntimeError(
                 f"unsupported manifest engine: {engine}"
             )
-        path_key = "manifest_path" if engine == PRODUCTION_ENGINE else "preregistration_path"
+        path_key = (
+            "manifest_path"
+            if engine in PRODUCTION_LIKE_ENGINES
+            else "preregistration_path"
+        )
         hash_key = (
             "manifest_file_sha256"
-            if engine == PRODUCTION_ENGINE
+            if engine in PRODUCTION_LIKE_ENGINES
             else "preregistration_file_sha256"
         )
         semantic_key = (
             "manifest_semantic_hash"
-            if engine == PRODUCTION_ENGINE
+            if engine in PRODUCTION_LIKE_ENGINES
             else "preregistration_semantic_hash"
         )
         # The queue schema historically calls every frozen campaign document a
         # preregistration.  Accept that spelling for production entries too,
         # while rejecting entries that provide neither complete form.
-        if path_key not in entry and engine == PRODUCTION_ENGINE:
+        if path_key not in entry and engine in PRODUCTION_LIKE_ENGINES:
             path_key = "preregistration_path"
             hash_key = "preregistration_file_sha256"
             semantic_key = "preregistration_semantic_hash"
@@ -362,8 +374,10 @@ class EconomicEvolutionManifestRuntime:
             config = load_and_verify_opportunity_density_preregistration(path)
         elif engine == "manifest_account_pair_v1":
             config = _load_and_verify_generic_account_pair_preregistration(path)
-        else:
+        elif engine == PRODUCTION_ENGINE:
             config = load_and_validate_production_manifest(path)
+        else:
+            config = load_and_validate_causal_target_velocity_manifest(path)
         if (
             _manifest_revision(config) != entry.get(semantic_key)
             or config.get("campaign_id") != entry.get("campaign_id")
@@ -390,7 +404,7 @@ class EconomicEvolutionManifestRuntime:
             entry[hash_key]
         ):
             raise EconomicEvolutionRuntimeError("campaign tagged blob drift")
-        if engine == PRODUCTION_ENGINE:
+        if engine in PRODUCTION_LIKE_ENGINES:
             self._verify_production_deployment_ancestry(config, tagged_commit)
         runtime_config = dict(config)
         runtime_config["_runtime_preregistration_path"] = str(path)
@@ -438,7 +452,7 @@ class EconomicEvolutionManifestRuntime:
     def _load_result(
         self, config: Mapping[str, Any], path: Path
     ) -> dict[str, Any]:
-        if _engine(config) == PRODUCTION_ENGINE:
+        if _is_production_like(config):
             result_file_sha256 = _sha256(path)
             cached = self._verified_production_results.get(str(path.resolve()))
             if cached is not None and cached[0] == result_file_sha256:
@@ -576,7 +590,7 @@ class EconomicEvolutionManifestRuntime:
             / f"{campaign_id}.{manifest_revision}.log"
         )
         log_path.parent.mkdir(parents=True, exist_ok=True)
-        if _engine(config) == PRODUCTION_ENGINE:
+        if _is_production_like(config):
             command = [
                 sys.executable,
                 str(runner),
@@ -642,7 +656,7 @@ class EconomicEvolutionManifestRuntime:
             return
         if result_path.is_file():
             return
-        if _engine(config) == PRODUCTION_ENGINE:
+        if _is_production_like(config):
             # A production output directory is a resumable checkpoint, not a
             # disposable failed attempt. Validation is deliberately performed
             # before relaunch; invalid or FAILED_CLOSED states stop the runtime
@@ -686,7 +700,7 @@ class EconomicEvolutionManifestRuntime:
         *,
         required: bool = False,
     ) -> dict[str, Any] | None:
-        if _engine(config) != PRODUCTION_ENGINE:
+        if not _is_production_like(config):
             return None
         state_path = output_dir / PRODUCTION_STATE_NAME
         if not state_path.is_file():
@@ -998,7 +1012,7 @@ class EconomicEvolutionManifestRuntime:
         config: Mapping[str, Any],
         output_dir: Path,
     ) -> bool:
-        if _engine(config) != PRODUCTION_ENGINE:
+        if not _is_production_like(config):
             return False
         state = self._production_resume_state(config, output_dir)
         if state is None:
@@ -1300,7 +1314,7 @@ class EconomicEvolutionManifestRuntime:
         result: Mapping[str, Any],
         output_dir: Path,
     ) -> dict[str, Any]:
-        if _engine(config) == PRODUCTION_ENGINE:
+        if _is_production_like(config):
             evidence = result["evidence_bundle"]
             next_action = result.get("autonomous_next_action")
             if not isinstance(next_action, Mapping):
@@ -1523,7 +1537,7 @@ class EconomicEvolutionManifestRuntime:
             **dict(predecessor),
             "action_type": "MANIFEST_ECONOMIC_PRODUCTION_RUNNING",
             "manifest_campaign_id": config["campaign_id"],
-            "manifest_campaign_engine": PRODUCTION_ENGINE,
+            "manifest_campaign_engine": _engine(config),
             "manifest_campaign_state": str((state or {}).get("state") or "STARTING"),
             "manifest_campaign_stage": str((state or {}).get("stage") or "STARTING"),
             "manifest_campaign_checkpoint_sequence": int(
@@ -1912,7 +1926,7 @@ class EconomicEvolutionManifestRuntime:
             **dict(predecessor),
             "action_type": "MANIFEST_ECONOMIC_PRODUCTION_COMPLETE",
             "manifest_campaign_id": config["campaign_id"],
-            "manifest_campaign_engine": PRODUCTION_ENGINE,
+            "manifest_campaign_engine": _engine(config),
             "manifest_campaign_state": "COMPLETE",
             "manifest_campaign_scientific_status": scientific_status,
             "manifest_campaign_live_kpis": dict(kpis),
@@ -1993,7 +2007,7 @@ class EconomicEvolutionManifestRuntime:
         config: Mapping[str, Any],
         reservation: Mapping[str, Any],
     ) -> dict[str, Any]:
-        if _engine(config) == PRODUCTION_ENGINE:
+        if _is_production_like(config):
             return self._production_running_action(
                 predecessor, config, reservation
             )
@@ -2039,7 +2053,7 @@ class EconomicEvolutionManifestRuntime:
         config: Mapping[str, Any],
         result: Mapping[str, Any],
     ) -> dict[str, Any]:
-        if _engine(config) == PRODUCTION_ENGINE:
+        if _is_production_like(config):
             return self._production_complete_action(predecessor, config, result)
         economics = result["account_policy_economics"]
         tripwire = result["family_tripwire"]
@@ -2166,13 +2180,13 @@ class EconomicEvolutionManifestRuntime:
                 "production_state_path": (
                     str(self._paths(self._active_config)[0] / PRODUCTION_STATE_NAME)
                     if self._active_config is not None
-                    and _engine(self._active_config) == PRODUCTION_ENGINE
+                    and _is_production_like(self._active_config)
                     else None
                 ),
                 "production_kpi_path": (
                     str(self._paths(self._active_config)[0] / PRODUCTION_KPI_NAME)
                     if self._active_config is not None
-                    and _engine(self._active_config) == PRODUCTION_ENGINE
+                    and _is_production_like(self._active_config)
                     else None
                 ),
                 "updated_at_utc": datetime.now(UTC).isoformat(),
@@ -2505,7 +2519,11 @@ def _project_root(path: Path) -> Path:
 def _runtime_manifest(config: Mapping[str, Any]) -> Mapping[str, Any]:
     value = (
         config.get("runtime")
-        if config.get("schema") == "hydra_economic_production_manifest_v1"
+        if config.get("schema")
+        in {
+            "hydra_economic_production_manifest_v1",
+            "hydra_causal_target_velocity_manifest_v1",
+        }
         else config.get("runtime_manifest")
     )
     if not isinstance(value, Mapping):
@@ -2517,10 +2535,18 @@ def _engine(config: Mapping[str, Any]) -> str:
     return str(_runtime_manifest(config).get("engine") or "")
 
 
+def _is_production_like(config: Mapping[str, Any]) -> bool:
+    return _engine(config) in PRODUCTION_LIKE_ENGINES
+
+
 def _manifest_revision(config: Mapping[str, Any]) -> str:
     field = (
         "manifest_hash"
-        if config.get("schema") == "hydra_economic_production_manifest_v1"
+        if config.get("schema")
+        in {
+            "hydra_economic_production_manifest_v1",
+            "hydra_causal_target_velocity_manifest_v1",
+        }
         or (
             "manifest_hash" in config
             and "preregistration_hash" not in config
