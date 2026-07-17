@@ -1,0 +1,174 @@
+{
+  "campaign_id": "hydra_fast_pass_factory_0029",
+  "classification": "TECHNICAL_DIVERSITY_DECISION_FIELD_ADAPTER_DEFECT",
+  "code_repair": {
+    "canonical_adapter": "_hazard_signal_decision_ns",
+    "new_manifest_validator_sha256": "5635ff1d017af84fafc8d66d8186d3fdfaf90f73b63a369d38c378727668f54a",
+    "new_runtime_file_sha256": "a7139b7a7721b46bab8cd65b00d0527550a590222200740eabf8eb6928e32d3e",
+    "old_manifest_validator_sha256": "9257547e32fafd8503728a18bc364436dafd0d31e9b1a4ddf4620360758592a1",
+    "old_runtime_file_sha256": "ec7f3fde620a4cef1f4dfa64b287baeb6e88279e38ec5c042b65c2f96b254a83",
+    "repair_commit": "2cad95acd69743c27ce5b626eb3aeb45c7274b7c"
+  },
+  "failed_closed_checkpoint": {
+    "balanced_10d_bank_size": 0,
+    "causal_executable_bank_size": 150,
+    "combine_episodes_completed": 553674,
+    "exact_account_replays": 5000,
+    "exact_books": 2000,
+    "failure_message": "'HazardEventEvidence' object has no attribute 'decision_ns'",
+    "failure_type": "AttributeError",
+    "fast_5d_bank_size": 0,
+    "file_sha256": "cc454598a132216fe4a3ea922c7c6fe321482c6347f943a1d889572e3a0707d5",
+    "graduated_book_count": 0,
+    "path": "reports/economic_evolution/fast_pass_factory_0029_revision_02/production_state.json",
+    "policies_proposed": 100000,
+    "robust_20d_bank_size": 0,
+    "stage": "WAVE_2_ECONOMIC_COMPLETE",
+    "state": "FAILED_CLOSED",
+    "state_hash": "22460267f802f05354a3e23360e89ca969175334bdc2082355cc03b672cf83c3",
+    "unique_policies_screened": 20000
+  },
+  "multiplicity": {
+    "existing_reserved_delta_trials": 150000,
+    "multiplicity_delta": 0,
+    "new_reservation_required": false,
+    "reservation_file_sha256": "e16dcb8ad58af669a7c44988d9549d13e780b017d8aaf50fe798e41a7dac2689",
+    "reservation_path": "reports/economic_evolution/hydra_fast_pass_factory_0029_multiplicity_reservation.json"
+  },
+  "preserved_frozen_evidence": {
+    "coverage_exclusion_inventory": {
+      "file_sha256": "d4c5e6a065382292351f7d7ffb991aadf2f2a825ee6ac9bd5d81959e344e81ba",
+      "path": "reports/economic_evolution/fast_pass_factory_0029_revision_02/coverage_exclusion_inventory.json"
+    },
+    "production_totals": {
+      "balanced_10d_bank_size": 0,
+      "causal_executable_bank_size": 150,
+      "combine_episodes_completed": 553674,
+      "exact_account_replays": 5000,
+      "exact_books": 2000,
+      "fast_5d_bank_size": 0,
+      "graduated_book_count": 0,
+      "normal_episodes_completed": 276837,
+      "policies_proposed": 100000,
+      "robust_20d_bank_size": 0,
+      "stressed_episodes_completed": 276837,
+      "unique_policies_screened": 20000
+    },
+    "wave_01": {
+      "bank_tiers.json": {
+        "file_sha256": "528f371b90f060cef38276dcc4f5dda2162d1796e3ceadc663c6eebe2015cd1d",
+        "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_01/bank_tiers.json"
+      },
+      "book_controls_sprint_batches": {
+        "file_count": 338,
+        "inventory_hash": "2c10217fdd633567f34b7fb00534f7d38844090ca82d393a0c9855eed3a58ea1",
+        "row_count": 1350
+      },
+      "books_sprint_batches": {
+        "file_count": 259,
+        "inventory_hash": "02ce2cd5790a79fb43e33e550bf54de19d7ffee5f78df54f50e65083dffa9bb5",
+        "row_count": 1034
+      },
+      "causal_executable_bank.json": {
+        "file_sha256": "5ce108c595d4b0be46fadc470191b655d3658ded89f79161aed782a8cc1336b1",
+        "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_01/causal_executable_bank.json"
+      },
+      "marginal_book_decisions.jsonl": {
+        "file_sha256": "126e5a7b25229da11777e1d84323354199684162d362be19259933ffecfd0403",
+        "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_01/marginal_book_decisions.jsonl"
+      },
+      "sleeves_sprint_batches": {
+        "file_count": 30,
+        "inventory_hash": "8a50a6a697be4ae383699150cb54cbcb4586bb15d96d8350533f29beabb0dac9",
+        "row_count": 120
+      },
+      "stage2_batches": {
+        "file_count": 625,
+        "inventory_hash": "84a423ad7fbbe8eacbca04822c16b01a9098f7d60cc3b783ad996ff8d73ad6f6",
+        "row_count": 2500
+      }
+    },
+    "wave_02": {
+      "bank_tiers.json": {
+        "file_sha256": "5df5cb96b56b6a5deac4aa674acecf898c4fcdfed34790aa4474edd8513ab907",
+        "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_02/bank_tiers.json"
+      },
+      "book_controls_sprint_batches": {
+        "file_count": 338,
+        "inventory_hash": "4c2ff58d506a8eb065f1f0e0367801284b5e43984dd71fd1a986f7253945f01e",
+        "row_count": 1350
+      },
+      "books_sprint_batches": {
+        "file_count": 257,
+        "inventory_hash": "7c907ce44b01e622b3a37cf17f0163092f1af371fd40a61dc18459aed14525fc",
+        "row_count": 1027
+      },
+      "causal_executable_bank.json": {
+        "file_sha256": "c73f333ca0f106650edf5f6859ee3c2786f0855c5821ecab280aae4687691d94",
+        "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_02/causal_executable_bank.json"
+      },
+      "marginal_book_decisions.jsonl": {
+        "file_sha256": "277cb7a9e34d2842c359bf8b77a6986660ab665091471c5f395b7493d1a197a2",
+        "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_02/marginal_book_decisions.jsonl"
+      },
+      "sleeves_sprint_batches": {
+        "file_count": 38,
+        "inventory_hash": "a6fa1bb8bf22f55e2e2b02858feeef1717426ee65418f9aebfdd8a57d6ad9194",
+        "row_count": 150
+      },
+      "stage2_batches": {
+        "file_count": 625,
+        "inventory_hash": "1d28be63aa74aa95bc526ad91d1b57121501da988d671122d7796a2af0e65847",
+        "row_count": 2500
+      }
+    }
+  },
+  "recorded_at_utc": "2026-07-17T20:08:41.707014Z",
+  "repair_record_hash": "2908df7087d56512cef42cc6ba4d24f2086e414e7e1c6c7a181a3d3b6c20d100",
+  "root_cause": {
+    "canonical_field": "HazardEventEvidence.decision_time_ns",
+    "defect": "Terminal quality-diversity audit used a legacy timestamp alias after both economic waves were complete",
+    "economic_decisions_or_account_paths_affected": false,
+    "lookahead_or_accounting_defect": false,
+    "obsolete_consumer_field": "decision_ns"
+  },
+  "safety": {
+    "broker_connections": 0,
+    "data_purchase_count_delta": 0,
+    "orders": 0,
+    "q4_access_delta": 0
+  },
+  "schema": "hydra_technical_runtime_repair_receipt_v1",
+  "scientific_status": "RESTORES_CANONICAL_DECISION_TIME_DIVERSITY_AUDIT",
+  "scope_guards": {
+    "candidate_population_or_selection_changed": false,
+    "completed_all_economic_evidence_reused_unchanged": true,
+    "completed_sprint_and_controls_reused_unchanged": true,
+    "completed_stage0_stage1_stage2_reused_unchanged": true,
+    "costs_slippage_or_account_rules_changed": false,
+    "episode_starts_or_horizons_changed": false,
+    "new_xfa_work_started": false,
+    "resume_scope": "REUSE_SEALED_ALL_ECONOMIC_EVIDENCE_FINALIZATION_ONLY",
+    "risk_threshold_or_control_changed": false,
+    "scientific_hypothesis_changed": false,
+    "sprint_or_control_evidence_recomputed": false,
+    "stage0_stage1_stage2_evidence_recomputed": false,
+    "terminal_economic_evidence_recomputed": false
+  },
+  "superseded_revision": {
+    "manifest_file_sha256": "4d402cd3484bb17b0585260f2c58c856647baef61f453b81184a73f2bf9f5e7c",
+    "manifest_hash": "5907af0925ce8958200a96e5497edce2ccc7fda22d3b8e39da70cbc384fbccd5",
+    "manifest_path": "config/v7/fast_pass_factory_0029_revision_02.json",
+    "worm_commit": "be45236e2e222b547e4d5c699379b6d73e1639f2",
+    "worm_tag": "worm/fast-pass-factory-0029-block-aggregation-repair-2026-07-17"
+  },
+  "validation": {
+    "bank_replays_reconstructed": 150,
+    "hazard_events_checked": 18011,
+    "result": "CANONICAL_DECISION_TIME_DIVERSITY_KEY_PROVEN",
+    "targeted_test_command": "PYTHONPATH=. .venv/bin/pytest -q tests/test_fast_pass_runtime_contract.py tests/test_fast_pass_runtime_helpers.py tests/test_fast_pass_manifest.py",
+    "targeted_tests_failed": 0,
+    "targeted_tests_passed": 34,
+    "unique_causal_decision_keys": 18011
+  }
+}
