@@ -1,0 +1,105 @@
+{
+  "campaign_id": "hydra_fast_pass_factory_0029",
+  "classification": "TECHNICAL_TERMINAL_EVIDENCE_MEMORY_MATERIALIZATION_DEFECT",
+  "code_repair": {
+    "bounded_record_view": "_EpisodeEvidenceRecordStream",
+    "new_manifest_validator_sha256": "7dae597a83f2eb426f9ab2e8b6d30e7a36324f0237035762abaa1175fab87a52",
+    "new_runtime_file_sha256": "f1e786e371f9b7c5a13ddfd09cd44c5a53f84506e10f11cc4dd6a22499186129",
+    "repair_commit": "322480e97fa500150bfbe60c3b314f32bc61445f",
+    "stream_contract": "DETERMINISTIC_REITERABLE_IMMUTABLE_RECEIPTS_ONE_RECEIPT_IN_MEMORY"
+  },
+  "controlled_stop": {
+    "economic_counter_drift": false,
+    "exit_code": 143,
+    "kernel_oom_observed": false,
+    "partial_evidence_bundle_staging_exists": false,
+    "runner_pid": 184546,
+    "service_left_stopped_for_single_writer_recovery": true,
+    "stop_reason": "MEMORY_THRASH_THRESHOLD_EXCEEDED_BEFORE_EVIDENCE_STAGING"
+  },
+  "failed_finalization_checkpoint": {
+    "causal_executable_bank_size": 150,
+    "combine_episodes_completed": 553674,
+    "exact_account_replays": 5000,
+    "exact_books": 2000,
+    "fast_5d_bank_size": 0,
+    "graduated_book_count": 0,
+    "last_completed_artifact": {
+      "file_sha256": "11701dd9576aba7a2622a19ab6b569217fdc1b112d0fb01b6626e809ebaff57b",
+      "path": "reports/economic_evolution/fast_pass_factory_0029_revision_03/quality_diversity_audit.json"
+    },
+    "normal_episodes_completed": 276837,
+    "production_kpis_file_sha256": "3dd8437add459a3b5b2f856cdb517f72d83bbdc97d9a6cc07f19b59115aa2c28",
+    "stressed_episodes_completed": 276837
+  },
+  "memory_diagnosis": {
+    "account_daily_rows_pending": 4173440,
+    "decoded_episode_json_bytes": 10236298416,
+    "maximum_observed_process_rss_bytes": 7568973824,
+    "maximum_observed_process_swap_bytes": 10260604000,
+    "materialized_episode_record_count": 553674,
+    "old_finalization_model": "ALL_EPISODE_AND_DAILY_PATH_RECORDS_MATERIALIZED_BEFORE_EVIDENCE_WRITER",
+    "perf_page_fault_sample_fraction": 0.9661,
+    "root_cause": "TERMINAL_RECORD_LIST_EXPANDED_BEYOND_RAM_AND_FORCED_SUSTAINED_SWAP_THRASH",
+    "scientific_or_accounting_effect": false
+  },
+  "multiplicity": {
+    "existing_reserved_delta_trials": 150000,
+    "multiplicity_delta": 0,
+    "new_reservation_required": false,
+    "reservation_path": "reports/economic_evolution/hydra_fast_pass_factory_0029_multiplicity_reservation.json"
+  },
+  "preserved_frozen_evidence": {
+    "coverage_exclusion_inventory": {
+      "file_sha256": "d4c5e6a065382292351f7d7ffb991aadf2f2a825ee6ac9bd5d81959e344e81ba",
+      "path": "reports/economic_evolution/fast_pass_factory_0029_revision_03/coverage_exclusion_inventory.json"
+    },
+    "data_censored_window_count": 0,
+    "economic_episode_recompute_allowed": false,
+    "economic_results_changed": false,
+    "normal_pass_count": 0,
+    "stressed_pass_count": 0
+  },
+  "recorded_at_utc": "2026-07-17T21:10:32.337339Z",
+  "repair_record_hash": "0b1d60ff1464250d3a39cb57cff9965f9f626ecae2a2850c8ae73d27ddbdb397",
+  "safety": {
+    "broker_connections": 0,
+    "data_purchase_count_delta": 0,
+    "orders": 0,
+    "q4_access_delta": 0
+  },
+  "schema": "hydra_technical_runtime_repair_receipt_v1",
+  "scientific_status": "RESTORES_BOUNDED_STREAMING_EVIDENCE_FINALIZATION",
+  "scope_guards": {
+    "candidate_population_or_selection_changed": false,
+    "completed_all_economic_evidence_reused_unchanged": true,
+    "completed_sprint_and_controls_reused_unchanged": true,
+    "completed_stage0_stage1_stage2_reused_unchanged": true,
+    "costs_slippage_or_account_rules_changed": false,
+    "episode_order_changed": false,
+    "episode_starts_or_horizons_changed": false,
+    "new_xfa_work_started": false,
+    "resume_scope": "REUSE_SEALED_ALL_ECONOMIC_EVIDENCE_FINALIZATION_ONLY",
+    "risk_threshold_or_control_changed": false,
+    "scientific_hypothesis_changed": false,
+    "sprint_or_control_evidence_recomputed": false,
+    "stage0_stage1_stage2_evidence_recomputed": false,
+    "terminal_economic_evidence_recomputed": false
+  },
+  "superseded_revision": {
+    "manifest_file_sha256": "f72083284bd1c53988d4242d0d3b0111482f2d584f856ac46d51a9b02c32dda2",
+    "manifest_hash": "4822cfdf495413ae951b3b9a360a630f5a1afbed1b749895d9a19581fb3b68f9",
+    "manifest_path": "config/v7/fast_pass_factory_0029_revision_03.json",
+    "output_dir": "reports/economic_evolution/fast_pass_factory_0029_revision_03",
+    "worm_commit": "947ed480e3dac5ece7167c7f41bc2b9d29d62cbb",
+    "worm_tag": "worm/fast-pass-factory-0029-diversity-timestamp-repair-2026-07-17"
+  },
+  "validation": {
+    "count_drift_rejected": true,
+    "deterministic_receipt_order_preserved": true,
+    "reiterable_two_pass_contract_tested": true,
+    "targeted_test_command": ".venv/bin/python -m pytest -q tests/test_fast_pass_manifest.py tests/test_fast_pass_runtime_contract.py",
+    "targeted_tests_failed": 0,
+    "targeted_tests_passed": 21
+  }
+}
