@@ -268,6 +268,65 @@ def test_seals_verifies_and_emits_lightweight_receipt(tmp_path: Path) -> None:
     assert guarded is not None and guarded["status"] == "COMPLETE"
 
 
+def test_seal_runs_one_relational_validation_then_shallow_file_checks(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    relational_calls = 0
+    verification_modes: list[bool] = []
+    original_relational = evidence_bundle_module._validate_relational_contract
+    original_verify = evidence_bundle_module.verify_evidence_bundle
+
+    def counted_relational(*args, **kwargs):
+        nonlocal relational_calls
+        relational_calls += 1
+        return original_relational(*args, **kwargs)
+
+    def counted_verify(bundle_path, *, deep: bool = True):
+        verification_modes.append(deep)
+        return original_verify(bundle_path, deep=deep)
+
+    monkeypatch.setattr(
+        evidence_bundle_module,
+        "_validate_relational_contract",
+        counted_relational,
+    )
+    monkeypatch.setattr(
+        evidence_bundle_module,
+        "verify_evidence_bundle",
+        counted_verify,
+    )
+
+    _seal(tmp_path)
+
+    assert relational_calls == 1
+    assert verification_modes == [False, False]
+
+
+def test_completion_guard_keeps_deep_default_and_accepts_shallow_override(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    modes: list[bool] = []
+
+    def fake_require(_path, *, campaign_id=None, deep: bool = True):
+        assert campaign_id == CAMPAIGN_ID
+        modes.append(deep)
+        return {"status": "COMPLETE"}
+
+    monkeypatch.setattr(
+        evidence_bundle_module,
+        "require_complete_evidence_bundle",
+        fake_require,
+    )
+
+    assert guard_campaign_completion(
+        "COMPLETE", "/unused", campaign_id=CAMPAIGN_ID
+    ) == {"status": "COMPLETE"}
+    assert guard_campaign_completion(
+        "COMPLETE", "/unused", campaign_id=CAMPAIGN_ID, deep=False
+    ) == {"status": "COMPLETE"}
+    assert modes == [True, False]
+
+
 def test_summary_only_campaign_cannot_complete(tmp_path: Path) -> None:
     writer = EvidenceBundleWriter.create(tmp_path, _identity())
     for name in (

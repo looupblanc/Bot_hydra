@@ -21,7 +21,6 @@ from hydra.economic_evolution.screen import CheapScreenPolicy
 from hydra.evidence import (
     guard_campaign_completion,
     recover_finalized_evidence_bundle,
-    verify_evidence_bundle,
 )
 from hydra.features.feature_matrix import FeatureMatrix
 from hydra.production.component_evidence import materialize_component_evidence
@@ -93,7 +92,10 @@ class _Clock:
 
 
 def load_and_verify_production_result(
-    path: str | Path, manifest: Mapping[str, Any]
+    path: str | Path,
+    manifest: Mapping[str, Any],
+    *,
+    deep_evidence: bool = True,
 ) -> dict[str, Any]:
     target = Path(path)
     try:
@@ -118,17 +120,17 @@ def load_and_verify_production_result(
     receipt = result.get("evidence_bundle")
     if not isinstance(receipt, Mapping) or not str(receipt.get("bundle_path") or ""):
         raise ProductionRuntimeError("production result lacks sealed EvidenceBundle receipt")
-    guard_campaign_completion(
+    verified = guard_campaign_completion(
         "COMPLETE",
         str(receipt["bundle_path"]),
         campaign_id=str(manifest["campaign_id"]),
+        deep=deep_evidence,
     )
-    verified = verify_evidence_bundle(str(receipt["bundle_path"]))
     if str(receipt.get("manifest_sha256") or "") != _sha256(
         Path(str(receipt["manifest_path"]))
     ):
         raise ProductionRuntimeError("EvidenceBundle receipt manifest checksum drift")
-    if verified.get("status") != "COMPLETE":
+    if verified is None or verified.get("status") != "COMPLETE":
         raise ProductionRuntimeError("EvidenceBundle is not complete")
     return result
 

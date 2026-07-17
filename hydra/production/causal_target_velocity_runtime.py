@@ -1145,10 +1145,10 @@ class _CausalTargetVelocityRun:
                 "stage1_event_evidence_inventory": dict(stage1_inventory),
             },
         )
-        verified = verify_evidence_bundle(receipt.bundle_path, deep=True)
+        verified = verify_evidence_bundle(receipt.bundle_path, deep=False)
         if verified.get("status") != "COMPLETE":
             raise CausalTargetVelocityRuntimeError(
-                "terminal EvidenceBundle deep verification failed"
+                "terminal EvidenceBundle verification failed"
             )
         disposition = _terminal_disposition(
             self.stage2_rows,

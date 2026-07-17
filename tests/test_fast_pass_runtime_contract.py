@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import json
 import time
 from datetime import UTC, datetime
@@ -450,12 +451,12 @@ def test_existing_terminal_result_uses_canonical_verifier_and_reconciles_snapsho
         },
         "successive_halving": {"stage_decisions": []},
     }
-    calls: list[str] = []
+    calls: list[dict[str, object]] = []
     published: list[dict[str, object]] = []
     monkeypatch.setattr(
         runtime,
         "load_and_verify_production_result",
-        lambda *_args, **_kwargs: calls.append("verified") or verified,
+        lambda *_args, **kwargs: calls.append(dict(kwargs)) or verified,
         raising=False,
     )
     monkeypatch.setattr(
@@ -466,7 +467,7 @@ def test_existing_terminal_result_uses_canonical_verifier_and_reconciles_snapsho
     result = run.execute()
 
     assert result is verified
-    assert calls == ["verified"]
+    assert calls == [{"deep_evidence": False}]
     assert published[-1]["state"] == "COMPLETE"
     assert published[-1]["exact_account_replays"] == 512
     assert published[-1]["combine_episodes_completed"] == 192
@@ -511,3 +512,8 @@ def test_sealed_bundle_recovery_precedes_any_economic_reentry(
 
 def test_fast_pass_exposes_a_real_sealed_bundle_recovery_projection() -> None:
     assert callable(getattr(_FastPassRun, "_recover_sealed_bundle_result", None))
+
+
+def test_fast_pass_terminal_result_loads_are_explicitly_shallow() -> None:
+    source = inspect.getsource(_FastPassRun)
+    assert source.count("deep_evidence=False") == 3

@@ -43,6 +43,66 @@ from hydra.propfirm.combine_episode import TradePathEvent
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_result_loader_uses_one_completion_guard_and_honors_depth_override(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    bundle_manifest = tmp_path / "evidence_bundle_manifest.json"
+    bundle_manifest.write_text('{"status":"COMPLETE"}\n', encoding="utf-8")
+    manifest = {
+        "campaign_id": "campaign",
+        "manifest_hash": "a" * 64,
+        "source_commit": "b" * 40,
+    }
+    payload = {
+        "schema": production_runtime.PRODUCTION_RESULT_SCHEMA,
+        "campaign_id": manifest["campaign_id"],
+        "manifest_hash": manifest["manifest_hash"],
+        "source_commit": manifest["source_commit"],
+        "status": "COMPLETE",
+        "evidence_bundle": {
+            "bundle_path": str(tmp_path / "bundle"),
+            "manifest_path": str(bundle_manifest),
+            "manifest_sha256": hashlib.sha256(
+                bundle_manifest.read_bytes()
+            ).hexdigest(),
+        },
+    }
+    payload["result_hash"] = stable_hash(payload)
+    result_path = tmp_path / "result.json"
+    result_path.write_text(json.dumps(payload), encoding="utf-8")
+    modes: list[bool] = []
+
+    def completion_guard(
+        requested_status,
+        bundle_path,
+        *,
+        campaign_id=None,
+        deep: bool = True,
+    ):
+        assert requested_status == "COMPLETE"
+        assert bundle_path == str(tmp_path / "bundle")
+        assert campaign_id == manifest["campaign_id"]
+        modes.append(deep)
+        return {"status": "COMPLETE"}
+
+    monkeypatch.setattr(
+        production_runtime,
+        "guard_campaign_completion",
+        completion_guard,
+    )
+
+    assert production_runtime.load_and_verify_production_result(
+        result_path,
+        manifest,
+        deep_evidence=False,
+    ) == payload
+    assert production_runtime.load_and_verify_production_result(
+        result_path,
+        manifest,
+    ) == payload
+    assert modes == [False, True]
+
+
 def _trade(
     component: str,
     market: str,

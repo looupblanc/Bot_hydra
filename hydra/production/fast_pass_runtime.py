@@ -425,7 +425,11 @@ class _FastPassRun:
     def execute(self) -> dict[str, Any]:
         result_path = self.output_dir / str(self.manifest["runtime"]["result_name"])
         if result_path.is_file():
-            result = load_and_verify_production_result(result_path, self.manifest)
+            result = load_and_verify_production_result(
+                result_path,
+                self.manifest,
+                deep_evidence=False,
+            )
             self._reconcile_completed_result_snapshots(result)
             return result
         try:
@@ -637,7 +641,7 @@ class _FastPassRun:
             lightweight_manifest_path=self.output_dir
             / "evidence_bundle_receipt.json",
         )
-        verified = verify_evidence_bundle(receipt.bundle_path, deep=True)
+        verified = verify_evidence_bundle(receipt.bundle_path, deep=False)
         if verified.get("status") != "COMPLETE":
             raise FastPassRuntimeError("sealed fast-pass EvidenceBundle is incomplete")
         provenance = list(iter_evidence_records(receipt.bundle_path, "provenance"))
@@ -656,6 +660,7 @@ class _FastPassRun:
         checked = load_and_verify_production_result(
             self.output_dir / str(self.manifest["runtime"]["result_name"]),
             self.manifest,
+            deep_evidence=False,
         )
         self._reconcile_completed_result_snapshots(checked)
         return checked
@@ -2359,7 +2364,7 @@ class _FastPassRun:
                 },
                 writer_id=f"fast-pass-factory:{self.campaign_id}",
             )
-        verified = verify_evidence_bundle(receipt.bundle_path, deep=True)
+        verified = verify_evidence_bundle(receipt.bundle_path, deep=False)
         if verified.get("status") != "COMPLETE":
             raise FastPassRuntimeError("terminal EvidenceBundle verification failed")
         self.reporting_seconds += max(time.perf_counter() - started, 0.0)
@@ -2384,6 +2389,7 @@ class _FastPassRun:
         checked = load_and_verify_production_result(
             self.output_dir / str(self.manifest["runtime"]["result_name"]),
             self.manifest,
+            deep_evidence=False,
         )
         self._reconcile_completed_result_snapshots(checked)
         return checked

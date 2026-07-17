@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+import hydra.evidence.causal_target_velocity_adapter as adapter_module
 from hydra.evidence import REQUIRED_DATASETS, iter_evidence_records, verify_evidence_bundle
 from hydra.evidence.causal_target_velocity_adapter import (
     CausalTargetVelocityEvidenceError,
@@ -287,6 +288,101 @@ def test_deep_seals_all_required_datasets_with_event_direction(
     assert signals[0]["signal"]["direction"] == -1
     assert signals[0]["raw_feature_values_embedded"] is False
     assert receipt.dataset_row_counts["episodes"] == 2
+
+
+def test_releases_terminal_collections_before_finalize_and_uses_shallow_followups(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    replay = _replay()
+    policy = _policy(replay)
+    policy_id = replay.candidate.candidate_id
+    chronology: list[str] = []
+    verification_modes: list[bool] = []
+    guard_modes: list[bool] = []
+    released_sizes: dict[str, int] = {}
+    gc_calls = 0
+    original_release = adapter_module._release_terminal_evidence_accumulators
+    original_finalize = adapter_module.EvidenceBundleWriter.finalize
+    original_verify = adapter_module.verify_evidence_bundle
+    original_guard = adapter_module.guard_campaign_completion
+
+    def counted_gc() -> int:
+        nonlocal gc_calls
+        gc_calls += 1
+        return 0
+
+    def release(**kwargs) -> None:
+        original_release(**kwargs)
+        released_sizes.update(
+            {
+                "rows": len(kwargs["accumulator"].rows),
+                "seen_hashes": len(kwargs["seen_hashes"]),
+                "scenario_coverage": len(kwargs["scenario_coverage"]),
+                "observed_base_keys": len(kwargs["observed_base_keys"]),
+            }
+        )
+        chronology.append("released")
+
+    def finalize(writer, **kwargs):
+        assert chronology == ["released"]
+        chronology.append("finalize")
+        return original_finalize(writer, **kwargs)
+
+    def shallow_verify(bundle_path, *, deep: bool = True):
+        verification_modes.append(deep)
+        return original_verify(bundle_path, deep=deep)
+
+    def shallow_guard(
+        requested_status,
+        bundle_path,
+        *,
+        campaign_id=None,
+        deep: bool = True,
+    ):
+        guard_modes.append(deep)
+        return original_guard(
+            requested_status,
+            bundle_path,
+            campaign_id=campaign_id,
+            deep=deep,
+        )
+
+    monkeypatch.setattr(adapter_module.gc, "collect", counted_gc)
+    monkeypatch.setattr(
+        adapter_module,
+        "_release_terminal_evidence_accumulators",
+        release,
+    )
+    monkeypatch.setattr(adapter_module.EvidenceBundleWriter, "finalize", finalize)
+    monkeypatch.setattr(adapter_module, "verify_evidence_bundle", shallow_verify)
+    monkeypatch.setattr(adapter_module, "guard_campaign_completion", shallow_guard)
+
+    finalize_causal_target_velocity_evidence_bundle(
+        base_dir=tmp_path / "payload",
+        lightweight_manifest_path=tmp_path / "receipt.json",
+        campaign_manifest=_manifest(),
+        exact_replays={policy_id: replay},
+        policies={policy_id: policy},
+        evaluated_policy_records=_records(replay),
+        data_fingerprints={"cached_feature_matrix:CL": "c" * 64},
+        provenance={
+            "access_ledger_sha256": "b" * 64,
+            "recorded_at_utc": "2026-07-17T00:01:00Z",
+            "market_data_role": "PRE_FREEZE_DEVELOPMENT_CACHE",
+            "immutable_checksums": {"manifest": "e" * 64},
+        },
+    )
+
+    assert chronology == ["released", "finalize"]
+    assert released_sizes == {
+        "rows": 0,
+        "seen_hashes": 0,
+        "scenario_coverage": 0,
+        "observed_base_keys": 0,
+    }
+    assert gc_calls == 1
+    assert verification_modes == [False]
+    assert guard_modes == [False]
 
 
 def test_refuses_summary_only_completion(tmp_path: Path) -> None:

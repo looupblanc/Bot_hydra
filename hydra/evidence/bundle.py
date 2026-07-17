@@ -905,12 +905,12 @@ class EvidenceBundleWriter:
         lightweight.parent.mkdir(parents=True, exist_ok=True)
         try:
             _validate_staging_layout(self.staging_dir, allow_manifest=True)
-            verify_evidence_bundle(self.staging_dir, deep=True)
+            verify_evidence_bundle(self.staging_dir, deep=False)
             _fsync_directory(self.staging_dir)
             os.replace(self.staging_dir, self.final_dir)
             _fsync_directory(self.base_dir)
             _make_bundle_read_only(self.final_dir)
-            verify_evidence_bundle(self.final_dir, deep=True)
+            verify_evidence_bundle(self.final_dir, deep=False)
             _project_receipt(lightweight, receipt)
         finally:
             self.close()
@@ -1774,6 +1774,7 @@ def guard_campaign_completion(
     bundle_path: str | Path | None,
     *,
     campaign_id: str | None = None,
+    deep: bool = True,
 ) -> dict[str, Any] | None:
     if requested_status not in {"COMPLETE", "COMPLETED"}:
         return None
@@ -1784,7 +1785,7 @@ def guard_campaign_completion(
     return require_complete_evidence_bundle(
         bundle_path,
         campaign_id=campaign_id,
-        deep=True,
+        deep=deep,
     )
 
 

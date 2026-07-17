@@ -18,6 +18,7 @@ completion.
 
 from __future__ import annotations
 
+import gc
 import hashlib
 import json
 import math
@@ -439,6 +440,12 @@ def finalize_causal_target_velocity_evidence_bundle(
                 "resume_contract": "REPLAY_IDENTICAL_LOGICAL_INPUT_FROM_BEGINNING",
             }
         )
+        _release_terminal_evidence_accumulators(
+            accumulator=accumulator,
+            seen_hashes=seen_hashes,
+            scenario_coverage=scenario_coverage,
+            observed_base_keys=observed_base_keys,
+        )
         receipt = writer.finalize(
             evidence_status="FRESH_DEVELOPMENT_EVIDENCE",
             lightweight_manifest_path=Path(lightweight_manifest_path),
@@ -446,15 +453,34 @@ def finalize_causal_target_velocity_evidence_bundle(
     except BaseException:
         writer.close()
         raise
-    manifest = verify_evidence_bundle(receipt.bundle_path, deep=True)
+    manifest = verify_evidence_bundle(receipt.bundle_path, deep=False)
     if manifest.get("evidence_status") != "FRESH_DEVELOPMENT_EVIDENCE":
         raise CausalTargetVelocityEvidenceError(
             "sealed target-velocity evidence status drift"
         )
     guard_campaign_completion(
-        "COMPLETE", receipt.bundle_path, campaign_id=campaign_id
+        "COMPLETE",
+        receipt.bundle_path,
+        campaign_id=campaign_id,
+        deep=False,
     )
     return receipt
+
+
+def _release_terminal_evidence_accumulators(
+    *,
+    accumulator: "_CompactAccumulator",
+    seen_hashes: dict[tuple[str, str, str, str], str],
+    scenario_coverage: dict[tuple[str, str, str], set[str]],
+    observed_base_keys: set[tuple[str, str, str]],
+) -> None:
+    """Release replay-only collections before the writer's relational scan."""
+
+    accumulator.rows.clear()
+    seen_hashes.clear()
+    scenario_coverage.clear()
+    observed_base_keys.clear()
+    gc.collect()
 
 
 def _hazard_event(
