@@ -377,6 +377,13 @@ def _validate_evaluation_grid(manifest: Mapping[str, Any]) -> None:
     ):
         raise FastPassManifestError("fast-pass evaluation-window contract drift")
     starts = _mapping(windows, "headline_starts")
+    if dict(windows.get("block_roles") or {}) != {
+        "B1": "DESIGN",
+        "B2": "DESIGN",
+        "B3": "HELD_OUT_DEVELOPMENT",
+        "B4": "HELD_OUT_DEVELOPMENT",
+    }:
+        raise FastPassManifestError("fast-pass frozen block-role drift")
     for horizon in FAST_PASS_WINDOWS:
         rows = starts.get(str(horizon))
         if not isinstance(rows, Sequence) or isinstance(rows, (str, bytes)) or not rows:
@@ -570,6 +577,17 @@ def _validate_controls(manifest: Mapping[str, Any]) -> None:
         or controls.get("one_batch_archive_per_wave") is not True
     ):
         raise FastPassManifestError("fast-pass progressive-control policy drift")
+    tolerances = _mapping(controls, "exposure_match_tolerances")
+    expected = {
+        "mean_daily_contract_utilization_absolute": 0.05,
+        "maximum_mini_equivalent_mean_relative": 0.25,
+        "accepted_event_count_relative": 0.25,
+    }
+    if any(
+        not math.isclose(float(tolerances.get(key, -1.0)), value)
+        for key, value in expected.items()
+    ):
+        raise FastPassManifestError("fast-pass exposure-match tolerance drift")
 
 
 def _validate_promotion(manifest: Mapping[str, Any]) -> None:

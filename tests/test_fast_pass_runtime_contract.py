@@ -11,7 +11,7 @@ from hydra.mission.economic_evolution_manifest_runtime import (
     EconomicEvolutionManifestRuntime,
 )
 from hydra.production import fast_pass_runtime as runtime
-from hydra.production.fast_pass_runtime import _FastPassRun
+from hydra.production.fast_pass_runtime import _FastPassRun, _exposure_match_audit
 
 
 def _summary(*, passes: int, net: float, progress: float = 0.1) -> dict[str, object]:
@@ -40,6 +40,29 @@ def _role_summaries(*, passes: int, net: float) -> dict[str, object]:
             for horizon in (5, 10, 20)
         }
         for scenario in ("NORMAL", "STRESSED_1_5X")
+    }
+
+
+def _level3_controls() -> dict[str, object]:
+    delta = {
+        "by_scenario_horizon": {
+            scenario: {
+                str(horizon): {
+                    "pass_rate_delta": 0.1,
+                    "target_progress_p25_delta": 0.1,
+                    "mll_breach_rate_delta": 0.0,
+                }
+                for horizon in (5, 10, 20)
+            }
+            for scenario in ("NORMAL", "STRESSED_1_5X")
+        }
+    }
+    return {
+        "level3_preseal_complete": True,
+        "exposure_match_passed": True,
+        "held_out_equal_risk": delta,
+        "held_out_exposure_matched_random": delta,
+        "temporal_crossfit": {"held_out_block_count": 2},
     }
 
 
@@ -83,6 +106,7 @@ def test_tier_gate_uses_held_out_development_not_design_results() -> None:
         "component_ids": ["sleeve"],
         "policy": {"policy_id": "book"},
         "marginally_accepted": True,
+        "level2_controls": _level3_controls(),
         "summaries_by_role": {
             "DESIGN": _role_summaries(passes=3, net=10_000.0),
             "HELD_OUT_DEVELOPMENT": _role_summaries(passes=0, net=100.0),
@@ -103,6 +127,7 @@ def test_tier_gate_admits_only_frozen_marginal_book_with_block_diverse_passes() 
         "component_ids": ["sleeve"],
         "policy": {"policy_id": "book"},
         "marginally_accepted": True,
+        "level2_controls": _level3_controls(),
         "summaries_by_role": {
             "DESIGN": _role_summaries(passes=0, net=-1.0),
             "HELD_OUT_DEVELOPMENT": _role_summaries(passes=2, net=10_000.0),
@@ -113,6 +138,86 @@ def test_tier_gate_admits_only_frozen_marginal_book_with_block_diverse_passes() 
 
     assert decision["fast_5d_bank_ids"] == ["book"]
     assert decision["graduated_book_ids"] == ["book"]
+
+
+def test_reference_bank_row_is_screened_but_never_sent_to_exact_replay() -> None:
+    run = _run()
+    run.manifest["waves"] = {"stage2_exact_sleeve_replay_maximum": 2}
+    candidate = {
+        "market": "ES",
+        "session_code": "INTRADAY",
+        "timeframe": "1m",
+        "horizon": 5,
+        "mechanism": "VOLATILITY_EXPANSION",
+        "direction_rule": "LONG",
+        "risk_level": 1.0,
+    }
+    base = {
+        "status": "STAGE_1_COMPLETE",
+        "hard_causality_defect_count": 0,
+        "candidate": candidate,
+        "screen": {"completed_event_count": 1},
+        "block_economics": {
+            "B1": {"stressed_net": 1.0, "completed_event_count": 1},
+            "B2": {"stressed_net": 1.0, "completed_event_count": 1},
+        },
+    }
+    reference = {
+        **base,
+        "candidate_id": "reference",
+        "reference_bank_role": "LOW_VELOCITY_CAUSAL_REFERENCE_ONLY_NO_PROMOTION",
+    }
+    fresh = {**base, "candidate_id": "fresh"}
+
+    selected = run._select_stage1([reference, fresh])
+
+    assert [row["candidate_id"] for row in selected] == ["fresh"]
+
+
+def test_exposure_match_audit_requires_actual_exposure_and_activity_match() -> None:
+    tolerances = {
+        "mean_daily_contract_utilization_absolute": 0.05,
+        "maximum_mini_equivalent_mean_relative": 0.25,
+        "accepted_event_count_relative": 0.25,
+    }
+    source = {
+        "summaries_by_role": {
+            "DESIGN": {
+                scenario: {
+                    "5": {
+                        **_summary(passes=0, net=10.0),
+                        "mean_daily_contract_utilization": 0.20,
+                        "maximum_mini_equivalent_mean": 3.0,
+                        "accepted_event_count": 100,
+                    }
+                }
+                for scenario in ("NORMAL", "STRESSED_1_5X")
+            }
+        }
+    }
+    matched = {
+        "summaries_by_role": {
+            "DESIGN": {
+                scenario: {
+                    "5": {
+                        **_summary(passes=0, net=9.0),
+                        "mean_daily_contract_utilization": 0.22,
+                        "maximum_mini_equivalent_mean": 3.2,
+                        "accepted_event_count": 110,
+                    }
+                }
+                for scenario in ("NORMAL", "STRESSED_1_5X")
+            }
+        }
+    }
+    unmatched = json.loads(json.dumps(matched))
+    for scenario in ("NORMAL", "STRESSED_1_5X"):
+        unmatched["summaries_by_role"]["DESIGN"][scenario]["5"][
+            "mean_daily_contract_utilization"
+        ] = 0.50
+
+    assert _exposure_match_audit(source, matched, tolerances)["matched"] is True
+    assert _exposure_match_audit(source, unmatched, tolerances)["matched"] is False
 
 
 def test_fast_pass_kpi_topology_matches_persistent_controller_contract() -> None:

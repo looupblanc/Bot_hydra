@@ -166,6 +166,117 @@ _SPRINT_CENSORED_DAYS: dict[str, frozenset[int]] = {}
 _SPRINT_GOVERNORS: tuple[dict[str, Any], ...] = ()
 
 
+def _design_book_result_key(row: Mapping[str, Any]) -> tuple[Any, ...]:
+    stressed = dict(
+        ((row.get("summaries_by_role") or {}).get("DESIGN") or {}).get(
+            "STRESSED_1_5X"
+        )
+        or {}
+    )
+    five = dict(stressed.get("5") or {})
+    ten = dict(stressed.get("10") or {})
+    return (
+        -float(five.get("pass_rate", 0.0)),
+        -float(ten.get("pass_rate", 0.0)),
+        -float(five.get("target_progress_p25", 0.0)),
+        float(five.get("mll_breach_rate", 1.0)),
+        -float(five.get("net_total", 0.0)),
+        str(row.get("policy_id", "")),
+    )
+
+
+def _exposure_match_audit(
+    source: Mapping[str, Any],
+    control: Mapping[str, Any],
+    tolerances: Mapping[str, Any],
+) -> dict[str, Any]:
+    observed: dict[str, dict[str, float]] = {}
+    passed = True
+    score = 0.0
+    for scenario in ("NORMAL", "STRESSED_1_5X"):
+        left = _role_horizon_summary(source, "DESIGN", scenario, 5)
+        right = _role_horizon_summary(control, "DESIGN", scenario, 5)
+        utilization = abs(
+            float(left.get("mean_daily_contract_utilization", 0.0))
+            - float(right.get("mean_daily_contract_utilization", 0.0))
+        )
+        left_mini = float(left.get("maximum_mini_equivalent_mean", 0.0))
+        right_mini = float(right.get("maximum_mini_equivalent_mean", 0.0))
+        mini_relative = abs(left_mini - right_mini) / max(abs(left_mini), 1.0)
+        left_events = int(left.get("accepted_event_count", 0))
+        right_events = int(right.get("accepted_event_count", 0))
+        event_relative = abs(left_events - right_events) / max(left_events, 1)
+        scenario_passed = bool(
+            utilization
+            <= float(
+                tolerances["mean_daily_contract_utilization_absolute"]
+            )
+            and mini_relative
+            <= float(tolerances["maximum_mini_equivalent_mean_relative"])
+            and event_relative
+            <= float(tolerances["accepted_event_count_relative"])
+        )
+        observed[scenario] = {
+            "mean_daily_contract_utilization_absolute_delta": utilization,
+            "maximum_mini_equivalent_mean_relative_delta": mini_relative,
+            "accepted_event_count_relative_delta": event_relative,
+            "matched": scenario_passed,
+        }
+        passed = passed and scenario_passed
+        score += (
+            utilization
+            / float(tolerances["mean_daily_contract_utilization_absolute"])
+            + mini_relative
+            / float(tolerances["maximum_mini_equivalent_mean_relative"])
+            + event_relative
+            / float(tolerances["accepted_event_count_relative"])
+        )
+    value: dict[str, Any] = {
+        "matched": passed,
+        "score": score,
+        "tolerances": dict(tolerances),
+        "by_scenario": observed,
+    }
+    value["audit_hash"] = stable_hash(value)
+    return value
+
+
+def _role_control_delta(
+    source: Mapping[str, Any], control: Mapping[str, Any], *, role: str
+) -> dict[str, Any]:
+    output: dict[str, Any] = {
+        "source_policy_id": str(source["policy_id"]),
+        "control_policy_id": str(control["policy_id"]),
+        "role": role,
+        "by_scenario_horizon": {},
+    }
+    for scenario in ("NORMAL", "STRESSED_1_5X"):
+        output["by_scenario_horizon"][scenario] = {}
+        for horizon in (5, 10, 20):
+            left = _role_horizon_summary(source, role, scenario, horizon)
+            right = _role_horizon_summary(control, role, scenario, horizon)
+            output["by_scenario_horizon"][scenario][str(horizon)] = {
+                "pass_rate_delta": float(left.get("pass_rate", 0.0))
+                - float(right.get("pass_rate", 0.0)),
+                "target_progress_p25_delta": float(
+                    left.get("target_progress_p25", 0.0)
+                )
+                - float(right.get("target_progress_p25", 0.0)),
+                "target_progress_median_delta": float(
+                    left.get("target_progress_median", 0.0)
+                )
+                - float(right.get("target_progress_median", 0.0)),
+                "net_total_delta": float(left.get("net_total", 0.0))
+                - float(right.get("net_total", 0.0)),
+                "mll_breach_rate_delta": float(
+                    left.get("mll_breach_rate", 0.0)
+                )
+                - float(right.get("mll_breach_rate", 0.0)),
+            }
+    output["delta_hash"] = stable_hash(output)
+    return output
+
+
 def run_fast_pass_manifest(
     manifest_path: str | Path,
     *,
@@ -778,6 +889,9 @@ class _FastPassRun:
                     "hard_causality_defect_count": 0,
                     "status": "STAGE_1_COMPLETE",
                     "reused_prior_development_event_evidence": True,
+                    "reference_bank_role": (
+                        "LOW_VELOCITY_CAUSAL_REFERENCE_ONLY_NO_PROMOTION"
+                    ),
                 }
             )
         if reused:
@@ -902,6 +1016,8 @@ class _FastPassRun:
             if row.get("status") == "STAGE_1_COMPLETE"
             and int(row.get("hard_causality_defect_count", 1)) == 0
             and int((row.get("screen") or {}).get("completed_event_count", 0)) > 0
+            and row.get("reference_bank_role")
+            != "LOW_VELOCITY_CAUSAL_REFERENCE_ONLY_NO_PROMOTION"
         ]
         ordered = sorted(complete, key=_stage1_key)
         maximum = int(
@@ -1336,7 +1452,7 @@ class _FastPassRun:
                     book_id=policy_id,
                     sleeve_ids=tuple(proposal.sleeve_ids),
                     metrics=_sprint_metrics(
-                        row["summaries_by_role"]["HELD_OUT_DEVELOPMENT"][
+                        row["summaries_by_role"]["DESIGN"][
                             "STRESSED_1_5X"
                         ]
                     ),
@@ -1345,7 +1461,7 @@ class _FastPassRun:
                     book_id=str(predecessor["policy_id"]),
                     sleeve_ids=tuple(proposal.predecessor_sleeve_ids),
                     metrics=_sprint_metrics(
-                        predecessor["summaries_by_role"]["HELD_OUT_DEVELOPMENT"][
+                        predecessor["summaries_by_role"]["DESIGN"][
                             "STRESSED_1_5X"
                         ]
                     ),
@@ -1354,9 +1470,9 @@ class _FastPassRun:
                     book_id=str(best_component["policy_id"]),
                     sleeve_ids=(best_component_id,),
                     metrics=_sprint_metrics(
-                        best_component["summaries_by_role"][
-                            "HELD_OUT_DEVELOPMENT"
-                        ]["STRESSED_1_5X"]
+                        best_component["summaries_by_role"]["DESIGN"][
+                            "STRESSED_1_5X"
+                        ]
                     ),
                 ),
                 thresholds=MarginalContributionThresholds(),
@@ -1367,7 +1483,9 @@ class _FastPassRun:
             row["marginally_accepted"] = bool(decision.accepted)
             primary.append(row)
         accepted = [row for row in primary if row["marginally_accepted"]]
-        accepted.sort(key=_book_result_key)
+        # Control eligibility is frozen from design evidence. Held-out B3/B4
+        # never decides which books receive the graduation control suite.
+        accepted.sort(key=_design_book_result_key)
         control_targets = accepted[:150]
         controls = self._book_level2_controls(
             wave,
@@ -1441,26 +1559,48 @@ class _FastPassRun:
                 predecessor_id=None,
                 force_quality=1.0,
             )
-            random_selection = select_matched_random_members(
-                sleeves=sleeve_inputs,
-                reference_sleeve_ids=members,
-                deterministic_seed=int(stable_hash(source_id)[:8], 16),
-            )
-            random_id = f"control_random_{stable_hash([source_id, random_selection.sleeve_ids])[:24]}"
-            random_spec = _book_spec(
-                policy_id=random_id,
-                members=random_selection.sleeve_ids,
-                bank_by_id=bank_by_id,
-                profile=profile,
-                role="EXPOSURE_MATCHED_RANDOM_ASSEMBLY_CONTROL",
-                wave=wave,
-                predecessor_id=None,
-            )
-            specs.extend((equal, random_spec))
+            random_candidates: list[dict[str, Any]] = []
+            seen_random_members: set[tuple[str, ...]] = set()
+            base_seed = int(stable_hash(source_id)[:8], 16)
+            for alternative in range(8):
+                random_selection = select_matched_random_members(
+                    sleeves=sleeve_inputs,
+                    reference_sleeve_ids=members,
+                    deterministic_seed=base_seed ^ (0x9E3779B9 * (alternative + 1)),
+                )
+                selected_members = tuple(random_selection.sleeve_ids)
+                if selected_members in seen_random_members:
+                    continue
+                seen_random_members.add(selected_members)
+                random_id = (
+                    "control_random_"
+                    + stable_hash([source_id, alternative, selected_members])[:24]
+                )
+                specs.append(
+                    _book_spec(
+                        policy_id=random_id,
+                        members=selected_members,
+                        bank_by_id=bank_by_id,
+                        profile=profile,
+                        role="EXPOSURE_MATCH_CANDIDATE_RANDOM_CONTROL",
+                        wave=wave,
+                        predecessor_id=None,
+                    )
+                )
+                random_candidates.append(
+                    {
+                        "policy_id": random_id,
+                        "selection": asdict(random_selection),
+                    }
+                )
+            if not random_candidates:
+                raise FastPassRuntimeError(
+                    f"no deterministic random control candidate: {source_id}"
+                )
+            specs.append(equal)
             meta[source_id] = {
                 "equal_policy_id": equal_id,
-                "random_policy_id": random_id,
-                "random_selection": asdict(random_selection),
+                "random_candidates": random_candidates,
             }
         evaluated = self._evaluate_sprint_specs(
             wave,
@@ -1476,14 +1616,70 @@ class _FastPassRun:
             source_id = str(source["policy_id"])
             value = meta[source_id]
             equal = by_id[value["equal_policy_id"]]
-            random_row = by_id[value["random_policy_id"]]
+            tolerances = self.manifest["progressive_controls"][
+                "exposure_match_tolerances"
+            ]
+            audited_random = [
+                (
+                    _exposure_match_audit(
+                        source, by_id[str(candidate["policy_id"])], tolerances
+                    ),
+                    dict(candidate),
+                    by_id[str(candidate["policy_id"])],
+                )
+                for candidate in value["random_candidates"]
+            ]
+            audit, chosen_random, random_row = min(
+                audited_random,
+                key=lambda item: (
+                    0 if item[0]["matched"] else 1,
+                    float(item[0]["score"]),
+                    str(item[1]["policy_id"]),
+                ),
+            )
+            heldout_equal = _role_control_delta(
+                source, equal, role="HELD_OUT_DEVELOPMENT"
+            )
+            heldout_random = _role_control_delta(
+                source, random_row, role="HELD_OUT_DEVELOPMENT"
+            )
+            folds = []
+            for block in ("B3", "B4"):
+                folds.append(
+                    {
+                        "block": block,
+                        "selection_role": "HELD_OUT_DEVELOPMENT",
+                        "source": dict(
+                            source["summaries_by_block"][block]
+                        ),
+                        "equal_risk": dict(
+                            equal["summaries_by_block"][block]
+                        ),
+                        "exposure_matched_random": dict(
+                            random_row["summaries_by_block"][block]
+                        ),
+                        "policy_frozen_before_block_outcomes": True,
+                    }
+                )
             output.append(
                 {
                     "schema": "hydra_fast_pass_book_level2_controls_v1",
                     "source_policy_id": source_id,
                     "equal_risk": _control_delta(source, equal),
                     "exposure_matched_random": _control_delta(source, random_row),
-                    "random_selection": value["random_selection"],
+                    "held_out_equal_risk": heldout_equal,
+                    "held_out_exposure_matched_random": heldout_random,
+                    "exposure_match_audit": audit,
+                    "exposure_match_passed": bool(audit["matched"]),
+                    "random_selection": chosen_random["selection"],
+                    "random_control_candidate_count": len(audited_random),
+                    "temporal_crossfit": {
+                        "design_blocks": ["B1", "B2"],
+                        "held_out_folds": folds,
+                        "held_out_block_count": 2,
+                        "policy_membership_frozen_on_design_only": True,
+                    },
+                    "level3_preseal_complete": bool(audit["matched"]),
                     "best_parent_policy_id": source.get("best_component_id"),
                     "preceding_smaller_policy_id": source.get("predecessor_policy_id"),
                 }
@@ -1681,9 +1877,48 @@ class _FastPassRun:
                 stressed5.get("blocks_with_passes") or ()
             )
             is_book = str(row.get("policy_role", "")).endswith("BOOK_CANDIDATE")
+            level3 = row.get("level2_controls")
+            level3 = level3 if isinstance(level3, Mapping) else {}
+
+            def heldout_control_ok(name: str) -> bool:
+                control = level3.get(name)
+                if not isinstance(control, Mapping):
+                    return False
+                deltas = control.get("by_scenario_horizon")
+                if not isinstance(deltas, Mapping):
+                    return False
+                for scenario in ("NORMAL", "STRESSED_1_5X"):
+                    scenario_values = deltas.get(scenario)
+                    if not isinstance(scenario_values, Mapping):
+                        return False
+                    five = scenario_values.get("5")
+                    if not isinstance(five, Mapping):
+                        return False
+                    if (
+                        float(five.get("pass_rate_delta", -1.0)) < 0.0
+                        or float(five.get("target_progress_p25_delta", -1.0))
+                        < 0.0
+                        or float(five.get("mll_breach_rate_delta", 1.0)) > 0.0
+                    ):
+                        return False
+                return True
+
+            level3_controls_ok = bool(
+                level3.get("level3_preseal_complete") is True
+                and level3.get("exposure_match_passed") is True
+                and heldout_control_ok("held_out_equal_risk")
+                and heldout_control_ok("held_out_exposure_matched_random")
+                and int(
+                    (level3.get("temporal_crossfit") or {}).get(
+                        "held_out_block_count", 0
+                    )
+                )
+                == 2
+            )
             is_graduated = bool(
                 is_book
                 and row.get("marginally_accepted") is True
+                and level3_controls_ok
                 and float(normal5.get("pass_rate", 0.0))
                 >= float(graduate_gate["normal_5d_pass_rate_minimum"])
                 and float(stressed5.get("pass_rate", 0.0))
@@ -1730,6 +1965,7 @@ class _FastPassRun:
                     "mll_gate_passed": mll_ok,
                     "consistency_gate_passed": consistency_ok,
                     "concentration_gate_passed": no_domination,
+                    "level3_controls_passed": level3_controls_ok,
                     "thresholds_changed_after_outcomes": False,
                 }
             )
@@ -1793,6 +2029,7 @@ class _FastPassRun:
         diversity: Mapping[str, Any],
         microstructure: Mapping[str, Any],
         bank: Sequence[Mapping[str, Any]],
+        coverage_inventory: Mapping[str, Any],
     ) -> dict[str, Any]:
         kpis = self._kpis()
         economics = self._economic_summary(
@@ -1802,6 +2039,12 @@ class _FastPassRun:
             diversity=diversity,
             microstructure=microstructure,
         )
+        economics.pop("summary_hash", None)
+        economics["coverage_exclusion_inventory"] = dict(coverage_inventory)
+        economics["data_censored_window_count"] = int(
+            coverage_inventory["data_censored_window_count"]
+        )
+        economics["summary_hash"] = stable_hash(economics)
         graduates = list(latest_tiers["graduated_book_ids"])
         scientific_status = (
             "FAST_PASS_FACTORY_GREEN"
@@ -1861,6 +2104,7 @@ class _FastPassRun:
             "successive_halving": successive_halving,
             "matched_controls": self._matched_control_summary(sprint_rows),
             "failure_vectors": self._failure_summary(sprint_rows),
+            "bank_tier_decision": dict(latest_tiers),
             "autonomous_next_action": {
                 "action": str(microstructure["next_action"]),
                 "candidate_ids": graduates,
@@ -1905,6 +2149,7 @@ class _FastPassRun:
         union_bank = self._union_bank_entries()
         if not union_bank or not sprint_rows:
             raise FastPassRuntimeError("terminal fast-pass evidence is summary-only")
+        coverage_inventory = self._seal_coverage_exclusion_inventory(sprint_rows)
         diversity = self._seal_diversity_audit(bank)
         policies: dict[str, Any] = {}
         records: list[dict[str, Any]] = []
@@ -1977,9 +2222,10 @@ class _FastPassRun:
                 sprint_rows=sprint_rows,
                 starts=starts,
                 diversity=diversity,
-                microstructure=microstructure,
-                bank=bank,
-            )
+            microstructure=microstructure,
+            bank=bank,
+            coverage_inventory=coverage_inventory,
+        )
             self.output_writer.write_json(
                 "terminal_recovery_payload.json", recovery_payload
             )
@@ -2026,6 +2272,9 @@ class _FastPassRun:
                             self.manifest["evaluation_grid"]["grid_hash"]
                         ),
                         "quality_diversity_audit": str(diversity["audit_hash"]),
+                        "coverage_exclusion_inventory": str(
+                            coverage_inventory["inventory_hash"]
+                        ),
                         "terminal_recovery_payload": recovery_hash,
                     },
                 },
@@ -2039,6 +2288,12 @@ class _FastPassRun:
                     "xfa_deferred_until_combine_graduates": True,
                     "q4_accessed": False,
                     "new_data_purchase_count": 0,
+                    "data_censored_window_count": int(
+                        coverage_inventory["data_censored_window_count"]
+                    ),
+                    "coverage_exclusion_inventory_hash": str(
+                        coverage_inventory["inventory_hash"]
+                    ),
                     "terminal_recovery_payload_hash": recovery_hash,
                 },
                 writer_id=f"fast-pass-factory:{self.campaign_id}",
@@ -2092,6 +2347,75 @@ class _FastPassRun:
             for row in self._load_bank_wave(wave) or ():
                 values[str(row["candidate_id"])] = dict(row)
         return sorted(values.values(), key=lambda row: str(row["candidate_id"]))
+
+    def _seal_coverage_exclusion_inventory(
+        self, sprint_rows: Sequence[Mapping[str, Any]]
+    ) -> dict[str, Any]:
+        exclusions: list[dict[str, Any]] = []
+        source_receipts: list[dict[str, Any]] = []
+        for row in sprint_rows:
+            receipt = dict(row["episode_evidence"])
+            source_receipts.append(
+                {
+                    "policy_id": str(row["policy_id"]),
+                    "relative_path": str(receipt["relative_path"]),
+                    "sha256": str(receipt["sha256"]),
+                    "record_count": int(receipt["record_count"]),
+                }
+            )
+            for record in _read_episode_receipt(self.payload_dir, receipt):
+                if record.get("episode") is not None:
+                    continue
+                if record.get("coverage_state") != "DATA_CENSORED":
+                    raise FastPassRuntimeError(
+                        "non-executed sprint window lacks DATA_CENSORED state"
+                    )
+                exclusions.append(
+                    {
+                        "policy_id": str(record["policy_id"]),
+                        "cost_scenario": str(record["cost_scenario"]),
+                        "horizon": str(record["horizon"]),
+                        "episode_id": str(record["episode_id"]),
+                        "start_day": int(record["start_day"]),
+                        "temporal_block": str(record["temporal_block"]),
+                        "coverage_state": "DATA_CENSORED",
+                        "reason": str(record["reason"]),
+                        "episode_executed": False,
+                        "fabricated_flat_path": False,
+                    }
+                )
+        exclusions.sort(
+            key=lambda row: (
+                row["policy_id"],
+                row["horizon"],
+                row["episode_id"],
+                row["cost_scenario"],
+            )
+        )
+        source_receipts.sort(key=lambda row: row["policy_id"])
+        receipt = self.payload_writer.write_jsonl_batch(
+            "terminal/coverage_exclusions.jsonl", exclusions
+        )
+        value: dict[str, Any] = {
+            "schema": "hydra_fast_pass_coverage_exclusion_inventory_v1",
+            "data_censored_window_count": len(exclusions),
+            "executed_episode_count": sum(
+                int(row.get("episode_evidence", {}).get("record_count", 0))
+                for row in sprint_rows
+            )
+            - len(exclusions),
+            "coverage_exclusion_ledger": {
+                "relative_path": "terminal/coverage_exclusions.jsonl",
+                "sha256": receipt.sha256,
+                "record_count": len(exclusions),
+            },
+            "source_episode_receipts_hash": stable_hash(source_receipts),
+            "censored_windows_enter_pass_denominator": False,
+            "fabricated_account_paths": False,
+        }
+        value["inventory_hash"] = stable_hash(value)
+        self.output_writer.write_json("coverage_exclusion_inventory.json", value)
+        return value
 
     def _seal_diversity_audit(
         self, bank: Sequence[Mapping[str, Any]]

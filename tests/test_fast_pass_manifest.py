@@ -249,6 +249,12 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
                 "DATA_CENSORED",
             ],
             "headline_starts": starts,
+            "block_roles": {
+                "B1": "DESIGN",
+                "B2": "DESIGN",
+                "B3": "HELD_OUT_DEVELOPMENT",
+                "B4": "HELD_OUT_DEVELOPMENT",
+            },
             "grid_hash": "e" * 64,
         },
         "bank_architecture": {
@@ -385,6 +391,11 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
             "universal_full_controls_allowed": False,
             "worm_receipts_for_weak_candidates": False,
             "one_batch_archive_per_wave": True,
+            "exposure_match_tolerances": {
+                "mean_daily_contract_utilization_absolute": 0.05,
+                "maximum_mini_equivalent_mean_relative": 0.25,
+                "accepted_event_count_relative": 0.25,
+            },
         },
         "promotion_gates": {
             "causal_executable_bank": {
