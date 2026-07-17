@@ -135,6 +135,10 @@ def load_and_verify_production_result(
 
 def read_live_status(manifest_path: str | Path) -> dict[str, Any]:
     manifest = load_and_validate_production_manifest(manifest_path)
+    if manifest.get("campaign_mode") == "FAST_PASS_FACTORY":
+        from hydra.production.fast_pass_runtime import read_fast_pass_status
+
+        return read_fast_pass_status(manifest_path)
     root = Path(manifest_path).resolve().parents[2]
     output = root / str(manifest["runtime"]["output_dir"])
     state = _load_json(output / "production_state.json")
@@ -154,6 +158,15 @@ def run_production_manifest(
     """Run/resume the evidence-first production funnel; never terminalize early."""
 
     manifest = load_and_validate_production_manifest(manifest_path)
+    if manifest.get("campaign_mode") == "FAST_PASS_FACTORY":
+        from hydra.production.fast_pass_runtime import run_fast_pass_manifest
+
+        return run_fast_pass_manifest(
+            manifest_path,
+            contract_map_path=contract_map_path,
+            cache_root=cache_root,
+            stop_after=stop_after,
+        )
     if manifest.get("campaign_mode") == "ACTIVE_RISK_POOL":
         from hydra.production.active_risk_runtime import run_active_risk_manifest
 

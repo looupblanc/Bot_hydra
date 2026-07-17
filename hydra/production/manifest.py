@@ -54,6 +54,17 @@ def load_and_validate_production_manifest(path: str | Path) -> dict[str, Any]:
         raise ProductionManifestError("production manifest hash drift")
     if manifest.get("schema") != PRODUCTION_MANIFEST_SCHEMA:
         raise ProductionManifestError("unsupported production manifest schema")
+    if manifest.get("campaign_mode") == "FAST_PASS_FACTORY":
+        from hydra.production.fast_pass_manifest import (
+            FastPassManifestError,
+            validate_fast_pass_manifest,
+        )
+
+        try:
+            validate_fast_pass_manifest(manifest, manifest_path=resolved)
+        except FastPassManifestError as exc:
+            raise ProductionManifestError(str(exc)) from exc
+        return manifest
     if manifest.get("campaign_mode") == "ACTIVE_RISK_POOL":
         from hydra.production.active_risk_manifest import (
             ActiveRiskManifestError,
