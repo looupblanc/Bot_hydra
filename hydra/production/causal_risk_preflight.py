@@ -196,7 +196,14 @@ def run_causal_risk_preflight(
         if (
             existing.get("schema") != CAUSAL_RISK_PREFLIGHT_SCHEMA
             or existing.get("campaign_id") != CAMPAIGN_ID
-            or existing.get("manifest_sha256") != _sha256(manifest_file)
+            or not _sealed_preflight_manifest_is_compatible(
+                existing_manifest_sha256=str(
+                    existing.get("manifest_sha256") or ""
+                ),
+                current_manifest_sha256=_sha256(manifest_file),
+                manifest=manifest,
+                root=root,
+            )
             or existing.get("multiplicity_reservation", {}).get("sha256")
             != reservation["sha256"]
             or existing.get("result_hash") != salvage.stable_hash(core)
@@ -428,6 +435,61 @@ def run_causal_risk_preflight(
         "risk_frontier_preflight_result.json", result
     )
     return result
+
+
+def _sealed_preflight_manifest_is_compatible(
+    *,
+    existing_manifest_sha256: str,
+    current_manifest_sha256: str,
+    manifest: Mapping[str, Any],
+    root: Path,
+) -> bool:
+    """Accept only the explicitly anchored KPI-only technical supersession.
+
+    The risk-frontier result is immutable economic evidence.  A later runtime
+    repair may revise the campaign manifest without rerunning that evidence,
+    but only when the revised manifest and its self-hashed WORM receipt bind
+    the exact historical manifest checksum and prohibit economic changes.
+    """
+
+    if existing_manifest_sha256 == current_manifest_sha256:
+        return True
+    repair = manifest.get("technical_repair")
+    if not isinstance(repair, Mapping):
+        return False
+    receipt_ref = repair.get("repair_receipt")
+    if not isinstance(receipt_ref, Mapping):
+        return False
+    try:
+        receipt_path = _inside(root, str(receipt_ref["path"]))
+        receipt = _read_json(receipt_path)
+    except (KeyError, OSError, CausalRiskPreflightError):
+        return False
+    receipt_core = dict(receipt)
+    claimed_receipt_hash = receipt_core.pop("repair_record_hash", None)
+    return bool(
+        repair.get("classification")
+        == "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT"
+        and repair.get("economic_semantics_changed") is False
+        and repair.get("population_or_selection_changed") is False
+        and repair.get("risk_threshold_or_control_changed") is False
+        and repair.get("completed_evidence_recomputed") is False
+        and repair.get("completed_stage3_batch_reused_unchanged") is True
+        and repair.get("new_multiplicity_reservation_required") is False
+        and repair.get("supersedes_manifest_file_sha256")
+        == existing_manifest_sha256
+        and receipt_ref.get("file_sha256") == _sha256(receipt_path)
+        and receipt_ref.get("repair_record_hash") == claimed_receipt_hash
+        and claimed_receipt_hash == salvage.stable_hash(receipt_core)
+        and receipt.get("classification") == repair.get("classification")
+        and receipt.get("scientific_status")
+        == "NO_ECONOMIC_SEMANTICS_CHANGE"
+        and receipt.get("repair_scope", {}).get(
+            "completed_stage3_batch_recomputed"
+        )
+        is False
+        and receipt.get("multiplicity", {}).get("multiplicity_delta") == 0
+    )
 
 
 def _scale_bank(

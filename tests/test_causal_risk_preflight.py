@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import hashlib
+import json
+
 import pytest
 
+from hydra.economic_evolution.schema import stable_hash
 from hydra.production.causal_risk_preflight import (
     CausalRiskPreflightError,
+    _sealed_preflight_manifest_is_compatible,
     executable_micro_quantity,
     risk_scale_gate,
     scale_causal_trajectory,
@@ -79,3 +84,51 @@ def test_risk_gate_requires_both_cost_scenarios_and_positive_stress() -> None:
     }
     result = risk_scale_gate([failed])
     assert result["status"] == "RISK_SCALE_ONLY_FALSIFIED"
+
+
+def test_sealed_preflight_accepts_only_anchored_kpi_repair(tmp_path) -> None:
+    old_sha = "a" * 64
+    receipt = {
+        "classification": "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT",
+        "scientific_status": "NO_ECONOMIC_SEMANTICS_CHANGE",
+        "repair_scope": {"completed_stage3_batch_recomputed": False},
+        "multiplicity": {"multiplicity_delta": 0},
+    }
+    receipt["repair_record_hash"] = stable_hash(receipt)
+    receipt_path = tmp_path / "repair.json"
+    receipt_path.write_text(
+        json.dumps(receipt, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    receipt_sha = hashlib.sha256(receipt_path.read_bytes()).hexdigest()
+    manifest = {
+        "technical_repair": {
+            "classification": "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT",
+            "economic_semantics_changed": False,
+            "population_or_selection_changed": False,
+            "risk_threshold_or_control_changed": False,
+            "completed_evidence_recomputed": False,
+            "completed_stage3_batch_reused_unchanged": True,
+            "new_multiplicity_reservation_required": False,
+            "supersedes_manifest_file_sha256": old_sha,
+            "repair_receipt": {
+                "path": "repair.json",
+                "file_sha256": receipt_sha,
+                "repair_record_hash": receipt["repair_record_hash"],
+            },
+        }
+    }
+
+    assert _sealed_preflight_manifest_is_compatible(
+        existing_manifest_sha256=old_sha,
+        current_manifest_sha256="b" * 64,
+        manifest=manifest,
+        root=tmp_path,
+    )
+    manifest["technical_repair"]["completed_evidence_recomputed"] = True
+    assert not _sealed_preflight_manifest_is_compatible(
+        existing_manifest_sha256=old_sha,
+        current_manifest_sha256="b" * 64,
+        manifest=manifest,
+        root=tmp_path,
+    )
