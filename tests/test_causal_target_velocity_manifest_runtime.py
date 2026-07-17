@@ -202,7 +202,12 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
                 "SESSION_MATCHED_NULL",
                 "CLEAN_LOW_VELOCITY_SLEEVE",
             ],
-            "match_dimensions": [
+            "strict_matched_null_types": [
+                "RANDOM_EVENT_TIMING",
+                "DIRECTION_FLIPPED",
+                "SESSION_MATCHED_NULL",
+            ],
+            "strict_matched_null_match_dimensions": [
                 "MARKET",
                 "SESSION",
                 "TIMEFRAME",
@@ -211,6 +216,15 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
                 "AVERAGE_EXPOSURE",
                 "COST_LEVEL",
             ],
+            "clean_low_velocity_baseline_contract": {
+                "type": "CLEAN_LOW_VELOCITY_SLEEVE",
+                "role": (
+                    "SAME_START_NEAREST_CELL_ECONOMIC_BASELINE_NOT_MATCHED_NULL"
+                ),
+                "limitations_explicit": True,
+                "strict_seven_dimension_match_required": False,
+                "positive_stressed_velocity_delta_required": True,
+            },
             "full_suite_after_cheap_screen_only": True,
         },
         "economic_objective": {
@@ -339,6 +353,21 @@ def test_valid_0028_manifest_is_production_like_and_frozen(tmp_path: Path) -> No
     assert actual == expected
     assert actual["runtime"]["engine"] == CAUSAL_TARGET_VELOCITY_ENGINE
     assert actual["clean_causal_baseline"]["promotion_status"] is None
+    controls = actual["matched_controls"]
+    assert set(controls["strict_matched_null_types"]) == {
+        "RANDOM_EVENT_TIMING",
+        "DIRECTION_FLIPPED",
+        "SESSION_MATCHED_NULL",
+    }
+    assert "CLEAN_LOW_VELOCITY_SLEEVE" not in controls[
+        "strict_matched_null_types"
+    ]
+    baseline = controls["clean_low_velocity_baseline_contract"]
+    assert baseline["role"] == (
+        "SAME_START_NEAREST_CELL_ECONOMIC_BASELINE_NOT_MATCHED_NULL"
+    )
+    assert baseline["strict_seven_dimension_match_required"] is False
+    assert baseline["positive_stressed_velocity_delta_required"] is True
 
 
 def test_0028_manifest_rejects_causal_contract_drift(tmp_path: Path) -> None:
@@ -349,6 +378,45 @@ def test_0028_manifest_rejects_causal_contract_drift(tmp_path: Path) -> None:
     path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
 
     with pytest.raises(CausalTargetVelocityManifestError, match="causal event"):
+        load_and_validate_causal_target_velocity_manifest(path)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("strict_seven_dimension_match_required", True),
+        ("limitations_explicit", False),
+        ("positive_stressed_velocity_delta_required", False),
+    ),
+)
+def test_0028_manifest_separates_strict_nulls_from_clean_economic_baseline(
+    tmp_path: Path, field: str, value: object
+) -> None:
+    path, manifest = _fixture(tmp_path)
+    contract = manifest["matched_controls"][
+        "clean_low_velocity_baseline_contract"
+    ]
+    contract[field] = value
+    manifest.pop("manifest_hash")
+    manifest["manifest_hash"] = stable_hash(manifest)
+    path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    with pytest.raises(CausalTargetVelocityManifestError, match="matched-control"):
+        load_and_validate_causal_target_velocity_manifest(path)
+
+
+def test_0028_manifest_forbids_clean_baseline_in_strict_7d_null_set(
+    tmp_path: Path,
+) -> None:
+    path, manifest = _fixture(tmp_path)
+    manifest["matched_controls"]["strict_matched_null_types"].append(
+        "CLEAN_LOW_VELOCITY_SLEEVE"
+    )
+    manifest.pop("manifest_hash")
+    manifest["manifest_hash"] = stable_hash(manifest)
+    path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    with pytest.raises(CausalTargetVelocityManifestError, match="matched-control"):
         load_and_validate_causal_target_velocity_manifest(path)
 
 

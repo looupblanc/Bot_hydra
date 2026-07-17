@@ -342,24 +342,48 @@ def _validate_scale_and_coverage(manifest: Mapping[str, Any]) -> None:
 
 def _validate_controls_objective_and_gates(manifest: Mapping[str, Any]) -> None:
     controls = _mapping(manifest, "matched_controls")
+    strict_null_types = {
+        "RANDOM_EVENT_TIMING",
+        "DIRECTION_FLIPPED",
+        "SESSION_MATCHED_NULL",
+    }
+    strict_dimensions = {
+        "MARKET",
+        "SESSION",
+        "TIMEFRAME",
+        "OPPORTUNITY_COUNT",
+        "ACTIVE_DURATION",
+        "AVERAGE_EXPOSURE",
+        "COST_LEVEL",
+    }
+    clean_baseline = _mapping(
+        controls, "clean_low_velocity_baseline_contract"
+    )
     if (
         set(str(value) for value in controls.get("types") or ())
-        != {
-            "RANDOM_EVENT_TIMING",
-            "DIRECTION_FLIPPED",
-            "SESSION_MATCHED_NULL",
-            "CLEAN_LOW_VELOCITY_SLEEVE",
-        }
-        or set(str(value) for value in controls.get("match_dimensions") or ())
-        != {
-            "MARKET",
-            "SESSION",
-            "TIMEFRAME",
-            "OPPORTUNITY_COUNT",
-            "ACTIVE_DURATION",
-            "AVERAGE_EXPOSURE",
-            "COST_LEVEL",
-        }
+        != strict_null_types | {"CLEAN_LOW_VELOCITY_SLEEVE"}
+        or "match_dimensions" in controls
+        or set(
+            str(value)
+            for value in controls.get("strict_matched_null_types") or ()
+        )
+        != strict_null_types
+        or set(
+            str(value)
+            for value in controls.get(
+                "strict_matched_null_match_dimensions"
+            )
+            or ()
+        )
+        != strict_dimensions
+        or clean_baseline.get("type") != "CLEAN_LOW_VELOCITY_SLEEVE"
+        or clean_baseline.get("role")
+        != "SAME_START_NEAREST_CELL_ECONOMIC_BASELINE_NOT_MATCHED_NULL"
+        or clean_baseline.get("limitations_explicit") is not True
+        or clean_baseline.get("strict_seven_dimension_match_required")
+        is not False
+        or clean_baseline.get("positive_stressed_velocity_delta_required")
+        is not True
         or controls.get("full_suite_after_cheap_screen_only") is not True
     ):
         raise CausalTargetVelocityManifestError("0028 matched-control drift")
