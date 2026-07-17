@@ -1,0 +1,109 @@
+{
+  "campaign_id": "hydra_fast_pass_factory_0029",
+  "classification": "TECHNICAL_SCENARIO_SUFFIX_QUALITY_IDENTITY_DEFECT",
+  "code_repair": {
+    "new_helper_file_sha256": "60be3006a1d7e55b9f0ccad68711c81ce14ef5a877c51bc842eb1a8019aea64e",
+    "new_manifest_validator_sha256": "df43a30897ba8fd78891982c932caf80d127a8bbae48c78e84f0defb01b8e610",
+    "normalization_scope": [
+      "terminal :NORMAL suffix",
+      "terminal :STRESSED_1_5X suffix"
+    ],
+    "old_helper_file_sha256": "5e96ff46532a5d3827f41db7718073ca97384528ae8b4f39d0442cd5bfbf0390",
+    "old_manifest_validator_sha256": "b08059f76d089681956d6f0d1dfe7e5997dc6f507ca963d3459440b7ce90f33d",
+    "repair_commit": "0ccee42e11f756d960e544076eb11aea7e5fee84"
+  },
+  "failed_closed_checkpoint": {
+    "causal_executable_bank_size": 120,
+    "exact_account_replays": 2500,
+    "failure_message": "normal/stressed quality selection drift",
+    "failure_type": "FastPassHelperError",
+    "file_sha256": "d9184cf663a0502c773bd29dc5d6821903363a85e5b2bf13ee29d7a45a4a742e",
+    "path": "reports/economic_evolution/fast_pass_factory_0029/production_state.json",
+    "policies_proposed": 50000,
+    "stage": "WAVE_1_STAGE_2_COMPLETE",
+    "state": "FAILED_CLOSED",
+    "state_hash": "bd0adfb37f9315e9ebc8ccedb565b2fbc3da2302eea471a01b7eea8d0e1873f8",
+    "unique_policies_screened": 10000
+  },
+  "multiplicity": {
+    "existing_reserved_delta_trials": 150000,
+    "multiplicity_delta": 0,
+    "new_reservation_required": false,
+    "reservation_file_sha256": "e16dcb8ad58af669a7c44988d9549d13e780b017d8aaf50fe798e41a7dac2689",
+    "reservation_path": "reports/economic_evolution/hydra_fast_pass_factory_0029_multiplicity_reservation.json"
+  },
+  "preserved_frozen_evidence": {
+    "causal_executable_bank": {
+      "bank_hash": "4adc7adaa172301d66f3c0111f17526dd3a839aac4dfcef1e65b47f2e9c2545c",
+      "entry_count": 120,
+      "file_sha256": "5ce108c595d4b0be46fadc470191b655d3658ded89f79161aed782a8cc1336b1",
+      "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_01/causal_executable_bank.json"
+    },
+    "original_manifest": {
+      "file_sha256": "6ea725cf5538efa50c8b0e8ab5be8b80fdea1674f0f8e08fb556284e849f531c",
+      "manifest_hash": "47465e3c7ee39c76660fb57b83db709c799d11ba22b1a49b9cac01dd437a31ec",
+      "path": "config/v7/fast_pass_factory_0029.json"
+    },
+    "stage1_halving": {
+      "file_sha256": "6770b0d5df6e42636b38ad071be5a4f2af4b75af8b7f8718592747ede338b066",
+      "input_count": 10000,
+      "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_01/stage1_halving.json",
+      "selected_count": 2500,
+      "selection_hash": "16b7481dc64a197d5f68af4875048825a478b562bf1f1af6e711c064e0860683"
+    },
+    "stage2_batches": {
+      "file_count": 625,
+      "inventory_hash": "84a423ad7fbbe8eacbca04822c16b01a9098f7d60cc3b783ad996ff8d73ad6f6",
+      "row_count": 2500
+    }
+  },
+  "recorded_at_utc": "2026-07-17T12:51:43.058505Z",
+  "repair_record_hash": "6c890d63be22bbaec8b41a8299134fdf366c19773c65e1f40402877786962cee",
+  "root_cause": {
+    "causal_identity_fields_unchanged": [
+      "component_id",
+      "market",
+      "side",
+      "decision_ns",
+      "session_day"
+    ],
+    "defect": "Scenario accounting suffix entered deterministic quality-selection identity",
+    "field": "TradePathEvent.event_id",
+    "lookahead_or_economic_logic_defect": false,
+    "normal_suffix": ":NORMAL",
+    "stressed_suffix": ":STRESSED_1_5X"
+  },
+  "safety": {
+    "broker_connections": 0,
+    "data_purchase_count_delta": 0,
+    "orders": 0,
+    "q4_access_delta": 0
+  },
+  "schema": "hydra_technical_runtime_repair_receipt_v1",
+  "scientific_status": "RESTORES_FROZEN_SCENARIO_NEUTRAL_QUALITY_SEMANTICS",
+  "scope_guards": {
+    "candidate_population_or_selection_changed": false,
+    "completed_stage0_stage1_stage2_reused_unchanged": true,
+    "costs_slippage_or_account_rules_changed": false,
+    "episode_starts_or_horizons_changed": false,
+    "new_xfa_work_started": false,
+    "resume_scope": "REUSE_SEALED_STAGE0_STAGE1_STAGE2_BEGIN_SPRINT_EVALUATION",
+    "risk_threshold_or_control_changed": false,
+    "scientific_hypothesis_changed": false,
+    "stage0_stage1_stage2_evidence_recomputed": false
+  },
+  "validation": {
+    "production_bank_replays_reconstructed": 120,
+    "quality_profile_set": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "quality_profiles_checked": 480,
+    "result": "NORMAL_STRESSED_SELECTION_PARITY_PROVEN",
+    "targeted_test_command": "PYTHONPATH=. .venv/bin/pytest -q tests/test_fast_pass_runtime_helpers.py tests/test_fast_pass_runtime_contract.py tests/test_fast_pass_manifest.py",
+    "targeted_tests_failed": 0,
+    "targeted_tests_passed": 32
+  }
+}
