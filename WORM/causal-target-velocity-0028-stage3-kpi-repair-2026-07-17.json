@@ -1,0 +1,107 @@
+{
+  "schema": "hydra_technical_runtime_repair_receipt_v1",
+  "campaign_id": "hydra_causal_target_velocity_0028",
+  "classification": "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT",
+  "recorded_at_utc": "2026-07-17T08:33:15Z",
+  "scientific_status": "NO_ECONOMIC_SEMANTICS_CHANGE",
+  "failed_closed": true,
+  "pre_repair_checkpoint": {
+    "state": "FAILED_CLOSED",
+    "stage": "STAGE_3_ROLLING_COMBINE_ACTIVE",
+    "checkpoint_sequence": 291,
+    "policies_proposed": 20000,
+    "unique_policies_screened": 4096,
+    "exact_account_replays": 206,
+    "combine_episodes_completed": 430,
+    "last_completed_policy_id": "hazard_01b84c042c95b8a6a206a8da",
+    "failure_type": "KeyError",
+    "failure_message": "'normal'",
+    "production_state_path": "reports/economic_evolution/causal_target_velocity_0028/production_state.json",
+    "production_state_file_sha256": "95cd72d89863ce951cd04696b501367ac7984b6bbda885cc5545d095259b2e72",
+    "production_state_hash": "6f04d10c0fd12bb3a0f1d97270ea7c01492e104a3aa14494043c6665a55cdb4f",
+    "production_kpi_path": "reports/economic_evolution/causal_target_velocity_0028/production_kpis.json",
+    "production_kpi_file_sha256": "eff50fc9e2733adffdcf50eb528cbdbdcfea8c4c5b7cb03afd227bea0180f0a3",
+    "production_kpi_hash": "155531f96365018188c06b928b10c4b4845271b957969ad045b5e0febad37528"
+  },
+  "root_cause": {
+    "implementation_file": "hydra/production/causal_target_velocity_runtime.py",
+    "old_file_sha256": "b69fdc1d90ad71636c0d816a17e4824204101301b979548955f2ad3afa98e066",
+    "primary_kpi_fix_file_sha256": "be949e427790923bf207f9ea00233003d67d44b1a9a25e365df74c219b1b3731",
+    "new_file_sha256": "64e131cc527606a8674d91e9ee2ce8242aaa87bbaba969da3ec271a82f714224",
+    "first_invalid_row_status": "CANDIDATE_INVALID_RECORDED",
+    "invalid_row_reason": "insufficient non-overlapping matched random null population",
+    "defect": "THE_DERIVED_KPI_AGGREGATOR_ACCESSED_NORMAL_AND_STRESSED_FIELDS_ON_AN_AUDITABLE_INVALID_STAGE3_ROW",
+    "economic_state_mutated_by_defect": false,
+    "market_signal_fill_pnl_mll_or_selection_semantics_changed": false
+  },
+  "preserved_stage3_batch": {
+    "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage3_rolling_combine_batches/batch_0000.jsonl",
+    "file_sha256": "abd0a664ba2727f1c2360225a49728387ad89efa2e3435818121e2ddbc2455d6",
+    "row_count": 4,
+    "complete_row_count": 3,
+    "invalid_audit_row_count": 1,
+    "economic_episode_count": 18,
+    "recomputed": false
+  },
+  "preserved_preflight": {
+    "path": "reports/economic_evolution/causal_target_velocity_0028/preflight/risk_frontier_preflight_result.json",
+    "file_sha256": "8b4037121883f6a387a599cfd15ceba433c9b1948c4f5098bf3dca425f27b90e",
+    "result_hash": "1a41762ad9620833fa3c8b82ca2e650072e7598ddcc888091ff91e33d450cc7b",
+    "manifest_sha256": "2329999422838d63210345f11d274c9b03986113e3eeca889a17ac086033880d",
+    "recomputed": false
+  },
+  "repair_scope": {
+    "implementation_change": "FILTER_STAGE3_KPI_INPUTS_TO_STATUS_STAGE_3_COMPLETE",
+    "completed_batches_reused_unchanged": true,
+    "stage0_recomputed": false,
+    "stage1_recomputed": false,
+    "stage2_recomputed": false,
+    "completed_stage3_batch_recomputed": false,
+    "resume_scope": "UNFINISHED_STAGE3_CANDIDATES_ONLY",
+    "candidate_or_policy_change_allowed": false,
+    "manifest_threshold_change_allowed": false,
+    "hazard_grammar_change_allowed": false,
+    "risk_frontier_change_allowed": false,
+    "starts_blocks_or_horizons_change_allowed": false,
+    "cost_or_account_rule_change_allowed": false,
+    "matched_control_change_allowed": false,
+    "targeted_test_modules": [
+      "tests/test_causal_risk_preflight.py",
+      "tests/test_causal_target_velocity_manifest_runtime.py",
+      "tests/test_causal_target_velocity_runtime_contract.py"
+    ],
+    "targeted_test_result": "36_PASSED",
+    "full_regression_repeated": false
+  },
+  "unchanged_economic_fields": [
+    "economic hypothesis",
+    "candidate population and fingerprints",
+    "hazard and opportunity-density mechanisms",
+    "risk-frontier levels",
+    "promotion thresholds",
+    "feature matrices and cached data",
+    "causal decision and fill semantics",
+    "episode starts and temporal blocks",
+    "episode horizons",
+    "normal and stressed costs",
+    "account rules",
+    "matched controls",
+    "random seeds"
+  ],
+  "multiplicity": {
+    "existing_reservation_event_id": "hydra_causal_target_velocity_0028_multiplicity_reservation",
+    "existing_cumulative_trials": 612109,
+    "new_reservation_required": false,
+    "multiplicity_delta": 0
+  },
+  "safety": {
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "live_trading": false
+  },
+  "primary_kpi_fix_commit": "79d517bfea82441f141f057cf8f9b4be0c25f41b",
+  "repair_commit": "a26bef721e528781397fe9f3cb55fdf04553414a",
+  "repair_record_hash": "992fc32a00c6b78dacbc6d1926aaef9f23ef355023c428bbe4c0c1d3bf6ced30"
+}

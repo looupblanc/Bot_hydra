@@ -1,0 +1,586 @@
+{
+  "account_parameters": {
+    "consistency_fraction": 0.5,
+    "maximum_loss_limit": 4500.0,
+    "maximum_mini_equivalent": 15,
+    "minimum_pass_days": 2,
+    "profit_target": 9000.0,
+    "session_flatten": "FROZEN_TOPSTEP_SESSION_FLATTEN",
+    "starting_balance": 150000.0
+  },
+  "campaign_id": "hydra_causal_target_velocity_0028",
+  "revision_id": "hydra_causal_target_velocity_0028_revision_01",
+  "causal_event_contract": {
+    "availability_rule": "AVAILABLE_AT_LTE_DECISION_TIME",
+    "batch_streaming_decision_equality_required": true,
+    "fill_policy": "CAUSAL_NEXT_TRADABLE_OPEN_V1",
+    "forbidden_decision_inputs": [
+      "FUTURE_LABEL_AVAILABILITY",
+      "NEGATIVE_SHIFT",
+      "NEXT_BAR_AT_EARLIER_TIMESTAMP",
+      "FUTURE_CONTINUITY",
+      "CENTERED_ROLLING",
+      "BACKWARD_FILL_ACROSS_DECISION_TIME"
+    ],
+    "future_outcomes_are_labels_only": true,
+    "kernel": "SHARED_CAUSAL_DECISION_KERNEL",
+    "missing_future_coverage": "CENSORED_FUTURE_COVERAGE",
+    "missing_future_suppresses_signal": false,
+    "persist_fields": [
+      "market",
+      "contract",
+      "timeframe",
+      "feature_fingerprint",
+      "entry_intent",
+      "causal_fill",
+      "adverse_threshold",
+      "favorable_threshold",
+      "maximum_horizon",
+      "result_observed_later"
+    ],
+    "persist_timestamps": [
+      "event_time",
+      "available_at",
+      "decision_time",
+      "earliest_executable_time",
+      "fill_time"
+    ]
+  },
+  "class_id": "TARGET_BEFORE_ADVERSE_EXCURSION_HAZARD_OPPORTUNITY_DENSITY_V1",
+  "clean_causal_baseline": {
+    "all_former_economic_and_xfa_statuses_withdrawn": true,
+    "best_former_book_full_horizon_stressed_median_target_progress": 0.06557888888889607,
+    "component_status": "LOW_VELOCITY_CAUSAL_COMPONENTS",
+    "former_b4_pass_concentration_disappeared": true,
+    "former_book_count": 6,
+    "former_book_ids": [
+      "active_pool_014dffb40e99814612d78c51",
+      "active_pool_070e391c7586ba1fac2f5494",
+      "active_pool_14e275fa8d869c28b1f27f78",
+      "active_pool_186a4177401aab223b0a21fa",
+      "active_pool_2287bfb0b1c6f07930150102",
+      "active_pool_2377af7025aadf9aaf456a7e"
+    ],
+    "former_book_passes_all_horizons": 0,
+    "forward_closed": true,
+    "negative_or_unstable_diagnostic_ids": [
+      "sleeve_617236bb4c8b7cca8a472bac"
+    ],
+    "normal_combine_passes": 0,
+    "observed_mll_breaches": 0,
+    "phase_b_closed": true,
+    "positive_component_ids": [
+      "sleeve_0d5f4ce40cc3e8f002657965",
+      "sleeve_1488a965163f4de09bca7cf3",
+      "sleeve_352b3dd8e17fd32021bf837b",
+      "sleeve_39eb74b174e7bdd240520b9d",
+      "sleeve_3ba7422174d7e5b1c2a01d58",
+      "sleeve_454819bd8caec8581b6016d2",
+      "sleeve_4de0a5d3b0ef1762cc9e4086",
+      "sleeve_57125a2989d8eac29398af60",
+      "sleeve_5c45e73e41fac686c67a0443",
+      "sleeve_5c79759104e5765769be23ea",
+      "sleeve_624310a1de865cef4db2f8f4",
+      "sleeve_64d6fd6dd9e5f74b920ac99b",
+      "sleeve_65bad2088913fc9fca0a145d",
+      "sleeve_7ecd76490fa9fb34e1af5820",
+      "sleeve_8af4e061229c8ce7ae335f63",
+      "sleeve_c5da4b5a67abadeb7d68eabe",
+      "sleeve_e017bb45b0937aef46657631"
+    ],
+    "positive_stressed_sleeves_at_90d": 17,
+    "promotion_status": null,
+    "sleeves_evaluated": 18,
+    "sources": {
+      "baseline_freeze": {
+        "file_sha256": "a6de73224e80df2c49f9ca69ed5ac8cbfa96582a39f211c2982119bb4ddb9214",
+        "path": "reports/economic_evolution/causal_target_velocity_0028_baseline_freeze.json"
+      },
+      "causal_salvage_manifest": {
+        "file_sha256": "5568d14809c6cb03846d45cd1ea98e22d674fc2d64a0ac3700ca533a71f034f7",
+        "path": "config/v7/causal_salvage_sprint_0027.json"
+      },
+      "causal_salvage_result": {
+        "file_sha256": "3abe76b0f6caef909ca4efb46fad47355230ca64392819f68f123fea5ee19bf5",
+        "path": "reports/economic_evolution/causal_salvage_sprint_0027_revision_02/causal_salvage_result.json"
+      },
+      "operating_package_v1_retraction": {
+        "file_sha256": "002499fa4c95b1d12c0b2c6d8ebccc0617ab84961edfbca33b079ca50ba9beb5",
+        "path": "reports/operating/hydra_operating_package_v1/OPERATING_PACKAGE_V1_RETRACTION_RECEIPT.json"
+      },
+      "phase_a_results": {
+        "file_sha256": "6edf8b982e8f3dd5868f853ab2ee4739b9ef85826b025405b8e4b2bb61ae5c0e",
+        "path": "reports/economic_evolution/causal_salvage_sprint_0027_revision_02/phase_a_results.json"
+      },
+      "pre_reservation_quarantine": {
+        "file_sha256": "9dad54ac97498887f88722d31b2bfc1c04ba69e711a520bbae14b4c9b984d81a",
+        "path": "reports/economic_evolution/causal_target_velocity_0028_pre_reservation_exposure_quarantine.json"
+      },
+      "pre_reservation_technical_defect_receipt": {
+        "file_sha256": "5b75a96bce8b9332ab07dcc41d54b9ee1714ab6bd158e615c95e44d2415bd423",
+        "path": "reports/economic_evolution/causal_target_velocity_0028_pre_reservation_technical_defect_receipt.json"
+      }
+    },
+    "stressed_combine_passes": 0,
+    "stressed_median_minimum_mll_buffer_usd": 4396.6975,
+    "worst_observed_minimum_mll_buffer_usd": 1869.725,
+    "xfa_closed": true
+  },
+  "compute": {
+    "asynchronous_evidence_writer_count": 1,
+    "compute_workers_read_only": true,
+    "worker_count": 3
+  },
+  "compute_allocation": {
+    "economic_compute_minimum": 0.85,
+    "integrity_persistence_maximum": 0.1,
+    "reporting_maximum": 0.05
+  },
+  "costs": {
+    "frozen_causal_cost_model": true,
+    "normal_multiplier": 1.0,
+    "source": {
+      "file_sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+      "path": "config/v7/phase0_g0_preregistration.json"
+    },
+    "stressed_multiplier": 1.5
+  },
+  "data": {
+    "cached_data_only": true,
+    "evaluation_end_exclusive": "2024-10-01",
+    "evaluation_start_inclusive": "2023-01-01",
+    "feature_matrix_bindings": {
+      "CL": {
+        "bundle_hash": "26d685702bed8d0fad36ec2ab03586a926fff4b00d6d83789dd7631009f28e6e",
+        "file_sha256": "6255364f0334adc3f2de3b0be6e48a2bc6a6a693b4660b3ff5ac9ff83551d1b9",
+        "path": "data/cache/economic_evolution/features/1bba31554504b8b7321e995731af6d104cdbd88b894aab56511a117b9d315043/manifest.json",
+        "row_count": 467223
+      },
+      "ES": {
+        "bundle_hash": "a8c0184d40ca7931b11072170a1be5a5aa671f16b02ff46c217031b1ee38a792",
+        "file_sha256": "3d3865d6b0ccd37aafb9010025f46a8e858fac085f71ddd186ae55dbbe50859f",
+        "path": "data/cache/economic_evolution/features/7e30357e0812f0cf5831bc8a5ec40fc9edc265834edffcc1ef8aecf93dd52568/manifest.json",
+        "row_count": 570787
+      },
+      "NQ": {
+        "bundle_hash": "078d9cc4013ed7172472b0bdb859a0891eeccd64dc3d69fc8f0323fb39577ebd",
+        "file_sha256": "4528e06bb4ff00aa4de14fcb90d0029a8dde5faf757e734f3b1f03118fd1dff9",
+        "path": "data/cache/economic_evolution/features/ef98149addd9d849a8554de55e3f1f784bde95ac284ceeefd13b7b59eb71db2b/manifest.json",
+        "row_count": 571046
+      },
+      "RTY": {
+        "bundle_hash": "8849d6c4145e353c72ac0a721a7b3b198de9b1b6df96f5adc079cd27c2b1fe61",
+        "file_sha256": "648f5707627d7ce7a0d4c56704f3a42f8dc1e7bd33d10e3a3417f9500080b5ca",
+        "path": "data/cache/economic_evolution/features/32dc48509983cba228b65847377e346a3249016901c95e4baa7af6a2eb9ae74d/manifest.json",
+        "row_count": 548581
+      },
+      "YM": {
+        "bundle_hash": "5315b3ad493d229042ea91c8d5c5e46957ec6332ad4a904c7c55f7033fa34b5d",
+        "file_sha256": "ec3367ec31dacf216f2235479b5148493a615fc2c579187fe583a20b1acf2908",
+        "path": "data/cache/economic_evolution/features/451c65ed48604bd9c09a56b260ad189591d55df36ac2cbb1d840ed5c72258112/manifest.json",
+        "row_count": 562802
+      }
+    },
+    "new_purchase_allowed": false,
+    "q4_access_allowed": false,
+    "role": "DEVELOPMENT_ONLY_Q4_EXCLUDED",
+    "roll_map": {
+      "file_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+      "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
+    }
+  },
+  "development_only": true,
+  "economic_hypothesis": "Causal target-before-adverse excursion hazard and independent opportunity density can convert weak positive expectancy into useful Combine target velocity without unacceptable MLL consumption.",
+  "economic_objective": {
+    "inactivity_rewarded": false,
+    "opportunity_density_required": true,
+    "pareto_metrics": [
+      "NORMAL_COMBINE_PASS_RATE",
+      "STRESSED_COMBINE_PASS_RATE",
+      "LOWER_QUARTILE_TARGET_PROGRESS",
+      "MEDIAN_TARGET_PROGRESS",
+      "DAYS_TO_TARGET",
+      "COST_ADJUSTED_TARGET_VELOCITY",
+      "STRESSED_NET_PNL",
+      "MLL_BREACH",
+      "MINIMUM_MLL_BUFFER",
+      "COMBINE_CONSISTENCY",
+      "OPPORTUNITY_DENSITY",
+      "BLOCK_STABILITY",
+      "MARKET_SESSION_CONCENTRATION",
+      "OPERATIONAL_SIMPLICITY"
+    ],
+    "ranking": "TRANSPARENT_PARETO_FRONTIER",
+    "raw_aggregate_pnl_primary": false
+  },
+  "evaluation_coverage": {
+    "administrative_block_boundary_censoring": false,
+    "block_role": "START_ORIGIN_TAG_ONLY",
+    "chronological_continuation_across_block_and_embargo_boundaries": true,
+    "coverage_rule_enters_strategy_decision": false,
+    "exact_limitation_reported_when_under_48": true,
+    "genuine_missing_coverage_only": true,
+    "headline_horizon_trading_days": 90,
+    "headline_requires_complete_horizon": true,
+    "manufacture_independence_when_under_48": false,
+    "overlapping_starts_role": "SECONDARY_DIAGNOSTIC_ONLY",
+    "reported_states": [
+      "FULL_COVERAGE",
+      "DATA_CENSORED",
+      "HARD_FAILURE",
+      "TARGET_REACHED",
+      "MLL_BREACHED"
+    ],
+    "role_frozen_before_run": true,
+    "start_selection_policy": "CHRONOLOGICAL_90D_START_ORIGIN_BLOCK_NONOVERLAPPING"
+  },
+  "evidence_bundle": {
+    "atomic_finalize": true,
+    "destination": "data/cache/evidence_bundles",
+    "large_files_git_tracked": false,
+    "lightweight_manifest_path": "reports/economic_evolution/causal_target_velocity_0028_revision_01/evidence_bundle_receipt.json",
+    "reconstruction_flag": false,
+    "required_datasets": [
+      "component_signals",
+      "component_entries",
+      "component_exits",
+      "component_trades",
+      "account_policy_membership",
+      "account_daily_paths",
+      "episodes",
+      "provenance"
+    ],
+    "required_for_campaign_complete": true,
+    "stage1_complete_event_ledgers_required": true,
+    "summary_only_complete_allowed": false
+  },
+  "failure_guided_mutation": {
+    "blind_whole_strategy_mutation": false,
+    "classifications": [
+      "TOO_FEW_OPPORTUNITIES",
+      "LOW_FAVORABLE_BEFORE_ADVERSE_RATE",
+      "COST_FRAGILITY",
+      "TARGET_TOO_SLOW",
+      "MLL_EXCESS",
+      "CONSISTENCY_FAILURE",
+      "TEMPORAL_INSTABILITY",
+      "MARKET_CONCENTRATION",
+      "DUPLICATE_BEHAVIOR"
+    ],
+    "targeted_children_only": true
+  },
+  "governance": {
+    "broker_connection_allowed": false,
+    "former_book_retry_allowed": false,
+    "live_trading_allowed": false,
+    "new_data_purchase_allowed": false,
+    "orders_allowed": false,
+    "q4_access_allowed": false,
+    "single_authoritative_mission_writer": true,
+    "single_persistent_controller": true,
+    "status_inheritance_allowed": false
+  },
+  "implementation_files": {
+    "hydra/account_policy/active_risk_pool.py": "a4ac4b8ae87fff29b7764836ea0002de1b0fabd994e9dd8999ef166261e132ab",
+    "hydra/account_policy/causal_active_pool_replay.py": "c41878290cffdd5af8ffa273950e861a1fa7e2cbcb22314c1e02162c6fb83587",
+    "hydra/evidence/causal_target_velocity_adapter.py": "33a3d0e05ca1e899059a68a3cf77ea1a7f465fff9974437bb286f77016a4f0a1",
+    "hydra/mission/economic_evolution_manifest_runtime.py": "19c948429db8495512b933c101d57cd971557d80fed626fef7265ae189a53243",
+    "hydra/production/causal_risk_preflight.py": "62d30c653e6df4291cacf9891b2749cf4c66c24ae0b11eeaa51aaab79392eb50",
+    "hydra/production/causal_target_velocity_manifest.py": "428178b46cb15dc6736d37d6cb05128a9466e8339418d90b3fcec2516e528d09",
+    "hydra/production/causal_target_velocity_runtime.py": "64e131cc527606a8674d91e9ee2ce8242aaa87bbaba969da3ec271a82f714224",
+    "hydra/research/causal_sleeve_replay.py": "821467378b61cf31e16c73e04f4a9e44ee907de4eb42519ef12e761c2b8677f1",
+    "hydra/research/causal_target_velocity.py": "a06206967cecf5a33dbcdbe127a29fef686a59a7e20a8aa8a0dba4b72fb629b5",
+    "scripts/run_causal_target_velocity_manifest.py": "84c1c346122e9e60d678c95e38fbd88fceddf6f392327f597dd9358cc353f8f3"
+  },
+  "manifest_hash": "aaa22ff5c7e5a6308f08e036f824e3b5a2a9d96aeff336c8d6d2b18e00114d29",
+  "matched_controls": {
+    "clean_low_velocity_baseline_contract": {
+      "limitations_explicit": true,
+      "positive_stressed_velocity_delta_required": true,
+      "role": "SAME_START_NEAREST_CELL_ECONOMIC_BASELINE_NOT_MATCHED_NULL",
+      "strict_seven_dimension_match_required": false,
+      "type": "CLEAN_LOW_VELOCITY_SLEEVE"
+    },
+    "deterministic_seed_contract": {
+      "direction_flipped": "IDENTICAL_EVENTS_DIRECTION_FLIPPED",
+      "random_event_timing": "STRUCTURAL_FINGERPRINT_PREFIX_64BIT_MOD_2_32",
+      "session_matched_null": "STAGE3_SEED_XOR_0x5E5510A7"
+    },
+    "full_suite_after_cheap_screen_only": true,
+    "strict_matched_null_match_dimensions": [
+      "MARKET",
+      "SESSION",
+      "TIMEFRAME",
+      "OPPORTUNITY_COUNT",
+      "ACTIVE_DURATION",
+      "AVERAGE_EXPOSURE",
+      "COST_LEVEL"
+    ],
+    "strict_matched_null_types": [
+      "RANDOM_EVENT_TIMING",
+      "DIRECTION_FLIPPED",
+      "SESSION_MATCHED_NULL"
+    ],
+    "types": [
+      "RANDOM_EVENT_TIMING",
+      "DIRECTION_FLIPPED",
+      "SESSION_MATCHED_NULL",
+      "CLEAN_LOW_VELOCITY_SLEEVE"
+    ]
+  },
+  "multiplicity": {
+    "base_inflated_reservation_trials": 30000,
+    "campaign_specific_inflation": 1.5,
+    "expected_global_N_trials_after_reservation": 612109,
+    "pre_reservation_quarantine_receipt_hash": "aac4364905148afbf39c4f8924a209a010e74715d4382a5e8e312bbc34ec227c",
+    "pre_reservation_quarantined_comparisons": 10,
+    "prior_global_N_trials": 582099,
+    "proof_window_consumed": false,
+    "prospective_comparisons": 20000,
+    "quarantined_probe_results_eligible_for_selection": false,
+    "reservation_required_before_outcome_access": true,
+    "reserved_delta_trials": 30010
+  },
+  "pre_reservation_integrity": {
+    "economic_outcomes_used_for_manifest_tuning": false,
+    "quarantined_candidate_count": 10,
+    "quarantine_receipt_hash": "aac4364905148afbf39c4f8924a209a010e74715d4382a5e8e312bbc34ec227c",
+    "technical_defect_receipt_hash": "ef173e587e256fa2437d1065ab25788d2f81edeb2a243e0e551b23ac6fa4769c"
+  },
+  "promotion_gates": {
+    "book_48_to_96": {
+      "maximum_mll_breach_rate": 0.1,
+      "minimum_contributing_blocks": 2,
+      "minimum_normal_passes": 3,
+      "minimum_stressed_passes": 2,
+      "positive_stressed_net_required": true
+    },
+    "final_development": {
+      "development_only": true,
+      "live_execution_allowed": false,
+      "minimum_normal_pass_rate": 0.1,
+      "minimum_stressed_pass_rate": 0.05
+    },
+    "sleeve_to_account_assembly": {
+      "hard_causal_defect_allowed": false,
+      "higher_target_velocity_than_clean_baseline": true,
+      "minimum_positive_blocks": 2,
+      "positive_normal_and_stressed_economics": true
+    }
+  },
+  "risk_frontier_preflight": {
+    "diagnostic_former_book_count": 6,
+    "executable_micro_quantities": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "executable_reference_micro_quantity": 4,
+    "failure_status": "RISK_SCALE_ONLY_FALSIFIED",
+    "maximum_campaign_compute_fraction": 0.1,
+    "neighbor_multiplier_tuning_allowed": false,
+    "normalized_levels": [
+      0.75,
+      1.0,
+      1.25,
+      1.5
+    ],
+    "outcome_inspection_before_reservation": false,
+    "positive_sleeve_count": 17,
+    "proceed_to_discovery_after_failure": true,
+    "success_gate": {
+      "maximum_mll_breach_rate": 0.1,
+      "minimum_normal_passes_out_of_48": 3,
+      "minimum_stressed_passes_out_of_48": 2,
+      "positive_stressed_net_required": true
+    }
+  },
+  "runtime": {
+    "asynchronous_evidence_writer_count": 1,
+    "controller_source_change_required": false,
+    "engine": "causal_target_velocity_v1",
+    "output_dir": "reports/economic_evolution/causal_target_velocity_0028_revision_01",
+    "result_name": "economic_production_result.json",
+    "result_schema": "hydra_economic_production_result_v1",
+    "resume_from_checkpoint": true,
+    "runner": "scripts/run_causal_target_velocity_manifest.py",
+    "worker_count": 3
+  },
+  "schema": "hydra_causal_target_velocity_manifest_v1",
+  "search_space": {
+    "behavioral_deduplication": true,
+    "cached_data_only": true,
+    "cemetery_resurrection_allowed": false,
+    "cross_asset_reference_map": {
+      "CL": "ES",
+      "ES": "NQ",
+      "NQ": "ES",
+      "RTY": "ES",
+      "YM": "ES"
+    },
+    "executable_sleeve_fields": [
+      "ENTRY",
+      "SIZING",
+      "STOP",
+      "TARGET_OR_EXIT",
+      "MAXIMUM_HOLDING_TIME",
+      "SESSION_HANDLING",
+      "CAUSAL_FILL_SEMANTICS"
+    ],
+    "executable_sleeve_required": true,
+    "market_exclusions": {
+      "GC": "INCOMPLETE_CACHED_CAUSAL_COVERAGE_5690_ROWS_EXCLUDED_BEFORE_OUTCOMES"
+    },
+    "markets": [
+      "CL",
+      "ES",
+      "NQ",
+      "RTY",
+      "YM"
+    ],
+    "mechanisms": [
+      "VOLATILITY_EXPANSION",
+      "PARTICIPATION_OPPORTUNITY_DENSITY",
+      "MULTI_TIMEFRAME_ALIGNMENT",
+      "CROSS_ASSET_STATE",
+      "REVERSAL_AFTER_EXHAUSTION",
+      "SESSION_SPECIALIZED_MECHANISM"
+    ],
+    "parameter_variants_independent": false,
+    "proposal_count": 20000,
+    "semantic_deduplication": true,
+    "sessions": [
+      "OVERNIGHT",
+      "SESSION_OPEN",
+      "INTRADAY",
+      "CLOSE"
+    ],
+    "structural_deduplication": true,
+    "timeframes": [
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "60m"
+    ],
+    "unique_event_screen_minimum": 4096
+  },
+  "source_commit": "a26bef721e528781397fe9f3cb55fdf04553414a",
+  "successive_halving": {
+    "minimum_useful_sleeves_before_account_assembly": 4,
+    "mutation_or_retuning_between_stages": false,
+    "stage0_proposals_minimum": 20000,
+    "stage1_survivor_maximum": 1024,
+    "stage1_unique_candidates_minimum": 4096,
+    "stage2_exact_sleeve_replay_maximum": 1024,
+    "stage2_survivor_maximum": 256,
+    "stage3_rolling_combine_maximum": 256,
+    "stage3_survivor_maximum": 64,
+    "stage4_account_assembly_maximum": 64,
+    "stage4_survivor_maximum": 16,
+    "stage5_192_start_maximum": 4,
+    "stage5_96_start_maximum": 16,
+    "xfa_before_clean_combine_survivors": false
+  },
+  "target_before_adverse_labels": {
+    "adverse_levels_r": [
+      0.5,
+      0.75,
+      1.0
+    ],
+    "censored_state": "CENSORED_FUTURE_COVERAGE",
+    "favorable_levels_r": [
+      0.5,
+      1.0,
+      1.5,
+      2.0
+    ],
+    "horizons": [
+      "5m",
+      "15m",
+      "30m",
+      "60m",
+      "SESSION",
+      "OVERNIGHT"
+    ],
+    "outcome_only": true,
+    "persisted_outputs": [
+      "FAVORABLE_FIRST",
+      "ADVERSE_FIRST",
+      "NEITHER_REACHED",
+      "TIME_TO_FAVORABLE",
+      "TIME_TO_ADVERSE",
+      "MAXIMUM_FAVORABLE_EXCURSION",
+      "MAXIMUM_ADVERSE_EXCURSION",
+      "NORMAL_NET_AFTER_COSTS",
+      "STRESSED_NET_AFTER_COSTS"
+    ],
+    "unrestricted_grid_allowed": false
+  },
+  "temporal_blocks": {
+    "blocks": [
+      {
+        "block_id": "B1",
+        "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP",
+        "end": "2023-10-05",
+        "markets": ["CL", "ES", "NQ", "RTY", "YM"],
+        "start": "2023-07-03"
+      },
+      {
+        "block_id": "B2",
+        "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP",
+        "end": "2024-02-02",
+        "markets": ["CL", "ES", "NQ", "RTY", "YM"],
+        "start": "2023-10-27"
+      },
+      {
+        "block_id": "B3",
+        "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP",
+        "end": "2024-05-31",
+        "markets": ["CL", "ES", "NQ", "RTY", "YM"],
+        "start": "2024-02-26"
+      },
+      {
+        "block_id": "B4",
+        "contract_separation": "EXPLICIT_DATE_AWARE_ROLL_MAP",
+        "end": "2024-09-26",
+        "markets": ["CL", "ES", "NQ", "RTY", "YM"],
+        "start": "2024-06-17"
+      }
+    ],
+    "method": "FOUR_CONTIGUOUS_BLOCKS_WITH_TEN_SESSION_EMBARGO",
+    "overlapping_episode_starts_independent": false,
+    "roll_boundaries_create_independence": false
+  },
+  "technical_repair": {
+    "classification": "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT",
+    "economic_semantics_changed": false,
+    "scientific_hypothesis_changed": false,
+    "population_or_selection_changed": false,
+    "risk_threshold_or_control_changed": false,
+    "completed_evidence_recomputed": false,
+    "completed_stage3_batch_reused_unchanged": true,
+    "resume_scope": "UNFINISHED_STAGE3_CANDIDATES_ONLY",
+    "new_multiplicity_reservation_required": false,
+    "supersedes_manifest_hash": "23b24c50c2f71a6bce87fe88b22df7ab2a0177700a0c618924911c35c405c27d",
+    "supersedes_manifest_file_sha256": "2329999422838d63210345f11d274c9b03986113e3eeca889a17ac086033880d",
+    "supersedes_worm_tag": "worm/causal-target-velocity-0028-2026-07-17",
+    "supersedes_worm_commit": "d8f3689adaf9e8be4f34470334502b0441a9b914",
+    "repair_commit": "a26bef721e528781397fe9f3cb55fdf04553414a",
+    "supersedes_output_dir": "reports/economic_evolution/causal_target_velocity_0028",
+    "revision_output_dir": "reports/economic_evolution/causal_target_velocity_0028_revision_01",
+    "preserved_preflight_path": "reports/economic_evolution/causal_target_velocity_0028/preflight/risk_frontier_preflight_result.json",
+    "repair_receipt": {
+      "path": "WORM/causal-target-velocity-0028-stage3-kpi-repair-2026-07-17.json",
+      "file_sha256": "2ad3807964c22ebc935d117ad068c7d7054811d46292208e43deb94feb2b2c1e",
+      "repair_record_hash": "992fc32a00c6b78dacbc6d1926aaef9f23ef355023c428bbe4c0c1d3bf6ced30"
+    }
+  },
+  "terminal_predecessors": {
+    "causal_salvage_0027": "CAUSAL_SALVAGE_GATE_FALSIFIED",
+    "inherit_economic_or_xfa_status": false,
+    "operating_package_v1": "RETRACTED_DEVELOPMENT_EVIDENCE_CONTAMINATED",
+    "retry_former_six_books_allowed": false
+  }
+}
