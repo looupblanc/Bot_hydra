@@ -541,6 +541,11 @@ def _is_technical_kpi_revision(manifest: Mapping[str, Any]) -> bool:
         == "reports/economic_evolution/causal_target_velocity_0028"
         and repair.get("revision_output_dir")
         == "reports/economic_evolution/causal_target_velocity_0028_revision_01"
+        and repair.get("preserved_preflight_path")
+        == (
+            "reports/economic_evolution/causal_target_velocity_0028/"
+            "preflight/risk_frontier_preflight_result.json"
+        )
     )
 
 

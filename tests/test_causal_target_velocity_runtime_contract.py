@@ -144,6 +144,30 @@ def test_kpis_ignore_recorded_invalid_stage3_candidates_without_results() -> Non
     assert kpis["best_stressed_pass_rate"] == pytest.approx(1.0)
 
 
+def test_kpi_revision_reuses_original_sealed_preflight(tmp_path: Path) -> None:
+    original = (
+        tmp_path
+        / "reports/economic_evolution/causal_target_velocity_0028/preflight/"
+        "risk_frontier_preflight_result.json"
+    )
+    original.parent.mkdir(parents=True)
+    original.write_text("{}\n", encoding="utf-8")
+    revised_output = (
+        tmp_path
+        / "reports/economic_evolution/causal_target_velocity_0028_revision_01"
+    )
+    manifest = {
+        "technical_repair": {
+            "classification": "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT",
+            "preserved_preflight_path": str(original.relative_to(tmp_path)),
+        }
+    }
+
+    assert runtime._risk_preflight_output_dir(  # noqa: SLF001
+        tmp_path, revised_output, manifest
+    ) == original.parent
+
+
 def _stage2_row() -> dict[str, object]:
     return {
         "status": "STAGE_2_COMPLETE",

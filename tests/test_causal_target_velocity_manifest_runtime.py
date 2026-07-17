@@ -411,6 +411,10 @@ def test_valid_0028_kpi_only_revision_uses_separate_output(tmp_path: Path) -> No
         "revision_output_dir": (
             "reports/economic_evolution/causal_target_velocity_0028_revision_01"
         ),
+        "preserved_preflight_path": (
+            "reports/economic_evolution/causal_target_velocity_0028/preflight/"
+            "risk_frontier_preflight_result.json"
+        ),
         "repair_commit": manifest["source_commit"],
         "repair_receipt": {
             "path": "WORM/repair.json",

@@ -204,7 +204,9 @@ class _CausalTargetVelocityRun:
             preflight = run_causal_risk_preflight(
                 self.manifest_path,
                 repository_root=self.root,
-                output_dir=self.output_dir / "preflight",
+                output_dir=_risk_preflight_output_dir(
+                    self.root, self.output_dir, self.manifest
+                ),
             )
             self.hot_seconds += time.perf_counter() - preflight_started
             self._publish(
@@ -1429,6 +1431,32 @@ class _CausalTargetVelocityRun:
 
     def _load_stage1_rows(self) -> list[dict[str, Any]]:
         return _load_batches(self.payload_dir / "stage1_event_screen_batches")
+
+
+def _risk_preflight_output_dir(
+    root: Path,
+    campaign_output_dir: Path,
+    manifest: Mapping[str, Any],
+) -> Path:
+    """Reuse the byte-identical sealed preflight for the KPI-only revision."""
+
+    repair = manifest.get("technical_repair")
+    if not isinstance(repair, Mapping):
+        return campaign_output_dir / "preflight"
+    raw = str(repair.get("preserved_preflight_path") or "")
+    preserved = (root / raw).resolve()
+    allowed = (root / "reports/economic_evolution").resolve()
+    if (
+        repair.get("classification")
+        != "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT"
+        or preserved.name != "risk_frontier_preflight_result.json"
+        or allowed not in preserved.parents
+        or not preserved.is_file()
+    ):
+        raise CausalTargetVelocityRuntimeError(
+            "technical revision preserved preflight is invalid"
+        )
+    return preserved.parent
 
 
 def _initialize_worker(
