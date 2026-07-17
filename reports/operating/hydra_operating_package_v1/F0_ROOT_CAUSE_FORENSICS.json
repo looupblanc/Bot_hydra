@@ -1,0 +1,230 @@
+{
+  "account_impact": {
+    "affected_book_count": 6,
+    "affected_book_replications": 126,
+    "economic_delta_identifiable": false,
+    "reason": "The 21 omitted causal events have no frozen fill, PnL, MAE or MFE oracle and can alter governor conflicts, exposure, target, MLL and consistency paths."
+  },
+  "affected_books": [
+    "active_pool_014dffb40e99814612d78c51",
+    "active_pool_070e391c7586ba1fac2f5494",
+    "active_pool_14e275fa8d869c28b1f27f78",
+    "active_pool_186a4177401aab223b0a21fa",
+    "active_pool_2287bfb0b1c6f07930150102",
+    "active_pool_2377af7025aadf9aaf456a7e"
+  ],
+  "affected_sleeves": [
+    {
+      "additional_causal_signals": 9,
+      "canonical_signal_count": 187,
+      "classification": "MIXED_SESSION_BOUNDARY_AND_DEVELOPMENT_LOOKAHEAD_DEFECT",
+      "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d",
+      "scheduled_boundary_count": 5,
+      "unpredictable_gap_count": 4
+    },
+    {
+      "additional_causal_signals": 3,
+      "canonical_signal_count": 120,
+      "classification": "SESSION_BOUNDARY_MISMATCH",
+      "sleeve_id": "sleeve_65bad2088913fc9fca0a145d",
+      "scheduled_boundary_count": 3,
+      "unpredictable_gap_count": 0
+    },
+    {
+      "additional_causal_signals": 1,
+      "canonical_signal_count": 74,
+      "classification": "DEVELOPMENT_LOOKAHEAD_DEFECT",
+      "sleeve_id": "sleeve_7ecd76490fa9fb34e1af5820",
+      "scheduled_boundary_count": 0,
+      "unpredictable_gap_count": 1
+    },
+    {
+      "additional_causal_signals": 6,
+      "canonical_signal_count": 317,
+      "classification": "SESSION_BOUNDARY_MISMATCH",
+      "sleeve_id": "sleeve_c5da4b5a67abadeb7d68eabe",
+      "scheduled_boundary_count": 6,
+      "unpredictable_gap_count": 0
+    },
+    {
+      "additional_causal_signals": 2,
+      "canonical_signal_count": 186,
+      "classification": "MIXED_SESSION_BOUNDARY_AND_DEVELOPMENT_LOOKAHEAD_DEFECT",
+      "sleeve_id": "sleeve_e017bb45b0937aef46657631",
+      "scheduled_boundary_count": 1,
+      "unpredictable_gap_count": 1
+    }
+  ],
+  "all_divergent_events": [
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2023-02-24T21:00:00Z", "market": "YM", "row_index": 53080, "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2023-03-10T21:00:00Z", "market": "YM", "row_index": 66813, "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d"},
+    {"classification": "DEVELOPMENT_LOOKAHEAD_DEFECT_UNEXPECTED_SEGMENT_BREAK_WITHIN_HORIZON", "decision_at_utc": "2023-03-14T19:30:00Z", "market": "YM", "row_index": 69506, "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d"},
+    {"classification": "DEVELOPMENT_LOOKAHEAD_DEFECT_UNEXPECTED_SEGMENT_BREAK_WITHIN_HORIZON", "decision_at_utc": "2023-03-15T19:40:00Z", "market": "YM", "row_index": 70785, "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2023-06-01T20:00:00Z", "market": "YM", "row_index": 140099, "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2023-08-10T20:00:00Z", "market": "YM", "row_index": 200735, "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d"},
+    {"classification": "DEVELOPMENT_LOOKAHEAD_DEFECT_UNEXPECTED_SEGMENT_BREAK_WITHIN_HORIZON", "decision_at_utc": "2023-09-13T19:30:00Z", "market": "YM", "row_index": 232863, "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2024-09-05T20:00:00Z", "market": "YM", "row_index": 547187, "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d"},
+    {"classification": "DEVELOPMENT_LOOKAHEAD_DEFECT_UNEXPECTED_SEGMENT_BREAK_WITHIN_HORIZON", "decision_at_utc": "2024-09-18T19:20:00Z", "market": "YM", "row_index": 558544, "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2023-09-29T20:00:00Z", "market": "ES", "row_index": 244837, "sleeve_id": "sleeve_65bad2088913fc9fca0a145d"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2024-01-31T21:00:00Z", "market": "ES", "row_index": 355799, "sleeve_id": "sleeve_65bad2088913fc9fca0a145d"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2024-07-12T20:00:00Z", "market": "ES", "row_index": 500506, "sleeve_id": "sleeve_65bad2088913fc9fca0a145d"},
+    {"classification": "DEVELOPMENT_LOOKAHEAD_DEFECT_UNEXPECTED_SEGMENT_BREAK_WITHIN_HORIZON", "decision_at_utc": "2023-06-16T15:52:00Z", "market": "CL", "row_index": 126120, "sleeve_id": "sleeve_7ecd76490fa9fb34e1af5820"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2023-01-16T17:35:00Z", "market": "NQ", "row_index": 13531, "sleeve_id": "sleeve_c5da4b5a67abadeb7d68eabe"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2023-02-20T17:30:00Z", "market": "NQ", "row_index": 47784, "sleeve_id": "sleeve_c5da4b5a67abadeb7d68eabe"},
+    {"classification": "KNOWN_SESSION_BOUNDARY", "decision_at_utc": "2023-05-29T17:00:00Z", "market": "NQ", "row_index": 136784, "sleeve_id": "sleeve_c5da4b5a67abadeb7d68eabe"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2023-07-03T17:00:00Z", "market": "NQ", "row_index": 164098, "sleeve_id": "sleeve_c5da4b5a67abadeb7d68eabe"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2023-11-24T17:55:00Z", "market": "NQ", "row_index": 299682, "sleeve_id": "sleeve_c5da4b5a67abadeb7d68eabe"},
+    {"classification": "KNOWN_SESSION_BOUNDARY", "decision_at_utc": "2024-09-02T17:00:00Z", "market": "NQ", "row_index": 550260, "sleeve_id": "sleeve_c5da4b5a67abadeb7d68eabe"},
+    {"classification": "KNOWN_SESSION_BOUNDARY_WITHIN_HORIZON", "decision_at_utc": "2023-06-01T20:00:00Z", "market": "NQ", "row_index": 140864, "sleeve_id": "sleeve_e017bb45b0937aef46657631"},
+    {"classification": "DEVELOPMENT_LOOKAHEAD_DEFECT_UNEXPECTED_SEGMENT_BREAK_WITHIN_HORIZON", "decision_at_utc": "2024-03-13T19:35:00Z", "market": "NQ", "row_index": 397045, "sleeve_id": "sleeve_e017bb45b0937aef46657631"}
+  ],
+  "entry_availability_defect": {
+    "affected_entry_count": 2052,
+    "classification": "AVAILABILITY_SEMANTICS_MISMATCH",
+    "example": {
+      "entry_price": 73.92,
+      "entry_time_label_utc": "2023-01-05T19:23:00Z",
+      "price_available_at_utc": "2023-01-05T19:24:00Z",
+      "sleeve_id": "sleeve_0d5f4ce40cc3e8f002657965"
+    },
+    "finding": "decision_ns is t+1 minute while the persisted entry price is close.shift(-1), available one additional minute later; every legacy entry is labelled one minute before its price is available."
+  },
+  "first_divergence_traces": [
+    {
+      "availability_at_utc": "2023-02-24T21:00:00Z",
+      "causal_prior_emissions": 39,
+      "classification": "SESSION_BOUNDARY_MISMATCH",
+      "context": {"feature": "ctx_15m_return", "operator": "GT", "threshold": 0.000702329392485046, "value": 0.0009147178095556541},
+      "contract": "YMH3",
+      "decision_at_utc": "2023-02-24T21:00:00Z",
+      "feature_vector_hash": "8c2b94535099c89202cf7130a478ed499bf99c663f6bb9807b4e0554f8e536c8",
+      "first_differing_field": "eligibility.horizon_available",
+      "legacy_offline_value": false,
+      "market": "YM",
+      "online_causal_value": true,
+      "position_state": "FLAT",
+      "row_index": 53080,
+      "segment_code": 29085,
+      "session_code": 2,
+      "session_day": "2023-02-24",
+      "sleeve_id": "sleeve_39eb74b174e7bdd240520b9d",
+      "source_bar_at_utc": "2023-02-24T20:59:00Z",
+      "trigger": {"feature": "past_return_60", "operator": "LT", "threshold": -0.0023460564755410362, "value": -0.0029480594474667887},
+      "warmup_count": 851
+    },
+    {
+      "availability_at_utc": "2023-09-29T20:00:00Z",
+      "causal_prior_emissions": 61,
+      "classification": "SESSION_BOUNDARY_MISMATCH",
+      "context": {"feature": "ctx_5m_return", "operator": "LT", "threshold": -0.00018921475875122162, "value": -0.0012696946961390232},
+      "contract": "ESZ3",
+      "decision_at_utc": "2023-09-29T20:00:00Z",
+      "feature_vector_hash": "95f45a4c1eca2822d58e52ba98288401045a73f8663245777eb6e6677970a2c2",
+      "first_differing_field": "eligibility.horizon_available",
+      "legacy_offline_value": false,
+      "market": "ES",
+      "online_causal_value": true,
+      "position_state": "FLAT",
+      "row_index": 244837,
+      "segment_code": 7485,
+      "session_code": 2,
+      "session_day": "2023-09-29",
+      "sleeve_id": "sleeve_65bad2088913fc9fca0a145d",
+      "source_bar_at_utc": "2023-09-29T19:59:00Z",
+      "trigger": {"feature": "shared_loss_risk_state", "operator": "GT", "threshold": 0.00019226599982074164, "value": 0.00023279236233855933},
+      "warmup_count": 1319
+    },
+    {
+      "availability_at_utc": "2023-06-16T15:52:00Z",
+      "causal_prior_emissions": 22,
+      "classification": "DEVELOPMENT_LOOKAHEAD_DEFECT",
+      "context": {"feature": "ctx_60m_return", "operator": "GT", "threshold": 0.0023030303030302512, "value": 0.01007235068804091},
+      "contract": "CLN3",
+      "decision_at_utc": "2023-06-16T15:52:00Z",
+      "feature_vector_hash": "201f284ae812330d375e5f23af7b1abee5527dd3b537798e15a6a3d3cd579f0d",
+      "first_differing_field": "eligibility.horizon_available",
+      "legacy_offline_value": false,
+      "market": "CL",
+      "online_causal_value": true,
+      "position_state": "FLAT",
+      "row_index": 126120,
+      "segment_code": 3514,
+      "session_code": 1,
+      "session_day": "2023-06-16",
+      "sleeve_id": "sleeve_7ecd76490fa9fb34e1af5820",
+      "source_bar_at_utc": "2023-06-16T15:51:00Z",
+      "trigger": {"feature": "past_return_60", "operator": "LT", "threshold": -0.004209554454063874, "value": -0.004633529907329348},
+      "warmup_count": 224
+    },
+    {
+      "availability_at_utc": "2023-01-16T17:35:00Z",
+      "causal_prior_emissions": 9,
+      "classification": "SESSION_BOUNDARY_MISMATCH",
+      "context": {"feature": "ctx_5m_return", "operator": "GT", "threshold": 0.000612711971310631, "value": 0.000626674734203414},
+      "contract": "NQH3",
+      "decision_at_utc": "2023-01-16T17:35:00Z",
+      "feature_vector_hash": "0edd22658ea456ca8a75f1f8027e6bb4dba91f65cbf1c40fbc0f78c637639eaa",
+      "first_differing_field": "eligibility.horizon_available",
+      "legacy_offline_value": false,
+      "market": "NQ",
+      "online_causal_value": true,
+      "position_state": "FLAT",
+      "row_index": 13531,
+      "segment_code": 12260,
+      "session_code": 1,
+      "session_day": "2023-01-16",
+      "sleeve_id": "sleeve_c5da4b5a67abadeb7d68eabe",
+      "source_bar_at_utc": "2023-01-16T17:34:00Z",
+      "trigger": {"feature": "directional_pressure_without_progress", "operator": "LT", "threshold": 75.5, "value": 36.5},
+      "warmup_count": 779
+    },
+    {
+      "availability_at_utc": "2023-06-01T20:00:00Z",
+      "causal_prior_emissions": 55,
+      "classification": "SESSION_BOUNDARY_MISMATCH",
+      "context": {"feature": "ctx_5m_return", "operator": "GT", "threshold": 0.0003708992452200466, "value": 0.0006914075328849911},
+      "contract": "NQM3",
+      "decision_at_utc": "2023-06-01T20:00:00Z",
+      "feature_vector_hash": "7de7cb442e015230631c0e3a60d48bb96d2949d14568ea32511abdbd939b03c4",
+      "first_differing_field": "eligibility.horizon_available",
+      "legacy_offline_value": false,
+      "market": "NQ",
+      "online_causal_value": true,
+      "position_state": "FLAT",
+      "row_index": 140864,
+      "segment_code": 12499,
+      "session_code": 2,
+      "session_day": "2023-06-01",
+      "sleeve_id": "sleeve_e017bb45b0937aef46657631",
+      "source_bar_at_utc": "2023-06-01T19:59:00Z",
+      "trigger": {"feature": "past_return_60", "operator": "LT", "threshold": -0.003109623797723082, "value": -0.003135984561306815},
+      "warmup_count": 1319
+    }
+  ],
+  "global_classification": "DEVELOPMENT_LOOKAHEAD_DEFECT",
+  "impact_counts": {
+    "additional_causal_signals": 21,
+    "affected_sleeve_canonical_signals": 884,
+    "affected_sleeve_canonical_share": 0.4308,
+    "canonical_signals": 2052,
+    "causal_signals_without_future_mask": 2073,
+    "unambiguously_gap_contaminated_sleeve_canonical_signals": 447,
+    "unambiguously_gap_contaminated_sleeve_share": 0.2178,
+    "unpredictable_gap_exclusions": 6
+  },
+  "method": "Pre-freeze-only comparison removing exactly np.isfinite(forward_move__holding_bars) while preserving triggers, contexts, session filters and non-overlap state.",
+  "quarantine_policy": {
+    "book_scope": "ALL_SIX_BOOKS",
+    "minimum_unambiguously_contaminated_sleeves": [
+      "sleeve_39eb74b174e7bdd240520b9d",
+      "sleeve_7ecd76490fa9fb34e1af5820",
+      "sleeve_e017bb45b0937aef46657631"
+    ],
+    "strict_sleeve_scope": "ALL_FIVE_AFFECTED_SLEEVES_PENDING_CAUSAL_CALENDAR_REPLAY"
+  },
+  "schema": "hydra_f0_root_cause_forensics_v1",
+  "source_locations": {
+    "forward_move_builder": "hydra/research/turbo_feature_builder.py:_market_arrays",
+    "legacy_signal_selector": "hydra/research/rolling_combine_replay.py:_signal_positions"
+  }
+}

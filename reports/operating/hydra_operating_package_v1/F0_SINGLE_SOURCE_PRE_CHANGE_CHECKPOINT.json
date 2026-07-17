@@ -1,0 +1,48 @@
+{
+  "schema": "hydra_f0_single_source_pre_change_checkpoint_v1",
+  "created_at_utc": "2026-07-17T00:14:21Z",
+  "git_head": "3544fcc1b7ad57f25541687361b25d749ce5672d",
+  "upstream_head": "3544fcc1b7ad57f25541687361b25d749ce5672d",
+  "controller_version": "hydra_v7_economic_evolution_controller_v17",
+  "service": "hydra-autonomous-mission.service",
+  "service_pid": 2880818,
+  "single_writer": true,
+  "operating_package_manifest_hash": "9fd671d43127004d9ab11d82a42f07a71e9d846e559b1317c53c488dd1bc0d87",
+  "f0_status": "ONLINE_OFFLINE_EQUIVALENCE_NOT_PROVEN_FAIL_CLOSED",
+  "prior_f0_audit_proof_hash": "a9bbaf74d080024001ad733511df942c05807fe768d9d5d6a61b481b744f7210",
+  "authorization_receipt_present": false,
+  "books": [
+    {"candidate_id": "active_pool_014dffb40e99814612d78c51", "package_hash": "fbc57d0acf0140e491d475390741a3fc3869aca91d1bbc5002f693c5f361b72e"},
+    {"candidate_id": "active_pool_070e391c7586ba1fac2f5494", "package_hash": "4ca3ac09e3bdab9695e04ccda4308fce9442a35972550646be9aaf95ed6e1145"},
+    {"candidate_id": "active_pool_14e275fa8d869c28b1f27f78", "package_hash": "5d957832d3f76fdd8da87ff14db4f3ee05143e9b250aaa413bf645def97c8492"},
+    {"candidate_id": "active_pool_186a4177401aab223b0a21fa", "package_hash": "efa5cdc55ba286ad5b826f56e1fada38f818ab9982782c0a1a2cd867a0e0c225"},
+    {"candidate_id": "active_pool_2287bfb0b1c6f07930150102", "package_hash": "88049ca68f653f397353a017330f2ce32a4839fd984d912e342b039c4ad9b70a"},
+    {"candidate_id": "active_pool_2377af7025aadf9aaf456a7e", "package_hash": "70bcca5d4b42dade5c7b8bc682ce564e0a61695f787a0fc0380cae13d215d04c"}
+  ],
+  "sleeve_count": 18,
+  "prior_mismatch_lower_bound": 4062,
+  "forward_backlog": {
+    "bar_count": 590,
+    "root_count": 10,
+    "bars_per_root": 59,
+    "first_bar_close_at_utc": "2026-07-16T15:07:00Z",
+    "last_bar_close_at_utc": "2026-07-16T16:05:00Z",
+    "sqlite_integrity": "ok",
+    "signals": 0,
+    "virtual_fills": 0,
+    "account_mutations": 0
+  },
+  "database_integrity": {
+    "mission": "ok",
+    "registry": "ok",
+    "strategy_registry": "ok",
+    "graveyard": "ok"
+  },
+  "cumulative_databento_spend_usd": 87.85216944664398,
+  "remaining_budget_usd": 37.14783055335602,
+  "q4_access_delta": 0,
+  "broker_connections": 0,
+  "orders": 0,
+  "frozen_package_mutation_authorized": false,
+  "post_freeze_bars_authorized_for_parity_debugging": false
+}

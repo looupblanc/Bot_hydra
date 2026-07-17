@@ -2802,32 +2802,128 @@ class V7FalsificationController:
         )
         if not package_path.is_file() or not package_receipt_path.is_file():
             return dict(action)
+        contamination_status = "DEVELOPMENT_EVIDENCE_CONTAMINATED_FAIL_CLOSED"
+        contamination_receipt_path = (
+            self.paths.state_dir
+            / "operating_package_v1_parity"
+            / "f0_single_source_engine_parity_receipt.json"
+        )
         now = datetime.now(timezone.utc)
         raw_due = get_kv(conn, "operating_forward_next_check_at_utc", None)
         if raw_due:
             due = datetime.fromisoformat(
                 str(raw_due).replace("Z", "+00:00")
             ).astimezone(timezone.utc)
-            if due > now:
+            current_status = str(
+                get_kv(
+                    conn,
+                    "operating_forward_status",
+                    "WAITING_FOR_NEXT_APPEND_TICK",
+                )
+            )
+            newly_terminal = (
+                contamination_receipt_path.is_file()
+                and current_status != contamination_status
+            )
+            if due > now and not newly_terminal:
                 return {
                     **dict(action),
                     "operating_package_forward": {
-                        "state": str(
-                            get_kv(
-                                conn,
-                                "operating_forward_status",
-                                "WAITING_FOR_NEXT_APPEND_TICK",
-                            )
-                        ),
+                        "state": current_status,
                         "next_check_at_utc": due.isoformat(),
                         "broker_connections": 0,
                         "outbound_orders": 0,
                     },
                 }
 
-        from hydra.operating.package_v1 import (
-            verify_operating_package_seal,
+        from hydra.operating.package_v1 import verify_operating_package_seal
+
+        try:
+            verify_operating_package_seal(
+                package_path.parent,
+                project_root=self.root,
+            )
+        except Exception as exc:
+            raise V7ControllerIntegrityError(
+                f"operating-package integrity failure: {exc}"
+            ) from exc
+        package = json.loads(package_path.read_text(encoding="utf-8"))
+        package_ids = tuple(
+            sorted(str(row["policy_id"]) for row in package["books"])
         )
+        if contamination_receipt_path.is_file():
+            try:
+                from hydra.shadow.f0_single_source_parity import (
+                    verify_f0_contamination_receipt,
+                )
+
+                contamination_receipt = dict(
+                    verify_f0_contamination_receipt(
+                        contamination_receipt_path,
+                        repository_root=self.root,
+                        expected_package_manifest_hash=str(
+                            package["manifest_hash"]
+                        ),
+                        expected_package_ids=package_ids,
+                    )
+                )
+            except Exception as exc:
+                raise V7ControllerIntegrityError(
+                    f"F0 contamination receipt integrity failure: {exc}"
+                ) from exc
+            if (
+                contamination_receipt.get("status")
+                != "DEVELOPMENT_EVIDENCE_CONTAMINATED"
+            ):
+                raise V7ControllerIntegrityError(
+                    "F0 contamination receipt has a non-terminal status"
+                )
+            receipt_hash = str(contamination_receipt["receipt_hash"])
+            next_check = now + timedelta(hours=24)
+            status = contamination_status
+            set_kv(conn, "operating_forward_status", status)
+            set_kv(
+                conn,
+                "operating_forward_next_check_at_utc",
+                next_check.isoformat(),
+            )
+            append_event(
+                conn,
+                "OPERATING_PACKAGE_FORWARD_CONTAMINATION_GATE",
+                {
+                    "package_manifest_hash": package["manifest_hash"],
+                    "f0_status": contamination_receipt["status"],
+                    "f0_contamination_receipt_hash": receipt_hash,
+                    "fresh_bars": 0,
+                    "events_appended": 0,
+                    "signals": 0,
+                    "fills": 0,
+                    "account_mutations": 0,
+                    "incremental_spend_usd": 0.0,
+                    "broker_connections": 0,
+                    "outbound_orders": 0,
+                    "q4_access_delta": 0,
+                },
+            )
+            return {
+                **dict(action),
+                "operating_package_forward": {
+                    "state": status,
+                    "f0_status": contamination_receipt["status"],
+                    "f0_contamination_receipt_hash": receipt_hash,
+                    "fresh_bars": 0,
+                    "events_appended": 0,
+                    "signals_emitted": 0,
+                    "virtual_fills": 0,
+                    "account_mutations": 0,
+                    "incremental_spend_usd": 0.0,
+                    "next_check_at_utc": next_check.isoformat(),
+                    "broker_connections": 0,
+                    "outbound_orders": 0,
+                    "q4_access_delta": 0,
+                },
+            }
+
         from hydra.shadow.active_risk_forward_processor import (
             ActiveRiskForwardProcessorError,
             run_active_risk_forward_processor,
@@ -2841,16 +2937,6 @@ class V7FalsificationController:
             current_commit,
         )
 
-        try:
-            verify_operating_package_seal(
-                package_path.parent,
-                project_root=self.root,
-            )
-        except Exception as exc:
-            raise V7ControllerIntegrityError(
-                f"operating-package integrity failure: {exc}"
-            ) from exc
-        package = json.loads(package_path.read_text(encoding="utf-8"))
         binding = dict(package["forward_data_binding"])
         authorization = dict(package["data_acquisition_authorization"])
         update_binding = dict(binding["latest_update"])
