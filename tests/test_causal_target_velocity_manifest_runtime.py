@@ -370,6 +370,65 @@ def test_valid_0028_manifest_is_production_like_and_frozen(tmp_path: Path) -> No
     assert baseline["positive_stressed_velocity_delta_required"] is True
 
 
+def test_valid_0028_kpi_only_revision_uses_separate_output(tmp_path: Path) -> None:
+    _path, manifest = _fixture(tmp_path)
+    receipt = {
+        "classification": "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT",
+        "scientific_status": "NO_ECONOMIC_SEMANTICS_CHANGE",
+        "multiplicity": {"multiplicity_delta": 0},
+    }
+    receipt["repair_record_hash"] = stable_hash(receipt)
+    receipt_path = tmp_path / "WORM/repair.json"
+    receipt_sha = _write(
+        receipt_path, json.dumps(receipt, sort_keys=True, indent=2) + "\n"
+    )
+    manifest["revision_id"] = "hydra_causal_target_velocity_0028_revision_01"
+    manifest["runtime"]["output_dir"] = (
+        "reports/economic_evolution/causal_target_velocity_0028_revision_01"
+    )
+    manifest["evidence_bundle"]["lightweight_manifest_path"] = (
+        "reports/economic_evolution/causal_target_velocity_0028_revision_01/"
+        "evidence_bundle_receipt.json"
+    )
+    manifest["technical_repair"] = {
+        "classification": "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT",
+        "economic_semantics_changed": False,
+        "scientific_hypothesis_changed": False,
+        "population_or_selection_changed": False,
+        "risk_threshold_or_control_changed": False,
+        "completed_evidence_recomputed": False,
+        "completed_stage3_batch_reused_unchanged": True,
+        "new_multiplicity_reservation_required": False,
+        "supersedes_manifest_hash": (
+            "23b24c50c2f71a6bce87fe88b22df7ab2a0177700a0c618924911c35c405c27d"
+        ),
+        "supersedes_manifest_file_sha256": (
+            "2329999422838d63210345f11d274c9b03986113e3eeca889a17ac086033880d"
+        ),
+        "supersedes_output_dir": (
+            "reports/economic_evolution/causal_target_velocity_0028"
+        ),
+        "revision_output_dir": (
+            "reports/economic_evolution/causal_target_velocity_0028_revision_01"
+        ),
+        "repair_commit": manifest["source_commit"],
+        "repair_receipt": {
+            "path": "WORM/repair.json",
+            "file_sha256": receipt_sha,
+            "repair_record_hash": receipt["repair_record_hash"],
+        },
+    }
+    manifest.pop("manifest_hash")
+    manifest["manifest_hash"] = stable_hash(manifest)
+    path = tmp_path / "config/v7/causal_target_velocity_0028_revision_01.json"
+    path.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    actual = load_and_validate_causal_target_velocity_manifest(path)
+
+    assert actual["revision_id"].endswith("revision_01")
+    assert actual["runtime"]["output_dir"].endswith("revision_01")
+
+
 def test_0028_manifest_rejects_causal_contract_drift(tmp_path: Path) -> None:
     path, manifest = _fixture(tmp_path)
     manifest["causal_event_contract"]["future_outcomes_are_labels_only"] = False

@@ -88,6 +88,7 @@ def load_and_validate_causal_target_velocity_manifest(
     root = _project_root(resolved)
     _validate_implementation_files(manifest, root)
     _validate_terminal_baseline(manifest, root)
+    _validate_technical_repair(manifest, root)
     _validate_causal_contract(manifest)
     _validate_risk_preflight(manifest)
     _validate_hazard_labels(manifest)
@@ -479,6 +480,11 @@ def _validate_compute_data_and_safety(manifest: Mapping[str, Any]) -> None:
 
 def _validate_evidence_contract(manifest: Mapping[str, Any]) -> None:
     evidence = _mapping(manifest, "evidence_bundle")
+    expected_prefix = (
+        "reports/economic_evolution/causal_target_velocity_0028_revision_01/"
+        if _is_technical_kpi_revision(manifest)
+        else "reports/economic_evolution/causal_target_velocity_0028/"
+    )
     if (
         set(str(value) for value in evidence.get("required_datasets") or ())
         != set(REQUIRED_DATASETS)
@@ -489,7 +495,7 @@ def _validate_evidence_contract(manifest: Mapping[str, Any]) -> None:
         or evidence.get("reconstruction_flag") is not False
         or evidence.get("destination") != "data/cache/evidence_bundles"
         or not str(evidence.get("lightweight_manifest_path") or "").startswith(
-            "reports/economic_evolution/causal_target_velocity_0028/"
+            expected_prefix
         )
     ):
         raise CausalTargetVelocityManifestError("0028 EvidenceBundle contract drift")
@@ -497,11 +503,15 @@ def _validate_evidence_contract(manifest: Mapping[str, Any]) -> None:
 
 def _validate_runtime(manifest: Mapping[str, Any]) -> None:
     runtime = _mapping(manifest, "runtime")
+    expected_output = (
+        "reports/economic_evolution/causal_target_velocity_0028_revision_01"
+        if _is_technical_kpi_revision(manifest)
+        else "reports/economic_evolution/causal_target_velocity_0028"
+    )
     if (
         runtime.get("engine") != CAUSAL_TARGET_VELOCITY_ENGINE
         or runtime.get("runner") != "scripts/run_causal_target_velocity_manifest.py"
-        or runtime.get("output_dir")
-        != "reports/economic_evolution/causal_target_velocity_0028"
+        or runtime.get("output_dir") != expected_output
         or runtime.get("result_name") != "economic_production_result.json"
         or runtime.get("result_schema") != CAUSAL_TARGET_VELOCITY_RESULT_SCHEMA
         or runtime.get("controller_source_change_required") is not False
@@ -510,6 +520,71 @@ def _validate_runtime(manifest: Mapping[str, Any]) -> None:
         or runtime.get("resume_from_checkpoint") is not True
     ):
         raise CausalTargetVelocityManifestError("0028 runtime declaration drift")
+
+
+def _is_technical_kpi_revision(manifest: Mapping[str, Any]) -> bool:
+    repair = manifest.get("technical_repair")
+    return bool(
+        manifest.get("revision_id")
+        == "hydra_causal_target_velocity_0028_revision_01"
+        and isinstance(repair, Mapping)
+        and repair.get("classification")
+        == "TECHNICAL_STAGE3_KPI_INVALID_ROW_AGGREGATION_DEFECT"
+        and repair.get("economic_semantics_changed") is False
+        and repair.get("scientific_hypothesis_changed") is False
+        and repair.get("population_or_selection_changed") is False
+        and repair.get("risk_threshold_or_control_changed") is False
+        and repair.get("completed_evidence_recomputed") is False
+        and repair.get("completed_stage3_batch_reused_unchanged") is True
+        and repair.get("new_multiplicity_reservation_required") is False
+        and repair.get("supersedes_output_dir")
+        == "reports/economic_evolution/causal_target_velocity_0028"
+        and repair.get("revision_output_dir")
+        == "reports/economic_evolution/causal_target_velocity_0028_revision_01"
+    )
+
+
+def _validate_technical_repair(
+    manifest: Mapping[str, Any], root: Path
+) -> None:
+    repair = manifest.get("technical_repair")
+    if repair is None:
+        if manifest.get("revision_id") is not None:
+            raise CausalTargetVelocityManifestError(
+                "0028 revision lacks a technical-repair contract"
+            )
+        return
+    if not _is_technical_kpi_revision(manifest) or not isinstance(repair, Mapping):
+        raise CausalTargetVelocityManifestError("0028 technical repair drift")
+    receipt_ref = repair.get("repair_receipt")
+    if not isinstance(receipt_ref, Mapping):
+        raise CausalTargetVelocityManifestError("0028 repair receipt missing")
+    receipt_path = (root / str(receipt_ref.get("path") or "")).resolve()
+    try:
+        receipt_path.relative_to(root)
+    except ValueError as exc:
+        raise CausalTargetVelocityManifestError(
+            "0028 repair receipt escapes root"
+        ) from exc
+    receipt = _load_json(receipt_path)
+    claimed = receipt.get("repair_record_hash")
+    receipt_core = dict(receipt)
+    receipt_core.pop("repair_record_hash", None)
+    if (
+        repair.get("supersedes_manifest_hash")
+        != "23b24c50c2f71a6bce87fe88b22df7ab2a0177700a0c618924911c35c405c27d"
+        or repair.get("supersedes_manifest_file_sha256")
+        != "2329999422838d63210345f11d274c9b03986113e3eeca889a17ac086033880d"
+        or repair.get("repair_commit") != manifest.get("source_commit")
+        or receipt_ref.get("file_sha256") != _sha256(receipt_path)
+        or receipt_ref.get("repair_record_hash") != claimed
+        or claimed != stable_hash(receipt_core)
+        or receipt.get("classification") != repair.get("classification")
+        or receipt.get("scientific_status")
+        != "NO_ECONOMIC_SEMANTICS_CHANGE"
+        or receipt.get("multiplicity", {}).get("multiplicity_delta") != 0
+    ):
+        raise CausalTargetVelocityManifestError("0028 repair provenance drift")
 
 
 def _validate_multiplicity(manifest: Mapping[str, Any]) -> None:
