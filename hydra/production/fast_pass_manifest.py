@@ -25,6 +25,7 @@ FAST_PASS_CAMPAIGN_ID = "hydra_fast_pass_factory_0029"
 FAST_PASS_CLASS_ID = "FIVE_DAY_COMBINE_QUALITY_DIVERSITY_MARGINAL_BOOK_V1"
 FAST_PASS_RUNTIME_VERSION = "hydra_fast_pass_factory_runtime_v1"
 FAST_PASS_TECHNICAL_REVISION_ID = "hydra_fast_pass_factory_0029_revision_01"
+FAST_PASS_TECHNICAL_REVISION_02_ID = "hydra_fast_pass_factory_0029_revision_02"
 FAST_PASS_ORIGINAL_MANIFEST_HASH = (
     "47465e3c7ee39c76660fb57b83db709c799d11ba22b1a49b9cac01dd437a31ec"
 )
@@ -686,9 +687,18 @@ def _technical_revision_output(manifest: Mapping[str, Any]) -> str:
     revision_id = manifest.get("revision_id")
     if revision_id is None:
         return "reports/economic_evolution/fast_pass_factory_0029"
-    if revision_id != FAST_PASS_TECHNICAL_REVISION_ID:
-        raise FastPassManifestError("unknown fast-pass technical revision")
-    return "reports/economic_evolution/fast_pass_factory_0029_revision_01"
+    outputs = {
+        FAST_PASS_TECHNICAL_REVISION_ID:
+            "reports/economic_evolution/fast_pass_factory_0029_revision_01",
+        FAST_PASS_TECHNICAL_REVISION_02_ID:
+            "reports/economic_evolution/fast_pass_factory_0029_revision_02",
+    }
+    try:
+        return outputs[str(revision_id)]
+    except KeyError as exc:
+        raise FastPassManifestError(
+            "unknown fast-pass technical revision"
+        ) from exc
 
 
 def _validate_technical_repair(
@@ -700,9 +710,10 @@ def _validate_technical_repair(
         if repair is not None:
             raise FastPassManifestError("unexpected fast-pass technical repair")
         return
-    if revision_id != FAST_PASS_TECHNICAL_REVISION_ID or not isinstance(
-        repair, Mapping
-    ):
+    if revision_id not in {
+        FAST_PASS_TECHNICAL_REVISION_ID,
+        FAST_PASS_TECHNICAL_REVISION_02_ID,
+    } or not isinstance(repair, Mapping):
         raise FastPassManifestError("fast-pass technical repair contract missing")
     receipt_ref = repair.get("repair_receipt")
     if not isinstance(receipt_ref, Mapping):
@@ -717,27 +728,63 @@ def _validate_technical_repair(
     claimed = str(receipt.get("repair_record_hash") or "")
     core = dict(receipt)
     core.pop("repair_record_hash", None)
+    revision_contracts = {
+        FAST_PASS_TECHNICAL_REVISION_ID: {
+            "classification": "TECHNICAL_SCENARIO_SUFFIX_QUALITY_IDENTITY_DEFECT",
+            "scientific_status":
+                "RESTORES_FROZEN_SCENARIO_NEUTRAL_QUALITY_SEMANTICS",
+            "resume_scope":
+                "REUSE_SEALED_STAGE0_STAGE1_STAGE2_BEGIN_SPRINT_EVALUATION",
+            "supersedes_manifest_hash": FAST_PASS_ORIGINAL_MANIFEST_HASH,
+            "supersedes_manifest_file_sha256":
+                FAST_PASS_ORIGINAL_MANIFEST_FILE_SHA256,
+            "supersedes_output_dir":
+                "reports/economic_evolution/fast_pass_factory_0029",
+            "revision_output_dir":
+                "reports/economic_evolution/fast_pass_factory_0029_revision_01",
+        },
+        FAST_PASS_TECHNICAL_REVISION_02_ID: {
+            "classification": "TECHNICAL_BLOCK_SUMMARY_SCHEMA_READER_DEFECT",
+            "scientific_status":
+                "RESTORES_CANONICAL_BY_BLOCK_CONTROL_AGGREGATION",
+            "resume_scope":
+                "REUSE_SEALED_STAGE0_STAGE1_STAGE2_SPRINT_AND_CONTROLS_AGGREGATE_ONLY",
+            "supersedes_manifest_hash":
+                "4e6a2feff9ea16ce866330e760ad05afd48b79f6aef207e16fadb1d9f2c6c882",
+            "supersedes_manifest_file_sha256":
+                "a10a667055da7a62bec2e5718b14823c2fdfeb7b2640e924bafca28d2dcbc2f4",
+            "supersedes_output_dir":
+                "reports/economic_evolution/fast_pass_factory_0029_revision_01",
+            "revision_output_dir":
+                "reports/economic_evolution/fast_pass_factory_0029_revision_02",
+        },
+    }
+    contract = revision_contracts[str(revision_id)]
     expected_flags = (
-        repair.get("classification")
-        == "TECHNICAL_SCENARIO_SUFFIX_QUALITY_IDENTITY_DEFECT"
+        repair.get("classification") == contract["classification"]
         and repair.get("scientific_hypothesis_changed") is False
         and repair.get("candidate_population_or_selection_changed") is False
         and repair.get("stage0_stage1_stage2_evidence_recomputed") is False
         and repair.get("completed_stage0_stage1_stage2_reused_unchanged") is True
         and repair.get("risk_threshold_or_control_changed") is False
         and repair.get("new_multiplicity_reservation_required") is False
-        and repair.get("resume_scope")
-        == "REUSE_SEALED_STAGE0_STAGE1_STAGE2_BEGIN_SPRINT_EVALUATION"
+        and repair.get("resume_scope") == contract["resume_scope"]
         and repair.get("supersedes_manifest_hash")
-        == FAST_PASS_ORIGINAL_MANIFEST_HASH
+        == contract["supersedes_manifest_hash"]
         and repair.get("supersedes_manifest_file_sha256")
-        == FAST_PASS_ORIGINAL_MANIFEST_FILE_SHA256
+        == contract["supersedes_manifest_file_sha256"]
         and repair.get("supersedes_output_dir")
-        == "reports/economic_evolution/fast_pass_factory_0029"
+        == contract["supersedes_output_dir"]
         and repair.get("revision_output_dir")
-        == "reports/economic_evolution/fast_pass_factory_0029_revision_01"
+        == contract["revision_output_dir"]
         and repair.get("repair_commit") == manifest.get("source_commit")
     )
+    if revision_id == FAST_PASS_TECHNICAL_REVISION_02_ID:
+        expected_flags = bool(
+            expected_flags
+            and repair.get("sprint_or_control_evidence_recomputed") is False
+            and repair.get("completed_sprint_and_controls_reused_unchanged") is True
+        )
     if (
         not expected_flags
         or receipt_ref.get("file_sha256") != _sha256(receipt_path)
@@ -746,11 +793,45 @@ def _validate_technical_repair(
         or stable_hash(core) != claimed
         or receipt.get("campaign_id") != FAST_PASS_CAMPAIGN_ID
         or receipt.get("classification") != repair.get("classification")
-        or receipt.get("scientific_status")
-        != "RESTORES_FROZEN_SCENARIO_NEUTRAL_QUALITY_SEMANTICS"
+        or receipt.get("scientific_status") != contract["scientific_status"]
+        or (receipt.get("code_repair") or {}).get("repair_commit")
+        != manifest.get("source_commit")
         or receipt.get("multiplicity", {}).get("multiplicity_delta") != 0
     ):
         raise FastPassManifestError("fast-pass technical repair provenance drift")
+    if revision_id == FAST_PASS_TECHNICAL_REVISION_02_ID:
+        _validate_repair_semantic_allowlist(manifest, repair, root)
+
+
+def _validate_repair_semantic_allowlist(
+    manifest: Mapping[str, Any], repair: Mapping[str, Any], root: Path
+) -> None:
+    relative = Path(str(repair.get("supersedes_manifest_path") or ""))
+    if relative.is_absolute() or ".." in relative.parts:
+        raise FastPassManifestError("fast-pass superseded manifest path is unsafe")
+    source_path = (root / relative).resolve()
+    if root not in source_path.parents or not source_path.is_file():
+        raise FastPassManifestError("fast-pass superseded manifest is missing")
+    if _sha256(source_path) != repair.get("supersedes_manifest_file_sha256"):
+        raise FastPassManifestError("fast-pass superseded manifest checksum drift")
+    prior = dict(_load_json(source_path))
+    current = dict(manifest)
+    for payload in (prior, current):
+        payload.pop("manifest_hash", None)
+        payload.pop("source_commit", None)
+        payload.pop("revision_id", None)
+        payload.pop("technical_repair", None)
+        payload.pop("implementation_files", None)
+        runtime = dict(payload["runtime"])
+        runtime.pop("output_dir", None)
+        payload["runtime"] = runtime
+        evidence = dict(payload["evidence_bundle"])
+        evidence.pop("lightweight_manifest_path", None)
+        payload["evidence_bundle"] = evidence
+    if current != prior:
+        raise FastPassManifestError(
+            "fast-pass technical revision changed frozen economics"
+        )
 
 
 def _validate_multiplicity(manifest: Mapping[str, Any]) -> None:
