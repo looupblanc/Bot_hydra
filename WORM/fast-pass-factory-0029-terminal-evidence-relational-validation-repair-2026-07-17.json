@@ -1,0 +1,98 @@
+{
+  "campaign_id": "hydra_fast_pass_factory_0029",
+  "classification": "TECHNICAL_TERMINAL_EVIDENCE_RELATIONAL_VALIDATION_MEMORY_REDUNDANCY_DEFECT",
+  "code_repair": {
+    "adapter_file_sha256": "039e3a9b34e1c107f8383b651c1dd390e422f243a7578d29e03780b681319c58",
+    "bundle_validator_file_sha256": "4266ca0902f315c71eaa410e802bc4290da8339d88229435739cf6450943e460",
+    "fast_pass_runtime_file_sha256": "0162f29ebdefa3b0ca5da6ad0968f9c95164f1374a338a161d9ef937f8130791",
+    "production_runtime_file_sha256": "1c9bbf7c71ad816c274cb0ca9b59c36631b4677552f9e9754e305e52bd8d7292",
+    "repair_commit": "90df9ca657434d812705996e0c3d097c0e55aa33",
+    "single_authoritative_deep_validation": "EVIDENCE_BUNDLE_WRITER_VALIDATE_COMPLETENESS_BEFORE_ATOMIC_SEAL",
+    "subsequent_validation_contract": "LAYOUT_SIZE_SHA256_AND_STATUS_ONLY"
+  },
+  "controlled_stop": {
+    "economic_counter_drift": false,
+    "exit_code": 143,
+    "kernel_oom_observed": false,
+    "last_open_partition": "datasets/account_daily_paths/part-000323.jsonl.gz",
+    "runner_pid": 201028,
+    "service_left_stopped_for_single_writer_recovery": true,
+    "staging_checkpoint_complete": true,
+    "stop_reason": "REDUNDANT_RELATIONAL_VALIDATION_SWAP_THRASH_WITH_SEVEN_ADDITIONAL_DEEP_SCANS_QUEUED"
+  },
+  "failed_finalization_checkpoint": {
+    "account_daily_path_count": 4173440,
+    "checkpoint_file_sha256": "8bbd98067cf2d5e877ae542559c6de7496feebca3af4c9460631c519c95b994e",
+    "checkpoint_path": "data/cache/evidence_bundles/.hydra_fast_pass_factory_0029.evidence-v1.staging/checkpoint.json",
+    "combine_episode_count": 553674,
+    "dataset_file_count": 1146,
+    "exact_account_replays": 5000,
+    "exact_books": 2000,
+    "normal_episode_count": 276837,
+    "stressed_episode_count": 276837
+  },
+  "memory_diagnosis": {
+    "additional_redundant_deep_relational_scans_before_result_load": 7,
+    "maximum_observed_process_backing_bytes": 9036107776,
+    "maximum_observed_process_rss_bytes": 7374184448,
+    "maximum_observed_process_swap_bytes": 1661923328,
+    "root_cause": "ADAPTER_EPISODE_ACCUMULATORS_RETAINED_DURING_RELATIONAL_VALIDATION_AND_IDENTICAL_DEEP_VALIDATION_REPEATED_AFTER_AUTHORITATIVE_PASS",
+    "scientific_or_accounting_effect": false,
+    "validated_account_daily_rows": 4173440,
+    "validated_episode_rows": 553674
+  },
+  "multiplicity": {
+    "existing_reserved_delta_trials": 150000,
+    "multiplicity_delta": 0,
+    "new_reservation_required": false,
+    "reservation_path": "reports/economic_evolution/hydra_fast_pass_factory_0029_multiplicity_reservation.json"
+  },
+  "preserved_frozen_evidence": {
+    "coverage_exclusion_inventory_file_sha256": "d4c5e6a065382292351f7d7ffb991aadf2f2a825ee6ac9bd5d81959e344e81ba",
+    "data_censored_window_count": 0,
+    "economic_episode_recompute_allowed": false,
+    "economic_results_changed": false,
+    "normal_pass_count": 0,
+    "quality_diversity_audit_file_sha256": "11701dd9576aba7a2622a19ab6b569217fdc1b112d0fb01b6626e809ebaff57b",
+    "stressed_pass_count": 0,
+    "terminal_recovery_payload_file_sha256": "cb59317190364537044ec90f05a4db69277cd0c04f11e4c80f36764330152c2e"
+  },
+  "recorded_at_utc": "2026-07-17T22:43:45.930094Z",
+  "repair_record_hash": "f39b1d705c15b9e12a079b7ac8dbc2adbdfb8b836bc44aa54c7c8317bd532f3f",
+  "safety": {
+    "broker_connections": 0,
+    "data_purchase_count_delta": 0,
+    "orders": 0,
+    "q4_access_delta": 0
+  },
+  "schema": "hydra_technical_runtime_repair_receipt_v1",
+  "scientific_status": "RESTORES_SINGLE_AUTHORITATIVE_DEEP_VALIDATION_AND_BOUNDED_FINALIZATION",
+  "scope_guards": {
+    "candidate_population_or_selection_changed": false,
+    "completed_all_economic_evidence_reused_unchanged": true,
+    "costs_slippage_or_account_rules_changed": false,
+    "economic_evidence_recomputed": false,
+    "episode_order_changed": false,
+    "episode_starts_or_horizons_changed": false,
+    "new_xfa_work_started": false,
+    "resume_scope": "REUSE_COMPLETE_STAGING_FINALIZATION_ONLY",
+    "risk_threshold_or_control_changed": false,
+    "scientific_hypothesis_changed": false
+  },
+  "superseded_revision": {
+    "manifest_file_sha256": "3c450fe8fb2f8e72f452cab9e65e6b8284cbd8585ae1391a88a162875f3c2515",
+    "manifest_hash": "410cb480e6ecc1b7e895a8c69017d4f6c3aa0cc23bb880129c465661f774af40",
+    "manifest_path": "config/v7/fast_pass_factory_0029_revision_04.json",
+    "output_dir": "reports/economic_evolution/fast_pass_factory_0029_revision_04",
+    "repair_commit": "322480e97fa500150bfbe60c3b314f32bc61445f"
+  },
+  "validation": {
+    "compileall_passed": true,
+    "deep_validation_default_preserved_for_other_callers": true,
+    "full_regression_required": false,
+    "single_deep_validation_call_count_tested": true,
+    "targeted_test_command": "PYTHONPATH=. .venv/bin/python -m pytest -q tests/test_evidence_bundle_v1.py tests/test_causal_target_velocity_evidence_adapter.py tests/test_causal_target_velocity_runtime_contract.py tests/test_causal_target_velocity_manifest_runtime.py tests/test_economic_production_kernel.py tests/test_fast_pass_manifest.py tests/test_fast_pass_runtime_contract.py",
+    "targeted_tests_failed": 0,
+    "targeted_tests_passed": 110
+  }
+}
