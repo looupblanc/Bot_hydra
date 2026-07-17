@@ -38,11 +38,17 @@ from hydra.research.causal_sleeve_replay import (
 )
 
 
-def _trajectory(day: int, *, pnl: float, component_id: str = "sleeve_a") -> CausalTradeTrajectory:
+def _trajectory(
+    day: int,
+    *,
+    pnl: float,
+    component_id: str = "sleeve_a",
+    event_suffix: str = "",
+) -> CausalTradeTrajectory:
     decision = int((day * 86_400 + 3_600) * 1_000_000_000)
     exit_time = decision + 60_000_000_000
     event = TradePathEvent(
-        event_id=f"{component_id}:{day}",
+        event_id=f"{component_id}:{day}{event_suffix}",
         decision_ns=decision,
         exit_ns=exit_time,
         session_day=day,
@@ -98,8 +104,13 @@ def _replay(
     missing_eligible_day: int | None = None,
 ) -> SimpleNamespace:
     days = tuple(range(19_500, 19_525))
-    normal = tuple(_trajectory(day, pnl=3_000.0) for day in days)
-    stressed = tuple(_trajectory(day, pnl=2_500.0) for day in days)
+    normal = tuple(
+        _trajectory(day, pnl=3_000.0, event_suffix=":NORMAL") for day in days
+    )
+    stressed = tuple(
+        _trajectory(day, pnl=2_500.0, event_suffix=":STRESSED_1_5X")
+        for day in days
+    )
     events = (
         ()
         if censored_day is None
@@ -210,6 +221,33 @@ def test_quality_tier_1_5_uses_only_deterministic_one_or_two_x_events() -> None:
     assert {row.event.quantity for row in resized}.issubset({4, 8})
     assert set(receipt["resolved_multiplier_counts"]).issubset({"1", "2"})
     assert len(receipt["selection_scaling_hash"]) == 64
+
+
+@pytest.mark.parametrize("quality", (0.5, 1.0, 1.5, 2.0))
+def test_quality_selection_ignores_only_explicit_cost_scenario_suffix(
+    quality: float,
+) -> None:
+    normal = tuple(
+        _trajectory(day, pnl=100.0, event_suffix=":NORMAL")
+        for day in range(19_500, 19_510)
+    )
+    stressed = tuple(
+        _trajectory(day, pnl=75.0, event_suffix=":STRESSED_1_5X")
+        for day in range(19_500, 19_510)
+    )
+
+    normal_rows, normal_receipt = _quality_trajectories(normal, quality)
+    stressed_rows, stressed_receipt = _quality_trajectories(stressed, quality)
+
+    assert normal_receipt["selection_scaling_hash"] == stressed_receipt[
+        "selection_scaling_hash"
+    ]
+    assert normal_receipt["selected_event_count"] == stressed_receipt[
+        "selected_event_count"
+    ]
+    assert [row.event.quantity for row in normal_rows] == [
+        row.event.quantity for row in stressed_rows
+    ]
 
 
 def test_sprint_worker_uses_union_calendar_and_produces_nested_summaries() -> None:

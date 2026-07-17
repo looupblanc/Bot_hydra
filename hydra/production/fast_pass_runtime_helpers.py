@@ -1017,7 +1017,13 @@ def _quality_trajectories(
     decisions: list[dict[str, Any]] = []
     for trajectory in trajectories:
         identity = {
-            "event_id": trajectory.event.event_id,
+            # Exact causal replay appends the cost scenario to the underlying
+            # event id (``:NORMAL`` or ``:STRESSED_1_5X``).  That suffix is an
+            # accounting namespace, not a decision-time field.  Including it
+            # here made the otherwise identical normal/stressed quality draw
+            # diverge.  Normalize only these two explicit terminal suffixes;
+            # every other part of the immutable causal identity is retained.
+            "event_id": _scenario_neutral_event_id(trajectory.event.event_id),
             "component_id": trajectory.component_id,
             "market": trajectory.market,
             "side": trajectory.side,
@@ -1051,6 +1057,19 @@ def _quality_trajectories(
     }
     receipt["selection_scaling_hash"] = stable_hash(decisions)
     return tuple(selected), receipt
+
+
+def _scenario_neutral_event_id(event_id: str) -> str:
+    """Return the causal event id without its explicit accounting scenario."""
+
+    value = str(event_id)
+    for suffix in (":STRESSED_1_5X", ":NORMAL"):
+        if value.endswith(suffix):
+            resolved = value[: -len(suffix)]
+            if not resolved:
+                raise FastPassHelperError("scenario-only event id is invalid")
+            return resolved
+    return value
 
 
 def _active_policy_from_spec(spec: Mapping[str, Any]) -> ActiveRiskPoolPolicy:

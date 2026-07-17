@@ -8,6 +8,7 @@ it neither reserves multiplicity nor writes mission state.
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 import re
 from datetime import datetime
@@ -23,6 +24,13 @@ FAST_PASS_CAMPAIGN_MODE = "FAST_PASS_FACTORY"
 FAST_PASS_CAMPAIGN_ID = "hydra_fast_pass_factory_0029"
 FAST_PASS_CLASS_ID = "FIVE_DAY_COMBINE_QUALITY_DIVERSITY_MARGINAL_BOOK_V1"
 FAST_PASS_RUNTIME_VERSION = "hydra_fast_pass_factory_runtime_v1"
+FAST_PASS_TECHNICAL_REVISION_ID = "hydra_fast_pass_factory_0029_revision_01"
+FAST_PASS_ORIGINAL_MANIFEST_HASH = (
+    "47465e3c7ee39c76660fb57b83db709c799d11ba22b1a49b9cac01dd437a31ec"
+)
+FAST_PASS_ORIGINAL_MANIFEST_FILE_SHA256 = (
+    "6ea725cf5538efa50c8b0e8ab5be8b80fdea1674f0f8e08fb556284e849f531c"
+)
 FAST_PASS_WINDOWS = (5, 10, 20)
 FAST_PASS_REQUIRED_IMPLEMENTATION_FILES = frozenset(
     {
@@ -116,6 +124,7 @@ def validate_fast_pass_manifest(
     root = _project_root(path)
     _validate_identity(manifest)
     _validate_implementation(manifest, root)
+    _validate_technical_repair(manifest, root)
     _validate_terminal_baseline(manifest, root)
     _validate_runtime(manifest, root)
     _validate_data_and_governance(manifest)
@@ -219,14 +228,13 @@ def _validate_terminal_baseline(
 def _validate_runtime(manifest: Mapping[str, Any], root: Path) -> None:
     runtime = _mapping(manifest, "runtime")
     output = (root / str(runtime.get("output_dir") or "")).resolve()
-    allowed = (root / "reports/economic_evolution").resolve()
     result_name = str(runtime.get("result_name") or "")
     if (
         runtime.get("engine") != "production_kernel_v1"
         or runtime.get("runner") != "scripts/run_economic_production_manifest.py"
         or runtime.get("fast_pass_runtime_version") != FAST_PASS_RUNTIME_VERSION
         or runtime.get("result_schema") != "hydra_economic_production_result_v1"
-        or output != allowed / "fast_pass_factory_0029"
+        or output != root / _technical_revision_output(manifest)
         or Path(result_name).name != result_name
         or result_name != "economic_production_result.json"
         or runtime.get("controller_source_change_required") is not False
@@ -657,6 +665,7 @@ def _validate_compute(manifest: Mapping[str, Any]) -> None:
 def _validate_evidence(manifest: Mapping[str, Any]) -> None:
     evidence = _mapping(manifest, "evidence_bundle")
     receipt = str(evidence.get("lightweight_manifest_path") or "")
+    expected_output = _technical_revision_output(manifest)
     if (
         evidence.get("required_for_campaign_complete") is not True
         or evidence.get("atomic_finalize") is not True
@@ -667,10 +676,81 @@ def _validate_evidence(manifest: Mapping[str, Any]) -> None:
         or evidence.get("reconstruction_flag") is not False
         or evidence.get("one_batch_archive_per_wave") is not True
         or str(evidence.get("destination") or "") != "data/cache/evidence_bundles"
-        or not receipt.startswith("reports/economic_evolution/fast_pass_factory_0029/")
+        or not receipt.startswith(f"{expected_output}/")
         or not receipt.endswith("/evidence_bundle_receipt.json")
     ):
         raise FastPassManifestError("fast-pass EvidenceBundle contract drift")
+
+
+def _technical_revision_output(manifest: Mapping[str, Any]) -> str:
+    revision_id = manifest.get("revision_id")
+    if revision_id is None:
+        return "reports/economic_evolution/fast_pass_factory_0029"
+    if revision_id != FAST_PASS_TECHNICAL_REVISION_ID:
+        raise FastPassManifestError("unknown fast-pass technical revision")
+    return "reports/economic_evolution/fast_pass_factory_0029_revision_01"
+
+
+def _validate_technical_repair(
+    manifest: Mapping[str, Any], root: Path
+) -> None:
+    repair = manifest.get("technical_repair")
+    revision_id = manifest.get("revision_id")
+    if revision_id is None:
+        if repair is not None:
+            raise FastPassManifestError("unexpected fast-pass technical repair")
+        return
+    if revision_id != FAST_PASS_TECHNICAL_REVISION_ID or not isinstance(
+        repair, Mapping
+    ):
+        raise FastPassManifestError("fast-pass technical repair contract missing")
+    receipt_ref = repair.get("repair_receipt")
+    if not isinstance(receipt_ref, Mapping):
+        raise FastPassManifestError("fast-pass technical repair receipt missing")
+    relative = Path(str(receipt_ref.get("path") or ""))
+    if relative.is_absolute() or ".." in relative.parts:
+        raise FastPassManifestError("fast-pass repair receipt path is unsafe")
+    receipt_path = (root / relative).resolve()
+    if root not in receipt_path.parents or not receipt_path.is_file():
+        raise FastPassManifestError("fast-pass repair receipt is missing")
+    receipt = _load_json(receipt_path)
+    claimed = str(receipt.get("repair_record_hash") or "")
+    core = dict(receipt)
+    core.pop("repair_record_hash", None)
+    expected_flags = (
+        repair.get("classification")
+        == "TECHNICAL_SCENARIO_SUFFIX_QUALITY_IDENTITY_DEFECT"
+        and repair.get("scientific_hypothesis_changed") is False
+        and repair.get("candidate_population_or_selection_changed") is False
+        and repair.get("stage0_stage1_stage2_evidence_recomputed") is False
+        and repair.get("completed_stage0_stage1_stage2_reused_unchanged") is True
+        and repair.get("risk_threshold_or_control_changed") is False
+        and repair.get("new_multiplicity_reservation_required") is False
+        and repair.get("resume_scope")
+        == "REUSE_SEALED_STAGE0_STAGE1_STAGE2_BEGIN_SPRINT_EVALUATION"
+        and repair.get("supersedes_manifest_hash")
+        == FAST_PASS_ORIGINAL_MANIFEST_HASH
+        and repair.get("supersedes_manifest_file_sha256")
+        == FAST_PASS_ORIGINAL_MANIFEST_FILE_SHA256
+        and repair.get("supersedes_output_dir")
+        == "reports/economic_evolution/fast_pass_factory_0029"
+        and repair.get("revision_output_dir")
+        == "reports/economic_evolution/fast_pass_factory_0029_revision_01"
+        and repair.get("repair_commit") == manifest.get("source_commit")
+    )
+    if (
+        not expected_flags
+        or receipt_ref.get("file_sha256") != _sha256(receipt_path)
+        or receipt_ref.get("repair_record_hash") != claimed
+        or not _SHA256.fullmatch(claimed)
+        or stable_hash(core) != claimed
+        or receipt.get("campaign_id") != FAST_PASS_CAMPAIGN_ID
+        or receipt.get("classification") != repair.get("classification")
+        or receipt.get("scientific_status")
+        != "RESTORES_FROZEN_SCENARIO_NEUTRAL_QUALITY_SEMANTICS"
+        or receipt.get("multiplicity", {}).get("multiplicity_delta") != 0
+    ):
+        raise FastPassManifestError("fast-pass technical repair provenance drift")
 
 
 def _validate_multiplicity(manifest: Mapping[str, Any]) -> None:
@@ -745,6 +825,20 @@ def _sha256(path: Path) -> str:
     except OSError as exc:
         raise FastPassManifestError(f"cannot hash fast-pass file: {path}") from exc
     return digest.hexdigest()
+
+
+def _load_json(path: Path) -> Mapping[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise FastPassManifestError(
+            f"cannot load fast-pass JSON receipt: {path}"
+        ) from exc
+    if not isinstance(payload, Mapping):
+        raise FastPassManifestError(
+            f"fast-pass JSON receipt is not an object: {path}"
+        )
+    return payload
 
 
 __all__ = [
