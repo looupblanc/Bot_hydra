@@ -13,9 +13,11 @@ from hydra.research.causal_target_velocity import (
     discover_intents_batch,
     discover_intents_streaming,
     exact_sleeve_replay,
+    frozen_eligible_session_calendar,
     generate_structural_proposals,
     matched_random_intents,
     observe_outcomes,
+    realized_behavioral_fingerprint,
     screen_result,
     with_availability_safe_cross_asset_feature,
 )
@@ -130,6 +132,11 @@ def test_bounded_population_supports_production_counts_and_is_diverse() -> None:
     assert len({row.market for row in unique}) == 6
     assert len({row.mechanism for row in unique}) == 10
     assert len({row.horizon for row in unique}) == 6
+    assert {-2, -1, 0, 1, 2}.issubset({row.session_code for row in unique})
+    assert all(
+        (row.session_code == -2) == (row.horizon == "OVERNIGHT")
+        for row in unique
+    )
 
 
 def test_calibration_and_decisions_never_require_future_arrays() -> None:
@@ -172,6 +179,16 @@ def test_same_bar_touch_is_ambiguous_and_adverse_first() -> None:
     assert event.fill_time_ns == event.earliest_executable_time_ns
     assert event.normal_net_pnl is not None and event.normal_net_pnl < 0
     assert event.stressed_net_pnl is not None and event.stressed_net_pnl < event.normal_net_pnl
+    terminal_mark = event.normal_marks[-1]
+    assert terminal_mark.best_unrealized_pnl == terminal_mark.current_unrealized_pnl
+    assert terminal_mark.current_unrealized_pnl == event.normal_net_pnl
+    # Full-bar 99/101 extremes occur after an immediate conservative stop for
+    # accounting purposes and therefore cannot leak into the post-exit path.
+    raw_full_bar_low_pnl = (
+        (99.0 - float(event.normal_fill_price)) * event.quantity * 100.0
+    )
+    assert terminal_mark.worst_unrealized_pnl > raw_full_bar_low_pnl
+    assert event.maximum_favorable_excursion_r == 0.0
 
 
 def test_timeframe_is_an_executable_completed_bar_gate_in_batch_and_stream() -> None:
@@ -198,6 +215,33 @@ def test_timeframe_is_an_executable_completed_bar_gate_in_batch_and_stream() -> 
     assert [(row.row_index, row.direction) for row in batch] == list(streaming)
 
 
+def test_overnight_minus_two_emits_but_any_rth_and_rth_role_do_not() -> None:
+    matrix = _matrix()
+    sessions = matrix.array("session_code").copy()
+    sessions[45:52] = -2
+    arrays = dict(matrix.arrays)
+    arrays["session_code"] = sessions
+    matrix = FeatureMatrix(root=matrix.root, manifest=matrix.manifest, arrays=arrays)
+    overnight = _calibrated(
+        matrix,
+        _candidate(session_code=-2, horizon="OVERNIGHT", cooldown_minutes=960),
+    )
+    any_rth = _calibrated(matrix, _candidate(session_code=-1))
+    open_rth = _calibrated(matrix, _candidate(session_code=0))
+    kwargs = {
+        "evaluation_start_ns": 40 * MINUTE,
+        "evaluation_end_exclusive_ns": 60 * MINUTE,
+    }
+    assert [row.row_index for row in discover_intents_batch(overnight, matrix, **kwargs)] == [45]
+    assert discover_intents_batch(any_rth, matrix, **kwargs) == ()
+    assert discover_intents_batch(open_rth, matrix, **kwargs) == ()
+    spec = overnight.candidate.executable_specification()
+    assert spec["session_role"] == "OVERNIGHT_OUTSIDE_RTH"
+    assert frozen_eligible_session_calendar(
+        overnight.candidate, matrix, **kwargs
+    ) == (20240102,)
+
+
 def test_missing_future_coverage_censors_but_preserves_signal() -> None:
     matrix = _matrix(truncate_after_entry=True)
     calibrated = _calibrated(matrix)
@@ -213,6 +257,29 @@ def test_missing_future_coverage_censors_but_preserves_signal() -> None:
     assert events[0].outcome == HazardOutcome.CENSORED_FUTURE_COVERAGE
     assert events[0].fill_time_ns == 46 * MINUTE
     assert events[0].normal_net_pnl is None
+
+
+def test_missing_interior_bar_before_exact_deadline_censors_path() -> None:
+    matrix = _matrix()
+    keep = np.ones(matrix.row_count, dtype=bool)
+    keep[47:51] = False
+    arrays = {name: value[keep] for name, value in matrix.arrays.items()}
+    matrix = FeatureMatrix(
+        root=matrix.root,
+        manifest={**matrix.manifest, "row_count": int(keep.sum())},
+        arrays=arrays,
+    )
+    calibrated = _calibrated(matrix)
+    intents = discover_intents_batch(
+        calibrated,
+        matrix,
+        evaluation_start_ns=40 * MINUTE,
+        evaluation_end_exclusive_ns=70 * MINUTE,
+    )
+    events = observe_outcomes(calibrated, matrix, intents)
+    assert len(events) == 1
+    assert events[0].outcome == HazardOutcome.CENSORED_FUTURE_COVERAGE
+    assert events[0].censor_reason == "HOLDING_PATH_MISSING_INTERVAL"
 
 
 def test_session_horizon_uses_predeclared_causal_session_flatten() -> None:
@@ -265,6 +332,16 @@ def test_screen_exact_replay_and_matched_controls_are_deterministic() -> None:
     assert result.independent_events_per_20_sessions == 5.0
     assert result.favorable_first_count == 1
     assert len(exact.normal_events) == len(exact.stressed_events) == 1
+    assert len(exact.normal_trajectories) == len(exact.stressed_trajectories) == 1
+    normal_path = exact.normal_trajectories[0]
+    assert normal_path.marks
+    assert normal_path.marks[-1].availability_time_ns == normal_path.event.exit_ns
+    assert all(
+        right.availability_time_ns > left.availability_time_ns
+        for left, right in zip(normal_path.marks, normal_path.marks[1:])
+    )
+    assert exact.normal_trajectory_hash != exact.stressed_trajectory_hash
+    assert realized_behavioral_fingerprint(events) == realized_behavioral_fingerprint(events)
     assert exact.normal_events[0].decision_ns == 46 * MINUTE
     flipped = direction_flipped_intents(intents)
     assert flipped[0].direction == -intents[0].direction

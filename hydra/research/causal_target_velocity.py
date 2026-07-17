@@ -34,6 +34,8 @@ from hydra.research.causal_sleeve_replay import (
     CENSORED_FUTURE_COVERAGE,
     MINUTE_NS,
     CausalFillPolicy,
+    CausalTradeMark,
+    CausalTradeTrajectory,
 )
 
 
@@ -48,7 +50,9 @@ STATIC_RISK_LEVELS = (0.75, 1.0, 1.25, 1.5)
 RISK_LEVEL_TO_MICRO_UNITS = {0.75: 3, 1.0: 4, 1.25: 5, 1.5: 6}
 QUANTILES = (0.55, 0.65, 0.75, 0.85)
 CONTEXT_QUANTILES = (0.35, 0.50, 0.65)
-SESSION_CODES = (-1, 0, 1, 2)
+# -2 is the cached overnight/outside-RTH role.  -1 remains the aggregate
+# ANY_RTH selector and must never absorb overnight rows.
+SESSION_CODES = (-2, -1, 0, 1, 2)
 TIMEFRAME_MINUTES = {"1m": 1, "5m": 5, "15m": 15, "30m": 30, "60m": 60}
 CROSS_ASSET_REFERENCE_MARKETS = {
     "ES": "NQ",
@@ -207,6 +211,10 @@ class HazardCandidate:
             raise ValueError("context candidate lacks a frozen quantile/operator")
         if self.session_code not in SESSION_CODES:
             raise ValueError("invalid frozen session code")
+        if (self.session_code == -2) != (self.horizon == "OVERNIGHT"):
+            raise ValueError(
+                "overnight session role and overnight holding horizon must be paired"
+            )
         if self.timeframe not in TIMEFRAME_MINUTES:
             raise ValueError("invalid executable decision timeframe")
         if self.cooldown_minutes < 1:
@@ -271,6 +279,13 @@ class HazardCandidate:
             "cross_asset_reference_market": self.cross_asset_reference_market,
             "timeframe": self.timeframe,
             "session_code": self.session_code,
+            "session_role": {
+                -2: "OVERNIGHT_OUTSIDE_RTH",
+                -1: "ANY_RTH",
+                0: "OPEN",
+                1: "MID_SESSION",
+                2: "LATE_CLOSE",
+            }[self.session_code],
             "entry": "DECISION_AFTER_COMPLETED_BAR_NEXT_TRADABLE_OPEN",
             "sizing": {
                 "static_risk_level": self.risk_level,
@@ -386,6 +401,10 @@ class HazardEventEvidence:
     stressed_worst_unrealized_pnl: float | None
     normal_best_unrealized_pnl: float | None
     stressed_best_unrealized_pnl: float | None
+    normal_initial_unrealized_pnl: float | None
+    stressed_initial_unrealized_pnl: float | None
+    normal_marks: tuple[CausalTradeMark, ...]
+    stressed_marks: tuple[CausalTradeMark, ...]
     same_bar_ambiguous: bool
     censor_reason: str | None
     feature_fingerprint: str
@@ -446,10 +465,14 @@ class ExactHazardSleeveReplay:
     events: tuple[HazardEventEvidence, ...]
     normal_events: tuple[TradePathEvent, ...]
     stressed_events: tuple[TradePathEvent, ...]
+    normal_trajectories: tuple[CausalTradeTrajectory, ...]
+    stressed_trajectories: tuple[CausalTradeTrajectory, ...]
     eligible_session_days: tuple[int, ...]
     decision_hash: str
     normal_event_hash: str
     stressed_event_hash: str
+    normal_trajectory_hash: str
+    stressed_trajectory_hash: str
     fill_policy_hash: str
 
 
@@ -472,9 +495,12 @@ class FrozenHazardDecisionRule:
         return_array = np.asarray(past_return, dtype=float)
         session_array = np.asarray(session_code)
         eligible = np.isfinite(trigger_array) & np.isfinite(return_array)
-        if candidate.session_code >= 0:
+        if candidate.session_code == -2:
+            eligible &= session_array == -2
+        elif candidate.session_code >= 0:
             eligible &= session_array == candidate.session_code
         else:
+            # -1 is explicitly ANY_RTH, never ANY_SESSION.
             eligible &= session_array >= 0
         eligible &= _compare(
             trigger_array,
@@ -611,6 +637,8 @@ def generate_structural_proposals(
             horizon,
         ) = reversed(resolved)
         market, execution_market = market_pair
+        if (session_code == -2) != (horizon == "OVERNIGHT"):
+            continue
         base = {
             "market": market,
             "execution_market": execution_market,
@@ -893,6 +921,35 @@ def discover_intents_batch(
     return tuple(intents)
 
 
+def frozen_eligible_session_calendar(
+    candidate: HazardCandidate,
+    matrix: FeatureMatrix,
+    *,
+    evaluation_start_ns: int,
+    evaluation_end_exclusive_ns: int,
+) -> tuple[int, ...]:
+    """Return the full pre-outcome calendar for the candidate session role."""
+
+    timestamp = matrix.array("timestamp_ns")
+    decision = matrix.array("decision_ns")
+    availability = matrix.array("availability_ns")
+    sessions = matrix.array("session_code")
+    days = matrix.array("session_day")
+    if candidate.session_code == -2:
+        role = sessions == -2
+    elif candidate.session_code == -1:
+        role = sessions >= 0
+    else:
+        role = sessions == candidate.session_code
+    mask = (
+        (timestamp >= int(evaluation_start_ns))
+        & (timestamp < int(evaluation_end_exclusive_ns))
+        & (availability <= decision)
+        & role
+    )
+    return tuple(sorted({int(value) for value in days[mask]}))
+
+
 def discover_intents_streaming(
     calibrated: CalibratedHazardCandidate,
     matrix: FeatureMatrix,
@@ -1094,6 +1151,66 @@ def observe_outcomes(
         stressed_favorable = (
             float(observed["best_raw_price"]) - stressed_entry
         ) * intent.direction * point_value * quantity - commission
+        normal_initial = (
+            (raw_entry - normal_entry)
+            * intent.direction
+            * point_value
+            * quantity
+            - commission
+        )
+        stressed_initial = (
+            (raw_entry - stressed_entry)
+            * intent.direction
+            * point_value
+            * quantity
+            - commission
+        )
+        normal_marks = _economic_marks(
+            observed["path_indices"],
+            entry=normal_entry,
+            direction=intent.direction,
+            quantity=quantity,
+            point_value=point_value,
+            commission=commission,
+            availability=availability,
+            highs=highs,
+            lows=lows,
+            closes=closes,
+            terminal_net=normal_net,
+            barrier_outcome=(
+                str(observed["outcome"])
+                if str(observed["exit_fill_semantics"]).startswith("RESTING_")
+                else None
+            ),
+            terminal_raw_exit=raw_exit,
+        )
+        stressed_marks = _economic_marks(
+            observed["path_indices"],
+            entry=stressed_entry,
+            direction=intent.direction,
+            quantity=quantity,
+            point_value=point_value,
+            commission=commission,
+            availability=availability,
+            highs=highs,
+            lows=lows,
+            closes=closes,
+            terminal_net=stressed_net,
+            barrier_outcome=(
+                str(observed["outcome"])
+                if str(observed["exit_fill_semantics"]).startswith("RESTING_")
+                else None
+            ),
+            terminal_raw_exit=raw_exit,
+        )
+        if (
+            not normal_marks
+            or normal_marks[-1].availability_time_ns
+            != int(observed["outcome_time_ns"])
+            or stressed_marks[-1].availability_time_ns
+            != int(observed["outcome_time_ns"])
+        ):
+            raise ValueError("causal hazard mark path does not terminate at exit boundary")
         evidence.append(
             HazardEventEvidence(
                 event_id=f"{intent.intent_namespace}:{ordinal:07d}",
@@ -1136,10 +1253,22 @@ def observe_outcomes(
                 exit_fill_semantics=str(observed["exit_fill_semantics"]),
                 normal_net_pnl=float(normal_net),
                 stressed_net_pnl=float(stressed_net),
-                normal_worst_unrealized_pnl=float(normal_adverse),
-                stressed_worst_unrealized_pnl=float(stressed_adverse),
-                normal_best_unrealized_pnl=float(normal_favorable),
-                stressed_best_unrealized_pnl=float(stressed_favorable),
+                normal_worst_unrealized_pnl=float(
+                    min(normal_initial, normal_adverse)
+                ),
+                stressed_worst_unrealized_pnl=float(
+                    min(stressed_initial, stressed_adverse)
+                ),
+                normal_best_unrealized_pnl=float(
+                    max(normal_initial, normal_favorable)
+                ),
+                stressed_best_unrealized_pnl=float(
+                    max(stressed_initial, stressed_favorable)
+                ),
+                normal_initial_unrealized_pnl=float(normal_initial),
+                stressed_initial_unrealized_pnl=float(stressed_initial),
+                normal_marks=normal_marks,
+                stressed_marks=stressed_marks,
                 same_bar_ambiguous=bool(observed["same_bar_ambiguous"]),
                 censor_reason=None,
                 feature_fingerprint=intent.feature_fingerprint,
@@ -1243,11 +1372,21 @@ def exact_sleeve_replay(
     )
     normal = tuple(_trade_path_event(row, scenario="NORMAL") for row in complete)
     stressed = tuple(_trade_path_event(row, scenario="STRESSED_1_5X") for row in complete)
+    normal_trajectories = tuple(
+        _hazard_trajectory(row, event, scenario="NORMAL")
+        for row, event in zip(complete, normal, strict=True)
+    )
+    stressed_trajectories = tuple(
+        _hazard_trajectory(row, event, scenario="STRESSED_1_5X")
+        for row, event in zip(complete, stressed, strict=True)
+    )
     return ExactHazardSleeveReplay(
         candidate=candidate,
         events=tuple(events),
         normal_events=normal,
         stressed_events=stressed,
+        normal_trajectories=normal_trajectories,
+        stressed_trajectories=stressed_trajectories,
         eligible_session_days=eligible_days,
         decision_hash=stable_hash(
             [
@@ -1262,7 +1401,42 @@ def exact_sleeve_replay(
         ),
         normal_event_hash=stable_hash([row.to_dict() for row in normal]),
         stressed_event_hash=stable_hash([row.to_dict() for row in stressed]),
+        normal_trajectory_hash=stable_hash(
+            [row.to_dict() for row in normal_trajectories]
+        ),
+        stressed_trajectory_hash=stable_hash(
+            [row.to_dict() for row in stressed_trajectories]
+        ),
         fill_policy_hash=(events[0].fill_policy_hash if events else CausalFillPolicy().fingerprint),
+    )
+
+
+def realized_behavioral_fingerprint(
+    events: Sequence[HazardEventEvidence],
+) -> str:
+    """Hash actual decisions/trades, never the proposal specification."""
+
+    return stable_hash(
+        [
+            {
+                "event_time_ns": row.event_time_ns,
+                "decision_time_ns": row.decision_time_ns,
+                "fill_time_ns": row.fill_time_ns,
+                "outcome_time_ns": row.outcome_time_ns,
+                "market": row.market,
+                "contract_code": row.contract_code,
+                "session_day": row.session_day,
+                "session_code": row.session_code,
+                "direction": row.direction,
+                "quantity": row.quantity,
+                "outcome": row.outcome,
+                "normal_net_pnl": row.normal_net_pnl,
+                "stressed_net_pnl": row.stressed_net_pnl,
+                "censor_reason": row.censor_reason,
+            }
+            for row in events
+            if row.evidence_role == "CANDIDATE"
+        ]
     )
 
 
@@ -1459,6 +1633,7 @@ def _traverse_barriers(
     worst = normal_entry
     prior_timestamp = entry_time - MINUTE_NS
     final_index: int | None = None
+    path_indices: list[int] = []
     for index in range(entry_index, len(timestamp)):
         ts = int(timestamp[index])
         if (
@@ -1482,8 +1657,14 @@ def _traverse_barriers(
                     exit_fill_semantics=(
                         "PREDECLARED_SESSION_CLOSE_FLATTEN_WITH_FROZEN_SLIPPAGE"
                     ),
+                    path_indices=path_indices,
                 )
             return _censor_observation("SESSION_ENDED_BEFORE_FROZEN_HORIZON")
+        # Validate the complete holding path before accepting an exact
+        # deadline open.  A deadline row after missing interior minutes cannot
+        # prove that neither barrier was touched inside the gap.
+        if index > entry_index and ts != prior_timestamp + MINUTE_NS:
+            return _censor_observation("HOLDING_PATH_MISSING_INTERVAL")
         # A fixed-horizon time exit is submitted in advance and fills at the
         # open whose timestamp equals the exact deadline.  Its OHLC must not be
         # inspected before that open fill.
@@ -1499,14 +1680,16 @@ def _traverse_barriers(
                 raw_exit=float(opens[index]),
                 outcome_time_ns=ts,
                 exit_fill_semantics="MAX_HORIZON_NEXT_TRADABLE_OPEN",
+                path_indices=path_indices,
             )
-        if index > entry_index and ts != prior_timestamp + MINUTE_NS:
-            return _censor_observation("HOLDING_PATH_MISSING_INTERVAL")
         if not all(math.isfinite(float(value)) for value in (opens[index], highs[index], lows[index], closes[index])):
             return _censor_observation("HOLDING_PATH_NONFINITE_OHLC")
         prior_timestamp = ts
         high = float(highs[index])
         low = float(lows[index])
+        path_indices.append(index)
+        prior_best = best
+        prior_worst = worst
         if intent.direction > 0:
             favorable_hit = high >= favorable_price
             adverse_hit = low <= adverse_price
@@ -1523,21 +1706,30 @@ def _traverse_barriers(
             # is deterministic and conservative, never an optimistic label.
             adverse_first = bool(adverse_hit)
             raw_exit = adverse_price if adverse_first else favorable_price
+            terminal_best = prior_best if adverse_first else favorable_price
+            terminal_worst = adverse_price if adverse_first else worst
             return {
                 "outcome": (
                     HazardOutcome.ADVERSE_FIRST
                     if adverse_first
                     else HazardOutcome.FAVORABLE_FIRST
                 ),
-                "outcome_time_ns": ts,
+                "outcome_time_ns": int(availability[index]),
                 "time_to_favorable_minutes": (None if adverse_first else elapsed),
                 "time_to_adverse_minutes": (elapsed if adverse_first else None),
-                "mfe_r": max(0.0, (best - normal_entry) * intent.direction / risk_unit),
-                "mae_r": max(0.0, (normal_entry - worst) * intent.direction / risk_unit),
+                "mfe_r": max(
+                    0.0,
+                    (terminal_best - normal_entry) * intent.direction / risk_unit,
+                ),
+                "mae_r": max(
+                    0.0,
+                    (normal_entry - terminal_worst) * intent.direction / risk_unit,
+                ),
                 "raw_exit_price": raw_exit,
-                "best_raw_price": best,
-                "worst_raw_price": worst,
+                "best_raw_price": terminal_best,
+                "worst_raw_price": terminal_worst,
                 "same_bar_ambiguous": bool(favorable_hit and adverse_hit),
+                "path_indices": tuple(path_indices),
                 "exit_fill_semantics": (
                     "RESTING_ADVERSE_BARRIER_INTRABAR_CONSERVATIVE"
                     if adverse_first
@@ -1561,6 +1753,7 @@ def _observed_neither(
     raw_exit: float,
     outcome_time_ns: int,
     exit_fill_semantics: str,
+    path_indices: Sequence[int],
 ) -> dict[str, Any]:
     return {
         "outcome": HazardOutcome.NEITHER_REACHED,
@@ -1573,9 +1766,81 @@ def _observed_neither(
         "best_raw_price": best,
         "worst_raw_price": worst,
         "same_bar_ambiguous": False,
+        "path_indices": tuple(int(value) for value in path_indices),
         "exit_fill_semantics": exit_fill_semantics,
         "censor_reason": None,
     }
+
+
+def _economic_marks(
+    path_indices: Sequence[int],
+    *,
+    entry: float,
+    direction: int,
+    quantity: int,
+    point_value: float,
+    commission: float,
+    availability: np.ndarray,
+    highs: np.ndarray,
+    lows: np.ndarray,
+    closes: np.ndarray,
+    terminal_net: float,
+    barrier_outcome: str | None,
+    terminal_raw_exit: float,
+) -> tuple[CausalTradeMark, ...]:
+    marks: list[CausalTradeMark] = []
+    for ordinal, raw_index in enumerate(path_indices):
+        index = int(raw_index)
+        adverse_price = float(lows[index]) if direction > 0 else float(highs[index])
+        favorable_price = float(highs[index]) if direction > 0 else float(lows[index])
+        worst = (
+            (adverse_price - entry)
+            * direction
+            * point_value
+            * quantity
+            - commission
+        )
+        best = (
+            (favorable_price - entry)
+            * direction
+            * point_value
+            * quantity
+            - commission
+        )
+        current = (
+            (float(closes[index]) - entry)
+            * direction
+            * point_value
+            * quantity
+            - commission
+        )
+        if barrier_outcome is not None and ordinal == len(path_indices) - 1:
+            current = float(terminal_net)
+            barrier_mark = (
+                (float(terminal_raw_exit) - entry)
+                * direction
+                * point_value
+                * quantity
+                - commission
+            )
+            if barrier_outcome == HazardOutcome.ADVERSE_FIRST:
+                # Once the resting stop fills, later high/low values in that
+                # minute do not belong to the account path.
+                worst = min(float(terminal_net), float(barrier_mark))
+                best = float(terminal_net)
+            elif barrier_outcome == HazardOutcome.FAVORABLE_FIRST:
+                # Preserve the conservative pre-target adverse extreme (the
+                # stop was not touched), but cap upside at the filled target.
+                best = max(float(terminal_net), float(barrier_mark))
+        marks.append(
+            CausalTradeMark(
+                availability_time_ns=int(availability[index]),
+                worst_unrealized_pnl=float(worst),
+                best_unrealized_pnl=float(best),
+                current_unrealized_pnl=float(current),
+            )
+        )
+    return tuple(marks)
 
 
 def _censored_event(
@@ -1639,6 +1904,10 @@ def _censored_event(
         stressed_worst_unrealized_pnl=None,
         normal_best_unrealized_pnl=None,
         stressed_best_unrealized_pnl=None,
+        normal_initial_unrealized_pnl=None,
+        stressed_initial_unrealized_pnl=None,
+        normal_marks=(),
+        stressed_marks=(),
         same_bar_ambiguous=False,
         censor_reason=reason,
         feature_fingerprint=intent.feature_fingerprint,
@@ -1689,6 +1958,31 @@ def _trade_path_event(row: HazardEventEvidence, *, scenario: str) -> TradePathEv
         session_compliant=True,
         contract_limit_compliant=True,
         same_bar_ambiguous=bool(row.same_bar_ambiguous),
+    )
+
+
+def _hazard_trajectory(
+    row: HazardEventEvidence,
+    event: TradePathEvent,
+    *,
+    scenario: str,
+) -> CausalTradeTrajectory:
+    normal = scenario == "NORMAL"
+    marks = row.normal_marks if normal else row.stressed_marks
+    initial = (
+        row.normal_initial_unrealized_pnl
+        if normal
+        else row.stressed_initial_unrealized_pnl
+    )
+    if initial is None or not marks:
+        raise ValueError("completed hazard event lacks chronological mark evidence")
+    return CausalTradeTrajectory(
+        component_id=row.candidate_id,
+        market=row.execution_market,
+        side=int(row.direction),
+        event=event,
+        marks=marks,
+        initial_unrealized_pnl=float(initial),
     )
 
 
@@ -1864,6 +2158,7 @@ __all__ = [
     "ADVERSE_R_LEVELS",
     "CausalHazardStreamingDecisionKernel",
     "CalibratedHazardCandidate",
+    "CROSS_ASSET_REFERENCE_MARKETS",
     "ENGINE_VERSION",
     "ExactHazardSleeveReplay",
     "FAVORABLE_R_LEVELS",
@@ -1875,6 +2170,7 @@ __all__ = [
     "HazardScreenResult",
     "LABEL_HORIZONS",
     "MECHANISM_RECIPES",
+    "SESSION_CODES",
     "STATIC_RISK_LEVELS",
     "calibrate_candidate",
     "deduplicate_for_event_screen",
@@ -1882,9 +2178,11 @@ __all__ = [
     "discover_intents_batch",
     "discover_intents_streaming",
     "exact_sleeve_replay",
+    "frozen_eligible_session_calendar",
     "generate_structural_proposals",
     "matched_random_intents",
     "observe_outcomes",
+    "realized_behavioral_fingerprint",
     "screen_result",
     "with_availability_safe_cross_asset_feature",
 ]
