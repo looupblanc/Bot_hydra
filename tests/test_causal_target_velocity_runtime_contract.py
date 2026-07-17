@@ -106,6 +106,44 @@ def _stage4_row() -> dict[str, object]:
     }
 
 
+def test_kpis_ignore_recorded_invalid_stage3_candidates_without_results() -> None:
+    run = object.__new__(runtime._CausalTargetVelocityRun)
+    run.state = {
+        "started_at_utc": runtime._utc_now(),
+        "checkpoint_sequence": 1,
+        "state": "STAGE_3_ROLLING_COMBINE",
+        "combine_episodes_completed": 4,
+        "exact_account_replays": 1,
+        "policies_proposed": 2,
+        "unique_policies_screened": 2,
+    }
+    run.manifest = {
+        "manifest_hash": "a" * 64,
+        "source_commit": "b" * 40,
+    }
+    run.campaign_id = "hydra_causal_target_velocity_0028"
+    run.hot_seconds = 1.0
+    run.prior_runner_wall_seconds = 0.0
+    run.started_wall = runtime.time.perf_counter() - 1.0
+    run.cpu_ticks_started = runtime._system_cpu_ticks()
+    run.population_summary = {}
+    run.stage3_rows = [
+        _stage3_row(),
+        {
+            "status": "CANDIDATE_INVALID_RECORDED",
+            "candidate_id": "invalid_without_economic_results",
+        },
+    ]
+
+    kpis = run._kpis()
+
+    assert kpis["positive_stressed_net_candidates"] == 1
+    assert kpis["candidates_with_normal_pass"] == 1
+    assert kpis["candidates_with_stressed_pass"] == 1
+    assert kpis["best_normal_pass_rate"] == pytest.approx(1.0)
+    assert kpis["best_stressed_pass_rate"] == pytest.approx(1.0)
+
+
 def _stage2_row() -> dict[str, object]:
     return {
         "status": "STAGE_2_COMPLETE",

@@ -1342,7 +1342,11 @@ class _CausalTargetVelocityRun:
             1e-9,
         )
         allocation = min(max(economic / elapsed, 0.0), 1.0)
-        stage3 = self.stage3_rows
+        stage3 = [
+            row
+            for row in self.stage3_rows
+            if row.get("status") == "STAGE_3_COMPLETE"
+        ]
         normal_rates = [float(row["normal"]["pass_rate"]) for row in stage3]
         stressed_rates = [float(row["stressed"]["pass_rate"]) for row in stage3]
         value: dict[str, Any] = {
