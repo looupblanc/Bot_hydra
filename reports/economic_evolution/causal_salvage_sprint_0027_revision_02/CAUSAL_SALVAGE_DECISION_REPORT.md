@@ -76,7 +76,8 @@ La correction élimine notamment l'ancienne concentration de passages en B4 : au
 
 - EvidenceBundle causal scellé : 2 110 signaux, 2 092 entrées, 1 885 sorties/trades, 126 memberships, 11 520 épisodes et 294 704 états journaliers.
 - 24 replays de politique exacts en Phase A : 18 standalone + 6 références-book, cinq horizons et deux scénarios. Phase B : 0 politique screenée, 0 replay exact, 0 finaliste, car le gate preregistré est fermé.
-- MLL : 0 brèche sur 11 520 épisodes. Sur les résumés politique/scénario/horizon, buffer minimum global 1 845,35 USD, médiane 4 107,07 USD. L'absence de brèche ne compense pas la vitesse cible insuffisante.
+- MLL : 0 brèche sur 11 520 épisodes. À 90 jours, la distribution par épisode du buffer est min/P25/médiane/P75/max = 1 845,35 / 4 237,03 / 4 396,89 / 4 468,09 / 4 500,00 USD en normal et 1 869,73 / 4 236,00 / 4 396,70 / 4 467,67 / 4 500,00 USD sous stress. L'absence de brèche ne compense pas la vitesse cible insuffisante.
+- Censure : à 90 jours, 2 304/2 304 trajectoires sont `DATA_CENSORED`. Dans le bundle multi-horizon complet, 10 302 terminaisons sont `DATA_CENSORED` et 1 218 sont `OPERATIONAL_HORIZON_NOT_REACHED`; ces dernières ne sont pas assimilées à des échecs économiques.
 - XFA/payout : 0 chemin lancé, conformément à l'interdiction avant au moins trois books Combine propres.
 - Scan causal : `PASS`, 0 `LOOKAHEAD_DEFECT`, 0 `UNRESOLVED`.
 - Gate technique ciblé : 18/18 batch-streaming identiques; session, roll, couverture future manquante, duplicate/restart/idempotence passent. Après les deux corrections bornées d'adaptateur, la suite ciblée combinée passe 68/68.
