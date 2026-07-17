@@ -44,6 +44,7 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
             "TARGET_BEFORE_ADVERSE_EXCURSION_HAZARD_OPPORTUNITY_DENSITY_V1"
         ),
         "development_only": True,
+        "created_at_utc": "2026-07-17T07:24:12Z",
         "source_commit": "a" * 40,
         "economic_hypothesis": "Causal hazard and density improve target velocity.",
         "implementation_files": implementation,
@@ -431,6 +432,61 @@ def test_valid_0028_kpi_only_revision_uses_separate_output(tmp_path: Path) -> No
 
     assert actual["revision_id"].endswith("revision_01")
     assert actual["runtime"]["output_dir"].endswith("revision_01")
+
+    identity_receipt = {
+        "classification": "TECHNICAL_EVIDENCE_IDENTITY_CREATED_AT_OMISSION",
+        "scientific_status": "NO_ECONOMIC_SEMANTICS_CHANGE",
+        "multiplicity": {"multiplicity_delta": 0},
+    }
+    identity_receipt["repair_record_hash"] = stable_hash(identity_receipt)
+    identity_receipt_path = tmp_path / "WORM/identity-repair.json"
+    identity_receipt_sha = _write(
+        identity_receipt_path,
+        json.dumps(identity_receipt, sort_keys=True, indent=2) + "\n",
+    )
+    manifest["revision_id"] = "hydra_causal_target_velocity_0028_revision_02"
+    manifest["runtime"]["output_dir"] = (
+        "reports/economic_evolution/causal_target_velocity_0028_revision_02"
+    )
+    manifest["evidence_bundle"]["lightweight_manifest_path"] = (
+        "reports/economic_evolution/causal_target_velocity_0028_revision_02/"
+        "evidence_bundle_receipt.json"
+    )
+    manifest["technical_repair"]["revision_output_dir"] = manifest["runtime"][
+        "output_dir"
+    ]
+    manifest["evidence_identity_repair"] = {
+        "classification": "TECHNICAL_EVIDENCE_IDENTITY_CREATED_AT_OMISSION",
+        "economic_semantics_changed": False,
+        "completed_evidence_recomputed": False,
+        "supersedes_manifest_hash": (
+            "aaa22ff5c7e5a6308f08e036f824e3b5a2a9d96aeff336c8d6d2b18e00114d29"
+        ),
+        "supersedes_manifest_file_sha256": (
+            "1cb28f9df361ba105ae397362c8f8fcc8caded456222c829521953cba1d1ed6f"
+        ),
+        "supersedes_output_dir": (
+            "reports/economic_evolution/causal_target_velocity_0028_revision_01"
+        ),
+        "revision_output_dir": (
+            "reports/economic_evolution/causal_target_velocity_0028_revision_02"
+        ),
+        "repair_commit": manifest["source_commit"],
+        "repair_receipt": {
+            "path": "WORM/identity-repair.json",
+            "file_sha256": identity_receipt_sha,
+            "repair_record_hash": identity_receipt["repair_record_hash"],
+        },
+    }
+    manifest.pop("manifest_hash")
+    manifest["manifest_hash"] = stable_hash(manifest)
+    revision2 = tmp_path / "config/v7/causal_target_velocity_0028_revision_02.json"
+    revision2.write_text(json.dumps(manifest, sort_keys=True, indent=2) + "\n")
+
+    actual2 = load_and_validate_causal_target_velocity_manifest(revision2)
+
+    assert actual2["revision_id"].endswith("revision_02")
+    assert actual2["created_at_utc"] == "2026-07-17T07:24:12Z"
 
 
 def test_0028_manifest_rejects_causal_contract_drift(tmp_path: Path) -> None:
