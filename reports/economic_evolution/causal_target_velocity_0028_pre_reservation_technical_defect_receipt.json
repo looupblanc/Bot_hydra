@@ -1,0 +1,31 @@
+{
+  "schema": "hydra_causal_target_velocity_pre_reservation_technical_defect_v1",
+  "campaign_id": "hydra_causal_target_velocity_0028",
+  "created_at_utc": "2026-07-17T06:21:20Z",
+  "quarantine_receipt": {
+    "path": "reports/economic_evolution/causal_target_velocity_0028_pre_reservation_exposure_quarantine.json",
+    "receipt_hash": "aac4364905148afbf39c4f8924a209a010e74715d4382a5e8e312bbc34ec227c"
+  },
+  "classification": "SHARED_CAUSAL_MARK_ACCOUNTING_INVARIANT_DEFECT_REPAIRED_BEFORE_MANIFEST_FREEZE",
+  "affected_contract": "FAVORABLE_BARRIER_GAP_THROUGH_TERMINAL_MARK",
+  "root_cause": "After a resting favorable barrier was filled at the terminal bar open, the mark builder retained a post-fill favorable bar extreme while using the executed terminal value for the other bound, which could invert worst and best unrealized PnL.",
+  "repair": "For a favorable-first terminal fill, retain only a potentially pre-fill adverse extreme and the executed terminal value; never retain post-fill favorable extremes.",
+  "causal_timing_changed": false,
+  "economic_threshold_or_hypothesis_changed": false,
+  "candidate_or_book_selected_from_exposed_results": false,
+  "all_pre_reservation_exposed_candidates_remain_excluded": true,
+  "repair_commit": "db71d99e6bfdf6cee5146485b4ef4ebe4fda2265",
+  "targeted_verification": {
+    "tests": [
+      "tests/test_causal_target_velocity.py",
+      "tests/test_causal_salvage_engine.py"
+    ],
+    "passed": 23,
+    "failed": 0,
+    "long_and_short_gap_through_covered": true,
+    "real_cache_replay_role": "TECHNICAL_INVARIANT_ONLY_NON_PROMOTIONAL"
+  },
+  "full_regression_required_once_after_shared_integration": true,
+  "campaign_output_directory_touched": false,
+  "receipt_hash": "ef173e587e256fa2437d1065ab25788d2f81edeb2a243e0e551b23ac6fa4769c"
+}
