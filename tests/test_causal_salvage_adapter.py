@@ -389,3 +389,49 @@ def test_streaming_seal_rejects_same_key_with_divergent_hash(
             episode_batch_size=1,
             daily_path_batch_size=1,
         )
+
+
+def test_explicit_future_censor_wins_over_completed_requested_duration() -> None:
+    records = deepcopy(_evaluated_records())
+    for record in records:
+        record["requested_duration_trading_days"] = 1
+        episode = record["episode"]
+        episode["terminal"] = "TIMEOUT"
+        episode["terminal_reason"] = CENSORED_FUTURE_COVERAGE
+        episode["net_pnl"] = 100.0
+        episode["target_progress"] = 100.0 / 9_000.0
+        episode["days_to_target"] = None
+        episode["consistency_ok"] = True
+        episode["best_day_concentration"] = 0.0
+        episode["component_contribution"] = {SLEEVE_ID: 100.0}
+        day = episode["daily_path"][0]
+        day["balance"] = 150_100.0
+        day["day_pnl"] = 100.0
+        day["realized_pnl"] = 100.0
+        day["unrealized_pnl"] = 0.0
+        day["target_progress"] = 100.0 / 9_000.0
+        day["consistency"] = 1.0
+        day["consistency_ok"] = False
+        day["component_attribution"] = {SLEEVE_ID: 100.0}
+
+    evidence = materialize_causal_salvage_evidence(
+        identity=_identity(),
+        causal_replays={SLEEVE_ID: _replay()},
+        evaluated_policy_records=records,
+        policies={POLICY_ID: _policy()},
+        sleeve_specs={SLEEVE_ID: _spec()},
+        provenance=_provenance(),
+    )
+
+    episodes = evidence.records["episodes"]
+    assert {row["terminal_state"] for row in episodes} == {
+        "DATA_CENSORED"
+    }
+    assert all(row["consistency_ok"] is False for row in episodes)
+    assert all(row["best_day_concentration"] == 1.0 for row in episodes)
+    assert all(row["source_episode_consistency_ok"] is True for row in episodes)
+    assert all(
+        row["consistency_representation_source"]
+        == "TERMINAL_REALIZED_ACCOUNT_PATH"
+        for row in episodes
+    )

@@ -160,3 +160,37 @@ def test_filled_then_missing_future_coverage_is_an_economic_censor() -> None:
     assert result.component_contribution == {"a": pytest.approx(25.0)}
     assert result.daily_path[-1]["unrealized_pnl"] == pytest.approx(25.0)
     assert result.daily_path[-1]["open_positions"] == 1
+
+
+def test_censored_consistency_uses_realized_account_basis_and_matches_path() -> None:
+    completed = _trajectory(
+        "a",
+        entry_ns=1,
+        exit_ns=2,
+        marks=((2, -10.0, 100.0, 100.0),),
+        net_pnl=100.0,
+    )
+    censored = _trajectory(
+        "b",
+        entry_ns=2,
+        exit_ns=4,
+        marks=((3, -10.0, -10.0, 0.0),),
+        net_pnl=25.0,
+        completed=False,
+        censor_time_ns=3,
+    )
+    result = run_causal_shared_account_episode(
+        {"a": (completed,), "b": (censored,)},
+        (DAY,),
+        policy=_policy("a", "b"),
+        start_day=DAY,
+        maximum_duration_days=1,
+    )
+
+    assert result.terminal_reason == "CENSORED_FUTURE_COVERAGE"
+    assert result.net_pnl == pytest.approx(90.0)
+    assert result.daily_path[-1]["realized_pnl"] == pytest.approx(100.0)
+    assert result.daily_path[-1]["unrealized_pnl"] == pytest.approx(-10.0)
+    assert result.best_day_concentration == pytest.approx(1.0)
+    assert result.consistency_ok is False
+    assert result.daily_path[-1]["consistency_ok"] is False

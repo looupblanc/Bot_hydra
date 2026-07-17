@@ -39,7 +39,7 @@ from hydra.research.causal_sleeve_replay import (
 )
 
 
-CAUSAL_ACCOUNT_REPLAY_VERSION = "hydra_causal_active_pool_account_replay_v1"
+CAUSAL_ACCOUNT_REPLAY_VERSION = "hydra_causal_active_pool_account_replay_v2"
 
 
 @dataclass(slots=True)
@@ -423,6 +423,11 @@ def run_causal_shared_account_episode(
             CombineTerminal.COMPLIANCE_FAILURE,
         } or terminal_reason == "CENSORED_FUTURE_COVERAGE":
             unrealized = _open_unrealized(open_positions)
+            # Consistency is an account-balance / realized-daily-profit rule.
+            # A censored open position contributes to the economic net and
+            # target-progress snapshot, but its unrealized mark must neither
+            # become a completed winning day nor leave ``best_day`` stale.
+            best_day = max(best_day, day_pnl)
             maximum_progress = max(
                 maximum_progress,
                 (
@@ -449,7 +454,7 @@ def run_causal_shared_account_episode(
                     starting_balance=float(rules.combine_starting_balance),
                     required_target=required_target,
                     day_pnl=day_pnl + unrealized,
-                    best_day=max(best_day, day_pnl),
+                    best_day=best_day,
                     minimum_buffer=minimum_buffer,
                     day_costs=day_costs,
                     day_conflicts=day_conflicts,
@@ -564,9 +569,16 @@ def run_causal_shared_account_episode(
                 reported_contribution.get(component_id, 0.0)
                 + position.current_unrealized
             )
-    concentration = best_day / net if net > 0.0 else 0.0
+    consistency_profit = (
+        balance - float(rules.combine_starting_balance)
+        if terminal_reason == "CENSORED_FUTURE_COVERAGE"
+        else net
+    )
+    concentration = (
+        best_day / consistency_profit if consistency_profit > 0.0 else 0.0
+    )
     consistency_ok = bool(
-        net <= 0.0
+        consistency_profit <= 0.0
         or concentration
         <= rules.consistency_best_day_max_pct_of_profit_target + 1e-12
     )

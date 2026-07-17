@@ -1,0 +1,47 @@
+{
+  "schema": "hydra_causal_salvage_phase_a_failed_seal_recovery_receipt_v1",
+  "campaign_id": "hydra_causal_salvage_sprint_0027",
+  "failed_source_commit": "768736d6e390dcd3516785a17620eaf6c8134746",
+  "failure_stage": "PHASE_A_EVIDENCE_BUNDLE_RELATIONAL_SEAL",
+  "failure": "causal terminal consistency drift",
+  "economic_episode_computation_completed": true,
+  "raw_episode_part_count": 24,
+  "raw_episode_count": 11520,
+  "raw_episode_inventory_sha256": "e97aceb566d318f1bf7b5b43b6efffba3658c3fe28bf305e85acf41098db0f03",
+  "consistency_divergence_count": 1681,
+  "explicit_future_censor_count": 4610,
+  "non_censored_divergence_count": 0,
+  "reconciled_fields": [
+    "net_pnl",
+    "costs",
+    "component_attribution",
+    "daily_path_length",
+    "target_progress",
+    "minimum_mll_buffer"
+  ],
+  "root_cause": "Censored-open episode summaries mixed realized best-day accounting with terminal net including unrealized PnL.",
+  "bounded_repair": {
+    "account_replay_version": "hydra_causal_active_pool_account_replay_v2",
+    "evidence_adapter_version": "hydra_causal_salvage_evidence_adapter_v2",
+    "consistency_basis_for_censored_open_path": "REALIZED_ACCOUNT_BALANCE_AND_REALIZED_DAILY_PROFIT",
+    "unrealized_retained_in_net_and_target_progress": true,
+    "explicit_future_censor_precedes_duration_in_terminal_classification": true,
+    "non_censored_mismatch_still_fails_closed": true
+  },
+  "preservation": {
+    "raw_parts_rewritten": false,
+    "raw_parts_deleted": false,
+    "failed_staging_deleted": false,
+    "failed_staging_archive": "data/cache/economic_production/hydra_causal_salvage_sprint_0027/failed_seal_attempt_001",
+    "failed_staging_episode_rows_committed": 0
+  },
+  "recovery_output": "reports/economic_evolution/causal_salvage_sprint_0027_revision_01",
+  "phase_b_authorized_before_recovery_seal": false,
+  "safety": {
+    "q4_access_count_delta": 0,
+    "data_purchase_usd": 0.0,
+    "broker_connections": 0,
+    "orders": 0,
+    "xfa_paths_started": 0
+  }
+}

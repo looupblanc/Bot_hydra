@@ -45,7 +45,7 @@ from hydra.research.causal_sleeve_replay import (
 )
 
 
-CAUSAL_SALVAGE_ADAPTER_VERSION = "hydra_causal_salvage_evidence_adapter_v1"
+CAUSAL_SALVAGE_ADAPTER_VERSION = "hydra_causal_salvage_evidence_adapter_v2"
 _REQUIRED_DAILY_FIELDS = {
     "session_day",
     "balance",
@@ -967,6 +967,31 @@ def _episode_ledgers(
             raise CausalSalvageEvidenceError(
                 "causal episode daily path does not match eligible-day duration"
             )
+        explicit_future_censor = (
+            terminal == "DATA_CENSORED"
+            and str(episode.get("terminal_reason") or "")
+            == CENSORED_FUTURE_COVERAGE
+        )
+        source_consistency_ok = bool(episode["consistency_ok"])
+        source_best_day_concentration = float(
+            episode.get("best_day_concentration", 0.0)
+        )
+        # Phase-A raw parts were durably written before the bounded terminal
+        # summary defect was found.  Their daily account path is complete and
+        # authoritative; only the duplicate episode-level consistency fields
+        # were computed from a stale best-day accumulator.  Normalize this one
+        # explicit censor representation without accepting any non-censored
+        # path mismatch.
+        terminal_consistency_ok = (
+            bool(daily[-1]["consistency_ok"])
+            if explicit_future_censor
+            else source_consistency_ok
+        )
+        terminal_best_day_concentration = (
+            float(daily[-1]["consistency"])
+            if explicit_future_censor
+            else source_best_day_concentration
+        )
         total_cost = float(episode["total_cost"])
         net_pnl = float(episode["net_pnl"])
         contribution = {
@@ -995,7 +1020,7 @@ def _episode_ledgers(
             "net_pnl": net_pnl,
             "target_progress": float(episode["target_progress"]),
             "minimum_mll_buffer": float(episode["minimum_mll_buffer"]),
-            "consistency_ok": bool(episode["consistency_ok"]),
+            "consistency_ok": terminal_consistency_ok,
             "days_to_target": (
                 None
                 if episode.get("days_to_target") is None
@@ -1013,8 +1038,15 @@ def _episode_ledgers(
             "maximum_target_progress": float(
                 episode.get("maximum_target_progress", episode["target_progress"])
             ),
-            "best_day_concentration": float(
-                episode.get("best_day_concentration", 0.0)
+            "best_day_concentration": terminal_best_day_concentration,
+            "source_episode_consistency_ok": source_consistency_ok,
+            "source_episode_best_day_concentration": (
+                source_best_day_concentration
+            ),
+            "consistency_representation_source": (
+                "TERMINAL_REALIZED_ACCOUNT_PATH"
+                if explicit_future_censor
+                else "ACCOUNT_POLICY_EPISODE"
             ),
             "maximum_mini_equivalent": float(
                 episode.get("maximum_mini_equivalent", 0.0)
@@ -1450,6 +1482,11 @@ def _terminal_state(
         raise CausalSalvageEvidenceError(f"unknown causal terminal state: {raw}")
     if raw in {"DATA_CENSORED", "OPERATIONAL_HORIZON_NOT_REACHED"}:
         return raw
+    # The causal replay can discover missing required future coverage on the
+    # nominal last day of a fixed horizon.  Duration equality does not turn an
+    # explicit data censor into an operational timeout.
+    if str(episode.get("terminal_reason") or "") == CENSORED_FUTURE_COVERAGE:
+        return "DATA_CENSORED"
     if "FULL" in horizon:
         return "DATA_CENSORED"
     duration = (
