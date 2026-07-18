@@ -76,6 +76,17 @@ def load_and_validate_production_manifest(path: str | Path) -> dict[str, Any]:
         except FoundryManifestError as exc:
             raise ProductionManifestError(str(exc)) from exc
         return manifest
+    if manifest.get("campaign_mode") == "MICROSTRUCTURE_SPARSE_ALPHA_DISTILLATION":
+        from hydra.production.microstructure_sparse_manifest import (
+            SparseManifestError,
+            validate_microstructure_sparse_manifest,
+        )
+
+        try:
+            validate_microstructure_sparse_manifest(manifest, manifest_path=resolved)
+        except SparseManifestError as exc:
+            raise ProductionManifestError(str(exc)) from exc
+        return manifest
     if manifest.get("campaign_mode") == "ACTIVE_RISK_POOL":
         from hydra.production.active_risk_manifest import (
             ActiveRiskManifestError,

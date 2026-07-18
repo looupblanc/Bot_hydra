@@ -1,0 +1,29 @@
+{
+  "schema": "hydra_lightweight_mission_checkpoint_v1",
+  "checkpoint_id": "microstructure_sparse_alpha_distillation_0032_prechange_20260718T095340Z",
+  "created_at_utc": "2026-07-18T09:53:40Z",
+  "mission_id": "hydra_v7_1_falsification_20260712_0001",
+  "controller_version": "hydra_v7_economic_evolution_controller_v17",
+  "service_pid": 722622,
+  "git_head": "6a0a07bd99cc776be7529237ad3bbbb7566d153d",
+  "campaign_0031": {
+    "status": "MICROSTRUCTURE_PILOT_FALSIFIED",
+    "manifest_hash": "f73c25c38d33fcb43c8c0178e40d7b5d498f4089ab72823fb833aa3b96850bbb",
+    "result_hash": "45fb93f5f103e48c8b2375c1551a8e6c1b622adfac2501e70f970199ec1725d1",
+    "result_file_sha256": "3ea30404f46359c3b9efcecf918fca0b3d59a37a66bc1dc61b820a42beca8ec5",
+    "evidence_bundle_content_sha256": "f2387366f6cdca79efa4b96902e560a927d67eb01c1abaa6793a14dd17d212c4",
+    "evidence_receipt_file_sha256": "59cc04afb72b14556c577c6ede62b53022a35f306b359a548b517afe0fd6ff20"
+  },
+  "queue": {
+    "path": "config/v7/economic_evolution_production_queue_0037.json",
+    "file_sha256": "694accad729f565679b4d1861da8c4950e1cab68308b473fc0fcde04b441a5e9",
+    "runtime_state": "IDLE",
+    "active_campaign_id": null
+  },
+  "safety": {
+    "broker_connections": 0,
+    "orders": 0,
+    "q4_access_delta": 0,
+    "remaining_budget_usd": 28.498462508622012
+  }
+}
