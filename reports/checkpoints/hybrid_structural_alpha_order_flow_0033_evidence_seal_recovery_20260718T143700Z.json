@@ -1,0 +1,65 @@
+{
+  "schema_version": "HYDRA_0033_EVIDENCE_ONLY_RECOVERY_V1",
+  "campaign_id": "hydra_hybrid_structural_alpha_order_flow_0033",
+  "recorded_at_utc": "2026-07-18T14:37:00Z",
+  "classification": "EVIDENCE_SEAL_AND_DERIVED_AGGREGATION_ONLY",
+  "root_cause": {
+    "exception": "hydra.evidence.schema.EvidenceContractError",
+    "message": "unknown compact output: paired_counterfactual_outcomes",
+    "economic_replay_completed_before_failure": true,
+    "economic_outcome_changed_by_recovery": false,
+    "signals_or_fills_replayed_by_recovery": false,
+    "policy_or_gate_threshold_changed": false
+  },
+  "authoritative_inputs": {
+    "manifest_hash": "cd693d5237469eb81d1d716088adb32686f65d990929dbab22751b7464acdb19",
+    "source_commit": "a98fde3f3e33e9383a275215767e9c7b17033548",
+    "pilot_summary_path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/pilot/hybrid_pilot_summary.json",
+    "pilot_summary_sha256": "2797a680491d6fc044d5d30f8062f0e3f7d2ed4e0a2b9eb946f33e085d0c0a36",
+    "evidence_material_path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/pilot/hybrid_evidence_material.json",
+    "evidence_material_sha256": "571810e93516aadc55b9d051cf8dd4cb7dc86277463934703cf8f425be92279e",
+    "paired_counterfactual_outcome_count": 1008,
+    "structural_opportunity_count": 72,
+    "overlay_policy_count": 20
+  },
+  "recovery": {
+    "canonical_compact_output_names": [
+      "campaign_summary",
+      "failure_vectors",
+      "pareto_archive",
+      "next_campaign_recommendations"
+    ],
+    "full_paired_lattice_remains_immutable_in_evidence_material": true,
+    "staging_backup_path": "reports/economic_evolution/quarantine/hydra_hybrid_structural_alpha_order_flow_0033_evidence_seal_recovery_20260718T1436Z/staging_pre_recovery",
+    "pilot_backup_path": "reports/economic_evolution/quarantine/hydra_hybrid_structural_alpha_order_flow_0033_evidence_seal_recovery_20260718T1436Z/pilot_authoritative",
+    "nested_role_account_denominators_reconciled": {
+      "normal": 60,
+      "stressed": 60
+    },
+    "preregistered_consistency_gate_reconciled": true,
+    "consistency_safe_survivor_count": 3,
+    "selected_policy_ids_recovered_from_frozen_gate_checks": [
+      "hybrid_0033_01_f0345ecb99af8c25",
+      "hybrid_0033_07_5f93891cf737e51a",
+      "hybrid_0033_10_67b936eb009c7e8b"
+    ]
+  },
+  "sealed_outputs": {
+    "decision": "HYBRID_OVERLAY_GREEN",
+    "result_path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/economic_production_result.json",
+    "result_hash": "795b87e27da313615fdf547e91311c01c51f8a4a52010fd85148aacd3759e0e2",
+    "result_file_sha256": "fe13dbb8a9da5ea3a49230396c07f9eee83d7c454deae451a33cf9af19d19ba4",
+    "evidence_bundle_path": "data/cache/evidence_bundles/hydra_hybrid_structural_alpha_order_flow_0033.evidence-v1",
+    "evidence_manifest_sha256": "f5b49a8e34ee7570d9175b49400d589dbbe936bf365a8be0d0da5eb780cdb22b",
+    "deep_validation": "PASS"
+  },
+  "governance": {
+    "pre_reservation_smoke_caveat_preserved": true,
+    "automatic_purchase_trigger_allowed": false,
+    "independent_confirmation_claimed": false,
+    "new_data_purchase_count": 0,
+    "q4_access_count_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  }
+}
