@@ -7,16 +7,18 @@
     "EVENT_SOURCED_LOB_TEACHER_STUDENT_MOE_FAST_COMBINE_V1"
   ],
   "created_at_utc": "2026-07-18T03:47:43.919944Z",
-  "source_commit": "d96b14d0494af1d408ff2f4538af9ad4a5e4156a",
+  "source_commit": "3b357f2e2136e7e56ff79d9dccd7cf6ce7e8149a",
   "development_only": true,
   "economic_hypothesis": "Event-level order flow and reconstructed limit-order-book state contain causal information that materially raises executable target velocity beyond the clean OHLCV frontier, and MBO teacher states can be distilled into an L1/L2 student supported by a personal-device TopstepX/ProjectX deployment feed.",
   "implementation_files": {
     "hydra/production/microstructure_event_engine.py": "7d28ff72de89617604bdc40a160998d4f6d9747d1fb03acbce8dca35a341e9d3",
     "hydra/production/microstructure_foundry_cost.py": "cfe790537f31c99dcdb0b28927eee434d46cba6df2ded584187c665dc7f98e2f",
     "hydra/production/microstructure_foundry_manifest.py": "10a8cf8f88ebc8ccfaaf90fc7914a3ecd50d4f946a0d3d7ae86a8d486ee85fcf",
-    "hydra/production/microstructure_foundry_pilot.py": "471fa6cffff69f54b75f5068416ec6b8be0511f011e405f4484f9b6f69ca7237",
+    "hydra/production/microstructure_foundry_pilot.py": "84b97fa99d2152ccde6caf473433570135267898a45f6fac5d196bc597e0abcf",
     "hydra/production/microstructure_foundry_runtime.py": "69de0d4ba2464e6c5b3280d4328588f897612a2569702fa2cbc49aef181f5607",
     "hydra/production/microstructure_teacher_student.py": "7668f002e912d286ef6ee6f622fc35a4dfdeedd74f9e1e95c56ce5bd6f2b79fe",
+    "hydra/production/halving.py": "232ca51304d6dc4dea31fae7210467cad9abef4a74b3ed7094da45e9bd79b7c8",
+    "hydra/mission/economic_evolution_manifest_runtime.py": "42e6c1dfcf39754bd52b7bd29d7cf299c99fb9102c46a62fa3299fa029b98d15",
     "scripts/acquire_microstructure_foundry_0031.py": "ff0fdf30790f390bd5f9278b24f267fe50a96431a9a9ac65834a743054f53315"
   },
   "runtime": {
@@ -512,6 +514,7 @@
   "post_outcome_account_terminal_recovery": {
     "classification": "ACCOUNT_TERMINAL_PRECEDENCE_AND_POST_MLL_TRUNCATION_RECOVERY",
     "prior_manifest_hash": "0c6a465b5715871be10455e2b4dffd20785353551dc9c895fc2c5f0b8d2dcb5c",
+    "intermediate_recovery_manifest_hash": "bb89f740d9b6d2aaf7513d0fdbe592ece7b560eb12b53ec7b29facc012acca41",
     "detected_at_stage": "EVIDENCE_BUNDLE_RELATIONAL_FINALIZATION",
     "economic_outcomes_observed_before_repair": true,
     "repair_rule_selected_from_outcomes": false,
@@ -526,8 +529,10 @@
     "repairs": [
       "OBSERVED_MLL_OR_TARGET_PRECEDES_COVERAGE_CENSORING",
       "ACCOUNT_EPISODE_STOPS_AFTER_FIRST_MLL_TERMINAL_TRADE",
-      "EVIDENCE_TARGET_PROGRESS_NORMALIZED_TO_FRACTION"
+      "EVIDENCE_TARGET_PROGRESS_NORMALIZED_TO_FRACTION",
+      "TERMINAL_CENSORING_SEPARATED_FROM_INCOMPLETE_REQUESTED_HORIZON",
+      "MANIFEST_BOUND_AUTHORITATIVE_RECONSTRUCTION_ADOPTION"
     ]
   },
-  "manifest_hash": "bb89f740d9b6d2aaf7513d0fdbe592ece7b560eb12b53ec7b29facc012acca41"
+  "manifest_hash": "f73c25c38d33fcb43c8c0178e40d7b5d498f4089ab72823fb833aa3b96850bbb"
 }
