@@ -10,6 +10,7 @@ from hydra.production.microstructure_sparse_pilot import (
     SparseTrade,
     _account_paths,
     _depth_fill,
+    _evidence_censored_state,
     _gate_decision,
 )
 
@@ -115,6 +116,10 @@ def test_account_windows_separate_full_coverage_and_censoring() -> None:
     assert all(row["horizon_days"] == 5 for row in full)
     assert all(row["terminal_state"] == "OPERATIONAL_HORIZON_NOT_REACHED" for row in full)
     assert all(row["terminal_state"] == "DATA_CENSORED" for row in paths if not row["full_coverage"])
+    assert _evidence_censored_state("OPERATIONAL_HORIZON_NOT_REACHED") is True
+    assert _evidence_censored_state("DATA_CENSORED") is True
+    assert _evidence_censored_state("TARGET_REACHED") is False
+    assert _evidence_censored_state("MLL_BREACHED") is False
 
 
 def test_sparse_gate_requires_two_distinct_mechanisms() -> None:

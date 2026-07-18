@@ -1726,7 +1726,13 @@ def _evidence_material(
                     "duration_trading_days": len(path["daily_path"]),
                     "target_reached": bool(path["target_reached"]),
                     "mll_breached": bool(path["mll_breached"]),
-                    "censored_state": not bool(path["full_coverage"]),
+                    # The shared EvidenceBundle contract treats both an
+                    # incomplete data horizon and a completed-but-unreached
+                    # operational horizon as censored rather than as a hard
+                    # account failure.
+                    "censored_state": _evidence_censored_state(
+                        str(path["terminal_state"])
+                    ),
                     "cost_scenario": path["scenario"],
                     "costs": path["costs_usd"],
                     "net_pnl": path["net_pnl_usd"],
@@ -1815,6 +1821,15 @@ def _evidence_material(
         "pareto_archive": report["retained_strategy_ids"],
     }
     return identity, datasets, compact
+
+
+def _evidence_censored_state(terminal_state: str) -> bool:
+    """Map account terminals to the shared EvidenceBundle censoring flag."""
+
+    return terminal_state in {
+        "DATA_CENSORED",
+        "OPERATIONAL_HORIZON_NOT_REACHED",
+    }
 
 
 def _atomic_json(path: Path, value: Mapping[str, Any]) -> None:
