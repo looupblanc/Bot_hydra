@@ -314,7 +314,11 @@ class OpportunityStepResult:
     consolidated: bool
     reset_reason: str | None
     decision: OpportunityDecision | None
-    state_hash: str
+    # ``None`` is an explicit high-throughput mode: the transition is fully
+    # applied, but the caller deferred the O(state-size) audit hash.  The hash
+    # remains available from ``OpportunityEpisodeFSM.state_hash`` and is always
+    # materialised by checkpoints.  Default step behaviour still returns it.
+    state_hash: str | None
 
     def to_record(self) -> dict[str, Any]:
         return asdict(self)
@@ -414,6 +418,7 @@ class OpportunityEpisodeFSM:
         observation: OpportunityObservation | Mapping[str, Any],
         *,
         decision_time_ns: int | None = None,
+        materialize_state_hash: bool = True,
     ) -> OpportunityStepResult:
         """Consume one causal observation and possibly emit one decision.
 
@@ -450,7 +455,7 @@ class OpportunityEpisodeFSM:
                 consolidated=False,
                 reset_reason=None,
                 decision=None,
-                state_hash=self.state_hash,
+                state_hash=(self.state_hash if materialize_state_hash else None),
             )
         if (
             self._last_decision_time_ns is not None
@@ -512,25 +517,38 @@ class OpportunityEpisodeFSM:
             consolidated=consolidated,
             reset_reason=reset_reason,
             decision=decision,
-            state_hash=self.state_hash,
+            state_hash=(self.state_hash if materialize_state_hash else None),
         )
 
     def process_batch(
         self,
         observations: Iterable[OpportunityObservation | Mapping[str, Any]],
+        *,
+        materialize_state_hash: bool = True,
     ) -> tuple[OpportunityStepResult, ...]:
         """Replay a batch strictly through the same one-observation step."""
 
-        return tuple(self.step(observation) for observation in observations)
+        return tuple(
+            self.step(
+                observation,
+                materialize_state_hash=materialize_state_hash,
+            )
+            for observation in observations
+        )
 
     @classmethod
     def replay_batch(
         cls,
         spec: OpportunityEpisodeSpec,
         observations: Iterable[OpportunityObservation | Mapping[str, Any]],
+        *,
+        materialize_state_hash: bool = True,
     ) -> tuple[OpportunityEpisodeFSM, tuple[OpportunityStepResult, ...]]:
         engine = cls(spec)
-        return engine, engine.process_batch(observations)
+        return engine, engine.process_batch(
+            observations,
+            materialize_state_hash=materialize_state_hash,
+        )
 
     def finalize(
         self,

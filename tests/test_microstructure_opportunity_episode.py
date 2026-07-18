@@ -131,6 +131,53 @@ def test_batch_is_only_streaming_step_and_final_hashes_are_identical() -> None:
     assert batch.state_hash == streaming.state_hash
 
 
+def test_high_throughput_step_defers_only_result_hash(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    observations = (
+        _observation(1),
+        _observation(2),
+        _observation(3, activation_score=0.20),
+        _observation(20, price=20_001.0),
+    )
+    audited = OpportunityEpisodeFSM(_spec())
+    audited_rows = audited.process_batch(observations)
+
+    deferred = OpportunityEpisodeFSM(_spec())
+    original_state_material = deferred._state_material
+    state_material_calls = 0
+
+    def counted_state_material() -> dict[str, object]:
+        nonlocal state_material_calls
+        state_material_calls += 1
+        return original_state_material()
+
+    monkeypatch.setattr(deferred, "_state_material", counted_state_material)
+    deferred_rows = deferred.process_batch(
+        observations,
+        materialize_state_hash=False,
+    )
+
+    assert state_material_calls == 0
+    assert all(row.state_hash is None for row in deferred_rows)
+    assert all(isinstance(row.state_hash, str) for row in audited_rows)
+    assert [
+        {key: value for key, value in row.to_record().items() if key != "state_hash"}
+        for row in audited_rows
+    ] == [
+        {key: value for key, value in row.to_record().items() if key != "state_hash"}
+        for row in deferred_rows
+    ]
+
+    # A later audit/checkpoint still materialises and reconciles the complete
+    # state; only the redundant per-observation hashes were skipped.
+    assert deferred.state_hash == audited.state_hash
+    assert state_material_calls == 1
+    checkpoint = deferred.checkpoint()
+    assert checkpoint["state_hash"] == audited.state_hash
+    assert state_material_calls == 2
+
+
 def test_duplicate_and_checkpoint_resume_are_idempotent() -> None:
     spec = _spec()
     first = _observation(1)

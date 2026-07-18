@@ -637,6 +637,11 @@ def build_opportunity_episodes(store: SparseStore, *, cfg: SparsePilotConfig) ->
                         feature_fingerprint=str(store.feature_hashes[row]),
                     ),
                     decision_time_ns=int(store.decision_ns[row]),
+                    # The sparse compiler consumes hundreds of thousands of
+                    # observations and never uses the per-step audit hash.
+                    # Checkpoints/final sealing still materialise the exact
+                    # complete FSM state hash when requested.
+                    materialize_state_hash=False,
                 )
             for engine in engines.values():
                 for canonical in engine.finalize(reason="END_OF_FROZEN_STORE"):
