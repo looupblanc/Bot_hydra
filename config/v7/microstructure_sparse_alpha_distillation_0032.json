@@ -8,7 +8,7 @@
   ],
   "development_only": true,
   "created_at_utc": "2026-07-18T10:23:52Z",
-  "source_commit": "38d5e627f9155c94a7ea80e5085e5fd12ed89f6e",
+  "source_commit": "ac8989239079eca119f9b4810b56c64d4a14d0eb",
   "economic_hypothesis": "Causally consolidated order-flow episodes plus abstention-first meta-labeling can preserve sparse gross alpha, overcome aggressive executable costs, and improve target velocity without the dense 0031 turnover architecture.",
   "implementation_files": {
     "hydra/production/manifest.py": "9000c41a2f252ccbb8cbcb33f4099cbe0471ccda8ab49a43c9fcb2a1f3e3d2f4",
@@ -16,7 +16,7 @@
     "hydra/production/microstructure_opportunity_episode.py": "0558feec01808d6d7229db5591453b6c7ccb543ef06b1c6208c1684afe2be3f9",
     "hydra/production/microstructure_sparse_forensics.py": "4149457e6146b321f3026a0b7d0ed2c88046fa1aa998187b38be13069a7ccd88",
     "hydra/production/microstructure_sparse_manifest.py": "f1ee8ba8f82ee1a13649124cda6efa45640d017f9a9f794cf5cd7497eca54ba8",
-    "hydra/production/microstructure_sparse_pilot.py": "d5d60adc3d5c5ff62d6cfa3e67f22da9fdbd75d14e28644b0601f74faaa75165",
+    "hydra/production/microstructure_sparse_pilot.py": "2b595e174726242521fabe2db3fb7657551ae6c2acc483e66d8329903caa60a4",
     "hydra/production/microstructure_sparse_runtime.py": "643fa73160144371233e98dc361235ead81c2767d12448e0a9b041ff67e790f4",
     "scripts/run_economic_production_manifest.py": "45e610a35ae5a260e628bc73fcd23634362c6cef0298707b2e6e97ff8762cc6f"
   },
@@ -425,5 +425,5 @@
     "threshold_lowering_after_results_allowed": false,
     "xfa_before_clean_combine_survivors_allowed": false
   },
-  "manifest_hash": "a39997ce27822e2852d461f530d193647bd9471d1e49cec611fb50e1fb3b1d26"
+  "manifest_hash": "3431e1917c47c9236dab883c1463354475daf0c0332ad91accf12b4ad4b5ba95"
 }

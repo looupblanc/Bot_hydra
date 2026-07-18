@@ -1,0 +1,23 @@
+{
+  "schema": "hydra_sparse_episode_pairing_recovery_checkpoint_v1",
+  "campaign_id": "hydra_microstructure_sparse_alpha_distillation_0032",
+  "recorded_at_utc": "2026-07-18T11:37:09Z",
+  "old_manifest_hash": "a39997ce27822e2852d461f530d193647bd9471d1e49cec611fb50e1fb3b1d26",
+  "new_manifest_hash": "3431e1917c47c9236dab883c1463354475daf0c0332ad91accf12b4ad4b5ba95",
+  "failed_bundle_error": "episode cost scenarios were serialized with scenario-specific episode IDs",
+  "observed_pilot_status": "SPARSE_PILOT_WEAK",
+  "strategies_evaluated": 30,
+  "opportunity_episode_count": 96590,
+  "trade_count": 327,
+  "economic_results_changed": false,
+  "thresholds_changed": false,
+  "hypothesis_changed": false,
+  "repair_scope": "EVIDENCE_EPISODE_ID_PAIRING_ONLY",
+  "repair_detail": "NORMAL and STRESSED_1_5X now share the canonical account-attempt episode ID; scenario remains explicit on each evidence row.",
+  "multiplicity_reservation_changed": false,
+  "data_purchase_count": 0,
+  "q4_access_delta": 0,
+  "broker_connections": 0,
+  "orders": 0,
+  "receipt_hash": "22f67e6abd8e1d65fd9d6fbd617bd89c921970b88e4a3b622133935914312dc1"
+}
