@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 import json
 import math
@@ -157,6 +158,156 @@ def test_foundry_pilot_e2e_is_causal_atomic_and_runtime_compatible(tmp_path: Pat
         assert trade["normal_costs_usd"] == pytest.approx(3.80)
         assert trade["stressed_costs_usd"] == pytest.approx(13.80)
         assert trade["normal_net_pnl_usd"] - trade["stressed_net_pnl_usd"] == pytest.approx(10.0)
+
+
+def test_observed_terminal_event_precedes_coverage_censoring() -> None:
+    assert pilot._episode_terminal_state(
+        {
+            "full_coverage": False,
+            "target_reached": False,
+            "mll_breached": True,
+        }
+    ) == "MLL_BREACHED"
+    assert pilot._episode_terminal_state(
+        {
+            "full_coverage": False,
+            "target_reached": True,
+            "mll_breached": False,
+        }
+    ) == "TARGET_REACHED"
+    assert pilot._episode_terminal_state(
+        {
+            "full_coverage": False,
+            "target_reached": False,
+            "mll_breached": False,
+        }
+    ) == "DATA_CENSORED"
+    with pytest.raises(pilot.FoundryPilotError, match="both TARGET_REACHED"):
+        pilot._episode_terminal_state(
+            {
+                "full_coverage": True,
+                "target_reached": True,
+                "mll_breached": True,
+            }
+        )
+
+
+def test_account_episode_preserves_observed_terminal_on_incomplete_horizon() -> None:
+    config = pilot.FoundryPilotConfig()
+    sessions = tuple(f"2024-07-{day:02d}" for day in range(8, 13))
+    passing_trade = pilot.ExecutedTrade(
+        sleeve_id="sleeve-pass",
+        trade_id="trade-pass",
+        signal_id="signal-pass",
+        market="NQ",
+        session_id=sessions[-2],
+        role=pilot.ROLE_FINAL,
+        execution_path="AGGRESSIVE",
+        direction=1,
+        requested_quantity=1,
+        filled_quantity=1,
+        quantity_ahead=0,
+        entry_time_ns=2,
+        exit_time_ns=3,
+        entry_price=20_000.0,
+        exit_price=20_500.0,
+        stop_price=19_999.0,
+        target_price=20_500.0,
+        exit_reason="TARGET",
+        gross_pnl_usd=5_000.0,
+        base_slippage_cost_usd=0.0,
+        normal_total_cost_usd=0.0,
+        stressed_total_cost_usd=0.0,
+        normal_costs_usd=0.0,
+        normal_net_pnl_usd=5_000.0,
+        stressed_costs_usd=0.0,
+        stressed_net_pnl_usd=5_000.0,
+        minimum_unrealized_pnl_usd=0.0,
+    )
+    second_trade = replace(
+        passing_trade,
+        trade_id="trade-pass-2",
+        signal_id="signal-pass-2",
+        session_id=sessions[-1],
+        entry_time_ns=4,
+        exit_time_ns=5,
+    )
+
+    rows = pilot._account_episodes(
+        "sleeve-pass", (passing_trade, second_trade), sessions, cfg=config
+    )
+    incomplete = next(
+        row
+        for row in rows
+        if row["start_session"] == sessions[-2]
+        and row["horizon_days"] == 5
+        and row["scenario"] == "NORMAL"
+    )
+
+    assert incomplete["full_coverage"] is False
+    assert incomplete["target_reached"] is True
+    assert incomplete["coverage_status"] == "TARGET_REACHED"
+
+
+def test_account_episode_stops_at_first_observed_mll_breach() -> None:
+    config = pilot.FoundryPilotConfig()
+    session = "2024-07-08"
+    terminal_trade = pilot.ExecutedTrade(
+        sleeve_id="sleeve-mll",
+        trade_id="trade-mll",
+        signal_id="signal-mll",
+        market="NQ",
+        session_id=session,
+        role=pilot.ROLE_DISCOVERY,
+        execution_path="AGGRESSIVE",
+        direction=1,
+        requested_quantity=1,
+        filled_quantity=1,
+        quantity_ahead=0,
+        entry_time_ns=1,
+        exit_time_ns=2,
+        entry_price=20_000.0,
+        exit_price=19_999.0,
+        stop_price=19_900.0,
+        target_price=20_100.0,
+        exit_reason="STOP",
+        gross_pnl_usd=-100.0,
+        base_slippage_cost_usd=0.0,
+        normal_total_cost_usd=0.0,
+        stressed_total_cost_usd=0.0,
+        normal_costs_usd=0.0,
+        normal_net_pnl_usd=-100.0,
+        stressed_costs_usd=0.0,
+        stressed_net_pnl_usd=-100.0,
+        minimum_unrealized_pnl_usd=-5_000.0,
+    )
+    forbidden_later_trade = replace(
+        terminal_trade,
+        trade_id="trade-after-mll",
+        signal_id="signal-after-mll",
+        entry_time_ns=3,
+        exit_time_ns=4,
+        gross_pnl_usd=10_000.0,
+        normal_net_pnl_usd=10_000.0,
+        stressed_net_pnl_usd=10_000.0,
+        minimum_unrealized_pnl_usd=0.0,
+    )
+
+    row = next(
+        value
+        for value in pilot._account_episodes(
+            "sleeve-mll",
+            (terminal_trade, forbidden_later_trade),
+            (session,),
+            cfg=config,
+        )
+        if value["horizon_days"] == 5 and value["scenario"] == "NORMAL"
+    )
+
+    assert row["mll_breached"] is True
+    assert row["coverage_status"] == "MLL_BREACHED"
+    assert row["net_pnl_usd"] == pytest.approx(-100.0)
+    assert row["daily_path"][0]["net_pnl_usd"] == pytest.approx(-100.0)
 
 
 def test_pilot_fails_closed_when_five_chronological_sessions_are_absent(tmp_path: Path):

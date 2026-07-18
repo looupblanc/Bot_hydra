@@ -2320,9 +2320,14 @@ def _account_episodes(
                         minimum_equity = equity_before + min(0.0, trade.minimum_unrealized_pnl_usd)
                         loss_limit = max(-cfg.combine_mll_usd, trailing_high_eod - cfg.combine_mll_usd)
                         minimum_buffer = min(minimum_buffer, minimum_equity - loss_limit)
+                        day_pnl += value
                         if minimum_equity < loss_limit:
                             breached = True
-                        day_pnl += value
+                            # The account is terminal at the first observed MLL
+                            # breach.  Retain the terminal trade's conservative
+                            # realized result, but never admit later trades or
+                            # sessions into this episode.
+                            break
                     cumulative += day_pnl
                     trailing_high_eod = max(trailing_high_eod, cumulative)
                     closing_loss_limit = max(
@@ -2340,17 +2345,19 @@ def _account_episodes(
                         passed = True
                         pass_day = day_number
                         break
+                    if breached:
+                        break
                 best_day = max((max(0.0, value["net_pnl_usd"]) for value in daily), default=0.0)
                 consistency_ratio = best_day / cumulative if cumulative > 0 else math.inf
-                status = (
-                    "DATA_CENSORED"
-                    if not full
-                    else "MLL_BREACHED"
-                    if breached
-                    else "TARGET_REACHED"
-                    if passed
-                    else "FULL_COVERAGE"
+                status = _episode_terminal_state(
+                    {
+                        "full_coverage": full,
+                        "target_reached": passed,
+                        "mll_breached": breached,
+                    }
                 )
+                if status == "OPERATIONAL_HORIZON_NOT_REACHED":
+                    status = "FULL_COVERAGE"
                 rows.append(
                     {
                         "episode_id": stable_hash({"sleeve_id": sleeve_id, "start": start_session, "horizon": horizon}),
@@ -2360,7 +2367,7 @@ def _account_episodes(
                         "scenario": scenario,
                         "coverage_status": status,
                         "full_coverage": full,
-                        "target_reached": bool(passed and full),
+                        "target_reached": bool(passed),
                         "mll_breached": bool(breached),
                         "days_to_target": pass_day,
                         "net_pnl_usd": cumulative,
@@ -3013,15 +3020,7 @@ def _canonical_evidence_material(
         )
         for row in candidate.episodes:
             full = bool(row["full_coverage"])
-            terminal = (
-                "DATA_CENSORED"
-                if not full
-                else "MLL_BREACHED"
-                if row["mll_breached"]
-                else "TARGET_REACHED"
-                if row["target_reached"]
-                else "OPERATIONAL_HORIZON_NOT_REACHED"
-            )
+            terminal = _episode_terminal_state(row)
             episode_rows.append(
                 {
                     "campaign_id": cfg.campaign_id,
@@ -3037,7 +3036,7 @@ def _canonical_evidence_material(
                     "cost_scenario": row["scenario"],
                     "costs": row["costs_usd"],
                     "net_pnl": row["net_pnl_usd"],
-                    "target_progress": row["target_progress_pct"],
+                    "target_progress": float(row["target_progress_pct"]) / 100.0,
                     "minimum_mll_buffer": float(row["minimum_mll_buffer_usd"]),
                     "consistency_ok": bool(row["consistency_compliant"]),
                     "days_to_target": None if row["days_to_target"] is None else float(row["days_to_target"]),
@@ -3072,7 +3071,7 @@ def _canonical_evidence_material(
                         "minimum_mll_buffer": min(buffer, float(row["minimum_mll_buffer_usd"])),
                         "consistency": consistency,
                         "consistency_ok": consistency <= cfg.consistency_limit,
-                        "target_progress": 100.0 * cumulative / cfg.combine_profit_target_usd,
+                        "target_progress": cumulative / cfg.combine_profit_target_usd,
                         "costs": daily["costs_usd"],
                         "conflicts": [],
                         "exposure": {sleeve.market: 0.0},
@@ -3153,6 +3152,31 @@ def _canonical_evidence_material(
         },
     }
     return identity, datasets, compact
+
+
+def _episode_terminal_state(row: Mapping[str, Any]) -> str:
+    """Preserve an observed terminal event even when coverage later censors a horizon.
+
+    Coverage describes whether the requested evaluation horizon is completely
+    observable.  It cannot erase an MLL breach or target reach that already
+    occurred inside the observed prefix.  Simultaneous terminal flags are
+    ambiguous without event ordering and therefore fail closed.
+    """
+
+    mll_breached = bool(row["mll_breached"])
+    target_reached = bool(row["target_reached"])
+    if mll_breached and target_reached:
+        raise FoundryPilotError(
+            "episode records both TARGET_REACHED and MLL_BREACHED without "
+            "terminal event ordering"
+        )
+    if mll_breached:
+        return "MLL_BREACHED"
+    if target_reached:
+        return "TARGET_REACHED"
+    if not bool(row["full_coverage"]):
+        return "DATA_CENSORED"
+    return "OPERATIONAL_HORIZON_NOT_REACHED"
 
 
 def _ns_iso(value: int) -> str:
