@@ -1,5 +1,5 @@
 {
-  "CONTRE": "Queue 0049 supersedes queue 0048 without adding a campaign manifest or multiplicity. Campaign 0034 retains the same frozen seeds, actions, thresholds, cost cells, windows and ten prospective comparisons; only metadata endpoint I/O is concurrent under the same global 10-starts-per-second cap after 17 complete triples and before any complete cost matrix, selected offer, purchase or long-sample outcome.",
+  "CONTRE": "Queue 0050 remains the single authoritative queue without adding a campaign manifest or multiplicity. Campaign 0034 retains the same frozen seeds, actions, thresholds, cost cells, acquired windows, chronological roles and ten prospective comparisons; the post-purchase pre-outcome repair only replaces the contradictory empty execution interval with the first causally available quote inside the frozen event window, reuses the exact immutable acquisition bundle, adds zero spend and has not inspected any long-sample outcome.",
   "entries": [
     {
       "campaign_id": "hydra_economic_evolution_opportunity_density_0013",
@@ -383,9 +383,9 @@
       },
       "enabled": true,
       "engine": "production_kernel_v1",
-      "manifest_file_sha256": "3a4640e173fb3f21872b3c061c77d74281ff849b1eeb1da8e05233bcb2cdbc51",
+      "manifest_file_sha256": "3aef5f35609b66788cda3768618b19541e069e5450051ac1fc7433dde6bc0f16",
       "manifest_path": "config/v7/selective_order_flow_veto_expansion_0034.json",
-      "manifest_semantic_hash": "e1bd883a486bf44076fff7920bc0cc68995ab452b13fd898f89f41d78e108ec5",
+      "manifest_semantic_hash": "f0f729b0b3bf71afc05f749d954f023e7480da658c7292d66e7fd099f4b0417c",
       "ordinal": 34,
       "pre_reservation_technical_repair": {
         "additional_manifest_count": 0,
@@ -424,8 +424,26 @@
         "repair_receipt_path": "WORM/selective-order-flow-veto-0034-pre-purchase-integrity-repair-2026-07-18.json",
         "scientific_thresholds_changed": false
       },
-      "worm_commit": "a38889850491bfceb5b5014f875de35b9a4e3cad",
-      "worm_tag": "worm/selective-order-flow-veto-expansion-0034-pre-purchase-integrity-repair-2026-07-18"
+      "post_purchase_execution_bound_repair": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "additional_spend_usd": 0.0,
+        "classification": "POST_PURCHASE_PRE_OUTCOME_EMPTY_EXECUTION_INTERVAL_DEFECT",
+        "immutable_acquisition_bundle_reused": true,
+        "long_sample_outcomes_seen": false,
+        "purchase_bundle_reuse_count": 1,
+        "raw_data_changed": false,
+        "repair_hash": "4fabee37d48dfb757011db10623977ac183b9cb06ba121cf39eda2a7f9de9c8e",
+        "repair_receipt_file_sha256": "c23077c7f97cb76eb6f9e06330ec6e20e95801642e19f5bae942dbee6a775b75",
+        "repair_receipt_path": "WORM/selective-order-flow-veto-0034-post-purchase-execution-bound-repair-2026-07-18.json",
+        "scientific_projection_hash": "01003c7c577be3bd691e884502361c61bb22f62a98228be801c5916b09cb87dc",
+        "scientific_thresholds_changed": false,
+        "structural_anchor_population_changed": false,
+        "temporal_roles_changed": false,
+        "window_requests_changed": false
+      },
+      "worm_commit": "f6c716f93b4bf07ad77c78e96f318a23549a30c0",
+      "worm_tag": "worm/selective-order-flow-veto-expansion-0034-post-purchase-causal-repair-2026-07-18"
     }
   ],
   "governance": {
@@ -434,8 +452,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-18T22:53:14Z",
-  "queue_hash": "c45cff436e1cdbd7a9f30920d94245286d301215502d2ebb445f668fd8abcb1b",
+  "issued_at_utc": "2026-07-19T00:11:00Z",
+  "queue_hash": "9dbb6c487cb6defa5b3908e9eb101bf5c54d6c4cdf066ac8f702b0f550f4b6f7",
   "queue_id": "hydra_economic_evolution_production_queue_0050",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
