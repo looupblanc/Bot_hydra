@@ -743,7 +743,21 @@ class EconomicEvolutionManifestRuntime:
                 raise EconomicEvolutionRuntimeError(
                     f"invalid production state counter: {field}"
                 )
-        if int(state["worker_count"]) != 3 or int(state["evidence_writer_count"]) != 1:
+        # Historical production manifests predate an explicit topology field
+        # and are canonically three-worker campaigns.  New manifests may
+        # freeze another positive count (0032 freezes two CPU workers).
+        expected_workers = int(_runtime_manifest(config).get("worker_count", 3))
+        expected_writer = int(
+            _runtime_manifest(config).get(
+                "asynchronous_evidence_writer_count",
+                _runtime_manifest(config).get("authoritative_writer_count", 1),
+            )
+        )
+        if (
+            expected_workers < 1
+            or int(state["worker_count"]) != expected_workers
+            or int(state["evidence_writer_count"]) != expected_writer
+        ):
             raise EconomicEvolutionRuntimeError(
                 "production checkpoint worker topology drift"
             )
@@ -1566,7 +1580,9 @@ class EconomicEvolutionManifestRuntime:
                 (state or {}).get("checkpoint_sequence", 0)
             ),
             "manifest_campaign_worker_pid": self._live_worker_pid(),
-            "manifest_campaign_worker_count": 3,
+            "manifest_campaign_worker_count": int(
+                _runtime_manifest(config).get("worker_count", 3)
+            ),
             "manifest_campaign_evidence_writer_count": 1,
             "manifest_campaign_state_path": str(state_path),
             "manifest_campaign_kpi_path": str(output_dir / PRODUCTION_KPI_NAME),
@@ -1588,7 +1604,9 @@ class EconomicEvolutionManifestRuntime:
                 config["multiplicity"]["expected_global_N_trials_after_reservation"]
             ),
             "authoritative_mission_writer_count": 1,
-            "production_research_worker_count": 3,
+            "production_research_worker_count": int(
+                _runtime_manifest(config).get("worker_count", 3)
+            ),
             "production_evidence_writer_count": 1,
             "q4_access_delta": 0,
             "new_data_purchase_count": 0,
@@ -1600,8 +1618,8 @@ class EconomicEvolutionManifestRuntime:
             "next_experiment_id": config["campaign_id"],
             "next_experiment_state": "RUNNING_PRODUCTION_MANIFEST",
             "reason": (
-                "Stable V17 is executing the frozen production manifest with "
-                "three research workers and one asynchronous EvidenceBundle writer."
+                "Stable V17 is executing the frozen manifest-declared research "
+                "worker topology with one asynchronous EvidenceBundle writer."
             ),
             "progressed": True,
         }

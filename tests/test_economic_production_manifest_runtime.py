@@ -228,6 +228,29 @@ def test_production_checkpoint_is_preserved_and_resumable(tmp_path: Path) -> Non
     runtime._quarantine_incomplete_attempt(config, output, result)
 
     assert state_path.is_file()
+
+
+def test_production_checkpoint_uses_manifest_declared_two_worker_topology(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    config["runtime"].update(
+        {
+            "worker_count": 2,
+            "asynchronous_evidence_writer_count": 1,
+        }
+    )
+    runtime = EconomicEvolutionManifestRuntime(tmp_path, tmp_path / "mission/state")
+    output, _ = runtime._paths(config)
+    _write_json(
+        output / PRODUCTION_STATE_NAME,
+        _state(config, worker_count=2),
+    )
+
+    state = runtime._production_resume_state(config, output)
+
+    assert state is not None
+    assert state["worker_count"] == 2
     assert not (tmp_path / "reports/economic_evolution/quarantine").exists()
     assert runtime._production_resume_state(config, output)["checkpoint_sequence"] == 4
 
