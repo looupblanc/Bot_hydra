@@ -122,6 +122,13 @@ def test_account_windows_separate_full_coverage_and_censoring() -> None:
     assert _evidence_censored_state("TARGET_REACHED") is False
     assert _evidence_censored_state("MLL_BREACHED") is False
 
+    paired: dict[tuple[str, int], dict[str, str]] = {}
+    for row in paths:
+        key = (str(row["start_session"]), int(row["horizon_days"]))
+        paired.setdefault(key, {})[str(row["scenario"])] = str(row["episode_id"])
+    assert all(set(value) == {"NORMAL", "STRESSED_1_5X"} for value in paired.values())
+    assert all(len(set(value.values())) == 1 for value in paired.values())
+
 
 def test_sparse_gate_requires_two_distinct_mechanisms() -> None:
     one = _green_row("INITIATIVE")

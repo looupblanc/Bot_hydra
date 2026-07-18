@@ -1332,7 +1332,19 @@ def _account_paths(
                 )
                 rows.append(
                     {
-                        "episode_id": stable_hash({"strategy": strategy_id, "account": account["account_size"], "start": start_session, "horizon": horizon, "scenario": scenario}),
+                        # NORMAL and STRESSED_1_5X are paired observations of
+                        # the same account attempt.  The canonical episode ID
+                        # therefore identifies the attempt, not its cost
+                        # scenario; the scenario remains an explicit field on
+                        # each evidence row.
+                        "episode_id": stable_hash(
+                            {
+                                "strategy": strategy_id,
+                                "account": account["account_size"],
+                                "start": start_session,
+                                "horizon": horizon,
+                            }
+                        ),
                         "strategy_id": strategy_id,
                         "account_size": float(account["account_size"]),
                         "start_session": start_session,
