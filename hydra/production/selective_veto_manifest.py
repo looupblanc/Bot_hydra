@@ -59,17 +59,30 @@ MODEL_CLASSES = (
 )
 FEATURE_TIERS = ("TRADES_ONLY", "TBBO", "MBP_1", "MBO_TEACHER_ONLY")
 MATERIAL_STRESSED_TARGET_PROGRESS_UPLIFT_MINIMUM = 0.05
+STRUCTURAL_FAMILIES = (
+    "CROSS_MARKET_DIVERGENCE",
+    "COMPRESSION_TO_EXPANSION",
+    "MULTI_TIMEFRAME_CONTINUATION",
+    "FAILED_BREAKOUT",
+    "SESSION_TRANSITION",
+    "OPENING_RANGE",
+)
+OFFICIAL_RULE_SOURCE_URLS = (
+    "https://help.topstep.com/en/articles/8284197-trading-combine-parameters",
+    "https://help.topstep.com/en/articles/8284204-what-is-the-maximum-loss-limit",
+    "https://help.topstep.com/en/articles/8284208-consistency-at-topstep",
+)
 
-# Only the 150K rule set has an official, source-linked snapshot in the current
-# repository.  The 50K and 100K configurations remain explicitly labelled
-# research snapshots; freezing their hashes prevents them from silently
-# acquiring official provenance through a shared account-size loop.
+# The three sizes were reconciled against the same official Topstep pages on
+# 2026-07-18 before any 0034 long-sample outcome or data purchase was observed.
 ACCOUNT_RULE_SNAPSHOTS: Mapping[str, Mapping[str, Any]] = {
     "50K": {
-        "snapshot_id": "TOPSTEP_COMBINE_50K_RESEARCH_SNAPSHOT_2026_07_18",
-        "snapshot_sha256": "0d5039eea0e51b89343a5a5f32279a6bd3ded88092922f527fdf82c699826d54",
-        "provenance_class": "VERSIONED_RESEARCH_SNAPSHOT_NOT_OFFICIAL_CONFIRMED",
-        "official_source_verified": False,
+        "snapshot_id": "topstep_50k_2026-07-18_official_no_optional_dll_v1",
+        "snapshot_sha256": "cb135983710b5c62755d8f38b1c9c283f90f403ee1a239ca8a670e5af505268f",
+        "provenance_class": "OFFICIAL_VERSIONED_RULE_SNAPSHOT",
+        "official_source_verified": True,
+        "official_source_urls": list(OFFICIAL_RULE_SOURCE_URLS),
+        "verified_at_utc": "2026-07-18T22:15:00Z",
         "account_size_usd": 50_000,
         "profit_target_usd": 3_000,
         "maximum_loss_limit_usd": 2_000,
@@ -78,13 +91,17 @@ ACCOUNT_RULE_SNAPSHOTS: Mapping[str, Mapping[str, Any]] = {
         "consistency_limit": 0.50,
         "minimum_pass_days": 2,
         "session_close_required": True,
+        "no_daily_loss_limit": True,
+        "use_optional_daily_loss_limit": False,
         "mll_mode": "EOD_LEVEL_RT_BREACH",
     },
     "100K": {
-        "snapshot_id": "TOPSTEP_COMBINE_100K_RESEARCH_SNAPSHOT_2026_07_18",
-        "snapshot_sha256": "54d8a8c3a4276e1a304ee366446deeae806b0a523ce4385d470a41bcef433a16",
-        "provenance_class": "VERSIONED_RESEARCH_SNAPSHOT_NOT_OFFICIAL_CONFIRMED",
-        "official_source_verified": False,
+        "snapshot_id": "topstep_100k_2026-07-18_official_no_optional_dll_v1",
+        "snapshot_sha256": "dd75379f2d378e657c1530cee50b8687252919897a8e2a6d072ca00313138f0c",
+        "provenance_class": "OFFICIAL_VERSIONED_RULE_SNAPSHOT",
+        "official_source_verified": True,
+        "official_source_urls": list(OFFICIAL_RULE_SOURCE_URLS),
+        "verified_at_utc": "2026-07-18T22:15:00Z",
         "account_size_usd": 100_000,
         "profit_target_usd": 6_000,
         "maximum_loss_limit_usd": 3_000,
@@ -93,13 +110,17 @@ ACCOUNT_RULE_SNAPSHOTS: Mapping[str, Mapping[str, Any]] = {
         "consistency_limit": 0.50,
         "minimum_pass_days": 2,
         "session_close_required": True,
+        "no_daily_loss_limit": True,
+        "use_optional_daily_loss_limit": False,
         "mll_mode": "EOD_LEVEL_RT_BREACH",
     },
     "150K": {
-        "snapshot_id": "topstep_150k_2026-07-15_no_dll_post_2026-01-12_v1",
-        "snapshot_sha256": "338866ccff7203a3a1bf175d3079cd1fe420fa401e7737517d405f9fdd8d5d15",
+        "snapshot_id": "topstep_150k_2026-07-18_official_no_optional_dll_v1",
+        "snapshot_sha256": "d777dd84c6cc2848d983ee4ee3d8df8836674e23d518962b15ed59d261ca9fce",
         "provenance_class": "OFFICIAL_VERSIONED_RULE_SNAPSHOT",
         "official_source_verified": True,
+        "official_source_urls": list(OFFICIAL_RULE_SOURCE_URLS),
+        "verified_at_utc": "2026-07-18T22:15:00Z",
         "account_size_usd": 150_000,
         "profit_target_usd": 9_000,
         "maximum_loss_limit_usd": 4_500,
@@ -108,6 +129,8 @@ ACCOUNT_RULE_SNAPSHOTS: Mapping[str, Mapping[str, Any]] = {
         "consistency_limit": 0.50,
         "minimum_pass_days": 2,
         "session_close_required": True,
+        "no_daily_loss_limit": True,
+        "use_optional_daily_loss_limit": False,
         "mll_mode": "EOD_LEVEL_RT_BREACH",
     },
 }
@@ -386,10 +409,10 @@ def _seed_audit(manifest: Mapping[str, Any]) -> None:
 
 def _structural_universe(manifest: Mapping[str, Any]) -> None:
     universe = _mapping(manifest, "structural_anchor_universe")
-    families = set(_tuple(universe.get("families")))
+    families = _tuple(universe.get("families"))
     if (
-        len(families) < 2
-        or not families <= _ALLOWED_STRUCTURAL_FAMILIES
+        families != STRUCTURAL_FAMILIES
+        or not set(families) <= _ALLOWED_STRUCTURAL_FAMILIES
         or universe.get("source") != "EXISTING_CACHED_CAUSAL_OHLCV_AND_STRUCTURAL_FEATURES"
         or universe.get("microstructure_outcomes_used_for_generation") is not False
         or universe.get("causal_generation_required") is not True
@@ -544,7 +567,13 @@ def _account_rule_snapshots(manifest: Mapping[str, Any]) -> None:
         raise SelectiveVetoManifestError("0034 account-rule snapshot inventory drift")
     for label, expected in ACCOUNT_RULE_SNAPSHOTS.items():
         row = snapshots.get(label)
-        if not isinstance(row, Mapping) or dict(row) != dict(expected):
+        payload = dict(row) if isinstance(row, Mapping) else {}
+        claimed = payload.pop("snapshot_sha256", None)
+        if (
+            not isinstance(row, Mapping)
+            or dict(row) != dict(expected)
+            or claimed != stable_hash(payload)
+        ):
             raise SelectiveVetoManifestError(
                 f"0034 {label} account-rule snapshot provenance drift"
             )
@@ -766,6 +795,7 @@ __all__ = [
     "CLASS_ID",
     "LONG_SAMPLE_DECISIONS",
     "MATERIAL_STRESSED_TARGET_PROGRESS_UPLIFT_MINIMUM",
+    "OFFICIAL_RULE_SOURCE_URLS",
     "PRIMARY_ACTIONS",
     "PRIMARY_SEED_ID",
     "RUNTIME_VERSION",
@@ -773,6 +803,7 @@ __all__ = [
     "SEED_DECISIONS",
     "SEED_IDS",
     "SEED_STATUS",
+    "STRUCTURAL_FAMILIES",
     "SelectiveVetoManifestError",
     "validate_selective_veto_manifest",
 ]

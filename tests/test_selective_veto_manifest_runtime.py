@@ -24,6 +24,7 @@ from hydra.production.selective_veto_manifest import (
     SECONDARY_SEED_ID,
     SEED_DECISIONS,
     SEED_STATUS,
+    STRUCTURAL_FAMILIES,
     SelectiveVetoManifestError,
     validate_selective_veto_manifest,
 )
@@ -215,7 +216,7 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
         },
         "structural_anchor_universe": {
             "source": "EXISTING_CACHED_CAUSAL_OHLCV_AND_STRUCTURAL_FEATURES",
-            "families": ["OPENING_RANGE", "FAILED_BREAKOUT"],
+            "families": list(STRUCTURAL_FAMILIES),
             "microstructure_outcomes_used_for_generation": False,
             "causal_generation_required": True,
             "behavioral_deduplication_required": True,
@@ -745,10 +746,23 @@ def test_0034_manifest_rejects_account_snapshot_provenance_drift(
     tmp_path: Path,
 ) -> None:
     path, manifest = _fixture(tmp_path)
-    manifest["account_rule_snapshots"]["50K"]["official_source_verified"] = True
+    manifest["account_rule_snapshots"]["50K"]["official_source_verified"] = False
     _rehash(manifest)
 
     with pytest.raises(SelectiveVetoManifestError, match="snapshot provenance"):
+        validate_selective_veto_manifest(manifest, manifest_path=path)
+
+
+def test_0034_manifest_rejects_partial_structural_family_denominator(
+    tmp_path: Path,
+) -> None:
+    path, manifest = _fixture(tmp_path)
+    manifest["structural_anchor_universe"]["families"] = list(
+        STRUCTURAL_FAMILIES[:-1]
+    )
+    _rehash(manifest)
+
+    with pytest.raises(SelectiveVetoManifestError, match="structural-anchor universe"):
         validate_selective_veto_manifest(manifest, manifest_path=path)
 
 

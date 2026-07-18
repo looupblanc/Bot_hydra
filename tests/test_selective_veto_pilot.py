@@ -5,13 +5,19 @@ from dataclasses import replace
 from datetime import UTC, datetime
 from multiprocessing import get_context
 from pathlib import Path
+import json
 
 import pandas as pd
+import pytest
+import pytest
 
 from hydra.evidence import EvidenceBundleWriter, REQUIRED_DATASETS, verify_evidence_bundle
 from hydra.evidence.schema import RECORD_SPECS, validate_identity
+from hydra.economic_evolution.schema import stable_hash
 from hydra.production.selective_veto_pilot import (
+    CausalEntryQuote,
     EventWindow,
+    SelectiveVetoPilotError,
     StructuralAnchor,
     TargetedCostConfig,
     build_long_anchor_universe,
@@ -19,11 +25,18 @@ from hydra.production.selective_veto_pilot import (
     make_event_windows,
     run_selective_veto_campaign,
     _account_matrix,
+    _account_rules,
+    _account_speed_gate,
     _acquire_selected_offer,
     _canonical_material,
     _causal_action_trajectory,
     _extract_features_from_frame_task,
+    _exact_action_quantity,
+    _feature_for_anchor,
     _outcome_row,
+    _select_fastest_viable_account,
+    _sequential_evidence_checkpoints,
+    _target_progress_uplift_matrix,
     evaluate_long_sample,
 )
 
@@ -50,14 +63,70 @@ class _Metadata:
 
 
 class _Timeseries:
+    def __init__(self, fail_on_call: int | None = None) -> None:
+        self.fail_on_call = fail_on_call
+        self.calls: list[dict] = []
+
     def get_range(self, **kwargs):
+        self.calls.append(dict(kwargs))
+        if self.fail_on_call == len(self.calls):
+            raise ValueError("bounded test interruption")
         Path(kwargs["path"]).write_bytes(b"real-dbn-test-payload")
 
 
 class _Historical:
-    def __init__(self, cost: float = 1.0) -> None:
+    def __init__(self, cost: float = 1.0, *, fail_on_call: int | None = None) -> None:
         self.metadata = _Metadata(cost=cost)
-        self.timeseries = _Timeseries()
+        self.timeseries = _Timeseries(fail_on_call=fail_on_call)
+
+
+def _authenticated_offer(requests: list[dict], *, cost: float = 1.0) -> dict:
+    normalized = []
+    for row in requests:
+        normalized.append(
+            {
+                **row,
+                "estimated_records": int(row.get("estimated_records", 10)),
+                "estimated_bytes": int(row.get("estimated_bytes", 1_000)),
+                "estimated_cost_usd": float(
+                    row.get("estimated_cost_usd", cost / len(requests))
+                ),
+                "zero_records": False,
+            }
+        )
+    anchor_ids = [
+        str(anchor_id)
+        for row in normalized
+        for anchor_id in row["anchor_ids"]
+    ]
+    markets = sorted({str(row["market"]) for row in normalized})
+    schema = str(normalized[0]["request"]["schema"])
+    core = {
+        "dataset": "GLBX.MDP3",
+        "schema": schema,
+        "anchor_window_count": len(anchor_ids),
+        "effective_anchor_count": len(anchor_ids),
+        "whole_session_prefix": True,
+        "market_count": len(markets),
+        "markets": markets,
+        "strongest_market": markets[0],
+        "control_market": markets[1] if len(markets) > 1 else None,
+        "merged_window_count": len(normalized),
+        "merged_window_duration_seconds": sum(
+            float(row["duration_seconds"]) for row in normalized
+        ),
+        "estimated_records": sum(int(row["estimated_records"]) for row in normalized),
+        "estimated_bytes": sum(int(row["estimated_bytes"]) for row in normalized),
+        "estimated_cost_usd": float(
+            sum(float(row["estimated_cost_usd"]) for row in normalized)
+        ),
+        "zero_record_window_count": 0,
+        "contains_zero_record_windows": False,
+        "feature_coverage": ["TRADES", "BBO"],
+        "requests": normalized,
+        "anchor_ids": anchor_ids,
+    }
+    return {**core, "estimate_fingerprint": stable_hash(core)}
 
 
 def _anchor(index: int, market: str = "NQ") -> StructuralAnchor:
@@ -282,6 +351,67 @@ def test_integer_one_point_five_trajectory_preserves_intraday_marks() -> None:
     assert trajectory.marks[-1].current_unrealized_pnl == 27.0
 
 
+def test_one_point_five_tier_never_rounds_above_nominal_ceiling() -> None:
+    anchor = replace(_anchor(0), quantity=3)
+    assert _exact_action_quantity(anchor, 1.5) == 4
+    assert _exact_action_quantity(anchor, 1.5) <= anchor.quantity * 1.5
+
+
+def test_mbp_one_flow_counts_only_trade_actions() -> None:
+    anchor = _anchor(0)
+    timestamps = pd.DatetimeIndex(
+        [
+            pd.Timestamp(anchor.decision_time_ns - 1_000_000_000, unit="ns", tz="UTC"),
+            pd.Timestamp(anchor.decision_time_ns, unit="ns", tz="UTC"),
+            pd.Timestamp(anchor.decision_time_ns + 500_000_000, unit="ns", tz="UTC"),
+        ]
+    )
+    frame = pd.DataFrame(
+        {
+            "ts_recv": timestamps,
+            "action": [b"A", b"T", b"M"],
+            "price": [15_000.0, 15_000.25, 15_000.5],
+            "size": [100.0, 2.0, 200.0],
+            "side": [b"A", b"A", b"A"],
+            "bid_px_00": [14_999.75, 15_000.0, 15_000.25],
+            "ask_px_00": [15_000.0, 15_000.25, 15_000.5],
+            "bid_sz_00": [10.0, 10.0, 10.0],
+            "ask_sz_00": [8.0, 8.0, 8.0],
+        },
+        index=timestamps,
+    )
+    features, _, quote = _feature_for_anchor(frame, anchor, schema="mbp-1")
+    assert features[0] == 2.0
+    assert features[1] == 2.0
+    assert quote.available_at_ns == anchor.decision_time_ns + 500_000_000
+
+
+def test_acquired_bbo_and_depth_drive_entry_fill_without_changing_structure() -> None:
+    anchor = _anchor(0)
+    quote = CausalEntryQuote(
+        schema="tbbo",
+        event_time_ns=anchor.decision_time_ns + 500_000_000,
+        available_at_ns=anchor.decision_time_ns + 500_000_000,
+        bid_price=15_000.75,
+        ask_price=15_001.0,
+        bid_size=0.25,
+        ask_size=0.25,
+    )
+    one = _outcome_row(anchor, "VALIDATION", 1.0, "TRADE_1X", "a" * 64, quote)
+    high = _outcome_row(
+        anchor, "VALIDATION", 2.0, "TRADE_1_5X", "b" * 64, quote
+    )
+    assert one["normal_entry_price"] == 15_001.25
+    assert high["normal_entry_price"] == 15_001.5
+    assert high["stressed_entry_price"] == 15_001.75
+    assert high["quantity"] == 6
+    assert high["quantity"] <= high["source_quantity"] * 1.5
+    assert high["entry_fill_model"] == "ACQUIRED_BBO_AGGRESSIVE_DEPTH_SLIPPAGE_V1"
+    assert high["direction"] == anchor.direction
+    assert high["stop_price"] == anchor.stop_price
+    assert high["target_price"] == anchor.target_price
+
+
 def test_feature_extraction_worker_matches_sequential() -> None:
     anchors = (_anchor(0), _anchor(1))
     timestamps = pd.DatetimeIndex(
@@ -368,7 +498,185 @@ def test_exact_account_matrix_uses_complete_calendar_not_signal_days() -> None:
     assert fifty["p5"]["full_coverage_windows"] == 2
     assert fifty["p10"]["full_coverage_windows"] == 0
     assert fifty["rule_snapshot_sha256"] == (
-        "0d5039eea0e51b89343a5a5f32279a6bd3ded88092922f527fdf82c699826d54"
+        "cb135983710b5c62755d8f38b1c9c283f90f403ee1a239ca8a670e5af505268f"
+    )
+    assert {
+        row["rule_snapshot"]["status"] for row in matrix
+    } == {"OFFICIAL_VERSIONED_RULE_SNAPSHOT"}
+
+
+def test_account_rules_explicitly_disable_optional_daily_loss_limit() -> None:
+    for account_label in ("50K", "100K", "150K"):
+        rules = _account_rules(account_label)
+        assert rules.no_daily_loss_limit is True
+        assert rules.use_optional_daily_loss_limit is False
+
+
+def test_sequential_checkpoint_decision_uses_only_its_prefix() -> None:
+    rows = []
+    for session in range(10):
+        family = "OPENING_RANGE" if session % 2 == 0 else "FAILED_BREAKOUT"
+        positive_prefix = session < 5
+        rows.extend(
+            [
+                {
+                    "temporal_role": "FINAL_DEVELOPMENT",
+                    "session_id": f"2024-01-{session + 1:02d}",
+                    "decision_time_ns": session * 2,
+                    "structural_family": family,
+                    "risk_tier": 1.0,
+                    "normal_net_pnl_usd": 100.0 if positive_prefix else -200.0,
+                    "stressed_net_pnl_usd": 100.0 if positive_prefix else -200.0,
+                    "baseline_normal_net_pnl_usd": -10.0,
+                    "baseline_stressed_net_pnl_usd": -10.0,
+                    "paired_normal_uplift_usd": 110.0 if positive_prefix else -190.0,
+                    "paired_stressed_uplift_usd": 110.0 if positive_prefix else -190.0,
+                },
+                {
+                    "temporal_role": "FINAL_DEVELOPMENT",
+                    "session_id": f"2024-01-{session + 1:02d}",
+                    "decision_time_ns": session * 2 + 1,
+                    "structural_family": family,
+                    "risk_tier": 0.0,
+                    "normal_net_pnl_usd": 0.0,
+                    "stressed_net_pnl_usd": 0.0,
+                    "baseline_normal_net_pnl_usd": -10.0,
+                    "baseline_stressed_net_pnl_usd": -10.0,
+                    "paired_normal_uplift_usd": 10.0,
+                    "paired_stressed_uplift_usd": 10.0,
+                },
+            ]
+        )
+    checkpoints = _sequential_evidence_checkpoints(rows)
+    assert checkpoints[0]["checkpoint_complete_session_count"] == 5
+    assert checkpoints[0]["decision"] == "SUCCESS_EVIDENCE_SUFFICIENT"
+    assert checkpoints[0]["summary"]["stressed_net_usd"] == 500.0
+    assert checkpoints[-1]["summary"]["stressed_net_usd"] < 0.0
+    assert all(
+        row["evidence_role"] == "FINAL_DEVELOPMENT_POST_FREEZE_PREFIX_ONLY"
+        and row["validation_rows_used_for_checkpoint_decision"] == 0
+        for row in checkpoints
+    )
+
+
+def test_sequential_checkpoint_cannot_leak_validation_outcomes() -> None:
+    rows = []
+    for session in range(5):
+        common = {
+            "session_id": f"2024-02-{session + 1:02d}",
+            "decision_time_ns": session,
+            "structural_family": (
+                "OPENING_RANGE" if session % 2 == 0 else "FAILED_BREAKOUT"
+            ),
+            "risk_tier": 1.0,
+            "baseline_normal_net_pnl_usd": 0.0,
+            "baseline_stressed_net_pnl_usd": 0.0,
+        }
+        rows.extend(
+            [
+                {
+                    **common,
+                    "temporal_role": "VALIDATION",
+                    "normal_net_pnl_usd": 10_000.0,
+                    "stressed_net_pnl_usd": 10_000.0,
+                    "paired_normal_uplift_usd": 10_000.0,
+                    "paired_stressed_uplift_usd": 10_000.0,
+                },
+                {
+                    **common,
+                    "temporal_role": "FINAL_DEVELOPMENT",
+                    "normal_net_pnl_usd": -100.0,
+                    "stressed_net_pnl_usd": -100.0,
+                    "paired_normal_uplift_usd": -100.0,
+                    "paired_stressed_uplift_usd": -100.0,
+                },
+            ]
+        )
+    checkpoints = _sequential_evidence_checkpoints(rows)
+    assert len(checkpoints) == 1
+    assert checkpoints[0]["summary"]["stressed_net_usd"] == -500.0
+    assert checkpoints[0]["decision"] == "FUTILITY_STOP"
+
+
+def test_target_progress_or_branch_and_fastest_official_account() -> None:
+    def summary(progress: float, *, passes: int = 0) -> dict[str, float | int]:
+        return {
+            "full_coverage_windows": 2,
+            "pass_count": passes,
+            "pass_rate": passes / 2.0,
+            "mll_breach_rate": 0.0,
+            "consistency_compliance_rate": 1.0,
+            "median_target_progress": progress,
+            "minimum_mll_buffer_usd": 1_500.0,
+            "net_total_usd": progress * 10_000.0,
+        }
+
+    def cell(label: str, validation: float, final: float) -> dict:
+        roles = {
+            "VALIDATION": {
+                "STRESSED_1_5X": {
+                    "p5": summary(validation),
+                    "p10": summary(validation),
+                }
+            },
+            "FINAL_DEVELOPMENT": {
+                "STRESSED_1_5X": {
+                    "p5": summary(final),
+                    "p10": summary(final),
+                }
+            },
+        }
+        return {
+            "account_label": label,
+            "by_role": roles,
+            "p5": summary((validation + final) / 2.0),
+            "p10": summary((validation + final) / 2.0),
+        }
+
+    baseline = [cell(label, 0.10, 0.10) for label in ("50K", "100K", "150K")]
+    selected = [
+        cell("50K", 0.18, 0.17),
+        cell("100K", 0.16, 0.16),
+        cell("150K", 0.14, 0.14),
+    ]
+    uplift = _target_progress_uplift_matrix(selected, baseline)
+    assert any(
+        row["account_label"] == "50K"
+        and row["material_stable_uplift"] is True
+        for row in uplift
+    )
+    assert _account_speed_gate(
+        any_stressed_pass=False, target_progress_uplift=uplift
+    ) is True
+    assert (
+        _select_fastest_viable_account(
+            selected,
+            uplift,
+            global_decision="LONG_SAMPLE_SELECTIVE_OVERLAY_WEAK",
+        )
+        is None
+    )
+    fastest = _select_fastest_viable_account(
+        selected,
+        uplift,
+        global_decision="LONG_SAMPLE_SELECTIVE_OVERLAY_GREEN",
+    )
+    assert fastest is not None
+    assert fastest["account_label"] == "50K"
+    account_ineligible = json.loads(json.dumps(selected))
+    for account in account_ineligible:
+        for role in ("VALIDATION", "FINAL_DEVELOPMENT"):
+            for horizon in ("p5", "p10"):
+                account["by_role"][role]["STRESSED_1_5X"][horizon][
+                    "net_total_usd"
+                ] = -1.0
+    assert (
+        _select_fastest_viable_account(
+            account_ineligible,
+            uplift,
+            global_decision="LONG_SAMPLE_SELECTIVE_OVERLAY_GREEN",
+        )
+        is None
     )
 
 
@@ -380,15 +688,7 @@ def test_manifest_bound_acquisition_is_resumable_and_charged_once(tmp_path: Path
         "request": window.request("tbbo"),
         "estimated_cost_usd": 1.0,
     }
-    offer = {
-        "estimated_cost_usd": 1.0,
-        "estimate_fingerprint": "e" * 64,
-        "schema": "tbbo",
-        "anchor_window_count": 100,
-        "effective_anchor_count": 1,
-        "anchor_ids": [anchor.anchor_event_id],
-        "requests": [request],
-    }
+    offer = _authenticated_offer([request])
     manifest = {"manifest_hash": "a" * 64}
     client = _Historical()
     first = _acquire_selected_offer(
@@ -417,6 +717,181 @@ def test_manifest_bound_acquisition_is_resumable_and_charged_once(tmp_path: Path
         ).read_text().splitlines()
     ]
     assert sum(row["download_status"] == "DOWNLOADED" for row in budget_rows) == 1
+
+
+def test_acquisition_resumes_per_window_without_redownload_or_double_charge(
+    tmp_path: Path,
+) -> None:
+    anchors = [_anchor(0), _anchor(20)]
+    requests = []
+    for anchor in anchors:
+        window = make_event_windows([anchor])[0]
+        requests.append(
+            {
+                **window.to_dict(),
+                "request": window.request("tbbo"),
+                "estimated_cost_usd": 0.5,
+            }
+        )
+    offer = _authenticated_offer(requests)
+    manifest = {"manifest_hash": "a" * 64}
+    interrupted = _Historical(cost=0.5, fail_on_call=2)
+    with pytest.raises(Exception, match="event-window download failed"):
+        _acquire_selected_offer(
+            interrupted,
+            offer,
+            root=tmp_path,
+            manifest=manifest,
+            config=TargetedCostConfig(),
+        )
+    assert len(interrupted.timeseries.calls) == 2
+
+    resumed = _Historical(cost=999.0)
+    receipt = _acquire_selected_offer(
+        resumed,
+        offer,
+        root=tmp_path,
+        manifest=manifest,
+        config=TargetedCostConfig(),
+    )
+    # The first completed window and the frozen metadata revalidation are both
+    # reused; only the interrupted second window reaches the vendor again.
+    assert len(resumed.timeseries.calls) == 1
+    assert resumed.metadata.calls == []
+    assert receipt["completed_window_count"] == 2
+    assert receipt["per_window_incremental_cost_accounting"] is True
+    budget_rows = [
+        __import__("json").loads(line)
+        for line in (
+            tmp_path / "reports/data_budget/databento_spend_ledger.jsonl"
+        ).read_text().splitlines()
+    ]
+    downloaded = [row for row in budget_rows if row["download_status"] == "DOWNLOADED"]
+    assert len(downloaded) == 2
+    assert sum(float(row["actual_cost_usd"]) for row in downloaded) == 1.0
+
+
+def test_completed_acquisition_fails_closed_on_immutable_window_drift(
+    tmp_path: Path,
+) -> None:
+    anchor = _anchor(0)
+    window = make_event_windows([anchor])[0]
+    offer = _authenticated_offer(
+        [
+            {
+                **window.to_dict(),
+                "request": window.request("tbbo"),
+                "estimated_cost_usd": 1.0,
+            }
+        ]
+    )
+    client = _Historical()
+    receipt = _acquire_selected_offer(
+        client,
+        offer,
+        root=tmp_path,
+        manifest={"manifest_hash": "a" * 64},
+        config=TargetedCostConfig(),
+    )
+    Path(receipt["files"][0]["raw_path"]).write_bytes(b"tampered")
+    with pytest.raises(Exception, match="checksum drift"):
+        _acquire_selected_offer(
+            client,
+            offer,
+            root=tmp_path,
+            manifest={"manifest_hash": "a" * 64},
+            config=TargetedCostConfig(),
+        )
+
+
+@pytest.mark.parametrize("artifact", ["intent", "authorization", "receipt"])
+def test_acquisition_resume_rejects_rehashed_chain_corruption(
+    tmp_path: Path, artifact: str
+) -> None:
+    anchor = _anchor(0)
+    window = make_event_windows([anchor])[0]
+    offer = _authenticated_offer(
+        [
+            {
+                **window.to_dict(),
+                "request": window.request("tbbo"),
+                "estimated_cost_usd": 1.0,
+            }
+        ]
+    )
+    manifest = {"manifest_hash": "a" * 64}
+    client = _Historical()
+    _acquire_selected_offer(
+        client,
+        offer,
+        root=tmp_path,
+        manifest=manifest,
+        config=TargetedCostConfig(),
+    )
+    artifact_path = next(
+        (tmp_path / "data/cache/databento/selective_veto_0034").glob(
+            f"*_{artifact}.json"
+        )
+    )
+    value = json.loads(artifact_path.read_text(encoding="utf-8"))
+    if artifact == "intent":
+        value["windows"][0]["anchor_ids"] = ["tampered-anchor"]
+        fingerprint_field = "intent_fingerprint"
+    elif artifact == "authorization":
+        value["data_schema"] = "mbp-1"
+        fingerprint_field = "authorization_fingerprint"
+    else:
+        value["files"][0]["anchor_ids"] = ["tampered-anchor"]
+        value["bundle_hash"] = stable_hash(value["files"])
+        fingerprint_field = "acquisition_receipt_fingerprint"
+    value[fingerprint_field] = stable_hash(
+        {key: item for key, item in value.items() if key != fingerprint_field}
+    )
+    artifact_path.write_text(
+        json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(SelectiveVetoPilotError, match="drift"):
+        _acquire_selected_offer(
+            client,
+            offer,
+            root=tmp_path,
+            manifest=manifest,
+            config=TargetedCostConfig(),
+        )
+
+
+@pytest.mark.parametrize("defect", ["SYMBOL", "Q4"])
+def test_acquisition_rejects_offer_identity_or_q4_leak_before_api(
+    tmp_path: Path, defect: str
+) -> None:
+    anchor = _anchor(0)
+    window = make_event_windows([anchor])[0]
+    offer = _authenticated_offer(
+        [{**window.to_dict(), "request": window.request("tbbo")}]
+    )
+    broken = json.loads(json.dumps(offer))
+    if defect == "SYMBOL":
+        broken["requests"][0]["request"]["symbols"] = ["ESH4"]
+    else:
+        broken["requests"][0]["start"] = "2024-10-01T00:00:00Z"
+        broken["requests"][0]["end"] = "2024-10-01T00:03:00Z"
+        broken["requests"][0]["request"]["start"] = "2024-10-01T00:00:00Z"
+        broken["requests"][0]["request"]["end"] = "2024-10-01T00:03:00Z"
+    broken["estimate_fingerprint"] = stable_hash(
+        {key: item for key, item in broken.items() if key != "estimate_fingerprint"}
+    )
+    client = _Historical()
+    with pytest.raises(SelectiveVetoPilotError, match="drift|Q4"):
+        _acquire_selected_offer(
+            client,
+            broken,
+            root=tmp_path,
+            manifest={"manifest_hash": "a" * 64},
+            config=TargetedCostConfig(),
+        )
+    assert client.metadata.calls == []
+    assert client.timeseries.calls == []
 
 
 def test_long_sample_emits_paired_metrics_and_exact_account_episodes(tmp_path: Path) -> None:
@@ -455,19 +930,22 @@ def test_long_sample_emits_paired_metrics_and_exact_account_episodes(tmp_path: P
             ),
         )
         anchors.append(anchor)
-        frame_index.append(pd.Timestamp(timestamp, unit="ns", tz="UTC"))
-        frame_rows.append(
-            {
-                "ts_recv": pd.Timestamp(timestamp, unit="ns", tz="UTC"),
-                "price": 15_000.0 + index,
-                "size": 1.0 + index % 5,
-                "side": "A" if index % 2 else "B",
-                "bid_px_00": 14_999.75 + index,
-                "ask_px_00": 15_000.0 + index,
-                "bid_sz_00": 10.0 + index % 3,
-                "ask_sz_00": 8.0 + index % 4,
-            }
-        )
+        for offset_ns in (0, 500_000_000):
+            event_timestamp = pd.Timestamp(timestamp + offset_ns, unit="ns", tz="UTC")
+            frame_index.append(event_timestamp)
+            frame_rows.append(
+                {
+                    "ts_recv": event_timestamp,
+                    "action": "T",
+                    "price": 15_000.0 + index,
+                    "size": 1.0 + index % 5,
+                    "side": "A" if index % 2 else "B",
+                    "bid_px_00": 14_999.75 + index,
+                    "ask_px_00": 15_000.0 + index,
+                    "bid_sz_00": 10.0 + index % 3,
+                    "ask_sz_00": 8.0 + index % 4,
+                }
+            )
     frame = pd.DataFrame(frame_rows, index=pd.DatetimeIndex(frame_index))
     receipt = {
         "files": [
@@ -485,6 +963,9 @@ def test_long_sample_emits_paired_metrics_and_exact_account_episodes(tmp_path: P
         eligible_session_days=tuple(range(19_543, 19_573)),
     )
     assert result["status"] == "COMPLETE"
+    assert result["feature_coverage_invariant"][
+        "final_development_all_eligible_anchors_included"
+    ] is True
     assert result["feature_extraction_runtime"] == {
         "process_pool_executed": False,
         "cpu_worker_count": 0,
@@ -549,3 +1030,66 @@ def test_long_sample_emits_paired_metrics_and_exact_account_episodes(tmp_path: P
         lightweight_manifest_path=tmp_path / "long-receipt.json",
     )
     verify_evidence_bundle(receipt.bundle_path, deep=True)
+
+
+def test_long_sample_fails_closed_when_final_anchor_has_no_executable_quote(
+    tmp_path: Path,
+) -> None:
+    base = int(datetime(2024, 1, 2, 14, tzinfo=UTC).timestamp() * 1e9)
+    anchors = []
+    rows = []
+    index = []
+    for ordinal in range(6):
+        decision = base + ordinal * 86_400_000_000_000
+        anchor = replace(
+            _anchor(0),
+            anchor_event_id=f"coverage-{ordinal}",
+            decision_time_ns=decision,
+            event_time_ns=decision - 60_000_000_000,
+            fill_time_ns=decision + 1_000_000_000,
+            outcome_time_ns=decision + 60_000_000_000,
+            session_day=20_000 + ordinal,
+            normal_marks=tuple(
+                {**mark, "availability_time_ns": decision + 60_000_000_000}
+                for mark in _anchor(0).normal_marks
+            ),
+            stressed_marks=tuple(
+                {**mark, "availability_time_ns": decision + 60_000_000_000}
+                for mark in _anchor(0).stressed_marks
+            ),
+        )
+        anchors.append(anchor)
+        offsets = (0,) if ordinal == 5 else (0, 500_000_000)
+        for offset in offsets:
+            timestamp = pd.Timestamp(decision + offset, unit="ns", tz="UTC")
+            index.append(timestamp)
+            rows.append(
+                {
+                    "ts_recv": timestamp,
+                    "action": "T",
+                    "price": 15_000.0,
+                    "size": 1.0,
+                    "side": "A",
+                    "bid_px_00": 14_999.75,
+                    "ask_px_00": 15_000.0,
+                    "bid_sz_00": 10.0,
+                    "ask_sz_00": 10.0,
+                }
+            )
+    frame = pd.DataFrame(rows, index=pd.DatetimeIndex(index))
+    receipt = {
+        "files": [
+            {
+                "raw_path": str(tmp_path / "incomplete.dbn.zst"),
+                "anchor_ids": [row.anchor_event_id for row in anchors],
+            }
+        ]
+    }
+    with pytest.raises(SelectiveVetoPilotError, match="feature coverage is not exact"):
+        evaluate_long_sample(
+            anchors,
+            receipt,
+            schema="tbbo",
+            frame_loader=lambda _path: frame,
+            eligible_session_days=tuple(range(20_000, 20_006)),
+        )

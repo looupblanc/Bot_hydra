@@ -69,8 +69,10 @@ from hydra.production.selective_veto_seed_audit import (
 from hydra.production.selective_veto_manifest import (
     ACCOUNT_RULE_SNAPSHOTS,
     MATERIAL_STRESSED_TARGET_PROGRESS_UPLIFT_MINIMUM,
+    STRUCTURAL_FAMILIES,
 )
 from hydra.production.selective_veto_metadata import (
+    MetadataRetryPolicy,
     ResilientMetadataEstimator,
 )
 from hydra.validation.data_roles import DataRole
@@ -95,6 +97,7 @@ FEATURE_NAMES = (
     "microprice_deviation_ticks",
     "spread_ticks",
 )
+ALLOWED_STRUCTURAL_FAMILIES = frozenset(STRUCTURAL_FAMILIES)
 PINNED_ROLL_MAP = Path(
     "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
 )
@@ -110,6 +113,10 @@ ACCOUNT_SNAPSHOTS = {
         "target": float(row["profit_target_usd"]),
         "mll": float(row["maximum_loss_limit_usd"]),
         "max_mini": float(row["maximum_mini_contracts"]),
+        "no_daily_loss_limit": bool(row["no_daily_loss_limit"]),
+        "use_optional_daily_loss_limit": bool(
+            row["use_optional_daily_loss_limit"]
+        ),
     }
     for label, row in ACCOUNT_RULE_SNAPSHOTS.items()
 }
@@ -236,6 +243,23 @@ class EventWindow:
 
 
 @dataclass(frozen=True, slots=True)
+class CausalEntryQuote:
+    """First executable top-of-book state observed after an anchor decision."""
+
+    schema: str
+    event_time_ns: int
+    available_at_ns: int
+    bid_price: float
+    ask_price: float
+    bid_size: float
+    ask_size: float
+
+    def to_dict(self) -> dict[str, Any]:
+        core = asdict(self)
+        return {**core, "quote_fingerprint": stable_hash(core)}
+
+
+@dataclass(frozen=True, slots=True)
 class TargetedCostConfig:
     pre_decision_seconds: int = 120
     post_decision_seconds: int = 60
@@ -301,7 +325,7 @@ def _read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def _normalize_family(mechanism: str) -> str:
-    return {
+    normalized = {
         "CROSS_ASSET_STATE": "CROSS_MARKET_DIVERGENCE",
         "DISPLACEMENT_ACCELERATION": "SESSION_TRANSITION",
         "EXHAUSTION_REVERSAL": "FAILED_BREAKOUT",
@@ -311,7 +335,12 @@ def _normalize_family(mechanism: str) -> str:
         "FAILED_CONTINUATION_REVERSAL": "FAILED_BREAKOUT",
         "PARTICIPATION_DENSITY": "SESSION_TRANSITION",
         "COMPRESSION_TO_EXPANSION": "COMPRESSION_TO_EXPANSION",
-    }.get(mechanism, "SESSION_TRANSITION")
+    }.get(mechanism)
+    if normalized not in ALLOWED_STRUCTURAL_FAMILIES:
+        raise SelectiveVetoPilotError(
+            f"0034 structural mechanism falls outside frozen family denominator: {mechanism}"
+        )
+    return normalized
 
 
 def _load_roll_contracts(root: Path) -> list[dict[str, Any]]:
@@ -502,6 +531,12 @@ def build_long_anchor_universe(root: str | Path) -> tuple[list[StructuralAnchor]
         dedup.values(),
         key=lambda row: (row.decision_time_ns, row.market, row.anchor_event_id),
     )
+    observed_families = {row.structural_family for row in anchors}
+    if observed_families != ALLOWED_STRUCTURAL_FAMILIES:
+        raise SelectiveVetoPilotError(
+            "0034 long anchor universe does not contain exactly the six frozen "
+            f"structural families: {sorted(observed_families)}"
+        )
     provenance = {
         "source_candidate_ids": list(ANCHOR_IDS_0033),
         "source_candidate_count": len(ANCHOR_IDS_0033),
@@ -510,6 +545,9 @@ def build_long_anchor_universe(root: str | Path) -> tuple[list[StructuralAnchor]
         "calibration_events_excluded": calendar_excluded,
         "anchors_generated": len(anchors),
         "duplicates_rejected": len(raw) - len(anchors),
+        "structural_family_denominator": sorted(ALLOWED_STRUCTURAL_FAMILIES),
+        "observed_structural_families": sorted(observed_families),
+        "structural_family_denominator_exact": True,
         "censored_or_incomplete_events_excluded": censored_or_incomplete,
         "deduplication_rule": "MARKET_DIRECTION_NORMALIZED_FAMILY_TWO_MINUTE_BUCKET_EARLIEST",
         "microstructure_outcomes_used": False,
@@ -987,6 +1025,347 @@ def _write_json_once(path: Path, value: Mapping[str, Any]) -> None:
     os.replace(temporary, path)
 
 
+@dataclass(frozen=True, slots=True)
+class _DownloadRetryPolicy:
+    """Bounded vendor-download contract for the one 0034 tranche.
+
+    Downloads remain serial: the two permitted CPU workers are reserved for
+    economic replay, while vendor I/O is paced independently here.  Retrying
+    is limited to explicit throttling and transient server failures.
+    """
+
+    maximum_calls_per_second: float = 2.0
+    maximum_retries: int = 3
+    base_retry_seconds: float = 0.5
+    maximum_retry_seconds: float = 30.0
+
+
+class _DownloadCallGate:
+    def __init__(
+        self,
+        *,
+        policy: _DownloadRetryPolicy | None = None,
+        enforce_rate_limit: bool,
+    ) -> None:
+        self.policy = policy or _DownloadRetryPolicy()
+        self.enforce_rate_limit = bool(enforce_rate_limit)
+        self.last_call: float | None = None
+        self.call_count = 0
+        self.retry_count = 0
+
+    def wait_for_slot(self) -> None:
+        now = time.monotonic()
+        if self.enforce_rate_limit and self.last_call is not None:
+            interval = 1.0 / self.policy.maximum_calls_per_second
+            remaining = interval - (now - self.last_call)
+            if remaining > 0.0:
+                time.sleep(remaining)
+                now = time.monotonic()
+        self.last_call = now
+        self.call_count += 1
+
+
+def _vendor_http_status(exc: Exception) -> int | None:
+    for name in ("http_status", "status_code", "status"):
+        value = getattr(exc, name, None)
+        if isinstance(value, int):
+            return value
+    response = getattr(exc, "response", None)
+    value = getattr(response, "status_code", None)
+    return value if isinstance(value, int) else None
+
+
+def _official_databento_object(value: Any) -> bool:
+    return type(value).__module__.startswith("databento.")
+
+
+def _download_window_bounded(
+    client: Any,
+    request: Mapping[str, Any],
+    path: Path,
+    *,
+    gate: _DownloadCallGate,
+) -> dict[str, int]:
+    """Download one immutable window with bounded transient retries.
+
+    A process-specific temporary file is never reused after an interrupted
+    process.  A stale temporary file therefore causes a fail-closed recovery
+    instead of an ambiguous vendor re-request and possible double charge.
+    """
+
+    stale = sorted(path.parent.glob(f".{path.name}.*.partial"))
+    if stale:
+        raise SelectiveVetoPilotError(
+            "0034 has an unresolved partial window; refusing automatic redownload"
+        )
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.partial")
+    attempts = 0
+    for attempt in range(gate.policy.maximum_retries + 1):
+        attempts += 1
+        gate.wait_for_slot()
+        temporary.unlink(missing_ok=True)
+        try:
+            client.timeseries.get_range(
+                **dict(request),
+                stype_out="instrument_id",
+                path=str(temporary),
+            )
+            if not temporary.is_file() or temporary.stat().st_size <= 0:
+                raise SelectiveVetoPilotError(
+                    "Databento returned an empty event-window file"
+                )
+            os.replace(temporary, path)
+            return {"attempts": attempts, "retries": attempts - 1}
+        except Exception as exc:
+            status = _vendor_http_status(exc)
+            retryable = status == 429 or (status is not None and 500 <= status <= 599)
+            if (
+                not retryable
+                or attempt >= gate.policy.maximum_retries
+                or isinstance(exc, SelectiveVetoPilotError)
+            ):
+                # A failed in-process request has a known exception outcome;
+                # its incomplete process-local temporary can be discarded.
+                temporary.unlink(missing_ok=True)
+                if isinstance(exc, SelectiveVetoPilotError):
+                    raise
+                raise SelectiveVetoPilotError(
+                    "Databento event-window download failed"
+                ) from exc
+            gate.retry_count += 1
+            temporary.unlink(missing_ok=True)
+            time.sleep(
+                min(
+                    gate.policy.base_retry_seconds * (2**attempt),
+                    gate.policy.maximum_retry_seconds,
+                )
+            )
+    raise AssertionError("bounded 0034 download retry loop exhausted")
+
+
+def _revalidate_offer_metadata(
+    metadata: MetadataAPI,
+    offer: Mapping[str, Any],
+    *,
+    cache_path: Path,
+) -> dict[str, Any]:
+    """Reprice every selected window immediately before authorization.
+
+    This is deliberately a fresh, acquisition-specific append-only cache,
+    distinct from the grid-estimation cache.  It is resumable if metadata I/O
+    is interrupted, concurrent because it is network-bound, and globally
+    capped at ten endpoint starts per second for the official client.
+    """
+
+    offer_contract = _validated_offer_contract(offer)
+    request_rows = list(offer_contract["windows"])
+    estimator = ResilientMetadataEstimator(
+        metadata,
+        cache_path=cache_path,
+        retry_policy=MetadataRetryPolicy(
+            maximum_endpoint_calls_per_second=10.0,
+            maximum_retries=3,
+        ),
+        enforce_rate_limit=_official_databento_object(metadata),
+    )
+    estimates = estimator.estimate_many(
+        (_mapping(row, "selected offer request")["request"] for row in request_rows),
+        max_workers=32,
+    )
+    windows: list[dict[str, Any]] = []
+    for index, (row, estimate) in enumerate(zip(request_rows, estimates, strict=True)):
+        source = _mapping(row, f"selected offer request {index}")
+        if estimate.zero_records:
+            raise SelectiveVetoPilotError(
+                "selected 0034 window has zero records at acquisition revalidation"
+            )
+        core = {
+            "window_index": index,
+            "request": dict(estimate.request),
+            "request_fingerprint": estimate.request_fingerprint,
+            "metadata_estimate_hash": estimate.estimate_hash,
+            "estimated_records": estimate.estimated_records,
+            "estimated_bytes": estimate.estimated_bytes,
+            "authorized_cost_usd": estimate.estimated_cost_usd,
+            "anchor_ids": list(source.get("anchor_ids") or ()),
+            "market": str(source.get("market") or ""),
+            "contract": str(source.get("contract") or ""),
+        }
+        if (
+            dict(estimate.request) != dict(source["request"])
+            or estimate.request_fingerprint != source["request_fingerprint"]
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 metadata endpoint changed the frozen request identity"
+            )
+        windows.append({**core, "window_metadata_hash": stable_hash(core)})
+    total_cost = float(math.fsum(float(row["authorized_cost_usd"]) for row in windows))
+    core = {
+        "schema": "hydra_selective_veto_acquisition_metadata_revalidation_v1",
+        "data_schema": str(offer_contract["schema"]),
+        "offer_contract_hash": str(offer_contract["offer_contract_hash"]),
+        "estimate_fingerprint": str(offer["estimate_fingerprint"]),
+        "window_count": len(windows),
+        "windows": windows,
+        "authorized_cost_usd": total_cost,
+        "maximum_endpoint_calls_per_second": 10.0,
+        "maximum_retries": 3,
+        "concurrent_io_worker_limit": 32,
+        "endpoint_call_count": estimator.endpoint_call_count,
+        "retry_count": estimator.retry_count,
+        "cache_hit_count": estimator.cache_hit_count,
+        "cache_miss_count": estimator.cache_miss_count,
+    }
+    return {**core, "revalidation_hash": stable_hash(core)}
+
+
+def _mapping(value: Any, label: str) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping):
+        raise SelectiveVetoPilotError(f"0034 {label} is not a mapping")
+    return value
+
+
+def _validate_self_hash(
+    value: Mapping[str, Any], fingerprint_field: str, label: str
+) -> str:
+    fingerprint = str(value.get(fingerprint_field) or "")
+    core = {key: item for key, item in value.items() if key != fingerprint_field}
+    if not fingerprint or fingerprint != stable_hash(core):
+        raise SelectiveVetoPilotError(f"0034 {label} self-hash drift")
+    return fingerprint
+
+
+def _parse_request_time(value: Any, label: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise SelectiveVetoPilotError(
+            f"0034 acquisition {label} is not an ISO timestamp"
+        ) from exc
+    if parsed.tzinfo is None:
+        raise SelectiveVetoPilotError(
+            f"0034 acquisition {label} lacks an explicit timezone"
+        )
+    return parsed.astimezone(UTC)
+
+
+def _validated_offer_contract(offer: Mapping[str, Any]) -> dict[str, Any]:
+    """Authenticate the immutable offer and its exact event-window identity."""
+
+    estimate_fingerprint = _validate_self_hash(
+        offer, "estimate_fingerprint", "selected offer"
+    )
+    schema = str(offer.get("schema") or "")
+    if schema not in SCHEMAS or str(offer.get("dataset") or "") != DATASET:
+        raise SelectiveVetoPilotError("0034 selected offer dataset/schema drift")
+    request_rows = list(offer.get("requests") or ())
+    if not request_rows:
+        raise SelectiveVetoPilotError("0034 selected offer contains no requests")
+    windows: list[dict[str, Any]] = []
+    flattened_anchor_ids: list[str] = []
+    q4_start = datetime(2024, 10, 1, tzinfo=UTC)
+    for index, value in enumerate(request_rows):
+        source = _mapping(value, f"offer request {index}")
+        request = dict(_mapping(source.get("request"), f"offer request {index} body"))
+        contract = str(source.get("contract") or "")
+        market = str(source.get("market") or "")
+        anchor_ids = [str(item) for item in source.get("anchor_ids") or ()]
+        symbols = [str(item) for item in request.get("symbols") or ()]
+        if (
+            str(request.get("dataset") or "") != DATASET
+            or str(request.get("schema") or "") != schema
+            or str(request.get("stype_in") or "") != "raw_symbol"
+            or symbols != [contract]
+            or not contract
+            or not market
+            or not anchor_ids
+            or len(anchor_ids) != len(set(anchor_ids))
+            or str(source.get("start") or "") != str(request.get("start") or "")
+            or str(source.get("end") or "") != str(request.get("end") or "")
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 selected offer request/schema/symbol/anchor identity drift"
+            )
+        start = _parse_request_time(request["start"], "start")
+        end = _parse_request_time(request["end"], "end")
+        if not start < end or start >= q4_start or end > q4_start:
+            raise SelectiveVetoPilotError(
+                "0034 selected offer crosses forbidden Q4 bounds"
+            )
+        flattened_anchor_ids.extend(anchor_ids)
+        windows.append(
+            {
+                "window_index": index,
+                "request": request,
+                "request_fingerprint": stable_hash(request),
+                "anchor_ids": anchor_ids,
+                "market": market,
+                "contract": contract,
+            }
+        )
+    offer_anchor_ids = [str(item) for item in offer.get("anchor_ids") or ()]
+    if (
+        len(flattened_anchor_ids) != len(set(flattened_anchor_ids))
+        or sorted(flattened_anchor_ids) != sorted(offer_anchor_ids)
+        or int(offer.get("effective_anchor_count", -1)) != len(offer_anchor_ids)
+        or int(offer.get("merged_window_count", -1)) != len(windows)
+    ):
+        raise SelectiveVetoPilotError(
+            "0034 selected offer anchor/window denominator drift"
+        )
+    core = {
+        "estimate_fingerprint": estimate_fingerprint,
+        "dataset": DATASET,
+        "schema": schema,
+        "anchor_ids": offer_anchor_ids,
+        "windows": windows,
+    }
+    return {**core, "offer_contract_hash": stable_hash(core)}
+
+
+def _validate_metadata_revalidation(
+    revalidation: Mapping[str, Any], offer_contract: Mapping[str, Any]
+) -> list[dict[str, Any]]:
+    _validate_self_hash(
+        revalidation, "revalidation_hash", "metadata revalidation"
+    )
+    expected_windows = list(offer_contract["windows"])
+    actual_windows = list(revalidation.get("windows") or ())
+    if (
+        str(revalidation.get("estimate_fingerprint") or "")
+        != str(offer_contract["estimate_fingerprint"])
+        or str(revalidation.get("offer_contract_hash") or "")
+        != str(offer_contract["offer_contract_hash"])
+        or str(revalidation.get("data_schema") or "")
+        != str(offer_contract["schema"])
+        or int(revalidation.get("window_count", -1)) != len(expected_windows)
+        or len(actual_windows) != len(expected_windows)
+    ):
+        raise SelectiveVetoPilotError("0034 metadata revalidation identity drift")
+    validated: list[dict[str, Any]] = []
+    for expected, value in zip(expected_windows, actual_windows, strict=True):
+        actual = dict(_mapping(value, "metadata-revalidated window"))
+        _validate_self_hash(
+            actual, "window_metadata_hash", "metadata-revalidated window"
+        )
+        if (
+            int(actual.get("window_index", -1)) != int(expected["window_index"])
+            or dict(_mapping(actual.get("request"), "revalidated request"))
+            != dict(expected["request"])
+            or str(actual.get("request_fingerprint") or "")
+            != str(expected["request_fingerprint"])
+            or [str(item) for item in actual.get("anchor_ids") or ()]
+            != list(expected["anchor_ids"])
+            or str(actual.get("market") or "") != str(expected["market"])
+            or str(actual.get("contract") or "") != str(expected["contract"])
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 offer/revalidation request or anchor drift"
+            )
+        validated.append(actual)
+    return validated
+
+
 def _acquire_selected_offer(
     client: Any,
     offer: Mapping[str, Any],
@@ -995,38 +1374,226 @@ def _acquire_selected_offer(
     manifest: Mapping[str, Any],
     config: TargetedCostConfig,
 ) -> dict[str, Any]:
-    """Acquire one manifest-bound, crash-resumable bundle of frozen windows."""
+    """Acquire one manifest-bound bundle with per-window crash consistency."""
 
+    offer_contract = _validated_offer_contract(offer)
     estimate = float(offer["estimated_cost_usd"])
     if estimate > config.maximum_incremental_spend_usd + 1e-9:
         raise SelectiveVetoPilotError("selected 0034 offer exceeds USD 8")
-    if config.current_remaining_budget_usd - estimate < config.minimum_budget_reserve_usd - 1e-9:
+    if (
+        config.current_remaining_budget_usd - estimate
+        < config.minimum_budget_reserve_usd - 1e-9
+    ):
         raise SelectiveVetoPilotError("selected 0034 offer consumes USD 20 reserve")
+    request_rows = list(offer_contract["windows"])
     request_core = {
         "campaign_id": CAMPAIGN_ID,
         "manifest_hash": manifest["manifest_hash"],
-        "estimate_fingerprint": offer["estimate_fingerprint"],
-        "schema": offer["schema"],
+        "estimate_fingerprint": offer_contract["estimate_fingerprint"],
+        "offer_contract_hash": offer_contract["offer_contract_hash"],
+        "schema": offer_contract["schema"],
         "anchor_window_count": offer["anchor_window_count"],
-        "window_requests": [row["request"] for row in offer["requests"]],
+        "window_contracts": request_rows,
     }
     request_id = request_id_for(request_core)
     receipt_root = root / "data/cache/databento/selective_veto_0034"
     receipt_path = receipt_root / f"{request_id}_receipt.json"
     intent_path = receipt_root / f"{request_id}_intent.json"
     authorization_path = receipt_root / f"{request_id}_authorization.json"
-    if receipt_path.is_file():
-        receipt = _read_json(receipt_path)
-        if receipt.get("request_id") != request_id or receipt.get("estimate_fingerprint") != offer["estimate_fingerprint"]:
+    metadata_cache_path = receipt_root / f"{request_id}_metadata_revalidation.jsonl"
+    window_receipt_root = receipt_root / f"{request_id}_windows"
+    raw_root = receipt_root / "raw_dbn"
+
+    def validate_intent(intent: Mapping[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+        _validate_self_hash(intent, "intent_fingerprint", "acquisition intent")
+        if (
+            intent.get("request_id") != request_id
+            or intent.get("estimate_fingerprint")
+            != offer_contract["estimate_fingerprint"]
+            or intent.get("manifest_hash") != str(manifest["manifest_hash"])
+            or intent.get("offer_contract_hash")
+            != offer_contract["offer_contract_hash"]
+            or intent.get("data_schema") != offer_contract["schema"]
+        ):
+            raise SelectiveVetoPilotError("0034 acquisition intent identity drift")
+        revalidation = dict(
+            _mapping(intent.get("metadata_revalidation"), "intent revalidation")
+        )
+        if str(intent.get("metadata_revalidation_hash") or "") != str(
+            revalidation.get("revalidation_hash") or ""
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 intent/revalidation fingerprint drift"
+            )
+        revalidated = _validate_metadata_revalidation(
+            revalidation, offer_contract
+        )
+        expected_windows: list[dict[str, Any]] = []
+        for window in revalidated:
+            window_core = {
+                "campaign_request_id": request_id,
+                "window_index": int(window["window_index"]),
+                "request_fingerprint": str(window["request_fingerprint"]),
+                "metadata_estimate_hash": str(window["metadata_estimate_hash"]),
+            }
+            expected_windows.append(
+                {**window, "window_request_id": request_id_for(window_core)}
+            )
+        actual_windows = [
+            dict(_mapping(row, "acquisition intent window"))
+            for row in intent.get("windows") or ()
+        ]
+        if actual_windows != expected_windows:
+            raise SelectiveVetoPilotError(
+                "0034 intent/offer/revalidation window contract drift"
+            )
+        live_cost = float(
+            math.fsum(float(row["authorized_cost_usd"]) for row in actual_windows)
+        )
+        if not math.isclose(
+            live_cost, float(intent["authorized_cost_usd"]), abs_tol=1e-9
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 acquisition cost reconciliation drift"
+            )
+        return dict(intent), actual_windows
+
+    def validate_authorization(
+        authorization: Mapping[str, Any], intent: Mapping[str, Any], windows: Sequence[Mapping[str, Any]]
+    ) -> dict[str, Any]:
+        _validate_self_hash(
+            authorization,
+            "authorization_fingerprint",
+            "download authorization",
+        )
+        if (
+            authorization.get("request_id") != request_id
+            or authorization.get("manifest_hash") != str(manifest["manifest_hash"])
+            or authorization.get("intent_fingerprint")
+            != str(intent["intent_fingerprint"])
+            or authorization.get("metadata_revalidation_hash")
+            != str(intent["metadata_revalidation_hash"])
+            or authorization.get("offer_contract_hash")
+            != str(offer_contract["offer_contract_hash"])
+            or authorization.get("data_schema") != str(offer_contract["schema"])
+            or authorization.get("window_contract_hash") != stable_hash(list(windows))
+            or int(authorization.get("window_count", -1)) != len(windows)
+        ):
+            raise SelectiveVetoPilotError("0034 download authorization drift")
+        return dict(authorization)
+
+    def validate_final_receipt(receipt: Mapping[str, Any]) -> dict[str, Any]:
+        _validate_self_hash(
+            receipt, "acquisition_receipt_fingerprint", "acquisition receipt"
+        )
+        if not intent_path.is_file() or not authorization_path.is_file():
+            raise SelectiveVetoPilotError(
+                "0034 final receipt lacks immutable intent/authorization chain"
+            )
+        intent, intent_windows = validate_intent(_read_json(intent_path))
+        authorization = validate_authorization(
+            _read_json(authorization_path), intent, intent_windows
+        )
+        if (
+            receipt.get("request_id") != request_id
+            or receipt.get("estimate_fingerprint")
+            != offer_contract["estimate_fingerprint"]
+            or receipt.get("manifest_hash") != str(manifest["manifest_hash"])
+            or receipt.get("offer_contract_hash")
+            != str(offer_contract["offer_contract_hash"])
+            or receipt.get("intent_fingerprint")
+            != str(intent["intent_fingerprint"])
+            or receipt.get("authorization_fingerprint")
+            != str(authorization["authorization_fingerprint"])
+            or receipt.get("metadata_revalidation_hash")
+            != str(intent["metadata_revalidation_hash"])
+            or receipt.get("authorization_receipt_path")
+            != str(authorization_path)
+            or receipt.get("authorization_receipt_sha256")
+            != _sha256(authorization_path)
+        ):
             raise SelectiveVetoPilotError("0034 acquisition receipt drift")
-        return receipt
+        files = receipt.get("files")
+        if not isinstance(files, list) or len(files) != len(intent_windows):
+            raise SelectiveVetoPilotError("0034 acquisition file denominator drift")
+        for row, window in zip(files, intent_windows, strict=True):
+            item = _mapping(row, "acquisition receipt file")
+            path = Path(str(item["raw_path"]))
+            if (
+                item.get("window_request_id") != window["window_request_id"]
+                or item.get("request_fingerprint") != window["request_fingerprint"]
+                or item.get("schema") != offer_contract["schema"]
+                or list(item.get("symbols") or ())
+                != list(window["request"]["symbols"])
+                or list(item.get("anchor_ids") or ()) != list(window["anchor_ids"])
+                or item.get("market") != window["market"]
+                or item.get("contract") != window["contract"]
+                or item.get("start") != window["request"]["start"]
+                or item.get("end") != window["request"]["end"]
+                or not path.is_file()
+                or path.stat().st_size != int(item["raw_size_bytes"])
+                or sha256_file(path) != str(item["raw_sha256"])
+            ):
+                raise SelectiveVetoPilotError("0034 immutable raw window checksum drift")
+            window_receipt_path = Path(str(item["window_receipt_path"]))
+            if (
+                not window_receipt_path.is_file()
+                or _sha256(window_receipt_path)
+                != str(item["window_receipt_sha256"])
+            ):
+                raise SelectiveVetoPilotError(
+                    "0034 immutable window receipt checksum drift"
+                )
+            window_receipt = _read_json(window_receipt_path)
+            _validate_self_hash(
+                window_receipt,
+                "window_receipt_fingerprint",
+                "window receipt",
+            )
+            if (
+                window_receipt.get("campaign_request_id") != request_id
+                or window_receipt.get("window_request_id")
+                != window["window_request_id"]
+                or int(window_receipt.get("window_index", -1))
+                != int(window["window_index"])
+                or window_receipt.get("request_fingerprint")
+                != window["request_fingerprint"]
+                or window_receipt.get("metadata_estimate_hash")
+                != window["metadata_estimate_hash"]
+                or window_receipt.get("raw_path") != str(path)
+                or window_receipt.get("raw_sha256") != item["raw_sha256"]
+            ):
+                raise SelectiveVetoPilotError(
+                    "0034 window receipt contract drift"
+                )
+        if (
+            receipt.get("bundle_hash") != stable_hash(files)
+            or int(receipt.get("window_count", -1)) != len(files)
+            or int(receipt.get("completed_window_count", -1)) != len(files)
+            or bool(receipt.get("q4_accessed"))
+            or not math.isclose(
+                float(receipt.get("actual_spend_usd", math.nan)),
+                math.fsum(
+                    float(window["authorized_cost_usd"])
+                    for window in intent_windows
+                ),
+                abs_tol=1e-9,
+            )
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 acquisition final bundle fingerprint drift"
+            )
+        return dict(receipt)
+
+    if receipt_path.is_file():
+        return validate_final_receipt(_read_json(receipt_path))
 
     lock_path = root / "reports/data_access/selective_veto_0034_acquisition.lock"
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     with lock_path.open("a+") as lock:
         fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
         if receipt_path.is_file():
-            return _read_json(receipt_path)
+            return validate_final_receipt(_read_json(receipt_path))
         budget = DatabentoBudgetConfig(
             ledger_path=str(root / "reports/data_budget/databento_spend_ledger.jsonl"),
             summary_path=str(root / "reports/data_budget/databento_budget_summary.md"),
@@ -1037,40 +1604,57 @@ def _acquire_selected_offer(
         def ledger_hash(path: Path, absent: str) -> str:
             return _sha256(path) if path.is_file() else stable_hash(absent)
 
-        existing_budget_rows = read_ledger(budget_path)
-        actual_rows = [
-            row
-            for row in existing_budget_rows
-            if row.get("request_id") == request_id
-            and row.get("download_status") == "DOWNLOADED"
-        ]
-        if len(actual_rows) > 1:
-            raise SelectiveVetoPilotError("0034 request was charged more than once")
         if intent_path.is_file():
-            intent = _read_json(intent_path)
-            if intent.get("request_id") != request_id:
-                raise SelectiveVetoPilotError("0034 acquisition intent identity drift")
-            live_cost = float(intent["authorized_cost_usd"])
+            intent, windows = validate_intent(_read_json(intent_path))
         else:
-            live_cost = float(
-                math.fsum(
-                    float(client.metadata.get_cost(**row["request"]))
-                    for row in offer["requests"]
-                )
+            revalidation = _revalidate_offer_metadata(
+                client.metadata,
+                offer,
+                cache_path=metadata_cache_path,
             )
+            live_cost = float(revalidation["authorized_cost_usd"])
             _estimated, current_actual = cumulative_spend(budget_path)
             live_remaining = float(budget.hard_cap_usd - current_actual)
             if live_cost > config.maximum_incremental_spend_usd + 1e-9:
                 raise SelectiveVetoPilotError("live 0034 cost exceeds USD 8")
-            if live_remaining - live_cost < config.minimum_budget_reserve_usd - 1e-9:
+            if (
+                config.current_remaining_budget_usd - live_cost
+                < config.minimum_budget_reserve_usd - 1e-9
+                or live_remaining - live_cost
+                < config.minimum_budget_reserve_usd - 1e-9
+            ):
                 raise SelectiveVetoPilotError("live 0034 cost consumes live USD 20 reserve")
+            windows: list[dict[str, Any]] = []
+            for row in revalidation["windows"]:
+                window = dict(_mapping(row, "metadata-revalidated window"))
+                window_core = {
+                    "campaign_request_id": request_id,
+                    "window_index": int(window["window_index"]),
+                    "request_fingerprint": str(window["request_fingerprint"]),
+                    "metadata_estimate_hash": str(window["metadata_estimate_hash"]),
+                }
+                windows.append(
+                    {
+                        **window,
+                        "window_request_id": request_id_for(window_core),
+                    }
+                )
             intent_core = {
-                "schema": "hydra_selective_veto_purchase_intent_v1",
+                "schema": "hydra_selective_veto_purchase_intent_v2",
+                "data_schema": str(offer_contract["schema"]),
                 "request_id": request_id,
                 "campaign_id": CAMPAIGN_ID,
                 "manifest_hash": str(manifest["manifest_hash"]),
-                "estimate_fingerprint": str(offer["estimate_fingerprint"]),
+                "estimate_fingerprint": str(
+                    offer_contract["estimate_fingerprint"]
+                ),
+                "offer_contract_hash": str(
+                    offer_contract["offer_contract_hash"]
+                ),
                 "authorized_cost_usd": live_cost,
+                "metadata_revalidation_hash": str(revalidation["revalidation_hash"]),
+                "metadata_revalidation": revalidation,
+                "windows": windows,
                 "budget_ledger_before_sha256": ledger_hash(
                     budget_path, "ABSENT_BUDGET_LEDGER"
                 ),
@@ -1084,14 +1668,31 @@ def _acquire_selected_offer(
                 intent_path,
                 {**intent_core, "intent_fingerprint": stable_hash(intent_core)},
             )
-            intent = _read_json(intent_path)
+            intent, windows = validate_intent(_read_json(intent_path))
 
+        live_cost = float(
+            math.fsum(float(row["authorized_cost_usd"]) for row in windows)
+        )
         if live_cost > config.maximum_incremental_spend_usd + 1e-9:
             raise SelectiveVetoPilotError("authorized 0034 cost exceeds USD 8")
         _estimated, current_actual = cumulative_spend(budget_path)
-        outstanding_cost = 0.0 if actual_rows else live_cost
-        if budget.hard_cap_usd - current_actual - outstanding_cost < config.minimum_budget_reserve_usd - 1e-9:
-            raise SelectiveVetoPilotError("0034 acquisition no longer preserves live USD 20 reserve")
+        downloaded_cost = float(
+            math.fsum(
+                float(row.get("actual_cost_usd") or 0.0)
+                for row in read_ledger(budget_path)
+                if str(row.get("request_id"))
+                in {str(window["window_request_id"]) for window in windows}
+                and row.get("download_status") == "DOWNLOADED"
+            )
+        )
+        outstanding_cost = live_cost - downloaded_cost
+        if (
+            budget.hard_cap_usd - current_actual - outstanding_cost
+            < config.minimum_budget_reserve_usd - 1e-9
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 acquisition no longer preserves live USD 20 reserve"
+            )
 
         access_rows = read_ledger(access_path)
         matching_access = [
@@ -1102,8 +1703,8 @@ def _acquire_selected_offer(
         if not matching_access:
             enforce_data_access(
                 period=(
-                    f"DISJOINT_EVENT_WINDOWS:{min(row['request']['start'] for row in offer['requests'])}:"
-                    f"{max(row['request']['end'] for row in offer['requests'])}"
+                    f"DISJOINT_EVENT_WINDOWS:{min(row['request']['start'] for row in windows)}:"
+                    f"{max(row['request']['end'] for row in windows)}"
                 ),
                 role=DataRole.CONTAMINATED_DEVELOPMENT,
                 requesting_module="hydra.production.selective_veto_pilot",
@@ -1115,124 +1716,229 @@ def _acquire_selected_offer(
         elif len(matching_access) != 1:
             raise SelectiveVetoPilotError("0034 data-access authorization duplicated")
 
-        existing_budget_rows = read_ledger(budget_path)
-        reserved = any(
-            row.get("request_id") == request_id
-            and row.get("download_status") == "ESTIMATED_ONLY"
-            for row in existing_budget_rows
-        )
-        if not reserved and not actual_rows:
-            projected, current_actual = enforce_budget(budget, live_cost)
-            append_spend_record(
-                budget,
-                DatabentoSpendRecord(
-                    request_id=request_id,
-                    timestamp_utc=utc_now(),
-                    dataset=DATASET,
-                    schema=str(offer["schema"]),
-                    symbols=sorted({str(row["contract"]) for row in offer["requests"]}),
-                    stype_in="raw_symbol",
-                    start=min(str(row["request"]["start"]) for row in offer["requests"]),
-                    end=max(str(row["request"]["end"]) for row in offer["requests"]),
-                    estimated_cost_usd=live_cost,
-                    actual_cost_usd=None,
-                    cumulative_estimated_spend_usd=projected,
-                    cumulative_actual_spend_usd=current_actual,
-                    cache_hit=False,
-                    research_purpose="0034 frozen anchor-conditioned disjoint selective-veto windows",
-                    candidate_tier="SELECTIVE_VETO_LONG_SAMPLE_0034",
-                    approval_mode=AUTO_UNDER_HARD_CAP,
-                    resulting_file=None,
-                    checksum=None,
-                    download_status="ESTIMATED_ONLY",
-                ),
+        # Reserve every immutable window separately before the first download.
+        # This makes partial completion and remaining liability explicit.
+        for window in windows:
+            window_id = str(window["window_request_id"])
+            ledger_rows = [
+                row for row in read_ledger(budget_path) if row.get("request_id") == window_id
+            ]
+            reserved_rows = [row for row in ledger_rows if row.get("download_status") == "ESTIMATED_ONLY"]
+            downloaded_rows = [row for row in ledger_rows if row.get("download_status") == "DOWNLOADED"]
+            if len(reserved_rows) > 1 or len(downloaded_rows) > 1:
+                raise SelectiveVetoPilotError("0034 window budget record duplicated")
+            if not reserved_rows and not downloaded_rows:
+                cost = float(window["authorized_cost_usd"])
+                projected, current_actual = enforce_budget(budget, cost)
+                append_spend_record(
+                    budget,
+                    DatabentoSpendRecord(
+                        request_id=window_id,
+                        timestamp_utc=utc_now(),
+                        dataset=DATASET,
+                        schema=str(offer["schema"]),
+                        symbols=[str(window["contract"])],
+                        stype_in="raw_symbol",
+                        start=str(window["request"]["start"]),
+                        end=str(window["request"]["end"]),
+                        estimated_cost_usd=cost,
+                        actual_cost_usd=None,
+                        cumulative_estimated_spend_usd=projected,
+                        cumulative_actual_spend_usd=current_actual,
+                        cache_hit=False,
+                        research_purpose="0034 frozen anchor-conditioned selective-veto window",
+                        candidate_tier="SELECTIVE_VETO_LONG_SAMPLE_0034",
+                        approval_mode=AUTO_UNDER_HARD_CAP,
+                        resulting_file=None,
+                        checksum=str(window["window_metadata_hash"]),
+                        download_status="ESTIMATED_ONLY",
+                    ),
+                )
+
+        if authorization_path.is_file():
+            authorization = validate_authorization(
+                _read_json(authorization_path), intent, windows
             )
-        authorization_core = {
-            "schema": "hydra_selective_veto_download_authorization_v1",
-            "request_id": request_id,
-            "manifest_hash": str(manifest["manifest_hash"]),
-            "intent_fingerprint": str(intent["intent_fingerprint"]),
-            "data_access_recorded_before_download": True,
-            "budget_reserved_before_download": True,
-            "data_access_ledger_after_authorization_sha256": ledger_hash(
-                access_path, "ABSENT_DATA_ACCESS_LEDGER"
-            ),
-            "budget_ledger_after_reservation_sha256": ledger_hash(
-                budget_path, "ABSENT_BUDGET_LEDGER"
-            ),
-        }
-        _write_json_once(
-            authorization_path,
-            {
-                **authorization_core,
-                "authorization_fingerprint": stable_hash(authorization_core),
-            },
-        )
-        raw_root = root / "data/cache/databento/selective_veto_0034/raw_dbn"
-        raw_root.mkdir(parents=True, exist_ok=True)
-        files: list[dict[str, Any]] = []
-        for index, row in enumerate(offer["requests"]):
-            raw_path = raw_root / f"{request_id}_{index:04d}_{offer['schema']}.dbn.zst"
-            if not raw_path.is_file():
-                temp = raw_path.with_name(f".{raw_path.name}.{os.getpid()}.tmp")
-                temp.unlink(missing_ok=True)
-                try:
-                    client.timeseries.get_range(**row["request"], stype_out="instrument_id", path=str(temp))
-                    if not temp.is_file() or temp.stat().st_size <= 0:
-                        raise SelectiveVetoPilotError("Databento returned an empty event-window file")
-                    os.replace(temp, raw_path)
-                finally:
-                    temp.unlink(missing_ok=True)
-            files.append(
+        else:
+            authorization_core = {
+                "schema": "hydra_selective_veto_download_authorization_v2",
+                "data_schema": str(offer_contract["schema"]),
+                "request_id": request_id,
+                "manifest_hash": str(manifest["manifest_hash"]),
+                "offer_contract_hash": str(
+                    offer_contract["offer_contract_hash"]
+                ),
+                "intent_fingerprint": str(intent["intent_fingerprint"]),
+                "metadata_revalidation_hash": str(intent["metadata_revalidation_hash"]),
+                "window_count": len(windows),
+                "window_contract_hash": stable_hash(windows),
+                "data_access_recorded_before_download": True,
+                "budget_reserved_before_download": True,
+                "per_window_budget_reservation": True,
+                "data_access_ledger_after_authorization_sha256": ledger_hash(
+                    access_path, "ABSENT_DATA_ACCESS_LEDGER"
+                ),
+                "budget_ledger_after_reservation_sha256": ledger_hash(
+                    budget_path, "ABSENT_BUDGET_LEDGER"
+                ),
+            }
+            _write_json_once(
+                authorization_path,
                 {
+                    **authorization_core,
+                    "authorization_fingerprint": stable_hash(authorization_core),
+                },
+            )
+            authorization = validate_authorization(
+                _read_json(authorization_path), intent, windows
+            )
+
+        raw_root.mkdir(parents=True, exist_ok=True)
+        window_receipt_root.mkdir(parents=True, exist_ok=True)
+        gate = _DownloadCallGate(
+            enforce_rate_limit=_official_databento_object(client.timeseries)
+        )
+        files: list[dict[str, Any]] = []
+        for window in windows:
+            index = int(window["window_index"])
+            window_id = str(window["window_request_id"])
+            raw_path = raw_root / f"{request_id}_{index:04d}_{offer['schema']}.dbn.zst"
+            window_receipt_path = window_receipt_root / f"{index:04d}_{window_id}.json"
+            download_metrics = {"attempts": 0, "retries": 0}
+            if window_receipt_path.is_file():
+                window_receipt = _read_json(window_receipt_path)
+                _validate_self_hash(
+                    window_receipt,
+                    "window_receipt_fingerprint",
+                    "window receipt",
+                )
+                if (
+                    window_receipt.get("campaign_request_id") != request_id
+                    or window_receipt.get("window_request_id") != window_id
+                    or int(window_receipt.get("window_index", -1)) != index
+                    or window_receipt.get("request_fingerprint")
+                    != window["request_fingerprint"]
+                    or window_receipt.get("metadata_estimate_hash")
+                    != window["metadata_estimate_hash"]
+                    or window_receipt.get("raw_path") != str(raw_path)
+                ):
+                    raise SelectiveVetoPilotError("0034 window receipt identity drift")
+            else:
+                if not raw_path.is_file():
+                    download_metrics = _download_window_bounded(
+                        client,
+                        _mapping(window["request"], "window request"),
+                        raw_path,
+                        gate=gate,
+                    )
+                if raw_path.stat().st_size <= 0:
+                    raise SelectiveVetoPilotError("0034 immutable raw window is empty")
+                window_core = {
+                    "schema": "hydra_selective_veto_window_receipt_v1",
+                    "campaign_request_id": request_id,
+                    "window_request_id": window_id,
+                    "window_index": index,
+                    "request_fingerprint": str(window["request_fingerprint"]),
+                    "metadata_estimate_hash": str(window["metadata_estimate_hash"]),
+                    "authorized_cost_usd": float(window["authorized_cost_usd"]),
                     "raw_path": str(raw_path),
                     "raw_sha256": sha256_file(raw_path),
                     "raw_size_bytes": raw_path.stat().st_size,
-                    "anchor_ids": list(row["anchor_ids"]),
-                    "market": row["market"],
-                    "contract": row["contract"],
-                    "start": row["request"]["start"],
-                    "end": row["request"]["end"],
+                    "download_attempts_this_process": download_metrics["attempts"],
+                    "download_retries_this_process": download_metrics["retries"],
+                    "append_only": True,
+                }
+                _write_json_once(
+                    window_receipt_path,
+                    {
+                        **window_core,
+                        "window_receipt_fingerprint": stable_hash(window_core),
+                    },
+                )
+                window_receipt = _read_json(window_receipt_path)
+            if (
+                not raw_path.is_file()
+                or raw_path.stat().st_size != int(window_receipt["raw_size_bytes"])
+                or sha256_file(raw_path) != str(window_receipt["raw_sha256"])
+            ):
+                raise SelectiveVetoPilotError("0034 immutable window checksum drift")
+
+            ledger_rows = [
+                row for row in read_ledger(budget_path) if row.get("request_id") == window_id
+            ]
+            downloaded_rows = [row for row in ledger_rows if row.get("download_status") == "DOWNLOADED"]
+            if len(downloaded_rows) > 1:
+                raise SelectiveVetoPilotError("0034 window was charged more than once")
+            if not downloaded_rows:
+                estimated_total, cumulative_actual = cumulative_spend(budget_path)
+                cost = float(window["authorized_cost_usd"])
+                append_spend_record(
+                    budget,
+                    DatabentoSpendRecord(
+                        request_id=window_id,
+                        timestamp_utc=utc_now(),
+                        dataset=DATASET,
+                        schema=str(offer["schema"]),
+                        symbols=[str(window["contract"])],
+                        stype_in="raw_symbol",
+                        start=str(window["request"]["start"]),
+                        end=str(window["request"]["end"]),
+                        estimated_cost_usd=0.0,
+                        actual_cost_usd=cost,
+                        cumulative_estimated_spend_usd=estimated_total,
+                        cumulative_actual_spend_usd=cumulative_actual + cost,
+                        cache_hit=False,
+                        research_purpose="0034 frozen anchor-conditioned selective-veto window",
+                        candidate_tier="SELECTIVE_VETO_LONG_SAMPLE_0034",
+                        approval_mode=AUTO_UNDER_HARD_CAP,
+                        resulting_file=str(raw_path),
+                        checksum=str(window_receipt["raw_sha256"]),
+                        download_status="DOWNLOADED",
+                    ),
+                )
+            files.append(
+                {
+                    "raw_path": str(raw_path),
+                    "raw_sha256": str(window_receipt["raw_sha256"]),
+                    "raw_size_bytes": int(window_receipt["raw_size_bytes"]),
+                    "window_request_id": window_id,
+                    "window_receipt_path": str(window_receipt_path),
+                    "window_receipt_sha256": _sha256(window_receipt_path),
+                    "authorized_cost_usd": float(window["authorized_cost_usd"]),
+                    "request_fingerprint": str(window["request_fingerprint"]),
+                    "schema": str(offer_contract["schema"]),
+                    "symbols": list(window["request"]["symbols"]),
+                    "anchor_ids": list(window["anchor_ids"]),
+                    "market": window["market"],
+                    "contract": window["contract"],
+                    "start": window["request"]["start"],
+                    "end": window["request"]["end"],
                 }
             )
+
         bundle_hash = stable_hash(files)
-        existing_budget_rows = read_ledger(budget_path)
-        actual_rows = [
-            row
-            for row in existing_budget_rows
-            if row.get("request_id") == request_id
-            and row.get("download_status") == "DOWNLOADED"
-        ]
-        if not actual_rows:
-            _estimated, cumulative_actual = cumulative_spend(budget_path)
-            append_spend_record(budget, DatabentoSpendRecord(
-                request_id=request_id,
-                timestamp_utc=utc_now(),
-                dataset=DATASET,
-                schema=str(offer["schema"]),
-                symbols=sorted({str(row["contract"]) for row in offer["requests"]}),
-                stype_in="raw_symbol",
-                start=min(str(row["request"]["start"]) for row in offer["requests"]),
-                end=max(str(row["request"]["end"]) for row in offer["requests"]),
-                estimated_cost_usd=0.0,
-                actual_cost_usd=live_cost,
-                cumulative_estimated_spend_usd=_estimated,
-                cumulative_actual_spend_usd=cumulative_actual + live_cost,
-                cache_hit=False,
-                research_purpose="0034 frozen anchor-conditioned disjoint selective-veto windows",
-                candidate_tier="SELECTIVE_VETO_LONG_SAMPLE_0034",
-                approval_mode=AUTO_UNDER_HARD_CAP,
-                resulting_file=str(receipt_path),
-                checksum=bundle_hash,
-                download_status="DOWNLOADED",
-            ))
         core = {
-            "schema": "hydra_selective_veto_acquisition_receipt_v1",
+            "schema": "hydra_selective_veto_acquisition_receipt_v2",
             "campaign_id": CAMPAIGN_ID,
             "request_id": request_id,
-            "estimate_fingerprint": offer["estimate_fingerprint"],
+            "manifest_hash": str(manifest["manifest_hash"]),
+            "estimate_fingerprint": offer_contract["estimate_fingerprint"],
+            "offer_contract_hash": offer_contract["offer_contract_hash"],
+            "intent_fingerprint": str(intent["intent_fingerprint"]),
+            "authorization_fingerprint": str(
+                authorization["authorization_fingerprint"]
+            ),
+            "metadata_revalidation_hash": str(intent["metadata_revalidation_hash"]),
             "actual_spend_usd": live_cost,
             "files": files,
+            "window_count": len(windows),
+            "completed_window_count": len(files),
+            "bundle_hash": bundle_hash,
+            "download_endpoint_call_count_this_process": gate.call_count,
+            "download_retry_count_this_process": gate.retry_count,
+            "download_maximum_calls_per_second": gate.policy.maximum_calls_per_second,
+            "download_maximum_retries": gate.policy.maximum_retries,
+            "per_window_incremental_cost_accounting": True,
             "independent_anchors_acquired": int(
                 offer.get("effective_anchor_count", len(offer.get("anchor_ids") or ()))
             ),
@@ -1245,15 +1951,11 @@ def _acquire_selected_offer(
             "orders": 0,
             "manifest_bound_data_purchase_count": 1,
             "unmanifested_data_purchase_count": 0,
-            "budget_ledger_before_sha256": str(
-                intent["budget_ledger_before_sha256"]
-            ),
+            "budget_ledger_before_sha256": str(intent["budget_ledger_before_sha256"]),
             "budget_ledger_after_sha256": ledger_hash(
                 budget_path, "ABSENT_BUDGET_LEDGER"
             ),
-            "data_access_ledger_before_sha256": str(
-                intent["data_access_ledger_before_sha256"]
-            ),
+            "data_access_ledger_before_sha256": str(intent["data_access_ledger_before_sha256"]),
             "data_access_ledger_after_sha256": ledger_hash(
                 access_path, "ABSENT_DATA_ACCESS_LEDGER"
             ),
@@ -1264,13 +1966,10 @@ def _acquire_selected_offer(
         core["live_prior_budget_usd"] = float(
             budget.hard_cap_usd - (actual_final - live_cost)
         )
-        core["live_remaining_budget_usd"] = float(
-            budget.hard_cap_usd - actual_final
-        )
+        core["live_remaining_budget_usd"] = float(budget.hard_cap_usd - actual_final)
         receipt = {**core, "acquisition_receipt_fingerprint": stable_hash(core)}
         _write_json_once(receipt_path, receipt)
-        fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
-        return receipt
+        return validate_final_receipt(_read_json(receipt_path))
 
 
 def _dataframe_from_dbn(path: Path) -> Any:
@@ -1304,24 +2003,51 @@ def _number_column(frame: Any, names: Sequence[str], default: float = 0.0) -> np
     return np.full(len(frame), default, dtype=float)
 
 
-def _feature_for_anchor(frame: Any, anchor: StructuralAnchor) -> tuple[np.ndarray, str] | None:
+def _event_codes(values: Any) -> np.ndarray:
+    return np.asarray(
+        [
+            (value.decode("ascii") if isinstance(value, bytes) else str(value)).upper()
+            for value in values
+        ],
+        dtype=str,
+    )
+
+
+def _feature_for_anchor(
+    frame: Any,
+    anchor: StructuralAnchor,
+    *,
+    schema: str = "tbbo",
+) -> tuple[np.ndarray, str, CausalEntryQuote] | None:
     if frame is None or len(frame) == 0:
         return None
+    if schema not in SCHEMAS:
+        raise SelectiveVetoPilotError(f"unsupported 0034 acquired schema: {schema}")
     event_ns = _timestamp_ns(frame.index)
     available_ns = (
         _timestamp_ns(frame["ts_recv"])
         if "ts_recv" in frame.columns
         else event_ns
     )
-    causal = np.flatnonzero(available_ns <= anchor.decision_time_ns)
-    if not len(causal):
-        return None
-    last = int(causal[-1])
     price = _number_column(frame, ("price",))
     size = _number_column(frame, ("size",))
-    sides = np.asarray(frame["side"].astype(str)) if "side" in frame.columns else np.full(len(frame), "N")
-    sign = np.where(np.char.upper(sides.astype(str)) == "A", 1.0, np.where(np.char.upper(sides.astype(str)) == "B", -1.0, 0.0))
-    trade = np.isfinite(price) & (price > 0.0) & (size > 0.0)
+    sides = _event_codes(frame["side"]) if "side" in frame.columns else np.full(len(frame), "N")
+    sign = np.where(sides == "A", 1.0, np.where(sides == "B", -1.0, 0.0))
+    if "action" in frame.columns:
+        actions = _event_codes(frame["action"])
+        is_trade_action = np.isin(actions, ("T", "TRADE"))
+    elif schema == "mbp-1":
+        # MBP-1 carries adds/cancels/modifies as price/size records.  Without
+        # the action field they cannot safely be distinguished from trades.
+        raise SelectiveVetoPilotError("MBP-1 feature frame lacks action field")
+    else:
+        is_trade_action = np.ones(len(frame), dtype=bool)
+    trade = (
+        np.isfinite(price)
+        & (price > 0.0)
+        & (size > 0.0)
+        & is_trade_action
+    )
     two = (available_ns >= anchor.decision_time_ns - 2_000_000_000) & (available_ns <= anchor.decision_time_ns) & trade
     thirty = (available_ns >= anchor.decision_time_ns - 30_000_000_000) & (available_ns <= anchor.decision_time_ns) & trade
     flow2 = float(np.sum(sign[two] * size[two]))
@@ -1330,8 +2056,27 @@ def _feature_for_anchor(frame: Any, anchor: StructuralAnchor) -> tuple[np.ndarra
     ask = _number_column(frame, ("ask_px_00", "ask_price"), math.nan)
     bid_size = _number_column(frame, ("bid_sz_00", "bid_size"), 0.0)
     ask_size = _number_column(frame, ("ask_sz_00", "ask_size"), 0.0)
-    if not (math.isfinite(float(bid[last])) and math.isfinite(float(ask[last])) and ask[last] >= bid[last]):
+    valid_quote = (
+        np.isfinite(bid)
+        & np.isfinite(ask)
+        & (ask >= bid)
+        & (bid_size > 0.0)
+        & (ask_size > 0.0)
+    )
+    causal_quotes = np.flatnonzero(
+        (available_ns <= anchor.decision_time_ns) & valid_quote
+    )
+    if not len(causal_quotes):
         return None
+    last = int(causal_quotes[-1])
+    executable_quotes = np.flatnonzero(
+        (available_ns > anchor.decision_time_ns)
+        & (available_ns <= anchor.fill_time_ns)
+        & valid_quote
+    )
+    if not len(executable_quotes):
+        return None
+    executable = int(executable_quotes[0])
     tick = 0.25 if anchor.market == "NQ" else 1.0
     total_depth = float(bid_size[last] + ask_size[last])
     imbalance = float((bid_size[last] - ask_size[last]) / total_depth) if total_depth > 0.0 else 0.0
@@ -1347,6 +2092,15 @@ def _feature_for_anchor(frame: Any, anchor: StructuralAnchor) -> tuple[np.ndarra
     )
     if not np.all(np.isfinite(values)):
         return None
+    quote = CausalEntryQuote(
+        schema=schema,
+        event_time_ns=int(event_ns[executable]),
+        available_at_ns=int(available_ns[executable]),
+        bid_price=float(bid[executable]),
+        ask_price=float(ask[executable]),
+        bid_size=float(bid_size[executable]),
+        ask_size=float(ask_size[executable]),
+    )
     feature_hash = stable_hash(
         {
             "anchor_event_id": anchor.anchor_event_id,
@@ -1354,42 +2108,58 @@ def _feature_for_anchor(frame: Any, anchor: StructuralAnchor) -> tuple[np.ndarra
             "decision_time_ns": anchor.decision_time_ns,
             "feature_names": FEATURE_NAMES,
             "values": values.tolist(),
+            "entry_quote": quote.to_dict(),
         }
     )
-    return values, feature_hash
+    return values, feature_hash, quote
 
 
 def _extract_features_from_frame_task(
-    task: tuple[Any, tuple[StructuralAnchor, ...]],
-) -> list[tuple[str, list[float], str]]:
+    task: tuple[Any, tuple[StructuralAnchor, ...]]
+    | tuple[Any, tuple[StructuralAnchor, ...], str],
+) -> list[tuple[str, list[float], str, dict[str, Any]]]:
     """Pure deterministic extraction helper shared by sequential and workers."""
 
-    frame, anchors = task
-    output: list[tuple[str, list[float], str]] = []
+    if len(task) == 2:
+        frame, anchors = task
+        schema = "tbbo"
+    else:
+        frame, anchors, schema = task
+    output: list[tuple[str, list[float], str, dict[str, Any]]] = []
     for anchor in anchors:
-        value = _feature_for_anchor(frame, anchor)
+        value = _feature_for_anchor(frame, anchor, schema=schema)
         if value is None:
             continue
-        features, feature_hash = value
-        output.append((anchor.anchor_event_id, features.tolist(), feature_hash))
+        features, feature_hash, quote = value
+        output.append(
+            (
+                anchor.anchor_event_id,
+                features.tolist(),
+                feature_hash,
+                quote.to_dict(),
+            )
+        )
     return output
 
 
 def _extract_features_from_dbn_task(
-    task: tuple[str, tuple[StructuralAnchor, ...]],
-) -> list[tuple[str, list[float], str]]:
+    task: tuple[str, tuple[StructuralAnchor, ...], str],
+) -> list[tuple[str, list[float], str, dict[str, Any]]]:
     """Load one immutable DBN file and extract its anchors inside a worker."""
 
-    raw_path, anchors = task
+    raw_path, anchors, schema = task
     frame = _dataframe_from_dbn(Path(raw_path))
-    return _extract_features_from_frame_task((frame, anchors))
+    return _extract_features_from_frame_task((frame, anchors, schema))
 
 
 def _load_acquired_features(
-    receipt: Mapping[str, Any], anchors: Sequence[StructuralAnchor]
-) -> tuple[dict[str, tuple[np.ndarray, str]], bool]:
+    receipt: Mapping[str, Any],
+    anchors: Sequence[StructuralAnchor],
+    *,
+    schema: str,
+) -> tuple[dict[str, tuple[np.ndarray, str, CausalEntryQuote]], bool]:
     by_id = {row.anchor_event_id: row for row in anchors}
-    tasks: list[tuple[str, tuple[StructuralAnchor, ...]]] = []
+    tasks: list[tuple[str, tuple[StructuralAnchor, ...], str]] = []
     for item in receipt.get("files") or ():
         task_anchors: list[StructuralAnchor] = []
         for anchor_id in item.get("anchor_ids") or ():
@@ -1399,12 +2169,12 @@ def _load_acquired_features(
                     "acquired window references unknown anchor"
                 )
             task_anchors.append(anchor)
-        tasks.append((str(item["raw_path"]), tuple(task_anchors)))
+        tasks.append((str(item["raw_path"]), tuple(task_anchors), schema))
     if not tasks:
         return {}, False
 
     _initialize_feature_worker()
-    features: dict[str, tuple[np.ndarray, str]] = {}
+    features: dict[str, tuple[np.ndarray, str, CausalEntryQuote]] = {}
     with ProcessPoolExecutor(
         max_workers=2,
         mp_context=get_context("spawn"),
@@ -1417,8 +2187,24 @@ def _load_acquired_features(
     # the sole aggregator and therefore preserves the old overwrite semantics
     # should an anchor be repeated in two immutable request files.
     for extracted in extracted_batches:
-        for anchor_id, values, feature_hash in extracted:
-            features[anchor_id] = (np.asarray(values, dtype=float), feature_hash)
+        for anchor_id, values, feature_hash, quote in extracted:
+            if anchor_id in features:
+                raise SelectiveVetoPilotError(
+                    f"duplicate acquired feature row for anchor {anchor_id}"
+                )
+            features[anchor_id] = (
+                np.asarray(values, dtype=float),
+                feature_hash,
+                CausalEntryQuote(
+                    schema=str(quote["schema"]),
+                    event_time_ns=int(quote["event_time_ns"]),
+                    available_at_ns=int(quote["available_at_ns"]),
+                    bid_price=float(quote["bid_price"]),
+                    ask_price=float(quote["ask_price"]),
+                    bid_size=float(quote["bid_size"]),
+                    ask_size=float(quote["ask_size"]),
+                ),
+            )
     return features, True
 
 
@@ -1482,15 +2268,63 @@ def _point_value(anchor: StructuralAnchor) -> float:
 
 
 def _exact_action_quantity(anchor: StructuralAnchor, tier: float) -> int:
-    """Resolve the frozen 1x/1.5x action into a whole micro quantity."""
+    """Resolve a tier without ever exceeding its frozen nominal multiplier."""
 
     if tier not in {1.0, 1.5}:
         raise SelectiveVetoPilotError("0034 executable risk tier drift")
-    return max(1, int(math.floor(anchor.quantity * tier + 0.5)))
+    quantity = int(math.floor(anchor.quantity * tier + 1e-12))
+    if quantity < 1 or quantity > anchor.quantity * tier + 1e-12:
+        raise SelectiveVetoPilotError("0034 integer risk tier exceeds nominal ceiling")
+    return quantity
+
+
+def _entry_fill_from_quote(
+    anchor: StructuralAnchor,
+    quote: CausalEntryQuote,
+    *,
+    quantity: int,
+    scenario: str,
+) -> float:
+    """Return a deterministic aggressive fill from the acquired causal BBO.
+
+    The structural sleeves trade micros while the acquired quote is for the
+    corresponding mini.  Quantity is therefore converted to mini-equivalent
+    depth.  Any amount beyond displayed contra-side depth pays one additional
+    tick per further displayed-depth unit.  The frozen normal-to-stressed
+    adverse fill increment is retained on top of that observable BBO fill.
+    """
+
+    if quote.available_at_ns <= anchor.decision_time_ns:
+        raise SelectiveVetoPilotError("0034 entry quote is not post-decision causal")
+    if quote.available_at_ns > anchor.fill_time_ns:
+        raise SelectiveVetoPilotError("0034 entry quote occurs after frozen fill bound")
+    contra_depth = quote.ask_size if anchor.direction > 0 else quote.bid_size
+    if contra_depth <= 0.0:
+        raise SelectiveVetoPilotError("0034 executable contra-side depth is empty")
+    requested_mini_equivalent = quantity / 10.0
+    excess = max(0.0, requested_mini_equivalent - contra_depth)
+    extra_levels = int(math.ceil(excess / contra_depth - 1e-12)) if excess else 0
+    tick = 0.25 if anchor.market == "NQ" else 1.0
+    stressed_increment = 0.0
+    if scenario == "STRESSED_1_5X":
+        stressed_increment = max(
+            0.0,
+            anchor.direction
+            * (anchor.stressed_fill_price - anchor.normal_fill_price),
+        )
+    elif scenario != "NORMAL":
+        raise SelectiveVetoPilotError("unsupported 0034 cost scenario")
+    touch = quote.ask_price if anchor.direction > 0 else quote.bid_price
+    return float(
+        touch + anchor.direction * (extra_levels * tick + stressed_increment)
+    )
 
 
 def _causal_action_trajectory(
-    anchor: StructuralAnchor, scenario: str, tier: float
+    anchor: StructuralAnchor,
+    scenario: str,
+    tier: float,
+    execution_quote: CausalEntryQuote | None = None,
 ) -> CausalTradeTrajectory:
     """Reconstruct an integer-sized causal trajectory from immutable 0028 marks."""
 
@@ -1499,36 +2333,68 @@ def _causal_action_trajectory(
     quantity = _exact_action_quantity(anchor, tier)
     ratio = quantity / anchor.quantity
     if scenario == "NORMAL":
-        fill = anchor.normal_fill_price
-        net = float(anchor.normal_net_pnl_usd or 0.0)
+        legacy_fill = anchor.normal_fill_price
+        legacy_net = float(anchor.normal_net_pnl_usd or 0.0)
         worst = float(anchor.normal_worst_unrealized_pnl_usd or 0.0)
         best = anchor.normal_best_unrealized_pnl_usd
         initial = anchor.normal_initial_unrealized_pnl_usd
         source_marks = anchor.normal_marks
     elif scenario == "STRESSED_1_5X":
-        fill = anchor.stressed_fill_price
-        net = float(anchor.stressed_net_pnl_usd or 0.0)
+        legacy_fill = anchor.stressed_fill_price
+        legacy_net = float(anchor.stressed_net_pnl_usd or 0.0)
         worst = float(anchor.stressed_worst_unrealized_pnl_usd or 0.0)
         best = anchor.stressed_best_unrealized_pnl_usd
         initial = anchor.stressed_initial_unrealized_pnl_usd
         source_marks = anchor.stressed_marks
     else:
         raise SelectiveVetoPilotError("unsupported 0034 cost scenario")
+    fill = (
+        legacy_fill
+        if execution_quote is None
+        else _entry_fill_from_quote(
+            anchor,
+            execution_quote,
+            quantity=quantity,
+            scenario=scenario,
+        )
+    )
+    legacy_gross = (
+        anchor.direction
+        * (float(anchor.raw_exit_price) - float(legacy_fill))
+        * _point_value(anchor)
+        * anchor.quantity
+    )
+    legacy_non_fill_cost = legacy_gross - legacy_net
+    if legacy_non_fill_cost < -1e-6:
+        raise SelectiveVetoPilotError("0034 immutable ledger implies negative all-in cost")
+    non_fill_cost = max(0.0, legacy_non_fill_cost) * ratio
     gross = (
         anchor.direction
         * (float(anchor.raw_exit_price) - float(fill))
         * _point_value(anchor)
         * quantity
     )
+    net = gross - non_fill_cost
+    entry_adjustment = (
+        anchor.direction
+        * (legacy_fill - fill)
+        * _point_value(anchor)
+        * quantity
+    )
     marks = tuple(
         CausalTradeMark(
             availability_time_ns=int(row["availability_time_ns"]),
-            worst_unrealized_pnl=float(row["worst_unrealized_pnl"]) * ratio,
-            best_unrealized_pnl=float(row["best_unrealized_pnl"]) * ratio,
+            worst_unrealized_pnl=(
+                float(row["worst_unrealized_pnl"]) * ratio + entry_adjustment
+            ),
+            best_unrealized_pnl=(
+                float(row["best_unrealized_pnl"]) * ratio + entry_adjustment
+            ),
             current_unrealized_pnl=(
                 None
                 if row.get("current_unrealized_pnl") is None
                 else float(row["current_unrealized_pnl"]) * ratio
+                + entry_adjustment
             ),
         )
         for row in source_marks
@@ -1538,15 +2404,22 @@ def _causal_action_trajectory(
         market=anchor.market,
         side=anchor.direction,
         event=TradePathEvent(
-            event_id=f"{anchor.anchor_event_id}:{scenario}:{quantity}",
+            event_id=(
+                f"{anchor.anchor_event_id}:{scenario}:{quantity}:"
+                f"{execution_quote.available_at_ns if execution_quote else 'STRUCTURAL'}"
+            ),
             # The account is flat until the causal next-tradable-event fill.
-            decision_ns=anchor.fill_time_ns,
+            decision_ns=(
+                anchor.fill_time_ns
+                if execution_quote is None
+                else execution_quote.available_at_ns
+            ),
             exit_ns=anchor.outcome_time_ns,
             session_day=anchor.session_day,
-            net_pnl=net * ratio,
+            net_pnl=net,
             gross_pnl=float(gross),
-            worst_unrealized_pnl=worst * ratio,
-            best_unrealized_pnl=best * ratio,
+            worst_unrealized_pnl=worst * ratio + entry_adjustment,
+            best_unrealized_pnl=best * ratio + entry_adjustment,
             quantity=quantity,
             mini_equivalent=quantity / 10.0,
             regime=anchor.structural_family,
@@ -1555,23 +2428,44 @@ def _causal_action_trajectory(
             same_bar_ambiguous=anchor.same_bar_ambiguous,
         ),
         marks=marks,
-        initial_unrealized_pnl=initial * ratio,
+        initial_unrealized_pnl=initial * ratio + entry_adjustment,
     )
 
 
 def _scaled_value(value: float | None, quantity: int, tier: float) -> float | None:
     if value is None:
         return None
-    scaled_quantity = max(1, int(math.floor(quantity * tier + 0.5)))
+    scaled_quantity = max(1, int(math.floor(quantity * tier + 1e-12)))
     return float(value) * scaled_quantity / quantity
 
 
-def _outcome_row(anchor: StructuralAnchor, role: str, economic_score: float, action: str, feature_hash: str) -> dict[str, Any]:
+def _outcome_row(
+    anchor: StructuralAnchor,
+    role: str,
+    economic_score: float,
+    action: str,
+    feature_hash: str,
+    execution_quote: CausalEntryQuote | None = None,
+) -> dict[str, Any]:
     tier = 0.0 if action == "ABSTAIN" else 1.0 if action == "TRADE_1X" else 1.5
-    baseline_normal_path = _causal_action_trajectory(anchor, "NORMAL", 1.0)
-    baseline_stressed_path = _causal_action_trajectory(anchor, "STRESSED_1_5X", 1.0)
-    normal_path = None if tier == 0.0 else _causal_action_trajectory(anchor, "NORMAL", tier)
-    stressed_path = None if tier == 0.0 else _causal_action_trajectory(anchor, "STRESSED_1_5X", tier)
+    baseline_normal_path = _causal_action_trajectory(
+        anchor, "NORMAL", 1.0, execution_quote
+    )
+    baseline_stressed_path = _causal_action_trajectory(
+        anchor, "STRESSED_1_5X", 1.0, execution_quote
+    )
+    normal_path = (
+        None
+        if tier == 0.0
+        else _causal_action_trajectory(anchor, "NORMAL", tier, execution_quote)
+    )
+    stressed_path = (
+        None
+        if tier == 0.0
+        else _causal_action_trajectory(
+            anchor, "STRESSED_1_5X", tier, execution_quote
+        )
+    )
     normal = 0.0 if normal_path is None else normal_path.event.net_pnl
     stressed = 0.0 if stressed_path is None else stressed_path.event.net_pnl
     baseline_normal = baseline_normal_path.event.net_pnl
@@ -1631,16 +2525,52 @@ def _outcome_row(anchor: StructuralAnchor, role: str, economic_score: float, act
         "quantity": 0 if tier == 0.0 else _exact_action_quantity(anchor, tier),
         "source_quantity": anchor.quantity,
         "integer_contract_sizing": True,
-        "entry_time_ns": None if tier == 0.0 else anchor.fill_time_ns,
+        "entry_time_ns": (
+            None
+            if tier == 0.0
+            else anchor.fill_time_ns
+            if execution_quote is None
+            else execution_quote.available_at_ns
+        ),
         "exit_time_ns": None if tier == 0.0 else anchor.outcome_time_ns,
-        "normal_entry_price": None if tier == 0.0 else anchor.normal_fill_price,
-        "stressed_entry_price": None if tier == 0.0 else anchor.stressed_fill_price,
+        "normal_entry_price": (
+            None
+            if normal_path is None
+            else anchor.normal_fill_price
+            if execution_quote is None
+            else _entry_fill_from_quote(
+                anchor,
+                execution_quote,
+                quantity=normal_path.event.quantity,
+                scenario="NORMAL",
+            )
+        ),
+        "stressed_entry_price": (
+            None
+            if stressed_path is None
+            else anchor.stressed_fill_price
+            if execution_quote is None
+            else _entry_fill_from_quote(
+                anchor,
+                execution_quote,
+                quantity=stressed_path.event.quantity,
+                scenario="STRESSED_1_5X",
+            )
+        ),
         "exit_price": None if tier == 0.0 else anchor.raw_exit_price,
         "stop_price": anchor.stop_price,
         "target_price": anchor.target_price,
         "same_bar_ambiguous": anchor.same_bar_ambiguous,
         "session_compliant": anchor.session_compliant,
         "contract_limit_compliant": anchor.contract_limit_compliant,
+        "entry_fill_model": (
+            "IMMUTABLE_STRUCTURAL_CAUSAL_FILL"
+            if execution_quote is None
+            else "ACQUIRED_BBO_AGGRESSIVE_DEPTH_SLIPPAGE_V1"
+        ),
+        "entry_execution_quote": (
+            None if execution_quote is None else execution_quote.to_dict()
+        ),
     }
     result["paired_outcome_hash"] = stable_hash(result)
     return result
@@ -1668,22 +2598,29 @@ def _summarize_paired(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
 
 
 def _sequential_evidence_checkpoints(
-    rows: Sequence[Mapping[str, Any]], final_decision: str
+    rows: Sequence[Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
-    heldout = sorted(
+    """Evaluate preregistered checkpoints from their causal prefix only.
+
+    In particular, a checkpoint may not be conditioned on the decision reached
+    after the complete sample has been inspected.  This makes an early success
+    (or continuation) reproducible from exactly the rows available at that
+    checkpoint.
+    """
+    post_freeze = sorted(
         (
             row
             for row in rows
-            if row["temporal_role"] in {"VALIDATION", "FINAL_DEVELOPMENT"}
+            if row["temporal_role"] == "FINAL_DEVELOPMENT"
         ),
         key=lambda row: (str(row["session_id"]), int(row["decision_time_ns"])),
     )
-    sessions = sorted({str(row["session_id"]) for row in heldout})
+    sessions = sorted({str(row["session_id"]) for row in post_freeze})
     checkpoints = sorted({value for value in (5, 10, 15, len(sessions)) if 0 < value <= len(sessions)})
     output: list[dict[str, Any]] = []
     for count in checkpoints:
         included = set(sessions[:count])
-        prefix = [row for row in heldout if str(row["session_id"]) in included]
+        prefix = [row for row in post_freeze if str(row["session_id"]) in included]
         summary = _summarize_paired(prefix)
         positive_families = sum(
             _summarize_paired(
@@ -1698,7 +2635,6 @@ def _sequential_evidence_checkpoints(
             and positive_families >= 2
             and summary["maximum_positive_trade_fraction"] <= 0.25 + 1e-9
             and 0.20 - 1e-9 <= summary["trade_coverage"] <= 0.80 + 1e-9
-            and final_decision == "LONG_SAMPLE_SELECTIVE_OVERLAY_GREEN"
         )
         futility = bool(
             count == len(sessions)
@@ -1721,6 +2657,8 @@ def _sequential_evidence_checkpoints(
             "positive_anchor_family_count": positive_families,
             "decision": decision,
             "policy_refit_since_prior_checkpoint": False,
+            "evidence_role": "FINAL_DEVELOPMENT_POST_FREEZE_PREFIX_ONLY",
+            "validation_rows_used_for_checkpoint_decision": 0,
             "data_acquisition_mode": "ONE_FROZEN_TRANCHE_NOT_SEQUENTIAL_DOWNLOAD",
         }
         output.append({**core, "checkpoint_hash": stable_hash(core)})
@@ -1766,7 +2704,9 @@ def _account_rules(account_label: str) -> Topstep150KConfig:
         combine_profit_target=float(snapshot["target"]),
         combine_max_loss_limit=float(snapshot["mll"]),
         combine_starting_balance=float(snapshot["account_size"]),
+        no_daily_loss_limit=bool(snapshot["no_daily_loss_limit"]),
         optional_daily_loss_limit=min(3_000.0, float(snapshot["mll"])),
+        use_optional_daily_loss_limit=bool(snapshot["use_optional_daily_loss_limit"]),
     )
 
 
@@ -1841,9 +2781,26 @@ def _account_matrix(
                 trajectories: dict[str, list[CausalTradeTrajectory]] = defaultdict(list)
                 for row in role_executed:
                     anchor = anchors[str(row["anchor_event_id"])]
+                    quote_value = row.get("entry_execution_quote")
+                    execution_quote = (
+                        None
+                        if quote_value is None
+                        else CausalEntryQuote(
+                            schema=str(quote_value["schema"]),
+                            event_time_ns=int(quote_value["event_time_ns"]),
+                            available_at_ns=int(quote_value["available_at_ns"]),
+                            bid_price=float(quote_value["bid_price"]),
+                            ask_price=float(quote_value["ask_price"]),
+                            bid_size=float(quote_value["bid_size"]),
+                            ask_size=float(quote_value["ask_size"]),
+                        )
+                    )
                     trajectories[str(row["source_candidate_id"])].append(
                         _causal_action_trajectory(
-                            anchor, scenario, float(row["risk_tier"])
+                            anchor,
+                            scenario,
+                            float(row["risk_tier"]),
+                            execution_quote,
                         )
                     )
                 scenario_result: dict[str, Any] = {}
@@ -1877,9 +2834,13 @@ def _account_matrix(
             "rule_snapshot": {
                 **dict(snapshot),
                 "status": (
-                    "OFFICIAL_150K_SNAPSHOT"
-                    if account_label == "150K"
-                    else "VERSIONED_RESEARCH_ACCOUNT_SIZE_SNAPSHOT"
+                    "OFFICIAL_VERSIONED_RULE_SNAPSHOT"
+                    if bool(
+                        ACCOUNT_RULE_SNAPSHOTS[account_label].get(
+                            "official_source_verified"
+                        )
+                    )
+                    else "UNVERIFIED_RESEARCH_ACCOUNT_SIZE_SNAPSHOT"
                 ),
             },
             "by_role": by_role,
@@ -1889,7 +2850,6 @@ def _account_matrix(
                 cell[f"{prefix}p{horizon}"] = _episode_summary(
                     heldout[(scenario, horizon)], float(snapshot["mll"])
                 )
-        snapshot_payload = cell["rule_snapshot"]
         frozen_snapshot = ACCOUNT_RULE_SNAPSHOTS[account_label]
         cell["rule_snapshot_id"] = str(frozen_snapshot["snapshot_id"])
         cell["rule_snapshot_sha256"] = str(frozen_snapshot["snapshot_sha256"])
@@ -1903,6 +2863,214 @@ def _account_matrix(
     return output
 
 
+def _entry_quote_from_outcome_row(
+    row: Mapping[str, Any],
+) -> CausalEntryQuote | None:
+    value = row.get("entry_execution_quote")
+    if value is None:
+        return None
+    if not isinstance(value, Mapping):
+        raise SelectiveVetoPilotError("0034 paired row has malformed execution quote")
+    return CausalEntryQuote(
+        schema=str(value["schema"]),
+        event_time_ns=int(value["event_time_ns"]),
+        available_at_ns=int(value["available_at_ns"]),
+        bid_price=float(value["bid_price"]),
+        ask_price=float(value["ask_price"]),
+        bid_size=float(value["bid_size"]),
+        ask_size=float(value["ask_size"]),
+    )
+
+
+def _same_opportunity_baseline_rows(
+    selected_rows: Sequence[Mapping[str, Any]],
+    anchors: Mapping[str, StructuralAnchor],
+) -> list[dict[str, Any]]:
+    """Rebuild A0 at 1x on exactly the opportunities seen by the rejector."""
+
+    output: list[dict[str, Any]] = []
+    for selected in selected_rows:
+        anchor_id = str(selected["anchor_event_id"])
+        anchor = anchors.get(anchor_id)
+        if anchor is None:
+            raise SelectiveVetoPilotError(
+                f"0034 same-opportunity baseline lacks anchor {anchor_id}"
+            )
+        baseline = _outcome_row(
+            anchor,
+            str(selected["temporal_role"]),
+            float(selected.get("economic_action_score") or 0.0),
+            "TRADE_1X",
+            str(selected["feature_hash"]),
+            _entry_quote_from_outcome_row(selected),
+        )
+        if not math.isclose(
+            float(baseline["stressed_net_pnl_usd"]),
+            float(selected["baseline_stressed_net_pnl_usd"]),
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 same-opportunity baseline economic reconciliation failed"
+            )
+        output.append(baseline)
+    return output
+
+
+def _target_progress_uplift_matrix(
+    selected_matrix: Sequence[Mapping[str, Any]],
+    baseline_matrix: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Compare selected and A0 account paths on identical starts.
+
+    The preregistered no-pass alternative is deliberately strict: the same
+    account size and horizon must improve stressed median target progress by at
+    least five percentage points in both validation and final-development.
+    """
+
+    baseline_by_label = {
+        str(cell["account_label"]): cell for cell in baseline_matrix
+    }
+    selected_labels = {str(cell["account_label"]) for cell in selected_matrix}
+    if selected_labels != set(baseline_by_label):
+        raise SelectiveVetoPilotError(
+            "0034 selected/baseline account-size denominator mismatch"
+        )
+    output: list[dict[str, Any]] = []
+    for selected in selected_matrix:
+        account_label = str(selected["account_label"])
+        baseline = baseline_by_label[account_label]
+        for horizon in ("p5", "p10"):
+            role_deltas: dict[str, float] = {}
+            role_counts: dict[str, int] = {}
+            role_values: dict[str, dict[str, float]] = {}
+            for role in ("VALIDATION", "FINAL_DEVELOPMENT"):
+                selected_summary = selected["by_role"][role]["STRESSED_1_5X"][
+                    horizon
+                ]
+                baseline_summary = baseline["by_role"][role]["STRESSED_1_5X"][
+                    horizon
+                ]
+                selected_count = int(selected_summary["full_coverage_windows"])
+                baseline_count = int(baseline_summary["full_coverage_windows"])
+                if selected_count != baseline_count:
+                    raise SelectiveVetoPilotError(
+                        "0034 same-opportunity account-start denominator mismatch"
+                    )
+                selected_progress = float(
+                    selected_summary["median_target_progress"]
+                )
+                baseline_progress = float(
+                    baseline_summary["median_target_progress"]
+                )
+                role_counts[role] = selected_count
+                role_deltas[role] = selected_progress - baseline_progress
+                role_values[role] = {
+                    "selected_median_stressed_target_progress": selected_progress,
+                    "baseline_median_stressed_target_progress": baseline_progress,
+                }
+            minimum_delta = min(role_deltas.values())
+            material_stable = bool(
+                all(value > 0 for value in role_counts.values())
+                and minimum_delta
+                >= MATERIAL_STRESSED_TARGET_PROGRESS_UPLIFT_MINIMUM - 1e-12
+            )
+            core = {
+                "account_label": account_label,
+                "horizon": horizon.upper(),
+                "same_opportunity_account_starts": role_counts,
+                "role_values": role_values,
+                "stressed_target_progress_uplift": role_deltas,
+                "minimum_validation_final_uplift": minimum_delta,
+                "material_stable_uplift": material_stable,
+                "minimum_required_uplift": (
+                    MATERIAL_STRESSED_TARGET_PROGRESS_UPLIFT_MINIMUM
+                ),
+            }
+            output.append({**core, "comparison_hash": stable_hash(core)})
+    return output
+
+
+def _select_fastest_viable_account(
+    selected_matrix: Sequence[Mapping[str, Any]],
+    target_progress_uplift: Sequence[Mapping[str, Any]],
+    *,
+    global_decision: str,
+) -> Mapping[str, Any] | None:
+    """Select only after GREEN and full account-specific qualification."""
+
+    if global_decision != "LONG_SAMPLE_SELECTIVE_OVERLAY_GREEN":
+        return None
+
+    uplift_by_label: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
+    for row in target_progress_uplift:
+        uplift_by_label[str(row["account_label"])].append(row)
+    viable: list[tuple[tuple[float, ...], Mapping[str, Any]]] = []
+    for cell in selected_matrix:
+        account_label = str(cell["account_label"])
+        snapshot = ACCOUNT_RULE_SNAPSHOTS[account_label]
+        if not bool(snapshot.get("official_source_verified")):
+            continue
+        uplift_rows = {
+            str(row["horizon"]).lower(): row
+            for row in uplift_by_label.get(account_label, ())
+        }
+        qualifying_horizons: list[tuple[float, ...]] = []
+        for horizon in ("p5", "p10"):
+            role_summaries = [
+                cell["by_role"][role]["STRESSED_1_5X"][horizon]
+                for role in ("VALIDATION", "FINAL_DEVELOPMENT")
+            ]
+            uplift = uplift_rows.get(horizon)
+            speed_branch = bool(
+                int(cell[horizon]["pass_count"]) > 0
+                or (uplift is not None and bool(uplift["material_stable_uplift"]))
+            )
+            fully_qualified = bool(
+                speed_branch
+                and all(
+                    int(summary["full_coverage_windows"]) > 0
+                    and float(summary["net_total_usd"]) > 0.0
+                    and float(summary["mll_breach_rate"]) <= 0.10 + 1e-12
+                    and float(summary["consistency_compliance_rate"])
+                    >= 0.50 - 1e-12
+                    for summary in role_summaries
+                )
+            )
+            if not fully_qualified:
+                continue
+            qualifying_horizons.append(
+                (
+                    1.0 if horizon == "p5" else 0.0,
+                    float(cell[horizon]["pass_rate"]),
+                    float(
+                        uplift["minimum_validation_final_uplift"]
+                        if uplift is not None
+                        else float("-inf")
+                    ),
+                    float(cell[horizon]["median_target_progress"]),
+                    float(cell[horizon]["minimum_mll_buffer_usd"]),
+                )
+            )
+        if qualifying_horizons:
+            best_horizon = max(qualifying_horizons)
+            viable.append((best_horizon, cell))
+    return max(viable, key=lambda item: item[0])[1] if viable else None
+
+
+def _account_speed_gate(
+    *,
+    any_stressed_pass: bool,
+    target_progress_uplift: Sequence[Mapping[str, Any]],
+) -> bool:
+    """Frozen disjunctive speed gate: an actual pass OR stable material uplift."""
+
+    return bool(
+        any_stressed_pass
+        or any(bool(row["material_stable_uplift"]) for row in target_progress_uplift)
+    )
+
+
 def evaluate_long_sample(
     anchors: Sequence[StructuralAnchor],
     receipt: Mapping[str, Any],
@@ -1911,13 +3079,39 @@ def evaluate_long_sample(
     frame_loader: Callable[[Path], Any] | None = None,
     eligible_session_days: Sequence[int] | None = None,
 ) -> dict[str, Any]:
-    selected_ids = {value for item in receipt.get("files") or () for value in item.get("anchor_ids") or ()}
-    selected = [row for row in anchors if row.anchor_event_id in selected_ids and row.stressed_net_pnl_usd is not None]
+    receipt_ids = [
+        str(value)
+        for item in receipt.get("files") or ()
+        for value in item.get("anchor_ids") or ()
+    ]
+    if len(receipt_ids) != len(set(receipt_ids)):
+        raise SelectiveVetoPilotError("acquired sample repeats a structural anchor")
+    selected_ids = set(receipt_ids)
+    anchor_by_id = {row.anchor_event_id: row for row in anchors}
+    unknown = sorted(selected_ids - set(anchor_by_id))
+    if unknown:
+        raise SelectiveVetoPilotError(
+            f"acquired sample references unknown structural anchors: {unknown[:5]}"
+        )
+    selected = [row for row in anchors if row.anchor_event_id in selected_ids]
+    incomplete = [
+        row.anchor_event_id
+        for row in selected
+        if row.normal_net_pnl_usd is None or row.stressed_net_pnl_usd is None
+    ]
+    if incomplete:
+        raise SelectiveVetoPilotError(
+            f"selected structural anchors lack paired economic outcomes: {incomplete[:5]}"
+        )
+    if len(selected) != len(selected_ids):
+        raise SelectiveVetoPilotError("selected structural-anchor denominator drift")
     roles = _chronological_roles(selected)
     role_by_id = {anchor_id: role for role, ids in roles.items() for anchor_id in ids}
     worker_path_executed = False
     if frame_loader is None:
-        features, worker_path_executed = _load_acquired_features(receipt, selected)
+        features, worker_path_executed = _load_acquired_features(
+            receipt, selected, schema=schema
+        )
     else:
         by_id = {row.anchor_event_id: row for row in selected}
         features = {}
@@ -1929,37 +3123,58 @@ def evaluate_long_sample(
                     raise SelectiveVetoPilotError(
                         "acquired window references unknown anchor"
                     )
-                value = _feature_for_anchor(frame, anchor)
+                value = _feature_for_anchor(frame, anchor, schema=schema)
                 if value is not None:
+                    if anchor.anchor_event_id in features:
+                        raise SelectiveVetoPilotError(
+                            f"duplicate acquired feature row for anchor {anchor.anchor_event_id}"
+                        )
                     features[anchor.anchor_event_id] = value
-    usable = [row for row in selected if row.anchor_event_id in features]
+    missing_features = sorted(selected_ids - set(features))
+    unexpected_features = sorted(set(features) - selected_ids)
+    if missing_features or unexpected_features:
+        raise SelectiveVetoPilotError(
+            "0034 acquired feature coverage is not exact; "
+            f"missing={missing_features[:10]}, unexpected={unexpected_features[:10]}"
+        )
+    usable = list(selected)
     discovery = [row for row in usable if role_by_id[row.anchor_event_id] == "DISCOVERY"]
     validation = [row for row in usable if role_by_id[row.anchor_event_id] == "VALIDATION"]
     final = [row for row in usable if role_by_id[row.anchor_event_id] == "FINAL_DEVELOPMENT"]
-    if min(len(discovery), len(validation), len(final)) == 0:
-        return _empty_long("COMPLETE", "LONG_SAMPLE_SELECTIVE_OVERLAY_FALSIFIED") | {
-            "policy_frozen_before_final_development": True,
-            "reason": "NO_CAUSAL_FEATURE_ROWS_IN_ONE_OR_MORE_TEMPORAL_ROLES",
-            "role_counts": {"DISCOVERY": len(discovery), "VALIDATION": len(validation), "FINAL_DEVELOPMENT": len(final)},
-            "feature_extraction_runtime": {
-                "process_pool_executed": worker_path_executed,
-                "cpu_worker_count": 2 if worker_path_executed else 0,
-            },
-        }
+    expected_role_counts = {role: len(ids) for role, ids in roles.items()}
+    usable_role_counts = {
+        "DISCOVERY": len(discovery),
+        "VALIDATION": len(validation),
+        "FINAL_DEVELOPMENT": len(final),
+    }
+    if usable_role_counts != expected_role_counts or min(usable_role_counts.values()) == 0:
+        raise SelectiveVetoPilotError(
+            "0034 temporal-role feature coverage is incomplete: "
+            f"expected={expected_role_counts}, usable={usable_role_counts}"
+        )
     x_discovery = np.vstack([features[row.anchor_event_id][0] for row in discovery])
+    discovery_paths = [
+        _causal_action_trajectory(
+            row,
+            "STRESSED_1_5X",
+            1.0,
+            features[row.anchor_event_id][2],
+        )
+        for row in discovery
+    ]
     discovery_net = np.asarray(
-        [float(row.stressed_net_pnl_usd or 0.0) for row in discovery], dtype=float
+        [path.event.net_pnl for path in discovery_paths],
+        dtype=float,
     )
     discovery_loss = np.asarray(discovery_net < 0.0, dtype=float)
     discovery_mae = np.asarray(
-        [-min(float(row.stressed_worst_unrealized_pnl_usd or 0.0), 0.0) for row in discovery],
+        [-min(float(path.event.worst_unrealized_pnl), 0.0) for path in discovery_paths],
         dtype=float,
     )
     discovery_cost = np.asarray(
         [
-            _causal_action_trajectory(row, "STRESSED_1_5X", 1.0).event.gross_pnl
-            - float(row.stressed_net_pnl_usd or 0.0)
-            for row in discovery
+            path.event.gross_pnl - path.event.net_pnl
+            for path in discovery_paths
         ],
         dtype=float,
     )
@@ -2007,6 +3222,7 @@ def evaluate_long_sample(
                 estimates[anchor.anchor_event_id]["score"],
                 _action_for_probability(estimates[anchor.anchor_event_id]["score"], low, high),
                 features[anchor.anchor_event_id][1],
+                features[anchor.anchor_event_id][2],
             )
             for anchor in validation
         ]
@@ -2023,6 +3239,7 @@ def evaluate_long_sample(
             estimates[anchor.anchor_event_id]["score"],
             _action_for_probability(estimates[anchor.anchor_event_id]["score"], float(frozen["low_threshold"]), float(frozen["high_threshold"])),
             features[anchor.anchor_event_id][1],
+            features[anchor.anchor_event_id][2],
         )
         for anchor in usable
     ]
@@ -2049,8 +3266,12 @@ def evaluate_long_sample(
         raise SelectiveVetoPilotError(
             "0034 long replay requires the immutable 0028 trading-day calendar"
         )
-    matrix = _account_matrix(
-        all_rows, {row.anchor_event_id: row for row in usable}, calendar
+    usable_by_id = {row.anchor_event_id: row for row in usable}
+    matrix = _account_matrix(all_rows, usable_by_id, calendar)
+    baseline_rows = _same_opportunity_baseline_rows(all_rows, usable_by_id)
+    baseline_matrix = _account_matrix(baseline_rows, usable_by_id, calendar)
+    target_progress_uplift = _target_progress_uplift_matrix(
+        matrix, baseline_matrix
     )
     heldout = [row for row in all_rows if row["temporal_role"] in {"VALIDATION", "FINAL_DEVELOPMENT"}]
     positive_contexts = max(
@@ -2059,6 +3280,13 @@ def evaluate_long_sample(
     )
     no_mll = all(float(cell[horizon]["mll_breach_rate"]) <= 0.10 for cell in matrix for horizon in ("p5", "p10"))
     any_pass = any(int(cell[horizon]["pass_count"]) > 0 for cell in matrix for horizon in ("p5", "p10"))
+    material_stable_target_progress_uplift = any(
+        bool(row["material_stable_uplift"]) for row in target_progress_uplift
+    )
+    account_speed_gate = _account_speed_gate(
+        any_stressed_pass=any_pass,
+        target_progress_uplift=target_progress_uplift,
+    )
     consistency = all(
         float(cell[horizon]["consistency_compliance_rate"]) >= 0.50
         for cell in matrix
@@ -2076,15 +3304,18 @@ def evaluate_long_sample(
         and no_mll
         and consistency
         and 0.20 - 1e-9 <= heldout_coverage <= 0.80 + 1e-9
-        and any_pass
+        and account_speed_gate
     )
     weak = (
         float(summaries["VALIDATION"]["paired_stressed_uplift_usd"]) > 0.0
         or float(summaries["FINAL_DEVELOPMENT"]["paired_stressed_uplift_usd"]) > 0.0
     )
     decision = "LONG_SAMPLE_SELECTIVE_OVERLAY_GREEN" if green else "LONG_SAMPLE_SELECTIVE_OVERLAY_WEAK" if weak else "LONG_SAMPLE_SELECTIVE_OVERLAY_FALSIFIED"
-    viable = [cell for cell in matrix if cell["p5"]["pass_count"] or cell["p10"]["pass_count"]]
-    fastest = max(viable, key=lambda cell: (cell["p5"]["pass_rate"], cell["p10"]["pass_rate"], cell["p5"]["minimum_mll_buffer_usd"]), default=None)
+    fastest = _select_fastest_viable_account(
+        matrix,
+        target_progress_uplift,
+        global_decision=decision,
+    )
     policy_core = {
         "policy_id": "selective_veto_0034_distilled_v1",
         "model_class": "REGULARIZED_PESSIMISTIC_ECONOMIC_RESPONSE_V1",
@@ -2131,21 +3362,37 @@ def evaluate_long_sample(
             for dimension in ("market", "structural_family", "session_id")
         },
         "account_size_matrix": matrix,
+        "same_opportunity_baseline_account_matrix": baseline_matrix,
+        "same_opportunity_target_progress_uplift": target_progress_uplift,
         "fastest_viable_account_size": None if fastest is None else fastest["account_label"],
         "causal_feature_row_count": len(usable),
+        "feature_coverage_invariant": {
+            "selected_anchor_count": len(selected),
+            "causal_feature_row_count": len(usable),
+            "missing_anchor_count": 0,
+            "unexpected_anchor_count": 0,
+            "expected_role_counts": expected_role_counts,
+            "usable_role_counts": usable_role_counts,
+            "final_development_all_eligible_anchors_included": True,
+        },
         "role_counts": {role: sum(row["temporal_role"] == role for row in all_rows) for role in ("DISCOVERY", "VALIDATION", "FINAL_DEVELOPMENT")},
         "positive_context_count": positive_contexts,
         "single_trade_domination_fraction": _summarize_paired(heldout)["maximum_positive_trade_fraction"],
         "mll_within_tolerance": no_mll,
         "consistency_within_tolerance": consistency,
         "heldout_trade_coverage": heldout_coverage,
-        "green_requires_actual_stressed_p5_or_p10_pass": True,
+        "green_account_speed_gate": {
+            "operator": "OR",
+            "actual_stressed_p5_or_p10_pass": any_pass,
+            "material_stable_stressed_target_progress_uplift": (
+                material_stable_target_progress_uplift
+            ),
+        },
+        "green_requires_actual_stressed_p5_or_p10_pass": False,
         "material_stressed_target_progress_uplift_minimum": (
             MATERIAL_STRESSED_TARGET_PROGRESS_UPLIFT_MINIMUM
         ),
-        "sequential_checkpoints": _sequential_evidence_checkpoints(
-            all_rows, decision
-        ),
+        "sequential_checkpoints": _sequential_evidence_checkpoints(all_rows),
         "feature_extraction_runtime": {
             "process_pool_executed": worker_path_executed,
             "cpu_worker_count": 2 if worker_path_executed else 0,
