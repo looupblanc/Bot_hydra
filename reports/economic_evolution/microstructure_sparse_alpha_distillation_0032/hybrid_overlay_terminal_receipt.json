@@ -1,0 +1,70 @@
+{
+  "schema": "hydra_microstructure_sparse_alpha_distillation_terminal_receipt_v1",
+  "recorded_at_utc": "2026-07-18T13:31:18Z",
+  "campaign_id": "hydra_microstructure_sparse_alpha_distillation_0032",
+  "class_id": "MICROSTRUCTURE_SPARSE_ALPHA_DISTILLATION_V1",
+  "terminal_status": "SPARSE_PILOT_WEAK",
+  "terminal_scope": "STANDALONE_SPARSE_MICROSTRUCTURE_EXECUTION_ONLY",
+  "failure_code": "SPARSE_STANDALONE_MICROSTRUCTURE_DID_NOT_COVER_COSTS",
+  "scientific_boundary": {
+    "development_evidence_only": true,
+    "automatic_campaign_retry_allowed": false,
+    "standalone_microstructure_neighbor_allowed": false,
+    "hybrid_structural_overlay_untested": true,
+    "hybrid_overlay_requires_new_manifest": true,
+    "evidence_regeneration_allowed": false,
+    "status_inheritance_allowed": false,
+    "independent_confirmation": false,
+    "xfa_started": false
+  },
+  "source_identity": {
+    "manifest_source_commit": "44957bbfa9c54398b4785de2deb676fe6643558f",
+    "manifest_path": "config/v7/microstructure_sparse_alpha_distillation_0032.json",
+    "manifest_file_sha256": "a8e10249ac7f2317648cfc3bd5d5148b3331eab7dee2b1910b6369246da997be",
+    "manifest_semantic_hash": "a108d0552e2d18075ef46e235d18df32ac5856334c74813be16b8531cf1cfee3",
+    "manifest_worm_tag": "worm/microstructure-sparse-alpha-distillation-0032-relational-preseal-recovery-2026-07-18",
+    "manifest_worm_commit": "bb7c7dbc5b2b7da96ab8c5f022c52ef0a74adf2a"
+  },
+  "terminal_result": {
+    "path": "reports/economic_evolution/microstructure_sparse_alpha_distillation_0032/economic_production_result.json",
+    "file_sha256": "05e572653ce92f398e0fb8c423d3ecd238454432a95b30f88b88797b1448ce9b",
+    "result_hash": "17dfd2a86deb54af57b58b870b5073940e7363fbeb15154559080b0f13de27a9",
+    "status": "COMPLETE",
+    "decision": "SPARSE_PILOT_WEAK"
+  },
+  "evidence_bundle": {
+    "receipt_path": "reports/economic_evolution/microstructure_sparse_alpha_distillation_0032/evidence_bundle_receipt.json",
+    "receipt_file_sha256": "ad12730ce692331de264e6872750b85d0bf1c28e200bbbd7c636e46415eaa654",
+    "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+    "reconstruction_flag": false,
+    "manifest_sha256": "6d76252d4d6e877c348cc5bb882d8c4cdfb2d5336450fe074c031b2fcfa6f779",
+    "bundle_content_sha256": "29b6e4142edd53072983555b0aab97d0e0ce69c8371b34fc73cee6e42ae61943",
+    "episode_rows": 1620,
+    "trade_rows": 327
+  },
+  "economic_totals": {
+    "sparse_strategies": 30,
+    "active_strategies": 18,
+    "correctly_abstaining_strategies": 12,
+    "unique_trades": 327,
+    "aggregate_gross_pnl_usd": 332.5,
+    "aggregate_normal_net_pnl_usd": -13737.6,
+    "aggregate_stressed_net_pnl_usd": -17007.6,
+    "positive_validation_and_final_development_candidates": 0,
+    "p5_passes": 0,
+    "p5_mll_breached_paths": 4,
+    "p5_paths": 180,
+    "bank_admissions": 0,
+    "additional_data_purchase_count": 0
+  },
+  "governance": {
+    "q4_status": "BURNED",
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "remaining_budget_usd": 28.498462508622012
+  },
+  "CONTRE": "This receipt terminalizes only standalone sparse microstructure execution in campaign 0032. It preserves all raw and derived evidence, forbids retry and inherited status, and records that microstructure as a conditional overlay on preexisting structural opportunities remains untested.",
+  "receipt_hash": "21de67526c92a84a1d4707834929c835ffb0669531195c82f67904491cfdd8ae"
+}

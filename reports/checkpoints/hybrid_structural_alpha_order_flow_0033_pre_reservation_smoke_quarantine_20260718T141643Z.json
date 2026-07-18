@@ -1,0 +1,69 @@
+{
+  "schema_version": "HYDRA_PRE_RESERVATION_OUTCOME_QUARANTINE_V1",
+  "campaign_id": "hydra_hybrid_structural_alpha_order_flow_0033",
+  "classification": "IMPLEMENTATION_SMOKE_NONPROMOTIONAL",
+  "occurred_at_utc": "2026-07-18T14:16:43.089436854Z",
+  "recorded_at_utc": "2026-07-18T14:29:10Z",
+  "incident": {
+    "description": "A real-data implementation smoke invoked run_microstructure_hybrid_pilot before the 0033 manifest was committed/tagged WORM and before the prospective multiplicity reservation existed.",
+    "entry_point": "hydra.production.microstructure_hybrid_pilot.run_microstructure_hybrid_pilot",
+    "invocation_form": "PYTHONPATH=. .venv/bin/python with an inline Python runner and HybridPilotConfig defaults",
+    "manifest_hash_at_execution": "UNBOUND_TEST_MANIFEST",
+    "source_commit_at_execution": "0000000000000000000000000000000000000000",
+    "manifest_worm_present_at_execution": false,
+    "multiplicity_reservation_present_at_execution": false,
+    "economic_outcome_was_exposed": true,
+    "exposed_status": "HYBRID_OVERLAY_GREEN"
+  },
+  "quarantined_artifacts": [
+    {
+      "path": "/tmp/hydra_hybrid_pilot_smoke_v3/hybrid_pilot_summary.json",
+      "bytes": 2615180,
+      "sha256": "8771c7309e51a52f2cf898e70c976daa1cdb674f82d6b7d1e59338d8221f4cf8"
+    },
+    {
+      "path": "/tmp/hydra_hybrid_pilot_smoke_v3/hybrid_evidence_material.json",
+      "bytes": 5565185,
+      "sha256": "62152ff52c5de05112eddbd8a499ce57924533146d962a86d8617d1055062886"
+    },
+    {
+      "path": "/tmp/hybrid_receipt.json",
+      "bytes": 902,
+      "sha256": "9f44a062adbf27a11c15f594e18b6002379c1e51573dcdc665a89849b0b86b56"
+    }
+  ],
+  "code_provenance": {
+    "repository_head_at_execution": "ebb2179f1d367e171266bda67c48be64f9a1660a",
+    "implementation_tree_sha256_at_execution": "4a1fa9bd02393a9cd86b76b11c196c7118fddfdb80f14fab2c916a286ab3f2e7",
+    "implementation_tree_sha256_when_quarantine_recorded": "597f50db8056a2aa7723ed518a9ad164eabf67f69d251a228580f9e7c97aa9e6"
+  },
+  "integrity_declaration": {
+    "economic_threshold_changed_after_exposure": false,
+    "action_lattice_changed_after_exposure": false,
+    "risk_tier_changed_after_exposure": false,
+    "anchor_bank_changed_after_exposure": false,
+    "gate_changed_after_exposure": false,
+    "subsequent_changes": [
+      "empty-fixture compatibility",
+      "deterministic two-worker execution",
+      "CPU accounting",
+      "paired-uplift reporting attribution",
+      "passive-side-lane reporting",
+      "complete paired-outcome persistence"
+    ]
+  },
+  "governance_effect": {
+    "counts_as_authoritative_campaign_evidence": false,
+    "promotion_allowed": false,
+    "data_purchase_trigger_allowed": false,
+    "long_sample_trigger_allowed": false,
+    "multiplicity_consumed_by_this_smoke": 0,
+    "required_remediation": "Freeze and commit the unchanged economic contract, reserve prospective multiplicity, then execute exactly one authoritative run while carrying this incident caveat in every 0033 decision artifact."
+  },
+  "safety": {
+    "data_purchase_count": 0,
+    "q4_access_count_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  }
+}

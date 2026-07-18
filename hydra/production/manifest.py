@@ -87,6 +87,19 @@ def load_and_validate_production_manifest(path: str | Path) -> dict[str, Any]:
         except SparseManifestError as exc:
             raise ProductionManifestError(str(exc)) from exc
         return manifest
+    if manifest.get("campaign_mode") == "HYBRID_STRUCTURAL_ALPHA_ORDER_FLOW":
+        from hydra.production.microstructure_hybrid_manifest import (
+            HybridManifestError,
+            validate_microstructure_hybrid_manifest,
+        )
+
+        try:
+            validate_microstructure_hybrid_manifest(
+                manifest, manifest_path=resolved
+            )
+        except HybridManifestError as exc:
+            raise ProductionManifestError(str(exc)) from exc
+        return manifest
     if manifest.get("campaign_mode") == "ACTIVE_RISK_POOL":
         from hydra.production.active_risk_manifest import (
             ActiveRiskManifestError,

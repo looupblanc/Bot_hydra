@@ -1,0 +1,44 @@
+{
+  "schema": "hydra_microstructure_sparse_alpha_distillation_terminal_verdict_worm_v1",
+  "campaign_id": "hydra_microstructure_sparse_alpha_distillation_0032",
+  "class_id": "MICROSTRUCTURE_SPARSE_ALPHA_DISTILLATION_V1",
+  "recorded_at_utc": "2026-07-18T13:31:18Z",
+  "immutable": true,
+  "terminal_status": "SPARSE_PILOT_WEAK",
+  "terminal_scope": "STANDALONE_SPARSE_MICROSTRUCTURE_EXECUTION_ONLY",
+  "failure_code": "SPARSE_STANDALONE_MICROSTRUCTURE_DID_NOT_COVER_COSTS",
+  "source_manifest": {
+    "path": "config/v7/microstructure_sparse_alpha_distillation_0032.json",
+    "file_sha256": "a8e10249ac7f2317648cfc3bd5d5148b3331eab7dee2b1910b6369246da997be",
+    "semantic_hash": "a108d0552e2d18075ef46e235d18df32ac5856334c74813be16b8531cf1cfee3",
+    "source_commit": "44957bbfa9c54398b4785de2deb676fe6643558f",
+    "tag": "worm/microstructure-sparse-alpha-distillation-0032-relational-preseal-recovery-2026-07-18",
+    "commit": "bb7c7dbc5b2b7da96ab8c5f022c52ef0a74adf2a"
+  },
+  "source_terminal_receipt": {
+    "path": "reports/economic_evolution/microstructure_sparse_alpha_distillation_0032/hybrid_overlay_terminal_receipt.json",
+    "file_sha256": "9efcc262c750b69288d08d44a67e53ed4ee5c1d426c082b2ce0a4aa469c56fef",
+    "receipt_hash": "21de67526c92a84a1d4707834929c835ffb0669531195c82f67904491cfdd8ae"
+  },
+  "decision_boundary": {
+    "campaign_retry_allowed": false,
+    "standalone_microstructure_parameter_neighbor_allowed": false,
+    "economic_evidence_regeneration_allowed": false,
+    "hybrid_structural_overlay_was_tested_by_0032": false,
+    "hybrid_overlay_requires_distinct_manifest": true,
+    "paper_shadow_ready_assigned": false,
+    "independent_confirmation_claimed": false
+  },
+  "scope": {
+    "next_state": "HYBRID_STRUCTURAL_ALPHA_ORDER_FLOW_0033",
+    "preserve_five_mbo_sessions": true,
+    "preserve_raw_events_books_features_opportunities_labels": true,
+    "preserve_eight_gross_positive_candidates_without_economic_status": true,
+    "preserve_clean_causal_structural_sleeves": true,
+    "q4_access_allowed": false,
+    "broker_or_orders_allowed": false,
+    "automatic_new_data_purchase_allowed": false
+  },
+  "CONTRE": "This WORM verdict closes campaign 0032 at SPARSE_PILOT_WEAK. It falsifies neither every microstructure representation nor the untested conditional overlay hypothesis and authorizes no inherited status, purchase, Q4 access, broker connection, order or live trading.",
+  "verdict_hash": "ec9183d690a591570fe2ee76a02f5b6e572b8fffacd9ebd0c16da2623ec69da0"
+}

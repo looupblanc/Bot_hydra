@@ -137,6 +137,12 @@ def load_and_verify_production_result(
 
 def read_live_status(manifest_path: str | Path) -> dict[str, Any]:
     manifest = load_and_validate_production_manifest(manifest_path)
+    if manifest.get("campaign_mode") == "HYBRID_STRUCTURAL_ALPHA_ORDER_FLOW":
+        from hydra.production.microstructure_hybrid_runtime import (
+            read_microstructure_hybrid_status,
+        )
+
+        return read_microstructure_hybrid_status(manifest_path)
     if manifest.get("campaign_mode") == "MICROSTRUCTURE_SPARSE_ALPHA_DISTILLATION":
         from hydra.production.microstructure_sparse_runtime import (
             read_microstructure_sparse_status,
@@ -172,6 +178,17 @@ def run_production_manifest(
     """Run/resume the evidence-first production funnel; never terminalize early."""
 
     manifest = load_and_validate_production_manifest(manifest_path)
+    if manifest.get("campaign_mode") == "HYBRID_STRUCTURAL_ALPHA_ORDER_FLOW":
+        from hydra.production.microstructure_hybrid_runtime import (
+            run_microstructure_hybrid_manifest,
+        )
+
+        return run_microstructure_hybrid_manifest(
+            manifest_path,
+            contract_map_path=contract_map_path,
+            cache_root=cache_root,
+            stop_after=stop_after,
+        )
     if manifest.get("campaign_mode") == "MICROSTRUCTURE_SPARSE_ALPHA_DISTILLATION":
         from hydra.production.microstructure_sparse_runtime import (
             run_microstructure_sparse_manifest,
