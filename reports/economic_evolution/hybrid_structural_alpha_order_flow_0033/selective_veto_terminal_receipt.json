@@ -1,0 +1,72 @@
+{
+  "CONTRE": "Campaign 0033 is terminal WEAK. The complete EvidenceBundle is preserved; only two selective-abstention policies survive as immutable diagnostic seeds, with no bank, promotion, Combine, XFA, forward or confirmation status.",
+  "authoritative_result": {
+    "decision_grade_override": "HYBRID_OVERLAY_WEAK",
+    "file_sha256": "fe13dbb8a9da5ea3a49230396c07f9eee83d7c454deae451a33cf9af19d19ba4",
+    "path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/economic_production_result.json",
+    "raw_pilot_decision": "HYBRID_OVERLAY_GREEN",
+    "result_hash": "795b87e27da313615fdf547e91311c01c51f8a4a52010fd85148aacd3759e0e2"
+  },
+  "campaign_id": "hydra_hybrid_structural_alpha_order_flow_0033",
+  "class_id": "HYBRID_STRUCTURAL_ALPHA_ORDER_FLOW_V1",
+  "decision_grade_report": {
+    "file_sha256": "6c4b7812a1d8d843fa43073a8a728e23050a10999326feedc87cb33019e97d96",
+    "path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/decision_report.json",
+    "retained_diagnostic_seed_count": 2,
+    "status": "HYBRID_OVERLAY_WEAK"
+  },
+  "economic_boundary": {
+    "bank_admissions": 0,
+    "combine_promotions": 0,
+    "opportunities": 72,
+    "paired_action_outcomes": 1008,
+    "retained_diagnostic_seed_ids": [
+      "hybrid_0033_01_f0345ecb99af8c25",
+      "hybrid_0033_07_5f93891cf737e51a"
+    ],
+    "serious_overlay_policies": 20,
+    "structural_anchors": 22,
+    "xfa_paths": 0
+  },
+  "evidence_bundle": {
+    "bundle_content_sha256": "7baf29e5149db97bdb8a2cfa530dcb2437e68a8e36b2ca5de61fe7d2ded78421",
+    "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+    "manifest_sha256": "f5b49a8e34ee7570d9175b49400d589dbbe936bf365a8be0d0da5eb780cdb22b",
+    "receipt_file_sha256": "2669d11e3ed2c153ac113f9dfbca3f4ac74ce864dcf538471a7774644a5c52b0",
+    "receipt_path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/evidence_bundle_receipt.json",
+    "reconstruction_flag": false
+  },
+  "failure_code": "POSITIVE_SELECTIVE_ABSTENTION_SAMPLE_UNDERPOWERED",
+  "governance": {
+    "broker_connections": 0,
+    "new_data_purchase_count": 0,
+    "orders": 0,
+    "q4_access_delta": 0,
+    "remaining_budget_usd": 28.498462508622012
+  },
+  "receipt_hash": "169224319927af0e45dffd94740abff5246f4e749043d33549d5a7fd53d09b74",
+  "recorded_at_utc": "2026-07-18T20:35:10Z",
+  "schema": "hydra_hybrid_structural_alpha_order_flow_terminal_receipt_v1",
+  "scientific_boundary": {
+    "automatic_campaign_retry_allowed": false,
+    "broad_refinement_resume_allowed": false,
+    "evidence_regeneration_allowed": false,
+    "execution_alpha_established": false,
+    "independent_confirmation": false,
+    "passive_execution_established": false,
+    "selective_abstention_diagnostic_seeds_preserved": true,
+    "standalone_microstructure_alpha_falsified": true,
+    "status_inheritance_allowed": false,
+    "timing_alpha_established": false
+  },
+  "source_identity": {
+    "manifest_file_sha256": "fb15e9e4a54aaf67647ad64bbe78199924c26808e60aa44d680076790889a451",
+    "manifest_path": "config/v7/hybrid_structural_alpha_order_flow_0033.json",
+    "manifest_semantic_hash": "cd693d5237469eb81d1d716088adb32686f65d990929dbab22751b7464acdb19",
+    "manifest_source_commit": "a98fde3f3e33e9383a275215767e9c7b17033548",
+    "manifest_worm_commit": "a09da175b099e0c4af85e79d3c85a67108195f09",
+    "manifest_worm_tag": "worm/hybrid-structural-alpha-order-flow-0033-2026-07-18"
+  },
+  "terminal_scope": "FIVE_SESSION_HYBRID_ACTION_LATTICE_ONLY",
+  "terminal_status": "HYBRID_OVERLAY_WEAK"
+}

@@ -100,6 +100,17 @@ def load_and_validate_production_manifest(path: str | Path) -> dict[str, Any]:
         except HybridManifestError as exc:
             raise ProductionManifestError(str(exc)) from exc
         return manifest
+    if manifest.get("campaign_mode") == "SELECTIVE_ORDER_FLOW_VETO_EXPANSION":
+        from hydra.production.selective_veto_manifest import (
+            SelectiveVetoManifestError,
+            validate_selective_veto_manifest,
+        )
+
+        try:
+            validate_selective_veto_manifest(manifest, manifest_path=resolved)
+        except SelectiveVetoManifestError as exc:
+            raise ProductionManifestError(str(exc)) from exc
+        return manifest
     if manifest.get("campaign_mode") == "ACTIVE_RISK_POOL":
         from hydra.production.active_risk_manifest import (
             ActiveRiskManifestError,

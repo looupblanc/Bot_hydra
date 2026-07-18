@@ -1,0 +1,50 @@
+{
+  "CONTRE": "This WORM verdict closes campaign 0033 as HYBRID_OVERLAY_WEAK. It preserves two immutable diagnostic seeds but assigns no bank, promotion, Combine, XFA, forward, Paper Shadow or independent-confirmation status.",
+  "campaign_id": "hydra_hybrid_structural_alpha_order_flow_0033",
+  "class_id": "HYBRID_STRUCTURAL_ALPHA_ORDER_FLOW_V1",
+  "decision_boundary": {
+    "broad_0033_refinement_allowed": false,
+    "campaign_retry_allowed": false,
+    "economic_evidence_regeneration_allowed": false,
+    "independent_confirmation_claimed": false,
+    "paper_shadow_ready_assigned": false,
+    "passive_execution_claimed": false,
+    "seed_mutation_allowed": false,
+    "timing_or_execution_alpha_claimed": false
+  },
+  "failure_code": "POSITIVE_SELECTIVE_ABSTENTION_SAMPLE_UNDERPOWERED",
+  "immutable": true,
+  "recorded_at_utc": "2026-07-18T20:35:10Z",
+  "schema": "hydra_hybrid_structural_alpha_order_flow_terminal_verdict_worm_v1",
+  "scope": {
+    "broker_or_orders_allowed": false,
+    "conditional_event_window_purchase_requires_robustness_gate": true,
+    "maximum_incremental_spend_usd": 8.0,
+    "minimum_budget_reserve_usd": 20.0,
+    "next_state": "SELECTIVE_ORDER_FLOW_VETO_EXPANSION_0034",
+    "preserve_complete_0033_evidence_bundle": true,
+    "preserve_two_diagnostic_seeds_immutable": true,
+    "primary_lane_actions": [
+      "ABSTAIN",
+      "TRADE_1X",
+      "TRADE_1_5X"
+    ],
+    "q4_access_allowed": false
+  },
+  "source_manifest": {
+    "commit": "a09da175b099e0c4af85e79d3c85a67108195f09",
+    "file_sha256": "fb15e9e4a54aaf67647ad64bbe78199924c26808e60aa44d680076790889a451",
+    "path": "config/v7/hybrid_structural_alpha_order_flow_0033.json",
+    "semantic_hash": "cd693d5237469eb81d1d716088adb32686f65d990929dbab22751b7464acdb19",
+    "source_commit": "a98fde3f3e33e9383a275215767e9c7b17033548",
+    "tag": "worm/hybrid-structural-alpha-order-flow-0033-2026-07-18"
+  },
+  "source_terminal_receipt": {
+    "file_sha256": "fabd4595fc93e2256e6121b4bb1cf94b8f02b48b9dae376eb7c977ed4ed6ec94",
+    "path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/selective_veto_terminal_receipt.json",
+    "receipt_hash": "169224319927af0e45dffd94740abff5246f4e749043d33549d5a7fd53d09b74"
+  },
+  "terminal_scope": "FIVE_SESSION_HYBRID_ACTION_LATTICE_ONLY",
+  "terminal_status": "HYBRID_OVERLAY_WEAK",
+  "verdict_hash": "84766b059c2a1d85e2d2115ee47da82016e4803e63805cd1d9f7246a23e4a3cd"
+}

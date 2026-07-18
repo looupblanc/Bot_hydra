@@ -1,0 +1,57 @@
+{
+  "schema": "hydra_selective_order_flow_veto_expansion_0034_checkpoint_v1",
+  "checkpoint_id": "selective_order_flow_veto_expansion_0034_preimplementation_20260718T201759Z",
+  "created_at_utc": "2026-07-18T20:17:59Z",
+  "mission_id": "hydra_v7_1_falsification_20260712_0001",
+  "git_head": "7415b277df51c8d0eaf83595475d8ca4244f81be",
+  "origin_branch": "origin/mission/v7-falsification",
+  "origin_head": "7415b277df51c8d0eaf83595475d8ca4244f81be",
+  "service": {
+    "unit": "hydra-autonomous-mission.service",
+    "active_state": "active",
+    "sub_state": "running",
+    "pid": 1216014,
+    "controller_version": "hydra_v7_economic_evolution_controller_v17",
+    "live_trading": false,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "source_campaign": {
+    "campaign_id": "hydra_hybrid_structural_alpha_order_flow_0033",
+    "terminal_status": "HYBRID_OVERLAY_WEAK",
+    "decision_report": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/decision_report.json",
+    "decision_report_sha256": "6c4b7812a1d8d843fa43073a8a728e23050a10999326feedc87cb33019e97d96",
+    "manifest_sha256": "fb15e9e4a54aaf67647ad64bbe78199924c26808e60aa44d680076790889a451",
+    "evidence_bundle": "data/cache/evidence_bundles/hydra_hybrid_structural_alpha_order_flow_0033.evidence-v1",
+    "evidence_preserved": true
+  },
+  "frozen_seed_policy_ids": [
+    "hybrid_0033_01_f0345ecb99af8c25",
+    "hybrid_0033_07_5f93891cf737e51a"
+  ],
+  "frozen_seed_status": "SELECTIVE_VETO_DIAGNOSTIC_SEED",
+  "initial_action_set": [
+    "ABSTAIN",
+    "TRADE_1X",
+    "TRADE_1_5X"
+  ],
+  "unsupported_primary_actions_closed": [
+    "A2_TIMING",
+    "A3_EXECUTION_VARIANTS",
+    "A4_PASSIVE_EXECUTION",
+    "A5_EARLY_INVALIDATION",
+    "DIRECTION_REVERSAL"
+  ],
+  "budget": {
+    "remaining_usd": 28.498462508622012,
+    "minimum_reserve_usd": 20.0,
+    "maximum_new_purchase_usd": 8.0,
+    "purchase_authorized_before_seed_audit": false
+  },
+  "safety": {
+    "q4_access_authorized": false,
+    "data_purchase_count_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  }
+}
