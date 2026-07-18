@@ -1,0 +1,499 @@
+{
+  "schema": "hydra_economic_production_manifest_v1",
+  "campaign_mode": "SELECTIVE_ORDER_FLOW_VETO_EXPANSION",
+  "campaign_id": "hydra_selective_order_flow_veto_expansion_0034",
+  "class_id": "SELECTIVE_ORDER_FLOW_VETO_EXPANSION_V1",
+  "policy_classes": [
+    "SELECTIVE_ORDER_FLOW_VETO_EXPANSION_V1"
+  ],
+  "development_only": true,
+  "created_at_utc": "2026-07-18T21:42:54Z",
+  "source_commit": "b4269cdafccf23b3b3ad345183cef074cf04e58f",
+  "economic_hypothesis": "Order flow can veto weak causal structural trades.",
+  "implementation_files": {
+    "hydra/production/selective_veto_manifest.py": "91cb399ef4623063cc6e36da22cadab3814ebdaefa742f7e129a9280cf46fb25",
+    "hydra/production/selective_veto_runtime.py": "7ce2db0035f0dd8a1ae439bfac06ccb8c424bcdce21130545b298b344fbd47f7",
+    "hydra/production/selective_veto_seed_audit.py": "b9057093c39f8310334cb261d3ab9d06e4c3eca92310f544192290c77e20f596",
+    "hydra/production/selective_veto_pilot.py": "d80173876c9fa2a2295568b32ee240a5cb8deb15d260ec69918b036a220850c5",
+    "hydra/production/selective_veto_metadata.py": "c1bb35b26d4558074e39a312b7a3939a9dac181c39f30c174e37f179fe82ef87",
+    "hydra/production/manifest.py": "de36c472b0bf36c712cdee5958bae1f5001c48099c5c879e29396dfa597cbd70",
+    "hydra/production/runtime.py": "2d7ce05842e0ff20400249544bba9e9974bd64230a5ae6e277dc4670874ef2f9",
+    "scripts/run_economic_production_manifest.py": "45e610a35ae5a260e628bc73fcd23634362c6cef0298707b2e6e97ff8762cc6f"
+  },
+  "terminal_source_0033": {
+    "campaign_id": "hydra_hybrid_structural_alpha_order_flow_0033",
+    "terminal_status": "HYBRID_OVERLAY_WEAK",
+    "reuse_mode": "IMMUTABLE_READ_ONLY",
+    "broad_refinement_resume_allowed": false,
+    "timing_alpha_established": false,
+    "execution_alpha_established": false,
+    "standalone_microstructure_alpha_falsified": true,
+    "status_inheritance_allowed": false,
+    "outcomes_are_development_only": true,
+    "source_hashes": {
+      "authoritative_result": {
+        "path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/economic_production_result.json",
+        "sha256": "fe13dbb8a9da5ea3a49230396c07f9eee83d7c454deae451a33cf9af19d19ba4"
+      },
+      "evidence_bundle_receipt": {
+        "path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/evidence_bundle_receipt.json",
+        "sha256": "2669d11e3ed2c153ac113f9dfbca3f4ac74ce864dcf538471a7774644a5c52b0"
+      },
+      "evidence_bundle_manifest": {
+        "path": "data/cache/evidence_bundles/hydra_hybrid_structural_alpha_order_flow_0033.evidence-v1/evidence_bundle_manifest.json",
+        "sha256": "f5b49a8e34ee7570d9175b49400d589dbbe936bf365a8be0d0da5eb780cdb22b"
+      },
+      "decision_report": {
+        "path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/decision_report.json",
+        "sha256": "6c4b7812a1d8d843fa43073a8a728e23050a10999326feedc87cb33019e97d96"
+      },
+      "pilot_summary": {
+        "path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/pilot/hybrid_pilot_summary.json",
+        "sha256": "2797a680491d6fc044d5d30f8062f0e3f7d2ed4e0a2b9eb946f33e085d0c0a36"
+      },
+      "selective_veto_terminal_receipt": {
+        "path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/selective_veto_terminal_receipt.json",
+        "sha256": "fabd4595fc93e2256e6121b4bb1cf94b8f02b48b9dae376eb7c977ed4ed6ec94"
+      },
+      "selective_veto_boundary_verdict": {
+        "path": "WORM/hybrid-structural-alpha-order-flow-0033-selective-veto-boundary-verdict-2026-07-18.json",
+        "sha256": "87de1f58c457e319b8df0f37c02c33ed162343928527ade64efa61c5a1b021ca"
+      },
+      "pre_reservation_smoke_quarantine_receipt": {
+        "path": "reports/checkpoints/hybrid_structural_alpha_order_flow_0033_pre_reservation_smoke_quarantine_20260718T141643Z.json",
+        "sha256": "0004f8e1dae71447dec948771714be3366886e9bc562b1fa9d9a725393da3432"
+      },
+      "evidence_seal_recovery_receipt": {
+        "path": "reports/checkpoints/hybrid_structural_alpha_order_flow_0033_evidence_seal_recovery_20260718T143700Z.json",
+        "sha256": "392127004f78d50170a5ff2e28809c194a1db5bb70f885fac4aa1f4206c25a08"
+      },
+      "multiplicity_reservation_receipt": {
+        "path": "reports/economic_evolution/hydra_hybrid_structural_alpha_order_flow_0033_multiplicity_reservation.json",
+        "sha256": "305ea4dd4835eae299d6c90b6a5fdf32877bdb8d3c9b4cfa930d56b036bad989"
+      },
+      "source_manifest": {
+        "path": "config/v7/hybrid_structural_alpha_order_flow_0033.json",
+        "sha256": "fb15e9e4a54aaf67647ad64bbe78199924c26808e60aa44d680076790889a451"
+      }
+    }
+  },
+  "frozen_seed_policies": [
+    {
+      "policy_id": "hybrid_0033_01_f0345ecb99af8c25",
+      "policy_fingerprint": "f0345ecb99af8c257500b3c27a7af10e010b20df6625e41e14e7480e351df915",
+      "status": "SELECTIVE_VETO_DIAGNOSTIC_SEED",
+      "immutable": true,
+      "mutation_allowed": false,
+      "status_inheritance_allowed": false,
+      "promotion_status": null,
+      "validation_normal_net_usd": 793.82,
+      "validation_stressed_net_usd": 776.32,
+      "final_development_normal_net_usd": 1324.78,
+      "final_development_stressed_net_usd": 1314.78,
+      "validation_paired_stressed_uplift_usd": 1120.58,
+      "final_development_paired_stressed_uplift_usd": 499.28,
+      "validation_abstention_rate": 0.5556,
+      "final_development_abstention_rate": 0.2083,
+      "minimum_mll_buffer_usd": 4141.3,
+      "deployability_tier": "L1_DEPLOYABLE"
+    },
+    {
+      "policy_id": "hybrid_0033_07_5f93891cf737e51a",
+      "policy_fingerprint": "5f93891cf737e51a586e848ea9efd433094d18d90bc26a6a3aaa1780078354f5",
+      "status": "SELECTIVE_VETO_DIAGNOSTIC_SEED",
+      "immutable": true,
+      "mutation_allowed": false,
+      "status_inheritance_allowed": false,
+      "promotion_status": null,
+      "validation_normal_net_usd": 972.7,
+      "validation_stressed_net_usd": 930.7,
+      "final_development_normal_net_usd": 1077.46,
+      "final_development_stressed_net_usd": 1046.96,
+      "validation_paired_stressed_uplift_usd": 1274.96,
+      "final_development_paired_stressed_uplift_usd": 231.46,
+      "validation_abstention_rate": 0.5556,
+      "final_development_abstention_rate": 0.2083,
+      "minimum_mll_buffer_usd": 3922.08,
+      "deployability_tier": "L1_DEPLOYABLE_OR_L2_DEPLOYABLE"
+    }
+  ],
+  "runtime": {
+    "engine": "production_kernel_v1",
+    "runner": "scripts/run_economic_production_manifest.py",
+    "selective_veto_runtime_version": "hydra_selective_order_flow_veto_runtime_v1",
+    "output_dir": "reports/economic_evolution/selective_order_flow_veto_expansion_0034",
+    "result_schema": "hydra_economic_production_result_v1",
+    "result_name": "economic_production_result.json",
+    "controller_source_change_required": false,
+    "resume_from_checkpoint": true,
+    "orchestrator_count": 1,
+    "worker_count": 2,
+    "asynchronous_evidence_writer_count": 1
+  },
+  "compute_contract": {
+    "vps_cpu_core_count": 3,
+    "orchestrator_count": 1,
+    "cpu_worker_count": 2,
+    "authoritative_writer_count": 1,
+    "cpu_workers_read_only": true,
+    "single_writer_atomic_commits": true,
+    "oversubscription_allowed": false,
+    "target_cpu_utilization_min": 0.8,
+    "target_cpu_utilization_max": 0.95,
+    "economic_wall_clock_minimum": 0.9,
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1"
+    }
+  },
+  "primary_action_contract": {
+    "actions": [
+      "ABSTAIN",
+      "TRADE_1X",
+      "TRADE_1_5X"
+    ],
+    "risk_levels": [
+      0.0,
+      1.0,
+      1.5
+    ],
+    "structural_direction_immutable": true,
+    "structural_entry_exit_stop_target_immutable": true,
+    "a2_timing_allowed": false,
+    "a3_execution_variant_allowed": false,
+    "a4_passive_allowed": false,
+    "a5_early_invalidation_allowed": false,
+    "direction_reversal_allowed": false,
+    "new_structural_direction_allowed": false
+  },
+  "seed_robustness_audit": {
+    "attribution_dimensions": [
+      "market",
+      "structural_anchor_family",
+      "session",
+      "individual_opportunity",
+      "abstention",
+      "risk_1_5x",
+      "all_in_costs"
+    ],
+    "leave_one_opportunity_out": true,
+    "top_trade_removal_counts": [
+      1,
+      2,
+      3
+    ],
+    "leave_one_anchor_family_out": true,
+    "cost_stress_multipliers": [
+      1.0,
+      1.25
+    ],
+    "feature_dependency_tiers": [
+      "TRADES_ONLY",
+      "TBBO",
+      "MBP_1",
+      "MBO_TEACHER_ONLY"
+    ],
+    "account_sizes_usd": [
+      50000,
+      100000,
+      150000
+    ],
+    "account_horizons_days": [
+      5,
+      10
+    ],
+    "allowed_decisions": [
+      "SELECTIVE_VETO_SEED_ROBUST",
+      "SELECTIVE_VETO_SEED_FRAGILE",
+      "SELECTIVE_VETO_SEED_FALSIFIED"
+    ],
+    "no_purchase_before_decision": true,
+    "best_trade_removal_positive_stressed_required": true,
+    "minimum_distinct_context_count": 2,
+    "maximum_single_opportunity_profit_share": 0.25,
+    "hard_data_or_deployability_defect_allowed": false,
+    "thresholds_may_change_after_results": false
+  },
+  "structural_anchor_universe": {
+    "source": "EXISTING_CACHED_CAUSAL_OHLCV_AND_STRUCTURAL_FEATURES",
+    "families": [
+      "OPENING_RANGE",
+      "FAILED_BREAKOUT"
+    ],
+    "microstructure_outcomes_used_for_generation": false,
+    "causal_generation_required": true,
+    "behavioral_deduplication_required": true,
+    "temporal_deduplication_required": true,
+    "neighboring_bar_duplicates_allowed": false,
+    "anchor_fields_complete": true
+  },
+  "anchor_conditioned_windows": {
+    "pre_decision_lookback_seconds": 120,
+    "post_decision_safety_seconds": 60,
+    "deterministic_warmup_included": true,
+    "overlapping_windows_merged": true,
+    "full_session_request_default": false,
+    "holding_period_microstructure_required": false,
+    "cached_market_data_used_for_post_entry_outcomes": true
+  },
+  "targeted_cost_policy": {
+    "schemas": [
+      "trades",
+      "tbbo",
+      "mbp-1"
+    ],
+    "window_counts": [
+      100,
+      250,
+      500,
+      1000
+    ],
+    "official_databento_cost_estimate_required": true,
+    "one_and_two_market_estimates_required": true,
+    "chronological_role_costs_required": true,
+    "no_new_mbo_purchase": true,
+    "purchase_before_seed_gate_allowed": false,
+    "silent_purchase_allowed": false,
+    "manifest_bound_purchase_counter_required": true,
+    "unmanifested_purchase_count_must_be_zero": true,
+    "ledger_before_after_hash_required": true,
+    "current_remaining_budget_usd": 28.498462508622012,
+    "minimum_budget_reserve_usd": 20.0,
+    "maximum_incremental_spend_usd": 8.0
+  },
+  "chronological_roles": {
+    "discovery_fraction": 0.6,
+    "validation_fraction": 0.2,
+    "final_development_fraction": 0.2,
+    "random_temporal_mixing_allowed": false,
+    "roles_frozen_before_download": true,
+    "final_development_includes_all_eligible_anchors": true,
+    "final_development_outcomes_visible_before_policy_freeze": false,
+    "final_development_is_independent_confirmation": false
+  },
+  "selective_policy_distillation": {
+    "actions": [
+      "ABSTAIN",
+      "TRADE_1X",
+      "TRADE_1_5X"
+    ],
+    "model_classes": [
+      "REGULARIZED_LOGISTIC_REGRESSION",
+      "SHALLOW_MONOTONIC_TREE",
+      "MONOTONIC_GRADIENT_BOOSTING",
+      "TRANSPARENT_POLICY_TREE"
+    ],
+    "maximum_production_features": 8,
+    "maximum_thresholds": 3,
+    "direction_generation_allowed": false,
+    "deterministic_versioned_output": true,
+    "objective": "LOWER_CONFIDENCE_BOUND_OF_PAIRED_STRESSED_UPLIFT",
+    "minimum_trade_coverage": 0.2,
+    "maximum_abstention": 0.8,
+    "exact_mll_required": true,
+    "consistency_required": true,
+    "single_opportunity_domination_allowed": false,
+    "raw_in_sample_net_is_primary": false
+  },
+  "paired_long_sample_evaluation": {
+    "baseline_action": "BASELINE_IMMEDIATE_CAUSAL_STRUCTURAL_TRADE",
+    "selective_actions": [
+      "ABSTAIN",
+      "TRADE_1X",
+      "TRADE_1_5X"
+    ],
+    "identical_structural_direction_stop_target_exit": true,
+    "identical_causal_fill_and_account_rules": true,
+    "paired_metrics": [
+      "normal_net",
+      "stressed_net",
+      "baseline_normal_net",
+      "baseline_stressed_net",
+      "paired_normal_uplift",
+      "paired_stressed_uplift",
+      "entry_cost",
+      "mae",
+      "mfe",
+      "stop_rate",
+      "target_rate",
+      "holding_duration",
+      "target_contribution",
+      "mll_contribution"
+    ],
+    "report_market_family_session_block": true,
+    "unpaired_opportunity_sets_primary": false,
+    "unique_structural_opportunity_required": true,
+    "aggregate_to_event_reconciliation_required": true
+  },
+  "sequential_evidence_policy": {
+    "additional_session_checkpoints": [
+      5,
+      10,
+      15
+    ],
+    "maximum_available_within_budget_checkpoint": true,
+    "allowed_decisions": [
+      "SUCCESS_EVIDENCE_SUFFICIENT",
+      "CONTINUE_ACQUISITION",
+      "FUTILITY_STOP"
+    ],
+    "evidence_available_up_to_checkpoint_only": true,
+    "continuous_retuning_allowed": false,
+    "success_requires_frozen_gate": true,
+    "futility_requires_negative_seed_and_policy_uplift": true
+  },
+  "diagnostic_forward": {
+    "status": "SELECTIVE_VETO_DIAGNOSTIC_FORWARD",
+    "policy_ids": [
+      "hybrid_0033_01_f0345ecb99af8c25",
+      "hybrid_0033_07_5f93891cf737e51a"
+    ],
+    "activation_requires_authorized_research_feed": true,
+    "append_only": true,
+    "zero_order": true,
+    "parameter_changes_allowed": false,
+    "economic_promotion_allowed": false,
+    "paper_shadow_ready_claim_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "activation_after_manifest_freeze_required": true,
+    "feed_authorization_receipt_required": true,
+    "raw_event_fingerprints_required": true,
+    "seed_fingerprint_match_required": true,
+    "falsified_seed_activation_allowed": false
+  },
+  "account_rule_snapshots": {
+    "50K": {
+      "snapshot_id": "TOPSTEP_COMBINE_50K_RESEARCH_SNAPSHOT_2026_07_18",
+      "snapshot_sha256": "0d5039eea0e51b89343a5a5f32279a6bd3ded88092922f527fdf82c699826d54",
+      "provenance_class": "VERSIONED_RESEARCH_SNAPSHOT_NOT_OFFICIAL_CONFIRMED",
+      "official_source_verified": false,
+      "account_size_usd": 50000,
+      "profit_target_usd": 3000,
+      "maximum_loss_limit_usd": 2000,
+      "maximum_mini_contracts": 5,
+      "maximum_micro_contracts": 50,
+      "consistency_limit": 0.5,
+      "minimum_pass_days": 2,
+      "session_close_required": true,
+      "mll_mode": "EOD_LEVEL_RT_BREACH"
+    },
+    "100K": {
+      "snapshot_id": "TOPSTEP_COMBINE_100K_RESEARCH_SNAPSHOT_2026_07_18",
+      "snapshot_sha256": "54d8a8c3a4276e1a304ee366446deeae806b0a523ce4385d470a41bcef433a16",
+      "provenance_class": "VERSIONED_RESEARCH_SNAPSHOT_NOT_OFFICIAL_CONFIRMED",
+      "official_source_verified": false,
+      "account_size_usd": 100000,
+      "profit_target_usd": 6000,
+      "maximum_loss_limit_usd": 3000,
+      "maximum_mini_contracts": 10,
+      "maximum_micro_contracts": 100,
+      "consistency_limit": 0.5,
+      "minimum_pass_days": 2,
+      "session_close_required": true,
+      "mll_mode": "EOD_LEVEL_RT_BREACH"
+    },
+    "150K": {
+      "snapshot_id": "topstep_150k_2026-07-15_no_dll_post_2026-01-12_v1",
+      "snapshot_sha256": "338866ccff7203a3a1bf175d3079cd1fe420fa401e7737517d405f9fdd8d5d15",
+      "provenance_class": "OFFICIAL_VERSIONED_RULE_SNAPSHOT",
+      "official_source_verified": true,
+      "account_size_usd": 150000,
+      "profit_target_usd": 9000,
+      "maximum_loss_limit_usd": 4500,
+      "maximum_mini_contracts": 15,
+      "maximum_micro_contracts": 150,
+      "consistency_limit": 0.5,
+      "minimum_pass_days": 2,
+      "session_close_required": true,
+      "mll_mode": "EOD_LEVEL_RT_BREACH"
+    }
+  },
+  "account_speed_gate": {
+    "account_sizes_usd": [
+      50000,
+      100000,
+      150000
+    ],
+    "horizons_days": [
+      5,
+      10
+    ],
+    "allowed_decisions": [
+      "LONG_SAMPLE_SELECTIVE_OVERLAY_GREEN",
+      "LONG_SAMPLE_SELECTIVE_OVERLAY_WEAK",
+      "LONG_SAMPLE_SELECTIVE_OVERLAY_FALSIFIED"
+    ],
+    "positive_stressed_validation_required": true,
+    "positive_stressed_final_development_required": true,
+    "positive_paired_uplift_validation_required": true,
+    "positive_paired_uplift_final_development_required": true,
+    "minimum_distinct_family_or_context_count": 2,
+    "single_trade_domination_allowed": false,
+    "maximum_single_trade_positive_profit_fraction": 0.25,
+    "mll_within_frozen_tolerance_required": true,
+    "maximum_mll_breach_rate": 0.1,
+    "consistency_required": true,
+    "complete_stressed_p5_or_p10_pass_or_material_progress_required": true,
+    "minimum_material_stressed_target_progress_uplift": 0.05,
+    "material_progress_required_in_validation_and_final_development": true,
+    "normal_and_stressed_scenarios_required": true,
+    "full_coverage_denominators_required": true,
+    "account_rule_snapshot_hash_required": true,
+    "select_fastest_viable_account_size": true,
+    "thresholds_may_change_after_results": false,
+    "development_only": true
+  },
+  "multiplicity": {
+    "prior_global_N_trials": 762244,
+    "prospective_comparisons": 10,
+    "reserved_delta_trials": 10,
+    "expected_global_N_trials_after_reservation": 762254,
+    "reservation_required_before_outcome_access": true,
+    "proof_window_consumed": false
+  },
+  "evidence_bundle": {
+    "required": true,
+    "atomic_single_writer_finalization": true,
+    "summary_only_complete_allowed": false,
+    "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+    "reconstruction_flag": false,
+    "destination": "data/cache/evidence_bundles",
+    "required_datasets": [
+      "component_signals",
+      "component_entries",
+      "component_exits",
+      "component_trades",
+      "account_policy_membership",
+      "account_daily_paths",
+      "episodes",
+      "provenance"
+    ],
+    "exact_account_replay_required": true,
+    "sentinel_economic_records_allowed": false,
+    "paired_evidence_reconciliation_required": true,
+    "normal_stressed_episode_pairing_required": true
+  },
+  "governance": {
+    "live_trading_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "q4_access_allowed": false,
+    "new_mission_allowed": false,
+    "new_service_allowed": false,
+    "new_database_allowed": false,
+    "new_registry_writer_allowed": false,
+    "controller_version_change_required": false,
+    "status_inheritance_allowed": false,
+    "threshold_lowering_after_results_allowed": false,
+    "broad_research_framework_allowed": false,
+    "xfa_work_allowed": false,
+    "new_data_purchase_allowed": true,
+    "purchase_only_after_seed_gate": true,
+    "maximum_incremental_spend_usd": 8.0,
+    "minimum_budget_reserve_usd": 20.0
+  },
+  "manifest_hash": "5d0a66cd12bd7e3629b0a6677a1c47361430e78fb8060cdd4851f19146d595c2"
+}
