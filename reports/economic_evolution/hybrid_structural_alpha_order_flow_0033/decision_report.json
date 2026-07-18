@@ -1,0 +1,300 @@
+{
+  "schema": "hydra_hybrid_structural_alpha_order_flow_0033_decision_report_v1",
+  "campaign_id": "hydra_hybrid_structural_alpha_order_flow_0033",
+  "generated_at_utc": "2026-07-18T15:12:00Z",
+  "manifest_path": "config/v7/hybrid_structural_alpha_order_flow_0033.json",
+  "manifest_hash": "cd693d5237469eb81d1d716088adb32686f65d990929dbab22751b7464acdb19",
+  "reviewed_source_commit": "a631df69f7746e801557bf508e098c4171d8afb1",
+  "campaign_0032_baseline": {
+    "terminal_status": "SPARSE_PILOT_WEAK",
+    "strategies_evaluated": 30,
+    "active_strategies": 18,
+    "correctly_abstaining_strategies": 12,
+    "unique_trades": 327,
+    "median_trades_per_session": 0.8,
+    "aggregate_gross_pnl_usd": 332.5,
+    "normal_net_pnl_usd": -13737.6,
+    "stressed_net_pnl_usd": -17007.0,
+    "normal_all_in_cost_per_trade_usd_approx": 43.0,
+    "stressed_all_in_cost_per_trade_usd_approx": 53.0,
+    "positive_on_validation_and_final_development_count": 0,
+    "p5_pass_count": 0,
+    "p5_mll_path_count": 4,
+    "p5_path_count": 180,
+    "reported_markout_median_usd": 0.0,
+    "no_gross_alpha_family_count": 11,
+    "cost_and_turnover_dominated_family_count": 13,
+    "execution_model_defect_count": 0,
+    "bank_admission_count": 0,
+    "additional_data_spend_usd": 0.0,
+    "remaining_budget_usd": 28.498462508622012
+  },
+  "authoritative_pilot_evidence": {
+    "pilot_summary_path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/pilot/hybrid_pilot_summary.json",
+    "pilot_summary_sha256": "2797a680491d6fc044d5d30f8062f0e3f7d2ed4e0a2b9eb946f33e085d0c0a36",
+    "evidence_material_path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/pilot/hybrid_evidence_material.json",
+    "evidence_material_sha256": "571810e93516aadc55b9d051cf8dd4cb7dc86277463934703cf8f425be92279e",
+    "evidence_bundle_path": "data/cache/evidence_bundles/hydra_hybrid_structural_alpha_order_flow_0033.evidence-v1",
+    "evidence_bundle_manifest_sha256": "f5b49a8e34ee7570d9175b49400d589dbbe936bf365a8be0d0da5eb780cdb22b",
+    "structural_anchors_evaluated": 22,
+    "baseline_structural_opportunities": 72,
+    "opportunities_by_market": {
+      "NQ": 59,
+      "YM": 13
+    },
+    "anchors_by_mechanism": {
+      "CROSS_ASSET_STATE": 6,
+      "DISPLACEMENT_ACCELERATION": 4,
+      "RANGE_BREAKOUT_WITH_ROOM": 4,
+      "EXHAUSTION_REVERSAL": 2,
+      "MULTI_TIMEFRAME_ALIGNMENT": 2,
+      "COMPRESSION_TO_EXPANSION": 1,
+      "DIRECTIONAL_PRESSURE_RELEASE": 1,
+      "FAILED_CONTINUATION_REVERSAL": 1,
+      "PARTICIPATION_DENSITY": 1
+    },
+    "role_opportunity_denominators": {
+      "discovery": 30,
+      "validation": 18,
+      "final_development": 24
+    },
+    "overlay_actions_per_opportunity": 14,
+    "paired_action_outcomes": 1008,
+    "serious_overlay_policies": 20,
+    "normal_account_role_windows": 60,
+    "stressed_account_role_windows": 60,
+    "data_purchase_count": 0,
+    "orders": 0,
+    "q4_access_count_delta": 0
+  },
+  "baseline_a0_economics_usd": {
+    "discovery": {
+      "normal": 165.96,
+      "stressed": -89.04
+    },
+    "validation": {
+      "normal": -344.26,
+      "stressed": -344.26
+    },
+    "final_development": {
+      "normal": 829.5,
+      "stressed": 815.5
+    }
+  },
+  "raw_frozen_calculation": {
+    "status": "HYBRID_OVERLAY_GREEN",
+    "raw_gate_policy_ids": [
+      "hybrid_0033_01_f0345ecb99af8c25",
+      "hybrid_0033_07_5f93891cf737e51a",
+      "hybrid_0033_10_67b936eb009c7e8b"
+    ],
+    "interpretation": "NON_PROMOTIONAL_RAW_CALCULATION_PENDING_DECISION_GRADE_CONTRACT_AUDIT"
+  },
+  "decision_grade_status": "HYBRID_OVERLAY_WEAK",
+  "decision_grade_reasons": [
+    "A pre-reservation real-data smoke exposed the raw gate before the formal replay; it was quarantined and no policy, threshold, action, risk tier, anchor, or gate was changed afterward.",
+    "The frozen A5 early-invalidation fraction and grace-period parameters were not applied, so its apparent survivor is quarantined.",
+    "The passive A4 lane was evaluated on ineligible anchors, lacked the required idealized upper bound, and exceeded its intended lane share; it is non-promotional and not decision-grade.",
+    "MFE was required by the paired persistence contract but was not serialized; MAE/minimum-unrealized evidence is present.",
+    "The claimed exposure-matched random action control was not executed; only same-opportunity paired A0 and the clean 0028 source reference are valid controls.",
+    "The two unaffected retained policies do satisfy held-out consistency, MLL, activity, concentration, positive-net, and paired-uplift checks, but the five-session result remains underpowered for promotion."
+  ],
+  "retained_diagnostic_policies": [
+    {
+      "policy_id": "hybrid_0033_01_f0345ecb99af8c25",
+      "status": "POSITIVE_PAIRED_UPLIFT_DIAGNOSTIC_ONLY",
+      "action": "A0_BASELINE_IMMEDIATE_WITH_CONDITIONAL_ABSTENTION",
+      "quality_quantile": 0.35,
+      "risk_tier": 1.0,
+      "deployability": "L1_DEPLOYABLE",
+      "validation": {
+        "opportunities": 18,
+        "fills": 8,
+        "abstained_fraction": 0.5555555555555556,
+        "improved_fraction": 0.3888888888888889,
+        "harmed_fraction": 0.16666666666666666,
+        "normal_net_usd": 793.82,
+        "stressed_net_usd": 776.32,
+        "paired_stressed_uplift_usd": 1120.58,
+        "minimum_stressed_mll_buffer_usd": 4141.3,
+        "mll_breached": false,
+        "consistency_ok": true
+      },
+      "final_development": {
+        "opportunities": 24,
+        "fills": 19,
+        "abstained_fraction": 0.20833333333333334,
+        "improved_fraction": 0.125,
+        "harmed_fraction": 0.08333333333333333,
+        "normal_net_usd": 1324.78,
+        "stressed_net_usd": 1314.78,
+        "paired_stressed_uplift_usd": 499.28,
+        "minimum_stressed_mll_buffer_usd": 4331.04,
+        "mll_breached": false,
+        "consistency_ok": true
+      },
+      "paired_uplift_total_validation_plus_final_usd": 1619.86,
+      "uplift_attribution_usd": {
+        "validation": {
+          "avoided_trades": 1120.58,
+          "timing": 0.0,
+          "execution": 0.0,
+          "risk_tier": 0.0
+        },
+        "final_development": {
+          "avoided_trades": 499.28,
+          "timing": 0.0,
+          "execution": 0.0,
+          "risk_tier": 0.0
+        }
+      }
+    },
+    {
+      "policy_id": "hybrid_0033_07_5f93891cf737e51a",
+      "status": "POSITIVE_PAIRED_UPLIFT_DIAGNOSTIC_ONLY",
+      "action": "A3_PULLBACK_MARKETABLE_LIMIT_WITH_CONDITIONAL_ABSTENTION",
+      "quality_quantile": 0.35,
+      "risk_tier": 1.5,
+      "deployability": "L1_L2_DEPLOYABLE",
+      "validation": {
+        "opportunities": 18,
+        "fills": 7,
+        "abstained_fraction": 0.5555555555555556,
+        "improved_fraction": 0.6111111111111112,
+        "harmed_fraction": 0.3888888888888889,
+        "normal_net_usd": 972.7,
+        "stressed_net_usd": 930.7,
+        "paired_stressed_uplift_usd": 1274.96,
+        "minimum_stressed_mll_buffer_usd": 3922.08,
+        "mll_breached": false,
+        "consistency_ok": true
+      },
+      "final_development": {
+        "opportunities": 24,
+        "fills": 12,
+        "abstained_fraction": 0.20833333333333334,
+        "improved_fraction": 0.4166666666666667,
+        "harmed_fraction": 0.5833333333333334,
+        "normal_net_usd": 1077.46,
+        "stressed_net_usd": 1046.96,
+        "paired_stressed_uplift_usd": 231.46,
+        "minimum_stressed_mll_buffer_usd": 4219.56,
+        "mll_breached": false,
+        "consistency_ok": true
+      },
+      "paired_uplift_total_validation_plus_final_usd": 1506.42,
+      "uplift_attribution_usd": {
+        "validation": {
+          "avoided_trades": 1120.58,
+          "timing": 0.0,
+          "execution": -203.28,
+          "risk_tier": 357.66
+        },
+        "final_development": {
+          "avoided_trades": 499.28,
+          "timing": 0.0,
+          "execution": -655.58,
+          "risk_tier": 387.76
+        }
+      }
+    }
+  ],
+  "quarantined_policy": {
+    "policy_id": "hybrid_0033_10_67b936eb009c7e8b",
+    "action": "A5_EARLY_INVALIDATION",
+    "reason": "FROZEN_EARLY_INVALIDATION_FRACTION_AND_GRACE_NS_NOT_APPLIED",
+    "promotion_allowed": false
+  },
+  "paired_economic_conclusion": {
+    "abstention": "POSITIVE_ON_BOTH_HELD_OUT_ROLES_FOR_THE_TWO_RETAINED_POLICIES",
+    "timing": "NO_POSITIVE_INCREMENTAL_TIMING_ALPHA_ESTABLISHED",
+    "execution": "NEGATIVE_INCREMENTAL_CONTRIBUTION_FOR_THE_RETAINED_A3_POLICY",
+    "risk_tier": "POSITIVE_INCREMENTAL_CONTRIBUTION_FOR_THE_RETAINED_A3_POLICY",
+    "complete_hybrid_stressed_economics": "POSITIVE_FOR_TWO_UNAFFECTED_DIAGNOSTIC_POLICIES",
+    "combine_or_promotion_claim": false
+  },
+  "passive_execution_side_lane": {
+    "status": "PASSIVE_EXECUTION_SALVAGE_FALSIFIED",
+    "decision_grade_interpretation": "NOT_EVALUABLE_ON_ELIGIBLE_ANCHORS",
+    "eligible_anchor_count": 0,
+    "promotion_allowed": false,
+    "reason": "NO_QUEUE_REPLENISHMENT_OR_OPENING_DRIVE_ANCHORS_AND_REQUIRED_IDEALIZED_UPPER_BOUND_ABSENT"
+  },
+  "deployability": {
+    "retained_l1_or_l2_policy_count": 2,
+    "bank_admission_count": 0,
+    "long_sample_hybrid_status": "NOT_STARTED_BUDGET_INFEASIBLE_AND_DECISION_GRADE_GREEN_NOT_ESTABLISHED"
+  },
+  "compute": {
+    "elapsed_seconds": 32.13308415794745,
+    "cpu_seconds": 44.642255,
+    "configured_cpu_worker_count": 2,
+    "three_core_cpu_utilization_fraction": 0.46656189798059383,
+    "economic_worker_utilization_fraction": 0.6998428469708907,
+    "economic_wall_clock_fraction": 0.9925746714266785,
+    "source_store_cache_hit_rate": 1.0,
+    "contract_note": "THE_TWO_WORKER_CAP_WAS_RESPECTED; BLAS_SINGLE_THREAD_ENFORCEMENT_WAS_NOT_PROVEN_BECAUSE_ENVIRONMENT_ASSIGNMENT_OCCURRED_AFTER_NUMPY_IMPORT"
+  },
+  "conditional_cost_matrix": {
+    "path": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033/official_conditional_cost_matrix.json",
+    "file_sha256": "c75acee355128c96d69851813a2c296d31e1e97a5695faf778734088859a2df8",
+    "semantic_cost_matrix_hash": "9751917695a23ad79b78d3848560537971eb1761caa5fa73bc702da6a36d2fb3",
+    "provider_method": "Databento Historical.metadata.get_cost",
+    "dataset": "GLBX.MDP3",
+    "symbols": [
+      "NQU4",
+      "ESU4"
+    ],
+    "session_counts": [
+      10,
+      20,
+      30,
+      40
+    ],
+    "combined_nq_es_tbbo_cost_usd": {
+      "10": 21.411646604538,
+      "20": 47.838907837868,
+      "30": 62.243272066116,
+      "40": 80.051892697811
+    },
+    "combined_nq_es_mbp1_cost_usd": {
+      "10": 23.963556870818,
+      "20": 51.28907699883,
+      "30": 65.867575675249,
+      "40": 85.3662301898
+    },
+    "maximum_additional_spend_usd": 3.25,
+    "minimum_budget_reserve_usd": 25.0,
+    "remaining_budget_usd": 28.498462508622012,
+    "affordable_balanced_row_count": 0,
+    "actual_additional_spend_usd": 0.0,
+    "purchase_performed": false,
+    "q4_accessed": false
+  },
+  "integrity_disclosures": {
+    "pre_reservation_smoke_quarantine_receipt": "reports/checkpoints/hybrid_structural_alpha_order_flow_0033_pre_reservation_smoke_quarantine_20260718T141643Z.json",
+    "evidence_only_seal_recovery_receipt": "reports/checkpoints/hybrid_structural_alpha_order_flow_0033_evidence_seal_recovery_20260718T143700Z.json",
+    "formal_authoritative_economic_replay_count": 1,
+    "post_outcome_policy_or_threshold_change": false,
+    "market_signal_replay_during_evidence_recovery": false,
+    "complete_matched_random_control": false,
+    "mfe_persisted": false,
+    "mae_or_minimum_unrealized_persisted": true
+  },
+  "autonomous_decision": {
+    "preserve_policy_ids": [
+      "hybrid_0033_01_f0345ecb99af8c25",
+      "hybrid_0033_07_5f93891cf737e51a"
+    ],
+    "promotion_count": 0,
+    "purchase_authorized": false,
+    "next_action": "PREREGISTER_AND_RUN_EXACTLY_ONE_BOUNDED_ACTION_TIMING_OR_EXECUTION_REFINEMENT_ON_EXISTING_DATA_AFTER_RECONCILING_A5_PASSIVE_MFE_AND_RANDOM_CONTROL_CONTRACTS",
+    "constraints": [
+      "NO_NEW_STANDALONE_MICROSTRUCTURE_SEARCH",
+      "NO_ADDITIONAL_DATA_PURCHASE",
+      "NO_Q4_ACCESS",
+      "NO_BROKER",
+      "NO_ORDERS"
+    ]
+  }
+}
