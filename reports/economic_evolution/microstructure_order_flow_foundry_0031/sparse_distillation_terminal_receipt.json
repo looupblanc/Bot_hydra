@@ -1,0 +1,67 @@
+{
+  "schema": "hydra_microstructure_order_flow_foundry_terminal_receipt_v1",
+  "recorded_at_utc": "2026-07-18T10:23:52Z",
+  "campaign_id": "hydra_microstructure_order_flow_foundry_0031",
+  "class_id": "EVENT_SOURCED_LOB_TEACHER_STUDENT_MOE_V1",
+  "terminal_status": "MICROSTRUCTURE_PILOT_FALSIFIED",
+  "terminal_scope": "DENSE_24_SLEEVE_EXECUTION_ARCHITECTURE_ONLY",
+  "failure_code": "DENSE_24_SLEEVE_EXECUTION_ARCHITECTURE_FALSIFIED",
+  "scientific_boundary": {
+    "development_evidence_only": true,
+    "automatic_campaign_retry_allowed": false,
+    "dense_24_sleeve_neighbor_allowed": false,
+    "raw_microstructure_representation_falsified": false,
+    "sparse_distillation_new_manifest_allowed": true,
+    "evidence_regeneration_allowed": false,
+    "independent_confirmation": false,
+    "xfa_started": false
+  },
+  "source_identity": {
+    "manifest_source_commit": "3b357f2e2136e7e56ff79d9dccd7cf6ce7e8149a",
+    "manifest_path": "config/v7/microstructure_order_flow_foundry_0031.json",
+    "manifest_file_sha256": "54abc0d798b20d48419877fd87dad3596af0f30d0c2353250af336390b2dc487",
+    "manifest_semantic_hash": "f73c25c38d33fcb43c8c0178e40d7b5d498f4089ab72823fb833aa3b96850bbb",
+    "manifest_worm_tag": "worm/microstructure-order-flow-foundry-0031-authoritative-account-terminal-recovery-2026-07-18",
+    "manifest_worm_commit": "1a8255d974f24ea4ebb3af7c84baabb89bd0f9b1"
+  },
+  "terminal_result": {
+    "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/economic_production_result.json",
+    "file_sha256": "3ea30404f46359c3b9efcecf918fca0b3d59a37a66bc1dc61b820a42beca8ec5",
+    "result_hash": "45fb93f5f103e48c8b2375c1551a8e6c1b622adfac2501e70f970199ec1725d1",
+    "status": "COMPLETE"
+  },
+  "evidence_bundle": {
+    "receipt_path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/evidence_bundle_receipt.json",
+    "receipt_file_sha256": "59cc04afb72b14556c577c6ede62b53022a35f306b359a548b517afe0fd6ff20",
+    "evidence_status": "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION",
+    "reconstruction_flag": true,
+    "manifest_sha256": "36ad8d4681ce9228e83988eee839078aed52519602ccd204f6e1d3e782f32804",
+    "bundle_content_sha256": "f2387366f6cdca79efa4b96902e560a927d67eb01c1abaa6793a14dd17d212c4",
+    "episode_rows": 720,
+    "trade_rows": 144947
+  },
+  "economic_totals": {
+    "sleeves": 24,
+    "signals": 293285,
+    "trades": 144947,
+    "account_episodes": 720,
+    "positive_stressed_candidates": 0,
+    "normal_passes": 0,
+    "stressed_passes": 0,
+    "mll_breached_episodes": 621,
+    "complete_sessions": 5,
+    "survivors": 0,
+    "books": 0,
+    "xfa_paths": 0
+  },
+  "governance": {
+    "q4_status": "BURNED",
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "remaining_budget_usd": 28.498462508622012
+  },
+  "CONTRE": "This receipt closes only the dense 24-sleeve campaign 0031. It preserves all raw and derived evidence, forbids retry or status inheritance, and does not claim that sparse microstructure mechanisms are falsified.",
+  "receipt_hash": "d55f6f6724296520ec29954ccc25860116e3951e5e1ee2a8c0c192faedb6ce8e"
+}

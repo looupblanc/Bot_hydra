@@ -1,0 +1,429 @@
+{
+  "schema": "hydra_economic_production_manifest_v1",
+  "campaign_mode": "MICROSTRUCTURE_SPARSE_ALPHA_DISTILLATION",
+  "campaign_id": "hydra_microstructure_sparse_alpha_distillation_0032",
+  "class_id": "MICROSTRUCTURE_SPARSE_ALPHA_DISTILLATION_V1",
+  "policy_classes": [
+    "MICROSTRUCTURE_SPARSE_ALPHA_DISTILLATION_V1"
+  ],
+  "development_only": true,
+  "created_at_utc": "2026-07-18T10:23:52Z",
+  "source_commit": "f8ffe0be02a07e5335487d59e4be30472fdfa84f",
+  "economic_hypothesis": "Causally consolidated order-flow episodes plus abstention-first meta-labeling can preserve sparse gross alpha, overcome aggressive executable costs, and improve target velocity without the dense 0031 turnover architecture.",
+  "implementation_files": {
+    "hydra/production/manifest.py": "9000c41a2f252ccbb8cbcb33f4099cbe0471ccda8ab49a43c9fcb2a1f3e3d2f4",
+    "hydra/production/runtime.py": "d4ae29ef0333c74067d2a2b40b7c60ed364c8f0b65eca387d0b529a39bbcfbe0",
+    "hydra/production/microstructure_opportunity_episode.py": "ab40104ec30f66014e6e8654e8c4bbc48387012f90d41abeb113afc39d1a935f",
+    "hydra/production/microstructure_sparse_forensics.py": "4149457e6146b321f3026a0b7d0ed2c88046fa1aa998187b38be13069a7ccd88",
+    "hydra/production/microstructure_sparse_manifest.py": "f1ee8ba8f82ee1a13649124cda6efa45640d017f9a9f794cf5cd7497eca54ba8",
+    "hydra/production/microstructure_sparse_pilot.py": "b92dadfa004b9df802915225ce7e708faf0e8f08ca04853e474854773a38fa8d",
+    "hydra/production/microstructure_sparse_runtime.py": "5ab9a6fae1834a6270833a38ba45ed658453638af0ab787a998ca69c1661e4fb",
+    "scripts/run_economic_production_manifest.py": "45e610a35ae5a260e628bc73fcd23634362c6cef0298707b2e6e97ff8762cc6f"
+  },
+  "terminal_baseline_0031": {
+    "campaign_id": "hydra_microstructure_order_flow_foundry_0031",
+    "terminal_status": "MICROSTRUCTURE_PILOT_FALSIFIED",
+    "manifest_hash": "f73c25c38d33fcb43c8c0178e40d7b5d498f4089ab72823fb833aa3b96850bbb",
+    "authoritative_bundle_content_sha256": "f2387366f6cdca79efa4b96902e560a927d67eb01c1abaa6793a14dd17d212c4",
+    "account_terminal_recovery_receipt_hash": "6ed1224e50d5e2184257edb2065f72a89358c8df62aa5c68f368427bc2c003e9",
+    "candidate_count": 24,
+    "exact_replays": 24,
+    "matched_control_replays": 72,
+    "combine_episodes": 720,
+    "normal_episodes": 360,
+    "stressed_episodes": 360,
+    "positive_stressed_candidates": 0,
+    "normal_pass_candidates": 0,
+    "stressed_pass_candidates": 0,
+    "teacher_event_count": 61240,
+    "events_processed": 92127026,
+    "full_coverage_episodes": 5,
+    "data_censored_episodes": 94,
+    "mll_breached_episodes": 621,
+    "source_trade_count": 144947,
+    "source_signal_count": 293285,
+    "source_trade_per_episode": 201.31527777777777,
+    "source_trade_per_sleeve": 6039.458333333333,
+    "source_mll_rate": 0.8625,
+    "actual_spend_usd": 8.648637887836,
+    "remaining_budget_usd": 28.498462508622012,
+    "mass_scale_started": false,
+    "xfa_paths": 0,
+    "retry_or_retune_allowed": false,
+    "status_inheritance_allowed": false
+  },
+  "source_store": {
+    "source_campaign_id": "hydra_microstructure_order_flow_foundry_0031",
+    "reuse_mode": "IMMUTABLE_READ_ONLY",
+    "raw_rewrite_allowed": false,
+    "source_feature_recomputation_allowed": false,
+    "outcome_labels_physically_separate": true,
+    "source_status_inheritance_allowed": false,
+    "source_hashes": {
+      "authoritative_result": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/economic_production_result.json",
+        "sha256": "3ea30404f46359c3b9efcecf918fca0b3d59a37a66bc1dc61b820a42beca8ec5"
+      },
+      "evidence_bundle_receipt": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/evidence_bundle_receipt.json",
+        "sha256": "59cc04afb72b14556c577c6ede62b53022a35f306b359a548b517afe0fd6ff20"
+      },
+      "event_store_receipt": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/store_receipt.json",
+        "sha256": "9a2a4136c2f382524a3136af8a1ddb71d840baf3ae2b190e6a900cfec03aac58"
+      },
+      "raw_dbn": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/raw_dbn/part-000000.parquet",
+        "sha256": "72bc509041a59fafb0746283881d17485d6c44a9f31985c9de9045f92cbcf38c"
+      },
+      "derived_events": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/derived_events/part-000000.parquet",
+        "sha256": "95962c14ccf5627a22db2e7680965a960112a7f09d613021b4a963b323bbc5f8"
+      },
+      "feature_matrices": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/feature_matrices/part-000000.parquet",
+        "sha256": "0d0ea39346c122bc37c51c5044d89b1e86ea0a429312491758f23f8665cb6a94"
+      },
+      "outcome_labels": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/outcome_labels/part-000000.parquet",
+        "sha256": "8368a8718daf6dab37bc2c84687bad17fb01fe52ca378d3acc10ece23635c176"
+      },
+      "signals": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/signals/part-000000.parquet",
+        "sha256": "dd03fe802f7c92d24cbe4ece49ddcd242b2a88893caf3e3545fff2c214e53a6b"
+      },
+      "trades": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/trades/part-000000.parquet",
+        "sha256": "c34690ee1aa2a349834ea554c106770770bccb036d3eeb547c4009d7007bc1af"
+      },
+      "episodes": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/episodes/part-000000.parquet",
+        "sha256": "ebd648b9bc7d1659d9d7efd2e6917f3266cf2b53fd3f21d5c1fd587499826cf2"
+      }
+    }
+  },
+  "runtime": {
+    "engine": "production_kernel_v1",
+    "runner": "scripts/run_economic_production_manifest.py",
+    "sparse_runtime_version": "hydra_microstructure_sparse_alpha_runtime_v1",
+    "output_dir": "reports/economic_evolution/microstructure_sparse_alpha_distillation_0032",
+    "result_name": "economic_production_result.json",
+    "result_schema": "hydra_economic_production_result_v1",
+    "controller_source_change_required": false,
+    "resume_from_checkpoint": true,
+    "orchestrator_count": 1,
+    "worker_count": 2,
+    "asynchronous_evidence_writer_count": 1
+  },
+  "compute_contract": {
+    "orchestrator_count": 1,
+    "cpu_worker_count": 2,
+    "authoritative_writer_count": 1,
+    "cpu_workers_read_only": true,
+    "single_writer_atomic_commits": true,
+    "oversubscription_allowed": false,
+    "thread_environment": {
+      "OMP_NUM_THREADS": 1,
+      "MKL_NUM_THREADS": 1,
+      "OPENBLAS_NUM_THREADS": 1,
+      "NUMEXPR_NUM_THREADS": 1
+    },
+    "cpu_utilization_target_minimum": 0.8,
+    "cpu_utilization_target_maximum": 0.95,
+    "economic_wall_clock_minimum": 0.85
+  },
+  "forensic_bridge": {
+    "required_before_sparse_outcomes": true,
+    "source_signal_trade_episode_reconciliation": true,
+    "gross_cost_net_arithmetic_reconciliation": true,
+    "account_terminal_precedence_preserved": true,
+    "post_mll_path_truncation_preserved": true,
+    "source_features_signals_trades_mutable": false,
+    "source_result_reinterpretation_allowed": false,
+    "bridge_is_new_economic_evidence": false
+  },
+  "opportunity_episode_contract": {
+    "availability_rule": "available_at<=decision_time",
+    "future_outcomes_are_labels_only": true,
+    "future_label_availability_in_eligibility": false,
+    "negative_shift_in_decision_code": false,
+    "one_decision_per_opportunity": true,
+    "duplicate_opportunities_allowed": false,
+    "missing_future_coverage_status": "CENSORED_FUTURE_COVERAGE",
+    "censored_in_headline_denominator": false,
+    "chronological_roles_frozen_before_outcomes": true,
+    "grouping_fields": [
+      "market",
+      "side",
+      "mechanism",
+      "price_zone",
+      "state_continuity",
+      "event_time_distance",
+      "order_flow_direction",
+      "session_context"
+    ]
+  },
+  "finite_state_engine": {
+    "states": [
+      "FLAT",
+      "ARMED",
+      "ENTRY_PENDING",
+      "OPEN",
+      "EXIT_PENDING",
+      "COOLDOWN"
+    ],
+    "mechanism_states": [
+      "NEUTRAL",
+      "INITIATIVE_BUY",
+      "INITIATIVE_SELL",
+      "ABSORPTION_BUY",
+      "ABSORPTION_SELL",
+      "LIQUIDITY_VACUUM_BUY",
+      "LIQUIDITY_VACUUM_SELL",
+      "EXHAUSTION_BUY",
+      "EXHAUSTION_SELL",
+      "RESET"
+    ],
+    "single_authoritative_step": true,
+    "batch_streaming_decision_equality": true,
+    "event_time_sequence_required": true,
+    "restart_resume_idempotent": true,
+    "duplicate_event_idempotent": true,
+    "future_state_access_allowed": false
+  },
+  "meta_labeling": {
+    "teacher_source": "CAMPAIGN_0031_MBO_OUTCOME_LABELS",
+    "student_source": "CAMPAIGN_0031_CAUSAL_FEATURE_MATRICES",
+    "model_classes": [
+      "REGULARIZED_LOGISTIC_REGRESSION",
+      "SHALLOW_DECISION_TREE",
+      "MONOTONIC_GRADIENT_BOOSTING"
+    ],
+    "chronological_cross_fit": true,
+    "roles": {
+      "discovery_sessions": 3,
+      "validation_sessions": 1,
+      "final_development_sessions": 1
+    },
+    "random_temporal_mixing_allowed": false,
+    "teacher_fields_at_inference_allowed": false,
+    "classification_accuracy_alone_promotable": false,
+    "economic_utility_required": true,
+    "primary_action": "TRADE_OR_ABSTAIN"
+  },
+  "execution_model": {
+    "decision_after_completed_event": true,
+    "earliest_fill_after_decision": true,
+    "touch_implies_fill": false,
+    "partial_fills_modeled": true,
+    "available_depth_enforced": true,
+    "fees_and_slippage_frozen": true,
+    "normal_cost_multiplier": 1.0,
+    "stressed_cost_multiplier": 1.5,
+    "sub_millisecond_latency_arbitrage_allowed": false,
+    "initial_mode": "AGGRESSIVE_CONSERVATIVE",
+    "latency_ns": 25000000,
+    "adverse_slippage_ticks_per_side": 2.0,
+    "passive_promotion_allowed": false
+  },
+  "sparse_policy_frontier": {
+    "edge_to_cost_ratios": [
+      1.25,
+      1.5,
+      2.0,
+      3.0
+    ],
+    "trade_budgets_per_session": [
+      2,
+      4,
+      8,
+      12
+    ],
+    "max_strategies": 30,
+    "continuous_threshold_optimization_allowed": false,
+    "parameter_clone_admission_allowed": false,
+    "frontier_frozen_before_outcomes": true
+  },
+  "holding_exit_frontier": {
+    "horizons_seconds": [
+      30,
+      120,
+      300,
+      900
+    ],
+    "exit_types": [
+      "FIXED_TARGET_STOP",
+      "ORDER_FLOW_DECAY",
+      "OPPOSITE_STATE_TRANSITION",
+      "TIME_STOP",
+      "VWAP_LIQUIDITY_LEVEL",
+      "EVENT_STATE_RESET"
+    ],
+    "event_state_reset_is_causal": true,
+    "unrestricted_exit_search_allowed": false
+  },
+  "pilot_configuration": {
+    "selected_markets": [
+      "NQ",
+      "YM"
+    ],
+    "contracts": {
+      "NQ": "NQU4",
+      "YM": "YMU4"
+    },
+    "chronological_roles": [
+      3,
+      1,
+      1
+    ],
+    "opportunity_gap_ns": 15000000000,
+    "price_zone_ticks": 4,
+    "hysteresis_enter_quantile": 0.85,
+    "hysteresis_exit_quantile": 0.65,
+    "aggressive_latency_ns": 25000000,
+    "adverse_slippage_ticks_per_side": 2.0,
+    "quantity": 1,
+    "target_ticks": 16.0,
+    "stop_ticks": 6.0,
+    "commission_usd": {
+      "NQ": 3.8,
+      "YM": 3.8
+    },
+    "tick_size": {
+      "NQ": 0.25,
+      "YM": 1.0
+    },
+    "point_value": {
+      "NQ": 20.0,
+      "YM": 5.0
+    },
+    "account_snapshots": {
+      "50K": {
+        "account_size": 50000.0,
+        "target": 3000.0,
+        "mll": 2000.0,
+        "max_contracts": 5.0,
+        "consistency": 0.5
+      },
+      "100K": {
+        "account_size": 100000.0,
+        "target": 6000.0,
+        "mll": 3000.0,
+        "max_contracts": 10.0,
+        "consistency": 0.5
+      },
+      "150K": {
+        "account_size": 150000.0,
+        "target": 9000.0,
+        "mll": 4500.0,
+        "max_contracts": 15.0,
+        "consistency": 0.5
+      }
+    },
+    "random_seed": 32032
+  },
+  "account_evaluation": {
+    "horizons_days": [
+      5,
+      10,
+      20
+    ],
+    "cost_scenarios": [
+      "NORMAL",
+      "STRESSED_1_5X"
+    ],
+    "full_coverage_only_headline": true,
+    "overlapping_windows_independent": false,
+    "xfa_enabled": false
+  },
+  "account_size_frontier": {
+    "account_sizes_usd": [
+      50000,
+      100000,
+      150000
+    ],
+    "official_rule_snapshot_per_size_required": true,
+    "legal_contract_limits_required": true,
+    "selected_after_final_outcomes": false
+  },
+  "development_gate": {
+    "allowed_decisions": [
+      "SPARSE_PILOT_GREEN",
+      "SPARSE_PILOT_WEAK",
+      "SPARSE_PILOT_FALSIFIED"
+    ],
+    "thresholds_may_change_after_results": false,
+    "development_only": true,
+    "independent_confirmation_claim_allowed": false,
+    "green_requirements": {
+      "material_target_velocity_uplift": true,
+      "positive_stressed_economics": true,
+      "two_behaviorally_distinct_mechanism_families": true,
+      "positive_net_validation_and_final_development": true,
+      "no_mll_breach_frozen_risk_profile": true,
+      "median_trades_per_session_maximum": 12,
+      "single_event_domination_allowed": false,
+      "acceptable_mll_and_consistency": true,
+      "final_development_evidence": true,
+      "deployable_causal_strategy": true
+    },
+    "weak_requires_information_uplift": true,
+    "falsified_when_no_material_uplift": true
+  },
+  "conditional_extension": {
+    "enabled": true,
+    "trigger_decisions": [
+      "SPARSE_PILOT_GREEN"
+    ],
+    "maximum_incremental_spend_usd": 3.25,
+    "minimum_budget_reserve_usd": 25.0,
+    "current_remaining_budget_usd": 28.498462508622012,
+    "maximum_extension_count": 1,
+    "official_cost_estimate_required_before_purchase": true,
+    "automatic_purchase_allowed": false,
+    "broad_historical_purchase_allowed": false,
+    "q4_access_allowed": false
+  },
+  "multiplicity": {
+    "prior_global_N_trials": 762169,
+    "prospective_comparisons": 30,
+    "campaign_specific_inflation": 1.5,
+    "reserved_delta_trials": 45,
+    "expected_global_N_trials_after_reservation": 762214,
+    "reservation_required_before_outcome_access": true,
+    "proof_window_consumed": false
+  },
+  "evidence_bundle": {
+    "required": true,
+    "atomic_single_writer_finalization": true,
+    "summary_only_complete_allowed": false,
+    "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+    "reconstruction_flag": false,
+    "destination": "data/cache/evidence_bundles",
+    "required_datasets": [
+      "component_signals",
+      "component_entries",
+      "component_exits",
+      "component_trades",
+      "account_policy_membership",
+      "account_daily_paths",
+      "episodes",
+      "provenance"
+    ]
+  },
+  "governance": {
+    "live_trading_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "q4_access_allowed": false,
+    "new_mission_allowed": false,
+    "new_service_allowed": false,
+    "new_database_allowed": false,
+    "new_registry_writer_allowed": false,
+    "controller_version_change_required": false,
+    "status_inheritance_allowed": false,
+    "threshold_lowering_after_results_allowed": false,
+    "xfa_before_clean_combine_survivors_allowed": false
+  },
+  "manifest_hash": "867d665c4d06d6cfb5ee9b6c7c291c0b3ddaf92aae7b96299a4f37cf24bf7e27"
+}

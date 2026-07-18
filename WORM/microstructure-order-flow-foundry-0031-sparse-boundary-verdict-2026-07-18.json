@@ -1,0 +1,42 @@
+{
+  "schema": "hydra_microstructure_order_flow_foundry_terminal_verdict_worm_v1",
+  "campaign_id": "hydra_microstructure_order_flow_foundry_0031",
+  "class_id": "EVENT_SOURCED_LOB_TEACHER_STUDENT_MOE_V1",
+  "recorded_at_utc": "2026-07-18T10:23:52Z",
+  "immutable": true,
+  "terminal_status": "MICROSTRUCTURE_PILOT_FALSIFIED",
+  "terminal_scope": "DENSE_24_SLEEVE_EXECUTION_ARCHITECTURE_ONLY",
+  "failure_code": "DENSE_24_SLEEVE_EXECUTION_ARCHITECTURE_FALSIFIED",
+  "source_manifest": {
+    "path": "config/v7/microstructure_order_flow_foundry_0031.json",
+    "file_sha256": "54abc0d798b20d48419877fd87dad3596af0f30d0c2353250af336390b2dc487",
+    "semantic_hash": "f73c25c38d33fcb43c8c0178e40d7b5d498f4089ab72823fb833aa3b96850bbb",
+    "source_commit": "3b357f2e2136e7e56ff79d9dccd7cf6ce7e8149a",
+    "tag": "worm/microstructure-order-flow-foundry-0031-authoritative-account-terminal-recovery-2026-07-18",
+    "commit": "1a8255d974f24ea4ebb3af7c84baabb89bd0f9b1"
+  },
+  "source_terminal_receipt": {
+    "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/sparse_distillation_terminal_receipt.json",
+    "file_sha256": "02265e284d4c3601828c36aca4c6d9f3389ac0ae701cd3f0f88fa0b2433bcdc0",
+    "receipt_hash": "d55f6f6724296520ec29954ccc25860116e3951e5e1ee2a8c0c192faedb6ce8e"
+  },
+  "decision_boundary": {
+    "campaign_retry_allowed": false,
+    "dense_parameter_neighbor_allowed": false,
+    "economic_evidence_regeneration_allowed": false,
+    "raw_microstructure_data_preserved": true,
+    "sparse_distillation_requires_new_manifest": true,
+    "paper_shadow_ready_assigned": false,
+    "independent_confirmation_claimed": false
+  },
+  "scope": {
+    "next_state": "MICROSTRUCTURE_SPARSE_ALPHA_DISTILLATION_0032",
+    "preserve_raw_mbo_tbbo_mbp": true,
+    "preserve_features_events_fills_reports_bundles": true,
+    "q4_access_allowed": false,
+    "broker_or_orders_allowed": false,
+    "automatic_new_data_purchase_allowed": false
+  },
+  "CONTRE": "This WORM verdict falsifies only the dense 0031 execution architecture. It neither validates sparse alpha nor authorizes live trading, Q4 access, broker access, orders, or inherited promotion.",
+  "verdict_hash": "2a83698bd192d3447d48789c4882eba9d73e3ee303ca3a9d0833b4571398ebbc"
+}
