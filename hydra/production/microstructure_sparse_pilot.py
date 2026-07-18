@@ -1618,7 +1618,10 @@ def _evidence_material(
 ) -> tuple[Mapping[str, Any], Mapping[str, Sequence[Mapping[str, Any]]], Mapping[str, Any]]:
     now = _utc_now()
     result_by_id = {str(value["strategy"]["strategy_id"]): value for value in results}
-    fingerprints = {value.strategy_id: value.specification_hash for value in specs}
+    evidence_specs = _executed_evidence_specs(specs, trades_by_id)
+    fingerprints = {
+        value.strategy_id: value.specification_hash for value in evidence_specs
+    }
     required_episode_keys: list[Mapping[str, str]] = []
     signals: list[Mapping[str, Any]] = []
     entries: list[Mapping[str, Any]] = []
@@ -1627,7 +1630,7 @@ def _evidence_material(
     memberships: list[Mapping[str, Any]] = []
     episodes: list[Mapping[str, Any]] = []
     account_daily: list[Mapping[str, Any]] = []
-    for spec in specs:
+    for spec in evidence_specs:
         strategy_trades = tuple(trades_by_id.get(spec.strategy_id, ()))
         memberships.append(
             {
@@ -1638,12 +1641,6 @@ def _evidence_material(
                 "component_role": spec.mechanism,
             }
         )
-        if not strategy_trades:
-            # Abstention is the economically correct output for several
-            # frozen meta-label policies.  Persist one explicit zero-risk
-            # signal so the relational EvidenceBundle can distinguish an
-            # evaluated all-abstain component from missing signal evidence.
-            signals.append(_no_trade_abstention_signal(cfg, store, spec))
         for trade in strategy_trades:
             signal_id = stable_hash(
                 {"strategy_id": spec.strategy_id, "opportunity_id": trade.opportunity_id}
@@ -1821,6 +1818,8 @@ def _evidence_material(
         "campaign_summary": {
             "decision": report["pilot_status"],
             "strategy_count": len(specs),
+            "executable_component_count": len(evidence_specs),
+            "all_abstain_screen_count": len(specs) - len(evidence_specs),
             "opportunity_episode_count": report["opportunity_episode_count"],
             "trade_count": report["trade_count"],
         },
@@ -1839,38 +1838,15 @@ def _evidence_censored_state(terminal_state: str) -> bool:
     }
 
 
-def _no_trade_abstention_signal(
-    cfg: SparsePilotConfig,
-    store: SparseStore,
-    spec: SparseStrategySpec,
-) -> dict[str, Any]:
-    """Create an evidence-only causal abstention record, never an order."""
+def _executed_evidence_specs(
+    specs: Sequence[SparseStrategySpec],
+    trades_by_id: Mapping[str, Sequence[SparseTrade]],
+) -> tuple[SparseStrategySpec, ...]:
+    """Keep abstention-only screens in reports, not executable trade ledgers."""
 
-    row = 0
-    market = str(store.market[row])
-    return {
-        "campaign_id": cfg.campaign_id,
-        "component_id": spec.strategy_id,
-        "signal_id": stable_hash(
-            {
-                "strategy_id": spec.strategy_id,
-                "decision": "NO_EXECUTABLE_SIGNAL_OBSERVED",
-                "store_hash": cfg.source_store_hash,
-            }
-        ),
-        "event_time": _ns_iso(int(store.decision_ns[row])),
-        "market": market,
-        "contract": str(store.contract[row]),
-        "timeframe": "EVENT",
-        "signal": 0,
-        "sizing": 0.0,
-        "stop": None,
-        "target": None,
-        "veto": True,
-        "component_role": spec.mechanism,
-        "evidence_only_reason": "NO_EXECUTABLE_SIGNAL_OBSERVED_AFTER_FROZEN_ABSTENTION",
-        "deployability_tier": spec.deployability_tier,
-    }
+    return tuple(
+        spec for spec in specs if tuple(trades_by_id.get(spec.strategy_id, ()))
+    )
 
 
 def _atomic_json(path: Path, value: Mapping[str, Any]) -> None:
