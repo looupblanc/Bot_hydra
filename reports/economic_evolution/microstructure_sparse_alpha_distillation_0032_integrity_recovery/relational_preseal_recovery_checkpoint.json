@@ -1,0 +1,40 @@
+{
+  "schema": "hydra_sparse_relational_preseal_recovery_checkpoint_v1",
+  "campaign_id": "hydra_microstructure_sparse_alpha_distillation_0032",
+  "recorded_at_utc": "2026-07-18T11:55:52Z",
+  "old_manifest_hash": "268e3103faa5f5ef52096fc38a36098371b116ffe75780bc3fdf9e6cc1f249d8",
+  "new_manifest_hash": "a108d0552e2d18075ef46e235d18df32ac5856334c74813be16b8531cf1cfee3",
+  "observed_pilot_status": "SPARSE_PILOT_WEAK",
+  "strategies_evaluated": 30,
+  "executed_strategy_count": 18,
+  "all_abstain_strategy_count": 12,
+  "opportunity_episode_count": 96590,
+  "trade_count": 327,
+  "repair_scope": "DAILY_MLL_PATH_AND_PROVENANCE_SERIALIZATION_ONLY",
+  "repair_details": [
+    "Daily MLL now records the actual trailing threshold and current buffer while preserving the running minimum buffer.",
+    "Provenance immutable_checksums now binds the configuration and every data fingerprint under canonical keys."
+  ],
+  "preseal_deep_validation_status": "GREEN",
+  "preseal_policy_count": 18,
+  "preseal_required_episode_key_count": 810,
+  "preseal_dataset_row_counts": {
+    "account_daily_paths": 4848,
+    "account_policy_membership": 18,
+    "component_entries": 327,
+    "component_exits": 327,
+    "component_signals": 327,
+    "component_trades": 327,
+    "episodes": 1620,
+    "provenance": 1
+  },
+  "economic_results_changed": false,
+  "thresholds_changed": false,
+  "hypothesis_changed": false,
+  "multiplicity_reservation_changed": false,
+  "data_purchase_count": 0,
+  "q4_access_delta": 0,
+  "broker_connections": 0,
+  "orders": 0,
+  "receipt_hash": "13f332af67e36e7b5acb692958b3b655bda76758b0829bb9907c35215e278865"
+}
