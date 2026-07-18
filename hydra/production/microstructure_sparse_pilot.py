@@ -1634,7 +1634,7 @@ def _evidence_material(
     fingerprints = {
         value.strategy_id: value.specification_hash for value in evidence_specs
     }
-    required_episode_keys: list[Mapping[str, str]] = []
+    required_episode_keys: dict[tuple[str, str, str], Mapping[str, str]] = {}
     signals: list[Mapping[str, Any]] = []
     entries: list[Mapping[str, Any]] = []
     exits: list[Mapping[str, Any]] = []
@@ -1724,12 +1724,18 @@ def _evidence_material(
             )
         for path in result_by_id[spec.strategy_id]["account_paths"]:
             horizon = f"{int(path['horizon_days'])}D"
-            required_episode_keys.append(
+            required_key = (
+                spec.strategy_id,
+                str(path["episode_id"]),
+                horizon,
+            )
+            required_episode_keys.setdefault(
+                required_key,
                 {
-                    "policy_id": spec.strategy_id,
-                    "episode_id": str(path["episode_id"]),
-                    "horizon": horizon,
-                }
+                    "policy_id": required_key[0],
+                    "episode_id": required_key[1],
+                    "horizon": required_key[2],
+                },
             )
             episodes.append(
                 {
@@ -1799,7 +1805,7 @@ def _evidence_material(
         "expected_coverage": {
             "policy_ids": list(fingerprints),
             "component_ids": list(fingerprints),
-            "required_episode_keys": required_episode_keys,
+            "required_episode_keys": list(required_episode_keys.values()),
             "allowed_horizons": ["5D", "10D", "20D"],
             "cost_scenarios": list(COST_SCENARIOS),
             "allow_additional_episode_keys": False,
