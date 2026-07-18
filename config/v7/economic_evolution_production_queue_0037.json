@@ -242,12 +242,19 @@
       "campaign_id": "hydra_microstructure_order_flow_foundry_0031",
       "enabled": true,
       "engine": "production_kernel_v1",
-      "manifest_file_sha256": "9bd3f662981c6478737a8dad18a49f68df3510ec1d2c39eaeb469013c8beb344",
+      "manifest_file_sha256": "ef90725ee7dbf008b864a7e6827c819056227fb6f141282a82d599e0e23ffe7f",
       "manifest_path": "config/v7/microstructure_order_flow_foundry_0031.json",
-      "manifest_semantic_hash": "5bb0c5a098e52bcf47407ad241c78fefa38fe6a630f7f12cca46a5dede806aac",
+      "manifest_semantic_hash": "59f0d105829968dae8431711b21e27f9a02bb72b684267e133e3b2474356fa9e",
       "ordinal": 31,
-      "worm_commit": "f04d902c6a3074debe88b94f1d02029e7fdeda71",
-      "worm_tag": "worm/microstructure-order-flow-foundry-0031-2026-07-18"
+      "pre_acquisition_technical_repair": {
+        "classification": "DATABENTO_AUTHENTICATED_SNAPSHOT_SEQUENCE_AND_COMPLETION_GATE_REPAIR",
+        "data_downloaded_before_repair": false,
+        "economic_outcomes_observed_before_repair": false,
+        "multiplicity_delta": 0,
+        "scientific_thresholds_changed": false
+      },
+      "worm_commit": "be41d67a755bec04b94d7931bd6040fff449171e",
+      "worm_tag": "worm/microstructure-order-flow-foundry-0031-snapshot-repair-2026-07-18"
     }
   ],
   "governance": {
@@ -257,7 +264,7 @@
     "q4_access_allowed": false
   },
   "issued_at_utc": "2026-07-18T02:43:59.485631Z",
-  "queue_hash": "12ba0c18df7c57a795a6f839600e05981d680231b04522f58021e4e72231eff2",
+  "queue_hash": "7ce1eedae3ef436d88f3bd362af3cf03a6499aa867dcd2c8b3b15ff75374905e",
   "queue_id": "hydra_economic_evolution_production_queue_0037",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
