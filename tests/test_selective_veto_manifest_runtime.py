@@ -362,6 +362,7 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
             "prospective_comparisons": 10,
             "reserved_delta_trials": 10,
             "expected_global_N_trials_after_reservation": 110,
+            "campaign_specific_inflation": 1.5,
             "reservation_required_before_outcome_access": True,
             "proof_window_consumed": False,
         },

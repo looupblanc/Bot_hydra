@@ -594,6 +594,7 @@ def _multiplicity(manifest: Mapping[str, Any]) -> None:
         or comparisons < 2
         or reserved < comparisons
         or expected != prior + reserved
+        or not _close(value.get("campaign_specific_inflation"), 1.5)
         or value.get("reservation_required_before_outcome_access") is not True
         or value.get("proof_window_consumed") is not False
     ):
