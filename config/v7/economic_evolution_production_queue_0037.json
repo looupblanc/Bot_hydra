@@ -242,10 +242,18 @@
       "campaign_id": "hydra_microstructure_order_flow_foundry_0031",
       "enabled": true,
       "engine": "production_kernel_v1",
-      "manifest_file_sha256": "ef90725ee7dbf008b864a7e6827c819056227fb6f141282a82d599e0e23ffe7f",
+      "manifest_file_sha256": "5de04ac9759c7188f678044a3bd26b770df8afa075b6f105e1ffeda45a093c2c",
       "manifest_path": "config/v7/microstructure_order_flow_foundry_0031.json",
-      "manifest_semantic_hash": "59f0d105829968dae8431711b21e27f9a02bb72b684267e133e3b2474356fa9e",
+      "manifest_semantic_hash": "0c6a465b5715871be10455e2b4dffd20785353551dc9c895fc2c5f0b8d2dcb5c",
       "ordinal": 31,
+      "post_acquisition_pre_outcome_technical_repair": {
+        "additional_data_purchase": false,
+        "classification": "NEUTRAL_TRADE_AND_PRE_INITIAL_SNAPSHOT_CAUSAL_DECODING_REPAIR",
+        "economic_outcomes_observed_before_repair": false,
+        "multiplicity_delta": 0,
+        "raw_dbn_sha256": "0d6c0dc8c0e5c353e2166778b3d3827e8467900983ec11c0e6899fa24986d741",
+        "scientific_thresholds_changed": false
+      },
       "pre_acquisition_technical_repair": {
         "classification": "DATABENTO_AUTHENTICATED_SNAPSHOT_SEQUENCE_AND_COMPLETION_GATE_REPAIR",
         "data_downloaded_before_repair": false,
@@ -253,8 +261,8 @@
         "multiplicity_delta": 0,
         "scientific_thresholds_changed": false
       },
-      "worm_commit": "be41d67a755bec04b94d7931bd6040fff449171e",
-      "worm_tag": "worm/microstructure-order-flow-foundry-0031-snapshot-repair-2026-07-18"
+      "worm_commit": "12223861ef98891ee61c8470565fe2413ab51d90",
+      "worm_tag": "worm/microstructure-order-flow-foundry-0031-real-tape-repair-2026-07-18"
     }
   ],
   "governance": {
@@ -264,7 +272,7 @@
     "q4_access_allowed": false
   },
   "issued_at_utc": "2026-07-18T02:43:59.485631Z",
-  "queue_hash": "7ce1eedae3ef436d88f3bd362af3cf03a6499aa867dcd2c8b3b15ff75374905e",
+  "queue_hash": "21435f477326d3366e974fd7e0726a33d0833c9a0068e82c56b97be9b0357741",
   "queue_id": "hydra_economic_evolution_production_queue_0037",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
