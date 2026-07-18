@@ -517,11 +517,12 @@ class _CompactTape:
 
     def records(self) -> Iterator[tuple[int, float, int, str, str]]:
         for index in range(len(self)):
+            direction = int(self.side[index])
             yield (
                 int(self.available_ns[index]),
                 float(self.price[index]),
                 int(self.size[index]),
-                "B" if int(self.side[index]) > 0 else "A",
+                "B" if direction > 0 else "A" if direction < 0 else "N",
                 self.session_at(index),
             )
 
@@ -551,7 +552,7 @@ class _TapeBuilder:
         self.available_ns.append(event.available_at_ns)
         self.price.append(float(event.price))
         self.size.append(int(event.size))
-        self.side.append(1 if event.side == "B" else -1)
+        self.side.append(1 if event.side == "B" else -1 if event.side == "A" else 0)
         self.session_code.append(code)
 
     def freeze(self) -> _CompactTape:
@@ -1161,6 +1162,7 @@ def _reconstruct_features(
     initialized_streams: dict[str, set[tuple[str, str]]] = {
         market: set() for market in cfg.selected_markets
     }
+    snapshot_started_streams: set[tuple[str, str]] = set()
     stream_ready: dict[tuple[str, str], bool] = {}
     snapshot_resets_by_market = defaultdict(int)
     first_available: int | None = None
@@ -1170,6 +1172,27 @@ def _reconstruct_features(
             raise FoundryPilotError(f"unexpected market in event stream: {market}")
         if event.available_at_ns < event.ts_event_ns:
             raise FoundryPilotError("event availability violates causal contract")
+        authenticated_snapshot = bool(event.flags & F_SNAPSHOT)
+        stream_key = (event.publisher_id, event.instrument_id)
+        encountered_streams[market].add(stream_key)
+        counts[market] += 1
+        counts[f"action_{event.action}"] += 1
+        first_available = event.available_at_ns if first_available is None else min(first_available, event.available_at_ns)
+        last_available = event.available_at_ns if last_available is None else max(last_available, event.available_at_ns)
+
+        # A vendor request can begin during Sunday's Globex session, before the
+        # first authenticated daily snapshot at 00:00 UTC.  Those leading raw
+        # messages are immutable provenance, but applying a C/M/F/T to an
+        # empty state would either fabricate a partial book or fail on an
+        # unknown order.  The first authenticated snapshot R is therefore the
+        # only permitted state-engine bootstrap for each stream.
+        initial_snapshot_reset = authenticated_snapshot and event.action == "R"
+        if stream_key not in snapshot_started_streams:
+            if not initial_snapshot_reset:
+                counts["events_gated_before_initial_snapshot"] += 1
+                counts["events_gated_until_snapshot_f_last"] += 1
+                continue
+            snapshot_started_streams.add(stream_key)
         try:
             compact = engine.step(event, materialize=False)
         except (BookStateError, MicrostructureEventEngineError) as exc:
@@ -1177,9 +1200,7 @@ def _reconstruct_features(
                 f"order-book reconstruction failed closed at {market} "
                 f"sequence={event.sequence}: {exc}"
             ) from exc
-        authenticated_snapshot = bool(event.flags & F_SNAPSHOT)
-        stream_key = (event.publisher_id, event.instrument_id)
-        encountered_streams[market].add(stream_key)
+        counts["state_engine_events"] += 1
         stream_status = engine.stream_status(*stream_key)
         stream_ready[stream_key] = bool(stream_status["book_ready"])
         snapshot_resets_by_market[market] = max(
@@ -1188,10 +1209,6 @@ def _reconstruct_features(
         )
         if stream_status["snapshot_complete"]:
             initialized_streams[market].add(stream_key)
-        counts[market] += 1
-        counts[f"action_{event.action}"] += 1
-        first_available = event.available_at_ns if first_available is None else min(first_available, event.available_at_ns)
-        last_available = event.available_at_ns if last_available is None else max(last_available, event.available_at_ns)
         if compact.duplicate:
             counts["duplicates"] += 1
             continue
@@ -1342,6 +1359,8 @@ def _reconstruct_features(
         "events_gated_before_initial_snapshot": int(
             counts["events_gated_before_initial_snapshot"]
         ),
+        "state_engine_event_count": int(counts["state_engine_events"]),
+        "pre_snapshot_state_engine_bypass": True,
         "events_gated_until_snapshot_f_last": int(
             counts["events_gated_until_snapshot_f_last"]
         ),
@@ -1373,7 +1392,7 @@ def _update_rolling_state(state: _RollingMarketState, event: MarketEvent) -> Non
     state.actions_2s.evict(now)
     if event.action == "T":
         assert event.price is not None
-        direction = 1 if event.side == "B" else -1
+        direction = 1 if event.side == "B" else -1 if event.side == "A" else 0
         for window in (state.trade_2s, state.trade_30s, state.trade_5m):
             window.add(now, direction, event.size, float(event.price))
             window.evict(now)

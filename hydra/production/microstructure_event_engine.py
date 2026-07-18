@@ -43,6 +43,7 @@ EVENT_ENGINE_SCHEMA = "hydra_microstructure_event_engine_v1"
 CHECKPOINT_SCHEMA = "hydra_microstructure_event_checkpoint_v1"
 SUPPORTED_ACTIONS = frozenset({"A", "M", "C", "F", "R", "T"})
 BOOK_SIDES = frozenset({"B", "A"})
+TRADE_SIDES = frozenset({"B", "A", "N"})
 F_MAYBE_BAD_BOOK = 0x04
 F_SNAPSHOT = 0x20
 F_LAST = 0x80
@@ -243,8 +244,8 @@ class MarketEvent:
             # feeds may omit a usable displayed-order identity on this marker.
             pass
         elif action == "T":
-            if side not in BOOK_SIDES:
-                raise ValueError("T requires aggressor side")
+            if side not in TRADE_SIDES:
+                raise ValueError("T requires aggressor side or neutral/unknown side")
             if self.price is None or self.price <= 0 or self.size <= 0:
                 raise ValueError("T requires positive price and size")
         elif action == "R" and self.order_id is not None:
@@ -883,7 +884,7 @@ class MicrostructureEventEngine:
             if event.side == "B":
                 state.buy_volume += event.size
                 state.session_buy_volume += event.size
-            else:
+            elif event.side == "A":
                 state.sell_volume += event.size
                 state.session_sell_volume += event.size
             return

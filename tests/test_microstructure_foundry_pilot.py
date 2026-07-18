@@ -210,6 +210,79 @@ def test_pilot_requires_completed_initial_snapshot_for_each_selected_market() ->
         pilot._reconstruct_features(values, cfg=pilot.FoundryPilotConfig())
 
 
+def test_pre_snapshot_neutral_trade_and_unknown_cancel_are_raw_gated() -> None:
+    bank = _event_bank()
+
+    def merged(values):
+        return pilot._merge_market_iterators(
+            {
+                market: iter(
+                    sorted(
+                        (event.validated() for event in events),
+                        key=lambda event: (
+                            event.available_at_ns,
+                            event.ts_event_ns,
+                            event.sequence,
+                        ),
+                    )
+                )
+                for market, events in values.items()
+            }
+        )
+
+    baseline_snapshots, baseline_tape, baseline = pilot._reconstruct_features(
+        merged(bank), cfg=pilot.FoundryPilotConfig()
+    )
+    first = bank["NQ"][0]
+    preamble = [
+        MarketEvent(
+            ts_event_ns=first.ts_event_ns - 2_000_000_000,
+            available_at_ns=first.available_at_ns - 2_000_000_000,
+            sequence=900_000,
+            publisher_id=first.publisher_id,
+            instrument_id=first.instrument_id,
+            action="T",
+            side="N",
+            price=19_999.0,
+            size=17,
+            session_id=first.session_id,
+        ),
+        MarketEvent(
+            ts_event_ns=first.ts_event_ns - 1_000_000_000,
+            available_at_ns=first.available_at_ns - 1_000_000_000,
+            sequence=900_001,
+            publisher_id=first.publisher_id,
+            instrument_id=first.instrument_id,
+            action="C",
+            size=3,
+            order_id="unknown-pre-snapshot-order",
+            session_id=first.session_id,
+        ),
+    ]
+    with_preamble = {**bank, "NQ": [*preamble, *bank["NQ"]]}
+
+    snapshots, tape, reconstruction = pilot._reconstruct_features(
+        merged(with_preamble), cfg=pilot.FoundryPilotConfig()
+    )
+
+    assert reconstruction["events_gated_before_initial_snapshot"] == 2
+    assert reconstruction["pre_snapshot_state_engine_bypass"] is True
+    assert reconstruction["state_engine_event_count"] == baseline["event_count"]
+    assert reconstruction["event_count"] == baseline["event_count"] + 2
+    assert reconstruction["action_counts"]["T"] == baseline["action_counts"]["T"] + 1
+    assert reconstruction["action_counts"]["C"] == baseline["action_counts"].get("C", 0) + 1
+    assert reconstruction["initial_snapshot_complete_by_market"] == {
+        "NQ": True,
+        "YM": True,
+    }
+    assert reconstruction["final_state_hash"] == baseline["final_state_hash"]
+    assert [item.feature_hash for item in snapshots] == [
+        item.feature_hash for item in baseline_snapshots
+    ]
+    assert list(tape["NQ"].records()) == list(baseline_tape["NQ"].records())
+    assert all(item.available_ns >= first.available_at_ns for item in snapshots)
+
+
 def test_pilot_fails_closed_on_vendor_maybe_bad_book_flag(tmp_path: Path) -> None:
     bank = _event_bank()
     original = bank["NQ"][1]
@@ -372,3 +445,47 @@ def test_rolling_mbo_partial_cancel_preserves_remaining_queue_state():
     )
     assert "o1" not in state.order_size
     assert "o1" not in state.order_birth_ns
+
+
+def test_neutral_trade_is_preserved_without_signed_volume_distortion():
+    state = pilot._RollingMarketState()
+    builder = pilot._TapeBuilder()
+    common = {
+        "publisher_id": "P",
+        "instrument_id": "I",
+        "action": "T",
+        "price": 100.0,
+        "session_id": "2024-07-08",
+    }
+    buy = MarketEvent(
+        **common,
+        ts_event_ns=1,
+        available_at_ns=1,
+        sequence=1,
+        side="B",
+        size=7,
+    )
+    neutral = MarketEvent(
+        **common,
+        ts_event_ns=2,
+        available_at_ns=2,
+        sequence=2,
+        side="N",
+        size=5,
+    )
+
+    for event in (buy, neutral):
+        pilot._update_rolling_state(state, event)
+        builder.append(event)
+
+    tape = builder.freeze()
+    assert tape.side.tolist() == [1, 0]
+    assert [record[3] for record in tape.records()] == ["B", "N"]
+    for window in (state.trade_2s, state.trade_30s, state.trade_5m):
+        assert window.count == 2
+        assert window.volume == pytest.approx(12.0)
+        assert window.notional == pytest.approx(1_200.0)
+        assert window.signed_volume == pytest.approx(7.0)
+    assert state.last_price == pytest.approx(100.0)
+    assert state.last_trade_side == "N"
+    assert state.last_trade_size == 5

@@ -83,6 +83,32 @@ def test_batch_is_only_streaming_step_and_all_actions_are_deterministic() -> Non
     assert final.session.trade_count == 1
 
 
+def test_neutral_trade_preserves_tape_economics_without_signed_side_distortion() -> None:
+    records = (
+        _event(1, "R", is_snapshot=True),
+        _event(2, "T", side="N", price=100.5, size=7),
+    )
+    batch_engine, batch_results = MicrostructureEventEngine.replay_batch(records)
+    stream_engine = MicrostructureEventEngine()
+    stream_results = tuple(stream_engine.step(record) for record in records)
+
+    assert [value.to_record() for value in batch_results] == [
+        value.to_record() for value in stream_results
+    ]
+    assert batch_engine.state_hash() == stream_engine.state_hash()
+    final = batch_results[-1]
+    assert final.tape.trade_count == 1
+    assert final.tape.total_volume == 7
+    assert final.tape.notional == pytest.approx(703.5)
+    assert final.tape.last_trade_price == pytest.approx(100.5)
+    assert final.tape.buy_volume == 0
+    assert final.tape.sell_volume == 0
+    assert final.session.trade_count == 1
+    assert final.session.volume == 7
+    assert final.session.buy_volume == 0
+    assert final.session.sell_volume == 0
+
+
 def test_availability_contract_fails_before_any_state_mutation() -> None:
     engine = MicrostructureEventEngine()
     record = _event(1, "R", is_snapshot=True)
