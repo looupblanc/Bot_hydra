@@ -128,6 +128,16 @@ def test_account_windows_separate_full_coverage_and_censoring() -> None:
         paired.setdefault(key, {})[str(row["scenario"])] = str(row["episode_id"])
     assert all(set(value) == {"NORMAL", "STRESSED_1_5X"} for value in paired.values())
     assert all(len(set(value.values())) == 1 for value in paired.values())
+    for row in paths:
+        account_size = 50_000.0
+        for daily in row["daily_path"]:
+            equity = account_size + float(daily["cumulative_net_usd"])
+            assert equity - float(daily["mll_usd"]) == pytest.approx(
+                float(daily["mll_buffer_usd"])
+            )
+            assert float(daily["minimum_mll_buffer_usd"]) <= float(
+                daily["mll_buffer_usd"]
+            )
 
 
 def test_sparse_gate_requires_two_distinct_mechanisms() -> None:

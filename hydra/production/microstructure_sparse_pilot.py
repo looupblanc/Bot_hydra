@@ -1309,6 +1309,9 @@ def _account_paths(
                             "net_pnl_usd": float(day_pnl),
                             "cumulative_net_usd": float(cumulative),
                             "costs_usd": float(day_costs),
+                            "mll_usd": float(account["account_size"] + closing_limit),
+                            "mll_buffer_usd": float(cumulative - closing_limit),
+                            "minimum_mll_buffer_usd": float(minimum_buffer),
                         }
                     )
                     best_day = max((max(0.0, float(value["net_pnl_usd"])) for value in daily), default=0.0)
@@ -1780,9 +1783,9 @@ def _evidence_material(
                         "unrealized_pnl": 0.0,
                         "daily_pnl": daily["net_pnl_usd"],
                         "equity": account_size + daily["cumulative_net_usd"],
-                        "mll": account_size - float(path["minimum_mll_buffer_usd"]),
-                        "mll_buffer": path["minimum_mll_buffer_usd"],
-                        "minimum_mll_buffer": path["minimum_mll_buffer_usd"],
+                        "mll": daily["mll_usd"],
+                        "mll_buffer": daily["mll_buffer_usd"],
+                        "minimum_mll_buffer": daily["minimum_mll_buffer_usd"],
                         "consistency": path["consistency_ratio"] or 1.0,
                         "consistency_ok": path["consistency_compliant"],
                         "target_progress": float(path["target_progress_pct"]) / 100.0,
@@ -1827,7 +1830,13 @@ def _evidence_material(
                 "market_data_role": "CHRONOLOGICAL_3_1_1_DEVELOPMENT",
                 "access_ledger_sha256": cfg.source_store_hash,
                 "reconstruction_flag": False,
-                "immutable_checksums": dict(store.source_hashes),
+                "immutable_checksums": {
+                    "configuration": cfg.manifest_hash,
+                    **{
+                        f"data:{name}": digest
+                        for name, digest in store.source_hashes.items()
+                    },
+                },
                 "recorded_at_utc": now,
             }
         ],
