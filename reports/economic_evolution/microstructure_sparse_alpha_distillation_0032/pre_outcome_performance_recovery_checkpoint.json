@@ -1,0 +1,27 @@
+{
+  "schema": "hydra_pre_outcome_performance_recovery_checkpoint_v1",
+  "campaign_id": "hydra_microstructure_sparse_alpha_distillation_0032",
+  "recorded_at_utc": "2026-07-18T10:52:41Z",
+  "reason": "PER_STEP_FULL_STATE_HASH_QUADRATIC_COST",
+  "old_manifest_hash": "867d665c4d06d6cfb5ee9b6c7c291c0b3ddaf92aae7b96299a4f37cf24bf7e27",
+  "new_manifest_hash": "2330403caa94e153c0ab79621099eda101a256b0becbce6d072311189ce545d4",
+  "old_state_sha256": "3bdd390769ca0534744bf502e5b30cbf3b7d19162751dc8eef04f58d0e9cdf22",
+  "old_kpis_sha256": "81fabde53fac0f370c8b2f86dfa3fca561861479c3fbc9b4e9ebcecf3bc73162",
+  "economic_outcomes_seen": false,
+  "policies_proposed": 0,
+  "unique_policies_screened": 0,
+  "exact_account_replays": 0,
+  "account_episodes": 0,
+  "thresholds_changed": false,
+  "hypothesis_changed": false,
+  "multiplicity_reservation_changed": false,
+  "q4_access_delta": 0,
+  "data_purchase_count": 0,
+  "broker_connections": 0,
+  "orders": 0,
+  "technical_changes": [
+    "DEFER_UNUSED_PER_OBSERVATION_FULL_STATE_HASH",
+    "PREINDEX_IMMUTABLE_MARKET_AND_SESSION_OUTCOME_ARRAYS"
+  ],
+  "receipt_hash": "c878d75bbfe92d64e8937b62027c480e72d92f4e79776ce888e8121e0b006f3d"
+}
