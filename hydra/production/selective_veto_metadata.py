@@ -8,6 +8,7 @@ its resumed equivalent produce the same append-only material.
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
@@ -17,11 +18,13 @@ import json
 import math
 import os
 from pathlib import Path
+import threading
 import time
-from typing import Any, Callable, Mapping, Protocol
+from typing import Any, Callable, Iterable, Mapping, Protocol
 
 
 CACHE_SCHEMA = "hydra_selective_veto_metadata_estimate_cache_v1"
+MAX_METADATA_IO_WORKERS = 32
 
 
 class SelectiveVetoMetadataError(RuntimeError):
@@ -255,7 +258,12 @@ class AppendOnlyMetadataEstimateCache:
 
 
 class ResilientMetadataEstimator:
-    """Estimate one request exactly once, with bounded endpoint retries."""
+    """Estimate metadata triples concurrently with bounded endpoint retries.
+
+    Worker threads only perform I/O.  Cache inspection and append operations
+    remain on the calling thread so an identical input order always produces
+    an identical append-only cache, regardless of completion order.
+    """
 
     def __init__(
         self,
@@ -275,35 +283,90 @@ class ResilientMetadataEstimator:
         self._monotonic = monotonic
         self._sleeper = sleeper
         self._last_endpoint_call: float | None = None
+        # One start-rate gate is shared by every endpoint and worker owned by
+        # this estimator.  Holding it across the short pacing sleep prevents
+        # concurrent workers from reserving the same start slot.
+        self._throttle_lock = threading.Lock()
+        self._counter_lock = threading.Lock()
         self.endpoint_call_count = 0
         self.retry_count = 0
         self.cache_hit_count = 0
         self.cache_miss_count = 0
 
     def estimate(self, request: Mapping[str, Any]) -> MetadataEstimate:
-        normalized = normalize_metadata_request(request)
-        cached = self.cache.get(normalized)
-        if cached is not None:
-            self.cache_hit_count += 1
-            return cached
-        self.cache_miss_count += 1
+        return self.estimate_many((request,))[0]
+
+    def estimate_many(
+        self,
+        requests: Iterable[Mapping[str, Any]],
+        *,
+        max_workers: int = MAX_METADATA_IO_WORKERS,
+    ) -> list[MetadataEstimate]:
+        """Estimate unique requests concurrently and restore input ordering."""
+
+        if isinstance(max_workers, bool) or not 1 <= int(max_workers) <= MAX_METADATA_IO_WORKERS:
+            raise SelectiveVetoMetadataError(
+                f"metadata I/O workers must be between 1 and {MAX_METADATA_IO_WORKERS}"
+            )
+
+        fingerprints: list[str] = []
+        unique: dict[str, Mapping[str, Any]] = {}
+        for request in requests:
+            normalized = normalize_metadata_request(request)
+            fingerprint = metadata_request_fingerprint(normalized)
+            fingerprints.append(fingerprint)
+            unique.setdefault(fingerprint, normalized)
+        if not fingerprints:
+            return []
+
+        estimates: dict[str, MetadataEstimate] = {}
+        misses: list[tuple[str, Mapping[str, Any]]] = []
+        cache_hits = 0
+        for fingerprint, normalized in unique.items():
+            cached = self.cache.get(normalized)
+            if cached is None:
+                misses.append((fingerprint, normalized))
+            else:
+                estimates[fingerprint] = cached
+                cache_hits += 1
+        with self._counter_lock:
+            self.cache_hit_count += cache_hits
+            self.cache_miss_count += len(misses)
+
+        if misses:
+            worker_count = min(int(max_workers), len(misses))
+            with ThreadPoolExecutor(
+                max_workers=worker_count,
+                thread_name_prefix="selective-veto-metadata",
+            ) as executor:
+                futures = [
+                    executor.submit(self._estimate_uncached, normalized)
+                    for _, normalized in misses
+                ]
+                # Resolve in first-seen order, not completion order.  Only this
+                # calling thread mutates the append-only cache.
+                for (fingerprint, _), future in zip(misses, futures, strict=True):
+                    estimates[fingerprint] = self.cache.append(future.result())
+
+        return [estimates[fingerprint] for fingerprint in fingerprints]
+
+    def _estimate_uncached(self, normalized: Mapping[str, Any]) -> MetadataEstimate:
         records = int(self._call("get_record_count", normalized))
         size = int(self._call("get_billable_size", normalized))
         cost = float(self._call("get_cost", normalized))
-        return self.cache.append(
-            MetadataEstimate.create(
-                normalized,
-                estimated_records=records,
-                estimated_bytes=size,
-                estimated_cost_usd=cost,
-            )
+        return MetadataEstimate.create(
+            normalized,
+            estimated_records=records,
+            estimated_bytes=size,
+            estimated_cost_usd=cost,
         )
 
     def _call(self, method_name: str, request: Mapping[str, Any]) -> Any:
         method = getattr(self.metadata, method_name)
         for attempt in range(self.retry_policy.maximum_retries + 1):
             self._throttle()
-            self.endpoint_call_count += 1
+            with self._counter_lock:
+                self.endpoint_call_count += 1
             try:
                 return method(**dict(request))
             except Exception as exc:
@@ -313,20 +376,22 @@ class ResilientMetadataEstimator:
                     raise SelectiveVetoMetadataError(
                         f"Databento metadata {method_name} failed"
                     ) from exc
-                self.retry_count += 1
+                with self._counter_lock:
+                    self.retry_count += 1
                 delay = _retry_delay(exc, attempt, self.retry_policy)
                 self._sleeper(delay)
         raise AssertionError("bounded metadata retry loop exhausted unexpectedly")
 
     def _throttle(self) -> None:
-        now = self._monotonic()
-        if self.enforce_rate_limit and self._last_endpoint_call is not None:
-            interval = 1.0 / self.retry_policy.maximum_endpoint_calls_per_second
-            remaining = interval - (now - self._last_endpoint_call)
-            if remaining > 0.0:
-                self._sleeper(remaining)
-                now = self._monotonic()
-        self._last_endpoint_call = now
+        with self._throttle_lock:
+            now = self._monotonic()
+            if self.enforce_rate_limit and self._last_endpoint_call is not None:
+                interval = 1.0 / self.retry_policy.maximum_endpoint_calls_per_second
+                remaining = interval - (now - self._last_endpoint_call)
+                if remaining > 0.0:
+                    self._sleeper(remaining)
+                    now = self._monotonic()
+            self._last_endpoint_call = now
 
 
 def normalize_metadata_request(request: Mapping[str, Any]) -> dict[str, Any]:
@@ -437,6 +502,7 @@ def _fsync_directory(path: Path) -> None:
 __all__ = [
     "AppendOnlyMetadataEstimateCache",
     "CACHE_SCHEMA",
+    "MAX_METADATA_IO_WORKERS",
     "MetadataEstimate",
     "MetadataRetryPolicy",
     "ResilientMetadataEstimator",

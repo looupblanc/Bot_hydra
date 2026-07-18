@@ -671,6 +671,10 @@ def generate_targeted_cost_matrix(
             raise SelectiveVetoPilotError("strongest market has fewer than 1,000 frozen anchors")
     rows: list[dict[str, Any]] = []
     role_costs = {role: 0.0 for role in ("DISCOVERY", "VALIDATION", "FINAL_DEVELOPMENT")}
+    cell_plans: list[dict[str, Any]] = []
+    unique_windows: dict[
+        tuple[str, int, int, str], tuple[EventWindow, str]
+    ] = {}
     cache: dict[tuple[str, int, int, str], tuple[int, int, float, bool]] = {}
     for market_count in (1, 2):
         markets = (primary_market,) if market_count == 1 else (primary_market, control_market)
@@ -688,60 +692,92 @@ def generate_targeted_cost_matrix(
                 post_seconds=cfg.post_decision_seconds,
             )
             for schema in cfg.schemas:
-                records = 0
-                size = 0
-                cost = 0.0
-                zero_record_windows = 0
-                requests: list[dict[str, Any]] = []
+                cell_plans.append(
+                    {
+                        "market_count": market_count,
+                        "markets": markets,
+                        "count": count,
+                        "selected": selected,
+                        "windows": windows,
+                        "schema": schema,
+                    }
+                )
                 for window in windows:
                     key = (window.contract, window.start_ns, window.end_ns, schema)
-                    estimate = cache.get(key)
-                    if estimate is None:
-                        estimate = _estimate_window(
-                            metadata,
-                            window,
-                            schema,
-                            estimator=estimator,
-                        )
-                        cache[key] = estimate
-                    records += estimate[0]
-                    size += estimate[1]
-                    cost += estimate[2]
-                    zero_record_windows += int(estimate[3])
-                    requests.append(
-                        {
-                            **window.to_dict(),
-                            "request": window.request(schema),
-                            "estimated_records": estimate[0],
-                            "estimated_bytes": estimate[1],
-                            "estimated_cost_usd": estimate[2],
-                            "zero_records": estimate[3],
-                        }
-                    )
-                core = {
-                    "dataset": DATASET,
-                    "schema": schema,
-                    "anchor_window_count": count,
-                    "effective_anchor_count": len(selected),
-                    "whole_session_prefix": True,
-                    "market_count": market_count,
-                    "markets": list(markets),
-                    "strongest_market": primary_market,
-                    "control_market": control_market if market_count == 2 else None,
-                    "merged_window_count": len(windows),
-                    "merged_window_duration_seconds": float(
-                        math.fsum(row.duration_seconds for row in windows)
-                    ),
-                    "estimated_records": records,
-                    "estimated_bytes": size,
-                    "estimated_cost_usd": cost,
-                    "zero_record_window_count": zero_record_windows,
-                    "contains_zero_record_windows": zero_record_windows > 0,
-                    "feature_coverage": _feature_coverage(schema),
-                    "requests": requests,
-                    "anchor_ids": [row.anchor_event_id for row in selected],
+                    unique_windows.setdefault(key, (window, schema))
+
+    # Resolve every unique window/schema triple before aggregation.  The
+    # estimator performs only metadata I/O in its worker threads and appends
+    # completed triples to the persistent cache on this calling thread.
+    prefetch = list(unique_windows.items())
+    if estimator is not None:
+        estimates = estimator.estimate_many(
+            window.request(schema) for _, (window, schema) in prefetch
+        )
+        for ((key, _), estimate) in zip(prefetch, estimates, strict=True):
+            cache[key] = (
+                estimate.estimated_records,
+                estimate.estimated_bytes,
+                estimate.estimated_cost_usd,
+                estimate.zero_records,
+            )
+    else:
+        for key, (window, schema) in prefetch:
+            cache[key] = _estimate_window(metadata, window, schema)
+
+    for plan in cell_plans:
+        market_count = int(plan["market_count"])
+        markets = tuple(plan["markets"])
+        count = int(plan["count"])
+        selected = list(plan["selected"])
+        windows = list(plan["windows"])
+        schema = str(plan["schema"])
+        records = 0
+        size = 0
+        cost = 0.0
+        zero_record_windows = 0
+        requests: list[dict[str, Any]] = []
+        for window in windows:
+            key = (window.contract, window.start_ns, window.end_ns, schema)
+            estimate = cache[key]
+            records += estimate[0]
+            size += estimate[1]
+            cost += estimate[2]
+            zero_record_windows += int(estimate[3])
+            requests.append(
+                {
+                    **window.to_dict(),
+                    "request": window.request(schema),
+                    "estimated_records": estimate[0],
+                    "estimated_bytes": estimate[1],
+                    "estimated_cost_usd": estimate[2],
+                    "zero_records": estimate[3],
                 }
-                rows.append({**core, "estimate_fingerprint": stable_hash(core)})
+            )
+        core = {
+            "dataset": DATASET,
+            "schema": schema,
+            "anchor_window_count": count,
+            "effective_anchor_count": len(selected),
+            "whole_session_prefix": True,
+            "market_count": market_count,
+            "markets": list(markets),
+            "strongest_market": primary_market,
+            "control_market": control_market if market_count == 2 else None,
+            "merged_window_count": len(windows),
+            "merged_window_duration_seconds": float(
+                math.fsum(row.duration_seconds for row in windows)
+            ),
+            "estimated_records": records,
+            "estimated_bytes": size,
+            "estimated_cost_usd": cost,
+            "zero_record_window_count": zero_record_windows,
+            "contains_zero_record_windows": zero_record_windows > 0,
+            "feature_coverage": _feature_coverage(schema),
+            "requests": requests,
+            "anchor_ids": [row.anchor_event_id for row in selected],
+        }
+        rows.append({**core, "estimate_fingerprint": stable_hash(core)})
 
     affordable_limit = min(
         cfg.maximum_incremental_spend_usd,

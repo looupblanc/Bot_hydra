@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+import threading
+import time
 from types import SimpleNamespace
 
 import pytest
@@ -169,6 +171,97 @@ def test_rate_limit_retry_after_and_5xx_retries_are_bounded(tmp_path: Path) -> N
     assert any(value == pytest.approx(0.2) for value in clock.sleeps)
 
 
+class _ConcurrentMetadata:
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self.active = 0
+        self.maximum_active = 0
+        self.calls: list[tuple[str, str]] = []
+        self.start_times: list[float] = []
+
+    def _value(self, endpoint: str, **kwargs: object) -> tuple[str, int]:
+        symbol = str(list(kwargs["symbols"])[0])
+        with self._lock:
+            self.active += 1
+            self.maximum_active = max(self.maximum_active, self.active)
+            self.calls.append((endpoint, symbol))
+            self.start_times.append(time.monotonic())
+        # Deliberately complete later first-seen requests last.
+        time.sleep(0.02 if symbol == "SLOW" else 0.005)
+        with self._lock:
+            self.active -= 1
+        return symbol, {"SLOW": 30, "FAST": 20, "OTHER": 10}[symbol]
+
+    def get_record_count(self, **kwargs: object) -> int:
+        return self._value("records", **kwargs)[1]
+
+    def get_billable_size(self, **kwargs: object) -> int:
+        return self._value("bytes", **kwargs)[1] * 100
+
+    def get_cost(self, **kwargs: object) -> float:
+        return self._value("cost", **kwargs)[1] / 100.0
+
+
+def _request_for(symbol: str) -> dict[str, object]:
+    return {**REQUEST, "symbols": [symbol]}
+
+
+def test_estimate_many_is_concurrent_deduplicated_and_appended_in_input_order(
+    tmp_path: Path,
+) -> None:
+    metadata = _ConcurrentMetadata()
+    path = tmp_path / "many.jsonl"
+    estimator = ResilientMetadataEstimator(
+        metadata, cache_path=path, enforce_rate_limit=False
+    )
+    requests = [
+        _request_for("SLOW"),
+        _request_for("FAST"),
+        _request_for("SLOW"),
+        _request_for("OTHER"),
+    ]
+
+    estimates = estimator.estimate_many(requests)
+
+    assert [row.estimated_records for row in estimates] == [30, 20, 30, 10]
+    assert estimates[0] is estimates[2]
+    assert metadata.maximum_active > 1
+    assert len(metadata.calls) == 3 * 3
+    assert estimator.cache_miss_count == 3
+    rows = [json.loads(line) for line in path.read_text().splitlines()]
+    assert [row["request"]["symbols"][0] for row in rows] == [
+        "SLOW",
+        "FAST",
+        "OTHER",
+    ]
+
+    resumed = estimator.estimate_many(reversed(requests))
+    assert [row.estimated_records for row in resumed] == [10, 30, 20, 30]
+    assert len(metadata.calls) == 9
+    assert estimator.cache_hit_count == 3
+
+
+def test_estimate_many_rate_limit_is_shared_by_all_worker_threads(
+    tmp_path: Path,
+) -> None:
+    metadata = _ConcurrentMetadata()
+    estimator = ResilientMetadataEstimator(
+        metadata,
+        cache_path=tmp_path / "rate-many.jsonl",
+        enforce_rate_limit=True,
+    )
+
+    estimator.estimate_many(
+        _request_for(symbol) for symbol in ("SLOW", "FAST", "OTHER")
+    )
+
+    assert len(metadata.start_times) == 9
+    assert all(
+        right - left >= 0.09
+        for left, right in zip(metadata.start_times, metadata.start_times[1:])
+    )
+
+
 def test_truncated_or_conflicting_append_only_cache_fails_closed(tmp_path: Path) -> None:
     truncated = tmp_path / "truncated.jsonl"
     truncated.write_text('{"schema":"incomplete"')
@@ -226,9 +319,15 @@ def test_full_cost_grid_resumes_from_cache_and_flags_zero_record_windows(
     second = generate_targeted_cost_matrix(
         metadata, anchors, audit, metadata_cache_path=cache
     )
+    sequential = generate_targeted_cost_matrix(
+        _Metadata(records=0, size=0, cost=0.0), anchors, audit
+    )
 
     assert len(first["rows"]) == 24
     assert first == second
+    assert first["rows"] == sequential["rows"]
+    assert first["selected_offer"] == sequential["selected_offer"]
+    assert first["chronological_role_costs"] == sequential["chronological_role_costs"]
     assert first["selected_offer"] is None
     assert all(row["contains_zero_record_windows"] for row in first["rows"])
     assert all(row["zero_record_window_count"] > 0 for row in first["rows"])
