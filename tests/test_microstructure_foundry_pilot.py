@@ -94,6 +94,11 @@ def test_foundry_pilot_e2e_is_causal_atomic_and_runtime_compatible(tmp_path: Pat
     assert summary["combine_episode_count"] == 720
     assert summary["normal_episode_count"] == 360
     assert summary["stressed_episode_count"] == 360
+    assert summary["incomplete_horizon_episode_count"] == 672
+    assert summary["censored_episode_count"] == sum(
+        row["terminal_state"] == "DATA_CENSORED"
+        for row in result.evidence_datasets["episodes"]
+    )
     assert result.store_receipt["receipt_hash"]
     assert len(result.decision_report["selected_sessions"]) == 5
 

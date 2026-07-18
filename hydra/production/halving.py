@@ -962,12 +962,36 @@ def build_final_result_payload(
     autonomous_next_action: Mapping[str, Any],
     scientific_status: str = "DEVELOPMENT_COMPLETE",
 ) -> dict[str, Any]:
-    """Create a terminal payload only from an already sealed fresh bundle receipt."""
+    """Create a terminal payload from the exact EvidenceBundle class in the manifest.
 
-    if evidence_receipt.get("evidence_status") != "FRESH_DEVELOPMENT_EVIDENCE":
-        raise ProductionHalvingError("terminal result requires fresh development evidence")
-    if evidence_receipt.get("reconstruction_flag") is not False:
-        raise ProductionHalvingError("production evidence cannot be a reconstruction")
+    Fresh evidence remains the default.  A bounded deterministic recovery may
+    terminate only when the frozen manifest explicitly declares the matching
+    authoritative-reconstruction pair; a receipt can never upgrade itself.
+    """
+
+    evidence_contract = manifest.get("evidence_bundle")
+    evidence_contract = (
+        evidence_contract if isinstance(evidence_contract, Mapping) else {}
+    )
+    expected_status = str(
+        evidence_contract.get("evidence_status", "FRESH_DEVELOPMENT_EVIDENCE")
+    )
+    expected_reconstruction = evidence_contract.get("reconstruction_flag", False)
+    if (expected_status, expected_reconstruction) not in {
+        ("FRESH_DEVELOPMENT_EVIDENCE", False),
+        ("AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION", True),
+    }:
+        raise ProductionHalvingError(
+            "manifest declares an invalid production evidence class"
+        )
+    if (
+        evidence_receipt.get("evidence_status") != expected_status
+        or evidence_receipt.get("reconstruction_flag")
+        is not expected_reconstruction
+    ):
+        raise ProductionHalvingError(
+            "terminal EvidenceBundle class/reconstruction does not match the frozen manifest"
+        )
     for field in (
         "bundle_path",
         "manifest_path",

@@ -2609,7 +2609,22 @@ def _decision_report(
         "stressed_episode_count": len(stressed),
         "combine_episode_count": len(all_episodes),
         "full_coverage_episode_count": len(full),
-        "censored_episode_count": len(all_episodes) - len(full),
+        # Requested-horizon coverage and observed terminal state are distinct.
+        # A target or MLL event observed inside an incomplete horizon remains
+        # terminal evidence and must not be relabelled as censorship.
+        "censored_episode_count": sum(
+            _episode_terminal_state(row) == "DATA_CENSORED"
+            for row in all_episodes
+        ),
+        "incomplete_horizon_episode_count": len(all_episodes) - len(full),
+        "mll_terminal_episode_count": sum(
+            _episode_terminal_state(row) == "MLL_BREACHED"
+            for row in all_episodes
+        ),
+        "target_terminal_episode_count": sum(
+            _episode_terminal_state(row) == "TARGET_REACHED"
+            for row in all_episodes
+        ),
         "positive_stressed_count": sum(float(value.economics["stressed_net_usd"]) > 0 for value in candidates),
         "normal_pass_candidate_count": p5_normal_pass_candidates,
         "stressed_pass_candidate_count": p5_stressed_pass_candidates,

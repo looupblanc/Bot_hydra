@@ -632,3 +632,27 @@ def test_stage5_cap_compact_outputs_and_terminal_payload_guards() -> None:
             evidence_receipt=bad,
             autonomous_next_action={},
         )
+
+    reconstructed_manifest = {
+        **manifest,
+        "evidence_bundle": {
+            "evidence_status": "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION",
+            "reconstruction_flag": True,
+        },
+    }
+    reconstructed_receipt = {
+        **receipt,
+        "evidence_status": "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION",
+        "reconstruction_flag": True,
+    }
+    reconstructed = build_final_result_payload(
+        manifest=reconstructed_manifest,
+        kpis={},
+        economic_results={},
+        successive_halving={},
+        matched_controls={},
+        failure_vectors={},
+        evidence_receipt=reconstructed_receipt,
+        autonomous_next_action={},
+    )
+    assert reconstructed["evidence_bundle"] == reconstructed_receipt

@@ -1083,6 +1083,25 @@ class EconomicEvolutionManifestRuntime:
             if not receipt_manifest.is_absolute()
             else receipt_manifest.resolve()
         )
+        evidence_contract = config.get("evidence_bundle")
+        evidence_contract = (
+            evidence_contract if isinstance(evidence_contract, Mapping) else {}
+        )
+        expected_status = str(
+            evidence_contract.get(
+                "evidence_status", "FRESH_DEVELOPMENT_EVIDENCE"
+            )
+        )
+        expected_reconstruction = evidence_contract.get(
+            "reconstruction_flag", False
+        )
+        if (expected_status, expected_reconstruction) not in {
+            ("FRESH_DEVELOPMENT_EVIDENCE", False),
+            ("AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION", True),
+        }:
+            raise EconomicEvolutionRuntimeError(
+                "production manifest declares an invalid evidence class"
+            )
         if (
             receipt.get("contract") != "HYDRA_EVIDENCE_BUNDLE_V1"
             or int(receipt.get("schema_version", -1)) != 1
@@ -1098,8 +1117,9 @@ class EconomicEvolutionManifestRuntime:
             is not verified.get("reconstruction_flag")
             or result.get("evidence_verification_manifest_sha256")
             != receipt.get("manifest_sha256")
-            or receipt.get("evidence_status") != "FRESH_DEVELOPMENT_EVIDENCE"
-            or receipt.get("reconstruction_flag") is not False
+            or receipt.get("evidence_status") != expected_status
+            or receipt.get("reconstruction_flag")
+            is not expected_reconstruction
         ):
             raise EconomicEvolutionRuntimeError(
                 "production terminal EvidenceBundle receipt drift"
@@ -1333,7 +1353,9 @@ class EconomicEvolutionManifestRuntime:
                 "manifest_campaign_evidence_bundle_sha256": evidence[
                     "bundle_content_sha256"
                 ],
-                "manifest_campaign_evidence_reconstruction": False,
+                "manifest_campaign_evidence_reconstruction": bool(
+                    evidence.get("reconstruction_flag", False)
+                ),
                 "manifest_campaign_summary_only_evidence": False,
                 "manifest_campaign_independently_confirmed": False,
                 "manifest_campaign_status_inheritance_allowed": False,

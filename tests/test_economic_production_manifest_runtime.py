@@ -800,3 +800,57 @@ def test_production_terminal_evidence_uses_deep_relational_verification(
             "deep": True,
         }
     ]
+
+
+def test_production_terminal_accepts_only_manifest_bound_reconstruction(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = _config(tmp_path)
+    config["evidence_bundle"].update(
+        evidence_status="AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION",
+        reconstruction_flag=True,
+    )
+    runtime = EconomicEvolutionManifestRuntime(tmp_path, tmp_path / "mission/state")
+    bundle = (
+        tmp_path
+        / "data/cache/evidence_bundles"
+        / "hydra_economic_production_test.evidence-v1"
+    )
+    manifest_path = bundle / "evidence_bundle_manifest.json"
+    manifest_path.parent.mkdir(parents=True)
+    manifest_path.write_text("{}\n")
+    manifest_sha = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+    verified = {
+        "bundle_content_sha256": "b" * 64,
+        "evidence_status": "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION",
+        "reconstruction_flag": True,
+        "dataset_row_counts": {"episodes": 96},
+    }
+    monkeypatch.setattr(
+        "hydra.mission.economic_evolution_manifest_runtime."
+        "require_complete_evidence_bundle",
+        lambda *args, **kwargs: verified,
+    )
+    receipt = {
+        "contract": "HYDRA_EVIDENCE_BUNDLE_V1",
+        "schema_version": 1,
+        "campaign_id": config["campaign_id"],
+        "bundle_path": str(bundle),
+        "manifest_path": str(manifest_path),
+        "manifest_sha256": manifest_sha,
+        **verified,
+    }
+    result = {
+        "evidence_bundle": receipt,
+        "evidence_verification_manifest_sha256": manifest_sha,
+    }
+
+    runtime._require_production_terminal_evidence(config, result)
+
+    config["evidence_bundle"] = {
+        "destination": "data/cache/evidence_bundles",
+        "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+        "reconstruction_flag": False,
+    }
+    with pytest.raises(EconomicEvolutionRuntimeError, match="receipt drift"):
+        runtime._require_production_terminal_evidence(config, result)
