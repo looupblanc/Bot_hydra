@@ -1881,6 +1881,10 @@ class EconomicEvolutionManifestRuntime:
                     )
                 canonical_frontier[field] = None
         else:
+            signed_frontier_fields = {
+                "stressed_target_progress_median_best",
+                "stressed_target_progress_median_population",
+            }
             for field in frontier_fields:
                 canonical_frontier[field] = cls._production_finite_number(
                     frontier,
@@ -1889,6 +1893,7 @@ class EconomicEvolutionManifestRuntime:
                     unit_interval=(
                         "pass_fraction" in field or "mll_breach_rate" in field
                     ),
+                    nonnegative=field not in signed_frontier_fields,
                 )
         return canonical_counters, production_kpis, canonical_frontier
 

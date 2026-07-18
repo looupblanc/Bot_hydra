@@ -4,7 +4,12 @@ import json
 import os
 from pathlib import Path
 
+import pytest
+
 from hydra.economic_evolution.schema import stable_hash
+from hydra.mission.economic_evolution_manifest_runtime import (
+    EconomicEvolutionManifestRuntime,
+)
 from hydra.production.microstructure_sparse_manifest import CAMPAIGN_ID
 from hydra.production.microstructure_sparse_pilot import SparsePilotConfig
 from hydra.production.microstructure_sparse_runtime import (
@@ -166,6 +171,42 @@ def test_terminal_result_is_hashed_and_never_authorizes_purchase(tmp_path: Path)
     assert result["result_hash"] == stable_hash(
         {key: value for key, value in result.items() if key != "result_hash"}
     )
+
+
+def test_v17_preserves_signed_target_progress_in_terminal_frontier(
+    tmp_path: Path,
+) -> None:
+    manifest = _manifest()
+    cost = _conditional_cost_report(
+        tmp_path,
+        manifest,
+        _pilot(),
+        "SPARSE_PILOT_WEAK",
+    )
+    result = _build_terminal_result(
+        manifest=manifest,
+        pilot=_pilot(),
+        evidence_receipt=_receipt(),
+        decision="SPARSE_PILOT_WEAK",
+        conditional_cost_report=cost,
+    )
+    frontier = result["economic_results"]["economic_frontier"]
+    frontier["stressed_target_progress_median_best"] = -0.01
+    frontier["stressed_target_progress_median_population"] = -0.04
+
+    _, _, canonical = EconomicEvolutionManifestRuntime._production_terminal_views(
+        result["economic_results"], result["kpis"]
+    )
+
+    assert canonical["stressed_target_progress_median_best"] == pytest.approx(-0.01)
+    assert canonical["stressed_target_progress_median_population"] == pytest.approx(
+        -0.04
+    )
+    frontier["stressed_pass_fraction_best"] = -0.01
+    with pytest.raises(Exception, match="negative number"):
+        EconomicEvolutionManifestRuntime._production_terminal_views(
+            result["economic_results"], result["kpis"]
+        )
 
 
 def test_green_cost_matrix_is_metadata_only_and_does_not_purchase(tmp_path: Path) -> None:
