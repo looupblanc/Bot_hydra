@@ -367,6 +367,11 @@ def _development_gate(manifest: Mapping[str, Any]) -> None:
         or gate.get("independent_confirmation_claim_allowed") is not False
         or green.get("material_target_velocity_uplift") is not True
         or green.get("positive_stressed_economics") is not True
+        or green.get("two_behaviorally_distinct_mechanism_families") is not True
+        or green.get("positive_net_validation_and_final_development") is not True
+        or green.get("no_mll_breach_frozen_risk_profile") is not True
+        or _integer(green.get("median_trades_per_session_maximum")) != 12
+        or green.get("single_event_domination_allowed") is not False
         or green.get("acceptable_mll_and_consistency") is not True
         or green.get("final_development_evidence") is not True
         or green.get("deployable_causal_strategy") is not True
@@ -384,7 +389,7 @@ def _conditional_extension(manifest: Mapping[str, Any]) -> None:
     if (
         extension.get("enabled") is not True
         or _tuple(extension.get("trigger_decisions"))
-        != ("SPARSE_PILOT_GREEN", "SPARSE_PILOT_WEAK")
+        != ("SPARSE_PILOT_GREEN",)
         or maximum < 0.0
         or maximum > 3.25
         or reserve < 25.0

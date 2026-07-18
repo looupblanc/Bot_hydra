@@ -246,6 +246,11 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any], dict[str, Path]]:
             "green_requirements": {
                 "material_target_velocity_uplift": True,
                 "positive_stressed_economics": True,
+                "two_behaviorally_distinct_mechanism_families": True,
+                "positive_net_validation_and_final_development": True,
+                "no_mll_breach_frozen_risk_profile": True,
+                "median_trades_per_session_maximum": 12,
+                "single_event_domination_allowed": False,
                 "acceptable_mll_and_consistency": True,
                 "final_development_evidence": True,
                 "deployable_causal_strategy": True,
@@ -255,7 +260,7 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any], dict[str, Path]]:
         },
         "conditional_extension": {
             "enabled": True,
-            "trigger_decisions": ["SPARSE_PILOT_GREEN", "SPARSE_PILOT_WEAK"],
+            "trigger_decisions": ["SPARSE_PILOT_GREEN"],
             "maximum_incremental_spend_usd": 3.25,
             "minimum_budget_reserve_usd": 25.0,
             "current_remaining_budget_usd": 28.498462508622012,
