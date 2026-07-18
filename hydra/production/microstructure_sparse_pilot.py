@@ -1628,6 +1628,7 @@ def _evidence_material(
     episodes: list[Mapping[str, Any]] = []
     account_daily: list[Mapping[str, Any]] = []
     for spec in specs:
+        strategy_trades = tuple(trades_by_id.get(spec.strategy_id, ()))
         memberships.append(
             {
                 "campaign_id": cfg.campaign_id,
@@ -1637,7 +1638,13 @@ def _evidence_material(
                 "component_role": spec.mechanism,
             }
         )
-        for trade in trades_by_id.get(spec.strategy_id, ()):
+        if not strategy_trades:
+            # Abstention is the economically correct output for several
+            # frozen meta-label policies.  Persist one explicit zero-risk
+            # signal so the relational EvidenceBundle can distinguish an
+            # evaluated all-abstain component from missing signal evidence.
+            signals.append(_no_trade_abstention_signal(cfg, store, spec))
+        for trade in strategy_trades:
             signal_id = stable_hash(
                 {"strategy_id": spec.strategy_id, "opportunity_id": trade.opportunity_id}
             )
@@ -1829,6 +1836,40 @@ def _evidence_censored_state(terminal_state: str) -> bool:
     return terminal_state in {
         "DATA_CENSORED",
         "OPERATIONAL_HORIZON_NOT_REACHED",
+    }
+
+
+def _no_trade_abstention_signal(
+    cfg: SparsePilotConfig,
+    store: SparseStore,
+    spec: SparseStrategySpec,
+) -> dict[str, Any]:
+    """Create an evidence-only causal abstention record, never an order."""
+
+    row = 0
+    market = str(store.market[row])
+    return {
+        "campaign_id": cfg.campaign_id,
+        "component_id": spec.strategy_id,
+        "signal_id": stable_hash(
+            {
+                "strategy_id": spec.strategy_id,
+                "decision": "NO_EXECUTABLE_SIGNAL_OBSERVED",
+                "store_hash": cfg.source_store_hash,
+            }
+        ),
+        "event_time": _ns_iso(int(store.decision_ns[row])),
+        "market": market,
+        "contract": str(store.contract[row]),
+        "timeframe": "EVENT",
+        "signal": 0,
+        "sizing": 0.0,
+        "stop": None,
+        "target": None,
+        "veto": True,
+        "component_role": spec.mechanism,
+        "evidence_only_reason": "NO_EXECUTABLE_SIGNAL_OBSERVED_AFTER_FROZEN_ABSTENTION",
+        "deployability_tier": spec.deployability_tier,
     }
 
 

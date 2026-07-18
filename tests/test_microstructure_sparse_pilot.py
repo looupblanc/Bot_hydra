@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from types import SimpleNamespace
 
+import numpy as np
 import pytest
 
+from hydra.evidence.schema import RECORD_SPECS
 from hydra.production.microstructure_sparse_pilot import (
     SparsePilotConfig,
     SparseStrategySpec,
@@ -12,6 +15,7 @@ from hydra.production.microstructure_sparse_pilot import (
     _depth_fill,
     _evidence_censored_state,
     _gate_decision,
+    _no_trade_abstention_signal,
 )
 
 
@@ -147,3 +151,24 @@ def test_sparse_gate_falsifies_without_positive_gross_markout() -> None:
 def test_config_rejects_worker_oversubscription() -> None:
     with pytest.raises(Exception, match="exactly two"):
         SparsePilotConfig(cpu_worker_count=3).validate()
+
+
+def test_zero_trade_component_persists_honest_abstention_signal() -> None:
+    config = SparsePilotConfig()
+    store = SimpleNamespace(
+        decision_ns=np.asarray([1_720_425_600_000_000_000], dtype=np.int64),
+        market=np.asarray(["NQ"], dtype=object),
+        contract=np.asarray(["NQU4"], dtype=object),
+    )
+    signal = _no_trade_abstention_signal(config, store, _spec())
+
+    RECORD_SPECS["component_signals"].validate(
+        signal,
+        campaign_id=config.campaign_id,
+    )
+    assert signal["signal"] == 0
+    assert signal["sizing"] == 0.0
+    assert signal["veto"] is True
+    assert signal["evidence_only_reason"] == (
+        "NO_EXECUTABLE_SIGNAL_OBSERVED_AFTER_FROZEN_ABSTENTION"
+    )
