@@ -1,0 +1,78 @@
+{
+  "schema": "hydra_fast_pass_factory_terminal_receipt_v1",
+  "recorded_at_utc": "2026-07-18T02:39:56.281810Z",
+  "campaign_id": "hydra_fast_pass_factory_0029",
+  "class_id": "FIVE_DAY_COMBINE_QUALITY_DIVERSITY_MARGINAL_BOOK_V1",
+  "terminal_status": "FAST_PASS_FACTORY_DATA_REPRESENTATION_LIMITED",
+  "terminal_scope": "TWO_CAUSAL_OHLCV_WAVES_AND_ATOMIC_EVIDENCE_FINALIZATION_COMPLETE",
+  "failure_code": "OHLCV_INFORMATION_REPRESENTATION_INSUFFICIENT_FOR_FAST_PASS",
+  "scientific_boundary": {
+    "development_evidence_only": true,
+    "automatic_campaign_retry_allowed": false,
+    "neighboring_ohlcv_grammar_allowed": false,
+    "evidence_regeneration_allowed": false,
+    "independent_confirmation": false,
+    "xfa_started": false
+  },
+  "source_identity": {
+    "actual_git_head_at_terminalization": "bb81868acd9fc3fac283f20f79ba4e970d6d7ac1",
+    "manifest_source_commit": "90df9ca657434d812705996e0c3d097c0e55aa33",
+    "manifest_path": "config/v7/fast_pass_factory_0029_revision_05.json",
+    "manifest_file_sha256": "8a2b730c37d6dbe8a5bdf341dce91455966a4d204dd8f0f63669efc4d653432e",
+    "manifest_semantic_hash": "3b1f7e4fe881a1de07c86584740bc19c2b79b248b287a146d96bc83bb71b0562",
+    "manifest_worm_tag": "worm/fast-pass-factory-0029-terminal-evidence-relational-validation-repair-revision-05-2026-07-17",
+    "manifest_worm_commit": "ada4063ef60ba610198abb1dc60422737629b829"
+  },
+  "terminal_result": {
+    "path": "reports/economic_evolution/fast_pass_factory_0029_revision_05/economic_production_result.json",
+    "file_sha256": "bf04d3fd88a9b00a830f131509bb8d06ef76cfd38a0d47fe52bf69e46df6681b",
+    "result_hash": "738023af87f03b45fc90e9164e053f364ca5afd93e6e154334130c27f9860da0",
+    "status": "COMPLETE"
+  },
+  "evidence_bundle": {
+    "receipt_path": "reports/economic_evolution/fast_pass_factory_0029_revision_05/evidence_bundle_receipt.json",
+    "receipt_file_sha256": "f2018527afc2a4aa581d50eee2d7eb8ee5da6700fd9ff436e3796d17de2da9f8",
+    "status": "COMPLETE",
+    "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+    "reconstruction_flag": false,
+    "manifest_sha256": "f119c021ed2ecc514c347bea0289db19f1d2654151512f4c7c36015db864a0f8",
+    "bundle_content_sha256": "cef10d882fb0ace6b544d232f3d624efa4de3b2facc4f1c238e029aae11bc9a3",
+    "episode_rows": 553674,
+    "account_daily_path_rows": 4173440
+  },
+  "economic_totals": {
+    "proposals": 100000,
+    "causal_screens": 20000,
+    "exact_replays": 5000,
+    "account_books": 2000,
+    "account_episodes": 553674,
+    "stressed_positive_candidates": 2799,
+    "combine_passes_5d": 0,
+    "combine_passes_10d": 0,
+    "combine_passes_20d": 0,
+    "mll_breaches": 0,
+    "bank_admissions": 0,
+    "graduations": 0,
+    "xfa_paths": 0
+  },
+  "administrative_reconciliation": {
+    "canonical_volume_source": "WORM/fast-pass-factory-0029-diversity-timestamp-repair-2026-07-17.json",
+    "canonical_volume_source_sha256": "b30051f3583598f2dc0205dd9f833036d93180ae4fb880f80008bd11c611c592",
+    "final_result_projects_stage0_proposals": 0,
+    "final_result_projects_stage1_screens": 0,
+    "canonical_stage0_proposals": 100000,
+    "canonical_stage1_screens": 20000,
+    "economic_evidence_or_account_paths_affected": false,
+    "classification": "FINALIZER_COUNTER_PROJECTION_LIMITATION"
+  },
+  "governance": {
+    "q4_status": "BURNED",
+    "q4_access_delta": 0,
+    "new_data_purchase_count": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "remaining_budget_usd": 37.14710039645801
+  },
+  "CONTRE": "This receipt terminalizes campaign 0029 and forbids retry, retuning, evidence regeneration, inherited promotion, Q4 access, broker connectivity and orders. It preserves the causal evidence and authorizes no claim beyond development.",
+  "receipt_hash": "aa18977612f46692d0ba409df4ef9e614cb78f137d4f25d60e7abd0ccfb93f0e"
+}

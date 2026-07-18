@@ -1,0 +1,47 @@
+{
+  "schema": "hydra_fast_pass_factory_terminal_verdict_worm_v1",
+  "campaign_id": "hydra_fast_pass_factory_0029",
+  "class_id": "FIVE_DAY_COMBINE_QUALITY_DIVERSITY_MARGINAL_BOOK_V1",
+  "recorded_at_utc": "2026-07-18T02:39:56.281810Z",
+  "immutable": true,
+  "terminal_status": "FAST_PASS_FACTORY_DATA_REPRESENTATION_LIMITED",
+  "terminal_scope": "TWO_CAUSAL_OHLCV_WAVES_AND_ATOMIC_EVIDENCE_FINALIZATION_COMPLETE",
+  "failure_code": "OHLCV_INFORMATION_REPRESENTATION_INSUFFICIENT_FOR_FAST_PASS",
+  "source_manifest": {
+    "path": "config/v7/fast_pass_factory_0029_revision_05.json",
+    "file_sha256": "8a2b730c37d6dbe8a5bdf341dce91455966a4d204dd8f0f63669efc4d653432e",
+    "semantic_hash": "3b1f7e4fe881a1de07c86584740bc19c2b79b248b287a146d96bc83bb71b0562",
+    "source_commit": "90df9ca657434d812705996e0c3d097c0e55aa33",
+    "tag": "worm/fast-pass-factory-0029-terminal-evidence-relational-validation-repair-revision-05-2026-07-17",
+    "commit": "ada4063ef60ba610198abb1dc60422737629b829"
+  },
+  "source_terminal_receipt": {
+    "path": "reports/economic_evolution/fast_pass_factory_0029_revision_05/development_terminal_receipt.json",
+    "file_sha256": "d85aa50e115e8db1352027da5bf373b87b7099d4fdcb6c47f663c0a646d94371",
+    "receipt_hash": "aa18977612f46692d0ba409df4ef9e614cb78f137d4f25d60e7abd0ccfb93f0e"
+  },
+  "decision_boundary": {
+    "campaign_retry_allowed": false,
+    "neighboring_ohlcv_grammar_allowed": false,
+    "economic_evidence_regeneration_allowed": false,
+    "microstructure_manifest_required": true,
+    "paper_shadow_ready_assigned": false,
+    "independent_confirmation_claimed": false
+  },
+  "administrative_reconciliation": {
+    "canonical_volume_source_sha256": "b30051f3583598f2dc0205dd9f833036d93180ae4fb880f80008bd11c611c592",
+    "canonical_proposals": 100000,
+    "canonical_screens": 20000,
+    "final_result_projection": [0, 0],
+    "economic_evidence_affected": false
+  },
+  "scope": {
+    "next_state": "MANIFEST_QUEUE_AWAITING_APPEND",
+    "preserve_causal_reference_bank": true,
+    "bounded_microstructure_pilot_allowed_only_by_new_manifest": true,
+    "q4_access_allowed": false,
+    "broker_or_orders_allowed": false
+  },
+  "CONTRE": "This WORM verdict closes only campaign 0029. It neither validates its candidates nor authorizes another OHLCV search, live trading, broker access, orders, Q4 access or inherited status.",
+  "verdict_hash": "26dfd69440ca99ba0c2b8d08cfd13a1105c016b21631476f6219ba4d3176ff99"
+}
