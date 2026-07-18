@@ -197,7 +197,7 @@
     },
     {
       "campaign_id": "hydra_causal_target_velocity_0028",
-      "enabled": true,
+      "enabled": false,
       "engine": "causal_target_velocity_v1",
       "manifest_file_sha256": "3b88a7c38712b7e6a6a58ba216aca0506b41b2ff8f6322976fa0acdd1cf1522b",
       "manifest_path": "config/v7/causal_target_velocity_0028_revision_02.json",
@@ -257,7 +257,7 @@
     "q4_access_allowed": false
   },
   "issued_at_utc": "2026-07-18T02:43:59.485631Z",
-  "queue_hash": "39d8725f52851b8a9cf76835870c7ae4846cfd5457b11db5aae2560677cd7857",
+  "queue_hash": "12ba0c18df7c57a795a6f839600e05981d680231b04522f58021e4e72231eff2",
   "queue_id": "hydra_economic_evolution_production_queue_0037",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
@@ -276,3 +276,4 @@
     "semantic_hash": "d69b6940087bab26ddc54fe3b697f29bdaeeb53c1acc17cfe7813ab86dc1ba19"
   }
 }
+
