@@ -176,6 +176,82 @@ def test_dbn_snapshot_bit_is_not_inferred_from_clear_action():
     assert pilot._dbn_snapshot_flag(0x00) is False
 
 
+def test_combined_dbn_routes_each_instrument_once_to_its_market():
+    timestamp = int(datetime(2024, 7, 16, 13, 30, tzinfo=UTC).timestamp() * 1e9)
+    dtype = np.dtype(
+        [
+            ("ts_event", "u8"),
+            ("ts_recv", "u8"),
+            ("publisher_id", "u2"),
+            ("instrument_id", "u4"),
+            ("action", "u1"),
+            ("side", "u1"),
+            ("price", "i8"),
+            ("size", "u4"),
+            ("sequence", "u4"),
+            ("flags", "u1"),
+        ]
+    )
+    records = np.asarray(
+        [
+            (timestamp, timestamp + 10, 1, 101, ord("T"), ord("B"), 20_000_000_000_000, 3, 1, 0),
+            (timestamp + 20, timestamp + 30, 1, 202, ord("T"), ord("A"), 40_000_000_000_000, 4, 2, 0),
+            (timestamp + 40, timestamp + 50, 1, 101, ord("T"), ord("A"), 20_001_000_000_000, 5, 3, 0),
+            (timestamp + 60, timestamp + 70, 1, 202, ord("T"), ord("B"), 40_001_000_000_000, 6, 4, 0),
+        ],
+        dtype=dtype,
+    )
+
+    class _Metadata:
+        mappings = {
+            "NQU4": [
+                {
+                    "start_date": "2024-07-01",
+                    "end_date": "2024-08-01",
+                    "symbol": "101",
+                }
+            ],
+            "YMU4": [
+                {
+                    "start_date": "2024-07-01",
+                    "end_date": "2024-08-01",
+                    "symbol": "202",
+                }
+            ],
+        }
+
+    class _CombinedStore:
+        metadata = _Metadata()
+
+        def __init__(self):
+            self.iterator_count = 0
+
+        def to_ndarray(self, *, count: int):
+            assert count == 2
+            self.iterator_count += 1
+            yield records[:2]
+            yield records[2:]
+
+    store = _CombinedStore()
+    routed = list(
+        pilot.iter_dbn_mbo_events_multi_from_store(
+            store,
+            market_contracts=(("NQ", "NQU4"), ("YM", "YMU4")),
+            chunk_size=2,
+        )
+    )
+
+    assert store.iterator_count == 1
+    assert [(market, event.instrument_id) for market, event in routed] == [
+        ("NQ", "101"),
+        ("YM", "202"),
+        ("NQ", "101"),
+        ("YM", "202"),
+    ]
+    assert len(routed) == len(records)
+    assert len({event.fingerprint for _, event in routed}) == len(records)
+
+
 def test_passive_queue_requires_contra_volume_beyond_quantity_ahead():
     tape = pilot._CompactTape(
         available_ns=np.asarray([10, 20, 30], dtype=np.int64),

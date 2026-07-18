@@ -186,6 +186,15 @@ class RawSource:
 
 
 @dataclass(frozen=True, slots=True)
+class _InstrumentRoute:
+    market: str
+    contract: str
+    instrument_id: str
+    start_date: str
+    end_date: str
+
+
+@dataclass(frozen=True, slots=True)
 class FeatureSnapshot:
     market: str
     contract: str
@@ -567,9 +576,13 @@ def run_microstructure_foundry_pilot(
 
     cfg = _bind_config(_coerce_config(config, contracts=contracts), manifest)
     if not isinstance(raw_paths, Mapping):
-        raw_paths = dict(zip(cfg.selected_markets, raw_paths, strict=True))
+        path_items = tuple(raw_paths)
+        if len(path_items) == 1:
+            raw_paths = {market: path_items[0] for market in cfg.selected_markets}
+        else:
+            raw_paths = dict(zip(cfg.selected_markets, path_items, strict=True))
     sources: list[RawSource] = []
-    iterators: dict[str, Iterator[MarketEvent]] = {}
+    path_groups: dict[Path, list[str]] = defaultdict(list)
     for market in cfg.selected_markets:
         raw = Path(raw_paths[market]).resolve()
         if not raw.is_file():
@@ -584,8 +597,16 @@ def run_microstructure_foundry_pilot(
                 byte_count=raw.stat().st_size,
             )
         )
-        iterators[market] = iter_dbn_mbo_events(raw, market=market, contract=cfg.contracts[market])
-    merged = _merge_market_iterators(iterators)
+        path_groups[raw].append(market)
+    tagged_sources: list[Iterator[tuple[str, MarketEvent]]] = []
+    for raw, markets in sorted(path_groups.items(), key=lambda value: str(value[0])):
+        tagged_sources.append(
+            iter_dbn_mbo_events_multi(
+                raw,
+                market_contracts=tuple((market, cfg.contracts[market]) for market in markets),
+            )
+        )
+    merged = _merge_tagged_sources(tagged_sources)
     return _run_pilot(merged, output_dir, cfg=cfg, raw_sources=tuple(sources))
 
 
@@ -711,6 +732,51 @@ def _merge_market_iterators(
         )
 
 
+def _merge_tagged_sources(
+    sources: Sequence[Iterator[tuple[str, MarketEvent]]],
+) -> Iterator[tuple[str, MarketEvent]]:
+    if len(sources) == 1:
+        yield from sources[0]
+        return
+    heap: list[tuple[int, int, str, int, int, MarketEvent]] = []
+    counters = [0 for _ in sources]
+    for source_index, source in enumerate(sources):
+        try:
+            market, event = next(source)
+        except StopIteration:
+            continue
+        heap.append(
+            (
+                event.available_at_ns,
+                event.ts_event_ns,
+                market,
+                source_index,
+                0,
+                event,
+            )
+        )
+    heapq.heapify(heap)
+    while heap:
+        _, _, market, source_index, _, event = heapq.heappop(heap)
+        yield market, event
+        counters[source_index] += 1
+        try:
+            next_market, next_event = next(sources[source_index])
+        except StopIteration:
+            continue
+        heapq.heappush(
+            heap,
+            (
+                next_event.available_at_ns,
+                next_event.ts_event_ns,
+                next_market,
+                source_index,
+                counters[source_index],
+                next_event,
+            ),
+        )
+
+
 def iter_dbn_mbo_events(
     path: str | Path,
     *,
@@ -720,11 +786,48 @@ def iter_dbn_mbo_events(
 ) -> Iterator[MarketEvent]:
     """Decode a DBN MBO stream without loading the purchased sample in memory."""
 
+    for routed_market, event in iter_dbn_mbo_events_multi(
+        path,
+        market_contracts=((market, contract),),
+        chunk_size=chunk_size,
+    ):
+        if routed_market != market:  # pragma: no cover - routing invariant
+            raise FoundryPilotError("single-market DBN routing drift")
+        yield event
+
+
+def iter_dbn_mbo_events_multi(
+    path: str | Path,
+    *,
+    market_contracts: Sequence[tuple[str, str]],
+    chunk_size: int = 250_000,
+) -> Iterator[tuple[str, MarketEvent]]:
+    """Decode a combined DBN once and route each instrument exactly once."""
+
     try:
         import databento as db
     except ImportError as exc:  # pragma: no cover - production environment guard
         raise FoundryPilotError("databento package is required to read RAW_DBN") from exc
     store = db.DBNStore.from_file(Path(path))
+    yield from iter_dbn_mbo_events_multi_from_store(
+        store,
+        market_contracts=market_contracts,
+        chunk_size=chunk_size,
+    )
+
+
+def iter_dbn_mbo_events_multi_from_store(
+    store: Any,
+    *,
+    market_contracts: Sequence[tuple[str, str]],
+    chunk_size: int = 250_000,
+) -> Iterator[tuple[str, MarketEvent]]:
+    mappings = getattr(getattr(store, "metadata", None), "mappings", None)
+    if mappings is None:
+        mappings = getattr(store, "mappings", None)
+    routes = _resolve_dbn_instrument_routes(mappings, market_contracts)
+    routed_counts = {str(market): 0 for market, _ in market_contracts}
+    unknown_instrument_counts: dict[str, int] = defaultdict(int)
     local_sequence = 0
     for chunk in store.to_ndarray(count=int(chunk_size)):
         names = set(chunk.dtype.names or ())
@@ -733,6 +836,7 @@ def iter_dbn_mbo_events(
         if missing:
             raise FoundryPilotError(f"RAW_DBN is not MBO-complete: {sorted(missing)}")
         for row in chunk:
+            instrument_id = str(int(row["instrument_id"]))
             action = _enum_char(row["action"])
             if action == "N":
                 continue
@@ -740,6 +844,21 @@ def iter_dbn_mbo_events(
             ts_event = int(row["ts_event"])
             ts_recv = int(row["ts_recv"]) if "ts_recv" in names else ts_event
             available = max(ts_event, ts_recv)
+            event_date = datetime.fromtimestamp(ts_event / 1_000_000_000, tz=UTC).date().isoformat()
+            matching_routes = [
+                route
+                for route in routes.get(instrument_id, ())
+                if (not route.start_date or route.start_date <= event_date)
+                and (not route.end_date or event_date < route.end_date)
+            ]
+            if not matching_routes:
+                unknown_instrument_counts[instrument_id] += 1
+                continue
+            if len(matching_routes) != 1:
+                raise FoundryPilotError(
+                    f"DBN instrument {instrument_id} has ambiguous temporal routing"
+                )
+            route = matching_routes[0]
             local_sequence += 1
             vendor_sequence = int(row["sequence"]) if "sequence" in names else local_sequence
             price = (
@@ -753,13 +872,13 @@ def iter_dbn_mbo_events(
                     raise FoundryPilotError("MBO order mutation lacks order_id")
                 order_id = str(int(row["order_id"]))
             flags = int(row["flags"]) if "flags" in names else 0
-            yield MarketEvent(
+            event = MarketEvent(
                 ts_event_ns=ts_event,
                 available_at_ns=available,
                 ts_recv_ns=ts_recv,
                 sequence=vendor_sequence,
                 publisher_id=str(int(row["publisher_id"])),
-                instrument_id=str(int(row["instrument_id"])),
+                instrument_id=instrument_id,
                 action=action,
                 side=side,
                 price=price,
@@ -770,6 +889,61 @@ def iter_dbn_mbo_events(
                 is_snapshot=_dbn_snapshot_flag(flags),
                 schema="mbo",
             ).validated()
+            routed_counts[route.market] += 1
+            yield route.market, event
+    if unknown_instrument_counts:
+        detail = ", ".join(
+            f"{instrument_id}:{count}"
+            for instrument_id, count in sorted(unknown_instrument_counts.items())[:10]
+        )
+        raise FoundryPilotError(
+            f"combined RAW_DBN contains unresolved instrument IDs: {detail}"
+        )
+    missing = [market for market, count in routed_counts.items() if count == 0]
+    if missing:
+        raise FoundryPilotError(
+            "combined RAW_DBN contains no routed events for: " + ", ".join(missing)
+        )
+
+
+def _resolve_dbn_instrument_routes(
+    mappings: Any,
+    market_contracts: Sequence[tuple[str, str]],
+) -> Mapping[str, tuple[_InstrumentRoute, ...]]:
+    if not isinstance(mappings, Mapping) or not mappings:
+        raise FoundryPilotError("RAW_DBN symbology mappings are unavailable")
+    requested = {str(contract).upper(): str(market) for market, contract in market_contracts}
+    routes: dict[str, list[_InstrumentRoute]] = defaultdict(list)
+    found_contracts: set[str] = set()
+    for raw_symbol, intervals in mappings.items():
+        contract = str(raw_symbol).upper()
+        market = requested.get(contract)
+        if market is None:
+            continue
+        found_contracts.add(contract)
+        for interval in intervals or ():
+            raw = interval if isinstance(interval, Mapping) else vars(interval)
+            instrument_id = str(raw.get("symbol") or raw.get("s") or "")
+            if not instrument_id:
+                raise FoundryPilotError(
+                    f"RAW_DBN symbology interval lacks instrument_id: {contract}"
+                )
+            routes[instrument_id].append(
+                _InstrumentRoute(
+                    market=market,
+                    contract=contract,
+                    instrument_id=instrument_id,
+                    start_date=str(raw.get("start_date") or raw.get("d0") or ""),
+                    end_date=str(raw.get("end_date") or raw.get("d1") or ""),
+                )
+            )
+    missing = set(requested) - found_contracts
+    if missing:
+        raise FoundryPilotError(
+            "RAW_DBN symbology lacks explicit contracts: "
+            + ", ".join(sorted(missing))
+        )
+    return {instrument_id: tuple(values) for instrument_id, values in routes.items()}
 
 
 def _enum_char(value: Any) -> str:
@@ -2986,6 +3160,8 @@ __all__ = [
     "FoundryPilotError",
     "FoundryPilotResult",
     "iter_dbn_mbo_events",
+    "iter_dbn_mbo_events_multi",
+    "iter_dbn_mbo_events_multi_from_store",
     "run_microstructure_foundry_pilot",
     "run_microstructure_foundry_pilot_from_events",
 ]
