@@ -1,0 +1,76 @@
+{
+  "schema": "hydra_selective_veto_0034_post_reservation_metadata_throughput_repair_v1",
+  "campaign_id": "hydra_selective_order_flow_veto_expansion_0034",
+  "recorded_at_utc": "2026-07-18T22:02:34Z",
+  "classification": "POST_RESERVATION_PRE_COST_MATRIX_METADATA_IO_SERIALIZATION_DEFECT",
+  "repair_scope": "PARALLELIZE_OFFICIAL_METADATA_IO_ONLY_WITH_GLOBAL_RATE_LIMIT_AND_DETERMINISTIC_PARENT_CACHE_APPEND",
+  "same_campaign_and_manifest_path": true,
+  "additional_manifest_count": 0,
+  "additional_multiplicity_reserved": false,
+  "multiplicity": {
+    "reservation_already_created": true,
+    "cumulative_N_trials": 762254,
+    "reserved_delta_trials": 10,
+    "prospective_comparisons_changed": false
+  },
+  "before": {
+    "source_commit": "4d441046c0638ec82870c966dc68f33dd6973053",
+    "manifest_hash": "6b73a0e82b43ae65f06d367f5239f5f800a16627fdb88e9aaf10014b2334991f",
+    "manifest_file_sha256": "564bc592a5fbe421e339da147d6fbabb3c04ec76500ae5a4d801db02de617357",
+    "metadata_module_sha256": "c1bb35b26d4558074e39a312b7a3939a9dac181c39f30c174e37f179fe82ef87",
+    "pilot_module_sha256": "d80173876c9fa2a2295568b32ee240a5cb8deb15d260ec69918b036a220850c5"
+  },
+  "after": {
+    "source_commit": "a9b4e74542a7b07b237871c21df4b58365100aef",
+    "manifest_hash": "caf77600fbb9416e3f540c320c1b2354b13c366e808e950759a1524dc132f349",
+    "manifest_file_sha256": "edf1cb89583fbbbdde60d7a1c991c9e848f1153df0f2196365106c738cc440b2",
+    "metadata_module_sha256": "a3f9d49dbe3c3338b634f35fc7eae9b412d346db5c92c7b61ac15bb5133ed386",
+    "pilot_module_sha256": "d414b8cd7a0eca6810feb4d0a428adcb7e9e6a2aee45cc03d83a165b6c1c1502"
+  },
+  "durable_state_at_repair": {
+    "service_state": "INACTIVE_BOUNDED_REPAIR",
+    "production_state": "STARTING",
+    "production_stage": "NO_PURCHASE_SEED_ROBUSTNESS_AUDIT",
+    "seed_audit_decision_seen": "SELECTIVE_VETO_SEED_ROBUST",
+    "complete_metadata_triples_cached": 17,
+    "metadata_cache_sha256": "f26e1dcc8dacc1ad049e6a51c31ccb0b583edd315a87a209d5d80976d748d001",
+    "complete_cost_matrix_seen": false,
+    "selected_offer_seen": false,
+    "data_purchase_count": 0,
+    "long_sample_outcomes_seen": false,
+    "final_decision_seen": false
+  },
+  "technical_contract": {
+    "maximum_io_threads": 32,
+    "maximum_metadata_endpoint_starts_per_second": 10.0,
+    "metadata_request_set_changed": false,
+    "metadata_request_order_changed": false,
+    "cache_schema_changed": false,
+    "existing_cache_preserved": true,
+    "parent_only_cache_writes": true,
+    "deterministic_first_seen_append_order": true,
+    "retries_remain_bounded": true
+  },
+  "scientific_invariants": {
+    "frozen_seed_membership_changed": false,
+    "primary_actions_changed": false,
+    "risk_tiers_changed": false,
+    "thresholds_changed": false,
+    "account_rules_changed": false,
+    "chronological_roles_changed": false,
+    "window_definitions_changed": false,
+    "cost_matrix_cells_changed": false,
+    "purchase_cap_changed": false,
+    "budget_reserve_changed": false,
+    "q4_access_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "verification": {
+    "targeted_tests_passed": 75,
+    "targeted_tests_failed": 0,
+    "full_regression_required": false,
+    "reason_full_regression_not_required": "No shared execution, PnL, MLL, schema, data-role or governance semantics changed"
+  },
+  "repair_hash": "c07922ef1a51495a9b5ba2b39fe50971f252eaf77a168905e5615dedcaa1e216"
+}
