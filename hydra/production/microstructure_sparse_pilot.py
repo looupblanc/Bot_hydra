@@ -734,19 +734,44 @@ def build_opportunity_outcomes(
 
     outcomes: list[OpportunityOutcome] = []
     horizons = (1, 5, 30, 120, 300, 900)
-    for episode in episodes:
-        market_rows = np.flatnonzero(store.market == episode.market)
+    # These arrays are immutable for the whole pilot.  Building them once
+    # avoids an O(opportunities x feature_rows) rescan while preserving the
+    # exact chronological indices used by the former implementation.
+    market_index: dict[
+        str, tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict[str, int]]
+    ] = {}
+    for market in cfg.selected_markets:
+        market_rows = np.flatnonzero(store.market == market)
         local_times = store.decision_ns[market_rows]
         local_prices = store.last_trade_price[market_rows]
+        session_local = store.session[market_rows]
+        session_end_local = {
+            str(session): int(offsets[-1]) + 1
+            for session in store.sessions
+            if len(offsets := np.flatnonzero(session_local == session))
+        }
+        market_index[market] = (
+            market_rows,
+            local_times,
+            local_prices,
+            session_local,
+            session_end_local,
+        )
+    for episode in episodes:
+        (
+            market_rows,
+            local_times,
+            local_prices,
+            session_local,
+            session_end_by_id,
+        ) = market_index[episode.market]
         start_local = int(np.searchsorted(local_times, episode.confirmation_ns, side="left"))
         start_price = float(store.last_trade_price[episode.confirmation_index])
         tick = float(cfg.tick_size[episode.market])
         session = episode.session_id
-        session_local = store.session[market_rows]
-        session_offsets = np.flatnonzero(session_local == session)
-        if len(session_offsets) == 0:
+        session_end_local = session_end_by_id.get(session)
+        if session_end_local is None:
             raise SparsePilotError("0032 opportunity session missing from causal lattice")
-        session_end_local = int(session_offsets[-1]) + 1
         maximum_ns = episode.confirmation_ns + max(horizons) * 1_000_000_000
         end_local = min(
             int(np.searchsorted(local_times, maximum_ns, side="right")),
