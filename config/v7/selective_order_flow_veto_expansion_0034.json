@@ -8,10 +8,10 @@
   ],
   "development_only": true,
   "created_at_utc": "2026-07-18T21:42:54Z",
-  "source_commit": "b4269cdafccf23b3b3ad345183cef074cf04e58f",
+  "source_commit": "4d441046c0638ec82870c966dc68f33dd6973053",
   "economic_hypothesis": "Order flow can veto weak causal structural trades.",
   "implementation_files": {
-    "hydra/production/selective_veto_manifest.py": "91cb399ef4623063cc6e36da22cadab3814ebdaefa742f7e129a9280cf46fb25",
+    "hydra/production/selective_veto_manifest.py": "f5c7f7d454f7ecc93f816b3e463e0fede77dc30e99e00949b2723fcb8e8024fe",
     "hydra/production/selective_veto_runtime.py": "7ce2db0035f0dd8a1ae439bfac06ccb8c424bcdce21130545b298b344fbd47f7",
     "hydra/production/selective_veto_seed_audit.py": "b9057093c39f8310334cb261d3ab9d06e4c3eca92310f544192290c77e20f596",
     "hydra/production/selective_veto_pilot.py": "d80173876c9fa2a2295568b32ee240a5cb8deb15d260ec69918b036a220850c5",
@@ -451,6 +451,7 @@
     "prospective_comparisons": 10,
     "reserved_delta_trials": 10,
     "expected_global_N_trials_after_reservation": 762254,
+    "campaign_specific_inflation": 1.5,
     "reservation_required_before_outcome_access": true,
     "proof_window_consumed": false
   },
@@ -495,5 +496,5 @@
     "maximum_incremental_spend_usd": 8.0,
     "minimum_budget_reserve_usd": 20.0
   },
-  "manifest_hash": "5d0a66cd12bd7e3629b0a6677a1c47361430e78fb8060cdd4851f19146d595c2"
+  "manifest_hash": "6b73a0e82b43ae65f06d367f5239f5f800a16627fdb88e9aaf10014b2334991f"
 }

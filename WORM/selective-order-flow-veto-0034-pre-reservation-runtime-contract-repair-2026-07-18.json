@@ -1,0 +1,50 @@
+{
+  "additional_manifest_count": 0,
+  "after": {
+    "campaign_specific_inflation": 1.5,
+    "manifest_file_sha256": "564bc592a5fbe421e339da147d6fbabb3c04ec76500ae5a4d801db02de617357",
+    "manifest_hash": "6b73a0e82b43ae65f06d367f5239f5f800a16627fdb88e9aaf10014b2334991f",
+    "source_commit": "4d441046c0638ec82870c966dc68f33dd6973053"
+  },
+  "before": {
+    "manifest_file_sha256": "910de7f72f401bd64e87d43b672ef26292bf475aaafcf74db73c8db9021d483b",
+    "manifest_hash": "5d0a66cd12bd7e3629b0a6677a1c47361430e78fb8060cdd4851f19146d595c2",
+    "manifest_tag": "worm/selective-order-flow-veto-expansion-0034-2026-07-18",
+    "source_commit": "b4269cdafccf23b3b3ad345183cef074cf04e58f"
+  },
+  "campaign_id": "hydra_selective_order_flow_veto_expansion_0034",
+  "classification": "PRE_RESERVATION_GENERIC_MULTIPLICITY_INTEGRATION_DEFECT",
+  "durable_state": {
+    "campaign_output_artifact_count": 0,
+    "multiplicity_reservation_created": false,
+    "registry_n_trials_after_failure": 762244,
+    "registry_n_trials_before": 762244
+  },
+  "failure": {
+    "exception": "KeyError: campaign_specific_inflation",
+    "fail_closed": true,
+    "failure_location": "hydra.mission.economic_evolution_manifest_runtime._ensure_multiplicity_reservation",
+    "service_pid": 1769279,
+    "timestamp_utc": "2026-07-18T21:44:58Z"
+  },
+  "recorded_at_utc": "2026-07-18T21:46:30Z",
+  "repair_hash": "c4b461728f55a07ab3cfda707635e096a069004f8993b759f5068694fc65d7f6",
+  "repair_scope": "ADD_GENERIC_RUNTIME_REQUIRED_MULTIPLICITY_FIELD_AND_VALIDATE_IT",
+  "same_campaign_and_manifest_path": true,
+  "schema": "hydra_selective_veto_0034_pre_reservation_runtime_contract_repair_v1",
+  "scientific_invariants": {
+    "account_rules_changed": false,
+    "actions_changed": false,
+    "broker_connections": 0,
+    "data_purchase_count": 0,
+    "data_roles_changed": false,
+    "databento_metadata_calls": 0,
+    "economic_outcomes_seen": false,
+    "orders": 0,
+    "prospective_comparisons_changed": false,
+    "q4_access_delta": 0,
+    "reserved_delta_trials_changed": false,
+    "seed_membership_changed": false,
+    "thresholds_changed": false
+  }
+}
