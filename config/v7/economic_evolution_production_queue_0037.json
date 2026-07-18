@@ -1,0 +1,73 @@
+{
+  "CONTRE": "Queue compacte de continuation: 0029 est terminalisé sans retry et 0031 est l'unique nouveau manifeste. Aucun nouveau service, contrôleur, writer, accès Q4, ordre ou achat autonome par le contrôleur n'est autorisé; l'acquisition 0031 reste bornée, externe au writer et liée au coût officiel gelé.",
+  "entries": [
+    {
+      "campaign_id": "hydra_fast_pass_factory_0029",
+      "enabled": false,
+      "engine": "production_kernel_v1",
+      "manifest_file_sha256": "8a2b730c37d6dbe8a5bdf341dce91455966a4d204dd8f0f63669efc4d653432e",
+      "manifest_path": "config/v7/fast_pass_factory_0029_revision_05.json",
+      "manifest_semantic_hash": "3b1f7e4fe881a1de07c86584740bc19c2b79b248b287a146d96bc83bb71b0562",
+      "ordinal": 29,
+      "terminal_disable": {
+        "automatic_retry_allowed": false,
+        "evidence_finalization_allowed": false,
+        "reason": "OHLCV_INFORMATION_REPRESENTATION_INSUFFICIENT_FOR_FAST_PASS",
+        "receipt_file_sha256": "d85aa50e115e8db1352027da5bf373b87b7099d4fdcb6c47f663c0a646d94371",
+        "receipt_hash": "aa18977612f46692d0ba409df4ef9e614cb78f137d4f25d60e7abd0ccfb93f0e",
+        "receipt_path": "reports/economic_evolution/fast_pass_factory_0029_revision_05/development_terminal_receipt.json",
+        "status": "FAST_PASS_FACTORY_DATA_REPRESENTATION_LIMITED",
+        "verdict_commit": "d4f85dc49eeb934a41a0194241770428a3b5915d",
+        "verdict_file_sha256": "ff44734c7aae4a78b28bf3680681b8882b658087bc44ddfced744efddcaf02bf",
+        "verdict_hash": "26dfd69440ca99ba0c2b8d08cfd13a1105c016b21631476f6219ba4d3176ff99",
+        "verdict_path": "WORM/fast-pass-factory-0029-terminal-verdict-2026-07-18.json",
+        "verdict_tag": "worm/fast-pass-factory-0029-terminal-verdict-2026-07-18"
+      },
+      "worm_commit": "ada4063ef60ba610198abb1dc60422737629b829",
+      "worm_tag": "worm/fast-pass-factory-0029-terminal-evidence-relational-validation-repair-revision-05-2026-07-17"
+    },
+    {
+      "bounded_acquisition": {
+        "controller_purchase_allowed": false,
+        "external_manifest_bound_acquisition_after_cost_report": true,
+        "maximum_initial_spend_usd": 10.0,
+        "minimum_budget_reserve_usd": 25.0,
+        "q4_access_allowed": false
+      },
+      "campaign_id": "hydra_microstructure_order_flow_foundry_0031",
+      "enabled": true,
+      "engine": "production_kernel_v1",
+      "manifest_file_sha256": "9bd3f662981c6478737a8dad18a49f68df3510ec1d2c39eaeb469013c8beb344",
+      "manifest_path": "config/v7/microstructure_order_flow_foundry_0031.json",
+      "manifest_semantic_hash": "5bb0c5a098e52bcf47407ad241c78fefa38fe6a630f7f12cca46a5dede806aac",
+      "ordinal": 31,
+      "worm_commit": "f04d902c6a3074debe88b94f1d02029e7fdeda71",
+      "worm_tag": "worm/microstructure-order-flow-foundry-0031-2026-07-18"
+    }
+  ],
+  "governance": {
+    "broker_or_orders_allowed": false,
+    "new_data_purchase_allowed": false,
+    "proof_window_consumption_allowed": false,
+    "q4_access_allowed": false
+  },
+  "issued_at_utc": "2026-07-18T02:43:59.485631Z",
+  "queue_hash": "a3b67346690ad178164d53dccee41e0b8fea3e80c9d23843e0c9d38838341cf3",
+  "queue_id": "hydra_economic_evolution_production_queue_0037",
+  "runtime_policy": {
+    "auto_tombstone_failed_exact_class": true,
+    "controller_source_change_for_new_manifest": false,
+    "full_repository_regression_per_campaign": false,
+    "maximum_deterministic_attempts": 3,
+    "reload_queue_each_controller_step": true,
+    "single_active_campaign": true,
+    "single_authoritative_mission_writer": true,
+    "targeted_integrity_checks_per_campaign": true
+  },
+  "schema": "hydra_manifest_campaign_queue_v1",
+  "supersedes": {
+    "file_sha256": "fb89e971c685c80891311edbd3d8fb9975a284449fc8b4e2f0cebbd2997c18e6",
+    "path": "config/v7/economic_evolution_production_queue_0036.json",
+    "semantic_hash": "d69b6940087bab26ddc54fe3b697f29bdaeeb53c1acc17cfe7813ab86dc1ba19"
+  }
+}
