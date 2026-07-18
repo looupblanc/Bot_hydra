@@ -1,0 +1,421 @@
+{
+  "schema": "hydra_economic_production_manifest_v1",
+  "campaign_id": "hydra_microstructure_order_flow_foundry_0031",
+  "campaign_mode": "MICROSTRUCTURE_ORDER_FLOW_FOUNDRY",
+  "class_id": "EVENT_SOURCED_LOB_TEACHER_STUDENT_MOE_FAST_COMBINE_V1",
+  "policy_classes": [
+    "EVENT_SOURCED_LOB_TEACHER_STUDENT_MOE_FAST_COMBINE_V1"
+  ],
+  "created_at_utc": "2026-07-18T02:39:56.281810Z",
+  "source_commit": "d4f85dc49eeb934a41a0194241770428a3b5915d",
+  "development_only": true,
+  "economic_hypothesis": "Event-level order flow and reconstructed limit-order-book state contain causal information that materially raises executable target velocity beyond the clean OHLCV frontier, and MBO teacher states can be distilled into an L1/L2 student supported by a personal-device TopstepX/ProjectX deployment feed.",
+  "implementation_files": {
+    "hydra/production/microstructure_event_engine.py": "423a5c92834bcdf89c2280c791c50c9cbded1cdab1f16e60647e724bddf76c18",
+    "hydra/production/microstructure_foundry_cost.py": "cfe790537f31c99dcdb0b28927eee434d46cba6df2ded584187c665dc7f98e2f",
+    "hydra/production/microstructure_foundry_manifest.py": "10a8cf8f88ebc8ccfaaf90fc7914a3ecd50d4f946a0d3d7ae86a8d486ee85fcf",
+    "hydra/production/microstructure_foundry_pilot.py": "780d83e334bdca13e2ed9aa84744e4909fe1e64e094754a8e4530051b5a6f65a",
+    "hydra/production/microstructure_foundry_runtime.py": "69de0d4ba2464e6c5b3280d4328588f897612a2569702fa2cbc49aef181f5607",
+    "hydra/production/microstructure_teacher_student.py": "7668f002e912d286ef6ee6f622fc35a4dfdeedd74f9e1e95c56ce5bd6f2b79fe",
+    "scripts/acquire_microstructure_foundry_0031.py": "ff0fdf30790f390bd5f9278b24f267fe50a96431a9a9ac65834a743054f53315"
+  },
+  "runtime": {
+    "engine": "production_kernel_v1",
+    "runner": "scripts/run_economic_production_manifest.py",
+    "result_schema": "hydra_economic_production_result_v1",
+    "result_name": "economic_production_result.json",
+    "output_dir": "reports/economic_evolution/microstructure_order_flow_foundry_0031",
+    "foundry_runtime_version": "hydra_microstructure_order_flow_foundry_runtime_v1",
+    "controller_source_change_required": false,
+    "authoritative_writer_count": 1,
+    "asynchronous_evidence_writer_count": 1,
+    "worker_count": 3,
+    "resume_from_checkpoint": true,
+    "receipt_poll_seconds": 5,
+    "receipt_heartbeat_seconds": 30
+  },
+  "terminal_baseline_0029": {
+    "terminal_status": "FAST_PASS_FACTORY_DATA_REPRESENTATION_LIMITED",
+    "proposals": 100000,
+    "causal_screens": 20000,
+    "exact_replays": 5000,
+    "account_books": 2000,
+    "account_episodes": 553674,
+    "stressed_positive_candidates": 2799,
+    "combine_passes_5d": 0,
+    "combine_passes_10d": 0,
+    "combine_passes_20d": 0,
+    "median_target_progress_pct": {
+      "5d": 0.03217367538891267,
+      "10d": 0.06714635109140847,
+      "20d": 0.2719056828846482
+    },
+    "best_ohlcv_baseline": {
+      "stressed_target_progress_pct": 8.097338902313397,
+      "population_median_stressed_target_progress_pct": 0.272,
+      "combine_pass_count": 0,
+      "deployment_status": "LOW_VELOCITY_CAUSAL_REFERENCE_ONLY"
+    },
+    "mll_breaches": 0,
+    "bank_admissions": 0,
+    "graduations": 0,
+    "xfa_paths": 0,
+    "regenerate_evidence_allowed": false,
+    "administrative_projection_reconciled": {
+      "final_result_stage0_stage1_projection": [0, 0],
+      "worm_canonical_stage0_stage1": [100000, 20000],
+      "economic_evidence_affected": false
+    },
+    "sources": {
+      "canonical_volume_worm": {
+        "path": "WORM/fast-pass-factory-0029-diversity-timestamp-repair-2026-07-17.json",
+        "sha256": "b30051f3583598f2dc0205dd9f833036d93180ae4fb880f80008bd11c611c592"
+      },
+      "terminal_result": {
+        "path": "reports/economic_evolution/fast_pass_factory_0029_revision_05/economic_production_result.json",
+        "sha256": "bf04d3fd88a9b00a830f131509bb8d06ef76cfd38a0d47fe52bf69e46df6681b"
+      },
+      "evidence_receipt": {
+        "path": "reports/economic_evolution/fast_pass_factory_0029_revision_05/evidence_bundle_receipt.json",
+        "sha256": "f2018527afc2a4aa581d50eee2d7eb8ee5da6700fd9ff436e3796d17de2da9f8"
+      },
+      "terminal_receipt": {
+        "path": "reports/economic_evolution/fast_pass_factory_0029_revision_05/development_terminal_receipt.json",
+        "sha256": "d85aa50e115e8db1352027da5bf373b87b7099d4fdcb6c47f663c0a646d94371"
+      },
+      "terminal_verdict": {
+        "path": "WORM/fast-pass-factory-0029-terminal-verdict-2026-07-18.json",
+        "sha256": "ff44734c7aae4a78b28bf3680681b8882b658087bc44ddfced744efddcaf02bf"
+      }
+    }
+  },
+  "market_selection": {
+    "selected_markets": ["NQ", "YM"],
+    "explicit_contracts": ["NQU4", "YMU4"],
+    "default_nq_es_displaced_by_evidence": true,
+    "selection_rule": "highest stressed full-net and opportunity-density combination in the frozen 0029 wave-2 causal executable bank",
+    "ranked_clean_0029_evidence": [
+      {
+        "market": "NQ",
+        "bank_candidate_count": 63,
+        "stressed_net_usd": 45399.82057197273,
+        "opportunities_per_20_sessions": 12.307589846298923,
+        "rank": 1
+      },
+      {
+        "market": "YM",
+        "bank_candidate_count": 27,
+        "stressed_net_usd": 11523.620082972251,
+        "opportunities_per_20_sessions": 7.957288274189683,
+        "rank": 2
+      },
+      {
+        "market": "ES",
+        "bank_candidate_count": 19,
+        "stressed_net_usd": 5901.1673675085185,
+        "opportunities_per_20_sessions": 2.678961392823513,
+        "rank": 3,
+        "role": "NON_PURCHASED_CONTROL_REFERENCE"
+      }
+    ],
+    "source": {
+      "path": "data/cache/economic_production/hydra_fast_pass_factory_0029/wave_02/causal_executable_bank.json",
+      "sha256": "c73f333ca0f106650edf5f6859ee3c2786f0855c5821ecab280aae4687691d94"
+    }
+  },
+  "account_rule_snapshot": {
+    "account_size_usd": 150000.0,
+    "profit_target_usd": 9000.0,
+    "maximum_loss_limit_usd": 4500.0,
+    "best_day_consistency_fraction": 0.5,
+    "maximum_mini_contracts": 15,
+    "maximum_micro_contracts": 150,
+    "session_close_rule": "FROZEN_TOPSTEP_SESSION_FLATTEN",
+    "derive_risk_limits_from_snapshot": true,
+    "optional_dll_enabled": false,
+    "costs_and_slippage": {
+      "source_path": "config/v7/phase0_g0_preregistration.json",
+      "source_sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+      "normal_multiplier": 1.0,
+      "stressed_multiplier": 1.5,
+      "round_turn_commission_usd": {"NQ": 3.8, "YM": 3.8},
+      "tick_value_usd": {"NQ": 5.0, "YM": 5.0},
+      "base_slippage_ticks_per_side": 2.0,
+      "normal_total_cost_per_contract_usd": 23.8,
+      "stressed_total_cost_per_contract_usd": 33.8,
+      "causal_next_tradable_event_fill": true
+    }
+  },
+  "bounded_acquisition": {
+    "provider": "Databento",
+    "dataset": "GLBX.MDP3",
+    "schemas": ["trades", "tbbo", "mbp-1", "mbp-10", "mbo"],
+    "session_counts": [5, 10, 20, 30],
+    "cost_api": "Historical.metadata.get_cost",
+    "record_count_api": "Historical.metadata.get_record_count",
+    "billable_size_api": "Historical.metadata.get_billable_size",
+    "maximum_initial_spend_usd": 10.0,
+    "minimum_budget_reserve_usd": 25.0,
+    "total_budget_usd": 125.0,
+    "purchase_before_cost_matrix_allowed": false,
+    "manifest_bound_purchase_after_cost_matrix_allowed": true,
+    "broad_historical_purchase_allowed": false,
+    "q4_access_allowed": false,
+    "temporal_split": {
+      "discovery": 0.6,
+      "validation": 0.2,
+      "final_development": 0.2
+    },
+    "acquisition_preference": [
+      "TWO_MARKET_MBO_DERIVE_LOWER_SCHEMAS",
+      "TWO_MARKET_DEPLOYABLE_PLUS_ONE_MARKET_MBO_TEACHER",
+      "TRADES_BASELINE_ONLY"
+    ]
+  },
+  "dual_plane": {
+    "research_plane": "EXISTING_SERVER_DATABENTO_HISTORICAL_TEACHER_DISCOVERY_REPLAY",
+    "deployment_plane": "PERSONAL_DEVICE_TOPSTEPX_PROJECTX_COMPATIBLE_NO_EXTERNAL_FEED_DEPENDENCY",
+    "deployability_statuses": [
+      "L1_DEPLOYABLE",
+      "L2_DEPLOYABLE",
+      "MBO_TEACHER_ONLY",
+      "UNDEPLOYABLE"
+    ],
+    "server_research_allowed": true,
+    "personal_device_export_required": true,
+    "databento_live_order_dependency_allowed": false,
+    "vps_order_execution_allowed": false,
+    "mbo_teacher_direct_deployment_allowed": false
+  },
+  "immutable_event_store": {
+    "layers": [
+      "RAW_DBN",
+      "BOOK_SNAPSHOTS",
+      "DERIVED_EVENTS",
+      "FEATURE_MATRICES",
+      "OUTCOME_LABELS"
+    ],
+    "raw_rewrite_allowed": false,
+    "outcome_labels_physically_separate": true,
+    "derived_format": "ARROW_PARQUET_ZSTD_BY_MARKET_SESSION",
+    "required_event_fields": [
+      "ts_event",
+      "ts_recv_or_available_at",
+      "sequence",
+      "publisher",
+      "instrument",
+      "action",
+      "side",
+      "price",
+      "size",
+      "order_id_when_available",
+      "flags"
+    ]
+  },
+  "event_state_engine": {
+    "single_batch_stream_step": true,
+    "sequence_and_snapshot_recovery_required": true,
+    "economic_results_before_reconstruction_green_allowed": false,
+    "state": [
+      "ORDER_BOOK",
+      "BBO",
+      "SPREAD",
+      "MICROPRICE",
+      "DEPTH",
+      "TAPE",
+      "SESSION",
+      "ANCHORED_VWAP",
+      "VOLUME_PROFILE",
+      "CROSS_MARKET"
+    ],
+    "combined_mbo_decoded_once_and_routed_by_instrument": true,
+    "batch_streaming_deterministic_equality_required": true
+  },
+  "feature_lattice": {
+    "horizons": ["MICRO", "SHORT", "MESO", "SESSION"],
+    "availability_rule": "available_at<=decision_time",
+    "normalization_by_market_session_volatility_spread_depth": true,
+    "micro_horizon": "EVENT_TO_2_SECONDS",
+    "short_horizon": "2_TO_30_SECONDS",
+    "meso_horizon": "30_SECONDS_TO_5_MINUTES",
+    "tape_features": [
+      "AGGRESSOR_FLOW",
+      "SIGNED_DELTA",
+      "CUMULATIVE_DELTA",
+      "DELTA_VELOCITY_ACCELERATION",
+      "TRADE_ARRIVAL_RATE",
+      "NOTIONAL_RATE",
+      "TRADE_SIZE_DISTRIBUTION",
+      "SAME_SIDE_SEQUENCE",
+      "SWEEP_CONSUMPTION",
+      "MARKOUTS"
+    ],
+    "book_features": [
+      "BBO_IMBALANCE",
+      "DEPTH_IMBALANCE_3_5_10",
+      "MICROPRICE",
+      "SPREAD",
+      "DEPTH_SLOPE_CONVEXITY",
+      "DEPLETION_REPLENISHMENT",
+      "ADD_CANCEL_MODIFY_RATES",
+      "ORDER_AGE_QUEUE_PERSISTENCE",
+      "LIQUIDITY_GAPS",
+      "EPHEMERAL_LIQUIDITY"
+    ],
+    "context_features": [
+      "PRICE_RESPONSE",
+      "CONTINUATION_REJECTION_EFFICIENCY",
+      "VWAP_AND_PROFILE_LOCATION",
+      "NQ_YM_FLOW_ALIGNMENT",
+      "LEAD_LAG",
+      "LIQUIDITY_DIVERGENCE"
+    ]
+  },
+  "teacher_student": {
+    "mbo_labels_outcome_only": true,
+    "mbo_teacher_direct_deployment_allowed": false,
+    "teacher_events": [
+      "ABSORPTION",
+      "DEPLETION",
+      "LIQUIDITY_VACUUM",
+      "EXHAUSTION",
+      "QUEUE_STATE"
+    ],
+    "student_tiers": ["L1", "L2"],
+    "student_l1_inputs": [
+      "TRADES",
+      "BBO",
+      "SPREAD",
+      "DELTA",
+      "TRADE_INTENSITY",
+      "VWAP_PROFILE_CONTEXT",
+      "CROSS_MARKET_STATE"
+    ],
+    "student_l2_additional_inputs": [
+      "MULTI_LEVEL_DEPTH",
+      "DEPTH_IMBALANCE",
+      "DEPLETION",
+      "REPLENISHMENT_PROXY",
+      "BOOK_SLOPE"
+    ],
+    "initial_model_classes": [
+      "REGULARIZED_LOGISTIC_REGRESSION",
+      "SHALLOW_DECISION_TREE",
+      "MONOTONIC_GRADIENT_BOOSTING",
+      "DISCRETE_COMPETING_RISK_SURVIVAL",
+      "TRANSPARENT_SYMBOLIC_RULE"
+    ],
+    "random_temporal_mixing_allowed": false,
+    "classification_accuracy_without_economic_utility_sufficient": false
+  },
+  "expert_families": {
+    "required_initial_families": [
+      "ABSORPTION_REVERSAL",
+      "INITIATIVE_CONTINUATION",
+      "LIQUIDITY_VACUUM_CONTINUATION",
+      "EXHAUSTION_REVERSAL",
+      "VWAP_ACCEPTANCE_REJECTION",
+      "OPENING_DRIVE",
+      "CROSS_ASSET_FLOW_DIVERGENCE",
+      "QUEUE_REPLENISHMENT"
+    ],
+    "minimum_structurally_distinct_sleeves": 20,
+    "maximum_structurally_distinct_sleeves": 40,
+    "frozen_initial_sleeve_count": 24,
+    "variants_per_family": [
+      "L1_AGGRESSIVE",
+      "L2_AGGRESSIVE",
+      "MBO_TEACHER_PASSIVE"
+    ],
+    "high_dimensional_indicator_soup_allowed": false
+  },
+  "execution_replay": {
+    "paths": ["AGGRESSIVE", "PASSIVE"],
+    "aggressive": [
+      "EXECUTABLE_BID_ASK",
+      "AVAILABLE_DEPTH",
+      "MULTI_LEVEL_SLIPPAGE",
+      "FEES",
+      "PERSONAL_DEVICE_LATENCY",
+      "PARTIAL_FILL"
+    ],
+    "passive": [
+      "QUEUE_POSITION_ESTIMATE",
+      "QUANTITY_AHEAD",
+      "CANCELLATION_AHEAD_BEHIND",
+      "PARTIAL_FILL",
+      "CANCEL_LATENCY",
+      "NON_FILL_PROBABILITY",
+      "ADVERSE_SELECTION"
+    ],
+    "touch_implies_fill": false,
+    "sub_millisecond_latency_arbitrage_allowed": false,
+    "deployment_execution_model_must_match_data_tier": true
+  },
+  "bounded_pilot": {
+    "minimum_candidates": 20,
+    "maximum_candidates": 40,
+    "horizons_days": [5, 10, 20],
+    "cost_scenarios": ["NORMAL", "STRESSED_1_5X"],
+    "controls": [
+      "DIRECTION_FLIP",
+      "SESSION_MATCHED_TIMING_NULL",
+      "EXPOSURE_MATCHED_RANDOM"
+    ],
+    "comparison_baseline": "BEST_CAUSAL_OHLCV_0029_8_0973389_PERCENT_STRESSED_TARGET_PROGRESS",
+    "allowed_decisions": [
+      "MICROSTRUCTURE_PILOT_GREEN",
+      "MICROSTRUCTURE_PILOT_WEAK",
+      "MICROSTRUCTURE_PILOT_FALSIFIED"
+    ],
+    "green_gate": {
+      "material_target_velocity_uplift_over_ohlcv": true,
+      "positive_stressed_economics": true,
+      "minimum_useful_mechanism_families": 3,
+      "sufficient_opportunity_density": true,
+      "acceptable_mll": true,
+      "minimum_one_l1_or_l2_serious_sleeve": true,
+      "final_development_evidence_required": true,
+      "thresholds_may_change_after_results": false
+    },
+    "scale_before_green_allowed": false,
+    "xfa_before_clean_combine_survivors_allowed": false
+  },
+  "evidence_bundle": {
+    "required": true,
+    "atomic_single_writer_finalization": true,
+    "destination": "data/cache/evidence_bundles",
+    "large_event_files_git_tracked": false,
+    "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+    "reconstruction_flag": false
+  },
+  "compute_allocation": {
+    "hot_economic_loop_minimum": 0.85,
+    "cold_safety_loop_maximum": 0.10,
+    "engineering_reporting_maximum": 0.05
+  },
+  "multiplicity": {
+    "prior_global_N_trials": 762109,
+    "prospective_comparisons": 40,
+    "campaign_specific_inflation": 1.5,
+    "reserved_delta_trials": 60,
+    "expected_global_N_trials_after_reservation": 762169,
+    "reservation_required_before_outcome_access": true,
+    "proof_window_consumed": false
+  },
+  "governance": {
+    "live_trading_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "q4_access_allowed": false,
+    "new_data_purchase_allowed": false,
+    "proof_window_consumption_allowed": false,
+    "status_inheritance_allowed": false,
+    "xfa_before_clean_combine_survivors": false,
+    "mass_scale_before_pilot_green": false,
+    "broad_ohlcv_search_allowed": false,
+    "bounded_manifest_acquisition_external_to_controller_only": true,
+    "deployment_order_route_enabled": false
+  },
+  "manifest_hash": "5bb0c5a098e52bcf47407ad241c78fefa38fe6a630f7f12cca46a5dede806aac"
+}
