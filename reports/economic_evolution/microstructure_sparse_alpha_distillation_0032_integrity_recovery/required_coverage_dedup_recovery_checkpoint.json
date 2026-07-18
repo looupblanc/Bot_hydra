@@ -1,0 +1,23 @@
+{
+  "schema": "hydra_sparse_required_coverage_dedup_recovery_checkpoint_v1",
+  "campaign_id": "hydra_microstructure_sparse_alpha_distillation_0032",
+  "recorded_at_utc": "2026-07-18T11:48:01Z",
+  "old_manifest_hash": "3431e1917c47c9236dab883c1463354475daf0c0332ad91accf12b4ad4b5ba95",
+  "new_manifest_hash": "268e3103faa5f5ef52096fc38a36098371b116ffe75780bc3fdf9e6cc1f249d8",
+  "failed_bundle_error": "required_episode_keys contained duplicate declarations after cost-scenario pairing",
+  "observed_pilot_status": "SPARSE_PILOT_WEAK",
+  "strategies_evaluated": 30,
+  "opportunity_episode_count": 96590,
+  "trade_count": 327,
+  "economic_results_changed": false,
+  "thresholds_changed": false,
+  "hypothesis_changed": false,
+  "repair_scope": "EVIDENCE_REQUIRED_COVERAGE_DEDUPLICATION_ONLY",
+  "repair_detail": "Each canonical policy/episode/horizon attempt is now declared once while retaining exactly two scenario evidence rows.",
+  "multiplicity_reservation_changed": false,
+  "data_purchase_count": 0,
+  "q4_access_delta": 0,
+  "broker_connections": 0,
+  "orders": 0,
+  "receipt_hash": "4b35208e3f0759a28f93e0018ed588f76306a514ea49a5413b3853b6f6ed7859"
+}
