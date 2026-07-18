@@ -6,15 +6,15 @@
   "policy_classes": [
     "EVENT_SOURCED_LOB_TEACHER_STUDENT_MOE_FAST_COMBINE_V1"
   ],
-  "created_at_utc": "2026-07-18T03:17:42.608505Z",
-  "source_commit": "af76423ccf93791e097d42a869c4bc6c1f88c692",
+  "created_at_utc": "2026-07-18T03:47:43.919944Z",
+  "source_commit": "33d33476f650facfe8066f99ffc06ed7c71d8521",
   "development_only": true,
   "economic_hypothesis": "Event-level order flow and reconstructed limit-order-book state contain causal information that materially raises executable target velocity beyond the clean OHLCV frontier, and MBO teacher states can be distilled into an L1/L2 student supported by a personal-device TopstepX/ProjectX deployment feed.",
   "implementation_files": {
-    "hydra/production/microstructure_event_engine.py": "80a3af6272fdf8d935f204bf2f0c0fa23d094387a2da4a34dd62a0862a831acf",
+    "hydra/production/microstructure_event_engine.py": "7d28ff72de89617604bdc40a160998d4f6d9747d1fb03acbce8dca35a341e9d3",
     "hydra/production/microstructure_foundry_cost.py": "cfe790537f31c99dcdb0b28927eee434d46cba6df2ded584187c665dc7f98e2f",
     "hydra/production/microstructure_foundry_manifest.py": "10a8cf8f88ebc8ccfaaf90fc7914a3ecd50d4f946a0d3d7ae86a8d486ee85fcf",
-    "hydra/production/microstructure_foundry_pilot.py": "e6be466535de334095912ed30ab7226437a922efcf57441c6147a0c96d0ca0f2",
+    "hydra/production/microstructure_foundry_pilot.py": "96ed9e8e65055efb6236a06932f7095b6a0195eba976c4f705d7fb2afceb507e",
     "hydra/production/microstructure_foundry_runtime.py": "69de0d4ba2464e6c5b3280d4328588f897612a2569702fa2cbc49aef181f5607",
     "hydra/production/microstructure_teacher_student.py": "7668f002e912d286ef6ee6f622fc35a4dfdeedd74f9e1e95c56ce5bd6f2b79fe",
     "scripts/acquire_microstructure_foundry_0031.py": "ff0fdf30790f390bd5f9278b24f267fe50a96431a9a9ac65834a743054f53315"
@@ -482,5 +482,32 @@
       "F_MAYBE_BAD_BOOK_FAIL_CLOSED"
     ]
   },
-  "manifest_hash": "59f0d105829968dae8431711b21e27f9a02bb72b684267e133e3b2474356fa9e"
+  "post_acquisition_pre_outcome_technical_repair": {
+    "classification": "NEUTRAL_TRADE_AND_PRE_INITIAL_SNAPSHOT_CAUSAL_DECODING_REPAIR",
+    "prior_manifest_hash": "59f0d105829968dae8431711b21e27f9a02bb72b684267e133e3b2474356fa9e",
+    "detected_at_stage": "EVENT_STORE_AND_BOOK_RECONSTRUCTION_BEFORE_LABELS_OR_CANDIDATE_RESULTS",
+    "prior_cost_matrix_hash": "14db96e88bcb434eeb3bd54215f2182b4800a0f4c8b5ad77214a1b95da258fd5",
+    "prior_cost_report_file_sha256": "3fbf924ee77e1448c8dee23fab008e475fca837b22fd867f65d30a77dc20ebf4",
+    "prior_acquisition_receipt_hash": "e6bf9c9503cd279b697ee817449eb582e67578078c93e19c1cdaeac7de6bd9ab",
+    "prior_acquisition_receipt_file_sha256": "91ceb74a1ebb17eb2ef3501c5169ad46f53e7e8605abb1e986cb4c8fbef4210e",
+    "raw_dbn_sha256": "0d6c0dc8c0e5c353e2166778b3d3827e8467900983ec11c0e6899fa24986d741",
+    "raw_dbn_size_bytes": 1878135090,
+    "additional_data_purchase": false,
+    "data_request_or_temporal_roles_changed": false,
+    "economic_outcomes_observed_before_repair": false,
+    "labels_models_candidates_or_thresholds_changed": false,
+    "repairs": [
+      "TRADE_SIDE_N_PRESERVED_AS_UNSIGNED_FLOW",
+      "PRE_INITIAL_SNAPSHOT_EVENTS_PRESERVED_RAW_BUT_BYPASS_STATE_ENGINE"
+    ],
+    "implementation_validation_only_smoke": {
+      "raw_events": 5000000,
+      "state_engine_events": 4810569,
+      "pre_snapshot_gated_events": 189431,
+      "feature_snapshots": 67676,
+      "status": "BOOK_STATE_RECONSTRUCTION_GREEN",
+      "economic_labels_or_scores_computed": false
+    }
+  },
+  "manifest_hash": "0c6a465b5715871be10455e2b4dffd20785353551dc9c895fc2c5f0b8d2dcb5c"
 }
