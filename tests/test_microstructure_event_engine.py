@@ -11,6 +11,9 @@ from hydra.production.microstructure_event_engine import (
     CheckpointError,
     CompactEventResult,
     EventOrderError,
+    F_LAST,
+    F_MAYBE_BAD_BOOK,
+    F_SNAPSHOT,
     MarketEvent,
     MicrostructureEventEngine,
     SequenceGapError,
@@ -23,6 +26,7 @@ BASE_TS = 1_720_000_000_000_000_000
 
 
 def _event(sequence: int, action: str, **overrides: object) -> MarketEvent:
+    flags_explicit = "flags" in overrides
     values: dict[str, object] = {
         "ts_event_ns": BASE_TS + sequence * 1_000,
         "available_at_ns": BASE_TS + sequence * 1_000 + 100,
@@ -38,6 +42,8 @@ def _event(sequence: int, action: str, **overrides: object) -> MarketEvent:
         "session_id": "2024-07-08",
     }
     values.update(overrides)
+    if values.get("is_snapshot") is True and not flags_explicit:
+        values["flags"] = int(values["flags"]) | F_SNAPSHOT | F_LAST
     return MarketEvent(**values)  # type: ignore[arg-type]
 
 
@@ -94,14 +100,14 @@ def test_sequence_gap_blocks_until_explicit_snapshot_reset() -> None:
 
     with pytest.raises(SequenceGapError, match="expected 3, got 4"):
         engine.step(_event(4, "A", side="A", price=101.0, size=2, order_id="lost"))
-    assert engine.stream_status("GLBX.MDP3", "NQU4") == {
-        "last_sequence": 2,
-        "blocked": True,
-        "expected_sequence": 3,
-    }
+    status = engine.stream_status("GLBX.MDP3", "NQU4")
+    assert {
+        key: status[key]
+        for key in ("last_sequence", "blocked", "expected_sequence")
+    } == {"last_sequence": 2, "blocked": True, "expected_sequence": 3}
     with pytest.raises(SnapshotRecoveryRequired):
         engine.step(_event(5, "T", side="B", price=101.0, size=1))
-    with pytest.raises(EventOrderError, match="snapshot sequence"):
+    with pytest.raises(ValueError, match="authenticated by F_SNAPSHOT"):
         engine.step(_event(1, "R", is_snapshot=True, flags=1))
 
     reset = engine.step(_event(10, "R", is_snapshot=True))
@@ -295,11 +301,11 @@ def test_compact_checkpoint_preserves_filtered_sequence_and_idempotence() -> Non
     assert isinstance(duplicate, CompactEventResult)
     assert duplicate.duplicate is True
     assert restored.state_hash() == before
-    assert restored.stream_status("GLBX.MDP3", "NQU4") == {
-        "last_sequence": 20,
-        "blocked": False,
-        "expected_sequence": 21,
-    }
+    status = restored.stream_status("GLBX.MDP3", "NQU4")
+    assert {
+        key: status[key]
+        for key in ("last_sequence", "blocked", "expected_sequence")
+    } == {"last_sequence": 20, "blocked": False, "expected_sequence": 21}
 
     # Filtered vendor feeds can contain several distinct messages from the same
     # packet sequence.  Non-contiguous mode is monotone, not strictly monotone.
@@ -382,3 +388,174 @@ def test_incremental_chain_matches_between_full_stream_and_compact_checkpoints()
         expected_chain[snapshot.sequence] for snapshot in replay.snapshots
     ]
     assert replay.final_state_hash == full_engine.state_hash()
+
+
+def test_authenticated_daily_snapshots_rebase_sequence_and_gate_until_f_last() -> None:
+    def at(index: int, sequence: int, action: str, **values: object) -> MarketEvent:
+        return _event(
+            sequence,
+            action,
+            ts_event_ns=BASE_TS + index * 10_000,
+            available_at_ns=BASE_TS + index * 10_000 + 100,
+            **values,
+        )
+
+    engine = MicrostructureEventEngine(strict_contiguous_sequence=False)
+    reset = at(1, 0, "R", is_snapshot=True, flags=F_SNAPSHOT)
+    engine.step(reset, materialize=False)
+    assert engine.stream_status("GLBX.MDP3", "NQU4")["book_ready"] is False
+    engine.step(
+        at(
+            2,
+            100,
+            "A",
+            side="B",
+            price=100.0,
+            size=5,
+            order_id="day1-bid",
+            is_snapshot=True,
+            flags=F_SNAPSHOT,
+        ),
+        materialize=False,
+    )
+    with pytest.raises(SnapshotRecoveryRequired, match="before snapshot F_LAST"):
+        engine.step(at(3, 101, "T", side="B", price=101.0, size=1))
+    final_snapshot = engine.step(
+        at(
+            4,
+            50,
+            "A",
+            side="A",
+            price=101.0,
+            size=6,
+            order_id="day1-ask",
+            is_snapshot=True,
+            flags=F_SNAPSHOT | F_LAST,
+        )
+    )
+    assert final_snapshot.book.bid_price == 100.0
+    assert engine.stream_status("GLBX.MDP3", "NQU4")["book_ready"] is True
+    engine.step(at(5, 51, "T", side="B", price=101.0, size=2))
+
+    # The next UTC-day snapshot legitimately restarts at sequence zero and
+    # replaces, rather than merges with, yesterday's displayed orders.
+    engine.step(
+        at(6, 0, "R", is_snapshot=True, flags=F_SNAPSHOT),
+        materialize=False,
+    )
+    engine.step(
+        at(
+            7,
+            700,
+            "A",
+            side="B",
+            price=102.0,
+            size=3,
+            order_id="day2-bid",
+            is_snapshot=True,
+            flags=F_SNAPSHOT,
+        ),
+        materialize=False,
+    )
+    daily_last = engine.step(
+        at(
+            8,
+            600,
+            "A",
+            side="A",
+            price=103.0,
+            size=4,
+            order_id="day2-ask",
+            is_snapshot=True,
+            flags=F_SNAPSHOT | F_LAST,
+        )
+    )
+    assert daily_last.book.bid_price == 102.0
+    assert daily_last.book.ask_price == 103.0
+    assert daily_last.book.order_count == 2
+    status = engine.stream_status("GLBX.MDP3", "NQU4")
+    assert status["snapshot_count"] == 2
+    assert status["book_ready"] is True
+
+
+def test_daily_snapshot_batch_and_streaming_states_are_identical() -> None:
+    records = (
+        _event(0, "R", is_snapshot=True, flags=F_SNAPSHOT),
+        _event(
+            9,
+            "A",
+            side="B",
+            price=100.0,
+            size=2,
+            order_id="b1",
+            is_snapshot=True,
+            flags=F_SNAPSHOT,
+        ),
+        _event(
+            7,
+            "A",
+            side="A",
+            price=101.0,
+            size=3,
+            order_id="a1",
+            is_snapshot=True,
+            flags=F_SNAPSHOT | F_LAST,
+        ),
+        _event(8, "T", side="B", price=101.0, size=1),
+        _event(
+            0,
+            "R",
+            is_snapshot=True,
+            flags=F_SNAPSHOT,
+            session_id="2024-07-09",
+        ),
+        _event(
+            20,
+            "A",
+            side="B",
+            price=102.0,
+            size=4,
+            order_id="b2",
+            is_snapshot=True,
+            flags=F_SNAPSHOT,
+        ),
+        _event(
+            18,
+            "A",
+            side="A",
+            price=103.0,
+            size=5,
+            order_id="a2",
+            is_snapshot=True,
+            flags=F_SNAPSHOT | F_LAST,
+        ),
+        _event(19, "T", side="A", price=102.0, size=2),
+    )
+    batch = MicrostructureEventEngine(strict_contiguous_sequence=False)
+    batch_rows = batch.process_batch(records)
+    streaming = MicrostructureEventEngine(strict_contiguous_sequence=False)
+    stream_rows = tuple(streaming.step(record) for record in records)
+
+    assert [value.to_record() for value in batch_rows] == [
+        value.to_record() for value in stream_rows
+    ]
+    assert batch.state_hash() == streaming.state_hash()
+    assert batch.stream_status("GLBX.MDP3", "NQU4")["snapshot_count"] == 2
+
+
+def test_maybe_bad_book_fails_closed_without_state_mutation() -> None:
+    engine = MicrostructureEventEngine()
+    engine.step(_event(1, "R", is_snapshot=True))
+    before = engine.state_hash()
+    with pytest.raises(BookStateError, match="F_MAYBE_BAD_BOOK"):
+        engine.step(
+            _event(
+                2,
+                "T",
+                side="B",
+                price=100.0,
+                size=1,
+                flags=F_MAYBE_BAD_BOOK,
+            )
+        )
+    assert engine.state_hash() == before

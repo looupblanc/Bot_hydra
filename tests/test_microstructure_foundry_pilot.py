@@ -12,7 +12,14 @@ import pytest
 from hydra.evidence.schema import RECORD_SPECS, validate_identity
 from hydra.evidence import EvidenceBundleWriter, verify_evidence_bundle
 from hydra.production import microstructure_foundry_pilot as pilot
-from hydra.production.microstructure_event_engine import CausalityViolation, MarketEvent
+from hydra.production.microstructure_event_engine import (
+    BookStateError,
+    CausalityViolation,
+    F_LAST,
+    F_MAYBE_BAD_BOOK,
+    F_SNAPSHOT,
+    MarketEvent,
+)
 
 
 def _market_events(market: str, instrument: str, base_price: float, days: int = 5):
@@ -47,6 +54,7 @@ def _market_events(market: str, instrument: str, base_price: float, days: int = 
                     price=price,
                     size=size,
                     order_id=order_id,
+                    flags=(F_SNAPSHOT | F_LAST) if action == "R" else 0,
                     session_id=session,
                     is_snapshot=action == "R",
                 )
@@ -98,6 +106,14 @@ def test_foundry_pilot_e2e_is_causal_atomic_and_runtime_compatible(tmp_path: Pat
     }
     assert report["governance"]["live_trading"] is False
     assert report["governance"]["mbo_teacher_direct_deployment"] is False
+    reconstruction = report["event_reconstruction"]
+    assert reconstruction["initial_snapshot_complete_by_market"] == {
+        "NQ": True,
+        "YM": True,
+    }
+    assert reconstruction["snapshot_resets_by_market"] == {"NQ": 5, "YM": 5}
+    assert reconstruction["snapshot_f_last_gating"] is True
+    assert reconstruction["maybe_bad_book_fail_closed"] is True
 
     features = pq.read_table(result.event_store_paths["feature_matrices"])
     labels = pq.read_table(result.event_store_paths["outcome_labels"])
@@ -160,6 +176,47 @@ def test_market_event_future_availability_is_rejected_before_research(tmp_path: 
         }
     )
     with pytest.raises(CausalityViolation):
+        pilot.run_microstructure_foundry_pilot_from_events(
+            bank, tmp_path / "pilot"
+        )
+
+
+def test_pilot_requires_completed_initial_snapshot_for_each_selected_market() -> None:
+    base = int(datetime(2024, 7, 8, 13, 30, tzinfo=UTC).timestamp() * 1e9)
+    values = tuple(
+        (
+            market,
+            MarketEvent(
+                ts_event_ns=base + index,
+                available_at_ns=base + index + 1,
+                sequence=1,
+                publisher_id="GLBX",
+                instrument_id=instrument,
+                action="T",
+                side="B",
+                price=price,
+                size=1,
+                session_id="2024-07-08",
+            ),
+        )
+        for index, (market, instrument, price) in enumerate(
+            (("NQ", "NQU4", 20_000.0), ("YM", "YMU4", 40_000.0))
+        )
+    )
+    with pytest.raises(
+        pilot.FoundryPilotError,
+        match="initial snapshot never completed",
+    ):
+        pilot._reconstruct_features(values, cfg=pilot.FoundryPilotConfig())
+
+
+def test_pilot_fails_closed_on_vendor_maybe_bad_book_flag(tmp_path: Path) -> None:
+    bank = _event_bank()
+    original = bank["NQ"][1]
+    bank["NQ"][1] = MarketEvent(
+        **{**original.to_record(), "flags": F_MAYBE_BAD_BOOK}
+    )
+    with pytest.raises(BookStateError, match="F_MAYBE_BAD_BOOK"):
         pilot.run_microstructure_foundry_pilot_from_events(
             bank, tmp_path / "pilot"
         )

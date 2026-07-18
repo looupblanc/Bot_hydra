@@ -43,6 +43,9 @@ EVENT_ENGINE_SCHEMA = "hydra_microstructure_event_engine_v1"
 CHECKPOINT_SCHEMA = "hydra_microstructure_event_checkpoint_v1"
 SUPPORTED_ACTIONS = frozenset({"A", "M", "C", "F", "R", "T"})
 BOOK_SIDES = frozenset({"B", "A"})
+F_MAYBE_BAD_BOOK = 0x04
+F_SNAPSHOT = 0x20
+F_LAST = 0x80
 
 
 class MicrostructureEventEngineError(RuntimeError):
@@ -210,6 +213,17 @@ class MarketEvent:
                 raise CausalityViolation("available_at precedes ts_recv")
         if self.sequence < 0:
             raise ValueError("sequence must be non-negative")
+        if self.flags < 0:
+            raise ValueError("flags must be non-negative")
+        if self.flags & F_MAYBE_BAD_BOOK:
+            raise BookStateError("F_MAYBE_BAD_BOOK marks the stream unrecoverable")
+        snapshot_flag = bool(self.flags & F_SNAPSHOT)
+        if self.is_snapshot and not snapshot_flag:
+            raise ValueError("snapshot marker is not authenticated by F_SNAPSHOT")
+        if snapshot_flag and action not in {"R", "A"}:
+            raise BookStateError(
+                f"unexpected {action} action inside an authenticated snapshot"
+            )
         if not self.publisher_id or not self.instrument_id:
             raise ValueError("publisher and instrument are required")
         if self.size < 0:
@@ -239,6 +253,7 @@ class MarketEvent:
             self,
             action=action,
             side=side,
+            is_snapshot=snapshot_flag,
             session_id=self.session_id or _session_from_timestamp(self.ts_event_ns),
         )
 
@@ -385,6 +400,10 @@ class _SequenceState:
     blocked: bool = False
     expected_sequence: int | None = None
     chain_hash: str = ""
+    snapshot_in_progress: bool = False
+    snapshot_complete: bool = False
+    awaiting_live_sequence: bool = False
+    snapshot_count: int = 0
 
 
 class _InstrumentState:
@@ -528,23 +547,42 @@ class MicrostructureEventEngine:
         key = self._key(event.publisher_id, event.instrument_id)
         sequence = self._sequences.setdefault(key, _SequenceState())
         recovery_reset = event.action == "R" and event.is_snapshot
+        snapshot_last = event.is_snapshot and bool(event.flags & F_LAST)
 
         if sequence.blocked and not recovery_reset:
             raise SnapshotRecoveryRequired(
                 f"stream {key} requires snapshot reset; expected sequence "
                 f"{sequence.expected_sequence}"
             )
-        if recovery_reset and sequence.last_sequence is not None:
-            stale_snapshot = (
-                event.sequence < sequence.last_sequence
-                or (
-                    self.strict_contiguous_sequence
-                    and event.sequence == sequence.last_sequence
+        if event.is_snapshot:
+            if event.action == "R":
+                # Historical MBO snapshots are an authenticated new base. Their
+                # clear record conventionally restarts sequence at zero, even
+                # after a live sequence with a much larger value. Snapshot Add
+                # records preserve queue priority and are not required to be
+                # monotonic venue events, so sequence checks resume only after
+                # F_LAST and the first following non-snapshot event.
+                pass
+            elif not sequence.snapshot_in_progress:
+                raise SnapshotRecoveryRequired(
+                    f"snapshot Add for {key} arrived without an authenticated "
+                    "snapshot clear"
                 )
+        elif sequence.snapshot_in_progress:
+            raise SnapshotRecoveryRequired(
+                f"stream {key} emitted a live event before snapshot F_LAST"
             )
-            if stale_snapshot:
+        elif sequence.awaiting_live_sequence:
+            # The first live event establishes the post-snapshot venue sequence
+            # baseline. It may skip sequence values represented by the
+            # synthetic snapshot, but it may never regress behind the F_LAST
+            # record that completed that image.
+            if (
+                sequence.last_sequence is not None
+                and event.sequence <= sequence.last_sequence
+            ):
                 raise EventOrderError(
-                    f"snapshot sequence {event.sequence} is not newer than "
+                    f"post-snapshot sequence {event.sequence} is not newer than "
                     f"{sequence.last_sequence} for {key}"
                 )
         elif sequence.last_sequence is not None:
@@ -574,9 +612,24 @@ class MicrostructureEventEngine:
         self._apply(state, event)
         state.session_event_count += 1
 
+        if recovery_reset:
+            sequence.snapshot_in_progress = True
+            sequence.snapshot_complete = False
+            sequence.awaiting_live_sequence = False
+            sequence.snapshot_count += 1
+        if snapshot_last:
+            sequence.snapshot_in_progress = False
+            sequence.snapshot_complete = True
+            sequence.awaiting_live_sequence = True
+        elif not event.is_snapshot:
+            sequence.awaiting_live_sequence = False
         sequence.last_sequence = event.sequence
         sequence.blocked = False
-        sequence.expected_sequence = event.sequence + 1
+        sequence.expected_sequence = (
+            None
+            if sequence.snapshot_in_progress or sequence.awaiting_live_sequence
+            else event.sequence + 1
+        )
         prior_chain = sequence.chain_hash or stable_hash(
             {"schema": EVENT_ENGINE_SCHEMA, "stream": key, "chain": "GENESIS"}
         )
@@ -938,6 +991,10 @@ class MicrostructureEventEngine:
                     "blocked": state.blocked,
                     "expected_sequence": state.expected_sequence,
                     "chain_hash": state.chain_hash,
+                    "snapshot_in_progress": state.snapshot_in_progress,
+                    "snapshot_complete": state.snapshot_complete,
+                    "awaiting_live_sequence": state.awaiting_live_sequence,
+                    "snapshot_count": state.snapshot_count,
                 }
                 for key, state in sorted(self._sequences.items())
             },
@@ -1016,6 +1073,10 @@ class MicrostructureEventEngine:
                 if raw["expected_sequence"] is None
                 else int(raw["expected_sequence"]),
                 chain_hash=str(raw.get("chain_hash") or ""),
+                snapshot_in_progress=bool(raw.get("snapshot_in_progress", False)),
+                snapshot_complete=bool(raw.get("snapshot_complete", False)),
+                awaiting_live_sequence=bool(raw.get("awaiting_live_sequence", False)),
+                snapshot_count=int(raw.get("snapshot_count", 0)),
             )
         for fingerprint, kind, raw_result in checkpoint.get("recent_results", []):
             if kind == "materialized":
@@ -1041,6 +1102,10 @@ class MicrostructureEventEngine:
             "last_sequence": state.last_sequence,
             "blocked": state.blocked,
             "expected_sequence": state.expected_sequence,
+            "snapshot_in_progress": state.snapshot_in_progress,
+            "snapshot_complete": state.snapshot_complete,
+            "book_ready": state.snapshot_complete and not state.snapshot_in_progress,
+            "snapshot_count": state.snapshot_count,
         }
 
 
@@ -1067,6 +1132,13 @@ def adapt_depth_snapshot(
     normalized_schema = schema.lower()
     if normalized_schema not in {"tbbo", "mbp-1", "mbp-10"}:
         raise ValueError("snapshot adapter supports tbbo, mbp-1 or mbp-10")
+    snapshot_flags = int(flags) | F_SNAPSHOT
+    levels = tuple(
+        (side, depth, float(price), int(size))
+        for side, values in (("B", bids), ("A", asks))
+        for depth, (price, size) in enumerate(values)
+        if int(size) > 0
+    )
     events: list[MarketEvent] = [
         MarketEvent(
             ts_event_ns=int(ts_event_ns),
@@ -1075,17 +1147,14 @@ def adapt_depth_snapshot(
             publisher_id=str(publisher_id),
             instrument_id=str(instrument_id),
             action="R",
-            flags=int(flags),
+            flags=snapshot_flags | (F_LAST if not levels else 0),
             session_id=session_id,
             is_snapshot=True,
             schema=normalized_schema,
         )
     ]
     sequence = int(base_sequence)
-    for side, levels in (("B", bids), ("A", asks)):
-        for depth, (price, size) in enumerate(levels):
-            if int(size) <= 0:
-                continue
+    for position, (side, depth, price, size) in enumerate(levels):
             sequence += 1
             events.append(
                 MarketEvent(
@@ -1102,7 +1171,9 @@ def adapt_depth_snapshot(
                         f"snapshot:{publisher_id}:{instrument_id}:"
                         f"{base_sequence}:{side}:{depth}"
                     ),
-                    flags=int(flags),
+                    flags=snapshot_flags | (
+                        F_LAST if position == len(levels) - 1 else 0
+                    ),
                     session_id=session_id,
                     is_snapshot=True,
                     schema=normalized_schema,
@@ -1115,6 +1186,9 @@ __all__ = [
     "BOOK_SIDES",
     "CHECKPOINT_SCHEMA",
     "EVENT_ENGINE_SCHEMA",
+    "F_LAST",
+    "F_MAYBE_BAD_BOOK",
+    "F_SNAPSHOT",
     "SUPPORTED_ACTIONS",
     "BookStateError",
     "BookView",

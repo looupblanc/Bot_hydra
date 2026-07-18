@@ -52,6 +52,7 @@ from hydra.production.microstructure_event_engine import (
     BookStateError,
     CompactEventResult,
     EventResult,
+    F_SNAPSHOT,
     MarketEvent,
     MicrostructureEventEngine,
     MicrostructureEventEngineError,
@@ -1154,6 +1155,14 @@ def _reconstruct_features(
         market: _TapeBuilder() for market in cfg.selected_markets
     }
     counts = defaultdict(int)
+    encountered_streams: dict[str, set[tuple[str, str]]] = {
+        market: set() for market in cfg.selected_markets
+    }
+    initialized_streams: dict[str, set[tuple[str, str]]] = {
+        market: set() for market in cfg.selected_markets
+    }
+    stream_ready: dict[tuple[str, str], bool] = {}
+    snapshot_resets_by_market = defaultdict(int)
     first_available: int | None = None
     last_available: int | None = None
     for market, event in merged_events:
@@ -1168,6 +1177,17 @@ def _reconstruct_features(
                 f"order-book reconstruction failed closed at {market} "
                 f"sequence={event.sequence}: {exc}"
             ) from exc
+        authenticated_snapshot = bool(event.flags & F_SNAPSHOT)
+        stream_key = (event.publisher_id, event.instrument_id)
+        encountered_streams[market].add(stream_key)
+        stream_status = engine.stream_status(*stream_key)
+        stream_ready[stream_key] = bool(stream_status["book_ready"])
+        snapshot_resets_by_market[market] = max(
+            snapshot_resets_by_market[market],
+            int(stream_status["snapshot_count"]),
+        )
+        if stream_status["snapshot_complete"]:
+            initialized_streams[market].add(stream_key)
         counts[market] += 1
         counts[f"action_{event.action}"] += 1
         first_available = event.available_at_ns if first_available is None else min(first_available, event.available_at_ns)
@@ -1176,7 +1196,34 @@ def _reconstruct_features(
             counts["duplicates"] += 1
             continue
         state = rolling[market]
-        _update_rolling_state(state, event)
+        # Events before the first authenticated snapshot are retained in raw
+        # provenance but cannot seed rolling features or tape economics. The
+        # snapshot records themselves must update queue-age state so the first
+        # post-F_LAST decision starts from the complete book image.
+        initialized_before = stream_key in initialized_streams[market]
+        if authenticated_snapshot or initialized_before:
+            _update_rolling_state(state, event)
+        else:
+            counts["events_gated_before_initial_snapshot"] += 1
+
+        all_markets_initialized = all(
+            encountered_streams[value]
+            and encountered_streams[value] <= initialized_streams[value]
+            for value in cfg.selected_markets
+        )
+        all_streams_ready = all(
+            stream_ready.get(value, False)
+            for values in encountered_streams.values()
+            for value in values
+        )
+        if (
+            not all_markets_initialized
+            or not all_streams_ready
+            or authenticated_snapshot
+        ):
+            counts["events_gated_until_snapshot_f_last"] += 1
+            continue
+
         if event.action == "T":
             assert event.price is not None
             tape[market].append(event)
@@ -1251,6 +1298,33 @@ def _reconstruct_features(
 
     if any(counts[market] == 0 for market in cfg.selected_markets):
         raise FoundryPilotError("one selected market has no reconstructed events")
+    missing_initial = {
+        market: sorted(encountered_streams[market] - initialized_streams[market])
+        for market in cfg.selected_markets
+        if not encountered_streams[market]
+        or encountered_streams[market] - initialized_streams[market]
+    }
+    if missing_initial:
+        raise FoundryPilotError(
+            "authenticated initial snapshot never completed for every selected "
+            f"market/instrument: {missing_initial}"
+        )
+    incomplete_final = {
+        market: sorted(
+            value
+            for value in encountered_streams[market]
+            if not stream_ready.get(value, False)
+        )
+        for market in cfg.selected_markets
+        if any(
+            not stream_ready.get(value, False)
+            for value in encountered_streams[market]
+        )
+    }
+    if incomplete_final:
+        raise FoundryPilotError(
+            f"RAW_DBN ended before snapshot F_LAST: {incomplete_final}"
+        )
     if len(snapshots) < 100:
         raise FoundryPilotError("causal event sample is too small for the bounded pilot")
     if any(len(tape[market]) == 0 for market in cfg.selected_markets):
@@ -1265,6 +1339,24 @@ def _reconstruct_features(
         "events_by_market": {m: int(counts[m]) for m in cfg.selected_markets},
         "action_counts": {key.removeprefix("action_"): int(value) for key, value in counts.items() if key.startswith("action_")},
         "duplicate_count": int(counts["duplicates"]),
+        "events_gated_before_initial_snapshot": int(
+            counts["events_gated_before_initial_snapshot"]
+        ),
+        "events_gated_until_snapshot_f_last": int(
+            counts["events_gated_until_snapshot_f_last"]
+        ),
+        "initial_snapshot_complete_by_market": {
+            market: len(initialized_streams[market])
+            == len(encountered_streams[market])
+            and bool(encountered_streams[market])
+            for market in cfg.selected_markets
+        },
+        "snapshot_resets_by_market": {
+            market: int(snapshot_resets_by_market[market])
+            for market in cfg.selected_markets
+        },
+        "snapshot_f_last_gating": True,
+        "maybe_bad_book_fail_closed": True,
         "snapshot_count": len(snapshots),
         "first_available_ns": first_available,
         "last_available_ns": last_available,
