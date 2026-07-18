@@ -11,6 +11,7 @@ import hashlib
 import json
 import math
 import re
+import subprocess
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -191,10 +192,95 @@ def _validate_implementation(manifest: Mapping[str, Any], root: Path) -> None:
                 f"fast-pass implementation path escapes root: {relative}"
             )
         claimed = str(raw_claimed or "")
-        if not _SHA256.fullmatch(claimed) or _sha256(target) != claimed:
+        if not _SHA256.fullmatch(claimed) or not _implementation_hash_matches(
+            root=root,
+            relative=relative,
+            target=target,
+            claimed=claimed,
+            source_commit=str(manifest.get("source_commit") or ""),
+        ):
             raise FastPassManifestError(
                 f"fast-pass implementation checksum drift: {relative}"
             )
+
+
+def _implementation_hash_matches(
+    *,
+    root: Path,
+    relative: str,
+    target: Path,
+    claimed: str,
+    source_commit: str,
+) -> bool:
+    """Verify live code or its immutable deployed ancestor.
+
+    Terminal campaign manifests remain auditable after the stable dispatcher
+    gains a later additive campaign mode.  The fallback accepts only a blob
+    already committed on the current first-parent ancestry and only after the
+    campaign source commit; arbitrary working-tree drift still fails closed.
+    """
+
+    if _sha256(target) == claimed:
+        return True
+    # Only the stable manifest dispatcher and this validator may evolve
+    # additively after a terminal fast-pass campaign.  Never use ancestry as a
+    # blanket escape hatch for replay, feature, PnL, MLL, or evidence code.
+    if relative not in {
+        "hydra/production/fast_pass_manifest.py",
+        "hydra/production/manifest.py",
+        "hydra/production/runtime.py",
+    }:
+        return False
+    if not _GIT_SHA.fullmatch(source_commit):
+        return False
+    ancestry = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", source_commit, "HEAD"],
+        cwd=root,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    if ancestry.returncode != 0:
+        return False
+    source_blob = subprocess.run(
+        ["git", "show", f"{source_commit}:{relative}"],
+        cwd=root,
+        capture_output=True,
+        check=False,
+    )
+    if (
+        source_blob.returncode == 0
+        and hashlib.sha256(source_blob.stdout).hexdigest() == claimed
+    ):
+        return True
+    history = subprocess.run(
+        ["git", "rev-list", "--first-parent", "HEAD", "--", relative],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if history.returncode != 0:
+        return False
+    for commit in history.stdout.splitlines()[:128]:
+        after_source = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", source_commit, commit],
+            cwd=root,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+        if after_source.returncode != 0:
+            continue
+        blob = subprocess.run(
+            ["git", "show", f"{commit}:{relative}"],
+            cwd=root,
+            capture_output=True,
+            check=False,
+        )
+        if blob.returncode == 0 and hashlib.sha256(blob.stdout).hexdigest() == claimed:
+            return True
+    return False
 
 
 def _validate_terminal_baseline(

@@ -65,6 +65,17 @@ def load_and_validate_production_manifest(path: str | Path) -> dict[str, Any]:
         except FastPassManifestError as exc:
             raise ProductionManifestError(str(exc)) from exc
         return manifest
+    if manifest.get("campaign_mode") == "MICROSTRUCTURE_ORDER_FLOW_FOUNDRY":
+        from hydra.production.microstructure_foundry_manifest import (
+            FoundryManifestError,
+            validate_microstructure_foundry_manifest,
+        )
+
+        try:
+            validate_microstructure_foundry_manifest(manifest, manifest_path=resolved)
+        except FoundryManifestError as exc:
+            raise ProductionManifestError(str(exc)) from exc
+        return manifest
     if manifest.get("campaign_mode") == "ACTIVE_RISK_POOL":
         from hydra.production.active_risk_manifest import (
             ActiveRiskManifestError,
