@@ -240,6 +240,11 @@ def _seal_evidence_bundle(
         or not isinstance(compact, Mapping)
     ):
         raise SparseRuntimeError("0032 pilot lacks complete canonical EvidenceBundle material")
+    compact = dict(compact)
+    compact.setdefault(
+        "next_campaign_recommendations",
+        _compact_next_campaign_recommendation(str(pilot.get("pilot_status") or "")),
+    )
     base = root / str(manifest["evidence_bundle"]["destination"])
     final = base / f"{CAMPAIGN_ID}.evidence-v1"
     lightweight = output / "evidence_bundle_receipt.json"
@@ -275,6 +280,29 @@ def _seal_evidence_bundle(
         writer.close()
     verify_evidence_bundle(receipt.bundle_path, deep=True)
     return receipt.to_dict()
+
+
+def _compact_next_campaign_recommendation(decision: str) -> dict[str, Any]:
+    """Return the mandatory EvidenceBundle successor output without mutation."""
+
+    actions = {
+        "SPARSE_PILOT_GREEN": "GENERATE_OFFICIAL_CONDITIONAL_DATA_COST_MATRIX_NO_PURCHASE",
+        "SPARSE_PILOT_WEAK": "PRESERVE_GROSS_ALPHA_AND_RUN_ONE_BOUNDED_REFINEMENT_NO_PURCHASE",
+        "SPARSE_PILOT_FALSIFIED": "TERMINATE_SPARSE_REPRESENTATION_AND_IDENTIFY_DISTINCT_INFORMATION_SOURCE",
+    }
+    if decision not in actions:
+        raise SparseRuntimeError("0032 cannot seal an unsupported successor decision")
+    return {
+        "schema": "hydra_production_next_campaign_recommendations_v1",
+        "campaign_id": CAMPAIGN_ID,
+        "recommendation": {
+            "action": actions[decision],
+            "manifest_required": True,
+            "automatic_data_purchase_authorized": False,
+            "new_data_purchase_authorized": False,
+            "q4_access_authorized": False,
+        },
+    }
 
 
 def _conditional_cost_report(

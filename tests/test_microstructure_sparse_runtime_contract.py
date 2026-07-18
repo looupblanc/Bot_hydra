@@ -12,6 +12,7 @@ from hydra.production.microstructure_sparse_runtime import (
     RESULT_SCHEMA,
     STATE_SCHEMA,
     _build_terminal_result,
+    _compact_next_campaign_recommendation,
     _conditional_cost_report,
     _pilot_config,
     _set_single_thread_libraries,
@@ -217,3 +218,14 @@ def test_blas_thread_contract_is_one() -> None:
         "NUMEXPR_NUM_THREADS",
     ):
         assert os.environ[name] == "1"
+
+
+def test_evidence_successor_output_is_mandatory_and_non_purchasing() -> None:
+    output = _compact_next_campaign_recommendation("SPARSE_PILOT_WEAK")
+
+    assert output["schema"] == "hydra_production_next_campaign_recommendations_v1"
+    assert output["recommendation"]["action"] == (
+        "PRESERVE_GROSS_ALPHA_AND_RUN_ONE_BOUNDED_REFINEMENT_NO_PURCHASE"
+    )
+    assert output["recommendation"]["new_data_purchase_authorized"] is False
+    assert output["recommendation"]["q4_access_authorized"] is False
