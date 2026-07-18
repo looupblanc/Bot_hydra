@@ -8,13 +8,13 @@
   ],
   "development_only": true,
   "created_at_utc": "2026-07-18T21:42:54Z",
-  "source_commit": "a9b4e74542a7b07b237871c21df4b58365100aef",
+  "source_commit": "3661cb3bac859cb6533dd6370c418ab281066560",
   "economic_hypothesis": "Order flow can veto weak causal structural trades.",
   "implementation_files": {
-    "hydra/production/selective_veto_manifest.py": "f5c7f7d454f7ecc93f816b3e463e0fede77dc30e99e00949b2723fcb8e8024fe",
+    "hydra/production/selective_veto_manifest.py": "98aa40adc39a406f253fac21d25593d730e562a328e2323e9821a5368d9da81f",
     "hydra/production/selective_veto_runtime.py": "7ce2db0035f0dd8a1ae439bfac06ccb8c424bcdce21130545b298b344fbd47f7",
     "hydra/production/selective_veto_seed_audit.py": "b9057093c39f8310334cb261d3ab9d06e4c3eca92310f544192290c77e20f596",
-    "hydra/production/selective_veto_pilot.py": "d414b8cd7a0eca6810feb4d0a428adcb7e9e6a2aee45cc03d83a165b6c1c1502",
+    "hydra/production/selective_veto_pilot.py": "c9247ed04014a0a5f8137739b95c49707c6de0a796178723fecacd6f47778176",
     "hydra/production/selective_veto_metadata.py": "a3f9d49dbe3c3338b634f35fc7eae9b412d346db5c92c7b61ac15bb5133ed386",
     "hydra/production/manifest.py": "de36c472b0bf36c712cdee5958bae1f5001c48099c5c879e29396dfa597cbd70",
     "hydra/production/runtime.py": "2d7ce05842e0ff20400249544bba9e9974bd64230a5ae6e277dc4670874ef2f9",
@@ -219,8 +219,12 @@
   "structural_anchor_universe": {
     "source": "EXISTING_CACHED_CAUSAL_OHLCV_AND_STRUCTURAL_FEATURES",
     "families": [
-      "OPENING_RANGE",
-      "FAILED_BREAKOUT"
+      "CROSS_MARKET_DIVERGENCE",
+      "COMPRESSION_TO_EXPANSION",
+      "MULTI_TIMEFRAME_CONTINUATION",
+      "FAILED_BREAKOUT",
+      "SESSION_TRANSITION",
+      "OPENING_RANGE"
     ],
     "microstructure_outcomes_used_for_generation": false,
     "causal_generation_required": true,
@@ -366,10 +370,16 @@
   },
   "account_rule_snapshots": {
     "50K": {
-      "snapshot_id": "TOPSTEP_COMBINE_50K_RESEARCH_SNAPSHOT_2026_07_18",
-      "snapshot_sha256": "0d5039eea0e51b89343a5a5f32279a6bd3ded88092922f527fdf82c699826d54",
-      "provenance_class": "VERSIONED_RESEARCH_SNAPSHOT_NOT_OFFICIAL_CONFIRMED",
-      "official_source_verified": false,
+      "snapshot_id": "topstep_50k_2026-07-18_official_no_optional_dll_v1",
+      "snapshot_sha256": "cb135983710b5c62755d8f38b1c9c283f90f403ee1a239ca8a670e5af505268f",
+      "provenance_class": "OFFICIAL_VERSIONED_RULE_SNAPSHOT",
+      "official_source_verified": true,
+      "official_source_urls": [
+        "https://help.topstep.com/en/articles/8284197-trading-combine-parameters",
+        "https://help.topstep.com/en/articles/8284204-what-is-the-maximum-loss-limit",
+        "https://help.topstep.com/en/articles/8284208-consistency-at-topstep"
+      ],
+      "verified_at_utc": "2026-07-18T22:15:00Z",
       "account_size_usd": 50000,
       "profit_target_usd": 3000,
       "maximum_loss_limit_usd": 2000,
@@ -378,13 +388,21 @@
       "consistency_limit": 0.5,
       "minimum_pass_days": 2,
       "session_close_required": true,
+      "no_daily_loss_limit": true,
+      "use_optional_daily_loss_limit": false,
       "mll_mode": "EOD_LEVEL_RT_BREACH"
     },
     "100K": {
-      "snapshot_id": "TOPSTEP_COMBINE_100K_RESEARCH_SNAPSHOT_2026_07_18",
-      "snapshot_sha256": "54d8a8c3a4276e1a304ee366446deeae806b0a523ce4385d470a41bcef433a16",
-      "provenance_class": "VERSIONED_RESEARCH_SNAPSHOT_NOT_OFFICIAL_CONFIRMED",
-      "official_source_verified": false,
+      "snapshot_id": "topstep_100k_2026-07-18_official_no_optional_dll_v1",
+      "snapshot_sha256": "dd75379f2d378e657c1530cee50b8687252919897a8e2a6d072ca00313138f0c",
+      "provenance_class": "OFFICIAL_VERSIONED_RULE_SNAPSHOT",
+      "official_source_verified": true,
+      "official_source_urls": [
+        "https://help.topstep.com/en/articles/8284197-trading-combine-parameters",
+        "https://help.topstep.com/en/articles/8284204-what-is-the-maximum-loss-limit",
+        "https://help.topstep.com/en/articles/8284208-consistency-at-topstep"
+      ],
+      "verified_at_utc": "2026-07-18T22:15:00Z",
       "account_size_usd": 100000,
       "profit_target_usd": 6000,
       "maximum_loss_limit_usd": 3000,
@@ -393,13 +411,21 @@
       "consistency_limit": 0.5,
       "minimum_pass_days": 2,
       "session_close_required": true,
+      "no_daily_loss_limit": true,
+      "use_optional_daily_loss_limit": false,
       "mll_mode": "EOD_LEVEL_RT_BREACH"
     },
     "150K": {
-      "snapshot_id": "topstep_150k_2026-07-15_no_dll_post_2026-01-12_v1",
-      "snapshot_sha256": "338866ccff7203a3a1bf175d3079cd1fe420fa401e7737517d405f9fdd8d5d15",
+      "snapshot_id": "topstep_150k_2026-07-18_official_no_optional_dll_v1",
+      "snapshot_sha256": "d777dd84c6cc2848d983ee4ee3d8df8836674e23d518962b15ed59d261ca9fce",
       "provenance_class": "OFFICIAL_VERSIONED_RULE_SNAPSHOT",
       "official_source_verified": true,
+      "official_source_urls": [
+        "https://help.topstep.com/en/articles/8284197-trading-combine-parameters",
+        "https://help.topstep.com/en/articles/8284204-what-is-the-maximum-loss-limit",
+        "https://help.topstep.com/en/articles/8284208-consistency-at-topstep"
+      ],
+      "verified_at_utc": "2026-07-18T22:15:00Z",
       "account_size_usd": 150000,
       "profit_target_usd": 9000,
       "maximum_loss_limit_usd": 4500,
@@ -408,6 +434,8 @@
       "consistency_limit": 0.5,
       "minimum_pass_days": 2,
       "session_close_required": true,
+      "no_daily_loss_limit": true,
+      "use_optional_daily_loss_limit": false,
       "mll_mode": "EOD_LEVEL_RT_BREACH"
     }
   },
@@ -496,5 +524,5 @@
     "maximum_incremental_spend_usd": 8.0,
     "minimum_budget_reserve_usd": 20.0
   },
-  "manifest_hash": "caf77600fbb9416e3f540c320c1b2354b13c366e808e950759a1524dc132f349"
+  "manifest_hash": "e1bd883a486bf44076fff7920bc0cc68995ab452b13fd898f89f41d78e108ec5"
 }

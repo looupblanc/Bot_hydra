@@ -1,0 +1,89 @@
+{
+  "schema": "hydra_selective_veto_0034_pre_purchase_integrity_repair_v1",
+  "campaign_id": "hydra_selective_order_flow_veto_expansion_0034",
+  "recorded_at_utc": "2026-07-18T22:51:49Z",
+  "classification": "POST_RESERVATION_PRE_PURCHASE_SCIENTIFIC_DENOMINATOR_AND_ACQUISITION_INTEGRITY_DEFECT",
+  "repair_scope": "DECLARE_EXACT_STRUCTURAL_DENOMINATOR_FREEZE_OFFICIAL_ACCOUNT_RULES_AND_FAIL_CLOSED_ACQUISITION_CHAIN",
+  "same_campaign_and_manifest_path": true,
+  "additional_manifest_count": 0,
+  "additional_multiplicity_reserved": false,
+  "multiplicity": {
+    "reservation_already_created": true,
+    "cumulative_N_trials": 762254,
+    "reserved_delta_trials": 10,
+    "prospective_comparisons_changed": false
+  },
+  "before": {
+    "source_commit": "a9b4e74542a7b07b237871c21df4b58365100aef",
+    "manifest_hash": "caf77600fbb9416e3f540c320c1b2354b13c366e808e950759a1524dc132f349",
+    "manifest_file_sha256": "edf1cb89583fbbbdde60d7a1c991c9e848f1153df0f2196365106c738cc440b2",
+    "declared_structural_family_count": 2,
+    "official_account_snapshot_count": 1
+  },
+  "after": {
+    "source_commit": "3661cb3bac859cb6533dd6370c418ab281066560",
+    "manifest_hash": "e1bd883a486bf44076fff7920bc0cc68995ab452b13fd898f89f41d78e108ec5",
+    "manifest_file_sha256": "3a4640e173fb3f21872b3c061c77d74281ff849b1eeb1da8e05233bcb2cdbc51",
+    "manifest_module_sha256": "98aa40adc39a406f253fac21d25593d730e562a328e2323e9821a5368d9da81f",
+    "pilot_module_sha256": "c9247ed04014a0a5f8137739b95c49707c6de0a796178723fecacd6f47778176",
+    "declared_structural_family_count": 6,
+    "official_account_snapshot_count": 3
+  },
+  "durable_state_at_repair": {
+    "service_state": "INACTIVE_FAIL_CLOSED_PRE_PURCHASE_REPAIR",
+    "seed_audit_decision_seen": "SELECTIVE_VETO_SEED_ROBUST",
+    "complete_metadata_triples_cached": 1473,
+    "metadata_cache_sha256": "3f6f417c8ff6e6902dfc4487e7da351859f2826f3880a87ff48177e47093acb1",
+    "complete_cost_matrix_seen": false,
+    "selected_offer_seen": false,
+    "data_purchase_count": 0,
+    "long_sample_outcomes_seen": false,
+    "final_decision_seen": false
+  },
+  "technical_contract": {
+    "structural_families": [
+      "CROSS_MARKET_DIVERGENCE",
+      "COMPRESSION_TO_EXPANSION",
+      "MULTI_TIMEFRAME_CONTINUATION",
+      "FAILED_BREAKOUT",
+      "SESSION_TRANSITION",
+      "OPENING_RANGE"
+    ],
+    "same_opportunity_baseline_required": true,
+    "sequential_checkpoints_final_development_prefix_only": true,
+    "validation_rows_used_for_checkpoint_decisions": 0,
+    "offer_revalidation_intent_authorization_window_and_final_receipts_self_hashed": true,
+    "request_schema_symbol_anchor_and_q4_bounds_fail_closed": true,
+    "fastest_viable_account_requires_global_green": true,
+    "account_sizes_officially_verified": [
+      "50K",
+      "100K",
+      "150K"
+    ],
+    "no_daily_loss_limit": true,
+    "optional_daily_loss_limit_enabled": false
+  },
+  "scientific_invariants": {
+    "frozen_seed_membership_changed": false,
+    "primary_actions_changed": false,
+    "risk_tiers_changed": false,
+    "decision_thresholds_changed": false,
+    "chronological_role_fractions_changed": false,
+    "window_definitions_changed": false,
+    "purchase_cap_changed": false,
+    "budget_reserve_changed": false,
+    "complete_cost_matrix_or_long_sample_outcomes_used_for_repair": false,
+    "q4_access_delta": 0,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "verification": {
+    "targeted_tests_passed": 91,
+    "targeted_tests_failed": 0,
+    "negative_corruption_tests_included": true,
+    "independent_prelaunch_audit": "GO_PRELAUNCH",
+    "full_regression_required": false,
+    "reason_full_regression_not_required": "Only the campaign-specific preregistered runtime changed; no shared execution, PnL, MLL, schema, data-role or governance semantics changed"
+  },
+  "repair_hash": "672dc0e3972c76fa1a85aab40edb30b2a4d2e68dc32f0985d06c44b34fcbd713"
+}
