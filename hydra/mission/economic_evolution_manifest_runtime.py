@@ -859,7 +859,8 @@ class EconomicEvolutionManifestRuntime:
             not isinstance(rates, Mapping)
             or not required_rates.issubset(rates)
             or not isinstance(workers, Mapping)
-            or int(workers.get("compute", -1)) != 3
+            or int(workers.get("compute", -1))
+            != int(_runtime_manifest(config).get("worker_count", 3))
             or int(workers.get("evidence_writer", -1)) != 1
             or snapshot.get("state") not in _PRODUCTION_RESUMABLE_STATES
             | {"COMPLETE", "FAILED_CLOSED"}
@@ -1813,7 +1814,23 @@ class EconomicEvolutionManifestRuntime:
             cls._production_finite_number(
                 rates, field, "production rates per hour"
             )
-        if workers.get("compute") != 3 or workers.get("evidence_writer") != 1:
+        result_workers = result_kpis.get("workers")
+        expected_compute = (
+            int(result_workers.get("compute", -1))
+            if isinstance(result_workers, Mapping)
+            else -1
+        )
+        expected_writer = (
+            int(result_workers.get("evidence_writer", -1))
+            if isinstance(result_workers, Mapping)
+            else -1
+        )
+        if (
+            expected_compute < 1
+            or workers.get("compute") != expected_compute
+            or expected_writer != 1
+            or workers.get("evidence_writer") != expected_writer
+        ):
             raise EconomicEvolutionRuntimeError(
                 "production campaign summary worker topology drift"
             )
