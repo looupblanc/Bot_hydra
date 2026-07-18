@@ -5,10 +5,10 @@ from dataclasses import replace
 from datetime import UTC, datetime
 from multiprocessing import get_context
 from pathlib import Path
+import hashlib
 import json
 
 import pandas as pd
-import pytest
 import pytest
 
 from hydra.evidence import EvidenceBundleWriter, REQUIRED_DATASETS, verify_evidence_bundle
@@ -386,6 +386,127 @@ def test_mbp_one_flow_counts_only_trade_actions() -> None:
     assert quote.available_at_ns == anchor.decision_time_ns + 500_000_000
 
 
+def test_zero_latency_legacy_anchor_uses_first_post_decision_quote() -> None:
+    """Real 0028 anchors record fill_time == decision_time.
+
+    The microstructure overlay must still use the first genuinely available
+    post-decision quote inside its frozen sixty-second acquisition window.
+    """
+
+    anchor = replace(_anchor(0), fill_time_ns=_anchor(0).decision_time_ns)
+    timestamps = pd.DatetimeIndex(
+        [
+            pd.Timestamp(anchor.decision_time_ns, unit="ns", tz="UTC"),
+            pd.Timestamp(
+                anchor.decision_time_ns + 500_000_000, unit="ns", tz="UTC"
+            ),
+        ]
+    )
+    frame = pd.DataFrame(
+        {
+            "ts_recv": timestamps,
+            "action": [b"T", b"T"],
+            "price": [15_000.0, 15_000.25],
+            "size": [2.0, 2.0],
+            "side": [b"A", b"A"],
+            "bid_px_00": [14_999.75, 15_000.0],
+            "ask_px_00": [15_000.0, 15_000.25],
+            "bid_sz_00": [10.0, 10.0],
+            "ask_sz_00": [8.0, 8.0],
+        },
+        index=timestamps,
+    )
+
+    _, _, quote = _feature_for_anchor(frame, anchor, schema="tbbo")
+    assert quote.available_at_ns == anchor.decision_time_ns + 500_000_000
+    row = _outcome_row(
+        anchor, "VALIDATION", 1.0, "TRADE_1X", "c" * 64, quote
+    )
+    assert row["entry_time_ns"] == quote.available_at_ns
+
+
+def test_execution_quote_uses_true_event_time_not_receive_index() -> None:
+    anchor = replace(_anchor(0), fill_time_ns=_anchor(0).decision_time_ns)
+    receive_times = pd.DatetimeIndex(
+        [
+            pd.Timestamp(anchor.decision_time_ns - 100_000_000, unit="ns", tz="UTC"),
+            pd.Timestamp(anchor.decision_time_ns + 1_000_000, unit="ns", tz="UTC"),
+            pd.Timestamp(anchor.decision_time_ns + 2_000_000, unit="ns", tz="UTC"),
+        ]
+    )
+    event_times = pd.DatetimeIndex(
+        [
+            pd.Timestamp(anchor.decision_time_ns - 200_000_000, unit="ns", tz="UTC"),
+            # This stale event arrived after the decision and must not fill.
+            pd.Timestamp(anchor.decision_time_ns - 1_000_000, unit="ns", tz="UTC"),
+            pd.Timestamp(anchor.decision_time_ns + 1_000_000, unit="ns", tz="UTC"),
+        ]
+    )
+    frame = pd.DataFrame(
+        {
+            "ts_event": event_times,
+            "action": [b"T", b"T", b"T"],
+            "price": [15_000.0, 15_000.0, 15_000.25],
+            "size": [2.0, 2.0, 2.0],
+            "side": [b"A", b"A", b"A"],
+            "bid_px_00": [14_999.75, 14_999.75, 15_000.0],
+            "ask_px_00": [15_000.0, 15_000.0, 15_000.25],
+            "bid_sz_00": [10.0, 10.0, 10.0],
+            "ask_sz_00": [8.0, 8.0, 8.0],
+        },
+        index=receive_times,
+    )
+
+    _, _, quote = _feature_for_anchor(frame, anchor, schema="tbbo")
+    assert quote.event_time_ns == anchor.decision_time_ns + 1_000_000
+    assert quote.available_at_ns == anchor.decision_time_ns + 2_000_000
+
+
+def test_acquired_bbo_rebuilds_initial_and_first_account_mark() -> None:
+    anchor = replace(_anchor(0), fill_time_ns=_anchor(0).decision_time_ns)
+    quote = CausalEntryQuote(
+        schema="tbbo",
+        event_time_ns=anchor.decision_time_ns + 1_000_000,
+        available_at_ns=anchor.decision_time_ns + 2_000_000,
+        bid_price=15_000.75,
+        ask_price=15_001.0,
+        bid_size=10.0,
+        ask_size=10.0,
+        first_mark_available_at_ns=anchor.normal_marks[0]["availability_time_ns"],
+        post_fill_worst_liquidation_price=15_000.0,
+        post_fill_best_liquidation_price=15_002.0,
+        post_fill_last_liquidation_price=15_001.5,
+    )
+
+    trajectory = _causal_action_trajectory(anchor, "NORMAL", 1.0, quote)
+    assert trajectory.event.decision_ns == quote.available_at_ns
+    assert trajectory.initial_unrealized_pnl == -6.0
+    assert trajectory.marks[0].worst_unrealized_pnl == -18.0
+    assert trajectory.marks[0].best_unrealized_pnl == 4.0
+    assert trajectory.marks[0].current_unrealized_pnl == 0.0
+    assert quote.available_at_ns < trajectory.marks[0].availability_time_ns
+
+
+def test_entry_quote_after_frozen_event_window_is_rejected() -> None:
+    anchor = replace(_anchor(0), fill_time_ns=_anchor(0).decision_time_ns)
+    quote = CausalEntryQuote(
+        schema="tbbo",
+        event_time_ns=anchor.decision_time_ns + 61_000_000_000,
+        available_at_ns=anchor.decision_time_ns + 61_000_000_000,
+        bid_price=15_000.0,
+        ask_price=15_000.25,
+        bid_size=10.0,
+        ask_size=8.0,
+    )
+
+    with pytest.raises(
+        SelectiveVetoPilotError, match="after frozen event-window bound"
+    ):
+        _outcome_row(
+            anchor, "VALIDATION", 1.0, "TRADE_1X", "d" * 64, quote
+        )
+
+
 def test_acquired_bbo_and_depth_drive_entry_fill_without_changing_structure() -> None:
     anchor = _anchor(0)
     quote = CausalEntryQuote(
@@ -712,6 +833,107 @@ def test_manifest_bound_acquisition_is_resumable_and_charged_once(tmp_path: Path
     assert first["data_access_ledger_before_sha256"] != first["data_access_ledger_after_sha256"]
     budget_rows = [
         __import__("json").loads(line)
+        for line in (
+            tmp_path / "reports/data_budget/databento_spend_ledger.jsonl"
+        ).read_text().splitlines()
+    ]
+    assert sum(row["download_status"] == "DOWNLOADED" for row in budget_rows) == 1
+
+
+def test_bounded_repair_reuses_exact_prior_bundle_without_api_or_charge(
+    tmp_path: Path,
+) -> None:
+    anchor = _anchor(0)
+    window = make_event_windows([anchor])[0]
+    offer = _authenticated_offer(
+        [
+            {
+                **window.to_dict(),
+                "request": window.request("tbbo"),
+                "estimated_cost_usd": 1.0,
+            }
+        ]
+    )
+    original_client = _Historical()
+    original = _acquire_selected_offer(
+        original_client,
+        offer,
+        root=tmp_path,
+        manifest={"manifest_hash": "a" * 64},
+        config=TargetedCostConfig(),
+    )
+    receipt_path = next(
+        (tmp_path / "data/cache/databento/selective_veto_0034").glob(
+            "*_receipt.json"
+        )
+    )
+    intent_path = next(
+        (tmp_path / "data/cache/databento/selective_veto_0034").glob(
+            "*_intent.json"
+        )
+    )
+    authorization_path = next(
+        (tmp_path / "data/cache/databento/selective_veto_0034").glob(
+            "*_authorization.json"
+        )
+    )
+    intent = json.loads(intent_path.read_text())
+    authorization = json.loads(authorization_path.read_text())
+    repair = {
+        "classification": "POST_PURCHASE_PRE_OUTCOME_EMPTY_EXECUTION_INTERVAL_DEFECT",
+        "repair_scope": "FIRST_POST_DECISION_QUOTE_WITHIN_FROZEN_EVENT_WINDOW",
+        "prior_manifest_hash": "a" * 64,
+        "prior_request_id": original["request_id"],
+        "prior_receipt_path": receipt_path.relative_to(tmp_path).as_posix(),
+        "prior_receipt_sha256": hashlib.sha256(receipt_path.read_bytes()).hexdigest(),
+        "prior_acquisition_receipt_fingerprint": original[
+            "acquisition_receipt_fingerprint"
+        ],
+        "prior_intent_path": intent_path.relative_to(tmp_path).as_posix(),
+        "prior_intent_sha256": hashlib.sha256(intent_path.read_bytes()).hexdigest(),
+        "prior_intent_fingerprint": intent["intent_fingerprint"],
+        "prior_authorization_path": authorization_path.relative_to(
+            tmp_path
+        ).as_posix(),
+        "prior_authorization_sha256": hashlib.sha256(
+            authorization_path.read_bytes()
+        ).hexdigest(),
+        "prior_authorization_fingerprint": authorization[
+            "authorization_fingerprint"
+        ],
+        "prior_metadata_revalidation_hash": intent[
+            "metadata_revalidation_hash"
+        ],
+        "prior_bundle_hash": original["bundle_hash"],
+        "post_decision_entry_bound_seconds": 60,
+        "prior_raw_bundle_reuse_allowed": True,
+        "new_purchase_after_repair_allowed": False,
+        "raw_records_changed": False,
+        "anchor_set_changed": False,
+        "temporal_roles_changed": False,
+        "actions_or_thresholds_changed": False,
+    }
+    repaired_client = _Historical(cost=999.0)
+    reused = _acquire_selected_offer(
+        repaired_client,
+        offer,
+        root=tmp_path,
+        manifest={
+            "manifest_hash": "b" * 64,
+            "post_purchase_execution_bound_repair": repair,
+        },
+        config=TargetedCostConfig(),
+    )
+
+    assert repaired_client.metadata.calls == []
+    assert repaired_client.timeseries.calls == []
+    assert reused["prior_raw_bundle_reused"] is True
+    assert reused["new_purchase_performed_after_repair"] is False
+    assert reused["additional_spend_after_repair_usd"] == 0.0
+    assert reused["original_manifest_hash"] == "a" * 64
+    assert reused["manifest_hash"] == "b" * 64
+    budget_rows = [
+        json.loads(line)
         for line in (
             tmp_path / "reports/data_budget/databento_spend_ledger.jsonl"
         ).read_text().splitlines()

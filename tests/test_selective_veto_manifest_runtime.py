@@ -77,6 +77,16 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
             "path": source_path.relative_to(tmp_path).as_posix(),
             "sha256": _write(source_path, name.encode()),
         }
+    prior_receipt = tmp_path / "data/cache/databento/selective_veto_0034/prior_receipt.json"
+    prior_receipt_sha256 = _write(prior_receipt, b"immutable-prior-receipt")
+    prior_intent = tmp_path / "data/cache/databento/selective_veto_0034/prior_intent.json"
+    prior_intent_sha256 = _write(prior_intent, b"immutable-prior-intent")
+    prior_authorization = (
+        tmp_path / "data/cache/databento/selective_veto_0034/prior_authorization.json"
+    )
+    prior_authorization_sha256 = _write(
+        prior_authorization, b"immutable-prior-authorization"
+    )
     seeds = [
         {
             "policy_id": PRIMARY_SEED_ID,
@@ -128,6 +138,46 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
         "source_commit": "a" * 40,
         "economic_hypothesis": "Order flow can veto weak causal structural trades.",
         "implementation_files": implementation_files,
+        "post_purchase_execution_bound_repair": {
+            "classification": "POST_PURCHASE_PRE_OUTCOME_EMPTY_EXECUTION_INTERVAL_DEFECT",
+            "repair_scope": "FIRST_POST_DECISION_QUOTE_WITHIN_FROZEN_EVENT_WINDOW",
+            "prior_manifest_hash": "0" * 64,
+            "prior_request_id": "prior-request",
+            "prior_receipt_path": prior_receipt.relative_to(tmp_path).as_posix(),
+            "prior_receipt_sha256": prior_receipt_sha256,
+            "prior_acquisition_receipt_fingerprint": "3" * 64,
+            "prior_intent_path": prior_intent.relative_to(tmp_path).as_posix(),
+            "prior_intent_sha256": prior_intent_sha256,
+            "prior_intent_fingerprint": "4" * 64,
+            "prior_authorization_path": prior_authorization.relative_to(
+                tmp_path
+            ).as_posix(),
+            "prior_authorization_sha256": prior_authorization_sha256,
+            "prior_authorization_fingerprint": "5" * 64,
+            "prior_metadata_revalidation_hash": "6" * 64,
+            "prior_manifest_file_sha256": "7" * 64,
+            "frozen_scientific_projection_hash": "PLACEHOLDER",
+            "offer_contract_hash": "8" * 64,
+            "estimate_fingerprint": "9" * 64,
+            "prior_bundle_hash": "a" * 64,
+            "window_count": 189,
+            "affected_anchor_count": 241,
+            "validated_post_decision_quote_count": 241,
+            "post_decision_entry_bound_seconds": 60,
+            "prior_raw_bundle_reuse_allowed": True,
+            "new_purchase_after_repair_allowed": False,
+            "raw_records_changed": False,
+            "anchor_set_changed": False,
+            "temporal_roles_changed": False,
+            "actions_or_thresholds_changed": False,
+            "long_sample_outcomes_seen_before_repair": False,
+            "actual_spend_usd": 4.219182431703,
+            "additional_spend_after_repair_usd": 0.0,
+            "multiplicity_delta": 0,
+            "q4_access_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        },
         "terminal_source_0033": {
             "campaign_id": "hydra_hybrid_structural_alpha_order_flow_0033",
             "terminal_status": "HYBRID_OVERLAY_WEAK",
@@ -400,6 +450,20 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
             "minimum_budget_reserve_usd": 20.0,
         },
     }
+    scientific_projection = {
+        key: value
+        for key, value in manifest.items()
+        if key
+        not in {
+            "manifest_hash",
+            "source_commit",
+            "implementation_files",
+            "post_purchase_execution_bound_repair",
+        }
+    }
+    manifest["post_purchase_execution_bound_repair"][
+        "frozen_scientific_projection_hash"
+    ] = stable_hash(scientific_projection)
     _rehash(manifest)
     return path, manifest
 

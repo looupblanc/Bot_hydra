@@ -97,6 +97,14 @@ FEATURE_NAMES = (
     "microprice_deviation_ticks",
     "spread_ticks",
 )
+# The purchased event windows were frozen at sixty seconds after each
+# structural decision.  A legacy structural fill can legitimately have the
+# same timestamp as the decision (the 0028 ledger records the completed-bar
+# boundary), so it cannot serve as the upper bound for a strictly
+# post-decision TBBO quote.  The selective overlay instead uses the first
+# executable quote after the decision, bounded by this already-preregistered
+# event window.
+MAX_POST_DECISION_ENTRY_DELAY_NS = 60 * 1_000_000_000
 ALLOWED_STRUCTURAL_FAMILIES = frozenset(STRUCTURAL_FAMILIES)
 PINNED_ROLL_MAP = Path(
     "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json"
@@ -253,6 +261,10 @@ class CausalEntryQuote:
     ask_price: float
     bid_size: float
     ask_size: float
+    first_mark_available_at_ns: int | None = None
+    post_fill_worst_liquidation_price: float | None = None
+    post_fill_best_liquidation_price: float | None = None
+    post_fill_last_liquidation_price: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
         core = asdict(self)
@@ -272,7 +284,7 @@ class TargetedCostConfig:
     def validate(self) -> None:
         if (
             self.pre_decision_seconds != 120
-            or self.post_decision_seconds not in {30, 60}
+            or self.post_decision_seconds != 60
             or self.window_counts != WINDOW_COUNTS
             or self.schemas != SCHEMAS
             or not math.isclose(self.maximum_incremental_spend_usd, 8.0)
@@ -1366,6 +1378,346 @@ def _validate_metadata_revalidation(
     return validated
 
 
+def _reuse_prior_acquisition_after_bounded_repair(
+    offer_contract: Mapping[str, Any],
+    offer: Mapping[str, Any],
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Reuse one exact immutable purchase after the bounded adapter repair.
+
+    This path performs no metadata or timeseries API call and no ledger write.
+    It validates the old manifest-bound acquisition down to every raw DBN and
+    per-window receipt, then emits a new self-hashed provenance wrapper bound
+    to the repaired manifest.  The original receipt remains unchanged.
+    """
+
+    repair_value = manifest.get("post_purchase_execution_bound_repair")
+    if repair_value is None:
+        return None
+    repair = _mapping(repair_value, "post-purchase execution-bound repair")
+    if (
+        repair.get("classification")
+        != "POST_PURCHASE_PRE_OUTCOME_EMPTY_EXECUTION_INTERVAL_DEFECT"
+        or repair.get("repair_scope")
+        != "FIRST_POST_DECISION_QUOTE_WITHIN_FROZEN_EVENT_WINDOW"
+        or repair.get("prior_raw_bundle_reuse_allowed") is not True
+        or repair.get("new_purchase_after_repair_allowed") is not False
+        or repair.get("raw_records_changed") is not False
+        or repair.get("anchor_set_changed") is not False
+        or repair.get("temporal_roles_changed") is not False
+        or repair.get("actions_or_thresholds_changed") is not False
+        or int(repair.get("post_decision_entry_bound_seconds", -1)) != 60
+    ):
+        raise SelectiveVetoPilotError(
+            "0034 post-purchase repair reuse authorization drift"
+        )
+
+    receipt_path = (root / str(repair.get("prior_receipt_path") or "")).resolve()
+    allowed_root = (root / "data/cache/databento/selective_veto_0034").resolve()
+    try:
+        receipt_path.relative_to(allowed_root)
+    except ValueError as exc:
+        raise SelectiveVetoPilotError(
+            "0034 prior acquisition receipt escapes immutable cache"
+        ) from exc
+    if (
+        not receipt_path.is_file()
+        or _sha256(receipt_path) != str(repair.get("prior_receipt_sha256") or "")
+    ):
+        raise SelectiveVetoPilotError("0034 prior acquisition receipt checksum drift")
+
+    receipt = _read_json(receipt_path)
+    _validate_self_hash(
+        receipt, "acquisition_receipt_fingerprint", "prior acquisition receipt"
+    )
+    prior_manifest_hash = str(repair.get("prior_manifest_hash") or "")
+    prior_request_id = str(repair.get("prior_request_id") or "")
+    intent_path = (root / str(repair.get("prior_intent_path") or "")).resolve()
+    authorization_path = (
+        root / str(repair.get("prior_authorization_path") or "")
+    ).resolve()
+    try:
+        intent_path.relative_to(allowed_root)
+        authorization_path.relative_to(allowed_root)
+    except ValueError as exc:
+        raise SelectiveVetoPilotError(
+            "0034 prior authorization chain escapes immutable cache"
+        ) from exc
+    if (
+        not intent_path.is_file()
+        or _sha256(intent_path) != str(repair.get("prior_intent_sha256") or "")
+        or not authorization_path.is_file()
+        or _sha256(authorization_path)
+        != str(repair.get("prior_authorization_sha256") or "")
+    ):
+        raise SelectiveVetoPilotError(
+            "0034 prior intent/authorization checksum drift"
+        )
+    intent = _read_json(intent_path)
+    authorization = _read_json(authorization_path)
+    _validate_self_hash(intent, "intent_fingerprint", "prior acquisition intent")
+    _validate_self_hash(
+        authorization,
+        "authorization_fingerprint",
+        "prior download authorization",
+    )
+    revalidation = dict(
+        _mapping(intent.get("metadata_revalidation"), "prior metadata revalidation")
+    )
+    revalidated_windows = _validate_metadata_revalidation(
+        revalidation, offer_contract
+    )
+    prior_windows: list[dict[str, Any]] = []
+    for window in revalidated_windows:
+        window_core = {
+            "campaign_request_id": prior_request_id,
+            "window_index": int(window["window_index"]),
+            "request_fingerprint": str(window["request_fingerprint"]),
+            "metadata_estimate_hash": str(window["metadata_estimate_hash"]),
+        }
+        prior_windows.append(
+            {**window, "window_request_id": request_id_for(window_core)}
+        )
+    if (
+        intent.get("request_id") != prior_request_id
+        or intent.get("manifest_hash") != prior_manifest_hash
+        or intent.get("estimate_fingerprint")
+        != offer_contract["estimate_fingerprint"]
+        or intent.get("offer_contract_hash") != offer_contract["offer_contract_hash"]
+        or intent.get("data_schema") != offer_contract["schema"]
+        or intent.get("intent_fingerprint")
+        != str(repair.get("prior_intent_fingerprint") or "")
+        or intent.get("metadata_revalidation_hash")
+        != revalidation.get("revalidation_hash")
+        or intent.get("metadata_revalidation_hash")
+        != str(repair.get("prior_metadata_revalidation_hash") or "")
+        or list(intent.get("windows") or ()) != prior_windows
+    ):
+        raise SelectiveVetoPilotError("0034 prior acquisition intent drift")
+    if (
+        authorization.get("request_id") != prior_request_id
+        or authorization.get("manifest_hash") != prior_manifest_hash
+        or authorization.get("intent_fingerprint")
+        != intent.get("intent_fingerprint")
+        or authorization.get("metadata_revalidation_hash")
+        != intent.get("metadata_revalidation_hash")
+        or authorization.get("offer_contract_hash")
+        != offer_contract["offer_contract_hash"]
+        or authorization.get("data_schema") != offer_contract["schema"]
+        or authorization.get("window_contract_hash") != stable_hash(prior_windows)
+        or int(authorization.get("window_count", -1)) != len(prior_windows)
+        or authorization.get("authorization_fingerprint")
+        != str(repair.get("prior_authorization_fingerprint") or "")
+    ):
+        raise SelectiveVetoPilotError("0034 prior download authorization drift")
+    files = receipt.get("files")
+    expected_windows = list(offer_contract["windows"])
+    if (
+        receipt.get("schema") != "hydra_selective_veto_acquisition_receipt_v2"
+        or receipt.get("campaign_id") != CAMPAIGN_ID
+        or receipt.get("manifest_hash") != prior_manifest_hash
+        or receipt.get("request_id") != prior_request_id
+        or receipt.get("acquisition_receipt_fingerprint")
+        != str(repair.get("prior_acquisition_receipt_fingerprint") or "")
+        or receipt.get("estimate_fingerprint")
+        != offer_contract["estimate_fingerprint"]
+        or receipt.get("offer_contract_hash")
+        != offer_contract["offer_contract_hash"]
+        or receipt.get("intent_fingerprint") != intent.get("intent_fingerprint")
+        or receipt.get("authorization_fingerprint")
+        != authorization.get("authorization_fingerprint")
+        or receipt.get("metadata_revalidation_hash")
+        != intent.get("metadata_revalidation_hash")
+        or receipt.get("authorization_receipt_path") != str(authorization_path)
+        or receipt.get("authorization_receipt_sha256")
+        != _sha256(authorization_path)
+        or not isinstance(files, list)
+        or len(files) != len(expected_windows)
+        or int(receipt.get("window_count", -1)) != len(expected_windows)
+        or int(receipt.get("completed_window_count", -1))
+        != len(expected_windows)
+        or int(receipt.get("independent_anchors_acquired", -1))
+        != int(offer.get("effective_anchor_count", -1))
+        or bool(receipt.get("q4_accessed"))
+        or int(receipt.get("broker_connections", -1)) != 0
+        or int(receipt.get("orders", -1)) != 0
+    ):
+        raise SelectiveVetoPilotError("0034 prior acquisition identity drift")
+
+    validated_files: list[Mapping[str, Any]] = []
+    for item_value, expected, prior_window in zip(
+        files, expected_windows, prior_windows, strict=True
+    ):
+        item = _mapping(item_value, "prior acquisition file")
+        raw_path = Path(str(item.get("raw_path") or "")).resolve()
+        window_receipt_path = Path(
+            str(item.get("window_receipt_path") or "")
+        ).resolve()
+        try:
+            raw_path.relative_to(allowed_root)
+            window_receipt_path.relative_to(allowed_root)
+        except ValueError as exc:
+            raise SelectiveVetoPilotError(
+                "0034 prior acquisition file escapes immutable cache"
+            ) from exc
+        expected_request = _mapping(expected.get("request"), "offer request")
+        if (
+            item.get("request_fingerprint")
+            != expected.get("request_fingerprint")
+            or item.get("window_request_id")
+            != prior_window.get("window_request_id")
+            or not math.isclose(
+                float(item.get("authorized_cost_usd", math.nan)),
+                float(prior_window.get("authorized_cost_usd", math.nan)),
+                rel_tol=0.0,
+                abs_tol=1e-9,
+            )
+            or item.get("schema") != offer_contract["schema"]
+            or list(item.get("symbols") or ())
+            != list(expected_request.get("symbols") or ())
+            or list(item.get("anchor_ids") or ())
+            != list(expected.get("anchor_ids") or ())
+            or item.get("market") != expected.get("market")
+            or item.get("contract") != expected.get("contract")
+            or item.get("start") != expected_request.get("start")
+            or item.get("end") != expected_request.get("end")
+            or not raw_path.is_file()
+            or raw_path.stat().st_size != int(item.get("raw_size_bytes", -1))
+            or sha256_file(raw_path) != str(item.get("raw_sha256") or "")
+            or not window_receipt_path.is_file()
+            or _sha256(window_receipt_path)
+            != str(item.get("window_receipt_sha256") or "")
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 prior acquisition raw/window contract drift"
+            )
+        window_receipt = _read_json(window_receipt_path)
+        _validate_self_hash(
+            window_receipt,
+            "window_receipt_fingerprint",
+            "prior window receipt",
+        )
+        if (
+            window_receipt.get("campaign_request_id") != prior_request_id
+            or window_receipt.get("window_request_id")
+            != item.get("window_request_id")
+            or int(window_receipt.get("window_index", -1))
+            != int(expected.get("window_index", -1))
+            or window_receipt.get("request_fingerprint")
+            != expected.get("request_fingerprint")
+            or window_receipt.get("metadata_estimate_hash")
+            != prior_window.get("metadata_estimate_hash")
+            or window_receipt.get("raw_path") != str(raw_path)
+            or window_receipt.get("raw_sha256") != item.get("raw_sha256")
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 prior window receipt identity drift"
+            )
+        validated_files.append(item)
+
+    actual_cost = float(receipt.get("actual_spend_usd", math.nan))
+    expected_cost = float(
+        math.fsum(float(item["authorized_cost_usd"]) for item in validated_files)
+    )
+    flattened_ids = [
+        str(anchor_id)
+        for item in validated_files
+        for anchor_id in item.get("anchor_ids") or ()
+    ]
+    if (
+        receipt.get("bundle_hash") != stable_hash(files)
+        or receipt.get("bundle_hash") != str(repair.get("prior_bundle_hash") or "")
+        or not math.isclose(actual_cost, expected_cost, rel_tol=0.0, abs_tol=1e-9)
+        or sorted(flattened_ids)
+        != sorted(str(value) for value in offer.get("anchor_ids") or ())
+        or len(flattened_ids) != len(set(flattened_ids))
+    ):
+        raise SelectiveVetoPilotError(
+            "0034 prior acquisition aggregate reconciliation drift"
+        )
+
+    budget_path = root / "reports/data_budget/databento_spend_ledger.jsonl"
+    budget_rows = [
+        row
+        for row in read_ledger(budget_path)
+        if str(row.get("request_id") or "")
+        in {str(window["window_request_id"]) for window in prior_windows}
+    ]
+    reserved = [
+        row for row in budget_rows if row.get("download_status") == "ESTIMATED_ONLY"
+    ]
+    downloaded = [
+        row for row in budget_rows if row.get("download_status") == "DOWNLOADED"
+    ]
+    expected_window_ids = {
+        str(window["window_request_id"]) for window in prior_windows
+    }
+    if (
+        len(reserved) != len(prior_windows)
+        or len(downloaded) != len(prior_windows)
+        or {str(row.get("request_id")) for row in reserved} != expected_window_ids
+        or {str(row.get("request_id")) for row in downloaded} != expected_window_ids
+        or not math.isclose(
+            math.fsum(float(row.get("actual_cost_usd") or 0.0) for row in downloaded),
+            actual_cost,
+            rel_tol=0.0,
+            abs_tol=1e-9,
+        )
+    ):
+        raise SelectiveVetoPilotError(
+            "0034 prior acquisition budget-ledger reconciliation drift"
+        )
+    access_path = root / "reports/data_access/data_access_ledger.jsonl"
+    matching_access = [
+        row
+        for row in read_ledger(access_path)
+        if prior_request_id
+        in {str(value) for value in row.get("candidate_ids") or ()}
+        and CAMPAIGN_ID
+        in {str(value) for value in row.get("candidate_ids") or ()}
+    ]
+    if (
+        len(matching_access) != 1
+        or matching_access[0].get("data_role") != "CONTAMINATED_DEVELOPMENT"
+        or matching_access[0].get("freeze_manifest_hash") != prior_manifest_hash
+    ):
+        raise SelectiveVetoPilotError(
+            "0034 prior acquisition data-access reconciliation drift"
+        )
+
+    reuse = {
+        **{
+            key: value
+            for key, value in receipt.items()
+            if key not in {"manifest_hash", "acquisition_receipt_fingerprint"}
+        },
+        "manifest_hash": str(manifest["manifest_hash"]),
+        "original_manifest_hash": prior_manifest_hash,
+        "original_request_id": prior_request_id,
+        "original_acquisition_receipt_path": str(receipt_path),
+        "original_acquisition_receipt_sha256": _sha256(receipt_path),
+        "original_acquisition_receipt_fingerprint": str(
+            receipt["acquisition_receipt_fingerprint"]
+        ),
+        "original_intent_path": str(intent_path),
+        "original_intent_sha256": _sha256(intent_path),
+        "original_authorization_path": str(authorization_path),
+        "original_authorization_sha256": _sha256(authorization_path),
+        "budget_ledger_at_reuse_sha256": _sha256(budget_path),
+        "data_access_ledger_at_reuse_sha256": _sha256(access_path),
+        "post_purchase_execution_bound_repair": True,
+        "prior_raw_bundle_reused": True,
+        "new_purchase_performed_after_repair": False,
+        "additional_spend_after_repair_usd": 0.0,
+    }
+    return {
+        **reuse,
+        "acquisition_receipt_fingerprint": stable_hash(reuse),
+    }
+
+
 def _acquire_selected_offer(
     client: Any,
     offer: Mapping[str, Any],
@@ -1385,6 +1737,14 @@ def _acquire_selected_offer(
         < config.minimum_budget_reserve_usd - 1e-9
     ):
         raise SelectiveVetoPilotError("selected 0034 offer consumes USD 20 reserve")
+    reused = _reuse_prior_acquisition_after_bounded_repair(
+        offer_contract,
+        offer,
+        root=root,
+        manifest=manifest,
+    )
+    if reused is not None:
+        return reused
     request_rows = list(offer_contract["windows"])
     request_core = {
         "campaign_id": CAMPAIGN_ID,
@@ -1993,6 +2353,9 @@ def _initialize_feature_worker() -> None:
 def _timestamp_ns(index: Any) -> np.ndarray:
     if hasattr(index, "asi8"):
         return np.asarray(index.asi8, dtype=np.int64)
+    array = getattr(index, "array", None)
+    if array is not None and hasattr(array, "asi8"):
+        return np.asarray(array.asi8, dtype=np.int64)
     return np.asarray(index, dtype="datetime64[ns]").astype(np.int64)
 
 
@@ -2023,11 +2386,15 @@ def _feature_for_anchor(
         return None
     if schema not in SCHEMAS:
         raise SelectiveVetoPilotError(f"unsupported 0034 acquired schema: {schema}")
-    event_ns = _timestamp_ns(frame.index)
+    event_ns = (
+        _timestamp_ns(frame["ts_event"])
+        if "ts_event" in frame.columns
+        else _timestamp_ns(frame.index)
+    )
     available_ns = (
         _timestamp_ns(frame["ts_recv"])
         if "ts_recv" in frame.columns
-        else event_ns
+        else _timestamp_ns(frame.index)
     )
     price = _number_column(frame, ("price",))
     size = _number_column(frame, ("size",))
@@ -2048,8 +2415,20 @@ def _feature_for_anchor(
         & (size > 0.0)
         & is_trade_action
     )
-    two = (available_ns >= anchor.decision_time_ns - 2_000_000_000) & (available_ns <= anchor.decision_time_ns) & trade
-    thirty = (available_ns >= anchor.decision_time_ns - 30_000_000_000) & (available_ns <= anchor.decision_time_ns) & trade
+    causal_at_decision = (
+        (available_ns <= anchor.decision_time_ns)
+        & (event_ns <= anchor.decision_time_ns)
+    )
+    two = (
+        (available_ns >= anchor.decision_time_ns - 2_000_000_000)
+        & causal_at_decision
+        & trade
+    )
+    thirty = (
+        (available_ns >= anchor.decision_time_ns - 30_000_000_000)
+        & causal_at_decision
+        & trade
+    )
     flow2 = float(np.sum(sign[two] * size[two]))
     flow30 = float(np.sum(sign[thirty] * size[thirty]))
     bid = _number_column(frame, ("bid_px_00", "bid_price"), math.nan)
@@ -2064,19 +2443,37 @@ def _feature_for_anchor(
         & (ask_size > 0.0)
     )
     causal_quotes = np.flatnonzero(
-        (available_ns <= anchor.decision_time_ns) & valid_quote
+        causal_at_decision & valid_quote
     )
     if not len(causal_quotes):
         return None
     last = int(causal_quotes[-1])
     executable_quotes = np.flatnonzero(
         (available_ns > anchor.decision_time_ns)
-        & (available_ns <= anchor.fill_time_ns)
+        & (event_ns > anchor.decision_time_ns)
+        & (
+            available_ns
+            < anchor.decision_time_ns + MAX_POST_DECISION_ENTRY_DELAY_NS
+        )
         & valid_quote
     )
     if not len(executable_quotes):
         return None
     executable = int(executable_quotes[0])
+    normal_mark_time = int(anchor.normal_marks[0]["availability_time_ns"])
+    stressed_mark_time = int(anchor.stressed_marks[0]["availability_time_ns"])
+    if normal_mark_time != stressed_mark_time:
+        raise SelectiveVetoPilotError(
+            "0034 normal/stressed first-mark availability drift"
+        )
+    post_fill_quotes = np.flatnonzero(
+        (available_ns >= available_ns[executable])
+        & (available_ns <= normal_mark_time)
+        & (event_ns > anchor.decision_time_ns)
+        & valid_quote
+    )
+    if not len(post_fill_quotes):
+        return None
     tick = 0.25 if anchor.market == "NQ" else 1.0
     total_depth = float(bid_size[last] + ask_size[last])
     imbalance = float((bid_size[last] - ask_size[last]) / total_depth) if total_depth > 0.0 else 0.0
@@ -2092,6 +2489,14 @@ def _feature_for_anchor(
     )
     if not np.all(np.isfinite(values)):
         return None
+    liquidation = bid if anchor.direction > 0 else ask
+    post_fill_liquidation = liquidation[post_fill_quotes]
+    if anchor.direction > 0:
+        worst_liquidation = float(np.min(post_fill_liquidation))
+        best_liquidation = float(np.max(post_fill_liquidation))
+    else:
+        worst_liquidation = float(np.max(post_fill_liquidation))
+        best_liquidation = float(np.min(post_fill_liquidation))
     quote = CausalEntryQuote(
         schema=schema,
         event_time_ns=int(event_ns[executable]),
@@ -2100,6 +2505,10 @@ def _feature_for_anchor(
         ask_price=float(ask[executable]),
         bid_size=float(bid_size[executable]),
         ask_size=float(ask_size[executable]),
+        first_mark_available_at_ns=normal_mark_time,
+        post_fill_worst_liquidation_price=worst_liquidation,
+        post_fill_best_liquidation_price=best_liquidation,
+        post_fill_last_liquidation_price=float(liquidation[post_fill_quotes[-1]]),
     )
     feature_hash = stable_hash(
         {
@@ -2108,7 +2517,6 @@ def _feature_for_anchor(
             "decision_time_ns": anchor.decision_time_ns,
             "feature_names": FEATURE_NAMES,
             "values": values.tolist(),
-            "entry_quote": quote.to_dict(),
         }
     )
     return values, feature_hash, quote
@@ -2203,6 +2611,26 @@ def _load_acquired_features(
                     ask_price=float(quote["ask_price"]),
                     bid_size=float(quote["bid_size"]),
                     ask_size=float(quote["ask_size"]),
+                    first_mark_available_at_ns=(
+                        None
+                        if quote.get("first_mark_available_at_ns") is None
+                        else int(quote["first_mark_available_at_ns"])
+                    ),
+                    post_fill_worst_liquidation_price=(
+                        None
+                        if quote.get("post_fill_worst_liquidation_price") is None
+                        else float(quote["post_fill_worst_liquidation_price"])
+                    ),
+                    post_fill_best_liquidation_price=(
+                        None
+                        if quote.get("post_fill_best_liquidation_price") is None
+                        else float(quote["post_fill_best_liquidation_price"])
+                    ),
+                    post_fill_last_liquidation_price=(
+                        None
+                        if quote.get("post_fill_last_liquidation_price") is None
+                        else float(quote["post_fill_last_liquidation_price"])
+                    ),
                 ),
             )
     return features, True
@@ -2296,8 +2724,20 @@ def _entry_fill_from_quote(
 
     if quote.available_at_ns <= anchor.decision_time_ns:
         raise SelectiveVetoPilotError("0034 entry quote is not post-decision causal")
-    if quote.available_at_ns > anchor.fill_time_ns:
-        raise SelectiveVetoPilotError("0034 entry quote occurs after frozen fill bound")
+    if quote.event_time_ns <= anchor.decision_time_ns:
+        raise SelectiveVetoPilotError("0034 entry event is not post-decision causal")
+    if (
+        quote.available_at_ns
+        >= anchor.decision_time_ns + MAX_POST_DECISION_ENTRY_DELAY_NS
+    ):
+        raise SelectiveVetoPilotError(
+            "0034 entry quote occurs after frozen event-window bound"
+        )
+    if (
+        anchor.outcome_time_ns is not None
+        and quote.available_at_ns >= anchor.outcome_time_ns
+    ):
+        raise SelectiveVetoPilotError("0034 entry quote occurs after anchor outcome")
     contra_depth = quote.ask_size if anchor.direction > 0 else quote.bid_size
     if contra_depth <= 0.0:
         raise SelectiveVetoPilotError("0034 executable contra-side depth is empty")
@@ -2335,16 +2775,12 @@ def _causal_action_trajectory(
     if scenario == "NORMAL":
         legacy_fill = anchor.normal_fill_price
         legacy_net = float(anchor.normal_net_pnl_usd or 0.0)
-        worst = float(anchor.normal_worst_unrealized_pnl_usd or 0.0)
-        best = anchor.normal_best_unrealized_pnl_usd
-        initial = anchor.normal_initial_unrealized_pnl_usd
+        legacy_initial = anchor.normal_initial_unrealized_pnl_usd
         source_marks = anchor.normal_marks
     elif scenario == "STRESSED_1_5X":
         legacy_fill = anchor.stressed_fill_price
         legacy_net = float(anchor.stressed_net_pnl_usd or 0.0)
-        worst = float(anchor.stressed_worst_unrealized_pnl_usd or 0.0)
-        best = anchor.stressed_best_unrealized_pnl_usd
-        initial = anchor.stressed_initial_unrealized_pnl_usd
+        legacy_initial = anchor.stressed_initial_unrealized_pnl_usd
         source_marks = anchor.stressed_marks
     else:
         raise SelectiveVetoPilotError("unsupported 0034 cost scenario")
@@ -2381,7 +2817,7 @@ def _causal_action_trajectory(
         * _point_value(anchor)
         * quantity
     )
-    marks = tuple(
+    adjusted_marks = [
         CausalTradeMark(
             availability_time_ns=int(row["availability_time_ns"]),
             worst_unrealized_pnl=(
@@ -2398,6 +2834,72 @@ def _causal_action_trajectory(
             ),
         )
         for row in source_marks
+    ]
+    initial_unrealized = legacy_initial * ratio + entry_adjustment
+    microstructure_mark_fields = (
+        None
+        if execution_quote is None
+        else (
+            execution_quote.first_mark_available_at_ns,
+            execution_quote.post_fill_worst_liquidation_price,
+            execution_quote.post_fill_best_liquidation_price,
+            execution_quote.post_fill_last_liquidation_price,
+        )
+    )
+    if microstructure_mark_fields is not None and any(
+        value is not None for value in microstructure_mark_fields
+    ):
+        if any(value is None for value in microstructure_mark_fields):
+            raise SelectiveVetoPilotError(
+                "0034 post-fill BBO mark is only partially specified"
+            )
+        first_mark_time = int(microstructure_mark_fields[0])
+        if (
+            first_mark_time != adjusted_marks[0].availability_time_ns
+            or execution_quote is None
+            or not execution_quote.available_at_ns < first_mark_time
+            or first_mark_time > anchor.outcome_time_ns
+        ):
+            raise SelectiveVetoPilotError(
+                "0034 post-fill BBO/structural mark chronology drift"
+            )
+        point_value = _point_value(anchor)
+
+        def liquidation_pnl(price: float) -> float:
+            return float(
+                anchor.direction * (float(price) - fill) * point_value * quantity
+                - non_fill_cost
+            )
+
+        liquidation_at_fill = (
+            execution_quote.bid_price
+            if anchor.direction > 0
+            else execution_quote.ask_price
+        )
+        initial_unrealized = liquidation_pnl(liquidation_at_fill)
+        observed_worst = liquidation_pnl(float(microstructure_mark_fields[1]))
+        observed_best = liquidation_pnl(float(microstructure_mark_fields[2]))
+        observed_current = liquidation_pnl(float(microstructure_mark_fields[3]))
+        # The acquired TBBO stream provides the exact post-fill favorable and
+        # current BBO path.  For MLL, retain the worse of that path and the
+        # legacy full-minute low/high, which is deliberately conservative if
+        # the few pre-fill milliseconds contained a more adverse print.
+        adjusted_marks[0] = CausalTradeMark(
+            availability_time_ns=first_mark_time,
+            worst_unrealized_pnl=min(
+                observed_worst, adjusted_marks[0].worst_unrealized_pnl
+            ),
+            best_unrealized_pnl=observed_best,
+            current_unrealized_pnl=observed_current,
+        )
+    marks = tuple(adjusted_marks)
+    path_worst = min(
+        initial_unrealized,
+        *(float(row.worst_unrealized_pnl) for row in marks),
+    )
+    path_best = max(
+        initial_unrealized,
+        *(float(row.best_unrealized_pnl) for row in marks),
     )
     return CausalTradeTrajectory(
         component_id=anchor.source_candidate_id,
@@ -2418,8 +2920,8 @@ def _causal_action_trajectory(
             session_day=anchor.session_day,
             net_pnl=net,
             gross_pnl=float(gross),
-            worst_unrealized_pnl=worst * ratio + entry_adjustment,
-            best_unrealized_pnl=best * ratio + entry_adjustment,
+            worst_unrealized_pnl=path_worst,
+            best_unrealized_pnl=path_best,
             quantity=quantity,
             mini_equivalent=quantity / 10.0,
             regime=anchor.structural_family,
@@ -2428,7 +2930,7 @@ def _causal_action_trajectory(
             same_bar_ambiguous=anchor.same_bar_ambiguous,
         ),
         marks=marks,
-        initial_unrealized_pnl=initial * ratio + entry_adjustment,
+        initial_unrealized_pnl=initial_unrealized,
     )
 
 
@@ -2478,8 +2980,13 @@ def _outcome_row(
     stressed_cost = 0.0 if stressed_path is None else (
         stressed_path.event.gross_pnl - stressed_path.event.net_pnl
     )
+    baseline_entry_time = (
+        anchor.fill_time_ns
+        if execution_quote is None
+        else execution_quote.available_at_ns
+    )
     baseline_duration = float(
-        (anchor.outcome_time_ns - anchor.fill_time_ns) / 1e9
+        (anchor.outcome_time_ns - baseline_entry_time) / 1e9
     ) if anchor.outcome_time_ns is not None else None
     result = {
         "anchor_event_id": anchor.anchor_event_id,
@@ -2793,6 +3300,26 @@ def _account_matrix(
                             ask_price=float(quote_value["ask_price"]),
                             bid_size=float(quote_value["bid_size"]),
                             ask_size=float(quote_value["ask_size"]),
+                            first_mark_available_at_ns=(
+                                None
+                                if quote_value.get("first_mark_available_at_ns") is None
+                                else int(quote_value["first_mark_available_at_ns"])
+                            ),
+                            post_fill_worst_liquidation_price=(
+                                None
+                                if quote_value.get("post_fill_worst_liquidation_price") is None
+                                else float(quote_value["post_fill_worst_liquidation_price"])
+                            ),
+                            post_fill_best_liquidation_price=(
+                                None
+                                if quote_value.get("post_fill_best_liquidation_price") is None
+                                else float(quote_value["post_fill_best_liquidation_price"])
+                            ),
+                            post_fill_last_liquidation_price=(
+                                None
+                                if quote_value.get("post_fill_last_liquidation_price") is None
+                                else float(quote_value["post_fill_last_liquidation_price"])
+                            ),
                         )
                     )
                     trajectories[str(row["source_candidate_id"])].append(
@@ -2879,6 +3406,26 @@ def _entry_quote_from_outcome_row(
         ask_price=float(value["ask_price"]),
         bid_size=float(value["bid_size"]),
         ask_size=float(value["ask_size"]),
+        first_mark_available_at_ns=(
+            None
+            if value.get("first_mark_available_at_ns") is None
+            else int(value["first_mark_available_at_ns"])
+        ),
+        post_fill_worst_liquidation_price=(
+            None
+            if value.get("post_fill_worst_liquidation_price") is None
+            else float(value["post_fill_worst_liquidation_price"])
+        ),
+        post_fill_best_liquidation_price=(
+            None
+            if value.get("post_fill_best_liquidation_price") is None
+            else float(value["post_fill_best_liquidation_price"])
+        ),
+        post_fill_last_liquidation_price=(
+            None
+            if value.get("post_fill_last_liquidation_price") is None
+            else float(value["post_fill_last_liquidation_price"])
+        ),
     )
 
 

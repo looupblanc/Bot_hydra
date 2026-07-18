@@ -202,6 +202,7 @@ def validate_selective_veto_manifest(
     _diagnostic_forward(manifest)
     _account_rule_snapshots(manifest)
     _account_speed_gate(manifest)
+    _post_purchase_repair(manifest, root)
     _multiplicity(manifest)
     _evidence_and_governance(manifest, root)
 
@@ -243,6 +244,99 @@ def _implementation(manifest: Mapping[str, Any], root: Path) -> None:
             raise SelectiveVetoManifestError(
                 f"0034 implementation checksum drift: {relative}"
             )
+
+
+def _post_purchase_repair(manifest: Mapping[str, Any], root: Path) -> None:
+    """Authorize only the immutable 0034 acquisition after the bounded fix.
+
+    The initial download was correctly authorized and completed before an
+    execution-adapter contradiction was discovered.  Updating the campaign
+    implementation necessarily changes the manifest hash; this declaration
+    permits reuse of that one exact raw bundle while prohibiting another
+    purchase or any change to the scientific population.
+    """
+
+    repair = _mapping(manifest, "post_purchase_execution_bound_repair")
+    receipt = _project_file(
+        root, repair.get("prior_receipt_path"), "prior acquisition receipt"
+    )
+    intent = _project_file(
+        root, repair.get("prior_intent_path"), "prior acquisition intent"
+    )
+    authorization = _project_file(
+        root,
+        repair.get("prior_authorization_path"),
+        "prior download authorization",
+    )
+    scientific_projection = {
+        key: value
+        for key, value in manifest.items()
+        if key
+        not in {
+            "manifest_hash",
+            "source_commit",
+            "implementation_files",
+            "post_purchase_execution_bound_repair",
+        }
+    }
+    if (
+        repair.get("classification")
+        != "POST_PURCHASE_PRE_OUTCOME_EMPTY_EXECUTION_INTERVAL_DEFECT"
+        or repair.get("repair_scope")
+        != "FIRST_POST_DECISION_QUOTE_WITHIN_FROZEN_EVENT_WINDOW"
+        or not _SHA256.fullmatch(str(repair.get("prior_manifest_hash") or ""))
+        or str(repair.get("prior_manifest_hash")) == str(manifest["manifest_hash"])
+        or not str(repair.get("prior_request_id") or "")
+        or not _SHA256.fullmatch(
+            str(repair.get("prior_acquisition_receipt_fingerprint") or "")
+        )
+        or not _SHA256.fullmatch(str(repair.get("prior_receipt_sha256") or ""))
+        or _sha256(receipt) != str(repair.get("prior_receipt_sha256"))
+        or not _SHA256.fullmatch(str(repair.get("prior_intent_sha256") or ""))
+        or _sha256(intent) != str(repair.get("prior_intent_sha256"))
+        or not _SHA256.fullmatch(
+            str(repair.get("prior_authorization_sha256") or "")
+        )
+        or _sha256(authorization)
+        != str(repair.get("prior_authorization_sha256"))
+        or not _SHA256.fullmatch(
+            str(repair.get("prior_intent_fingerprint") or "")
+        )
+        or not _SHA256.fullmatch(
+            str(repair.get("prior_authorization_fingerprint") or "")
+        )
+        or not _SHA256.fullmatch(
+            str(repair.get("frozen_scientific_projection_hash") or "")
+        )
+        or stable_hash(scientific_projection)
+        != str(repair.get("frozen_scientific_projection_hash"))
+        or not _SHA256.fullmatch(
+            str(repair.get("prior_manifest_file_sha256") or "")
+        )
+        or not _SHA256.fullmatch(str(repair.get("offer_contract_hash") or ""))
+        or not _SHA256.fullmatch(str(repair.get("estimate_fingerprint") or ""))
+        or not _SHA256.fullmatch(str(repair.get("prior_bundle_hash") or ""))
+        or _integer(repair.get("window_count")) != 189
+        or _integer(repair.get("affected_anchor_count")) != 241
+        or _integer(repair.get("validated_post_decision_quote_count")) != 241
+        or _integer(repair.get("post_decision_entry_bound_seconds")) != 60
+        or repair.get("prior_raw_bundle_reuse_allowed") is not True
+        or repair.get("new_purchase_after_repair_allowed") is not False
+        or repair.get("raw_records_changed") is not False
+        or repair.get("anchor_set_changed") is not False
+        or repair.get("temporal_roles_changed") is not False
+        or repair.get("actions_or_thresholds_changed") is not False
+        or repair.get("long_sample_outcomes_seen_before_repair") is not False
+        or not _close(repair.get("actual_spend_usd"), 4.219182431703)
+        or not _close(repair.get("additional_spend_after_repair_usd"), 0.0)
+        or _integer(repair.get("multiplicity_delta")) != 0
+        or repair.get("q4_access_delta") != 0
+        or repair.get("broker_connections") != 0
+        or repair.get("orders") != 0
+    ):
+        raise SelectiveVetoManifestError(
+            "0034 bounded post-purchase repair contract drift"
+        )
 
 
 def _source_0033(manifest: Mapping[str, Any], root: Path) -> None:
@@ -429,7 +523,7 @@ def _window_and_cost_contract(manifest: Mapping[str, Any]) -> None:
     cost = _mapping(manifest, "targeted_cost_policy")
     if (
         _integer(windows.get("pre_decision_lookback_seconds")) != 120
-        or _integer(windows.get("post_decision_safety_seconds")) not in {30, 60}
+        or _integer(windows.get("post_decision_safety_seconds")) != 60
         or windows.get("deterministic_warmup_included") is not True
         or windows.get("overlapping_windows_merged") is not True
         or windows.get("full_session_request_default") is not False
