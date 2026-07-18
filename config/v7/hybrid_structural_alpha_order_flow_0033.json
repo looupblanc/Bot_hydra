@@ -1,0 +1,948 @@
+{
+  "schema": "hydra_economic_production_manifest_v1",
+  "campaign_mode": "HYBRID_STRUCTURAL_ALPHA_ORDER_FLOW",
+  "campaign_id": "hydra_hybrid_structural_alpha_order_flow_0033",
+  "class_id": "HYBRID_STRUCTURAL_ALPHA_ORDER_FLOW_V1",
+  "policy_classes": [
+    "HYBRID_STRUCTURAL_ALPHA_ORDER_FLOW_V1"
+  ],
+  "created_at_utc": "2026-07-18T14:31:00Z",
+  "source_commit": "a98fde3f3e33e9383a275215767e9c7b17033548",
+  "development_only": true,
+  "economic_hypothesis": "Standalone microstructure events have insufficient executable gross alpha, but causal order-flow abstention, timing, execution and bounded risk tiers may improve paired stressed outcomes when conditioned on a preexisting directional structural opportunity.",
+  "implementation_files": {
+    "hydra/production/microstructure_hybrid_manifest.py": "eb8d3cbc71f6dc6cfad939262d2066e431c031d0961a6994f9e6f695fd1173dd",
+    "hydra/production/microstructure_hybrid_pilot.py": "fee353ad4ec0d9f064ea027f83e1e578d2b304e2229bc2e4f4787bb93cd28643",
+    "hydra/production/microstructure_hybrid_runtime.py": "a12a74d13c81770458f8f17b6b2929a85c906a090781ca5a8138e5df661dcd7c",
+    "hydra/production/manifest.py": "db2f9e2d69f1b8a75f451a88f6db358de9aa967f4958f05fc972e8a58f0b072e",
+    "hydra/production/runtime.py": "7a032fee30ae99e4fb5e7cf17998fa8fca2e393c19d8449a57aeb50a77278e8e",
+    "scripts/run_economic_production_manifest.py": "45e610a35ae5a260e628bc73fcd23634362c6cef0298707b2e6e97ff8762cc6f"
+  },
+  "terminal_source_0032": {
+    "campaign_id": "hydra_microstructure_sparse_alpha_distillation_0032",
+    "terminal_status": "SPARSE_PILOT_WEAK",
+    "reuse_mode": "IMMUTABLE_READ_ONLY",
+    "retry_or_retune_allowed": false,
+    "status_inheritance_allowed": false,
+    "outcomes_are_development_only": true,
+    "gross_positive_diagnostic_candidate_ids": [
+      "sparse_0032_absorption_01_1a7f4f1e37a2",
+      "sparse_0032_absorption_02_bf5ae94f4040",
+      "sparse_0032_absorption_05_2c1860d24548",
+      "sparse_0032_liquidity_vacuum_02_d8f691bcb84d",
+      "sparse_0032_liquidity_vacuum_05_af796fed539e",
+      "sparse_0032_exhaustion_01_1b2e41dc11c8",
+      "sparse_0032_queue_replenishment_01_00399b62e441",
+      "sparse_0032_queue_replenishment_04_34d257646ef8"
+    ],
+    "gross_positive_diagnostics_receive_economic_status": false,
+    "frozen_baseline": {
+      "sparse_strategies_evaluated": 30,
+      "active_strategies": 18,
+      "correctly_abstaining_strategies": 12,
+      "unique_trades": 327,
+      "median_trades_per_session": 0.8,
+      "aggregate_gross_pnl_usd": 332.5,
+      "aggregate_normal_net_pnl_usd": -13737.6,
+      "aggregate_stressed_net_pnl_usd": -17007.6,
+      "positive_validation_and_final_development_count": 0,
+      "p5_passes": 0,
+      "p5_mll_breached_paths": 4,
+      "p5_paths": 180,
+      "markout_medians_zero_at_all_reported_horizons": true,
+      "no_gross_alpha_family_count": 11,
+      "cost_and_turnover_dominated_family_count": 13,
+      "execution_model_defect_count": 0,
+      "bank_admissions": 0,
+      "additional_data_purchase_count": 0,
+      "remaining_budget_usd": 28.498462508622012
+    },
+    "source_hashes": {
+      "authoritative_result": {
+        "path": "reports/economic_evolution/microstructure_sparse_alpha_distillation_0032/economic_production_result.json",
+        "sha256": "05e572653ce92f398e0fb8c423d3ecd238454432a95b30f88b88797b1448ce9b"
+      },
+      "evidence_bundle_receipt": {
+        "path": "reports/economic_evolution/microstructure_sparse_alpha_distillation_0032/evidence_bundle_receipt.json",
+        "sha256": "ad12730ce692331de264e6872750b85d0bf1c28e200bbbd7c636e46415eaa654"
+      },
+      "decision_report": {
+        "path": "reports/economic_evolution/microstructure_sparse_alpha_distillation_0032/pilot/decision_report.json",
+        "sha256": "1844c91fdff0c1dd9e72a10781177f5c04c7c7c3098a24fa190d4d3dbcd0840b"
+      },
+      "opportunity_episodes": {
+        "path": "reports/economic_evolution/microstructure_sparse_alpha_distillation_0032/pilot/opportunity_episodes.parquet",
+        "sha256": "394ad84527316a9dd18eae6ec37f5fbfbcf52ea832ac6a052e8ae85433ef164b"
+      },
+      "opportunity_outcomes": {
+        "path": "reports/economic_evolution/microstructure_sparse_alpha_distillation_0032/pilot/opportunity_outcomes.parquet",
+        "sha256": "986345aa4d59d541ccc828bf3b3cc81db1282c846792c35d56ead418e39449be"
+      }
+    }
+  },
+  "immutable_source_store_0031": {
+    "campaign_id": "hydra_microstructure_order_flow_foundry_0031",
+    "terminal_status": "MICROSTRUCTURE_PILOT_FALSIFIED",
+    "store_status": "BOOK_STATE_RECONSTRUCTION_GREEN",
+    "reuse_mode": "IMMUTABLE_READ_ONLY",
+    "raw_rewrite_allowed": false,
+    "source_feature_recomputation_allowed": false,
+    "outcome_labels_physically_separate": true,
+    "status_inheritance_allowed": false,
+    "source_hashes": {
+      "event_store_receipt": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/store_receipt.json",
+        "sha256": "9a2a4136c2f382524a3136af8a1ddb71d840baf3ae2b190e6a900cfec03aac58"
+      },
+      "raw_dbn": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/raw_dbn/part-000000.parquet",
+        "sha256": "72bc509041a59fafb0746283881d17485d6c44a9f31985c9de9045f92cbcf38c"
+      },
+      "book_snapshots": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/book_snapshots/part-000000.parquet",
+        "sha256": "08a98960c68f6304b8b0d7c06e598afed37fa8a427eac0a95339da5234884141"
+      },
+      "derived_events": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/derived_events/part-000000.parquet",
+        "sha256": "95962c14ccf5627a22db2e7680965a960112a7f09d613021b4a963b323bbc5f8"
+      },
+      "feature_matrices": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/feature_matrices/part-000000.parquet",
+        "sha256": "0d0ea39346c122bc37c51c5044d89b1e86ea0a429312491758f23f8665cb6a94"
+      },
+      "outcome_labels": {
+        "path": "reports/economic_evolution/microstructure_order_flow_foundry_0031/pilot/datasets/outcome_labels/part-000000.parquet",
+        "sha256": "8368a8718daf6dab37bc2c84687bad17fb01fe52ca378d3acc10ece23635c176"
+      }
+    }
+  },
+  "clean_structural_anchors_0028": {
+    "campaign_id": "hydra_causal_target_velocity_0028",
+    "terminal_status": "CAUSAL_TARGET_VELOCITY_INCONCLUSIVE_COVERAGE_LIMITED",
+    "component_status": "LOW_VELOCITY_CAUSAL_REFERENCE_BANK",
+    "reuse_mode": "IMMUTABLE_READ_ONLY",
+    "maximum_anchor_count": 24,
+    "frozen_anchor_count": 22,
+    "anchor_ids": [
+      "hazard_04561035cc31c31b0dd3f85a",
+      "hazard_01b84c042c95b8a6a206a8da",
+      "hazard_39113048dd9e10ded1a41a74",
+      "hazard_2ce4b3e6934c5b55ff8829bb",
+      "hazard_33532edae13835fab0408952",
+      "hazard_19772a45d22932906b543e59",
+      "hazard_00efa9bbb8ddd4eebb3a1483",
+      "hazard_04742cf1b919fc9771ee291d",
+      "hazard_3431aecefc87c345371ca745",
+      "hazard_072556d2ea8da045d1072812",
+      "hazard_20281c39a8744fce6d7b452e",
+      "hazard_1d191acd46c786f415e413eb",
+      "hazard_319170b7485b4802091b05dd",
+      "hazard_1fe0960034e66a60281b7304",
+      "hazard_178325b10e8b10efa9966c91",
+      "hazard_063cc5711d0e40f9e375e2f8",
+      "hazard_25e4f411aafb0840d86843d5",
+      "hazard_0542f3388c119e46904ba18b",
+      "hazard_109e715f60d31444d7ad42f6",
+      "hazard_232fc968a6a1b55c0d3adb29",
+      "hazard_1931ef31a7ddd6c349445ddd",
+      "hazard_026cc350e74a5098105325c2"
+    ],
+    "markets": [
+      "NQ",
+      "YM"
+    ],
+    "coverage_session_dates": [
+      "2024-07-08",
+      "2024-07-09",
+      "2024-07-10",
+      "2024-07-11",
+      "2024-07-12"
+    ],
+    "selection_policy": [
+      "PREEXISTING_CLEAN_EVIDENCE_ONLY",
+      "POSITIVE_STRESSED_ECONOMICS",
+      "ACTIVE_IN_EXISTING_MICROSTRUCTURE_SESSIONS",
+      "STRUCTURAL_AND_BEHAVIORAL_DIVERSITY",
+      "COMPLETE_EXECUTABLE_SPECIFICATION"
+    ],
+    "new_structural_grammar_added": false,
+    "anchor_selection_frozen_before_hybrid_outcomes": true,
+    "promotion_status_inheritance_allowed": false,
+    "source_hashes": {
+      "source_result": {
+        "path": "reports/economic_evolution/causal_target_velocity_0028_revision_02/economic_production_result.json",
+        "sha256": "10c0fd04e031c89985c71e97edd615746afa997f3d45891352621329fbae5b23"
+      },
+      "candidate_population": {
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage1_candidate_population.jsonl",
+        "sha256": "c3c5090d1141f003efd39de1085d24d666d3fcaece7c7dba77449b7f5804352c"
+      }
+    },
+    "event_ledgers": {
+      "hazard_04561035cc31c31b0dd3f85a": {
+        "candidate_id": "hazard_04561035cc31c31b0dd3f85a",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_04561035cc31c31b0dd3f85a.jsonl",
+        "sha256": "2e671182982af120c7978f1daa1066bc8f38de70204c4dc7d2e46e1afea08888",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 5
+      },
+      "hazard_01b84c042c95b8a6a206a8da": {
+        "candidate_id": "hazard_01b84c042c95b8a6a206a8da",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_01b84c042c95b8a6a206a8da.jsonl",
+        "sha256": "d814f4017b4b73d9fb80978846606220f9ddeed45a3bee5b0ad6b429d933d88f",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-09",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 3
+      },
+      "hazard_39113048dd9e10ded1a41a74": {
+        "candidate_id": "hazard_39113048dd9e10ded1a41a74",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_39113048dd9e10ded1a41a74.jsonl",
+        "sha256": "e14edd89e55799fef040c2d34911d58be5b10e8e61c43e6ea382d8f35ec4c41f",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 5
+      },
+      "hazard_2ce4b3e6934c5b55ff8829bb": {
+        "candidate_id": "hazard_2ce4b3e6934c5b55ff8829bb",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_2ce4b3e6934c5b55ff8829bb.jsonl",
+        "sha256": "c8928004242e50421eb34fe32c2175b589c0ae5a4dedfd5ca9b5ec98ad08712b",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 3
+      },
+      "hazard_33532edae13835fab0408952": {
+        "candidate_id": "hazard_33532edae13835fab0408952",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_33532edae13835fab0408952.jsonl",
+        "sha256": "8851efe182c0d1359155f0148370f71fffffc00b1bbbcd69d5244e6d2a935737",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 4
+      },
+      "hazard_19772a45d22932906b543e59": {
+        "candidate_id": "hazard_19772a45d22932906b543e59",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_19772a45d22932906b543e59.jsonl",
+        "sha256": "a8b208cac899a80ee9069bff377abcf35400a1a4217800d0e05b208765ea26d4",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-09",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 3
+      },
+      "hazard_00efa9bbb8ddd4eebb3a1483": {
+        "candidate_id": "hazard_00efa9bbb8ddd4eebb3a1483",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_00efa9bbb8ddd4eebb3a1483.jsonl",
+        "sha256": "04d097ad35ced1f240910986a9415e46e722bda6dc85205c4b68adcff855861d",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 5
+      },
+      "hazard_04742cf1b919fc9771ee291d": {
+        "candidate_id": "hazard_04742cf1b919fc9771ee291d",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_04742cf1b919fc9771ee291d.jsonl",
+        "sha256": "682bd7ba678579a413418801de24f68c522595d00ddf21ef278e9fc8916add57",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-10",
+          "2024-07-11"
+        ],
+        "event_count_in_window": 2
+      },
+      "hazard_3431aecefc87c345371ca745": {
+        "candidate_id": "hazard_3431aecefc87c345371ca745",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_3431aecefc87c345371ca745.jsonl",
+        "sha256": "a5c3cbb3c324429ac75c2bf1283f8dca35811271d1667479f253d60232d27883",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 2
+      },
+      "hazard_072556d2ea8da045d1072812": {
+        "candidate_id": "hazard_072556d2ea8da045d1072812",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_072556d2ea8da045d1072812.jsonl",
+        "sha256": "478c20ae240d63d891dd02c961043d770aa78ebc01fd99d4b8a2399146148dfb",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 5
+      },
+      "hazard_20281c39a8744fce6d7b452e": {
+        "candidate_id": "hazard_20281c39a8744fce6d7b452e",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_20281c39a8744fce6d7b452e.jsonl",
+        "sha256": "48742661ed68fa4a8472fe9afac142f5996b973fd82d305a0b643baa9cd0cee8",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 5
+      },
+      "hazard_1d191acd46c786f415e413eb": {
+        "candidate_id": "hazard_1d191acd46c786f415e413eb",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_1d191acd46c786f415e413eb.jsonl",
+        "sha256": "5dbe94caa2792fc94229cdcb20787fc151da4b797353661549cb362c81128ff6",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-08",
+          "2024-07-11"
+        ],
+        "event_count_in_window": 2
+      },
+      "hazard_319170b7485b4802091b05dd": {
+        "candidate_id": "hazard_319170b7485b4802091b05dd",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_319170b7485b4802091b05dd.jsonl",
+        "sha256": "472e696f01e2b783f0e750ad9330fcbe8ff40ddfbdcf60fc1cab3cd244d342fd",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-09",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 4
+      },
+      "hazard_1fe0960034e66a60281b7304": {
+        "candidate_id": "hazard_1fe0960034e66a60281b7304",
+        "market": "YM",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_1fe0960034e66a60281b7304.jsonl",
+        "sha256": "9aa9b328e8e6ac5e6c8fe79dd1535e99a437ca66c7759b8e870bf8d5ec09681d",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 5
+      },
+      "hazard_178325b10e8b10efa9966c91": {
+        "candidate_id": "hazard_178325b10e8b10efa9966c91",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_178325b10e8b10efa9966c91.jsonl",
+        "sha256": "a99fca403e4fbd5ae40e2df0b464bfd36f95188483b72d14c9a89e18f96e085a",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 4
+      },
+      "hazard_063cc5711d0e40f9e375e2f8": {
+        "candidate_id": "hazard_063cc5711d0e40f9e375e2f8",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_063cc5711d0e40f9e375e2f8.jsonl",
+        "sha256": "efb21ab559201d1d6e0071a47b36d4d303da86ead55addf22dede18deaa72a9c",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 2
+      },
+      "hazard_25e4f411aafb0840d86843d5": {
+        "candidate_id": "hazard_25e4f411aafb0840d86843d5",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_25e4f411aafb0840d86843d5.jsonl",
+        "sha256": "861b795f4a0cd26bfbed898f2b7086b06ed986f8e247e585df496d74f20b11a0",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-08",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 2
+      },
+      "hazard_0542f3388c119e46904ba18b": {
+        "candidate_id": "hazard_0542f3388c119e46904ba18b",
+        "market": "YM",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_0542f3388c119e46904ba18b.jsonl",
+        "sha256": "00684c9f350e064d06fdf47533a62ea5dcecd85aaaec86eed7e111e129d3c9e3",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 4
+      },
+      "hazard_109e715f60d31444d7ad42f6": {
+        "candidate_id": "hazard_109e715f60d31444d7ad42f6",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_109e715f60d31444d7ad42f6.jsonl",
+        "sha256": "84bbbb9caff38d727fe88b53114756cf6c7babc3f08fe9a4bc22f1433d9fb998",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 2
+      },
+      "hazard_232fc968a6a1b55c0d3adb29": {
+        "candidate_id": "hazard_232fc968a6a1b55c0d3adb29",
+        "market": "YM",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_232fc968a6a1b55c0d3adb29.jsonl",
+        "sha256": "7478c70249eaabb584fef5d6a1b75cfc01e537ef9de80b0e23032cd132e8dfe3",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-08",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 2
+      },
+      "hazard_1931ef31a7ddd6c349445ddd": {
+        "candidate_id": "hazard_1931ef31a7ddd6c349445ddd",
+        "market": "YM",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_1931ef31a7ddd6c349445ddd.jsonl",
+        "sha256": "f9baf591938386f8a794cdba35774b72cb18ae0f7cbd24b5c8d0f207aead3171",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-08",
+          "2024-07-12"
+        ],
+        "event_count_in_window": 2
+      },
+      "hazard_026cc350e74a5098105325c2": {
+        "candidate_id": "hazard_026cc350e74a5098105325c2",
+        "market": "NQ",
+        "path": "data/cache/economic_production/hydra_causal_target_velocity_0028/stage2_event_evidence/hazard_026cc350e74a5098105325c2.jsonl",
+        "sha256": "352a2c28a016d4866a26892b67416a11ba1ae0e4302eb26518ed650c9b205be4",
+        "coverage_session_dates": [
+          "2024-07-08",
+          "2024-07-09",
+          "2024-07-10",
+          "2024-07-11",
+          "2024-07-12"
+        ],
+        "active_session_dates": [
+          "2024-07-12"
+        ],
+        "event_count_in_window": 1
+      }
+    }
+  },
+  "runtime": {
+    "engine": "production_kernel_v1",
+    "runner": "scripts/run_economic_production_manifest.py",
+    "hybrid_runtime_version": "hydra_hybrid_structural_alpha_order_flow_runtime_v1",
+    "output_dir": "reports/economic_evolution/hybrid_structural_alpha_order_flow_0033",
+    "result_name": "economic_production_result.json",
+    "result_schema": "hydra_economic_production_result_v1",
+    "controller_source_change_required": false,
+    "resume_from_checkpoint": true,
+    "orchestrator_count": 1,
+    "worker_count": 2,
+    "asynchronous_evidence_writer_count": 1
+  },
+  "compute_contract": {
+    "orchestrator_count": 1,
+    "cpu_worker_count": 2,
+    "authoritative_writer_count": 1,
+    "cpu_workers_read_only": true,
+    "single_writer_atomic_commits": true,
+    "oversubscription_allowed": false,
+    "thread_environment": {
+      "OMP_NUM_THREADS": 1,
+      "MKL_NUM_THREADS": 1,
+      "OPENBLAS_NUM_THREADS": 1,
+      "NUMEXPR_NUM_THREADS": 1
+    },
+    "economic_wall_clock_minimum": 0.85,
+    "integrity_wall_clock_maximum": 0.1,
+    "reporting_wall_clock_maximum": 0.05,
+    "serial_consolidation_profile_threshold": 0.35,
+    "serial_profile_minimum_run_seconds": 300,
+    "bounded_performance_repair_minutes": 20
+  },
+  "structural_opportunity_episode_contract": {
+    "schema": "hydra_structural_opportunity_episode_v1",
+    "availability_rule": "available_at<=decision_time",
+    "persist_timestamps": [
+      "event_time",
+      "available_at",
+      "decision_time",
+      "order_submit_time",
+      "earliest_executable_time",
+      "fill_time"
+    ],
+    "future_outcomes_are_labels_only": true,
+    "outcome_labels_physically_separate": true,
+    "post_confirmation_episode_fields_in_decision_allowed": false,
+    "future_label_availability_in_eligibility": false,
+    "one_decision_per_episode": true,
+    "duplicate_episode_ids_allowed": false,
+    "batch_streaming_decision_equality_required": true,
+    "missing_future_coverage_status": "CENSORED_FUTURE_COVERAGE",
+    "censored_suppresses_decision": false
+  },
+  "paired_action_frontier": {
+    "action_ids": [
+      "A0",
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5"
+    ],
+    "actions": [
+      {
+        "action_id": "A0",
+        "action_type": "BASELINE_IMMEDIATE",
+        "side_lane_only": false,
+        "deployability_tier": "L1_DEPLOYABLE",
+        "description": "Frozen causal structural baseline entry."
+      },
+      {
+        "action_id": "A1",
+        "action_type": "ABSTAIN",
+        "side_lane_only": false,
+        "deployability_tier": "L1_DEPLOYABLE",
+        "description": "Zero-exposure abstention on the same opportunity."
+      },
+      {
+        "action_id": "A2",
+        "action_type": "WAIT_FOR_FLOW_CONFIRMATION",
+        "side_lane_only": false,
+        "deployability_tier": "L1_DEPLOYABLE_OR_L2_DEPLOYABLE",
+        "description": "Wait within the frozen causal interval for order-flow confirmation."
+      },
+      {
+        "action_id": "A3",
+        "action_type": "PULLBACK_OR_MARKETABLE_LIMIT",
+        "side_lane_only": false,
+        "deployability_tier": "L1_DEPLOYABLE_OR_L2_DEPLOYABLE",
+        "description": "Enter only at the frozen pullback or marketable-limit condition."
+      },
+      {
+        "action_id": "A4",
+        "action_type": "PASSIVE_JOIN",
+        "side_lane_only": true,
+        "deployability_tier": "MBO_TEACHER_ONLY",
+        "description": "Queue-realistic passive diagnostic for the bounded side lane."
+      },
+      {
+        "action_id": "A5",
+        "action_type": "EARLY_INVALIDATION",
+        "side_lane_only": false,
+        "deployability_tier": "L1_DEPLOYABLE_OR_L2_DEPLOYABLE",
+        "description": "Cancel when causal flow contradicts the frozen structural thesis."
+      }
+    ],
+    "risk_levels": [
+      0.5,
+      1.0,
+      1.5
+    ],
+    "maximum_policy_count": 20,
+    "paired_on_identical_episode": true,
+    "paired_on_identical_start_and_costs": true,
+    "action_selected_from_decision_time_features_only": true,
+    "abstention_has_zero_exposure_and_cost": true,
+    "continuous_risk_optimization_allowed": false,
+    "neighbor_action_generation_allowed": false,
+    "frontier_frozen_before_outcomes": true
+  },
+  "paired_counterfactual_contract": {
+    "primary_quantity": "PAIRED_STRESSED_UPLIFT=SELECTED_ACTION_STRESSED_NET-A0_STRESSED_NET",
+    "same_structural_opportunity_required": true,
+    "same_execution_model_required": true,
+    "micro_per_mini_ratio": 10,
+    "persisted_deltas": [
+      "net_pnl",
+      "stressed_net_pnl",
+      "entry_cost",
+      "fill_probability",
+      "mae",
+      "mfe",
+      "stop_rate",
+      "target_rate",
+      "holding_time",
+      "account_target_contribution",
+      "mll_contribution"
+    ],
+    "uplift_attribution": [
+      "ABSTENTION",
+      "TIMING",
+      "EXECUTION",
+      "RISK_TIER"
+    ],
+    "unrelated_opportunity_primary_comparison_allowed": false
+  },
+  "policy_learning": {
+    "scope": "BOUNDED_CONTEXTUAL_ACTION_SELECTION",
+    "model_classes": [
+      "REGULARIZED_MULTINOMIAL_LOGISTIC_REGRESSION",
+      "SHALLOW_DECISION_TREE",
+      "MONOTONIC_GRADIENT_BOOSTING",
+      "TRANSPARENT_SYMBOLIC_ACTION_SCORE"
+    ],
+    "new_direction_generation_allowed": false,
+    "validation_or_final_threshold_selection_allowed": false,
+    "classification_accuracy_is_primary_objective": false,
+    "economic_paired_uplift_is_primary_objective": true
+  },
+  "passive_execution_side_lane": {
+    "maximum_compute_fraction": 0.1,
+    "eligible_actions": [
+      "A4"
+    ],
+    "eligible_mechanisms": [
+      "QUEUE_REPLENISHMENT",
+      "OPENING_DRIVE"
+    ],
+    "promotion_allowed": false,
+    "required_comparisons": [
+      "AGGRESSIVE_BASELINE",
+      "IDEALIZED_PASSIVE_UPPER_BOUND",
+      "QUEUE_REALISTIC_PASSIVE",
+      "PASSIVE_ADVERSE_SELECTION_STRESS"
+    ],
+    "close_status_on_nonpositive_validation_and_final": "PASSIVE_EXECUTION_SALVAGE_FALSIFIED"
+  },
+  "pilot_configuration": {
+    "selected_markets": [
+      "NQ",
+      "YM"
+    ],
+    "selected_sessions": [
+      "2024-07-08",
+      "2024-07-09",
+      "2024-07-10",
+      "2024-07-11",
+      "2024-07-12"
+    ],
+    "chronological_roles": [
+      3,
+      1,
+      1
+    ],
+    "expected_active_anchors": 22,
+    "risk_tiers": [
+      0.5,
+      1.0,
+      1.5
+    ],
+    "aggressive_latency_ns": 25000000,
+    "wait_confirmation_ns": 2000000000,
+    "pullback_deadline_ns": 10000000000,
+    "passive_deadline_ns": 10000000000,
+    "pullback_improvement_ticks": 1.0,
+    "early_invalidation_fraction": 0.25,
+    "early_invalidation_grace_ns": 2000000000,
+    "normal_adverse_slippage_ticks": 2.0,
+    "stressed_adverse_slippage_ticks": 3.0,
+    "commission_per_micro_round_trip_usd": {
+      "NQ": 1.24,
+      "YM": 1.24
+    },
+    "tick_size": {
+      "NQ": 0.25,
+      "YM": 1.0
+    },
+    "micro_point_value": {
+      "NQ": 2.0,
+      "YM": 0.5
+    },
+    "maximum_micro_contracts": 150,
+    "account_target_usd": 9000.0,
+    "account_mll_usd": 4500.0,
+    "maximum_opportunity_profit_concentration": 0.5,
+    "minimum_activity_rate": 0.2,
+    "minimum_fills_heldout": 2,
+    "micro_per_mini_ratio": 10,
+    "same_execution_model_required": true,
+    "minimum_green_policies": 2,
+    "minimum_green_anchor_families": 2,
+    "minimum_weak_policies": 1,
+    "no_data_purchase": true,
+    "q4_access_authorized": false,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "chronological_roles": {
+    "discovery_sessions": 3,
+    "validation_sessions": 1,
+    "final_development_sessions": 1,
+    "random_temporal_mixing_allowed": false,
+    "roles_frozen_before_outcomes": true,
+    "validation_or_final_used_for_thresholds": false,
+    "final_development_is_independent_confirmation": false
+  },
+  "development_gate": {
+    "allowed_decisions": [
+      "HYBRID_OVERLAY_GREEN",
+      "HYBRID_OVERLAY_WEAK",
+      "HYBRID_OVERLAY_FALSIFIED"
+    ],
+    "thresholds_may_change_after_results": false,
+    "development_only": true,
+    "independent_confirmation_claim_allowed": false,
+    "positive_stressed_economics_required": true,
+    "material_uplift_over_structural_anchor_required": true,
+    "acceptable_mll_and_consistency_required": true,
+    "final_development_evidence_required": true,
+    "minimum_distinct_anchor_families_green": 2,
+    "positive_validation_paired_stressed_uplift_green": true,
+    "positive_final_development_paired_stressed_uplift_green": true,
+    "single_opportunity_domination_allowed": false,
+    "near_zero_activity_explains_green_allowed": false,
+    "minimum_deployability_tier": "L1_DEPLOYABLE_OR_L2_DEPLOYABLE"
+  },
+  "conditional_extension": {
+    "enabled_before_qualified_gate": false,
+    "trigger_decisions": [
+      "HYBRID_OVERLAY_GREEN",
+      "HYBRID_OVERLAY_WEAK"
+    ],
+    "weak_qualification_required": true,
+    "weak_qualification": {
+      "positive_paired_uplift_validation": true,
+      "positive_paired_uplift_final_development": true,
+      "minimum_near_break_even_stressed_strategy_count": 1
+    },
+    "maximum_incremental_spend_usd": 3.25,
+    "minimum_budget_reserve_usd": 25.0,
+    "current_remaining_budget_usd": 28.498462508622012,
+    "maximum_extension_count": 1,
+    "official_cost_estimate_required_before_purchase": true,
+    "automatic_purchase_allowed": false,
+    "broad_historical_purchase_allowed": false,
+    "q4_access_allowed": false,
+    "markets": [
+      "NQ",
+      "ES"
+    ],
+    "schemas": [
+      "tbbo",
+      "mbp-1"
+    ],
+    "session_counts": [
+      10,
+      20,
+      30,
+      40
+    ]
+  },
+  "multiplicity": {
+    "prior_global_N_trials": 762214,
+    "prospective_comparisons": 20,
+    "campaign_specific_inflation": 1.5,
+    "reserved_delta_trials": 30,
+    "expected_global_N_trials_after_reservation": 762244,
+    "reservation_required_before_outcome_access": true,
+    "proof_window_consumed": false
+  },
+  "evidence_bundle": {
+    "required": true,
+    "atomic_single_writer_finalization": true,
+    "summary_only_complete_allowed": false,
+    "evidence_status": "FRESH_DEVELOPMENT_EVIDENCE",
+    "reconstruction_flag": false,
+    "destination": "data/cache/evidence_bundles",
+    "required_datasets": [
+      "component_signals",
+      "component_entries",
+      "component_exits",
+      "component_trades",
+      "account_policy_membership",
+      "account_daily_paths",
+      "episodes",
+      "provenance"
+    ]
+  },
+  "governance": {
+    "live_trading_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "q4_access_allowed": false,
+    "new_mission_allowed": false,
+    "new_service_allowed": false,
+    "new_database_allowed": false,
+    "new_registry_writer_allowed": false,
+    "controller_version_change_required": false,
+    "status_inheritance_allowed": false,
+    "threshold_lowering_after_results_allowed": false,
+    "new_data_purchase_before_gate_allowed": false,
+    "standalone_microstructure_search_allowed": false,
+    "xfa_before_clean_combine_survivors_allowed": false
+  },
+  "manifest_hash": "cd693d5237469eb81d1d716088adb32686f65d990929dbab22751b7464acdb19"
+}
