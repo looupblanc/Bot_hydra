@@ -242,9 +242,9 @@
       "campaign_id": "hydra_microstructure_order_flow_foundry_0031",
       "enabled": true,
       "engine": "production_kernel_v1",
-      "manifest_file_sha256": "5de04ac9759c7188f678044a3bd26b770df8afa075b6f105e1ffeda45a093c2c",
+      "manifest_file_sha256": "54abc0d798b20d48419877fd87dad3596af0f30d0c2353250af336390b2dc487",
       "manifest_path": "config/v7/microstructure_order_flow_foundry_0031.json",
-      "manifest_semantic_hash": "0c6a465b5715871be10455e2b4dffd20785353551dc9c895fc2c5f0b8d2dcb5c",
+      "manifest_semantic_hash": "f73c25c38d33fcb43c8c0178e40d7b5d498f4089ab72823fb833aa3b96850bbb",
       "ordinal": 31,
       "post_acquisition_pre_outcome_technical_repair": {
         "additional_data_purchase": false,
@@ -254,6 +254,20 @@
         "raw_dbn_sha256": "0d6c0dc8c0e5c353e2166778b3d3827e8467900983ec11c0e6899fa24986d741",
         "scientific_thresholds_changed": false
       },
+      "post_outcome_account_terminal_recovery": {
+        "account_episode_paths_replayed": 720,
+        "authoritative_bundle_content_sha256": "f2387366f6cdca79efa4b96902e560a927d67eb01c1abaa6793a14dd17d212c4",
+        "candidate_membership_changed": false,
+        "classification": "ACCOUNT_TERMINAL_PRECEDENCE_AND_POST_MLL_TRUNCATION_RECOVERY",
+        "economic_outcomes_observed_before_repair": true,
+        "features_signals_and_trades_changed": false,
+        "pilot_decision_after": "MICROSTRUCTURE_PILOT_FALSIFIED",
+        "pilot_decision_before": "MICROSTRUCTURE_PILOT_FALSIFIED",
+        "raw_events_replayed": false,
+        "reconstruction_flag": true,
+        "recovery_receipt_hash": "6ed1224e50d5e2184257edb2065f72a89358c8df62aa5c68f368427bc2c003e9",
+        "scientific_thresholds_changed": false
+      },
       "pre_acquisition_technical_repair": {
         "classification": "DATABENTO_AUTHENTICATED_SNAPSHOT_SEQUENCE_AND_COMPLETION_GATE_REPAIR",
         "data_downloaded_before_repair": false,
@@ -261,8 +275,8 @@
         "multiplicity_delta": 0,
         "scientific_thresholds_changed": false
       },
-      "worm_commit": "12223861ef98891ee61c8470565fe2413ab51d90",
-      "worm_tag": "worm/microstructure-order-flow-foundry-0031-real-tape-repair-2026-07-18"
+      "worm_commit": "1a8255d974f24ea4ebb3af7c84baabb89bd0f9b1",
+      "worm_tag": "worm/microstructure-order-flow-foundry-0031-authoritative-account-terminal-recovery-2026-07-18"
     }
   ],
   "governance": {
@@ -272,7 +286,7 @@
     "q4_access_allowed": false
   },
   "issued_at_utc": "2026-07-18T02:43:59.485631Z",
-  "queue_hash": "21435f477326d3366e974fd7e0726a33d0833c9a0068e82c56b97be9b0357741",
+  "queue_hash": "30f581df103da92aacb6456bbf97a48b280d4d1194b4499f367b62880e4e87c7",
   "queue_id": "hydra_economic_evolution_production_queue_0037",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
@@ -291,4 +305,3 @@
     "semantic_hash": "d69b6940087bab26ddc54fe3b697f29bdaeeb53c1acc17cfe7813ab86dc1ba19"
   }
 }
-
