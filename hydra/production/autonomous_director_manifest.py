@@ -26,6 +26,7 @@ CAMPAIGN_MODE = "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR"
 CAMPAIGN_ID = "hydra_autonomous_economic_discovery_director_0035"
 CLASS_ID = "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR_V1"
 RUNTIME_VERSION = "hydra_autonomous_economic_discovery_director_runtime_v1"
+ARTIFACT_COMPATIBILITY_LIMIT = 12
 
 LANE_IDS = ("EXPLOITATION", "EXPLORATION")
 EXPLOITATION_BRANCH = "0034_NQ_SELECTIVE_EXECUTION_CONFIRMATION"
@@ -234,7 +235,7 @@ def _validate_artifact_compatibility(manifest: Mapping[str, Any]) -> None:
         raise AutonomousDirectorManifestError("artifact compatibility drift")
     values = tuple(str(item) for item in raw)
     if (
-        len(values) > 8
+        len(values) > ARTIFACT_COMPATIBILITY_LIMIT
         or len(values) != len(set(values))
         or str(manifest.get("manifest_hash") or "") in values
         or any(not _SHA256.fullmatch(value) for value in values)

@@ -10,6 +10,7 @@ import pytest
 from hydra.economic_evolution.schema import stable_hash
 from hydra.production.autonomous_director_manifest import (
     ACCOUNT_SIZES_USD,
+    ARTIFACT_COMPATIBILITY_LIMIT,
     CAMPAIGN_ID,
     CAMPAIGN_MODE,
     CLASS_ID,
@@ -341,6 +342,30 @@ def test_autonomous_director_manifest_and_dispatch_accept_frozen_contract(
 
     validate_autonomous_director_manifest(manifest, manifest_path=path)
     assert load_and_validate_production_manifest(path) == manifest
+
+
+def test_artifact_compatibility_capacity_preserves_bounded_repairs(
+    tmp_path: Path,
+) -> None:
+    path, manifest = _fixture(tmp_path)
+    manifest["compatible_artifact_manifest_hashes"] = [
+        f"{index:064x}" for index in range(1, ARTIFACT_COMPATIBILITY_LIMIT + 1)
+    ]
+    manifest["post_launch_pre_economic_counter_repair"] = {
+        "economic_outcomes_changed": False,
+        "scientific_policy_changed": False,
+    }
+    _rehash(manifest)
+    path.write_text(
+        json.dumps(manifest, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    validate_autonomous_director_manifest(manifest, manifest_path=path)
+
+    manifest["compatible_artifact_manifest_hashes"].append("f" * 64)
+    _rehash(manifest)
+    with pytest.raises(AutonomousDirectorManifestError, match="compatibility"):
+        validate_autonomous_director_manifest(manifest, manifest_path=path)
 
 
 @pytest.mark.parametrize(
