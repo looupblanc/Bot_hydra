@@ -643,6 +643,12 @@
         "breadth_contract_hash": "4fd7975dc775e249517eac58511076637ac03e066ae94d71d15785015c37640a",
         "breadth_evidence_ceiling": "TIER_G_DEVELOPMENT",
         "classification": "POST_CONFIRMATION_MATERIALLY_DISTINCT_BREADTH_AND_EVENT_TIME_CONTROL_RELAY",
+        "counter_reconciliation_repair": {
+          "classification": "DERIVED_POST_CONFIRMATION_POLICY_VERSUS_EPISODE_DENOMINATOR_RECONCILIATION",
+          "economic_outcomes_changed": false,
+          "repair_commit": "965623f51b5ec4c2f00ea759199bf32f4a746808",
+          "shared_execution_or_accounting_semantics_changed": false
+        },
         "event_time_controls_expected_hash": "a4a3f70e167b12bfbc0e64827014ff47cc767f2e53d1d9bcadfcb2db259a218e",
         "implementation_commit": "9835b1520a983661e5c27d5f1fc3b91978b5b021",
         "old_manifest_hash": "00dcb0ffffc205089dcadbed12a9a992cb793e56d93e0139be40a4cfb70f8e61",
@@ -676,8 +682,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T10:43:36Z",
-  "queue_hash": "0f6db668bc25c4c90666b21fc550fa99a458975b83328552f03c999777271bc6",
+  "issued_at_utc": "2026-07-19T10:53:43Z",
+  "queue_hash": "6ffc7f298ade147bcecf887f2866a36108e340cd518113600f70a2d60eec5946",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
