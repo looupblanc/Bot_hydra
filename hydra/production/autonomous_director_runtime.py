@@ -977,10 +977,12 @@ def _exploration_worker(
     summaries: dict[str, dict[str, Any]] = {}
     rows_read = 0
     source_hashes: dict[str, str] = {}
+    source_paths: list[Path] = []
     for raw_path in sorted(set(str(value) for value in episode_paths)):
         path = Path(raw_path)
         if not path.is_file():
             continue
+        source_paths.append(path)
         source_hashes[str(path)] = _file_sha256(path)
         for row in _iter_gzip_jsonl(path):
             rows_read += 1
@@ -1001,13 +1003,9 @@ def _exploration_worker(
                 policy_id,
                 {
                     "policy_id": policy_id,
-                    "rows": [],
                     "stressed_target_progress": [],
                     "stressed_net": [],
                 },
-            )
-            policy["rows"].append(
-                {"scenario": scenario, "horizon": horizon, "episode": episode}
             )
             if scenario == "STRESSED_1_5X":
                 policy["stressed_target_progress"].append(target)
@@ -1021,6 +1019,40 @@ def _exploration_worker(
             row["policy_id"],
         ),
     )[: max(1, min(int(policy_maximum), 256))]
+
+    # Keep the economic ordering identical while bounding memory.  The first
+    # pass retains only ranking scalars; a second sequential pass materialises
+    # full episodes solely for the frozen shortlist.
+    selected = {str(row["policy_id"]): row for row in ranked}
+    for policy in ranked:
+        policy["rows"] = []
+    selected_episode_rows_reloaded = 0
+    for path in source_paths:
+        for row in _iter_gzip_jsonl(path):
+            policy_id = str(
+                row.get("policy_id")
+                or (row.get("episode") or {}).get("policy_id")
+                or ""
+            )
+            policy = selected.get(policy_id)
+            if policy is None:
+                continue
+            scenario = str(row.get("scenario") or "")
+            horizon = _horizon(row)
+            if (
+                scenario not in _SCENARIOS
+                or horizon not in _HORIZONS
+                or row.get("coverage_state") != "FULL_COVERAGE"
+            ):
+                continue
+            policy["rows"].append(
+                {
+                    "scenario": scenario,
+                    "horizon": horizon,
+                    "episode": dict(row.get("episode") or row),
+                }
+            )
+            selected_episode_rows_reloaded += 1
 
     frontiers: list[dict[str, Any]] = []
     upper_bounds: list[dict[str, Any]] = []
@@ -1122,6 +1154,7 @@ def _exploration_worker(
         "exact_account_replay_required_before_any_PASS_claim": True,
         "episode_files_scanned": len(source_hashes),
         "episode_rows_read": rows_read,
+        "selected_episode_rows_reloaded": selected_episode_rows_reloaded,
         "eligible_policy_count": len(summaries),
         "selected_policy_count": len(ranked),
         "selected_policy_ids": [str(row["policy_id"]) for row in ranked],

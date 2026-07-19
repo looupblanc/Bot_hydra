@@ -186,6 +186,7 @@ def test_legal_frontier_scans_gzip_and_keeps_upper_bound_non_promotable(
     assert result["selected_policy_ids"][0] == "policy_fast"
     assert result["selected_policy_count"] == 2
     assert result["episode_rows_read"] == len(rows)
+    assert result["selected_episode_rows_reloaded"] == len(rows)
     assert any(
         row["account_size_usd"] == 50_000
         and row["scenario"] == "STRESSED_1_5X"
