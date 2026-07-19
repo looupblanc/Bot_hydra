@@ -716,8 +716,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "babcd0777be812d3f043c50bc6197d1a8455908f",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-post-breadth-evidence-relays-2026-07-19"
+      "worm_commit": "853f5569a8c35fc388c6d042500b82ad88478cc8",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-treasury-macro-relay-2026-07-19"
     }
   ],
   "governance": {
@@ -727,7 +727,7 @@
     "q4_access_allowed": false
   },
   "issued_at_utc": "2026-07-19T12:28:12Z",
-  "queue_hash": "093d7bd93a150d67b4d734546194e9ad8e604abd9c44c2b8ef2d11622e218155",
+  "queue_hash": "57e1c9db9417a81b2f6915f5f3d27a7b76c300e960f02e37810d37bb7f96249d",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
