@@ -323,3 +323,111 @@ def test_strict_verifiers_reject_worker_side_effects() -> None:
     )
     with pytest.raises(runtime.AutonomousDirectorRuntimeError, match="safety counter"):
         runtime._verify_treasury_curve_result(treasury, allow_waiting=False)
+
+
+def test_treasury_input_accepts_exact_raw_and_roll_map_inventory(
+    tmp_path: Path,
+) -> None:
+    raw = tmp_path / "raw.dbn.zst"
+    roll = tmp_path / "roll-map.json"
+    raw.write_bytes(b"raw")
+    roll.write_bytes(b"roll")
+    request = {
+        "dataset": "GLBX.MDP3",
+        "schema": "ohlcv-1m",
+        "symbols": ["ZT.c.0", "ZF.c.0", "ZN.c.0", "TN.c.0", "ZB.c.0", "UB.c.0"],
+        "stype_in": "continuous",
+        "start": "2023-01-03",
+        "end": "2024-10-01",
+    }
+    estimated_cost = runtime.TREASURY_CURVE_COST_RECEIPT
+    core = {
+        "schema": runtime._TREASURY_ACQUISITION_SCHEMA,
+        "request": request,
+        "official_live_cost_usd": estimated_cost["estimated_cost_usd"],
+        "official_record_count": estimated_cost["estimated_records"],
+        "official_billable_bytes": estimated_cost["estimated_bytes"],
+        "raw_immutable": True,
+        "runtime_or_manifest_modified": False,
+        "q4_access_count_delta": 0,
+        "protected_data_access_count_delta": 0,
+        "broker_connections": 0,
+        "orders": 0,
+        "files": [
+            {
+                "kind": "RAW_DBN_OHLCV",
+                "path": str(raw),
+                "sha256": runtime._file_sha256(raw),
+                "size_bytes": raw.stat().st_size,
+            },
+            {
+                "kind": "SYMBOLOGY_ROLL_MAP",
+                "path": str(roll),
+                "sha256": runtime._file_sha256(roll),
+                "size_bytes": roll.stat().st_size,
+            },
+        ],
+    }
+    receipt = {**core, "receipt_hash": stable_hash(core)}
+    receipt_path = tmp_path / "receipt.json"
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    roll_core = {
+        "schema": "hydra_treasury_curve_roll_receipt_v1",
+        "policy": "EXPLICIT_CONTRACT_DELIVERY_SYNC_NO_FORWARD_FILL",
+        "source_receipts": {
+            "raw_ohlcv": {
+                "path": str(raw),
+                "sha256": runtime._file_sha256(raw),
+                "bytes": raw.stat().st_size,
+            },
+            "mapping_receipt": {
+                "path": str(roll),
+                "sha256": runtime._file_sha256(roll),
+                "bytes": roll.stat().st_size,
+            },
+        },
+    }
+    roll_receipt = {**roll_core, "receipt_hash": stable_hash(roll_core)}
+    roll_receipt_path = tmp_path / "roll-receipt.json"
+    roll_receipt_path.write_text(json.dumps(roll_receipt), encoding="utf-8")
+
+    root_files = []
+    for root_name in ("ZT", "ZF", "ZN", "TN", "ZB", "UB"):
+        path = tmp_path / f"{root_name.lower()}.parquet"
+        path.write_bytes(root_name.encode("ascii"))
+        root_files.append(
+            {
+                "path": str(path),
+                "sha256": runtime._file_sha256(path),
+                "dataset": "GLBX.MDP3",
+                "schema": "ohlcv-1m",
+                "roots": [root_name],
+                "record_count": 1,
+            }
+        )
+    contract_core = {
+        "schema": runtime.TREASURY_CURVE_INPUT_SCHEMA,
+        "q4_excluded": True,
+        "files": root_files,
+        "roll_receipt": {
+            "path": str(roll_receipt_path),
+            "sha256": runtime._file_sha256(roll_receipt_path),
+            "policy": "EXPLICIT_CONTRACT_DELIVERY_SYNC_NO_FORWARD_FILL",
+        },
+        "cost_receipt": dict(estimated_cost),
+    }
+    contract = {**contract_core, "builder_contract_hash": stable_hash(contract_core)}
+    validated = runtime.validate_treasury_curve_input_contract(tmp_path, contract)
+    contract["tripwire_input_contract_hash"] = validated["input_contract_hash"]
+    contract_path = tmp_path / "contract.json"
+    contract_path.write_text(json.dumps(contract), encoding="utf-8")
+
+    value, missing = runtime._treasury_input_if_ready(
+        tmp_path,
+        {
+            "treasury_acquisition_receipt_path": receipt_path,
+            "treasury_input_contract_path": contract_path,
+        },
+    )
+    assert missing == ()
+    assert value == contract

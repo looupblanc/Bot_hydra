@@ -134,11 +134,13 @@ from hydra.production.v71_event_time_account_exploration import (
     event_time_account_exploration_worker,
 )
 from hydra.research.curve_relative_value_tripwire import (
+    CurveTripwireError,
     EVIDENCE_ROLE as TREASURY_CURVE_EVIDENCE_ROLE,
     INPUT_SCHEMA as TREASURY_CURVE_INPUT_SCHEMA,
     OFFICIAL_COST_RECEIPT as TREASURY_CURVE_COST_RECEIPT,
     SCHEMA as TREASURY_CURVE_SCHEMA,
     WAITING_STATUS as TREASURY_CURVE_WAITING_STATUS,
+    _validate_input_contract as validate_treasury_curve_input_contract,
     build_curve_relative_value_tripwire,
 )
 from hydra.research.clean_cross_asset_daily_tripwire import (
@@ -8340,29 +8342,93 @@ def _treasury_input_if_ready(
             "Treasury acquisition receipt identity or safety drift"
         )
     files = [dict(item) for item in receipt.get("files") or ()]
-    if len(files) != 1 or files[0].get("kind") != "RAW_DBN_OHLCV":
+    by_kind = {str(item.get("kind") or ""): item for item in files}
+    expected_kinds = {"RAW_DBN_OHLCV", "SYMBOLOGY_ROLL_MAP"}
+    if len(files) != len(expected_kinds) or set(by_kind) != expected_kinds:
         raise AutonomousDirectorRuntimeError(
             "Treasury acquisition raw-file inventory drift"
         )
-    raw_path = Path(str(files[0].get("path") or "")).resolve()
-    _assert_within(root.resolve(), raw_path)
-    if (
-        not raw_path.is_file()
-        or _file_sha256(raw_path) != str(files[0].get("sha256") or "")
-    ):
-        raise AutonomousDirectorRuntimeError(
-            "Treasury acquisition raw artifact drift"
-        )
+    for kind, artifact in sorted(by_kind.items()):
+        artifact_path = Path(str(artifact.get("path") or "")).resolve()
+        _assert_within(root.resolve(), artifact_path)
+        if (
+            not artifact_path.is_file()
+            or _file_sha256(artifact_path) != str(artifact.get("sha256") or "")
+            or artifact_path.stat().st_size != int(artifact.get("size_bytes", -1))
+        ):
+            raise AutonomousDirectorRuntimeError(
+                f"Treasury acquisition artifact drift: {kind}"
+            )
 
     contract = _read_json_object(contract_path)
+    contract_core = {
+        key: value
+        for key, value in contract.items()
+        if key not in {"builder_contract_hash", "tripwire_input_contract_hash"}
+    }
     if (
         contract.get("schema") != TREASURY_CURVE_INPUT_SCHEMA
         or contract.get("q4_excluded") is not True
-        or contract.get("source_acquisition_receipt_hash") != claimed
+        or stable_hash(contract_core) != str(contract.get("builder_contract_hash") or "")
     ):
         raise AutonomousDirectorRuntimeError(
-            "Treasury input contract is not bound to the acquisition receipt"
+            "Treasury input contract identity drift"
         )
+
+    try:
+        validated = validate_treasury_curve_input_contract(root, contract)
+    except CurveTripwireError as exc:
+        raise AutonomousDirectorRuntimeError(
+            f"Treasury input contract validation failed: {exc}"
+        ) from exc
+    if validated.get("input_contract_hash") != contract.get(
+        "tripwire_input_contract_hash"
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "Treasury consumer input-contract hash drift"
+        )
+
+    roll_reference = dict(contract.get("roll_receipt") or {})
+    roll_path = Path(str(roll_reference.get("path") or ""))
+    roll_path = (
+        roll_path.resolve()
+        if roll_path.is_absolute()
+        else (root.resolve() / roll_path).resolve()
+    )
+    _assert_within(root.resolve(), roll_path)
+    roll_receipt = _read_json_object(roll_path)
+    roll_core = dict(roll_receipt)
+    roll_claimed = str(roll_core.pop("receipt_hash", ""))
+    if not roll_claimed or stable_hash(roll_core) != roll_claimed:
+        raise AutonomousDirectorRuntimeError("Treasury roll receipt identity drift")
+
+    source_receipts = dict(roll_receipt.get("source_receipts") or {})
+    source_to_kind = {
+        "raw_ohlcv": "RAW_DBN_OHLCV",
+        "mapping_receipt": "SYMBOLOGY_ROLL_MAP",
+    }
+    if set(source_receipts) != set(source_to_kind):
+        raise AutonomousDirectorRuntimeError(
+            "Treasury roll source-receipt inventory drift"
+        )
+    for source_key, kind in source_to_kind.items():
+        source = dict(source_receipts[source_key])
+        source_path = Path(str(source.get("path") or ""))
+        source_path = (
+            source_path.resolve()
+            if source_path.is_absolute()
+            else (root.resolve() / source_path).resolve()
+        )
+        acquired = by_kind[kind]
+        acquired_path = Path(str(acquired.get("path") or "")).resolve()
+        if (
+            source_path != acquired_path
+            or source.get("sha256") != acquired.get("sha256")
+            or int(source.get("bytes", -1)) != int(acquired.get("size_bytes", -2))
+        ):
+            raise AutonomousDirectorRuntimeError(
+                f"Treasury input is not bound to acquired artifact: {kind}"
+            )
     return contract, ()
 
 
