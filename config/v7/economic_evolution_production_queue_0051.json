@@ -457,15 +457,25 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "0d7b24fecf85c61b603427ad2dd543aeb337debdd7300a99f49a5a47f23c4e53",
+      "manifest_file_sha256": "a5a7257da873075642e2183a987c452fd72f7b1e43d6bb8f6311390de4460bdd",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "65ddad8799eb773347fac423201d02a7cc9c93af021265ce43532dacbf3a2d47",
+      "manifest_semantic_hash": "e592522c5ce7f78e4c1746a775b1bc04f09bbe928380a4a1961d591a6912c3d8",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
         "reserved_delta_trials": 100000
       },
       "ordinal": 35,
+      "post_launch_pre_economic_performance_repair": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "classification": "PRE_ECONOMIC_UNBOUNDED_EPISODE_MATERIALIZATION",
+        "economic_outcomes_seen": false,
+        "old_manifest_hash": "65ddad8799eb773347fac423201d02a7cc9c93af021265ce43532dacbf3a2d47",
+        "old_output_preserved": true,
+        "repair_commit": "9d2a2e4bc60fe6adfbc9eced71b94cdf1691fd06",
+        "scientific_policy_changed": false
+      },
       "post_reservation_pre_outcome_technical_repair": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
@@ -477,8 +487,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "e5ab89e12809097925686de07c391888a0998aa0",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-pre-outcome-evidence-repair-2026-07-19"
+      "worm_commit": "9d2a2e4bc60fe6adfbc9eced71b94cdf1691fd06",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-pre-outcome-memory-repair-2026-07-19"
     }
   ],
   "governance": {
@@ -487,8 +497,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T02:56:11Z",
-  "queue_hash": "af7a1735b8775acaa1286d38abaf76a6c81e3e20b54d32d5b6a5fc205e7b34ba",
+  "issued_at_utc": "2026-07-19T03:01:42Z",
+  "queue_hash": "dc607ad7a1db45e7446f1eea439d86cf13ee8ea4f4fb5c55176c75b6dcdb0808",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
