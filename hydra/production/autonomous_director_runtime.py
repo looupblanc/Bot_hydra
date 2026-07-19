@@ -108,10 +108,30 @@ from hydra.production.frozen_breadth_continuation import (
     evaluate_breadth_continuation,
     open_breadth_matrices,
 )
+from hydra.production.frozen_legal_frontier_replay import (
+    SCHEMA as FROZEN_LEGAL_FRONTIER_SCHEMA,
+    frozen_legal_frontier_worker,
+)
 from hydra.production.manifest import load_and_validate_production_manifest
 from hydra.production.runtime import PRODUCTION_KPI_SCHEMA, PRODUCTION_STATE_SCHEMA
+from hydra.production.session_safe_fast_book_tripwire import (
+    BRANCH_ID as SESSION_SAFE_FAST_BOOK_BRANCH_ID,
+    EVIDENCE_ROLE as SESSION_SAFE_FAST_BOOK_EVIDENCE_ROLE,
+    REPAIR_VARIANTS as SESSION_SAFE_REPAIR_VARIANTS,
+    SCHEMA as SESSION_SAFE_FAST_BOOK_SCHEMA,
+    SOURCE_POLICY_ID as SESSION_SAFE_FAST_BOOK_SOURCE_POLICY_ID,
+    session_safe_fast_book_worker,
+)
 from hydra.production.v71_event_time_account_exploration import (
     event_time_account_exploration_worker,
+)
+from hydra.research.curve_relative_value_tripwire import (
+    EVIDENCE_ROLE as TREASURY_CURVE_EVIDENCE_ROLE,
+    INPUT_SCHEMA as TREASURY_CURVE_INPUT_SCHEMA,
+    OFFICIAL_COST_RECEIPT as TREASURY_CURVE_COST_RECEIPT,
+    SCHEMA as TREASURY_CURVE_SCHEMA,
+    WAITING_STATUS as TREASURY_CURVE_WAITING_STATUS,
+    build_curve_relative_value_tripwire,
 )
 
 
@@ -120,6 +140,11 @@ BRANCH_STATE_SCHEMA = "hydra_autonomous_branch_state_v1"
 ECONOMIC_SCORECARD_SCHEMA = "hydra_autonomous_economic_scorecard_v1"
 _HORIZONS = (5, 10, 20)
 _SCENARIOS = ("NORMAL", "STRESSED_1_5X")
+_POST_BREADTH_RELATIVE_ROOT = Path("post_breadth_portfolio")
+_SESSION_SAFE_PORTFOLIO_SCHEMA = "hydra_session_safe_fast_book_portfolio_v1"
+_TREASURY_ACQUISITION_SCHEMA = (
+    "hydra_treasury_curve_tripwire_acquisition_receipt_v1"
+)
 _DEFAULT_SCALE_FACTORS = (
     0.50,
     0.75,
@@ -2007,6 +2032,32 @@ def _run_post_book_graduation_relay(
             heartbeat_seconds=heartbeat_seconds,
             runtime_results=results,
         )
+        state, results, _post_breadth_portfolio = (
+            _run_post_breadth_portfolio_relay(
+                root=root,
+                manifest=manifest,
+                output=output,
+                live_writer=live_writer,
+                branch_writer=branch_writer,
+                prior_state=state,
+                started=started,
+                heartbeat_seconds=heartbeat_seconds,
+                runtime_results=results,
+            )
+        )
+        state, results, _session_safe_portfolio = (
+            _run_session_safe_fast_book_relay(
+                root=root,
+                manifest=manifest,
+                output=output,
+                live_writer=live_writer,
+                branch_writer=branch_writer,
+                prior_state=state,
+                started=started,
+                heartbeat_seconds=heartbeat_seconds,
+                runtime_results=results,
+            )
+        )
     elif os.environ.get("HYDRA_PRODUCTION_TEST_MODE") != "1":
         raise AutonomousDirectorRuntimeError(
             "post-confirmation branch portfolio is undeclared"
@@ -2888,6 +2939,598 @@ def _run_frozen_breadth_continuation_relay(
     _publish(live_writer, state, _kpis(manifest, state, results, started))
     _write_mission_views(root, manifest, state, results)
     return state, results, result
+
+
+def _run_post_breadth_portfolio_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    """Run/resume the bounded post-breadth legal/curve portfolio.
+
+    Both workers are read-only and at most two are spawned.  The coordinator
+    alone seals immutable branch envelopes.  A missing Treasury acquisition or
+    input contract produces a transient fail-closed result in production state,
+    not an immutable terminal artifact, so a later manifest-bound input can be
+    consumed exactly once without rerunning the completed legal branch.
+    """
+
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    paths = _post_breadth_manifest_paths(root, output, manifest)
+    branch_specs = {
+        "POST_BREADTH_LEGAL_EXACT": {
+            "path": paths["legal_result_path"],
+            "payload_key": "frozen_legal_frontier_exact",
+            "branch_id": "FROZEN_LEGAL_FRONTIER_EXACT_REPLAY",
+        },
+        "POST_BREADTH_TREASURY_CURVE": {
+            "path": paths["treasury_result_path"],
+            "payload_key": "treasury_curve_tripwire",
+            "branch_id": "TREASURY_CURVE_RELATIVE_VALUE_TRIPWIRE",
+        },
+    }
+
+    completed: dict[str, dict[str, Any]] = {}
+    for key, spec in branch_specs.items():
+        result_path = Path(spec["path"])
+        if not result_path.is_file():
+            continue
+        envelope = _read_hashed(result_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                f"post-breadth {key} envelope identity drift"
+            )
+        payload = dict(envelope.get(str(spec["payload_key"])) or {})
+        if key == "POST_BREADTH_LEGAL_EXACT":
+            payload = _verify_frozen_legal_frontier_result(payload)
+        else:
+            payload = _verify_treasury_curve_result(payload, allow_waiting=False)
+        completed[key] = payload
+        results[key] = payload
+
+    treasury_contract, treasury_missing = _treasury_input_if_ready(root, paths)
+    jobs: dict[str, tuple[Any, dict[str, Any]]] = {}
+    if "POST_BREADTH_LEGAL_EXACT" not in completed:
+        jobs["POST_BREADTH_LEGAL_EXACT"] = (
+            frozen_legal_frontier_worker,
+            {"root": str(root)},
+        )
+    if "POST_BREADTH_TREASURY_CURVE" not in completed:
+        jobs["POST_BREADTH_TREASURY_CURVE"] = (
+            _treasury_curve_tripwire_worker,
+            {
+                "root": str(root),
+                "input_contract": treasury_contract,
+                "missing_inputs": list(treasury_missing),
+            },
+        )
+
+    if jobs:
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=min(len(jobs), 2),
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                futures = {
+                    pool.submit(worker, payload): key
+                    for key, (worker, payload) in jobs.items()
+                }
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="POST_BREADTH_PORTFOLIO_RUNNING",
+                    branch_results=results,
+                    next_action=(
+                        "RUN_FROZEN_LEGAL_EXACT_AND_TREASURY_CURVE_READ_ONLY"
+                    ),
+                )
+                state.update(
+                    {
+                        "active_economic_worker_processes": len(futures),
+                        "post_breadth_worker_limit": 2,
+                        "post_breadth_parent_writer_only": True,
+                        "q4_access_count_delta": 0,
+                        "broker_connections": 0,
+                        "orders": 0,
+                    }
+                )
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+
+                pending = set(futures)
+                while pending:
+                    done, pending = wait(
+                        pending,
+                        timeout=max(min(float(heartbeat_seconds), 5.0), 0.1),
+                        return_when=FIRST_COMPLETED,
+                    )
+                    for future in done:
+                        key = futures[future]
+                        raw = dict(future.result())
+                        result = (
+                            _verify_frozen_legal_frontier_result(raw)
+                            if key == "POST_BREADTH_LEGAL_EXACT"
+                            else _verify_treasury_curve_result(
+                                raw, allow_waiting=True
+                            )
+                        )
+                        completed[key] = result
+                        results[key] = result
+                        # WAITING is a resumable input boundary, not a terminal
+                        # economic result.  Persist it only in mutable state.
+                        if not (
+                            key == "POST_BREADTH_TREASURY_CURVE"
+                            and result["status"] == TREASURY_CURVE_WAITING_STATUS
+                        ):
+                            spec = branch_specs[key]
+                            next_action = _post_breadth_branch_next_action(
+                                key, result
+                            )
+                            envelope = _post_source_envelope(
+                                manifest,
+                                lane_id=(
+                                    "EXPLOITATION"
+                                    if key == "POST_BREADTH_LEGAL_EXACT"
+                                    else "EXPLORATION"
+                                ),
+                                branch_id=str(spec["branch_id"]),
+                                decision=str(result["decision"]),
+                                payload_key=str(spec["payload_key"]),
+                                payload=result,
+                                next_action=next_action,
+                            )
+                            relative = _relative_branch_artifact_path(
+                                output,
+                                Path(spec["path"]),
+                                f"post-breadth {key} result",
+                            )
+                            branch_writer.write_json(relative, envelope)
+                            _append_decision_once(root, manifest, envelope)
+                    state = _heartbeat_state(
+                        state,
+                        active_economic_worker_processes=len(pending),
+                    )
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+        finally:
+            _end_economic_phase()
+
+    if "POST_BREADTH_LEGAL_EXACT" not in completed:
+        raise AutonomousDirectorRuntimeError(
+            "post-breadth legal exact branch did not produce a result"
+        )
+    if "POST_BREADTH_TREASURY_CURVE" not in completed:
+        raise AutonomousDirectorRuntimeError(
+            "post-breadth Treasury branch did not produce a result"
+        )
+
+    portfolio = {
+        "legal_exact": completed["POST_BREADTH_LEGAL_EXACT"],
+        "treasury_curve": completed["POST_BREADTH_TREASURY_CURVE"],
+    }
+    portfolio["portfolio_hash"] = stable_hash(portfolio)
+    next_action = _post_breadth_portfolio_next_action(portfolio)
+    counts = _post_breadth_counts(results)
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage="POST_BREADTH_PORTFOLIO_DECIDED",
+        branch_results=results,
+        next_action=next_action,
+    )
+    state.update(
+        {
+            "active_economic_worker_processes": 0,
+            "post_breadth_worker_limit": 2,
+            "post_breadth_parent_writer_only": True,
+            **counts,
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        }
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, portfolio
+
+
+def _run_session_safe_fast_book_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    """Run/resume the two bounded session-safe repairs after post-breadth.
+
+    Each child is a read-only economic worker.  Only the persistent parent
+    writes branch envelopes and the deterministic portfolio receipt.  Results
+    remain Tier E diagnostics even when their frozen signal gate passes; the
+    only allowed advance is an unchanged chronological 50K/20-day
+    confirmation.
+    """
+
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    relative_root = _POST_BREADTH_RELATIVE_ROOT / "session_safe_fast_book"
+    branch_root = output / "branch_results"
+    variant_keys = {
+        "HORIZON_SAFE_ENTRY_CUTOFF": (
+            "POST_BREADTH_SESSION_SAFE_HORIZON_CUTOFF"
+        ),
+        "DROP_OFFENDING_COMPONENT": (
+            "POST_BREADTH_SESSION_SAFE_DROP_COMPONENT"
+        ),
+    }
+    variant_paths = {
+        variant: branch_root
+        / relative_root
+        / f"{variant.lower()}.json"
+        for variant in SESSION_SAFE_REPAIR_VARIANTS
+    }
+
+    completed: dict[str, dict[str, Any]] = {}
+    for variant in SESSION_SAFE_REPAIR_VARIANTS:
+        path = variant_paths[variant]
+        if not path.is_file():
+            continue
+        envelope = _read_hashed(path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                f"session-safe {variant} envelope identity drift"
+            )
+        result = _verify_session_safe_fast_book_result(
+            dict(envelope.get("session_safe_fast_book_tripwire") or {}),
+            expected_variant=variant,
+        )
+        completed[variant] = result
+        results[variant_keys[variant]] = result
+
+    missing = [
+        variant
+        for variant in SESSION_SAFE_REPAIR_VARIANTS
+        if variant not in completed
+    ]
+    if missing:
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=min(len(missing), 2),
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                futures = {
+                    pool.submit(
+                        session_safe_fast_book_worker,
+                        {
+                            "root": str(root),
+                            "repair_variant": variant,
+                        },
+                    ): variant
+                    for variant in missing
+                }
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="SESSION_SAFE_FAST_BOOK_REPAIR_RUNNING",
+                    branch_results=results,
+                    next_action=(
+                        "RUN_TWO_FROZEN_SESSION_SAFE_REPAIRS_READ_ONLY"
+                    ),
+                )
+                state.update(
+                    {
+                        "active_economic_worker_processes": len(futures),
+                        "session_safe_worker_limit": 2,
+                        "session_safe_parent_writer_only": True,
+                        "q4_access_count_delta": 0,
+                        "broker_connections": 0,
+                        "orders": 0,
+                    }
+                )
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+
+                pending = set(futures)
+                while pending:
+                    done, pending = wait(
+                        pending,
+                        timeout=max(min(float(heartbeat_seconds), 5.0), 0.1),
+                        return_when=FIRST_COMPLETED,
+                    )
+                    for future in done:
+                        variant = futures[future]
+                        result = _verify_session_safe_fast_book_result(
+                            dict(future.result()), expected_variant=variant
+                        )
+                        completed[variant] = result
+                        key = variant_keys[variant]
+                        results[key] = result
+                        envelope = _post_source_envelope(
+                            manifest,
+                            lane_id=(
+                                "EXPLOITATION"
+                                if variant == "HORIZON_SAFE_ENTRY_CUTOFF"
+                                else "EXPLORATION"
+                            ),
+                            branch_id=(
+                                f"{SESSION_SAFE_FAST_BOOK_BRANCH_ID}:{variant}"
+                            ),
+                            decision=str(result["decision"]),
+                            payload_key="session_safe_fast_book_tripwire",
+                            payload=result,
+                            next_action=_session_safe_result_next_action(result),
+                        )
+                        branch_writer.write_json(
+                            relative_root / variant_paths[variant].name,
+                            envelope,
+                        )
+                        _append_decision_once(root, manifest, envelope)
+                    state = _heartbeat_state(
+                        state,
+                        active_economic_worker_processes=len(pending),
+                    )
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+        finally:
+            _end_economic_phase()
+
+    if set(completed) != set(SESSION_SAFE_REPAIR_VARIANTS):
+        raise AutonomousDirectorRuntimeError(
+            "session-safe repair portfolio did not produce both frozen variants"
+        )
+
+    portfolio = _build_session_safe_fast_book_portfolio(completed)
+    composite_path = branch_root / relative_root / "portfolio.json"
+    if composite_path.is_file():
+        envelope = _read_hashed(composite_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "session-safe portfolio envelope identity drift"
+            )
+        persisted = _verify_session_safe_fast_book_portfolio(
+            dict(envelope.get("session_safe_fast_book_portfolio") or {}),
+            completed,
+        )
+        if str(persisted["result_hash"]) != str(portfolio["result_hash"]):
+            raise AutonomousDirectorRuntimeError(
+                "session-safe portfolio changed after persistence"
+            )
+        portfolio = persisted
+    else:
+        envelope = _post_source_envelope(
+            manifest,
+            lane_id="DIRECTOR",
+            branch_id=f"{SESSION_SAFE_FAST_BOOK_BRANCH_ID}:PORTFOLIO",
+            decision=str(portfolio["decision"]),
+            payload_key="session_safe_fast_book_portfolio",
+            payload=portfolio,
+            next_action=str(portfolio["next_action"]),
+        )
+        branch_writer.write_json(
+            relative_root / composite_path.name,
+            envelope,
+        )
+        _append_decision_once(root, manifest, envelope)
+
+    results["POST_BREADTH_SESSION_SAFE_PORTFOLIO"] = portfolio
+    signal_count = int(
+        dict(portfolio.get("counters") or {}).get("signal_gate_pass_count", 0)
+    )
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage=(
+            "SESSION_SAFE_FAST_BOOK_SIGNAL_REQUIRES_FROZEN_CONFIRMATION"
+            if signal_count
+            else "SESSION_SAFE_FAST_BOOK_TRIPWIRE_FALSIFIED"
+        ),
+        branch_results=results,
+        next_action=str(portfolio["next_action"]),
+    )
+    state.update(
+        {
+            "active_economic_worker_processes": 0,
+            "session_safe_worker_limit": 2,
+            "session_safe_parent_writer_only": True,
+            **_session_safe_counts(results),
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        }
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, portfolio
+
+
+def _session_safe_result_next_action(result: Mapping[str, Any]) -> str:
+    if dict(result.get("repair_signal_gate") or {}).get("passed") is True:
+        return (
+            "FREEZE_UNCHANGED_REPAIR_FOR_CHRONOLOGICAL_CONFIRMATION_50K_20D"
+        )
+    return "CLOSE_SESSION_SAFE_REPAIR_AND_ADVANCE_DISTINCT_BRANCH"
+
+
+def _build_session_safe_fast_book_portfolio(
+    completed: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    variants: dict[str, Any] = {}
+    exact_replays = 0
+    source_replay_rows = 0
+    normal_episode_count = 0
+    stressed_episode_count = 0
+    normal_pass_count = 0
+    stressed_pass_count = 0
+    signal_variants: list[str] = []
+    for variant in SESSION_SAFE_REPAIR_VARIANTS:
+        result = _verify_session_safe_fast_book_result(
+            completed.get(variant) or {}, expected_variant=variant
+        )
+        selected = dict(
+            dict(result["account_results"])["50K"]["horizon_results"]["20"]
+        )
+        normal = dict(selected["normal"])
+        stressed = dict(selected["stressed"])
+        passed = dict(result["repair_signal_gate"])["passed"] is True
+        if passed:
+            signal_variants.append(variant)
+        counts = dict(result["counters"])
+        exact_replays += int(counts["exact_account_replays"])
+        source_replay_rows += int(counts["source_event_rows_reconstructed"])
+        normal_episode_count += int(normal["episode_count"])
+        stressed_episode_count += int(stressed["episode_count"])
+        normal_pass_count += int(normal["pass_count"])
+        stressed_pass_count += int(stressed["pass_count"])
+        variants[variant] = {
+            "result_hash": str(result["result_hash"]),
+            "evidence_tier": "E",
+            "promotion_status": None,
+            "signal_gate_passed": passed,
+            "frozen_account_label": "50K",
+            "frozen_horizon_trading_days": 20,
+            "full_coverage_start_count": int(
+                selected["full_coverage_start_count"]
+            ),
+            "normal_pass_count": int(normal["pass_count"]),
+            "stressed_pass_count": int(stressed["pass_count"]),
+            "normal_target_progress_median": float(
+                normal["target_progress_median"]
+            ),
+            "stressed_target_progress_median": float(
+                stressed["target_progress_median"]
+            ),
+            "stressed_mll_breach_count": int(stressed["mll_breach_count"]),
+        }
+
+    signal_gate_pass_count = len(signal_variants)
+    next_action = (
+        "FREEZE_SESSION_SAFE_REPAIRS_AND_RUN_UNCHANGED_CHRONOLOGICAL_CONFIRMATION_50K_20D"
+        if signal_gate_pass_count
+        else "CLOSE_SESSION_SAFE_REPAIRS_AND_DISPATCH_DISTINCT_CAUSAL_BRANCH"
+    )
+    core: dict[str, Any] = {
+        "schema": _SESSION_SAFE_PORTFOLIO_SCHEMA,
+        "status": "COMPLETE_SESSION_SAFE_FAST_BOOK_PORTFOLIO",
+        "branch_id": SESSION_SAFE_FAST_BOOK_BRANCH_ID,
+        "source_policy_id": SESSION_SAFE_FAST_BOOK_SOURCE_POLICY_ID,
+        "evidence_role": SESSION_SAFE_FAST_BOOK_EVIDENCE_ROLE,
+        "evidence_tier": "E",
+        "promotion_status": None,
+        "status_inherited": False,
+        "repair_variants": variants,
+        "signal_gate_passing_variants": signal_variants,
+        "confirmation_contract": {
+            "required_only_when_signal_gate_passes": True,
+            "account_label": "50K",
+            "horizon_trading_days": 20,
+            "chronological": True,
+            "frozen_before_outcomes": True,
+            "mutation_allowed": False,
+            "automatic_promotion_allowed": False,
+        },
+        "counters": {
+            "repair_variant_count": len(variants),
+            "signal_gate_pass_count": signal_gate_pass_count,
+            "source_event_replay_operations": source_replay_rows,
+            "exact_account_replays": exact_replays,
+            "frozen_50k_20d_normal_episode_count": normal_episode_count,
+            "frozen_50k_20d_stressed_episode_count": stressed_episode_count,
+            "frozen_50k_20d_normal_pass_count": normal_pass_count,
+            "frozen_50k_20d_stressed_pass_count": stressed_pass_count,
+            "worker_authoritative_writes": 0,
+            "parent_branch_artifact_count": 3,
+            "data_purchase_count": 0,
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+            "promotion_count": 0,
+        },
+        "decision": (
+            "SESSION_SAFE_REPAIR_SIGNAL_REQUIRES_FROZEN_CHRONOLOGICAL_CONFIRMATION_50K_20D"
+            if signal_gate_pass_count
+            else "SESSION_SAFE_REPAIR_PORTFOLIO_FALSIFIED"
+        ),
+        "next_action": next_action,
+        "read_only_workers": True,
+        "parent_writer_only": True,
+    }
+    return {**core, "result_hash": stable_hash(core)}
+
+
+def _post_breadth_branch_next_action(
+    key: str, result: Mapping[str, Any]
+) -> str:
+    if key == "POST_BREADTH_LEGAL_EXACT":
+        passes = int(
+            dict(result.get("counters") or {}).get(
+                "admissible_exact_passes_all_horizons_and_scenarios", 0
+            )
+        )
+        return (
+            "FREEZE_LEGAL_EXACT_SURVIVORS_FOR_CHRONOLOGICAL_VALIDATION"
+            if passes
+            else "CLOSE_SUMMARY_SCALE_SIGNAL_AND_ADVANCE_DISTINCT_BRANCH"
+        )
+    if result.get("status") == TREASURY_CURVE_WAITING_STATUS:
+        return "ACQUIRE_AND_BIND_TREASURY_CURVE_INPUT_THEN_RESUME"
+    if result.get("decision") == (
+        "CURVE_RELATIVE_VALUE_TRIPWIRE_GREEN_DEVELOPMENT_ONLY"
+    ):
+        return "FREEZE_CURVE_TRIPWIRE_SURVIVORS_FOR_UNTOUCHED_CONFIRMATION"
+    return "CLOSE_OR_REDIRECT_TREASURY_CURVE_TRIPWIRE"
+
+
+def _post_breadth_portfolio_next_action(
+    portfolio: Mapping[str, Mapping[str, Any]],
+) -> str:
+    legal = dict(portfolio["legal_exact"])
+    treasury = dict(portfolio["treasury_curve"])
+    legal_passes = int(
+        dict(legal.get("counters") or {}).get(
+            "admissible_exact_passes_all_horizons_and_scenarios", 0
+        )
+    )
+    if treasury.get("status") == TREASURY_CURVE_WAITING_STATUS:
+        return (
+            "FREEZE_LEGAL_EXACT_SURVIVORS_AND_AWAIT_MANIFEST_BOUND_TREASURY_INPUT"
+            if legal_passes
+            else "AWAIT_MANIFEST_BOUND_TREASURY_INPUT_AND_ADVANCE_DISTINCT_BRANCH"
+        )
+    if legal_passes or treasury.get("decision") == (
+        "CURVE_RELATIVE_VALUE_TRIPWIRE_GREEN_DEVELOPMENT_ONLY"
+    ):
+        return "ADVANCE_POST_BREADTH_WINNERS_TO_FROZEN_CHRONOLOGICAL_VALIDATION"
+    return "SELECT_NEXT_MATERIALLY_DISTINCT_BRANCH_AFTER_POST_BREADTH_DECISION"
 
 
 def _run_event_time_safety_relay(
@@ -3818,6 +4461,28 @@ def _frozen_breadth_continuation_worker(
     return _verify_frozen_breadth_continuation_result(result)
 
 
+def _treasury_curve_tripwire_worker(payload: Mapping[str, Any]) -> dict[str, Any]:
+    """Run the Treasury tripwire read-only or return its input-boundary status."""
+
+    result = build_curve_relative_value_tripwire(
+        str(payload["root"]),
+        input_contract=(
+            dict(payload["input_contract"])
+            if payload.get("input_contract") is not None
+            else None
+        ),
+    )
+    if result.get("status") == TREASURY_CURVE_WAITING_STATUS:
+        row = dict(result)
+        row.pop("result_hash", None)
+        row["missing_manifest_bound_inputs"] = sorted(
+            str(value) for value in payload.get("missing_inputs") or ()
+        )
+        row["result_hash"] = stable_hash(row)
+        result = row
+    return _verify_treasury_curve_result(result, allow_waiting=True)
+
+
 def _verify_event_time_matched_controls_result(
     value: Mapping[str, Any],
 ) -> dict[str, Any]:
@@ -3890,6 +4555,530 @@ def _event_time_control_counts(value: Mapping[str, Any]) -> dict[str, int]:
         "exact_episode_count": exact,
         "normal_episode_count": normal,
         "stressed_episode_count": stressed,
+    }
+
+
+def _verify_frozen_legal_frontier_result(
+    value: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Verify exact legal replay identity and its no-promotion worker boundary."""
+
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    counts = dict(row.get("counters") or {})
+    results = [dict(item) for item in row.get("results") or ()]
+    diagnostic = int(
+        counts.get("diagnostic_exact_passes_all_horizons_and_scenarios", -1)
+    )
+    admissible = int(
+        counts.get("admissible_exact_passes_all_horizons_and_scenarios", -1)
+    )
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != FROZEN_LEGAL_FRONTIER_SCHEMA
+        or row.get("status") != "COMPLETE_EXACT_FROZEN_LEGAL_FRONTIER_REPLAY"
+        or row.get("evidence_tier") != "E"
+        or row.get("promotion_status") is not None
+        or row.get("read_only_worker") is not True
+        or len(results) != 3
+        or int(counts.get("frozen_cell_count", -1)) != len(results)
+        or int(counts.get("exact_account_replays", 0)) <= 0
+        or diagnostic < 0
+        or admissible < 0
+        or admissible > diagnostic
+        or int(counts.get("data_purchase_count", -1)) != 0
+        or int(counts.get("q4_access_count_delta", -1)) != 0
+        or int(counts.get("broker_connections", -1)) != 0
+        or int(counts.get("orders", -1)) != 0
+        or int(counts.get("authoritative_writes", -1)) != 0
+        or dict(row.get("evidence_bundle_adapter") or {}).get(
+            "sealing_performed"
+        )
+        is not False
+        or dict(row.get("evidence_bundle_adapter") or {}).get(
+            "authoritative_writer_required_for_sealing"
+        )
+        is not True
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "frozen legal-frontier result identity, denominator, or safety drift"
+        )
+    expected_decision = (
+        "EXACT_PASS_OBSERVED_REQUIRES_FROZEN_CHRONOLOGICAL_VALIDATION"
+        if admissible
+        else "SUMMARY_LEGAL_FRONTIER_PASS_SIGNAL_NOT_CONFIRMED_EXACTLY"
+    )
+    if row.get("decision") != expected_decision:
+        raise AutonomousDirectorRuntimeError(
+            "frozen legal-frontier decision differs from exact pass evidence"
+        )
+    exact_ids = [str(item.get("exact_policy_id") or "") for item in results]
+    if any(not value for value in exact_ids) or len(set(exact_ids)) != len(exact_ids):
+        raise AutonomousDirectorRuntimeError(
+            "frozen legal-frontier exact policy inventory drift"
+        )
+    return {**row, "result_hash": claimed}
+
+
+def _verify_treasury_curve_result(
+    value: Mapping[str, Any], *, allow_waiting: bool
+) -> dict[str, Any]:
+    """Verify the Treasury result without converting development into status."""
+
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    status = str(row.get("status") or "")
+    if not claimed or stable_hash(row) != claimed or row.get("schema") != TREASURY_CURVE_SCHEMA:
+        raise AutonomousDirectorRuntimeError("Treasury curve result hash/schema drift")
+    for field in (
+        "authoritative_writes",
+        "data_purchase_count",
+        "q4_access_count_delta",
+        "broker_connections",
+        "orders",
+    ):
+        if int(row.get(field, -1)) != 0:
+            raise AutonomousDirectorRuntimeError(
+                f"Treasury curve worker safety counter drift: {field}"
+            )
+    if row.get("promotion_status") is not None:
+        raise AutonomousDirectorRuntimeError(
+            "Treasury curve tripwire attempted a promotion"
+        )
+    rules = [dict(item) for item in row.get("rule_specs") or ()]
+    if len(rules) != 16 or len({str(item.get("rule_id")) for item in rules}) != 16:
+        raise AutonomousDirectorRuntimeError("Treasury frozen rule inventory drift")
+
+    if status == TREASURY_CURVE_WAITING_STATUS:
+        if (
+            not allow_waiting
+            or row.get("decision") != TREASURY_CURVE_WAITING_STATUS
+            or row.get("economic_result_created") is not False
+            or row.get("evidence_role") is not None
+        ):
+            raise AutonomousDirectorRuntimeError(
+                "Treasury waiting result crossed an economic boundary"
+            )
+        return {**row, "result_hash": claimed}
+
+    candidates = [dict(item) for item in row.get("candidate_results") or ()]
+    summary = dict(row.get("economic_summary") or {})
+    allowed_decisions = {
+        "CURVE_RELATIVE_VALUE_TRIPWIRE_GREEN_DEVELOPMENT_ONLY",
+        "CURVE_RELATIVE_VALUE_TRIPWIRE_WEAK",
+        "CURVE_RELATIVE_VALUE_TRIPWIRE_FALSIFIED",
+    }
+    if (
+        status != "COMPLETE_DEVELOPMENT_TRIPWIRE"
+        or row.get("evidence_role") != TREASURY_CURVE_EVIDENCE_ROLE
+        or row.get("decision") not in allowed_decisions
+        or len(candidates) != 16
+        or int(summary.get("rule_count", -1)) != len(candidates)
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "Treasury completed tripwire identity/evidence-role drift"
+        )
+    candidate_ids = [str(item.get("rule_id") or "") for item in candidates]
+    if any(not value for value in candidate_ids) or len(set(candidate_ids)) != 16:
+        raise AutonomousDirectorRuntimeError(
+            "Treasury completed candidate inventory drift"
+        )
+    for candidate in candidates:
+        labels = sorted(
+            str(account.get("account_label") or "")
+            for account in candidate.get("account_matrix") or ()
+        )
+        if labels != ["100K", "150K", "50K"]:
+            raise AutonomousDirectorRuntimeError(
+                "Treasury account-size matrix denominator drift"
+            )
+    return {**row, "result_hash": claimed}
+
+
+def _verify_session_safe_fast_book_result(
+    value: Mapping[str, Any], *, expected_variant: str
+) -> dict[str, Any]:
+    """Verify one frozen session repair without granting inherited status."""
+
+    if expected_variant not in SESSION_SAFE_REPAIR_VARIANTS:
+        raise AutonomousDirectorRuntimeError(
+            "session-safe verifier received an unfrozen repair variant"
+        )
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    counts = dict(row.get("counters") or {})
+    repair = dict(row.get("repair_contract") or {})
+    gate = dict(row.get("repair_signal_gate") or {})
+    checks = dict(gate.get("checks") or {})
+    adapter = dict(row.get("evidence_bundle_adapter") or {})
+    accounts = {
+        str(key): dict(item)
+        for key, item in dict(row.get("account_results") or {}).items()
+    }
+    expected_coverage = {"5": 36, "10": 13, "20": 4}
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != SESSION_SAFE_FAST_BOOK_SCHEMA
+        or row.get("branch_id") != SESSION_SAFE_FAST_BOOK_BRANCH_ID
+        or row.get("status") != "COMPLETE_SESSION_SAFE_FAST_BOOK_TRIPWIRE"
+        or row.get("repair_variant") != expected_variant
+        or row.get("source_policy_id") != SESSION_SAFE_FAST_BOOK_SOURCE_POLICY_ID
+        or row.get("evidence_role") != SESSION_SAFE_FAST_BOOK_EVIDENCE_ROLE
+        or row.get("evidence_tier") != "E"
+        or row.get("promotion_status") is not None
+        or row.get("status_inherited") is not False
+        or row.get("read_only_worker") is not True
+        or row.get("outbound_order_capability") is not False
+        or repair.get("variant") != expected_variant
+        or int(repair.get("scale_factor", -1)) != 3
+        or repair.get("outcome_fields_used") is not False
+        or repair.get("future_label_eligibility_used") is not False
+        or repair.get("mandatory_flatten_local") != "15:10"
+        or set(accounts) != {"50K", "100K", "150K"}
+        or int(counts.get("cpu_shards_for_this_result", -1)) != 1
+        or int(counts.get("maximum_parallel_cpu_shards", -1)) != 2
+        or int(counts.get("source_component_count", -1)) != 3
+        or int(counts.get("source_event_rows_reconstructed", 0)) <= 0
+        or int(counts.get("repaired_session_violation_count", -1)) != 0
+        or int(counts.get("data_purchase_count", -1)) != 0
+        or int(counts.get("q4_access_count_delta", -1)) != 0
+        or int(counts.get("broker_connections", -1)) != 0
+        or int(counts.get("orders", -1)) != 0
+        or int(counts.get("authoritative_writes", -1)) != 0
+        or int(counts.get("promotion_count", -1)) != 0
+        or adapter.get("sealing_performed") is not False
+        or adapter.get("authoritative_writer_required_for_sealing") is not True
+    ):
+        raise AutonomousDirectorRuntimeError(
+            f"session-safe {expected_variant} identity, tier, or safety drift"
+        )
+    if (
+        sum(
+            int(value)
+            for value in dict(
+                row.get("original_session_violation_count_by_component") or {}
+            ).values()
+        )
+        != 8
+        or sum(
+            int(value)
+            for value in dict(
+                row.get("repaired_session_violation_count_by_component") or {}
+            ).values()
+        )
+        != 0
+    ):
+        raise AutonomousDirectorRuntimeError(
+            f"session-safe {expected_variant} session denominator drift"
+        )
+
+    exact_episode_count = 0
+    for account_label, account in accounts.items():
+        horizons = {
+            str(key): dict(item)
+            for key, item in dict(account.get("horizon_results") or {}).items()
+        }
+        if (
+            account.get("hard_execution_contract_clean") is not True
+            or account.get("promotion_status") is not None
+            or account.get("evidence_tier") != "E_EXACT_DEVELOPMENT_TRIPWIRE"
+            or set(horizons) != set(expected_coverage)
+            or any(
+                int(value) != 0
+                for value in dict(
+                    account.get(
+                        "official_market_contract_cap_breach_count_by_component"
+                    )
+                    or {}
+                ).values()
+            )
+        ):
+            raise AutonomousDirectorRuntimeError(
+                f"session-safe {expected_variant} {account_label} account drift"
+            )
+        for horizon, expected_count in expected_coverage.items():
+            result = horizons[horizon]
+            normal = dict(result.get("normal") or {})
+            stressed = dict(result.get("stressed") or {})
+            if (
+                int(result.get("horizon_trading_days", -1)) != int(horizon)
+                or int(result.get("full_coverage_start_count", -1))
+                != expected_count
+                or int(normal.get("episode_count", -1)) != expected_count
+                or int(stressed.get("episode_count", -1)) != expected_count
+                or int(normal.get("pass_count", -1)) < 0
+                or int(stressed.get("pass_count", -1)) < 0
+                or int(normal.get("pass_count", -1)) > expected_count
+                or int(stressed.get("pass_count", -1)) > expected_count
+                or int(normal.get("mll_breach_count", -1)) < 0
+                or int(stressed.get("mll_breach_count", -1)) < 0
+            ):
+                raise AutonomousDirectorRuntimeError(
+                    f"session-safe {expected_variant} exact episode denominator drift"
+                )
+            exact_episode_count += 2 * expected_count
+    records = [dict(item) for item in adapter.get("evaluated_policy_records") or ()]
+    if (
+        exact_episode_count != int(counts.get("exact_account_replays", -1))
+        or len(records) != exact_episode_count
+        or adapter.get("records_hash") != stable_hash(records)
+    ):
+        raise AutonomousDirectorRuntimeError(
+            f"session-safe {expected_variant} EvidenceBundle denominator drift"
+        )
+    if (
+        gate.get("gate_role") != "DEVELOPMENT_TRIPWIRE_ONLY_NO_PROMOTION"
+        or not checks
+        or any(not isinstance(value, bool) for value in checks.values())
+        or gate.get("passed") is not all(checks.values())
+        or gate.get("gate_hash") != stable_hash(checks)
+    ):
+        raise AutonomousDirectorRuntimeError(
+            f"session-safe {expected_variant} signal-gate drift"
+        )
+    expected_decision = (
+        "SESSION_SAFE_REPAIR_SIGNAL_REQUIRES_FROZEN_VALIDATION"
+        if gate["passed"]
+        else "SESSION_SAFE_REPAIR_FALSIFIED_AT_TRIPWIRE"
+    )
+    if row.get("decision") != expected_decision:
+        raise AutonomousDirectorRuntimeError(
+            f"session-safe {expected_variant} decision drift"
+        )
+    return {**row, "result_hash": claimed}
+
+
+def _verify_session_safe_fast_book_portfolio(
+    value: Mapping[str, Any],
+    completed: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    variants = {
+        str(key): dict(item)
+        for key, item in dict(row.get("repair_variants") or {}).items()
+    }
+    counts = dict(row.get("counters") or {})
+    confirmation = dict(row.get("confirmation_contract") or {})
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != _SESSION_SAFE_PORTFOLIO_SCHEMA
+        or row.get("status") != "COMPLETE_SESSION_SAFE_FAST_BOOK_PORTFOLIO"
+        or row.get("branch_id") != SESSION_SAFE_FAST_BOOK_BRANCH_ID
+        or row.get("source_policy_id") != SESSION_SAFE_FAST_BOOK_SOURCE_POLICY_ID
+        or row.get("evidence_role") != SESSION_SAFE_FAST_BOOK_EVIDENCE_ROLE
+        or row.get("evidence_tier") != "E"
+        or row.get("promotion_status") is not None
+        or row.get("status_inherited") is not False
+        or row.get("read_only_workers") is not True
+        or row.get("parent_writer_only") is not True
+        or set(variants) != set(SESSION_SAFE_REPAIR_VARIANTS)
+        or int(counts.get("repair_variant_count", -1)) != 2
+        or int(counts.get("worker_authoritative_writes", -1)) != 0
+        or int(counts.get("parent_branch_artifact_count", -1)) != 3
+        or int(counts.get("data_purchase_count", -1)) != 0
+        or int(counts.get("q4_access_count_delta", -1)) != 0
+        or int(counts.get("broker_connections", -1)) != 0
+        or int(counts.get("orders", -1)) != 0
+        or int(counts.get("promotion_count", -1)) != 0
+        or confirmation.get("account_label") != "50K"
+        or int(confirmation.get("horizon_trading_days", -1)) != 20
+        or confirmation.get("chronological") is not True
+        or confirmation.get("frozen_before_outcomes") is not True
+        or confirmation.get("mutation_allowed") is not False
+        or confirmation.get("automatic_promotion_allowed") is not False
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "session-safe portfolio identity, tier, or safety drift"
+        )
+    signal_variants: list[str] = []
+    exact_replays = 0
+    for variant in SESSION_SAFE_REPAIR_VARIANTS:
+        result = _verify_session_safe_fast_book_result(
+            completed.get(variant) or {}, expected_variant=variant
+        )
+        summary = variants[variant]
+        passed = dict(result["repair_signal_gate"])["passed"] is True
+        if (
+            summary.get("result_hash") != result["result_hash"]
+            or summary.get("evidence_tier") != "E"
+            or summary.get("promotion_status") is not None
+            or summary.get("signal_gate_passed") is not passed
+            or summary.get("frozen_account_label") != "50K"
+            or int(summary.get("frozen_horizon_trading_days", -1)) != 20
+        ):
+            raise AutonomousDirectorRuntimeError(
+                f"session-safe portfolio {variant} summary drift"
+            )
+        exact_replays += int(result["counters"]["exact_account_replays"])
+        if passed:
+            signal_variants.append(variant)
+    if (
+        list(row.get("signal_gate_passing_variants") or ()) != signal_variants
+        or int(counts.get("signal_gate_pass_count", -1)) != len(signal_variants)
+        or int(counts.get("exact_account_replays", -1)) != exact_replays
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "session-safe portfolio gate or replay denominator drift"
+        )
+    expected_decision = (
+        "SESSION_SAFE_REPAIR_SIGNAL_REQUIRES_FROZEN_CHRONOLOGICAL_CONFIRMATION_50K_20D"
+        if signal_variants
+        else "SESSION_SAFE_REPAIR_PORTFOLIO_FALSIFIED"
+    )
+    expected_next = (
+        "FREEZE_SESSION_SAFE_REPAIRS_AND_RUN_UNCHANGED_CHRONOLOGICAL_CONFIRMATION_50K_20D"
+        if signal_variants
+        else "CLOSE_SESSION_SAFE_REPAIRS_AND_DISPATCH_DISTINCT_CAUSAL_BRANCH"
+    )
+    if row.get("decision") != expected_decision or row.get("next_action") != expected_next:
+        raise AutonomousDirectorRuntimeError(
+            "session-safe portfolio decision or confirmation boundary drift"
+        )
+    return {**row, "result_hash": claimed}
+
+
+def _session_safe_counts(
+    branch_results: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Expose isolated Tier-E repair counters without inflating core totals."""
+
+    key_by_variant = {
+        "HORIZON_SAFE_ENTRY_CUTOFF": (
+            "POST_BREADTH_SESSION_SAFE_HORIZON_CUTOFF"
+        ),
+        "DROP_OFFENDING_COMPONENT": (
+            "POST_BREADTH_SESSION_SAFE_DROP_COMPONENT"
+        ),
+    }
+    values: dict[str, dict[str, Any]] = {}
+    for variant, key in key_by_variant.items():
+        raw = branch_results.get(key) or {}
+        if raw:
+            values[variant] = _verify_session_safe_fast_book_result(
+                raw, expected_variant=variant
+            )
+    counts: dict[str, Any] = {
+        "session_safe_tier_e_result_count": len(values),
+        "session_safe_signal_gate_pass_count": 0,
+        "session_safe_exact_account_replay_count": 0,
+        "session_safe_50k_20d_normal_episode_count": 0,
+        "session_safe_50k_20d_stressed_episode_count": 0,
+        "session_safe_50k_20d_normal_pass_count": 0,
+        "session_safe_50k_20d_stressed_pass_count": 0,
+        "session_safe_horizon_cutoff_exact_account_replay_count": 0,
+        "session_safe_drop_component_exact_account_replay_count": 0,
+        "session_safe_status": "NOT_RUN",
+    }
+    for variant, result in values.items():
+        replay_count = int(result["counters"]["exact_account_replays"])
+        selected = dict(
+            result["account_results"]["50K"]["horizon_results"]["20"]
+        )
+        normal = dict(selected["normal"])
+        stressed = dict(selected["stressed"])
+        counts["session_safe_exact_account_replay_count"] += replay_count
+        counts["session_safe_50k_20d_normal_episode_count"] += int(
+            normal["episode_count"]
+        )
+        counts["session_safe_50k_20d_stressed_episode_count"] += int(
+            stressed["episode_count"]
+        )
+        counts["session_safe_50k_20d_normal_pass_count"] += int(
+            normal["pass_count"]
+        )
+        counts["session_safe_50k_20d_stressed_pass_count"] += int(
+            stressed["pass_count"]
+        )
+        counts["session_safe_signal_gate_pass_count"] += int(
+            dict(result["repair_signal_gate"])["passed"] is True
+        )
+        field = (
+            "session_safe_horizon_cutoff_exact_account_replay_count"
+            if variant == "HORIZON_SAFE_ENTRY_CUTOFF"
+            else "session_safe_drop_component_exact_account_replay_count"
+        )
+        counts[field] = replay_count
+    if len(values) == 2:
+        portfolio_raw = branch_results.get("POST_BREADTH_SESSION_SAFE_PORTFOLIO")
+        if portfolio_raw:
+            portfolio = _verify_session_safe_fast_book_portfolio(
+                portfolio_raw, values
+            )
+            counts["session_safe_status"] = str(portfolio["status"])
+        else:
+            counts["session_safe_status"] = "REPAIRS_COMPLETE_PORTFOLIO_PENDING"
+    elif values:
+        counts["session_safe_status"] = "PARTIAL_RESUME"
+    return counts
+
+
+def _post_breadth_counts(
+    branch_results: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Return new isolated counters; never add them to historical totals."""
+
+    legal_raw = branch_results.get("POST_BREADTH_LEGAL_EXACT") or {}
+    treasury_raw = branch_results.get("POST_BREADTH_TREASURY_CURVE") or {}
+    legal = _verify_frozen_legal_frontier_result(legal_raw) if legal_raw else {}
+    treasury = (
+        _verify_treasury_curve_result(treasury_raw, allow_waiting=True)
+        if treasury_raw
+        else {}
+    )
+    legal_counts = dict(legal.get("counters") or {})
+    treasury_summary = dict(treasury.get("economic_summary") or {})
+    treasury_complete = treasury.get("status") == "COMPLETE_DEVELOPMENT_TRIPWIRE"
+    return {
+        "post_breadth_legal_frozen_cell_count": int(
+            legal_counts.get("frozen_cell_count", 0)
+        ),
+        "post_breadth_legal_source_event_count": int(
+            legal_counts.get("source_event_rows_reconstructed", 0)
+        ),
+        "post_breadth_legal_exact_account_replay_count": int(
+            legal_counts.get("exact_account_replays", 0)
+        ),
+        "post_breadth_legal_diagnostic_pass_count": int(
+            legal_counts.get(
+                "diagnostic_exact_passes_all_horizons_and_scenarios", 0
+            )
+        ),
+        "post_breadth_legal_admissible_pass_count": int(
+            legal_counts.get(
+                "admissible_exact_passes_all_horizons_and_scenarios", 0
+            )
+        ),
+        "post_breadth_legal_status": str(legal.get("status") or "NOT_RUN"),
+        "post_breadth_treasury_rule_count": (
+            int(treasury_summary.get("rule_count", 0)) if treasury_complete else 0
+        ),
+        "post_breadth_treasury_final_stressed_episode_count": (
+            int(
+                treasury_summary.get(
+                    "final_development_stressed_episode_count", 0
+                )
+            )
+            if treasury_complete
+            else 0
+        ),
+        "post_breadth_treasury_final_stressed_pass_count": (
+            int(
+                treasury_summary.get(
+                    "final_development_stressed_pass_count", 0
+                )
+            )
+            if treasury_complete
+            else 0
+        ),
+        "post_breadth_treasury_status": str(
+            treasury.get("status") or "NOT_RUN"
+        ),
+        "post_breadth_completed_economic_branch_count": int(bool(legal))
+        + int(treasury_complete),
     }
 
 
@@ -5341,6 +6530,8 @@ def _state_payload(
         (branch_results.get("EVENT_TIME_SAFETY") or {}).get("counts") or {}
     )
     relay_counts = _relay_evidence_counts(branch_results)
+    post_breadth_counts = _post_breadth_counts(branch_results)
+    session_safe_counts = _session_safe_counts(branch_results)
     event_control = branch_results.get("EVENT_TIME_MATCHED_CONTROLS") or {}
     event_control_counts = (
         _event_time_control_counts(
@@ -5539,6 +6730,10 @@ def _state_payload(
         "frozen_breadth_status": str(
             breadth_continuation.get("status") or "NOT_RUN"
         ),
+        # These counters are deliberately separate.  They must never be added
+        # retrospectively to the long-running proposal/replay/episode totals.
+        **post_breadth_counts,
+        **session_safe_counts,
     }
     return _rehash(payload, "state_hash")
 
@@ -5567,6 +6762,8 @@ def _kpis(
         (branch_results.get("EVENT_TIME_SAFETY") or {}).get("counts") or {}
     )
     relay_counts = _relay_evidence_counts(branch_results)
+    post_breadth_counts = _post_breadth_counts(branch_results)
+    session_safe_counts = _session_safe_counts(branch_results)
     frontier = list(exploration.get("uniform_legal_frontier") or ())
     stressed_points = [row for row in frontier if row.get("scenario") == "STRESSED_1_5X"]
     normal_points = [row for row in frontier if row.get("scenario") == "NORMAL"]
@@ -5718,6 +6915,8 @@ def _kpis(
         "frozen_breadth_status": str(
             state.get("frozen_breadth_status", "NOT_RUN")
         ),
+        **post_breadth_counts,
+        **session_safe_counts,
         "best_normal_pass_rate": exact_metrics["best_normal_pass_rate"],
         "best_stressed_pass_rate": exact_metrics["best_stressed_pass_rate"],
         "best_normal_summary_threshold_rate": max(
@@ -5801,6 +7000,11 @@ def _write_mission_views(
                 "FRESH_CONFIRMATION",
                 "EVENT_TIME_MATCHED_CONTROLS",
                 "FROZEN_BREADTH_CONTINUATION",
+                "POST_BREADTH_LEGAL_EXACT",
+                "POST_BREADTH_TREASURY_CURVE",
+                "POST_BREADTH_SESSION_SAFE_HORIZON_CUTOFF",
+                "POST_BREADTH_SESSION_SAFE_DROP_COMPONENT",
+                "POST_BREADTH_SESSION_SAFE_PORTFOLIO",
             )
             if key in branch_results
         },
@@ -5828,6 +7032,8 @@ def _write_mission_views(
     tier_g_graduation = branch_results.get("TIER_G_GRADUATION") or {}
     fresh_confirmation = branch_results.get("FRESH_CONFIRMATION") or {}
     relay_counts = _relay_evidence_counts(branch_results)
+    post_breadth_counts = _post_breadth_counts(branch_results)
+    session_safe_counts = _session_safe_counts(branch_results)
     tier_q_count = int(candidate_counts.get("tier_q_contract_cleared_count", 0))
     g_precontrol_count = int(book_counts.get("g_ready_count", 0)) + int(
         book_counts.get("standalone_g_ready_count", 0)
@@ -5948,6 +7154,8 @@ def _write_mission_views(
         "fresh_confirmation_status": relay_counts[
             "fresh_confirmation_status"
         ],
+        **post_breadth_counts,
+        **session_safe_counts,
         "tier_c_candidate_ids": relay_counts["tier_c_candidate_ids"],
         "branch_decisions": {
             lane: (branch_results.get(lane) or {}).get("decision")
@@ -5998,6 +7206,8 @@ def _write_mission_views(
             "frozen_breadth_status": str(
                 state.get("frozen_breadth_status", "NOT_RUN")
             ),
+            **post_breadth_counts,
+            **session_safe_counts,
             "data_purchase_count": int(state.get("data_purchase_count", 0)),
             "tier_c_candidate_ids": relay_counts["tier_c_candidate_ids"],
         }
@@ -6191,6 +7401,144 @@ def _frozen_breadth_manifest_paths(
             ) from exc
         paths[output_key] = resolved
     return paths, tuple(sorted(missing))
+
+
+def _post_breadth_manifest_paths(
+    root: Path, output: Path, manifest: Mapping[str, Any]
+) -> dict[str, Path]:
+    """Resolve optional declarations with manifest-output-bound defaults."""
+
+    section = dict(manifest.get("post_breadth_branch_portfolio") or {})
+    defaults = {
+        "legal_result_path": output
+        / "branch_results"
+        / _POST_BREADTH_RELATIVE_ROOT
+        / "frozen_legal_frontier_exact.json",
+        "treasury_result_path": output
+        / "branch_results"
+        / _POST_BREADTH_RELATIVE_ROOT
+        / "treasury_curve_tripwire.json",
+        "treasury_acquisition_receipt_path": root
+        / "reports/data_access/treasury_curve_tripwire_acquisition_receipt.json",
+        "treasury_input_contract_path": root
+        / "reports/data_access/treasury_curve_tripwire_input_contract.json",
+    }
+    resolved: dict[str, Path] = {}
+    project = root.resolve()
+    branch_root = (output / "branch_results").resolve()
+    for key, default in defaults.items():
+        raw = str(section.get(key) or "").strip()
+        candidate = Path(raw) if raw else default
+        path = (
+            candidate.resolve()
+            if candidate.is_absolute()
+            else (project / candidate).resolve()
+        )
+        try:
+            path.relative_to(project)
+        except ValueError as exc:
+            raise AutonomousDirectorRuntimeError(
+                f"post-breadth manifest path escapes repository: {key}"
+            ) from exc
+        if key.endswith("result_path"):
+            try:
+                path.relative_to(branch_root)
+            except ValueError as exc:
+                raise AutonomousDirectorRuntimeError(
+                    f"post-breadth result must remain under branch_results: {key}"
+                ) from exc
+        resolved[key] = path
+    return resolved
+
+
+def _treasury_input_if_ready(
+    root: Path, paths: Mapping[str, Path],
+) -> tuple[dict[str, Any] | None, tuple[str, ...]]:
+    """Verify the acquisition/input binding or return the exact missing set."""
+
+    receipt_path = paths["treasury_acquisition_receipt_path"]
+    contract_path = paths["treasury_input_contract_path"]
+    missing = tuple(
+        key
+        for key, path in (
+            ("treasury_acquisition_receipt", receipt_path),
+            ("treasury_input_contract", contract_path),
+        )
+        if not path.is_file()
+    )
+    if missing:
+        return None, missing
+
+    receipt = _read_json_object(receipt_path)
+    receipt_core = dict(receipt)
+    claimed = str(receipt_core.pop("receipt_hash", ""))
+    request = dict(receipt.get("request") or {})
+    expected_request = {
+        "dataset": "GLBX.MDP3",
+        "schema": "ohlcv-1m",
+        "symbols": [
+            "ZT.c.0",
+            "ZF.c.0",
+            "ZN.c.0",
+            "TN.c.0",
+            "ZB.c.0",
+            "UB.c.0",
+        ],
+        "stype_in": "continuous",
+        "start": "2023-01-03",
+        "end": "2024-10-01",
+    }
+    expected_cost = float(TREASURY_CURVE_COST_RECEIPT["estimated_cost_usd"])
+    if (
+        not claimed
+        or stable_hash(receipt_core) != claimed
+        or receipt.get("schema") != _TREASURY_ACQUISITION_SCHEMA
+        or request != expected_request
+        or not math.isclose(
+            float(receipt.get("official_live_cost_usd", -1.0)),
+            expected_cost,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        )
+        or int(receipt.get("official_record_count", -1))
+        != int(TREASURY_CURVE_COST_RECEIPT["estimated_records"])
+        or int(receipt.get("official_billable_bytes", -1))
+        != int(TREASURY_CURVE_COST_RECEIPT["estimated_bytes"])
+        or receipt.get("raw_immutable") is not True
+        or receipt.get("runtime_or_manifest_modified") is not False
+        or int(receipt.get("q4_access_count_delta", -1)) != 0
+        or int(receipt.get("protected_data_access_count_delta", -1)) != 0
+        or int(receipt.get("broker_connections", -1)) != 0
+        or int(receipt.get("orders", -1)) != 0
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "Treasury acquisition receipt identity or safety drift"
+        )
+    files = [dict(item) for item in receipt.get("files") or ()]
+    if len(files) != 1 or files[0].get("kind") != "RAW_DBN_OHLCV":
+        raise AutonomousDirectorRuntimeError(
+            "Treasury acquisition raw-file inventory drift"
+        )
+    raw_path = Path(str(files[0].get("path") or "")).resolve()
+    _assert_within(root.resolve(), raw_path)
+    if (
+        not raw_path.is_file()
+        or _file_sha256(raw_path) != str(files[0].get("sha256") or "")
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "Treasury acquisition raw artifact drift"
+        )
+
+    contract = _read_json_object(contract_path)
+    if (
+        contract.get("schema") != TREASURY_CURVE_INPUT_SCHEMA
+        or contract.get("q4_excluded") is not True
+        or contract.get("source_acquisition_receipt_hash") != claimed
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "Treasury input contract is not bound to the acquisition receipt"
+        )
+    return contract, ()
 
 
 def _relative_branch_artifact_path(

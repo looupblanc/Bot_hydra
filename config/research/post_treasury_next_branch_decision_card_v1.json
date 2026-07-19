@@ -1,0 +1,62 @@
+{
+  "schema": "hydra_autonomous_branch_decision_card_v1",
+  "decision_id": "POST_TREASURY_NEXT_BRANCH_20260719_V1",
+  "evidence_role": "PREREGISTERED_DEVELOPMENT_DECISION",
+  "selected_branch": "SESSION_SAFE_FAST_BOOK_477B_TRIPWIRE_V1",
+  "selected_hypothesis": "A causal pre-entry session cutoff can remove the known mandatory-flatten defect from fast_book_477b while preserving enough of its unusually high exact 20-day target velocity to justify unchanged chronological validation.",
+  "strongest_argument_against": "The apparent 2/4 normal and 2/4 stressed exact passes may depend on the noncompliant MNQ events, only four full 20-day starts exist, and B4 contributes one of the two passes.",
+  "smallest_decisive_falsification_experiment": {
+    "source_policy_id": "fast_book_477b40613795d1d45557a83a:w1",
+    "repair_variants": [
+      "HORIZON_SAFE_ENTRY_CUTOFF",
+      "DROP_OFFENDING_COMPONENT"
+    ],
+    "maximum_cpu_shards": 2,
+    "account_sizes": ["50K", "100K", "150K"],
+    "horizons_trading_days": [5, 10, 20],
+    "cost_scenarios": ["NORMAL", "STRESSED_1_5X"],
+    "promotion_allowed": false,
+    "q4_access_allowed": false,
+    "data_purchase_allowed": false
+  },
+  "frozen_tripwire_gate": {
+    "account_size": "50K",
+    "horizon_trading_days": 20,
+    "full_coverage_starts": 4,
+    "minimum_normal_passes": 2,
+    "minimum_stressed_passes": 2,
+    "minimum_passing_temporal_blocks": 2,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "minimum_stressed_consistency_compliance_rate": 0.75,
+    "positive_stressed_net_required": true,
+    "hard_session_and_contract_clean_required": true,
+    "interpretation": "Tier-E development signal only; passing creates no promotion and requires a frozen next validation."
+  },
+  "expected_runtime_minutes": 1,
+  "expected_data_cost_usd": 0,
+  "expected_information_gain": "HIGH: directly distinguishes a repairable execution defect from a noncausal false near-pass using already reconstructed exact ledgers.",
+  "expected_economic_upside": "HIGH_BUT_UNDERPOWERED: prior inadmissible exact diagnostic reached 2/4 normal and 2/4 stressed passes with approximately 95.46%/94.42% median target progress and zero MLL breach at 20 days.",
+  "alternative_audit": {
+    "branch": "CLEAN_CROSS_ASSET_DAILY_RECONSTRUCTION",
+    "candidate": "strategy_daily_cross_YM_to_GC_relative_prior_trend_reversal_q80_h120_v1__prior_equity_guard_v3",
+    "materially_distinct": true,
+    "existing_signal": "Legacy development showed positive 1.5x-cost net and a diagnostic 15-day scaled Combine path.",
+    "evidence_debt": [
+      "only 18 retained trades",
+      "complete 2023 replay absent",
+      "BH-adjusted null p-value approximately 0.255",
+      "legacy deployment precheck failed",
+      "requires clean causal fill/account reconstruction before any claim"
+    ],
+    "expected_runtime_minutes": 5,
+    "expected_data_cost_usd": 0,
+    "selection_reason": "Lower value of information per compute minute than the 477b session repair, but the next materially distinct action if both repair shards fail."
+  },
+  "branch_rule": {
+    "when_selected_tripwire_passes": "FREEZE_REPAIR_AND_RUN_UNCHANGED_CHRONOLOGICAL_VALIDATION",
+    "when_selected_tripwire_fails": "RUN_DISTINCT_CLEAN_CROSS_ASSET_DAILY_RECONSTRUCTION",
+    "status_inheritance_allowed": false,
+    "real_orders_allowed": false,
+    "broker_connection_allowed": false
+  }
+}

@@ -3,14 +3,13 @@
 - Budget start: 2026-07-10
 - Hard cap USD: 200.72
 - Safety ceiling USD: 200.72
-- Cumulative estimated spend USD: 104.155141
-- Cumulative actual spend USD: 104.155141
-- Remaining hard-cap budget USD: 96.565579
-- Remaining automatic safety budget USD: 96.565579
-- Ledger records: 451
+- Cumulative estimated spend USD: 113.245408
+- Cumulative actual spend USD: 113.245408
+- Remaining hard-cap budget USD: 87.475312
+- Remaining automatic safety budget USD: 87.475312
+- Ledger records: 452
 
 ## Recent Records
-- 2026-07-18T23:22:43.710398+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-07-20T16:43:00Z to 2023-07-20T16:46:00Z estimate=$0.000000 actual=$0.002159 status=DOWNLOADED
 - 2026-07-18T23:22:47.636926+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-07-21T13:43:00Z to 2023-07-21T13:46:00Z estimate=$0.000000 actual=$0.010118 status=DOWNLOADED
 - 2026-07-18T23:22:51.290421+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-07-21T16:13:00Z to 2023-07-21T16:16:00Z estimate=$0.000000 actual=$0.001871 status=DOWNLOADED
 - 2026-07-18T23:22:59.812063+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-07-24T13:43:00Z to 2023-07-24T13:46:00Z estimate=$0.000000 actual=$0.006947 status=DOWNLOADED
@@ -30,3 +29,4 @@
 - 2026-07-18T23:24:08.798841+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-08-01T15:43:00Z to 2023-08-01T15:46:00Z estimate=$0.000000 actual=$0.001696 status=DOWNLOADED
 - 2026-07-19T09:55:33.715142+00:00 GLBX.MDP3 ohlcv-1m+definition ['YM.c.0', 'MYM.c.0', 'ES.c.0'] 2025-01-02 to 2025-07-01 estimate=$1.847859 actual=$1.847859 status=DOWNLOADED
 - 2026-07-19T10:46:52.294722+00:00 GLBX.MDP3 ohlcv-1m+definition ['YM.c.0', 'MYM.c.0', 'ES.c.0', 'NQ.c.0', 'RTY.c.0'] 2025-07-01 to 2025-10-01 estimate=$1.586562 actual=$1.586562 status=DOWNLOADED
+- 2026-07-19T12:03:52.585346+00:00 GLBX.MDP3 ohlcv-1m ['ZT.c.0', 'ZF.c.0', 'ZN.c.0', 'TN.c.0', 'ZB.c.0', 'UB.c.0'] 2023-01-03 to 2024-10-01 estimate=$9.090267 actual=$9.090267 status=DOWNLOADED
