@@ -1,0 +1,186 @@
+{
+  "branch_rule": {
+    "broker_connections": 0,
+    "fail": "CLOSE_EXACT_SESSION_SAFE_BOOK_BRANCH",
+    "orders": 0,
+    "pass": "PRESERVE_AS_TIER_Q_ELIGIBLE_AND_RUN_FROZEN_TIER_G_DEVELOPMENT",
+    "q4_access_count_delta": 0,
+    "status_inheritance_allowed": false
+  },
+  "card_hash": "52703f6bcbeeb589873370cb98a5ce62252f7eec3993623c72d1e89b33f39ef8",
+  "components": [
+    {
+      "calibration": {
+        "calibration_end_exclusive_ns": 1688342400000000000,
+        "calibration_hash": "8c2b696de305dbd51f4ac6876b93b0f36eae04e6a9d3949f3f0955c4947c322b",
+        "context_threshold": 0.0015113350125944836,
+        "finite_context_observations": 102745,
+        "finite_trigger_observations": 120466,
+        "source_matrix_hash": "8849d6c4145e353c72ac0a721a7b3b198de9b1b6df96f5adc079cd27c2b1fe61",
+        "trigger_threshold": 0.18333333333333332
+      },
+      "candidate": {
+        "adverse_r": 1.0,
+        "context_feature": "past_return_60",
+        "context_operator": "ABS_GT",
+        "context_quantile": 0.5,
+        "cooldown_minutes": 15,
+        "cross_asset_reference_market": null,
+        "direction_rule": "PAST_RETURN_REVERSAL",
+        "execution_market": "M2K",
+        "favorable_r": 0.5,
+        "horizon": 15,
+        "market": "RTY",
+        "mechanism": "EXHAUSTION_REVERSAL",
+        "risk_level": 0.75,
+        "session_code": 0,
+        "timeframe": "60m",
+        "trigger_feature": "extreme_dwell",
+        "trigger_operator": "GT",
+        "trigger_quantile": 0.65,
+        "version": 1
+      },
+      "candidate_fingerprint": "1478619b60a10a3b9bccef4fc0e5fbbdbc80d8ec492fa07d61b00d4e824b9499",
+      "candidate_id": "hazard_1478619b60a10a3b9bccef4f",
+      "quality_tier": 1.0
+    },
+    {
+      "calibration": {
+        "calibration_end_exclusive_ns": 1688342400000000000,
+        "calibration_hash": "ebafdc668543d2524b624b36ef9af72d0e83aa25698529f5ec4b6c3d2e60085a",
+        "context_threshold": 0.0005459839844697001,
+        "finite_context_observations": 161539,
+        "finite_trigger_observations": 161539,
+        "source_matrix_hash": "514d2d1aadb8a6d00aad2a13b61f51a8f3271eba531031ea9499f31a18ef615e",
+        "trigger_threshold": 0.0009598944116147035
+      },
+      "candidate": {
+        "adverse_r": 1.0,
+        "context_feature": "cross_asset_ctx_15m_return",
+        "context_operator": "SAME_SIGN",
+        "context_quantile": 0.65,
+        "cooldown_minutes": 30,
+        "cross_asset_reference_market": "ES",
+        "direction_rule": "TRIGGER_SIGN_CONTINUATION",
+        "execution_market": "MYM",
+        "favorable_r": 1.0,
+        "horizon": 30,
+        "market": "YM",
+        "mechanism": "CROSS_ASSET_STATE",
+        "risk_level": 1.25,
+        "session_code": 0,
+        "timeframe": "15m",
+        "trigger_feature": "ctx_15m_return",
+        "trigger_operator": "ABS_GT",
+        "trigger_quantile": 0.85,
+        "version": 1
+      },
+      "candidate_fingerprint": "19327ab34a21d623c654a6ccce764f8e22c349106e770e15c813c6264ac5c845",
+      "candidate_id": "hazard_19327ab34a21d623c654a6cc",
+      "quality_tier": 0.5
+    }
+  ],
+  "data_request": {
+    "confirmation_role": "CONFIRMATION",
+    "confirmation_start_inclusive": "2022-01-03",
+    "dataset": "GLBX.MDP3",
+    "end_exclusive": "2023-01-01",
+    "q4_access_allowed": false,
+    "request_start_inclusive": "2021-12-20",
+    "schema": "ohlcv-1m",
+    "stype_in": "continuous",
+    "stype_out": "instrument_id",
+    "symbols": ["RTY.c.0", "M2K.c.0", "YM.c.0", "MYM.c.0", "ES.c.0"],
+    "warmup_role": "IMPLEMENTATION_WARMUP_ONLY"
+  },
+  "decision_id": "SESSION_SAFE_M2K_MYM_CONFIRMATION_2022_V1",
+  "evaluation": {
+    "cost_scenarios": ["NORMAL", "STRESSED_1_5X"],
+    "horizons_trading_days": [5, 10, 20],
+    "one_shot": true,
+    "parameters_mutable": false,
+    "recalibration_allowed": false,
+    "start_grid": "COMPLETE_NON_OVERLAPPING_FROM_FROZEN_CONFIRMATION_CALENDAR"
+  },
+  "evidence_role": "ONE_SHOT_UNTOUCHED_CONFIRMATION_REPLICATION",
+  "frozen_account": {
+    "account_label": "50K",
+    "integer_quantity_tier": 3,
+    "official_rule_snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "official_rule_snapshot_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "policy": {
+      "actual_stop_risk_available": false,
+      "aggregate_open_risk_ceiling": 2000.0,
+      "component_priority": ["hazard_1478619b60a10a3b9bccef4f", "hazard_19327ab34a21d623c654a6cc"],
+      "concurrency_scaling": "PRIORITY",
+      "daily_consistency_profit_guard": 3000.0,
+      "daily_loss_guard": 2000.0,
+      "future_outcome_fields_used": false,
+      "maximum_concurrent_sleeves": 2,
+      "maximum_mini_equivalent": 5.0,
+      "maximum_mll_buffer_fraction": 1.0,
+      "nominal_risk_charge_per_mini": {
+        "hazard_1478619b60a10a3b9bccef4f": 764.3670069403114,
+        "hazard_19327ab34a21d623c654a6cc": 924.108948196035
+      },
+      "outbound_order_capability": false,
+      "policy_id": "session_safe_477b:DROP_OFFENDING_COMPONENT:50K:3x",
+      "policy_version": "hydra_active_risk_pool_governor_v1",
+      "preserve_sole_sleeve_nominal_risk": true,
+      "protected_mll_buffer": 0.0,
+      "risk_measure": "DECLARED_NOMINAL_RISK_UTILISATION",
+      "same_instrument_conflict_rule": "PRIORITY",
+      "schema": "hydra_active_risk_pool_policy_v1",
+      "static_risk_tier": 1.0,
+      "structural_fingerprint": "234848c776dfb14d2fcae8451f5e8a8655df2c2df28034f28b642524259886e5",
+      "target_protection_distance": 0.0,
+      "target_protection_mode": "NONE"
+    },
+    "policy_hash": "60cf3ee01714eab2340d679282d92b30d90237040e9a823e349bebd92d728f3f"
+  },
+  "gate": {
+    "all_stressed_passing_paths_consistency_compliant": true,
+    "evidence_ceiling_on_pass": "FRESH_REPLICATION_SUCCESS_TIER_Q_ELIGIBLE_NOT_TIER_C",
+    "matching_horizon_trading_days": 20,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "minimum_normal_passes": 1,
+    "minimum_stressed_passes": 1,
+    "no_retuning": true,
+    "positive_stressed_net_required": true,
+    "reason": "Source is Tier E, so one untouched replication cannot skip Tier G."
+  },
+  "hypothesis": "The session-clean M2K+MYM 50K book preserves positive stressed target velocity and at least one 20-day normal and stressed Combine pass on untouched 2022 evidence without retuning.",
+  "official_cost_estimate": {
+    "actual_spend_usd": 0.0,
+    "definition": {"billable_bytes": 2586960, "cost_usd": 0.004095800221, "records": 7186},
+    "maximum_authorized_by_this_card_usd": 7.0,
+    "ohlcv": {"billable_bytes": 100190048, "cost_usd": 6.531647741795, "records": 1789108},
+    "retrieved_at_utc": "2026-07-19T12:21:09.213677+00:00",
+    "total_cost_usd": 6.535743542016
+  },
+  "schema": "hydra_session_safe_m2k_mym_confirmation_decision_card_v1",
+  "source": {
+    "development_20d": {
+      "full_coverage_starts": 4,
+      "normal_passes": 2,
+      "normal_target_progress_median": 0.9546162873194699,
+      "passing_blocks": ["B3", "B4"],
+      "stressed_mll_breach_rate": 0.0,
+      "stressed_net_usd": 8344.845521621413,
+      "stressed_passes": 2,
+      "stressed_target_progress_median": 0.9441701119185189
+    },
+    "repair_variant": "DROP_OFFENDING_COMPONENT",
+    "source_evidence_tier": "E",
+    "source_policy_id": "fast_book_477b40613795d1d45557a83a:w1",
+    "source_tripwire_result_hash": "0a58d72f3c1de83d7f57dc378dc5e38fdf08b359fb733b367ead753467f81d46"
+  },
+  "status": "FROZEN_AWAITING_ACQUISITION",
+  "strongest_argument_against": "Only four full development starts exist and one of two passes came from B4.",
+  "untouched_audit": {
+    "data_access_ledger_minimum_period_start": "2023-01-01",
+    "period_is_unviewed": true,
+    "pre_2023_date_ranged_cache_file_count": 0,
+    "target_period_overlap_count": 0
+  }
+}

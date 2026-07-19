@@ -122,6 +122,14 @@ from hydra.production.session_safe_fast_book_tripwire import (
     SOURCE_POLICY_ID as SESSION_SAFE_FAST_BOOK_SOURCE_POLICY_ID,
     session_safe_fast_book_worker,
 )
+from hydra.production.session_safe_m2k_mym_confirmation import (
+    FEATURE_SCHEMA as SESSION_SAFE_CONFIRMATION_FEATURE_SCHEMA,
+    SCHEMA as SESSION_SAFE_CONFIRMATION_SCHEMA,
+    build_feature_bundles as build_session_safe_confirmation_features,
+    evaluate_confirmation as evaluate_session_safe_confirmation,
+    load_decision_card as load_session_safe_confirmation_card,
+    open_feature_matrices as open_session_safe_confirmation_matrices,
+)
 from hydra.production.v71_event_time_account_exploration import (
     event_time_account_exploration_worker,
 )
@@ -142,6 +150,15 @@ _HORIZONS = (5, 10, 20)
 _SCENARIOS = ("NORMAL", "STRESSED_1_5X")
 _POST_BREADTH_RELATIVE_ROOT = Path("post_breadth_portfolio")
 _SESSION_SAFE_PORTFOLIO_SCHEMA = "hydra_session_safe_fast_book_portfolio_v1"
+_SESSION_SAFE_CONFIRMATION_RELATIVE_ROOT = (
+    _POST_BREADTH_RELATIVE_ROOT / "session_safe_m2k_mym_confirmation"
+)
+_SESSION_SAFE_CONFIRMATION_DEFAULT_RECEIPT = Path(
+    "reports/data_access/session_safe_m2k_mym_confirmation_acquisition_receipt.json"
+)
+_SESSION_SAFE_CONFIRMATION_WAITING = (
+    "WAITING_FOR_SESSION_SAFE_M2K_MYM_CONFIRMATION_INPUT"
+)
 _TREASURY_ACQUISITION_SCHEMA = (
     "hydra_treasury_curve_tripwire_acquisition_receipt_v1"
 )
@@ -2058,6 +2075,19 @@ def _run_post_book_graduation_relay(
                 runtime_results=results,
             )
         )
+        state, results, _session_safe_confirmation = (
+            _run_session_safe_m2k_mym_confirmation_relay(
+                root=root,
+                manifest=manifest,
+                output=output,
+                live_writer=live_writer,
+                branch_writer=branch_writer,
+                prior_state=state,
+                started=started,
+                heartbeat_seconds=heartbeat_seconds,
+                runtime_results=results,
+            )
+        )
     elif os.environ.get("HYDRA_PRODUCTION_TEST_MODE") != "1":
         raise AutonomousDirectorRuntimeError(
             "post-confirmation branch portfolio is undeclared"
@@ -3381,6 +3411,335 @@ def _session_safe_result_next_action(result: Mapping[str, Any]) -> str:
     return "CLOSE_SESSION_SAFE_REPAIR_AND_ADVANCE_DISTINCT_BRANCH"
 
 
+def _run_session_safe_m2k_mym_confirmation_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+    acquisition_receipt_path: str | Path = _SESSION_SAFE_CONFIRMATION_DEFAULT_RECEIPT,
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    """Consume the frozen M2K+MYM confirmation once, or wait resumably.
+
+    Feature materialization is a parent-side cache operation.  The sole child
+    process is read-only: it opens the sealed matrices and evaluates the
+    unchanged decision card.  Only the persistent parent writes the result
+    envelope and decision ledger.
+    """
+
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    branch_root = output / "branch_results"
+    relative_root = _SESSION_SAFE_CONFIRMATION_RELATIVE_ROOT
+    feature_path = branch_root / relative_root / "technical_feature_receipt.json"
+    result_path = branch_root / relative_root / "confirmation_result.json"
+    card_path = (root / "config/research/session_safe_m2k_mym_confirmation_decision_card_v1.json").resolve()
+    if not card_path.is_file():
+        raise AutonomousDirectorRuntimeError(
+            "session-safe confirmation decision card is absent"
+        )
+    card = load_session_safe_confirmation_card(card_path)
+    card_hash = str(card["card_hash"])
+    raw_receipt_path = Path(acquisition_receipt_path)
+    receipt_path = (
+        raw_receipt_path
+        if raw_receipt_path.is_absolute()
+        else (root / raw_receipt_path)
+    ).resolve()
+
+    if result_path.is_file():
+        if not receipt_path.is_file() or not feature_path.is_file():
+            raise AutonomousDirectorRuntimeError(
+                "persisted session-safe confirmation lost a bound input"
+            )
+        feature_envelope = _read_hashed(feature_path, "result_hash")
+        if not _artifact_manifest_compatible(feature_envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "session-safe confirmation feature envelope identity drift"
+            )
+        _verify_session_safe_confirmation_feature_receipt(
+            dict(feature_envelope.get("session_safe_confirmation_features") or {}),
+            expected_card_hash=card_hash,
+        )
+        envelope = _read_hashed(result_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "session-safe confirmation envelope identity drift"
+            )
+        confirmation = _verify_session_safe_m2k_mym_confirmation_result(
+            dict(envelope.get("session_safe_m2k_mym_confirmation") or {}),
+            expected_card_hash=card_hash,
+        )
+        results["POST_BREADTH_SESSION_SAFE_CONFIRMATION"] = confirmation
+        return _publish_session_safe_confirmation_state(
+            root=root,
+            manifest=manifest,
+            live_writer=live_writer,
+            prior_state=state,
+            started=started,
+            results=results,
+            confirmation=confirmation,
+        )
+
+    if not receipt_path.is_file():
+        waiting = {
+            "status": _SESSION_SAFE_CONFIRMATION_WAITING,
+            "economic_result_created": False,
+            "decision_card_hash": card_hash,
+            "acquisition_receipt_path": str(receipt_path),
+            "evidence_tier": None,
+            "promotion_status": None,
+        }
+        state = _state_payload(
+            manifest,
+            sequence=int(state["checkpoint_sequence"]) + 1,
+            state="ROBUSTNESS_ACTIVE",
+            stage=_SESSION_SAFE_CONFIRMATION_WAITING,
+            branch_results=results,
+            next_action=(
+                "ACQUIRE_FROZEN_SESSION_SAFE_M2K_MYM_CONFIRMATION_INPUT_AND_RESUME"
+            ),
+        )
+        state.update(
+            {
+                "active_economic_worker_processes": 0,
+                "session_safe_confirmation_worker_limit": 1,
+                "session_safe_confirmation_parent_writer_only": True,
+                "session_safe_confirmation_status": _SESSION_SAFE_CONFIRMATION_WAITING,
+                "session_safe_confirmation_economic_result_created": False,
+                "session_safe_confirmation_tier_q_eligible_count": 0,
+                "session_safe_confirmation_automatic_tier_g_count": 0,
+                "session_safe_confirmation_automatic_tier_c_count": 0,
+                "session_safe_confirmation_automatic_tier_f_count": 0,
+                "q4_access_count_delta": 0,
+                "broker_connections": 0,
+                "orders": 0,
+            }
+        )
+        state = _rehash(state, "state_hash")
+        _publish(live_writer, state, _kpis(manifest, state, results, started))
+        _write_mission_views(root, manifest, state, results)
+        return state, results, waiting
+
+    acquisition = _read_json_object(receipt_path)
+    acquisition_core = dict(acquisition)
+    acquisition_hash = str(acquisition_core.pop("receipt_hash", ""))
+    if (
+        not acquisition_hash
+        or stable_hash(acquisition_core) != acquisition_hash
+        or acquisition.get("decision_card_hash") != card_hash
+        or acquisition.get("download_status") != "DOWNLOADED"
+        or int(acquisition.get("q4_access_count_delta", -1)) != 0
+        or int(acquisition.get("broker_connections", -1)) != 0
+        or int(acquisition.get("orders", -1)) != 0
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "session-safe confirmation acquisition receipt drift"
+        )
+
+    if feature_path.is_file():
+        feature_envelope = _read_hashed(feature_path, "result_hash")
+        if not _artifact_manifest_compatible(feature_envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "session-safe confirmation feature envelope identity drift"
+            )
+        features = _verify_session_safe_confirmation_feature_receipt(
+            dict(feature_envelope.get("session_safe_confirmation_features") or {}),
+            expected_card_hash=card_hash,
+        )
+    else:
+        feature_inputs = dict(acquisition.get("feature_build_inputs") or {})
+        source_files = [dict(item) for item in feature_inputs.get("source_files") or ()]
+        contract_map_path = Path(str(feature_inputs.get("contract_map_path") or ""))
+        cache_root = Path(str(feature_inputs.get("cache_root") or ""))
+        if (
+            not source_files
+            or not contract_map_path.is_file()
+            or any(
+                not Path(str(item.get("path") or "")).is_file()
+                for item in source_files
+            )
+            or not str(cache_root)
+        ):
+            raise AutonomousDirectorRuntimeError(
+                "session-safe confirmation receipt references absent feature inputs"
+            )
+        features = _verify_session_safe_confirmation_feature_receipt(
+            build_session_safe_confirmation_features(
+                card,
+                source_files=source_files,
+                contract_map_path=contract_map_path,
+                cache_root=cache_root,
+            ),
+            expected_card_hash=card_hash,
+        )
+        feature_envelope = _session_safe_confirmation_feature_envelope(
+            manifest, features
+        )
+        branch_writer.write_json(
+            relative_root / feature_path.name,
+            feature_envelope,
+        )
+
+    _begin_economic_phase()
+    try:
+        with ProcessPoolExecutor(
+            max_workers=1,
+            mp_context=multiprocessing.get_context("spawn"),
+        ) as pool:
+            future = pool.submit(
+                _session_safe_m2k_mym_confirmation_worker,
+                {
+                    "card_path": str(card_path),
+                    "acquisition_receipt_path": str(receipt_path),
+                    "feature_receipt": features,
+                    "expected_card_hash": card_hash,
+                },
+            )
+            state = _state_payload(
+                manifest,
+                sequence=int(state["checkpoint_sequence"]) + 1,
+                state="ROBUSTNESS_ACTIVE",
+                stage="SESSION_SAFE_M2K_MYM_CONFIRMATION_RUNNING",
+                branch_results=results,
+                next_action="RUN_FROZEN_SESSION_SAFE_M2K_MYM_CONFIRMATION_ONCE",
+            )
+            state.update(
+                {
+                    "active_economic_worker_processes": 1,
+                    "session_safe_confirmation_worker_limit": 1,
+                    "session_safe_confirmation_parent_writer_only": True,
+                    "session_safe_confirmation_status": "RUNNING",
+                    "q4_access_count_delta": 0,
+                    "broker_connections": 0,
+                    "orders": 0,
+                }
+            )
+            state = _rehash(state, "state_hash")
+            _publish(live_writer, state, _kpis(manifest, state, results, started))
+            _write_mission_views(root, manifest, state, results)
+            while not future.done():
+                wait(
+                    {future},
+                    timeout=max(min(float(heartbeat_seconds), 5.0), 0.1),
+                    return_when=FIRST_COMPLETED,
+                )
+                state = _heartbeat_state(
+                    state, active_economic_worker_processes=int(not future.done())
+                )
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+            confirmation = _verify_session_safe_m2k_mym_confirmation_result(
+                dict(future.result()), expected_card_hash=card_hash
+            )
+    finally:
+        _end_economic_phase()
+
+    next_action = _session_safe_confirmation_next_action(confirmation)
+    envelope = _post_source_envelope(
+        manifest,
+        lane_id="EXPLOITATION",
+        branch_id="SESSION_SAFE_M2K_MYM_CONFIRMATION_2022_V1",
+        decision=str(confirmation["resulting_evidence_status"]),
+        payload_key="session_safe_m2k_mym_confirmation",
+        payload=confirmation,
+        next_action=next_action,
+    )
+    branch_writer.write_json(relative_root / result_path.name, envelope)
+    _append_decision_once(root, manifest, envelope)
+    results["POST_BREADTH_SESSION_SAFE_CONFIRMATION"] = confirmation
+    return _publish_session_safe_confirmation_state(
+        root=root,
+        manifest=manifest,
+        live_writer=live_writer,
+        prior_state=state,
+        started=started,
+        results=results,
+        confirmation=confirmation,
+    )
+
+
+def _publish_session_safe_confirmation_state(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    live_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    results: Mapping[str, Mapping[str, Any]],
+    confirmation: Mapping[str, Any],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    verified = _verify_session_safe_m2k_mym_confirmation_result(confirmation)
+    runtime_results = {key: dict(value) for key, value in results.items()}
+    runtime_results["POST_BREADTH_SESSION_SAFE_CONFIRMATION"] = verified
+    passed = dict(verified["confirmation_gate"])["passed"] is True
+    state = _state_payload(
+        manifest,
+        sequence=int(prior_state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage=(
+            "SESSION_SAFE_M2K_MYM_CONFIRMATION_TIER_Q_ELIGIBLE"
+            if passed
+            else "SESSION_SAFE_M2K_MYM_CONFIRMATION_BRANCH_CLOSED"
+        ),
+        branch_results=runtime_results,
+        next_action=_session_safe_confirmation_next_action(verified),
+    )
+    state.update(
+        {
+            "active_economic_worker_processes": 0,
+            "session_safe_confirmation_worker_limit": 1,
+            "session_safe_confirmation_parent_writer_only": True,
+            **_session_safe_confirmation_counts(runtime_results),
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        }
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, runtime_results, started))
+    _write_mission_views(root, manifest, state, runtime_results)
+    return state, runtime_results, verified
+
+
+def _session_safe_confirmation_next_action(result: Mapping[str, Any]) -> str:
+    if dict(result.get("confirmation_gate") or {}).get("passed") is True:
+        return (
+            "PRESERVE_SESSION_SAFE_BOOK_AS_TIER_Q_ELIGIBLE_AND_RUN_FROZEN_TIER_G_DEVELOPMENT"
+        )
+    return "CLOSE_SESSION_SAFE_REPAIR_AND_DISPATCH_DISTINCT_CAUSAL_BRANCH"
+
+
+def _session_safe_confirmation_feature_envelope(
+    manifest: Mapping[str, Any], features: Mapping[str, Any]
+) -> dict[str, Any]:
+    value = {
+        "schema": BRANCH_RESULT_SCHEMA,
+        "campaign_id": manifest["campaign_id"],
+        "manifest_hash": manifest["manifest_hash"],
+        "source_commit": manifest["source_commit"],
+        "lane_id": "DIRECTOR",
+        "branch_id": "SESSION_SAFE_M2K_MYM_CONFIRMATION_FEATURES_2022_V1",
+        "status": "COMPLETE",
+        "decision": "CAUSAL_CONFIRMATION_FEATURES_READY",
+        "session_safe_confirmation_features": dict(features),
+        "completed_at_utc": _utc_now(),
+        "implementation_validation_only": True,
+        "economic_result_created": False,
+        "parent_writer_only": True,
+        "promotion_status": None,
+        "q4_access_count_delta": 0,
+        "broker_connections": 0,
+        "orders": 0,
+    }
+    return _with_hash(value, "result_hash")
+
+
 def _build_session_safe_fast_book_portfolio(
     completed: Mapping[str, Mapping[str, Any]],
 ) -> dict[str, Any]:
@@ -4435,6 +4794,33 @@ def _fresh_confirmation_worker(
     return _verify_fresh_confirmation_result(result)
 
 
+def _session_safe_m2k_mym_confirmation_worker(
+    payload: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Evaluate the frozen confirmation with no durable or status writes."""
+
+    card = load_session_safe_confirmation_card(str(payload["card_path"]))
+    expected = str(payload.get("expected_card_hash") or "")
+    if expected and str(card.get("card_hash") or "") != expected:
+        raise AutonomousDirectorRuntimeError(
+            "session-safe confirmation worker card hash drift"
+        )
+    acquisition = _read_json_object(Path(str(payload["acquisition_receipt_path"])))
+    features = _verify_session_safe_confirmation_feature_receipt(
+        dict(payload.get("feature_receipt") or {}),
+        expected_card_hash=expected,
+    )
+    result = evaluate_session_safe_confirmation(
+        card,
+        matrices=open_session_safe_confirmation_matrices(features),
+        acquisition_receipt=acquisition,
+        existing_result=None,
+    )
+    return _verify_session_safe_m2k_mym_confirmation_result(
+        result, expected_card_hash=expected
+    )
+
+
 def _frozen_breadth_continuation_worker(
     contract_path: str,
     acquisition_receipt_path: str,
@@ -4693,6 +5079,127 @@ def _verify_treasury_curve_result(
             raise AutonomousDirectorRuntimeError(
                 "Treasury account-size matrix denominator drift"
             )
+    return {**row, "result_hash": claimed}
+
+
+def _verify_session_safe_confirmation_feature_receipt(
+    value: Mapping[str, Any], *, expected_card_hash: str = ""
+) -> dict[str, Any]:
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    bundles = {
+        str(key): dict(item)
+        for key, item in dict(row.get("bundles") or {}).items()
+    }
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != SESSION_SAFE_CONFIRMATION_FEATURE_SCHEMA
+        or row.get("status") != "CAUSAL_FEATURE_BUNDLES_READY"
+        or (expected_card_hash and row.get("decision_card_hash") != expected_card_hash)
+        or row.get("future_outcomes_in_decision_bundle") is not False
+        or set(bundles) != {"RTY", "YM", "ES"}
+        or any(
+            not str(item.get("path") or "")
+            or not str(item.get("bundle_hash") or "")
+            or int(item.get("row_count", 0)) <= 0
+            for item in bundles.values()
+        )
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "session-safe confirmation feature receipt drift"
+        )
+    return {**row, "result_hash": claimed}
+
+
+def _verify_session_safe_m2k_mym_confirmation_result(
+    value: Mapping[str, Any], *, expected_card_hash: str = ""
+) -> dict[str, Any]:
+    """Enforce the one-shot Tier-Q ceiling and exact episode denominators."""
+
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    gate = dict(row.get("confirmation_gate") or {})
+    gate_checks = dict(gate.get("checks") or {})
+    horizons = {
+        str(key): dict(item)
+        for key, item in dict(row.get("horizon_results") or {}).items()
+    }
+    adapter = dict(row.get("evidence_bundle_adapter") or {})
+    components = dict(row.get("component_results") or {})
+    passed = gate.get("passed") is True
+    expected_status = (
+        "FRESH_REPLICATION_SUCCESS_TIER_Q_ELIGIBLE_NOT_TIER_C"
+        if passed
+        else "FRESH_REPLICATION_FAILED_BRANCH_CLOSED"
+    )
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != SESSION_SAFE_CONFIRMATION_SCHEMA
+        or row.get("status") != "CONFIRMATION_CONSUMED_ONCE"
+        or (expected_card_hash and row.get("decision_card_hash") != expected_card_hash)
+        or row.get("account_label") != "50K"
+        or row.get("source_evidence_tier") != "E"
+        or row.get("resulting_evidence_status") != expected_status
+        or set(horizons) != {"5", "10", "20"}
+        or len(components) != 2
+        or any(
+            dict(item).get("recalibrated") is not False
+            or dict(item).get("batch_stream_equal") is not True
+            for item in components.values()
+        )
+        or not gate_checks
+        or any(not isinstance(item, bool) for item in gate_checks.values())
+        or passed is not all(gate_checks.values())
+        or gate.get("evidence_ceiling")
+        != "FRESH_REPLICATION_SUCCESS_TIER_Q_ELIGIBLE_NOT_TIER_C"
+        or adapter.get("sealing_performed") is not False
+        or row.get("retuning_performed") is not False
+        or row.get("recalibration_performed") is not False
+        or int(row.get("q4_access_count_delta", -1)) != 0
+        or int(row.get("broker_connections", -1)) != 0
+        or int(row.get("orders", -1)) != 0
+        or row.get("promotion_status") is not None
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "session-safe confirmation identity, evidence ceiling, or safety drift"
+        )
+
+    expected_records = 0
+    for horizon, result in horizons.items():
+        normal = dict(result.get("normal") or {})
+        stressed = dict(result.get("stressed") or {})
+        start_count = int(result.get("full_coverage_start_count", -1))
+        if (
+            int(result.get("horizon_trading_days", -1)) != int(horizon)
+            or start_count <= 0
+            or int(normal.get("episode_count", -1)) != start_count
+            or int(stressed.get("episode_count", -1)) != start_count
+            or not 0 <= int(normal.get("pass_count", -1)) <= start_count
+            or not 0 <= int(stressed.get("pass_count", -1)) <= start_count
+            or not 0 <= int(normal.get("mll_breach_count", -1)) <= start_count
+            or not 0 <= int(stressed.get("mll_breach_count", -1)) <= start_count
+        ):
+            raise AutonomousDirectorRuntimeError(
+                f"session-safe confirmation {horizon}-day denominator drift"
+            )
+        expected_records += 2 * start_count
+    records = [dict(item) for item in adapter.get("evaluated_policy_records") or ()]
+    if (
+        len(records) != expected_records
+        or adapter.get("records_hash") != stable_hash(records)
+        or any(
+            item.get("record_hash")
+            != stable_hash(
+                {key: content for key, content in item.items() if key != "record_hash"}
+            )
+            for item in records
+        )
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "session-safe confirmation EvidenceBundle denominator drift"
+        )
     return {**row, "result_hash": claimed}
 
 
@@ -5013,6 +5520,65 @@ def _session_safe_counts(
             counts["session_safe_status"] = "REPAIRS_COMPLETE_PORTFOLIO_PENDING"
     elif values:
         counts["session_safe_status"] = "PARTIAL_RESUME"
+    return counts
+
+
+def _session_safe_confirmation_counts(
+    branch_results: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Expose fresh-replication counters without changing historical totals."""
+
+    raw = branch_results.get("POST_BREADTH_SESSION_SAFE_CONFIRMATION") or {}
+    counts: dict[str, Any] = {
+        "session_safe_confirmation_status": "NOT_RUN",
+        "session_safe_confirmation_economic_result_created": False,
+        "session_safe_confirmation_feature_bundle_count": 0,
+        "session_safe_confirmation_50k_20d_normal_episode_count": 0,
+        "session_safe_confirmation_50k_20d_stressed_episode_count": 0,
+        "session_safe_confirmation_50k_20d_normal_pass_count": 0,
+        "session_safe_confirmation_50k_20d_stressed_pass_count": 0,
+        "session_safe_confirmation_exact_episode_count": 0,
+        "session_safe_confirmation_tier_q_eligible_count": 0,
+        "session_safe_confirmation_automatic_tier_g_count": 0,
+        "session_safe_confirmation_automatic_tier_c_count": 0,
+        "session_safe_confirmation_automatic_tier_f_count": 0,
+    }
+    if not raw:
+        return counts
+    result = _verify_session_safe_m2k_mym_confirmation_result(raw)
+    horizons = dict(result["horizon_results"])
+    selected = dict(horizons["20"])
+    normal = dict(selected["normal"])
+    stressed = dict(selected["stressed"])
+    counts.update(
+        {
+            "session_safe_confirmation_status": str(
+                result["resulting_evidence_status"]
+            ),
+            "session_safe_confirmation_economic_result_created": True,
+            "session_safe_confirmation_feature_bundle_count": 3,
+            "session_safe_confirmation_50k_20d_normal_episode_count": int(
+                normal["episode_count"]
+            ),
+            "session_safe_confirmation_50k_20d_stressed_episode_count": int(
+                stressed["episode_count"]
+            ),
+            "session_safe_confirmation_50k_20d_normal_pass_count": int(
+                normal["pass_count"]
+            ),
+            "session_safe_confirmation_50k_20d_stressed_pass_count": int(
+                stressed["pass_count"]
+            ),
+            "session_safe_confirmation_exact_episode_count": sum(
+                int(dict(cell)[scenario]["episode_count"])
+                for cell in horizons.values()
+                for scenario in ("normal", "stressed")
+            ),
+            "session_safe_confirmation_tier_q_eligible_count": int(
+                dict(result["confirmation_gate"])["passed"] is True
+            ),
+        }
+    )
     return counts
 
 
@@ -6532,6 +7098,9 @@ def _state_payload(
     relay_counts = _relay_evidence_counts(branch_results)
     post_breadth_counts = _post_breadth_counts(branch_results)
     session_safe_counts = _session_safe_counts(branch_results)
+    session_safe_confirmation_counts = _session_safe_confirmation_counts(
+        branch_results
+    )
     event_control = branch_results.get("EVENT_TIME_MATCHED_CONTROLS") or {}
     event_control_counts = (
         _event_time_control_counts(
@@ -6734,6 +7303,7 @@ def _state_payload(
         # retrospectively to the long-running proposal/replay/episode totals.
         **post_breadth_counts,
         **session_safe_counts,
+        **session_safe_confirmation_counts,
     }
     return _rehash(payload, "state_hash")
 
@@ -6764,6 +7334,9 @@ def _kpis(
     relay_counts = _relay_evidence_counts(branch_results)
     post_breadth_counts = _post_breadth_counts(branch_results)
     session_safe_counts = _session_safe_counts(branch_results)
+    session_safe_confirmation_counts = _session_safe_confirmation_counts(
+        branch_results
+    )
     frontier = list(exploration.get("uniform_legal_frontier") or ())
     stressed_points = [row for row in frontier if row.get("scenario") == "STRESSED_1_5X"]
     normal_points = [row for row in frontier if row.get("scenario") == "NORMAL"]
@@ -6917,6 +7490,7 @@ def _kpis(
         ),
         **post_breadth_counts,
         **session_safe_counts,
+        **session_safe_confirmation_counts,
         "best_normal_pass_rate": exact_metrics["best_normal_pass_rate"],
         "best_stressed_pass_rate": exact_metrics["best_stressed_pass_rate"],
         "best_normal_summary_threshold_rate": max(

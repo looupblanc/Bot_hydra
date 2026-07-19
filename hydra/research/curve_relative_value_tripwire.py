@@ -105,6 +105,29 @@ class CurveTripwireError(RuntimeError):
 
 
 @dataclass(frozen=True, slots=True)
+class _PairExecutionView:
+    """Dense scalar views used by the chronological execution replay."""
+
+    length: int
+    timestamp_ns: np.ndarray
+    session_id: np.ndarray
+    roll_segment: np.ndarray
+    local_minute: np.ndarray
+    session_day: np.ndarray
+    relative_z: np.ndarray
+    left_dollar_sigma_60: np.ndarray
+    right_dollar_sigma_60: np.ndarray
+    left_open: np.ndarray
+    left_high: np.ndarray
+    left_low: np.ndarray
+    left_close: np.ndarray
+    right_open: np.ndarray
+    right_high: np.ndarray
+    right_low: np.ndarray
+    right_close: np.ndarray
+
+
+@dataclass(frozen=True, slots=True)
 class TreasurySpec:
     root: str
     tenor_years: float
@@ -634,6 +657,7 @@ def evaluate_rule(
     account_rules: Mapping[str, Mapping[str, Any]],
 ) -> dict[str, Any]:
     signals = _signal_indices(frame, rule)
+    execution = _pair_execution_view(frame, pair)
     accounts: list[dict[str, Any]] = []
     event_counts: dict[str, dict[str, int]] = {}
     for label in ("50K", "100K", "150K"):
@@ -648,6 +672,7 @@ def evaluate_rule(
                 account_rule=account_rule,
                 signal_indices=signals,
                 control=control,
+                execution=execution,
             )
             event_counts[label][control] = len(gross)
             scenarios = {
@@ -701,6 +726,38 @@ def _signal_indices(frame: pd.DataFrame, rule: RuleSpec) -> tuple[int, ...]:
     return tuple(int(value) for value in np.flatnonzero(selected.to_numpy()))
 
 
+def _pair_execution_view(
+    frame: pd.DataFrame, pair: PairSpec
+) -> _PairExecutionView:
+    """Expose prepared replay columns without pandas scalar-indexing overhead."""
+
+    left = pair.shorter_root
+    right = pair.longer_root
+
+    def values(column: str) -> np.ndarray:
+        return frame[column].to_numpy(copy=False)
+
+    return _PairExecutionView(
+        length=len(frame),
+        timestamp_ns=frame["timestamp"].array.as_unit("ns").asi8,
+        session_id=values("session_id"),
+        roll_segment=values("roll_segment"),
+        local_minute=values("local_minute"),
+        session_day=values("session_day"),
+        relative_z=values("relative_z"),
+        left_dollar_sigma_60=values("left_dollar_sigma_60"),
+        right_dollar_sigma_60=values("right_dollar_sigma_60"),
+        left_open=values(f"{left}_open"),
+        left_high=values(f"{left}_high"),
+        left_low=values(f"{left}_low"),
+        left_close=values(f"{left}_close"),
+        right_open=values(f"{right}_open"),
+        right_high=values(f"{right}_high"),
+        right_low=values(f"{right}_low"),
+        right_close=values(f"{right}_close"),
+    )
+
+
 def _generate_gross_events(
     frame: pd.DataFrame,
     *,
@@ -709,9 +766,11 @@ def _generate_gross_events(
     account_rule: Mapping[str, Any],
     signal_indices: Sequence[int],
     control: str,
+    execution: _PairExecutionView | None = None,
 ) -> tuple[TradePathEvent, ...]:
     if control not in CONTROLS:
         raise CurveTripwireError(f"unknown matched control: {control}")
+    replay = execution if execution is not None else _pair_execution_view(frame, pair)
     entry_lag = 5 if control == "TIMING_DELAY_5_BARS" else 1
     next_free = -1
     events: list[TradePathEvent] = []
@@ -719,20 +778,20 @@ def _generate_gross_events(
         if signal_index <= next_free:
             continue
         entry_index = signal_index + entry_lag
-        if not _same_execution_segment(frame, signal_index, entry_index):
+        if not _same_execution_segment(replay, signal_index, entry_index):
             continue
-        z = float(frame.at[signal_index, "relative_z"])
+        z = float(replay.relative_z[signal_index])
         direction = 1 if z > 0.0 else -1
         if rule.mechanism == "REVERSION":
             direction *= -1
         if control == "SIGN_FLIP":
             direction *= -1
-        quantities = _causal_quantities(frame, signal_index, pair, account_rule)
+        quantities = _causal_quantities(replay, signal_index, pair, account_rule)
         if quantities is None:
             continue
         quantity_a, quantity_b, risk_budget = quantities
         exit_result = _causal_exit(
-            frame,
+            replay,
             pair=pair,
             direction=direction,
             quantity_a=quantity_a,
@@ -746,7 +805,7 @@ def _generate_gross_events(
             continue
         exit_index, worst, best = exit_result
         gross = _pair_pnl(
-            frame,
+            replay,
             pair=pair,
             direction=direction,
             quantity_a=quantity_a,
@@ -755,9 +814,9 @@ def _generate_gross_events(
             mark_index=exit_index,
             field="open",
         )
-        decision_ns = int(pd.Timestamp(frame.at[signal_index, "timestamp"]).value)
-        fill_ns = int(pd.Timestamp(frame.at[entry_index, "timestamp"]).value)
-        exit_ns = int(pd.Timestamp(frame.at[exit_index, "timestamp"]).value)
+        decision_ns = int(replay.timestamp_ns[signal_index])
+        fill_ns = int(replay.timestamp_ns[entry_index])
+        exit_ns = int(replay.timestamp_ns[exit_index])
         identity = _stable_hash(
             {
                 "rule_id": rule.rule_id,
@@ -777,7 +836,7 @@ def _generate_gross_events(
                 event_id=f"{rule.rule_id}:{account_rule['account_label']}:{control}:{identity}",
                 decision_ns=decision_ns,
                 exit_ns=exit_ns,
-                session_day=int(frame.at[signal_index, "session_day"]),
+                session_day=int(replay.session_day[signal_index]),
                 net_pnl=float(gross),
                 gross_pnl=float(gross),
                 worst_unrealized_pnl=float(min(0.0, worst, gross)),
@@ -796,13 +855,17 @@ def _generate_gross_events(
 
 
 def _causal_quantities(
-    frame: pd.DataFrame,
+    frame: pd.DataFrame | _PairExecutionView,
     decision_index: int,
     pair: PairSpec,
     account_rule: Mapping[str, Any],
 ) -> tuple[int, int, float] | None:
-    sigma_left = float(frame.at[decision_index, "left_dollar_sigma_60"])
-    sigma_right = float(frame.at[decision_index, "right_dollar_sigma_60"])
+    if isinstance(frame, _PairExecutionView):
+        sigma_left = float(frame.left_dollar_sigma_60[decision_index])
+        sigma_right = float(frame.right_dollar_sigma_60[decision_index])
+    else:
+        sigma_left = float(frame.at[decision_index, "left_dollar_sigma_60"])
+        sigma_right = float(frame.at[decision_index, "right_dollar_sigma_60"])
     if not all(math.isfinite(value) and value > 0.0 for value in (sigma_left, sigma_right)):
         return None
     hedge_right = max(1, min(4, int(round(sigma_left / sigma_right))))
@@ -822,7 +885,7 @@ def _causal_quantities(
 
 
 def _causal_exit(
-    frame: pd.DataFrame,
+    frame: pd.DataFrame | _PairExecutionView,
     *,
     pair: PairSpec,
     direction: int,
@@ -833,16 +896,23 @@ def _causal_exit(
     target_usd: float,
     holding_minutes: int,
 ) -> tuple[int, float, float] | None:
-    deadline = pd.Timestamp(frame.at[entry_index, "timestamp"]) + pd.Timedelta(
-        minutes=holding_minutes
+    replay = (
+        frame
+        if isinstance(frame, _PairExecutionView)
+        else _pair_execution_view(frame, pair)
+    )
+    deadline_ns = int(replay.timestamp_ns[entry_index]) + int(
+        pd.Timedelta(minutes=holding_minutes).value
     )
     worst = 0.0
     best = 0.0
     cursor = entry_index
     decision: int | None = None
-    while cursor + 1 < len(frame) and _same_execution_segment(frame, entry_index, cursor):
+    while cursor + 1 < replay.length and _same_execution_segment(
+        replay, entry_index, cursor
+    ):
         adverse, favorable = _pair_extrema(
-            frame,
+            replay,
             pair=pair,
             direction=direction,
             quantity_a=quantity_a,
@@ -853,7 +923,7 @@ def _causal_exit(
         worst = min(worst, adverse)
         best = max(best, favorable)
         close_pnl = _pair_pnl(
-            frame,
+            replay,
             pair=pair,
             direction=direction,
             quantity_a=quantity_a,
@@ -865,20 +935,22 @@ def _causal_exit(
         if adverse <= -stop_usd or close_pnl >= target_usd:
             decision = cursor
             break
-        if pd.Timestamp(frame.at[cursor, "timestamp"]) >= deadline:
+        if int(replay.timestamp_ns[cursor]) >= deadline_ns:
             decision = cursor
             break
-        if int(frame.at[cursor, "local_minute"]) >= 15 * 60 + 9:
+        if int(replay.local_minute[cursor]) >= 15 * 60 + 9:
             decision = cursor
             break
         cursor += 1
-    if decision is None or not _same_execution_segment(frame, entry_index, decision + 1):
+    if decision is None or not _same_execution_segment(
+        replay, entry_index, decision + 1
+    ):
         return None
     return decision + 1, worst, best
 
 
 def _pair_pnl(
-    frame: pd.DataFrame,
+    frame: pd.DataFrame | _PairExecutionView,
     *,
     pair: PairSpec,
     direction: int,
@@ -888,12 +960,17 @@ def _pair_pnl(
     mark_index: int,
     field: str,
 ) -> float:
+    replay = (
+        frame
+        if isinstance(frame, _PairExecutionView)
+        else _pair_execution_view(frame, pair)
+    )
     left = TREASURY_SPECS[pair.shorter_root]
     right = TREASURY_SPECS[pair.longer_root]
-    entry_left = float(frame.at[entry_index, f"{pair.shorter_root}_open"])
-    entry_right = float(frame.at[entry_index, f"{pair.longer_root}_open"])
-    mark_left = float(frame.at[mark_index, f"{pair.shorter_root}_{field}"])
-    mark_right = float(frame.at[mark_index, f"{pair.longer_root}_{field}"])
+    entry_left = float(replay.left_open[entry_index])
+    entry_right = float(replay.right_open[entry_index])
+    mark_left = float(getattr(replay, f"left_{field}")[mark_index])
+    mark_right = float(getattr(replay, f"right_{field}")[mark_index])
     return float(
         direction * (mark_left - entry_left) * left.point_value_usd * quantity_a
         - direction * (mark_right - entry_right) * right.point_value_usd * quantity_b
@@ -901,7 +978,7 @@ def _pair_pnl(
 
 
 def _pair_extrema(
-    frame: pd.DataFrame,
+    frame: pd.DataFrame | _PairExecutionView,
     *,
     pair: PairSpec,
     direction: int,
@@ -910,20 +987,25 @@ def _pair_extrema(
     entry_index: int,
     mark_index: int,
 ) -> tuple[float, float]:
+    replay = (
+        frame
+        if isinstance(frame, _PairExecutionView)
+        else _pair_execution_view(frame, pair)
+    )
     left = TREASURY_SPECS[pair.shorter_root]
     right = TREASURY_SPECS[pair.longer_root]
-    entry_left = float(frame.at[entry_index, f"{pair.shorter_root}_open"])
-    entry_right = float(frame.at[entry_index, f"{pair.longer_root}_open"])
+    entry_left = float(replay.left_open[entry_index])
+    entry_right = float(replay.right_open[entry_index])
     if direction > 0:
-        adverse_left = float(frame.at[mark_index, f"{pair.shorter_root}_low"])
-        favorable_left = float(frame.at[mark_index, f"{pair.shorter_root}_high"])
-        adverse_right = float(frame.at[mark_index, f"{pair.longer_root}_high"])
-        favorable_right = float(frame.at[mark_index, f"{pair.longer_root}_low"])
+        adverse_left = float(replay.left_low[mark_index])
+        favorable_left = float(replay.left_high[mark_index])
+        adverse_right = float(replay.right_high[mark_index])
+        favorable_right = float(replay.right_low[mark_index])
     else:
-        adverse_left = float(frame.at[mark_index, f"{pair.shorter_root}_high"])
-        favorable_left = float(frame.at[mark_index, f"{pair.shorter_root}_low"])
-        adverse_right = float(frame.at[mark_index, f"{pair.longer_root}_low"])
-        favorable_right = float(frame.at[mark_index, f"{pair.longer_root}_high"])
+        adverse_left = float(replay.left_high[mark_index])
+        favorable_left = float(replay.left_low[mark_index])
+        adverse_right = float(replay.right_low[mark_index])
+        favorable_right = float(replay.right_high[mark_index])
     adverse = (
         direction * (adverse_left - entry_left) * left.point_value_usd * quantity_a
         - direction * (adverse_right - entry_right) * right.point_value_usd * quantity_b
@@ -1177,7 +1259,16 @@ def _causal_contract() -> dict[str, Any]:
     }
 
 
-def _same_execution_segment(frame: pd.DataFrame, left: int, right: int) -> bool:
+def _same_execution_segment(
+    frame: pd.DataFrame | _PairExecutionView, left: int, right: int
+) -> bool:
+    if isinstance(frame, _PairExecutionView):
+        return bool(
+            0 <= left < frame.length
+            and 0 <= right < frame.length
+            and str(frame.session_id[left]) == str(frame.session_id[right])
+            and int(frame.roll_segment[left]) == int(frame.roll_segment[right])
+        )
     return bool(
         0 <= left < len(frame)
         and 0 <= right < len(frame)

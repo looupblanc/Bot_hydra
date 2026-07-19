@@ -71,6 +71,28 @@ def _toy_inventory() -> dict[str, pd.DataFrame]:
     return {pair.pair_id: _toy_pair(pair) for pair in curve.PAIR_SPECS}
 
 
+def _execution_fixture(pair: curve.PairSpec, *, rows: int = 10) -> pd.DataFrame:
+    timestamp = pd.date_range("2024-01-02 14:00:00Z", periods=rows, freq="min")
+    frame = pd.DataFrame(
+        {
+            "timestamp": timestamp,
+            "session_id": ["2024-01-02"] * rows,
+            "roll_segment": np.ones(rows, dtype=int),
+            "local_minute": np.arange(8 * 60, 8 * 60 + rows, dtype=int),
+            "session_day": np.full(
+                rows, pd.Timestamp("2024-01-02").date().toordinal(), dtype=int
+            ),
+            "relative_z": np.full(rows, 2.5),
+            "left_dollar_sigma_60": np.ones(rows),
+            "right_dollar_sigma_60": np.ones(rows),
+        }
+    )
+    for root in (pair.shorter_root, pair.longer_root):
+        for field in ("open", "high", "low", "close"):
+            frame[f"{root}_{field}"] = np.full(rows, 100.0)
+    return frame
+
+
 def test_missing_bound_input_fails_closed_deterministically() -> None:
     first = curve.build_curve_relative_value_tripwire(ROOT)
     second = curve.build_curve_relative_value_tripwire(ROOT)
@@ -259,3 +281,196 @@ def test_toy_tripwire_has_complete_account_matrix_and_deterministic_hash() -> No
     core = dict(result)
     claimed = core.pop("result_hash")
     assert curve._stable_hash(core) == claimed
+
+
+def test_execution_view_preserves_causal_exit_boundaries() -> None:
+    pair = curve.PAIR_SPECS[0]
+    base = _execution_fixture(pair)
+    left = pair.shorter_root
+    exit_kwargs = {
+        "pair": pair,
+        "direction": 1,
+        "quantity_a": 1,
+        "quantity_b": 1,
+        "entry_index": 2,
+        "stop_usd": 1_000.0,
+        "target_usd": 2_000.0,
+        "holding_minutes": 10,
+    }
+
+    view = curve._pair_execution_view(base, pair)
+    assert int(view.timestamp_ns[2]) == int(base.at[2, "timestamp"].value)
+
+    stopped = base.copy()
+    stopped.loc[2, f"{left}_low"] = 99.5
+    stop_exit = curve._causal_exit(
+        curve._pair_execution_view(stopped, pair), **exit_kwargs
+    )
+    assert stop_exit is not None
+    assert stop_exit[0] == 3
+    assert stop_exit[1] == -1_000.0
+
+    targeted = base.copy()
+    targeted.loc[3, f"{left}_high"] = 102.0
+    targeted.loc[4, [f"{left}_high", f"{left}_close"]] = 101.0
+    target_exit = curve._causal_exit(
+        curve._pair_execution_view(targeted, pair), **exit_kwargs
+    )
+    assert target_exit is not None
+    assert target_exit == (5, 0.0, 4_000.0)
+
+    deadline_exit = curve._causal_exit(
+        view,
+        **{
+            **exit_kwargs,
+            "stop_usd": 1e9,
+            "target_usd": 1e9,
+            "holding_minutes": 2,
+        },
+    )
+    assert deadline_exit is not None
+    assert deadline_exit[0] == 5
+
+    flattened = base.copy()
+    flattened.loc[2, "local_minute"] = 15 * 60 + 9
+    flatten_exit = curve._causal_exit(
+        curve._pair_execution_view(flattened, pair),
+        **{**exit_kwargs, "stop_usd": 1e9, "target_usd": 1e9},
+    )
+    assert flatten_exit is not None
+    assert flatten_exit[0] == 3
+
+    for boundary_column, boundary_value in (
+        ("session_id", "2024-01-03"),
+        ("roll_segment", 2),
+    ):
+        crossed = targeted.copy()
+        crossed.loc[5:, boundary_column] = boundary_value
+        assert (
+            curve._causal_exit(
+                curve._pair_execution_view(crossed, pair), **exit_kwargs
+            )
+            is None
+        )
+
+        entry_crossed = base.copy()
+        entry_crossed.loc[5:, boundary_column] = boundary_value
+        boundary_rule = curve.RuleSpec(
+            rule_id=f"test:array_view:{boundary_column}",
+            pair_id=pair.pair_id,
+            mechanism="CONTINUATION",
+            session_role="OPEN",
+            trigger_z=1.0,
+            holding_minutes=0,
+        )
+        boundary_account = {
+            "account_label": "150K",
+            "maximum_loss_limit_usd": 4_500,
+            "maximum_mini_contracts": 15,
+        }
+        for control, signal_index in (("PRIMARY", 4), ("TIMING_DELAY_5_BARS", 0)):
+            assert not curve._generate_gross_events(
+                entry_crossed,
+                pair=pair,
+                rule=boundary_rule,
+                account_rule=boundary_account,
+                signal_indices=(signal_index,),
+                control=control,
+            )
+
+
+def test_execution_view_preserves_controls_sizing_and_next_free() -> None:
+    pair = curve.PAIR_SPECS[0]
+    frame = _execution_fixture(pair)
+    left = pair.shorter_root
+    frame.loc[3, f"{left}_open"] = 100.01
+    frame.loc[6, f"{left}_open"] = 100.02
+    frame.loc[7, f"{left}_open"] = 100.05
+    account = {
+        "account_label": "150K",
+        "maximum_loss_limit_usd": 4_500,
+        "maximum_mini_contracts": 15,
+    }
+    immediate = curve.RuleSpec(
+        rule_id="test:array_view:controls",
+        pair_id=pair.pair_id,
+        mechanism="CONTINUATION",
+        session_role="OPEN",
+        trigger_z=1.0,
+        holding_minutes=0,
+    )
+
+    primary = curve._generate_gross_events(
+        frame,
+        pair=pair,
+        rule=immediate,
+        account_rule=account,
+        signal_indices=(1,),
+        control="PRIMARY",
+    )
+    flipped = curve._generate_gross_events(
+        frame,
+        pair=pair,
+        rule=immediate,
+        account_rule=account,
+        signal_indices=(1,),
+        control="SIGN_FLIP",
+    )
+    delayed = curve._generate_gross_events(
+        frame,
+        pair=pair,
+        rule=immediate,
+        account_rule=account,
+        signal_indices=(1,),
+        control="TIMING_DELAY_5_BARS",
+    )
+    assert len(primary) == len(flipped) == len(delayed) == 1
+    assert flipped[0].gross_pnl == -primary[0].gross_pnl
+    assert flipped[0].decision_ns == primary[0].decision_ns
+    assert flipped[0].exit_ns == primary[0].exit_ns
+    assert flipped[0].quantity == primary[0].quantity
+    assert flipped[0].worst_unrealized_pnl == -primary[0].best_unrealized_pnl
+    assert primary[0].exit_ns == int(frame.at[3, "timestamp"].value)
+    assert delayed[0].exit_ns == int(frame.at[7, "timestamp"].value)
+
+    no_capacity = {**account, "maximum_mini_contracts": 1}
+    assert not curve._generate_gross_events(
+        frame,
+        pair=pair,
+        rule=immediate,
+        account_rule=no_capacity,
+        signal_indices=(1,),
+        control="PRIMARY",
+    )
+
+    held = curve.RuleSpec(
+        rule_id="test:array_view:next_free",
+        pair_id=pair.pair_id,
+        mechanism="CONTINUATION",
+        session_role="OPEN",
+        trigger_z=1.0,
+        holding_minutes=2,
+        stop_risk_multiple=1e9,
+        target_risk_multiple=1e9,
+    )
+    sequence = _execution_fixture(pair, rows=12)
+    sequence.loc[1, "left_dollar_sigma_60"] = 0.0
+    sequence_account = {
+        **account,
+        "maximum_loss_limit_usd": 1_000,
+        "maximum_mini_contracts": 2,
+    }
+    non_overlapping = curve._generate_gross_events(
+        sequence,
+        pair=pair,
+        rule=held,
+        account_rule=sequence_account,
+        signal_indices=(1, 2, 6, 7),
+        control="PRIMARY",
+    )
+    assert [row.decision_ns for row in non_overlapping] == [
+        int(sequence.at[index, "timestamp"].value) for index in (2, 7)
+    ]
+    assert [row.exit_ns for row in non_overlapping] == [
+        int(sequence.at[index, "timestamp"].value) for index in (6, 11)
+    ]
