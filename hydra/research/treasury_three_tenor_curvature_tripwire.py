@@ -75,6 +75,23 @@ class TreasuryCurvatureError(RuntimeError):
     """The bounded tripwire cannot preserve its frozen causal contract."""
 
 
+class _FrozenCalendar(tuple[dict[str, Any], ...]):
+    """Read-only-by-contract calendar whose pandas metadata copy is O(1).
+
+    pandas deep-copies ``DataFrame.attrs`` whenever it boxes a column.  The
+    canonical calendar is only ever read through fresh ``dict`` copies, so
+    sharing this immutable container is exact and avoids copying thousands of
+    nested records for every scalar event-field lookup.
+    """
+
+    def __new__(cls, rows: Sequence[Mapping[str, Any]]) -> _FrozenCalendar:
+        return tuple.__new__(cls, (dict(row) for row in rows))
+
+    def __deepcopy__(self, memo: dict[int, Any]) -> _FrozenCalendar:
+        memo[id(self)] = self
+        return self
+
+
 @dataclass(frozen=True, slots=True)
 class TriangleSpec:
     triangle_id: str
@@ -577,7 +594,7 @@ def prepare_curvature_features(
         else:
             value["coverage_reason"] = "FULL_COVERAGE"
         canonical_calendar.append(value)
-    output.attrs["canonical_session_calendar"] = canonical_calendar
+    output.attrs["canonical_session_calendar"] = _FrozenCalendar(canonical_calendar)
     _validate_decision_columns(output.columns)
     audit_core = {
         "triangle_id": triangle.triangle_id,
@@ -2470,7 +2487,7 @@ def _attach_canonical_calendar_roles(
     for row in calendar:
         timestamp = pd.Series([pd.Timestamp(str(row["session_id"]), tz="UTC")])
         row["temporal_role"] = str(_assign_roles(timestamp, card).iloc[0])
-    frame.attrs["canonical_session_calendar"] = calendar
+    frame.attrs["canonical_session_calendar"] = _FrozenCalendar(calendar)
 
 
 def _prior_two_factor_betas(

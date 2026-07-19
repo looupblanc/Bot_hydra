@@ -136,6 +136,20 @@ def test_vectorized_contract_identity_matches_pandas_row_join() -> None:
     pd.testing.assert_series_equal(observed, expected)
 
 
+def test_frozen_calendar_preserves_values_and_avoids_nested_metadata_copy() -> None:
+    calendar = tripwire._FrozenCalendar(
+        [{"session_id": "2024-01-03", "observed_roots": ["ZT", "ZF", "ZN"]}]
+    )
+    assert deepcopy(calendar) is calendar
+    frame = pd.DataFrame({"value": [1]})
+    frame.attrs["canonical_session_calendar"] = calendar
+    assert frame["value"].attrs["canonical_session_calendar"] is calendar
+
+    mutable_copy = [dict(row) for row in calendar]
+    mutable_copy[0]["session_id"] = "changed"
+    assert calendar[0]["session_id"] == "2024-01-03"
+
+
 def test_real_audit_reads_metadata_not_outcomes(monkeypatch: pytest.MonkeyPatch) -> None:
     def forbidden_decode(*_args: object, **_kwargs: object) -> object:
         raise AssertionError("economic Parquet rows were decoded")
