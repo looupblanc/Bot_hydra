@@ -61,6 +61,7 @@
   "campaign_mode": "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR",
   "class_id": "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR_V1",
   "compatible_artifact_manifest_hashes": [
+    "f468e25e5ab466f108d92fd050cb0053e4c573489b4f60bd709f98701553ef1e",
     "e2a02b1732b4310c3b482e515baffb22d53068e64b474e43e64be8cc0bf1c886",
     "7c88239e2f2b07e441740e7f530834fc7b3b859529d04973fc9f41ec9ed39275",
     "e592522c5ce7f78e4c1746a775b1bc04f09bbe928380a4a1961d591a6912c3d8"
@@ -211,19 +212,23 @@
   },
   "implementation_files": {
     "hydra/mission/economic_evolution_manifest_runtime.py": "107fa738cb5569e2ea581557ab3bd9178b3b8a744085f2424345e84838f00757",
+    "hydra/production/autonomous_combine_pass_bank.py": "79ea21c8e8fb988650f2c80b313fb7ad0b79280225bb05af0058d6e4cec1003d",
     "hydra/production/autonomous_director_manifest.py": "066997f1bb9dc7fe64843614ab5814b2c3008bdd868d876e6a1ae14ab04b7ca3",
     "hydra/production/autonomous_combine_candidate_bank.py": "ad73ddd66fb225a9dd56ff54b1127dc078acb0a6cf9557643d959644790d9ebe",
-    "hydra/production/autonomous_director_runtime.py": "ec1b8428a02f36343eca98a0f9f42ea8c8763d19367c4766ffd1f06b40d50482",
+    "hydra/production/autonomous_consistency_account_policies.py": "5e8e1fe841b42036e43337099df15fb1339369305660fca4ef4feeab00a18e39",
+    "hydra/production/autonomous_director_runtime.py": "d6c5a2383f3223b89e5fcbae8aa9f99fb97bae38ed8d153b251abd4046ef9433",
+    "hydra/production/autonomous_event_time_safety_frontier.py": "c2212fd4b0115e33fec64c7d566f4a0876e858781e946b3dd42c375a0408a20e",
     "hydra/production/autonomous_exact_continuation.py": "c28380ff75986c4bc99dbc225d01dbbc1f93ceae380997843ad841247350b1c8",
     "hydra/production/autonomous_exact_replay.py": "63aa48c5933aface3f677cce7dc53861ab1d0d7c6532e90acc0f9e61647e6236",
-    "hydra/production/autonomous_marginal_combine_books.py": "53ba81d4410be7673a461f8cd550e3d3fc79f52c26e77b29d9bdf18d6897cce0",
+    "hydra/production/autonomous_marginal_combine_books.py": "460ac6292946c1a0fa2329bd28826ca693f0777d56b69cf65c21e176524619ed",
+    "hydra/production/fast_pass_runtime_helpers.py": "c86298e82c5ac02dbd7806a4bb4c9ac4acd74dcbd64e8be3b37d252fb082e52e",
     "hydra/production/graduated_xfa_relay.py": "85f9236a501632a893140fc8f37173fe84633f073c0ba6949dc6fa8183bdc643",
     "hydra/production/manifest.py": "eee4abb753f336f167f35c0e2bf9a0bb7f0fa2cc15494d0a1ee9ac5d110ea599",
     "hydra/production/runtime.py": "e9c2dd775a96db10181b9f5ae794c15b89963514e5373f70195bb90e57675a3b",
     "hydra/production/v71_event_time_account_exploration.py": "6695ee682198cf784a6644202758d2fa31b45b47956c483d180ac0c1c7ad7acb",
     "scripts/run_economic_production_manifest.py": "45e610a35ae5a260e628bc73fcd23634362c6cef0298707b2e6e97ff8762cc6f"
   },
-  "manifest_hash": "f468e25e5ab466f108d92fd050cb0053e4c573489b4f60bd709f98701553ef1e",
+  "manifest_hash": "3fea73c0dab408fe02dfeb020c465947f175d1c1161a16afa4a85469a5e4c738",
   "mission_state_contract": {
     "create_new_reporting_framework": false,
     "decision_ledger_append_only": true,
@@ -253,7 +258,7 @@
       100000,
       150000
     ],
-    "file_sha256": "fec2803fddadb1a79d192dbc0c0869b36817486b4e7f147bff8dddde0793d35a",
+    "file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
     "official_source_urls": [
       "https://help.topstep.com/en/articles/8284197-trading-combine-parameters",
       "https://help.topstep.com/en/articles/8284208-consistency-at-topstep",
@@ -330,6 +335,29 @@
     "two_read_only_book_shards": true,
     "xfa_requires_frozen_tier_g": true
   },
+  "post_book_graduation_semantic_reconciliation": {
+    "additional_manifest_count": 0,
+    "additional_multiplicity_reserved": false,
+    "authoritative_promotion_requires_unique_ledger_concentration_and_controls": true,
+    "combine_pass_observed_bank_capacity": 100,
+    "combine_pass_observed_bank_minimum_target": 50,
+    "consistency_direct_frozen_profile_count": 6,
+    "derived_graduation_classifier_semantics_corrected": true,
+    "development_pass_paths_must_be_consistency_compliant": true,
+    "event_time_safety_frozen_profile_count": 8,
+    "event_time_safety_source_candidate_count": 3,
+    "legacy_marginal_book_composite_hash": "c72ddbeac24bf1571aaa68d8f9db9ff52b260bc83955036c7526b133016929ef",
+    "legacy_marginal_book_evidence_preserved": true,
+    "old_manifest_hash": "f468e25e5ab466f108d92fd050cb0053e4c573489b4f60bd709f98701553ef1e",
+    "promotion_thresholds_changed": false,
+    "scientific_policy_changed": false,
+    "semantic_reconciliation_code_commit": "ecc215a1f2f8731b5b76f5957e701d9931e4d82f",
+    "semantic_reconciliation_shard_count": 2,
+    "shared_execution_or_accounting_semantics_changed": false,
+    "single_day_concentration_from_overlapping_starts_is_diagnostic_only": true,
+    "trade_concentration_not_inferred_from_daily_episode_summaries": true,
+    "xfa_requires_authoritative_tier_g": true
+  },
   "post_reservation_pre_outcome_technical_repair": {
     "additional_manifest_count": 0,
     "additional_multiplicity_reserved": false,
@@ -368,5 +396,5 @@
     "worker_count": 2
   },
   "schema": "hydra_economic_production_manifest_v1",
-  "source_commit": "b2063cecc18fe9842c5711e0eaf735a48b6a58d9"
+  "source_commit": "ecc215a1f2f8731b5b76f5957e701d9931e4d82f"
 }
