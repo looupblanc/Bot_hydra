@@ -2,9 +2,10 @@
 
 Only the parent process writes durable state.  The two process-pool workers
 receive immutable paths, perform read-only economic analysis, and return plain
-mappings.  The director intentionally does not terminalize after its first
-epoch: it seals the two bounded decisions, queues materially distinct successor
-cards, and keeps publishing a resumable heartbeat for the existing controller.
+mappings.  The director does not terminalize after its first epoch: it keeps a
+resumable heartbeat until an append-only post-macro portfolio is frozen, then
+drains that bounded queue, seals exact terminal evidence, and returns control
+to the existing controller for successor handoff.
 """
 
 from __future__ import annotations
@@ -24,6 +25,10 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from hydra.compute.result_writer import AtomicResultWriter
 from hydra.economic_evolution.schema import stable_hash
+from hydra.evidence import (
+    recover_finalized_evidence_bundle,
+    verify_evidence_bundle,
+)
 from hydra.production.autonomous_director_manifest import (
     ACCOUNT_SIZES_USD,
     CAMPAIGN_ID,
@@ -113,7 +118,12 @@ from hydra.production.frozen_legal_frontier_replay import (
     frozen_legal_frontier_worker,
 )
 from hydra.production.manifest import load_and_validate_production_manifest
-from hydra.production.runtime import PRODUCTION_KPI_SCHEMA, PRODUCTION_STATE_SCHEMA
+from hydra.production.halving import build_final_result_payload
+from hydra.production.runtime import (
+    PRODUCTION_KPI_SCHEMA,
+    PRODUCTION_STATE_SCHEMA,
+    load_and_verify_production_result,
+)
 from hydra.production.session_safe_fast_book_tripwire import (
     BRANCH_ID as SESSION_SAFE_FAST_BOOK_BRANCH_ID,
     EVIDENCE_ROLE as SESSION_SAFE_FAST_BOOK_EVIDENCE_ROLE,
@@ -161,6 +171,83 @@ ECONOMIC_SCORECARD_SCHEMA = "hydra_autonomous_economic_scorecard_v1"
 _HORIZONS = (5, 10, 20)
 _SCENARIOS = ("NORMAL", "STRESSED_1_5X")
 _POST_BREADTH_RELATIVE_ROOT = Path("post_breadth_portfolio")
+_POST_MACRO_RELAY_SCHEMA = "hydra_post_macro_economic_relay_v1"
+_POST_MACRO_LAUNCH_SCHEMA = "hydra_post_macro_read_only_launch_receipt_v1"
+_POST_MACRO_FAILURE_SCHEMA = "hydra_post_macro_read_only_worker_failure_v1"
+_POST_MACRO_RESUME_SCHEMA = "hydra_post_macro_read_only_resume_receipt_v1"
+_POST_MACRO_RELAY_KEYS = (
+    "POST_MACRO_TIER_Q_2026_FINAL_DEVELOPMENT",
+    "POST_MACRO_CL_FRONT_SECOND_TERM_STRUCTURE",
+    "POST_MACRO_TREASURY_THREE_TENOR_CURVATURE",
+)
+_POST_MACRO_WORKER_IMPLEMENTATIONS = {
+    "TIER_Q_2026_FINAL_DEVELOPMENT_READ_ONLY": (
+        "hydra/production/tier_q_2026_two_stage_runner.py"
+    ),
+    "CL_FRONT_SECOND_TERM_STRUCTURE_READ_ONLY": (
+        "hydra/research/cl_front_second_term_structure_economic_runner.py"
+    ),
+    "TREASURY_THREE_TENOR_CURVATURE_READ_ONLY": (
+        "hydra/research/treasury_three_tenor_curvature_tripwire.py"
+    ),
+}
+_POST_MACRO_WORKER_CONTRACTS = {
+    "TIER_Q_2026_FINAL_DEVELOPMENT_READ_ONLY": {
+        "relay_key": "POST_MACRO_TIER_Q_2026_FINAL_DEVELOPMENT",
+        "schema": "hydra_tier_q_2026_two_stage_economic_result_v2",
+        "statuses": ("FINAL_DEVELOPMENT_CONSUMED",),
+        "source_modes": (
+            "PREEXISTING_HASH_BOUND",
+            "GENERATE_READ_ONLY_ONCE",
+        ),
+    },
+    "CL_FRONT_SECOND_TERM_STRUCTURE_READ_ONLY": {
+        "relay_key": "POST_MACRO_CL_FRONT_SECOND_TERM_STRUCTURE",
+        "schema": "hydra_cl_front_second_term_structure_economic_tripwire_v1",
+        "statuses": (
+            "TERM_STRUCTURE_TRIPWIRE_GREEN_TIER_E",
+            "TERM_STRUCTURE_TRIPWIRE_WEAK",
+            "TERM_STRUCTURE_TRIPWIRE_FALSIFIED",
+            "TERM_STRUCTURE_TRIPWIRE_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
+        ),
+        "source_modes": (
+            "PREEXISTING_HASH_BOUND",
+            "GENERATE_READ_ONLY_ONCE",
+        ),
+    },
+    "TREASURY_THREE_TENOR_CURVATURE_READ_ONLY": {
+        "relay_key": "POST_MACRO_TREASURY_THREE_TENOR_CURVATURE",
+        "schema": "hydra_treasury_three_tenor_curvature_tripwire_v1",
+        "statuses": (
+            "TREASURY_CURVATURE_TO_BELLY_GREEN_TIER_E",
+            "TREASURY_CURVATURE_TO_BELLY_WEAK",
+            "TREASURY_CURVATURE_TO_BELLY_FALSIFIED",
+            "TREASURY_CURVATURE_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
+        ),
+        "source_modes": (
+            "PREEXISTING_HASH_BOUND",
+            "GENERATE_READ_ONLY_ONCE",
+        ),
+    },
+}
+_POST_MACRO_REQUIRED_SAFETY_FIELDS = {
+    "TIER_Q_2026_FINAL_DEVELOPMENT_READ_ONLY": {
+        "q4_access_count_delta": 0,
+        "broker_connections": 0,
+        "orders": 0,
+    },
+    "CL_FRONT_SECOND_TERM_STRUCTURE_READ_ONLY": {
+        "governance.q4_rows": 0,
+        "governance.protected_data_access_count_delta": 0,
+        "governance.broker_connections": 0,
+        "governance.orders": 0,
+    },
+    "TREASURY_THREE_TENOR_CURVATURE_READ_ONLY": {
+        "governance.q4_access_count_delta": 0,
+        "governance.broker_connections": 0,
+        "governance.orders": 0,
+    },
+}
 _SESSION_SAFE_PORTFOLIO_SCHEMA = "hydra_session_safe_fast_book_portfolio_v1"
 _SESSION_SAFE_CONFIRMATION_RELATIVE_ROOT = (
     _POST_BREADTH_RELATIVE_ROOT / "session_safe_m2k_mym_confirmation"
@@ -227,6 +314,50 @@ def read_autonomous_director_status(manifest_path: str | Path) -> dict[str, Any]
     return {"state": state, "kpis": kpis}
 
 
+def _load_existing_post_macro_terminal_state(
+    output: Path, manifest: Mapping[str, Any]
+) -> dict[str, Any] | None:
+    """Return a deeply verified terminal state without performing any write.
+
+    ``economic_production_result.json`` is the terminal commit marker.  It is
+    deliberately written after the COMPLETE state, KPIs, mission views, and
+    EvidenceBundle.  A process crash after that final atomic write must resume
+    by verification and return, never by recomputing or rewriting evidence.
+    """
+
+    result_path = output / "economic_production_result.json"
+    if not result_path.is_file():
+        return None
+    result = load_and_verify_production_result(
+        result_path, manifest, deep_evidence=True
+    )
+    state_path = output / "production_state.json"
+    if not state_path.is_file():
+        raise AutonomousDirectorRuntimeError(
+            "terminal production result exists without its prior COMPLETE state"
+        )
+    state = _read_hashed(state_path, "state_hash")
+    evidence_contract = dict(manifest.get("evidence_bundle") or {})
+    receipt = dict(result.get("evidence_bundle") or {})
+    if (
+        state.get("campaign_id") != manifest.get("campaign_id")
+        or state.get("manifest_hash") != manifest.get("manifest_hash")
+        or state.get("state") != "COMPLETE"
+        or state.get("stage")
+        != "POST_MACRO_BRANCH_PORTFOLIO_TERMINAL_EVIDENCE_SEALED"
+        or state.get("next_action")
+        != dict(result["autonomous_next_action"])["action"]
+        or receipt.get("evidence_status")
+        != evidence_contract.get("evidence_status")
+        or receipt.get("reconstruction_flag")
+        is not evidence_contract.get("reconstruction_flag")
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "existing terminal result/state/evidence-class drift"
+        )
+    return state
+
+
 def run_autonomous_director_manifest(
     manifest_path: str | Path,
     *,
@@ -235,7 +366,7 @@ def run_autonomous_director_manifest(
     stop_after: str | None = None,
     heartbeat_seconds: float = 15.0,
 ) -> dict[str, Any]:
-    """Run/resume the first two-lane epoch, then remain persistently active."""
+    """Run/resume the two-lane epoch and any frozen post-macro queue."""
 
     del contract_map_path, cache_root  # Inputs remain frozen in branch artifacts.
     if stop_after is not None and os.environ.get("HYDRA_PRODUCTION_TEST_MODE") != "1":
@@ -248,6 +379,9 @@ def run_autonomous_director_manifest(
     manifest = load_and_validate_production_manifest(path)
     validate_autonomous_director_manifest(manifest, manifest_path=path)
     output = root / str(manifest["runtime"]["output_dir"])
+    completed = _load_existing_post_macro_terminal_state(output, manifest)
+    if completed is not None:
+        return completed
     output.mkdir(parents=True, exist_ok=True)
     live_writer = AtomicResultWriter(output, immutable=False)
     branch_writer = AtomicResultWriter(output / "branch_results")
@@ -2126,6 +2260,22 @@ def _run_post_book_graduation_relay(
                 runtime_results=results,
             )
         )
+        if manifest.get("post_macro_branch_portfolio") is not None:
+            state, results, _post_macro_portfolio = (
+                _run_post_macro_branch_portfolio_relay(
+                    root=root,
+                    manifest=manifest,
+                    output=output,
+                    live_writer=live_writer,
+                    branch_writer=branch_writer,
+                    prior_state=state,
+                    started=started,
+                    heartbeat_seconds=heartbeat_seconds,
+                    runtime_results=results,
+                )
+            )
+            if state.get("state") == "COMPLETE":
+                return state
     elif os.environ.get("HYDRA_PRODUCTION_TEST_MODE") != "1":
         raise AutonomousDirectorRuntimeError(
             "post-confirmation branch portfolio is undeclared"
@@ -2133,13 +2283,51 @@ def _run_post_book_graduation_relay(
     if os.environ.get("HYDRA_PRODUCTION_TEST_MODE") == "1":
         return state
 
-    # This manifest is intentionally persistent and has no terminal result.
-    # Returning here makes V17 relaunch the same completed checkpoint forever.
-    # Keep the single runner alive after the bounded branch decision so the
-    # controller remains healthy while the next frozen branch is prepared.
+    post_macro_section = manifest.get("post_macro_branch_portfolio")
+    if post_macro_section is None:
+        # Older compatible manifests had no durable post-macro queue.  Keep the
+        # same process alive, but make the missing append explicit instead of
+        # publishing an apparently terminal heartbeat with no work inventory.
+        state = _post_macro_state(
+            manifest,
+            state,
+            results,
+            (),
+            stage="POST_MACRO_BRANCH_QUEUE_AWAITING_APPEND",
+            next_action="APPEND_NEXT_FROZEN_POST_MACRO_BRANCH_PORTFOLIO",
+        )
+        _publish(live_writer, state, _kpis(manifest, state, results, started))
+        _write_mission_views(root, manifest, state, results)
+
+    next_input_poll = time.monotonic() + max(float(heartbeat_seconds), 60.0)
     while True:
         time.sleep(max(float(heartbeat_seconds), 1.0))
-        state = _heartbeat_state(state, active_economic_worker_processes=0)
+        if (
+            post_macro_section is not None
+            and str(state.get("stage"))
+            == "POST_MACRO_BRANCH_PORTFOLIO_WAITING_INPUT"
+            and time.monotonic() >= next_input_poll
+        ):
+            state, results, _post_macro_portfolio = (
+                _run_post_macro_branch_portfolio_relay(
+                    root=root,
+                    manifest=manifest,
+                    output=output,
+                    live_writer=live_writer,
+                    branch_writer=branch_writer,
+                    prior_state=state,
+                    started=started,
+                    heartbeat_seconds=heartbeat_seconds,
+                    runtime_results=results,
+                )
+            )
+            if state.get("state") == "COMPLETE":
+                return state
+            next_input_poll = time.monotonic() + max(
+                float(heartbeat_seconds), 60.0
+            )
+        else:
+            state = _heartbeat_state(state, active_economic_worker_processes=0)
         _publish(live_writer, state, _kpis(manifest, state, results, started))
         _write_mission_views(root, manifest, state, results)
 
@@ -4090,6 +4278,1214 @@ def _run_scheduled_macro_release_tripwire_relay(
     _publish(live_writer, state, _kpis(manifest, state, results, started))
     _write_mission_views(root, manifest, state, results)
     return state, results, result
+
+
+def _run_post_macro_branch_portfolio_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    """Drain a bounded multi-card queue with at most two read-only workers."""
+
+    section = dict(manifest.get("post_macro_branch_portfolio") or {})
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    state = dict(prior_state)
+    inventory = _post_macro_inventory(root, output, manifest, section)
+    if not inventory:
+        state = _post_macro_state(
+            manifest,
+            state,
+            results,
+            inventory,
+            stage="POST_MACRO_BRANCH_QUEUE_AWAITING_APPEND",
+            next_action="APPEND_NEXT_FROZEN_POST_MACRO_BRANCH_PORTFOLIO",
+        )
+        _publish(live_writer, state, _kpis(manifest, state, results, started))
+        _write_mission_views(root, manifest, state, results)
+        return state, results, {"card_count": 0, "job_count": 0}
+
+    for item in inventory:
+        if item["action"] == "RELAYED":
+            source = _read_post_macro_relay(item, manifest, root=root)
+        elif item["action"] == "RELAY_SOURCE":
+            source = _verify_post_macro_source(
+                _read_json_object(item["source_path"]), item["card"]
+            )
+            _write_post_macro_relay(root, manifest, branch_writer, item, source)
+            item["action"] = "RELAYED"
+        else:
+            continue
+        item["economic_status"] = str(source["status"])
+        results[str(item["card"]["relay_key"])] = source
+
+    worker_limit = int(section["worker_maximum"])
+    launchable = _post_macro_launch_batch(inventory, worker_limit)
+    if launchable:
+        for item in launchable:
+            _verify_post_macro_pre_spawn(root, manifest, item)
+            if item["action"] == "LAUNCH_ONCE":
+                branch_writer.write_json(
+                    item["launch_relative"],
+                    _post_macro_launch_receipt(
+                        manifest,
+                        item,
+                        lease_seconds=int(section["lease_seconds"]),
+                        lease_generation=0,
+                    ),
+                )
+            elif item["action"] == "RESUME_EXPIRED_LEASE":
+                branch_writer.write_json(
+                    item["resume_relative"],
+                    _post_macro_launch_receipt(
+                        manifest,
+                        item,
+                        lease_seconds=int(section["lease_seconds"]),
+                        lease_generation=1,
+                        prior_receipt=item["launch_receipt"],
+                    ),
+                )
+            item["action"] = "RUNNING"
+        state = _post_macro_state(
+            manifest,
+            state,
+            results,
+            inventory,
+            stage="POST_MACRO_BRANCH_PORTFOLIO_RUNNING",
+            next_action="COMPLETE_FROZEN_READ_ONLY_POST_MACRO_BRANCHES",
+            active_workers=len(launchable),
+        )
+        _publish(live_writer, state, _kpis(manifest, state, results, started))
+        _write_mission_views(root, manifest, state, results)
+
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=len(launchable),
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                jobs = {
+                    pool.submit(
+                        _post_macro_read_only_worker,
+                        str(root),
+                        str(item["card"]["worker_kind"]),
+                        {
+                            name: str(path)
+                            for name, path in item["worker_inputs"].items()
+                        },
+                    ): item
+                    for item in launchable
+                }
+                pending = set(jobs)
+                while pending:
+                    done, pending = wait(
+                        pending,
+                        timeout=max(min(float(heartbeat_seconds), 5.0), 0.1),
+                        return_when=FIRST_COMPLETED,
+                    )
+                    for future in done:
+                        item = jobs[future]
+                        try:
+                            source = _verify_post_macro_source(
+                                dict(future.result()), item["card"]
+                            )
+                        except Exception as exc:  # noqa: BLE001 - durable fail closed
+                            branch_writer.write_json(
+                                item["failure_relative"],
+                                _post_macro_failure_receipt(manifest, item, exc),
+                            )
+                            item["action"] = "WAITING_INPUT_AFTER_WORKER_FAILURE"
+                            item["worker_failure"] = type(exc).__name__
+                            continue
+                        branch_writer.write_json(item["source_relative"], source)
+                        _write_post_macro_relay(
+                            root, manifest, branch_writer, item, source
+                        )
+                        item["action"] = "RELAYED"
+                        item["economic_status"] = str(source["status"])
+                        results[str(item["card"]["relay_key"])] = source
+                    state = _heartbeat_state(
+                        state, active_economic_worker_processes=len(pending)
+                    )
+                    _publish(
+                        live_writer, state, _kpis(manifest, state, results, started)
+                    )
+                    _write_mission_views(root, manifest, state, results)
+        finally:
+            _end_economic_phase()
+
+    if any(item["action"] == "QUEUED_FOR_WORKER_SLOT" for item in inventory):
+        return _run_post_macro_branch_portfolio_relay(
+            root=root,
+            manifest=manifest,
+            output=output,
+            live_writer=live_writer,
+            branch_writer=branch_writer,
+            prior_state=state,
+            started=started,
+            heartbeat_seconds=heartbeat_seconds,
+            runtime_results=results,
+        )
+
+    waiting = any(
+        str(item["action"]).startswith("WAITING") for item in inventory
+    )
+    if not waiting and inventory and all(
+        item["action"] == "RELAYED" for item in inventory
+    ):
+        terminal_state = _finalize_post_macro_campaign(
+            root=root,
+            manifest=manifest,
+            output=output,
+            prior_state=state,
+            runtime_results=results,
+            inventory=inventory,
+            started=started,
+            live_writer=live_writer,
+        )
+        return terminal_state, results, {
+            "card_count": len(inventory),
+            "relayed_count": len(inventory),
+            "waiting_input_count": 0,
+            "terminal_result_created": True,
+        }
+    state = _post_macro_state(
+        manifest,
+        state,
+        results,
+        inventory,
+        stage=(
+            "POST_MACRO_BRANCH_PORTFOLIO_WAITING_INPUT"
+            if waiting
+            else "POST_MACRO_BRANCH_PORTFOLIO_COMPLETE_HANDOFF_READY"
+        ),
+        next_action=(
+            "WAIT_FOR_FROZEN_INPUT_OR_REPAIR_FAILED_READ_ONLY_ATTEMPT"
+            if waiting
+            else "HANDOFF_TO_APPEND_ONLY_SUCCESSOR_MANIFEST"
+        ),
+    )
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, {
+        "card_count": len(inventory),
+        "relayed_count": sum(item["action"] == "RELAYED" for item in inventory),
+        "waiting_input_count": sum(
+            str(item["action"]).startswith("WAITING") for item in inventory
+        ),
+    }
+
+
+def _post_macro_inventory(
+    root: Path,
+    output: Path,
+    manifest: Mapping[str, Any],
+    section: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    """Plan restart actions; never create an empty shard or a durable write."""
+
+    cards = [dict(row) for row in section.get("cards") or ()]
+    if len(cards) > int(section.get("card_capacity", len(cards))):
+        raise AutonomousDirectorRuntimeError("post-macro card capacity exceeded")
+    inventory: list[dict[str, Any]] = []
+    for card in cards:
+        worker_contract = _POST_MACRO_WORKER_CONTRACTS.get(
+            str(card.get("worker_kind") or "")
+        )
+        if (
+            worker_contract is None
+            or card.get("relay_key") != worker_contract["relay_key"]
+            or card.get("expected_schema") != worker_contract["schema"]
+            or tuple(card.get("allowed_statuses") or ())
+            != tuple(worker_contract["statuses"])
+            or card.get("source_mode") not in worker_contract["source_modes"]
+        ):
+            raise AutonomousDirectorRuntimeError(
+                "post-macro runtime worker contract drift"
+            )
+        source_path, source_relative = _post_macro_path(
+            root, output, card["source_result_path"], "source result"
+        )
+        relay_path, relay_relative = _post_macro_path(
+            root, output, card["relay_result_path"], "relay result"
+        )
+        launch_path, launch_relative = _post_macro_path(
+            root, output, card["launch_receipt_path"], "launch receipt"
+        )
+        resume_path, resume_relative = _post_macro_path(
+            root, output, card["resume_receipt_path"], "resume receipt"
+        )
+        failure_path = launch_path.with_suffix(".failure.json")
+        inputs: dict[str, Path] = {}
+        missing: list[str] = []
+        for name, raw in dict(card["worker_inputs"]).items():
+            binding = dict(raw)
+            path = (root / str(binding["path"])).resolve()
+            _assert_within(root.resolve(), path)
+            if not path.is_file():
+                missing.append(str(name))
+            elif _file_sha256(path) != str(binding["sha256"]):
+                raise AutonomousDirectorRuntimeError(
+                    f"post-macro frozen input drift: {card['relay_key']}:{name}"
+                )
+            inputs[str(name)] = path
+
+        launch_receipt: dict[str, Any] | None = None
+        if relay_path.is_file():
+            action = "RELAYED"
+        elif source_path.is_file():
+            if card["source_mode"] == "GENERATE_READ_ONLY_ONCE":
+                if not launch_path.is_file():
+                    raise AutonomousDirectorRuntimeError(
+                        "generated post-macro source lacks its immutable launch lease"
+                    )
+                generated_launch = _read_hashed(launch_path, "receipt_hash")
+                _verify_post_macro_launch_receipt(
+                    generated_launch, manifest, card, expected_generation=0
+                )
+            action = "RELAY_SOURCE"
+        elif card["source_mode"] == "PREEXISTING_HASH_BOUND":
+            # A hash-bound result is an immutable input, not permission to
+            # recompute the economic branch if that input disappears.
+            action = "WAITING_INPUT_PREEXISTING_RESULT"
+            missing.append("preexisting_source_result")
+        elif missing:
+            # Missing immutable inputs always win over a stale lease/failure
+            # receipt.  A restart may not execute with a partial input closure.
+            action = "WAITING_INPUT"
+        elif failure_path.is_file():
+            failure = _read_hashed(failure_path, "failure_hash")
+            if (
+                not _artifact_manifest_compatible(failure, manifest)
+                or failure.get("relay_key") != card["relay_key"]
+            ):
+                raise AutonomousDirectorRuntimeError(
+                    "post-macro worker-failure receipt drift"
+                )
+            action = "WAITING_INPUT_AFTER_WORKER_FAILURE"
+        elif launch_path.is_file():
+            receipt = _read_hashed(launch_path, "receipt_hash")
+            _verify_post_macro_launch_receipt(
+                receipt, manifest, card, expected_generation=0
+            )
+            launch_receipt = receipt
+            if not _post_macro_launch_lease_expired(receipt):
+                if resume_path.is_file():
+                    raise AutonomousDirectorRuntimeError(
+                        "post-macro resume receipt predates initial lease expiry"
+                    )
+                action = "WAITING_FOR_ACTIVE_LEASE"
+            elif not resume_path.is_file():
+                action = "RESUME_EXPIRED_LEASE"
+            else:
+                resumed = _read_hashed(resume_path, "receipt_hash")
+                _verify_post_macro_launch_receipt(
+                    resumed,
+                    manifest,
+                    card,
+                    expected_generation=1,
+                    prior_receipt=receipt,
+                )
+                action = (
+                    "WAITING_INPUT_LEASE_EXHAUSTED"
+                    if _post_macro_launch_lease_expired(resumed)
+                    else "WAITING_FOR_ACTIVE_RESUME_LEASE"
+                )
+        elif resume_path.is_file():
+            raise AutonomousDirectorRuntimeError(
+                "post-macro resume receipt exists without initial lease"
+            )
+        else:
+            action = "LAUNCH_ONCE"
+        inventory.append(
+            {
+                "card": card,
+                "action": action,
+                "missing_inputs": tuple(sorted(missing)),
+                "worker_inputs": inputs,
+                "source_path": source_path,
+                "source_relative": source_relative,
+                "relay_path": relay_path,
+                "relay_relative": relay_relative,
+                "launch_path": launch_path,
+                "launch_relative": launch_relative,
+                "resume_path": resume_path,
+                "resume_relative": resume_relative,
+                "launch_receipt": launch_receipt,
+                "failure_relative": _relative_branch_artifact_path(
+                    output, failure_path, "worker failure receipt"
+                ),
+            }
+        )
+    return inventory
+
+
+def _post_macro_launch_batch(
+    inventory: Sequence[dict[str, Any]], worker_limit: int
+) -> list[dict[str, Any]]:
+    queued = [
+        item
+        for item in inventory
+        if item["action"] in {"LAUNCH_ONCE", "RESUME_EXPIRED_LEASE"}
+    ]
+    for item in queued[max(worker_limit, 0) :]:
+        item["action"] = "QUEUED_FOR_WORKER_SLOT"
+    return queued[: max(worker_limit, 0)]
+
+
+def _post_macro_path(
+    root: Path, output: Path, raw: Any, label: str
+) -> tuple[Path, Path]:
+    path = (root / str(raw or "")).resolve()
+    _assert_within(root.resolve(), path)
+    return path, _relative_branch_artifact_path(output, path, label)
+
+
+def _post_macro_read_only_worker(
+    root_path: str, worker_kind: str, inputs: Mapping[str, str]
+) -> dict[str, Any]:
+    """Workers receive immutable inputs only and return an unpublished mapping."""
+
+    root = Path(root_path).resolve()
+    paths = {name: Path(value).resolve() for name, value in inputs.items()}
+    for path in paths.values():
+        _assert_within(root, path)
+    if worker_kind == "TIER_Q_2026_FINAL_DEVELOPMENT_READ_ONLY":
+        from hydra.production.tier_q_2026_two_stage_runner import (
+            FINAL_DEVELOPMENT,
+            evaluate_stage,
+            load_frozen_bindings,
+        )
+
+        contract = _read_json_object(paths["contract"])
+        bindings, rules, rule_receipt = load_frozen_bindings(
+            root,
+            contract,
+            candidate_bank_path=paths["candidate_bank"],
+            initial_exact_path=paths["initial_exact"],
+            continuation_paths=tuple(
+                paths[name]
+                for name in sorted(paths)
+                if name.startswith("continuation_")
+            ),
+            fast_pass_manifest_path=paths["fast_pass_manifest"],
+            rule_snapshot_path=paths["rule_snapshot"],
+        )
+        return evaluate_stage(
+            contract,
+            _read_json_object(paths["acquisition_receipt"]),
+            _read_json_object(paths["feature_receipt"]),
+            role=FINAL_DEVELOPMENT,
+            bindings=bindings,
+            rules=rules,
+            rule_receipt=rule_receipt,
+        )
+    if worker_kind == "CL_FRONT_SECOND_TERM_STRUCTURE_READ_ONLY":
+        from hydra.research.cl_front_second_term_structure_economic_runner import (
+            run_tripwire,
+        )
+
+        return run_tripwire(
+            root,
+            card_path=paths["decision_card"],
+            receipt_path=paths["acquisition_receipt"],
+        )
+    if worker_kind == "TREASURY_THREE_TENOR_CURVATURE_READ_ONLY":
+        from hydra.research.treasury_three_tenor_curvature_tripwire import (
+            RUN_AUTHORIZATION,
+            run_economic_tripwire,
+        )
+
+        return run_economic_tripwire(
+            root,
+            authorization=RUN_AUTHORIZATION,
+            card_path=paths["decision_card"],
+        )
+    raise AutonomousDirectorRuntimeError(f"unknown post-macro worker: {worker_kind}")
+
+
+def _verify_post_macro_source(
+    value: Mapping[str, Any], card: Mapping[str, Any]
+) -> dict[str, Any]:
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != card["expected_schema"]
+        or str(row.get("status")) not in set(card["allowed_statuses"])
+    ):
+        raise AutonomousDirectorRuntimeError("post-macro source identity/hash drift")
+    worker_kind = str(card.get("worker_kind") or "")
+    hard_safety = _POST_MACRO_REQUIRED_SAFETY_FIELDS.get(worker_kind)
+    if hard_safety is None:
+        raise AutonomousDirectorRuntimeError("post-macro worker kind is unmapped")
+    expected_fields = dict(card["expected_fields"])
+    if not hard_safety.items() <= expected_fields.items():
+        raise AutonomousDirectorRuntimeError(
+            "post-macro card omits mandatory runtime safety counters"
+        )
+    for dotted, expected in {**expected_fields, **hard_safety}.items():
+        actual: Any = value
+        for part in str(dotted).split("."):
+            if not isinstance(actual, Mapping) or part not in actual:
+                raise AutonomousDirectorRuntimeError(
+                    f"post-macro source field absent: {dotted}"
+                )
+            actual = actual[part]
+        if isinstance(expected, bool):
+            equal = isinstance(actual, bool) and actual is expected
+        else:
+            equal = actual == expected
+        if not equal:
+            raise AutonomousDirectorRuntimeError(
+                f"post-macro source field drift: {dotted}"
+            )
+    if (
+        card.get("source_mode") == "PREEXISTING_HASH_BOUND"
+        and claimed != str(card.get("preexisting_result_hash") or "")
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "post-macro preexisting economic result hash drift"
+        )
+    return {**row, "result_hash": claimed}
+
+
+def _write_post_macro_relay(
+    root: Path,
+    manifest: Mapping[str, Any],
+    branch_writer: AtomicResultWriter,
+    item: Mapping[str, Any],
+    source: Mapping[str, Any],
+) -> None:
+    card = dict(item["card"])
+    next_field = str(card.get("next_action_field") or "")
+    next_action = str(card.get("next_action") or "HANDOFF_TO_NEXT_BRANCH")
+    if next_field:
+        next_action = str(source[next_field])
+    envelope = _post_source_envelope(
+        manifest,
+        lane_id=str(card["lane_id"]),
+        branch_id=str(card["branch_id"]),
+        decision=str(source["status"]),
+        payload_key="post_macro_source_result",
+        payload=source,
+        next_action=next_action,
+    )
+    envelope["schema"] = _POST_MACRO_RELAY_SCHEMA
+    envelope["relay_key"] = str(card["relay_key"])
+    envelope["economic_status"] = str(source["status"])
+    envelope["evidence_tier"] = str(card["relay_evidence_tier"])
+    envelope = _rehash(envelope, "result_hash")
+    branch_writer.write_json(item["relay_relative"], envelope)
+    _append_decision_once(root, manifest, envelope)
+
+
+def _read_post_macro_relay(
+    item: Mapping[str, Any],
+    manifest: Mapping[str, Any],
+    *,
+    root: Path,
+) -> dict[str, Any]:
+    if item["card"].get("source_mode") == "GENERATE_READ_ONLY_ONCE":
+        if not item["launch_path"].is_file():
+            raise AutonomousDirectorRuntimeError(
+                "generated post-macro relay lacks its immutable launch lease"
+            )
+        generated_launch = _read_hashed(item["launch_path"], "receipt_hash")
+        _verify_post_macro_launch_receipt(
+            generated_launch,
+            manifest,
+            item["card"],
+            expected_generation=0,
+        )
+        if item["resume_path"].is_file():
+            generated_resume = _read_hashed(
+                item["resume_path"], "receipt_hash"
+            )
+            _verify_post_macro_launch_receipt(
+                generated_resume,
+                manifest,
+                item["card"],
+                expected_generation=1,
+                prior_receipt=generated_launch,
+            )
+    envelope = _read_hashed(item["relay_path"], "result_hash")
+    source = _verify_post_macro_source(
+        dict(envelope.get("post_macro_source_result") or {}), item["card"]
+    )
+    if (
+        envelope.get("schema") != _POST_MACRO_RELAY_SCHEMA
+        or not _artifact_manifest_compatible(envelope, manifest)
+        or envelope.get("relay_key") != item["card"]["relay_key"]
+        or envelope.get("economic_status") != source["status"]
+        or int(envelope.get("q4_access_count_delta", -1)) != 0
+        or int(envelope.get("broker_connections", -1)) != 0
+        or int(envelope.get("orders", -1)) != 0
+    ):
+        raise AutonomousDirectorRuntimeError("post-macro relay drift")
+    _append_decision_once(root, manifest, envelope)
+    return source
+
+
+def _post_macro_launch_receipt(
+    manifest: Mapping[str, Any],
+    item: Mapping[str, Any],
+    *,
+    lease_seconds: int,
+    lease_generation: int = 0,
+    prior_receipt: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    card = dict(item["card"])
+    input_hashes = {
+        name: _file_sha256(path) for name, path in sorted(item["worker_inputs"].items())
+    }
+    card_hash = stable_hash(card)
+    implementation_sha256 = str(card["worker_implementation_sha256"])
+    attempt_id = _post_macro_attempt_id(
+        card,
+        input_hashes=input_hashes,
+        card_hash=card_hash,
+        implementation_sha256=implementation_sha256,
+    )
+    if lease_generation not in (0, 1):
+        raise AutonomousDirectorRuntimeError("post-macro lease generation drift")
+    if lease_generation == 1:
+        if prior_receipt is None:
+            raise AutonomousDirectorRuntimeError(
+                "post-macro resume requires the initial immutable lease"
+            )
+        _verify_post_macro_launch_receipt(
+            prior_receipt, manifest, card, expected_generation=0
+        )
+        if prior_receipt.get("deterministic_attempt_id") != attempt_id:
+            raise AutonomousDirectorRuntimeError(
+                "post-macro resume changed deterministic attempt"
+            )
+    reserved = datetime.now(UTC)
+    core = {
+        "schema": (
+            _POST_MACRO_LAUNCH_SCHEMA
+            if lease_generation == 0
+            else _POST_MACRO_RESUME_SCHEMA
+        ),
+        "campaign_id": manifest["campaign_id"],
+        "manifest_hash": manifest["manifest_hash"],
+        "branch_id": card["branch_id"],
+        "relay_key": card["relay_key"],
+        "status": "READ_ONLY_BRANCH_LEASE_RESERVED",
+        "deterministic_attempt_id": attempt_id,
+        "card_hash": card_hash,
+        "worker_implementation_file": card["worker_implementation_file"],
+        "worker_implementation_sha256": implementation_sha256,
+        "input_hashes": input_hashes,
+        "lease_generation": lease_generation,
+        "prior_receipt_hash": (
+            None if prior_receipt is None else str(prior_receipt["receipt_hash"])
+        ),
+        "reserved_at_utc": reserved.isoformat(),
+        "lease_expires_at_utc": datetime.fromtimestamp(
+            reserved.timestamp() + max(lease_seconds, 60), tz=UTC
+        ).isoformat(),
+        "worker_received_output_or_writer_path": False,
+        "parent_only_authoritative_writer": True,
+    }
+    return {**core, "receipt_hash": stable_hash(core)}
+
+
+def _verify_post_macro_launch_receipt(
+    receipt: Mapping[str, Any],
+    manifest: Mapping[str, Any],
+    card: Mapping[str, Any],
+    *,
+    expected_generation: int = 0,
+    prior_receipt: Mapping[str, Any] | None = None,
+) -> None:
+    input_hashes = {
+        str(name): str(dict(raw)["sha256"])
+        for name, raw in dict(card["worker_inputs"]).items()
+    }
+    card_hash = stable_hash(card)
+    implementation_sha256 = str(card["worker_implementation_sha256"])
+    attempt_id = _post_macro_attempt_id(
+        card,
+        input_hashes=input_hashes,
+        card_hash=card_hash,
+        implementation_sha256=implementation_sha256,
+    )
+    if (
+        receipt.get("schema")
+        != (
+            _POST_MACRO_LAUNCH_SCHEMA
+            if expected_generation == 0
+            else _POST_MACRO_RESUME_SCHEMA
+        )
+        or not _artifact_manifest_compatible(receipt, manifest)
+        or receipt.get("relay_key") != card["relay_key"]
+        or receipt.get("deterministic_attempt_id") != attempt_id
+        or receipt.get("card_hash") != card_hash
+        or receipt.get("worker_implementation_file")
+        != card["worker_implementation_file"]
+        or receipt.get("worker_implementation_sha256")
+        != implementation_sha256
+        or dict(receipt.get("input_hashes") or {}) != input_hashes
+        or receipt.get("lease_generation") != expected_generation
+        or receipt.get("prior_receipt_hash")
+        != (
+            None if prior_receipt is None else prior_receipt.get("receipt_hash")
+        )
+        or receipt.get("worker_received_output_or_writer_path") is not False
+        or receipt.get("parent_only_authoritative_writer") is not True
+    ):
+        raise AutonomousDirectorRuntimeError("post-macro launch lease drift")
+
+
+def _post_macro_attempt_id(
+    card: Mapping[str, Any],
+    *,
+    input_hashes: Mapping[str, str],
+    card_hash: str,
+    implementation_sha256: str,
+) -> str:
+    return stable_hash(
+        {
+            "branch_id": card["branch_id"],
+            "worker_kind": card["worker_kind"],
+            "card_hash": card_hash,
+            "worker_implementation_sha256": implementation_sha256,
+            "input_hashes": dict(sorted(input_hashes.items())),
+        }
+    )
+
+
+def _verify_post_macro_pre_spawn(
+    root: Path,
+    manifest: Mapping[str, Any],
+    item: Mapping[str, Any],
+) -> None:
+    """Re-hash every immutable worker dependency immediately before spawn."""
+
+    card = dict(item["card"])
+    worker_kind = str(card.get("worker_kind") or "")
+    implementation = _POST_MACRO_WORKER_IMPLEMENTATIONS.get(worker_kind)
+    implementation_sha256 = str(card.get("worker_implementation_sha256") or "")
+    if (
+        implementation is None
+        or card.get("worker_implementation_file") != implementation
+        or implementation_sha256
+        != str(dict(manifest.get("implementation_files") or {}).get(implementation) or "")
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "post-macro worker implementation mapping drift"
+        )
+    implementation_path = (root / implementation).resolve()
+    _assert_within(root.resolve(), implementation_path)
+    if (
+        not implementation_path.is_file()
+        or _file_sha256(implementation_path) != implementation_sha256
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "post-macro worker implementation changed before spawn"
+        )
+    expected_inputs = {
+        str(name): str(dict(raw)["sha256"])
+        for name, raw in dict(card["worker_inputs"]).items()
+    }
+    actual_inputs = {
+        str(name): _file_sha256(path)
+        for name, path in dict(item["worker_inputs"]).items()
+    }
+    if actual_inputs != expected_inputs:
+        raise AutonomousDirectorRuntimeError(
+            "post-macro input closure changed before spawn"
+        )
+
+
+def _post_macro_launch_lease_expired(receipt: Mapping[str, Any]) -> bool:
+    try:
+        expires = datetime.fromisoformat(
+            str(receipt["lease_expires_at_utc"]).replace("Z", "+00:00")
+        )
+    except (KeyError, ValueError) as exc:
+        raise AutonomousDirectorRuntimeError("post-macro lease timestamp drift") from exc
+    return datetime.now(UTC) >= expires
+
+
+def _post_macro_failure_receipt(
+    manifest: Mapping[str, Any], item: Mapping[str, Any], exc: Exception
+) -> dict[str, Any]:
+    core = {
+        "schema": _POST_MACRO_FAILURE_SCHEMA,
+        "campaign_id": manifest["campaign_id"],
+        "manifest_hash": manifest["manifest_hash"],
+        "relay_key": item["card"]["relay_key"],
+        "status": "WAITING_INPUT_AFTER_WORKER_FAILURE",
+        "failure_type": type(exc).__name__,
+        "failure_message": str(exc),
+        "relaunch_allowed_without_technical_revision": False,
+        "worker_slot_reusable": True,
+        "q4_access_count_delta": 0,
+        "broker_connections": 0,
+        "orders": 0,
+    }
+    return {**core, "failure_hash": stable_hash(core)}
+
+
+def _post_macro_state(
+    manifest: Mapping[str, Any],
+    prior: Mapping[str, Any],
+    results: Mapping[str, Mapping[str, Any]],
+    inventory: Sequence[Mapping[str, Any]],
+    *,
+    stage: str,
+    next_action: str,
+    active_workers: int = 0,
+) -> dict[str, Any]:
+    state = _state_payload(
+        manifest,
+        sequence=int(prior["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage=stage,
+        branch_results=results,
+        next_action=next_action,
+    )
+    cards = []
+    for item in inventory:
+        action = str(item["action"])
+        cards.append(
+            {
+                "lane_id": item["card"]["lane_id"],
+                "branch_id": item["card"]["branch_id"],
+                "relay_key": item["card"]["relay_key"],
+                "status": (
+                    "COMPLETE_RELAYED"
+                    if action == "RELAYED"
+                    else "RUNNING"
+                    if action == "RUNNING"
+                    else "WAITING_INPUT"
+                    if action.startswith("WAITING")
+                    else "QUEUED"
+                ),
+                "missing_inputs": list(item["missing_inputs"]),
+                "worker_slot_reusable": action.startswith("WAITING"),
+                **(
+                    {"economic_status": item["economic_status"]}
+                    if item.get("economic_status")
+                    else {}
+                ),
+            }
+        )
+    state.update(
+        {
+            "active_economic_worker_processes": active_workers,
+            "post_macro_branch_card_count": len(inventory),
+            "post_macro_relayed_branch_count": sum(
+                item["action"] == "RELAYED" for item in inventory
+            ),
+            "post_macro_waiting_input_count": sum(
+                str(item["action"]).startswith("WAITING") for item in inventory
+            ),
+            "post_macro_parent_writer_only": True,
+            "post_macro_empty_inventory_job_count": 0 if not inventory else None,
+            "next_branch_cards": cards,
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        }
+    )
+    return _rehash(state, "state_hash")
+
+
+def _finalize_post_macro_campaign(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    prior_state: Mapping[str, Any],
+    runtime_results: Mapping[str, Mapping[str, Any]],
+    inventory: Sequence[Mapping[str, Any]],
+    started: float,
+    live_writer: AtomicResultWriter,
+) -> dict[str, Any]:
+    """Seal one real 0035 EvidenceBundle and let the persistent V17 advance."""
+
+    if not inventory or any(item.get("action") != "RELAYED" for item in inventory):
+        raise AutonomousDirectorRuntimeError(
+            "post-macro terminalization requires every frozen card relay"
+        )
+    tier_q = runtime_results.get("POST_MACRO_TIER_Q_2026_FINAL_DEVELOPMENT")
+    if not isinstance(tier_q, Mapping):
+        raise AutonomousDirectorRuntimeError(
+            "post-macro terminalization lacks Tier-Q final-development evidence"
+        )
+    receipt, economic_summary, halving, failures = _seal_post_macro_evidence_bundle(
+        root=root,
+        output=output,
+        manifest=manifest,
+        tier_q=tier_q,
+        runtime_results=runtime_results,
+    )
+    section = dict(manifest.get("post_macro_branch_portfolio") or {})
+    next_branch = dict(section.get("next_branch") or {})
+    next_action = {
+        "action": str(
+            next_branch.get("action")
+            or "ADVANCE_TO_PREAPPENDED_RESEARCH_BOARD_SUCCESSOR"
+        ),
+        "manifest_required": bool(next_branch.get("append_required", True)),
+        "selected_lane_id": str(next_branch.get("lane_id") or "EXPLORATION"),
+        "selected_branch_id": str(
+            next_branch.get("branch_id") or "MATERIALLY_DISTINCT_SUCCESSOR"
+        ),
+        "automatic_parameter_neighbor": bool(
+            next_branch.get("automatic_parameter_neighbor", False)
+        ),
+        "q4_access_authorized": False,
+        "new_data_purchase_authorized": False,
+    }
+    if (
+        next_action["action"]
+        != "ADVANCE_TO_PREAPPENDED_RESEARCH_BOARD_SUCCESSOR"
+        or next_action["manifest_required"] is not True
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "post-macro successor handoff must be preappended and non-tombstoning"
+        )
+    terminal = _state_payload(
+        manifest,
+        sequence=int(prior_state["checkpoint_sequence"]) + 1,
+        state="COMPLETE",
+        stage="POST_MACRO_BRANCH_PORTFOLIO_TERMINAL_EVIDENCE_SEALED",
+        branch_results=runtime_results,
+        next_action=str(next_action["action"]),
+    )
+    terminal.update(
+        {
+            "active_economic_worker_processes": 0,
+            "post_macro_branch_card_count": len(inventory),
+            "post_macro_relayed_branch_count": len(inventory),
+            "post_macro_waiting_input_count": 0,
+            "post_macro_parent_writer_only": True,
+            "next_branch_consumed": next_branch,
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        }
+    )
+    terminal = _rehash(terminal, "state_hash")
+    kpis = _kpis(manifest, terminal, runtime_results, started)
+    production_kpis = {
+        field: kpis[field]
+        for field in (
+            "rates_per_hour",
+            "economic_research_wall_clock_fraction",
+            "cpu_utilization_fraction",
+            "workers",
+            "duplicate_rejection_rate",
+            "cache_hit_rate",
+        )
+    }
+    economic_summary = {
+        **economic_summary,
+        "production_kpis": production_kpis,
+    }
+    result = build_final_result_payload(
+        manifest=manifest,
+        kpis=kpis,
+        economic_results=economic_summary,
+        successive_halving=halving,
+        matched_controls={
+            "schema": "hydra_autonomous_director_post_macro_controls_v1",
+            "status": "NO_POST_HOC_PROMOTION_AND_DISTINCT_BRANCH_RELAYS_ONLY",
+            "relayed_branch_ids": [
+                str(item["card"]["branch_id"]) for item in inventory
+            ],
+        },
+        failure_vectors=failures,
+        evidence_receipt=receipt,
+        autonomous_next_action=next_action,
+        scientific_status="POST_MACRO_PORTFOLIO_COMPLETE_NO_TIER_G_PROMOTION",
+    )
+    _publish(live_writer, terminal, kpis)
+    _write_mission_views(root, manifest, terminal, runtime_results)
+    # This is the terminal commit marker and must remain the literal final
+    # durable write.  Restart observes it, deep-verifies evidence, and returns
+    # without rewriting any artifact.
+    live_writer.write_json("economic_production_result.json", result)
+    return terminal
+
+
+def _seal_post_macro_evidence_bundle(
+    *,
+    root: Path,
+    output: Path,
+    manifest: Mapping[str, Any],
+    tier_q: Mapping[str, Any],
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Seal the viewed Tier-Q economics through the canonical exact adapter."""
+
+    from hydra.evidence.causal_target_velocity_adapter import (
+        finalize_causal_target_velocity_evidence_bundle,
+    )
+    from hydra.production.tier_q_2026_two_stage_runner import (
+        FINAL_DEVELOPMENT,
+        load_frozen_bindings,
+        reconstruct_stage_evidence_material,
+    )
+
+    candidates = [dict(row) for row in tier_q.get("candidate_results") or ()]
+    if not candidates:
+        raise AutonomousDirectorRuntimeError(
+            "Tier-Q final-development source contains no candidates"
+        )
+    section = dict(manifest.get("post_macro_branch_portfolio") or {})
+    tier_cards = [
+        dict(row)
+        for row in section.get("cards") or ()
+        if row.get("worker_kind") == "TIER_Q_2026_FINAL_DEVELOPMENT_READ_ONLY"
+    ]
+    if len(tier_cards) != 1:
+        raise AutonomousDirectorRuntimeError(
+            "post-macro terminal evidence requires one Tier-Q card"
+        )
+    card = tier_cards[0]
+    inputs = {
+        str(name): (root / str(dict(raw)["path"])).resolve()
+        for name, raw in dict(card["worker_inputs"]).items()
+    }
+    for path in inputs.values():
+        _assert_within(root, path)
+    required = {
+        "contract",
+        "acquisition_receipt",
+        "feature_receipt",
+        "candidate_bank",
+        "initial_exact",
+        "fast_pass_manifest",
+        "rule_snapshot",
+        "access_ledger",
+    }
+    if not required <= set(inputs):
+        raise AutonomousDirectorRuntimeError(
+            "Tier-Q terminal reconstruction input closure is incomplete"
+        )
+    contract = _read_json_object(inputs["contract"])
+    acquisition = _read_json_object(inputs["acquisition_receipt"])
+    feature = _read_json_object(inputs["feature_receipt"])
+    continuations = tuple(
+        inputs[name] for name in sorted(inputs) if name.startswith("continuation_")
+    )
+    bindings, rules, _rule_receipt = load_frozen_bindings(
+        root,
+        contract,
+        candidate_bank_path=inputs["candidate_bank"],
+        initial_exact_path=inputs["initial_exact"],
+        continuation_paths=continuations,
+        fast_pass_manifest_path=inputs["fast_pass_manifest"],
+        rule_snapshot_path=inputs["rule_snapshot"],
+    )
+    material = reconstruct_stage_evidence_material(
+        contract,
+        acquisition,
+        feature,
+        tier_q,
+        role=FINAL_DEVELOPMENT,
+        bindings=bindings,
+        rules=rules,
+    )
+    if len(material["candidate_result_hashes"]) != len(candidates):
+        raise AutonomousDirectorRuntimeError(
+            "Tier-Q exact reconstruction candidate denominator drift"
+        )
+
+    data_fingerprints = {
+        f"tier_q_worker_input:{name}": str(dict(card["worker_inputs"])[name]["sha256"])
+        for name in sorted(card["worker_inputs"])
+    }
+    for market, raw in sorted(dict(feature.get("bundles") or {}).items()):
+        binding = dict(raw)
+        data_fingerprints[f"tier_q_role_matrix:{market}"] = str(
+            binding["bundle_hash"]
+        )
+    access_ledger = inputs["access_ledger"]
+    evidence_base = root / str(manifest["evidence_bundle"]["destination"])
+    lightweight = output / "evidence_bundle_receipt.json"
+    sealed = evidence_base / f"{manifest['campaign_id']}.evidence-v1"
+    if sealed.is_dir():
+        receipt = recover_finalized_evidence_bundle(
+            evidence_base,
+            str(manifest["campaign_id"]),
+            lightweight_manifest_path=lightweight,
+        )
+    else:
+        receipt = finalize_causal_target_velocity_evidence_bundle(
+            base_dir=evidence_base,
+            lightweight_manifest_path=lightweight,
+            campaign_manifest=manifest,
+            exact_replays=material["exact_replays"],
+            policies=material["policies"],
+            evaluated_policy_records=material["evaluated_policy_records"],
+            data_fingerprints=data_fingerprints,
+            provenance={
+                "access_ledger_sha256": _file_sha256(access_ledger),
+                # Frozen for resumable batch identity: a crash between append
+                # and finalize must replay byte-identical provenance.
+                "recorded_at_utc": str(manifest["created_at_utc"]),
+                "market_data_role": "VIEWED_PRE_Q4_FINAL_DEVELOPMENT_ONLY",
+                "immutable_checksums": {
+                    "manifest": str(manifest["manifest_hash"]),
+                    "tier_q_final_development_result": str(tier_q["result_hash"]),
+                    **{
+                        f"post_macro_result:{key}": str(value["result_hash"])
+                        for key, value in sorted(runtime_results.items())
+                        if key in _POST_MACRO_RELAY_KEYS
+                    },
+                },
+            },
+            compact_context={
+                "terminal_reason": "POST_MACRO_PORTFOLIO_COMPLETE",
+                "evidence_stage": "VIEWED_FINAL_DEVELOPMENT",
+                "candidate_result_hash_match_count": len(
+                    material["candidate_result_hashes"]
+                ),
+                "tier_g_candidate_ids": [],
+                "confirmation_deferred": True,
+                "xfa_deferred": True,
+                "forward_deferred": True,
+            },
+            writer_id=f"post-macro-terminal:{manifest['campaign_id']}",
+            evidence_status=(
+                "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION"
+            ),
+        )
+    receipt_dict = receipt.to_dict()
+    verified = verify_evidence_bundle(receipt.bundle_path, deep=True)
+    identity = _read_json_object(Path(receipt.bundle_path) / "identity.json")
+    evidence_contract = dict(manifest.get("evidence_bundle") or {})
+    if (
+        identity.get("campaign_id") != manifest["campaign_id"]
+        or identity.get("source_commit") != manifest["source_commit"]
+        or identity.get("grammar_id") != manifest["class_id"]
+        or receipt_dict.get("evidence_status")
+        != "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION"
+        or receipt_dict.get("reconstruction_flag") is not True
+        or receipt_dict.get("evidence_status")
+        != evidence_contract.get("evidence_status")
+        or receipt_dict.get("reconstruction_flag")
+        is not evidence_contract.get("reconstruction_flag")
+        or verified.get("dataset_row_counts")
+        != receipt_dict["dataset_row_counts"]
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "0035 terminal EvidenceBundle identity or count drift"
+        )
+    economic_summary, halving, failures = _post_macro_terminal_economics(candidates)
+    economic_summary["tier_q_final_development_result_hash"] = str(
+        tier_q["result_hash"]
+    )
+    economic_summary["candidate_result_hash_match_count"] = len(
+        material["candidate_result_hashes"]
+    )
+    economic_summary["post_macro_branch_results"] = {
+        key: {
+            "status": str(value["status"]),
+            "result_hash": str(value["result_hash"]),
+        }
+        for key, value in sorted(runtime_results.items())
+        if key in _POST_MACRO_RELAY_KEYS
+    }
+    return receipt_dict, economic_summary, halving, failures
+
+
+def _post_macro_terminal_economics(
+    candidates: Sequence[Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+    """Project the already sealed exact economics into the V17 result schema."""
+
+    normal_rates = [float(row["normal"]["pass_rate"]) for row in candidates]
+    stressed_rates = [float(row["stressed"]["pass_rate"]) for row in candidates]
+    stressed_progress = [
+        float(row["stressed"]["target_progress_median"]) for row in candidates
+    ]
+    stressed_mll = [
+        float(row["stressed"]["mll_breach_rate"]) for row in candidates
+    ]
+    normal_episodes = sum(int(row["normal"]["episode_count"]) for row in candidates)
+    stressed_episodes = sum(
+        int(row["stressed"]["episode_count"]) for row in candidates
+    )
+    economic_summary = {
+        "schema": "hydra_autonomous_director_terminal_economics_v1",
+        "production_counters": {
+            "serious_exact_account_replays": len(candidates),
+            "predeclared_control_policy_replays": 0,
+            "combine_episodes_completed": normal_episodes + stressed_episodes,
+            "normal_episodes_completed": normal_episodes,
+            "stressed_episodes_completed": stressed_episodes,
+        },
+        "production_kpis": {},
+        "economic_frontier": {
+            "candidate_count": len(candidates),
+            "normal_pass_fraction_best": max(normal_rates),
+            "normal_pass_fraction_median": statistics.median(normal_rates),
+            "stressed_pass_fraction_best": max(stressed_rates),
+            "stressed_pass_fraction_median": statistics.median(stressed_rates),
+            "stressed_target_progress_median_best": max(stressed_progress),
+            "stressed_target_progress_median_population": statistics.median(
+                stressed_progress
+            ),
+            "stressed_mll_breach_rate_minimum": min(stressed_mll),
+            "stressed_mll_breach_rate_maximum": max(stressed_mll),
+            "positive_stressed_net_count": sum(
+                float(row["stressed"]["net_total_usd"]) > 0.0
+                for row in candidates
+            ),
+        },
+        "normal_pass_candidate_count": sum(
+            int(row["normal"]["pass_count"]) > 0 for row in candidates
+        ),
+        "stressed_pass_candidate_count": sum(
+            int(row["stressed"]["pass_count"]) > 0 for row in candidates
+        ),
+        "positive_stressed_net_count": sum(
+            float(row["stressed"]["net_total_usd"]) > 0.0
+            for row in candidates
+        ),
+        "confirmation_ready_candidate_ids": [],
+        "development_only": True,
+        "independently_confirmed": False,
+    }
+    halving = {
+        "schema": "hydra_autonomous_director_terminal_halving_v1",
+        "stage_decisions": [
+            {
+                "stage": "POST_MACRO_FINAL_DEVELOPMENT",
+                "input_count": len(candidates),
+                "output_count": 0,
+                "selected_policy_ids": [],
+                "decision": "NO_TIER_G_CANDIDATE_FROM_VIEWED_FINAL_DEVELOPMENT",
+            }
+        ],
+    }
+    failures = {
+        "schema": "hydra_autonomous_director_terminal_failure_vectors_v1",
+        "by_candidate": [
+            {
+                "candidate_id": str(row["candidate_id"]),
+                "resulting_evidence_tier": str(row["resulting_evidence_tier"]),
+                "promotion_gate": dict(row["promotion_gate"]),
+            }
+            for row in candidates
+        ],
+    }
+    return economic_summary, halving, failures
 
 
 def _session_safe_confirmation_feature_envelope(
@@ -8140,6 +9536,7 @@ def _write_mission_views(
                 "POST_BREADTH_SESSION_SAFE_CONFIRMATION",
                 "POST_BREADTH_CLEAN_CROSS_ASSET_DAILY",
                 "POST_BREADTH_SCHEDULED_MACRO_RELEASE",
+                *_POST_MACRO_RELAY_KEYS,
             )
             if key in branch_results
         },

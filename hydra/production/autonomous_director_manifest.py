@@ -26,7 +26,82 @@ CAMPAIGN_MODE = "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR"
 CAMPAIGN_ID = "hydra_autonomous_economic_discovery_director_0035"
 CLASS_ID = "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR_V1"
 RUNTIME_VERSION = "hydra_autonomous_economic_discovery_director_runtime_v1"
-ARTIFACT_COMPATIBILITY_LIMIT = 12
+ARTIFACT_COMPATIBILITY_LIMIT = 13
+
+_POST_MACRO_WORKER_IMPLEMENTATIONS = {
+    "TIER_Q_2026_FINAL_DEVELOPMENT_READ_ONLY": (
+        "hydra/production/tier_q_2026_two_stage_runner.py"
+    ),
+    "CL_FRONT_SECOND_TERM_STRUCTURE_READ_ONLY": (
+        "hydra/research/cl_front_second_term_structure_economic_runner.py"
+    ),
+    "TREASURY_THREE_TENOR_CURVATURE_READ_ONLY": (
+        "hydra/research/treasury_three_tenor_curvature_tripwire.py"
+    ),
+}
+_POST_MACRO_WORKER_CONTRACTS = {
+    "TIER_Q_2026_FINAL_DEVELOPMENT_READ_ONLY": {
+        "relay_key": "POST_MACRO_TIER_Q_2026_FINAL_DEVELOPMENT",
+        "schema": "hydra_tier_q_2026_two_stage_economic_result_v2",
+        "statuses": ("FINAL_DEVELOPMENT_CONSUMED",),
+        "evidence_role_field": "role",
+        "evidence_role": "FINAL_DEVELOPMENT",
+        "source_modes": (
+            "PREEXISTING_HASH_BOUND",
+            "GENERATE_READ_ONLY_ONCE",
+        ),
+    },
+    "CL_FRONT_SECOND_TERM_STRUCTURE_READ_ONLY": {
+        "relay_key": "POST_MACRO_CL_FRONT_SECOND_TERM_STRUCTURE",
+        "schema": "hydra_cl_front_second_term_structure_economic_tripwire_v1",
+        "statuses": (
+            "TERM_STRUCTURE_TRIPWIRE_GREEN_TIER_E",
+            "TERM_STRUCTURE_TRIPWIRE_WEAK",
+            "TERM_STRUCTURE_TRIPWIRE_FALSIFIED",
+            "TERM_STRUCTURE_TRIPWIRE_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
+        ),
+        "evidence_role_field": "evidence_role",
+        "evidence_role": "VIEWED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
+        "source_modes": (
+            "PREEXISTING_HASH_BOUND",
+            "GENERATE_READ_ONLY_ONCE",
+        ),
+    },
+    "TREASURY_THREE_TENOR_CURVATURE_READ_ONLY": {
+        "relay_key": "POST_MACRO_TREASURY_THREE_TENOR_CURVATURE",
+        "schema": "hydra_treasury_three_tenor_curvature_tripwire_v1",
+        "statuses": (
+            "TREASURY_CURVATURE_TO_BELLY_GREEN_TIER_E",
+            "TREASURY_CURVATURE_TO_BELLY_WEAK",
+            "TREASURY_CURVATURE_TO_BELLY_FALSIFIED",
+            "TREASURY_CURVATURE_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
+        ),
+        "evidence_role_field": "evidence_role",
+        "evidence_role": "VIEWED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
+        "source_modes": (
+            "PREEXISTING_HASH_BOUND",
+            "GENERATE_READ_ONLY_ONCE",
+        ),
+    },
+}
+_POST_MACRO_REQUIRED_SAFETY_FIELDS = {
+    "TIER_Q_2026_FINAL_DEVELOPMENT_READ_ONLY": {
+        "q4_access_count_delta": 0,
+        "broker_connections": 0,
+        "orders": 0,
+    },
+    "CL_FRONT_SECOND_TERM_STRUCTURE_READ_ONLY": {
+        "governance.q4_rows": 0,
+        "governance.protected_data_access_count_delta": 0,
+        "governance.broker_connections": 0,
+        "governance.orders": 0,
+    },
+    "TREASURY_THREE_TENOR_CURVATURE_READ_ONLY": {
+        "governance.q4_access_count_delta": 0,
+        "governance.broker_connections": 0,
+        "governance.orders": 0,
+    },
+}
 
 LANE_IDS = ("EXPLOITATION", "EXPLORATION")
 EXPLOITATION_BRANCH = "0034_NQ_SELECTIVE_EXECUTION_CONFIRMATION"
@@ -133,6 +208,8 @@ def validate_autonomous_director_manifest(
     _validate_rule_snapshot(manifest, root)
     _validate_mission_state_contract(manifest, root)
     _validate_branch_portfolio(manifest)
+    if manifest.get("post_macro_branch_portfolio") is not None:
+        _validate_post_macro_branch_portfolio(manifest, root)
     _validate_epoch_policy(manifest)
     _validate_evidence_tiers(manifest)
     _validate_objective(manifest)
@@ -420,6 +497,234 @@ def _validate_branch_portfolio(manifest: Mapping[str, Any]) -> None:
     ):
         raise AutonomousDirectorManifestError(
             "direct legal-feasibility exploration contract drift"
+        )
+
+
+def _validate_post_macro_branch_portfolio(
+    manifest: Mapping[str, Any], root: Path
+) -> None:
+    """Validate the bounded, parent-published multi-card continuation queue."""
+
+    section = _mapping(manifest, "post_macro_branch_portfolio")
+    cards = list(section.get("cards") or ())
+    if (
+        section.get("schema") != "hydra_post_macro_branch_portfolio_v1"
+        or len(cards) != 3
+        or int(section.get("card_capacity", 0)) != len(cards)
+        or int(section.get("worker_maximum", 0)) != 2
+        or int(section.get("launch_count_maximum_per_card", 0)) != 1
+        or int(section.get("lease_resume_maximum", -1)) != 1
+        or int(section.get("lease_seconds", 0)) < 60
+        or section.get("expired_lease_resume_same_attempt") is not True
+        or section.get("read_only_workers") is not True
+        or section.get("parent_only_authoritative_writer") is not True
+        or section.get("empty_inventory_launch_allowed") is not False
+        or section.get("missing_input_spin_allowed") is not False
+        or section.get("result_recompute_when_valid_exists") is not False
+        or section.get("q4_access_allowed") is not False
+        or section.get("broker_connection_allowed") is not False
+        or section.get("orders_allowed") is not False
+        or section.get("new_service_allowed") is not False
+        or section.get("new_controller_version_allowed") is not False
+        or section.get("new_database_allowed") is not False
+        or section.get("new_registry_writer_allowed") is not False
+    ):
+        raise AutonomousDirectorManifestError(
+            "post-macro bounded continuation contract drift"
+        )
+    next_branch = section.get("next_branch")
+    if not isinstance(next_branch, Mapping):
+        raise AutonomousDirectorManifestError(
+            "post-macro next-branch waiting card is absent"
+        )
+    row = dict(next_branch)
+    if (
+        row.get("action")
+        != "ADVANCE_TO_PREAPPENDED_RESEARCH_BOARD_SUCCESSOR"
+        or not str(row.get("lane_id") or "")
+        or not str(row.get("branch_id") or "")
+        or row.get("append_required") is not True
+        or row.get("automatic_parameter_neighbor") is not False
+    ):
+        raise AutonomousDirectorManifestError(
+            "post-macro next-branch waiting card drift"
+        )
+    evidence_contract = _mapping(manifest, "evidence_bundle")
+    if (
+        evidence_contract.get("evidence_status")
+        != "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION"
+        or evidence_contract.get("reconstruction_flag") is not True
+    ):
+        raise AutonomousDirectorManifestError(
+            "post-macro deterministic materialization must be declared as "
+            "authoritative development reconstruction"
+        )
+
+    output = _project_file(
+        root, _mapping(manifest, "runtime").get("output_dir"), "runtime output"
+    )
+    branch_root = (output / "branch_results").resolve()
+    implementations = _mapping(manifest, "implementation_files")
+    terminal_adapter = "hydra/evidence/causal_target_velocity_adapter.py"
+    terminal_adapter_sha = str(implementations.get(terminal_adapter) or "")
+    if (
+        not _SHA256.fullmatch(terminal_adapter_sha)
+        or terminal_adapter_sha
+        != _sha256(
+            _project_file(
+                root, terminal_adapter, "post-macro terminal evidence adapter"
+            )
+        )
+    ):
+        raise AutonomousDirectorManifestError(
+            "post-macro terminal EvidenceBundle adapter is outside checksum closure"
+        )
+    seen_keys: set[str] = set()
+    seen_branches: set[str] = set()
+    seen_paths: set[Path] = set()
+    allowed_workers = set(_POST_MACRO_WORKER_IMPLEMENTATIONS)
+    for raw in cards:
+        if not isinstance(raw, Mapping):
+            raise AutonomousDirectorManifestError(
+                "post-macro card must be a mapping"
+            )
+        card = dict(raw)
+        relay_key = str(card.get("relay_key") or "")
+        branch_id = str(card.get("branch_id") or "")
+        allowed_statuses = _tuple(card.get("allowed_statuses"))
+        expected_fields = card.get("expected_fields")
+        worker_kind = str(card.get("worker_kind") or "")
+        worker_contract = _POST_MACRO_WORKER_CONTRACTS.get(worker_kind, {})
+        evidence_role_field = str(
+            worker_contract.get("evidence_role_field") or ""
+        )
+        source_mode = str(card.get("source_mode") or "")
+        preexisting_result_hash = card.get("preexisting_result_hash")
+        if (
+            str(card.get("lane_id") or "") not in (*LANE_IDS, "DIRECTOR")
+            or not relay_key
+            or relay_key in seen_keys
+            or not branch_id
+            or branch_id in seen_branches
+            or worker_kind not in allowed_workers
+            or relay_key != worker_contract.get("relay_key")
+            or card.get("expected_schema") != worker_contract.get("schema")
+            or allowed_statuses != tuple(worker_contract.get("statuses") or ())
+            or card.get("hash_field") != "result_hash"
+            or not isinstance(expected_fields, Mapping)
+            or dict(expected_fields).get(evidence_role_field)
+            != worker_contract.get("evidence_role")
+            or source_mode not in tuple(worker_contract.get("source_modes") or ())
+            or (
+                source_mode == "PREEXISTING_HASH_BOUND"
+                and not _SHA256.fullmatch(str(preexisting_result_hash or ""))
+            )
+            or (
+                source_mode == "GENERATE_READ_ONLY_ONCE"
+                and preexisting_result_hash is not None
+            )
+            or card.get("source_result_absent_launch_once") is not True
+            or card.get("valid_existing_result_relay_only") is not True
+            or card.get("worker_receives_output_path") is not False
+            or card.get("parent_publishes_source_and_relay") is not True
+            or not str(card.get("relay_evidence_tier") or "")
+            or not _POST_MACRO_REQUIRED_SAFETY_FIELDS[worker_kind].items()
+            <= dict(expected_fields).items()
+        ):
+            raise AutonomousDirectorManifestError(
+                "post-macro frozen card identity or execution drift"
+            )
+        seen_keys.add(relay_key)
+        seen_branches.add(branch_id)
+        source_target: Path | None = None
+        for key in (
+            "source_result_path",
+            "relay_result_path",
+            "launch_receipt_path",
+            "resume_receipt_path",
+        ):
+            target = _project_file(root, card.get(key), f"post-macro {key}")
+            try:
+                target.relative_to(branch_root)
+            except ValueError as exc:
+                raise AutonomousDirectorManifestError(
+                    f"post-macro {key} leaves authoritative branch root"
+                ) from exc
+            if target in seen_paths:
+                raise AutonomousDirectorManifestError(
+                    "post-macro source/relay/receipt path collision"
+                )
+            seen_paths.add(target)
+            if key == "source_result_path":
+                source_target = target
+        if source_mode == "PREEXISTING_HASH_BOUND":
+            if source_target is None or not source_target.is_file():
+                raise AutonomousDirectorManifestError(
+                    "post-macro preexisting source result is absent"
+                )
+            try:
+                source_payload = json.loads(source_target.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise AutonomousDirectorManifestError(
+                    "post-macro preexisting source result is invalid"
+                ) from exc
+            if (
+                not isinstance(source_payload, Mapping)
+                or source_payload.get("result_hash") != preexisting_result_hash
+            ):
+                raise AutonomousDirectorManifestError(
+                    "post-macro preexisting source result hash drift"
+                )
+        worker_inputs = card.get("worker_inputs")
+        if not isinstance(worker_inputs, Mapping) or not worker_inputs:
+            raise AutonomousDirectorManifestError(
+                "post-macro worker input inventory is empty"
+            )
+        for name, raw_binding in worker_inputs.items():
+            if not str(name) or not isinstance(raw_binding, Mapping):
+                raise AutonomousDirectorManifestError(
+                    "post-macro worker input binding drift"
+                )
+            binding = dict(raw_binding)
+            target = _project_file(
+                root, binding.get("path"), f"post-macro worker input {name}"
+            )
+            claimed = str(binding.get("sha256") or "")
+            if (
+                not target.is_file()
+                or not _SHA256.fullmatch(claimed)
+                or _sha256(target) != claimed
+            ):
+                raise AutonomousDirectorManifestError(
+                    f"post-macro frozen worker input drift: {name}"
+                )
+        worker_file = str(card.get("worker_implementation_file") or "")
+        implementation_sha256 = str(
+            card.get("worker_implementation_sha256") or ""
+        )
+        if (
+            worker_file != _POST_MACRO_WORKER_IMPLEMENTATIONS[worker_kind]
+            or worker_file not in implementations
+            or not _SHA256.fullmatch(implementation_sha256)
+            or str(implementations.get(worker_file) or "")
+            != implementation_sha256
+            or implementation_sha256
+            != _sha256(
+                _project_file(
+                    root, worker_file, "post-macro worker implementation"
+                )
+            )
+        ):
+            raise AutonomousDirectorManifestError(
+                "post-macro worker implementation is outside checksum closure"
+            )
+
+    if seen_keys != {
+        str(value["relay_key"])
+        for value in _POST_MACRO_WORKER_CONTRACTS.values()
+    }:
+        raise AutonomousDirectorManifestError(
+            "post-macro frozen worker portfolio is incomplete"
         )
 
 

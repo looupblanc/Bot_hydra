@@ -11,6 +11,7 @@ import pytest
 
 from hydra.economic_evolution.schema import stable_hash
 from hydra.evidence import REQUIRED_DATASETS
+from hydra.production import fast_pass_manifest as fast_pass_contract
 from hydra.production.fast_pass_manifest import (
     FAST_PASS_CAMPAIGN_MODE,
     FAST_PASS_CLASS_ID,
@@ -500,6 +501,28 @@ def test_terminal_validation_recovery_revision_is_valid_and_finalization_only() 
         "REUSE_COMPLETE_STAGING_FINALIZATION_ONLY"
     )
     assert manifest["technical_repair"]["terminal_economic_evidence_recomputed"] is False
+
+
+def test_terminal_adapter_accepts_only_exact_ancestor_blob() -> None:
+    path = ROOT / "config/v7/fast_pass_factory_0029_revision_05.json"
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    relative = "hydra/evidence/causal_target_velocity_adapter.py"
+    claimed = str(manifest["implementation_files"][relative])
+
+    assert fast_pass_contract._implementation_hash_matches(
+        root=ROOT,
+        relative=relative,
+        target=ROOT / relative,
+        claimed=claimed,
+        source_commit=str(manifest["source_commit"]),
+    )
+    assert not fast_pass_contract._implementation_hash_matches(
+        root=ROOT,
+        relative=relative,
+        target=ROOT / relative,
+        claimed="f" * 64,
+        source_commit=str(manifest["source_commit"]),
+    )
 
 
 @pytest.mark.parametrize(

@@ -124,6 +124,19 @@ def load_and_validate_production_manifest(path: str | Path) -> dict[str, Any]:
         except AutonomousDirectorManifestError as exc:
             raise ProductionManifestError(str(exc)) from exc
         return manifest
+    if manifest.get("campaign_mode") == "CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER":
+        from hydra.production.cross_ecology_analog_manifest import (
+            CrossEcologyAnalogManifestError,
+            validate_cross_ecology_analog_manifest,
+        )
+
+        try:
+            validate_cross_ecology_analog_manifest(
+                manifest, manifest_path=resolved
+            )
+        except CrossEcologyAnalogManifestError as exc:
+            raise ProductionManifestError(str(exc)) from exc
+        return manifest
     if manifest.get("campaign_mode") == "ACTIVE_RISK_POOL":
         from hydra.production.active_risk_manifest import (
             ActiveRiskManifestError,

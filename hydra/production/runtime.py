@@ -137,6 +137,12 @@ def load_and_verify_production_result(
 
 def read_live_status(manifest_path: str | Path) -> dict[str, Any]:
     manifest = load_and_validate_production_manifest(manifest_path)
+    if manifest.get("campaign_mode") == "CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER":
+        from hydra.production.cross_ecology_analog_runtime import (
+            read_cross_ecology_analog_status,
+        )
+
+        return read_cross_ecology_analog_status(manifest_path)
     if manifest.get("campaign_mode") == "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR":
         from hydra.production.autonomous_director_runtime import (
             read_autonomous_director_status,
@@ -190,6 +196,17 @@ def run_production_manifest(
     """Run/resume the evidence-first production funnel; never terminalize early."""
 
     manifest = load_and_validate_production_manifest(manifest_path)
+    if manifest.get("campaign_mode") == "CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER":
+        from hydra.production.cross_ecology_analog_runtime import (
+            run_cross_ecology_analog_manifest,
+        )
+
+        return run_cross_ecology_analog_manifest(
+            manifest_path,
+            contract_map_path=contract_map_path,
+            cache_root=cache_root,
+            stop_after=stop_after,
+        )
     if manifest.get("campaign_mode") == "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR":
         from hydra.production.autonomous_director_runtime import (
             run_autonomous_director_manifest,

@@ -189,6 +189,7 @@ def finalize_causal_target_velocity_evidence_bundle(
     provenance: Mapping[str, Any],
     compact_context: Mapping[str, Any] | None = None,
     writer_id: str | None = None,
+    evidence_status: str = "FRESH_DEVELOPMENT_EVIDENCE",
 ) -> EvidenceBundleReceipt:
     """Atomically seal complete causal target-velocity development evidence.
 
@@ -252,12 +253,22 @@ def finalize_causal_target_velocity_evidence_bundle(
         component_ids=replay_ids,
         expected_fingerprints=checked_identity["policy_fingerprints"],
     )
+    if evidence_status not in {
+        "FRESH_DEVELOPMENT_EVIDENCE",
+        "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION",
+    }:
+        raise CausalTargetVelocityEvidenceError(
+            "causal target-velocity evidence status is invalid"
+        )
     provenance_row = _provenance_row(
         campaign_id=campaign_id,
         identity=checked_identity,
         exact_replays=exact_replays,
         policies=policy_views,
         value=provenance,
+        reconstruction_flag=(
+            evidence_status == "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION"
+        ),
     )
     small_datasets: dict[str, list[dict[str, Any]]] = {
         **component_rows,
@@ -419,6 +430,7 @@ def finalize_causal_target_velocity_evidence_bundle(
                 + json.dumps(count_drift, sort_keys=True)
             )
         compact = accumulator.outputs(
+            evidence_status=evidence_status,
             context={
                 **dict(compact_context or {}),
                 "adapter_version": CAUSAL_TARGET_VELOCITY_ADAPTER_VERSION,
@@ -447,14 +459,14 @@ def finalize_causal_target_velocity_evidence_bundle(
             observed_base_keys=observed_base_keys,
         )
         receipt = writer.finalize(
-            evidence_status="FRESH_DEVELOPMENT_EVIDENCE",
+            evidence_status=evidence_status,
             lightweight_manifest_path=Path(lightweight_manifest_path),
         )
     except BaseException:
         writer.close()
         raise
     manifest = verify_evidence_bundle(receipt.bundle_path, deep=False)
-    if manifest.get("evidence_status") != "FRESH_DEVELOPMENT_EVIDENCE":
+    if manifest.get("evidence_status") != evidence_status:
         raise CausalTargetVelocityEvidenceError(
             "sealed target-velocity evidence status drift"
         )
@@ -987,6 +999,7 @@ def _provenance_row(
     exact_replays: Mapping[str, ExactHazardSleeveReplay],
     policies: Mapping[str, Mapping[str, Any]],
     value: Mapping[str, Any],
+    reconstruction_flag: bool = False,
 ) -> dict[str, Any]:
     access_hash = str(value.get("access_ledger_sha256") or "")
     recorded = str(value.get("recorded_at_utc") or "")
@@ -1029,7 +1042,7 @@ def _provenance_row(
         "replay_version": CAUSAL_ACCOUNT_REPLAY_VERSION,
         "market_data_role": market_role,
         "access_ledger_sha256": access_hash,
-        "reconstruction_flag": False,
+        "reconstruction_flag": reconstruction_flag,
         "immutable_checksums": checksums,
         "recorded_at_utc": recorded,
         "adapter_version": CAUSAL_TARGET_VELOCITY_ADAPTER_VERSION,
@@ -1053,7 +1066,9 @@ class _CompactAccumulator:
     def add(self, row: Mapping[str, Any]) -> None:
         self.rows.append(dict(row))
 
-    def outputs(self, *, context: Mapping[str, Any]) -> dict[str, Any]:
+    def outputs(
+        self, *, context: Mapping[str, Any], evidence_status: str
+    ) -> dict[str, Any]:
         if not self.rows:
             raise CausalTargetVelocityEvidenceError(
                 "compact outputs cannot replace missing episode evidence"
@@ -1109,7 +1124,13 @@ class _CompactAccumulator:
                 scenario: summarize(rows)
                 for scenario, rows in sorted(by_scenario.items())
             },
-            "fresh_development_evidence": True,
+            "evidence_status": evidence_status,
+            "reconstruction_flag": (
+                evidence_status == "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION"
+            ),
+            "fresh_development_evidence": (
+                evidence_status == "FRESH_DEVELOPMENT_EVIDENCE"
+            ),
             "independently_confirmed": False,
             "xfa_deferred": True,
             "context": dict(context),

@@ -755,6 +755,153 @@ def evaluate_stage(
     return {**core, "result_hash": stable_hash(core)}
 
 
+def reconstruct_stage_evidence_material(
+    contract: Mapping[str, Any],
+    acquisition_receipt: Mapping[str, Any],
+    feature_receipt: Mapping[str, Any],
+    expected_stage_result: Mapping[str, Any],
+    *,
+    role: str,
+    bindings: Mapping[str, FrozenCandidateBinding],
+    rules: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Rebuild canonical EvidenceBundle inputs without changing economics.
+
+    The durable two-stage result predates terminal EvidenceBundle sealing.  A
+    summary-only adapter is insufficient because it cannot reconstruct the
+    component ledgers.  This bounded recovery therefore invokes the exact same
+    candidate evaluator, captures its typed exact replay, and accepts it only
+    when every candidate-result hash is byte-for-byte compatible with the
+    already viewed stage result.  Censored starts stay outside the economic
+    denominator; only the original FULL_COVERAGE account episodes are emitted.
+    """
+
+    frozen = verify_contract(contract)
+    verified_acquisition = verify_acquisition_receipt(
+        frozen, acquisition_receipt, open_role=role
+    )
+    expected = dict(expected_stage_result)
+    claimed = str(expected.pop("result_hash", ""))
+    expected_status = (
+        "FINAL_DEVELOPMENT_CONSUMED"
+        if role == FINAL_DEVELOPMENT
+        else "CONFIRMATION_CONSUMED_ONCE"
+    )
+    if (
+        not claimed
+        or stable_hash(expected) != claimed
+        or expected_stage_result.get("schema") != STAGE_SCHEMA
+        or expected_stage_result.get("status") != expected_status
+        or expected_stage_result.get("role") != role
+        or expected_stage_result.get("contract_hash") != frozen["contract_hash"]
+        or expected_stage_result.get("acquisition_receipt_hash")
+        != verified_acquisition.get("receipt_hash")
+        or expected_stage_result.get("feature_receipt_hash")
+        != feature_receipt.get("result_hash")
+        or expected_stage_result.get("retuning_performed") is not False
+        or expected_stage_result.get("recalibration_performed") is not False
+        or int(expected_stage_result.get("q4_access_count_delta", -1)) != 0
+        or int(expected_stage_result.get("broker_connections", -1)) != 0
+        or int(expected_stage_result.get("orders", -1)) != 0
+    ):
+        raise TierQTwoStageError("expected stage evidence identity/safety drift")
+
+    candidate_ids = tuple(
+        str(row["candidate_id"])
+        for row in frozen["candidate_cohort"]
+    )
+    expected_rows = {
+        str(row.get("candidate_id") or ""): dict(row)
+        for row in expected_stage_result.get("candidate_results") or ()
+    }
+    if (
+        tuple(expected_rows) != candidate_ids
+        or set(bindings) != set(candidate_ids)
+        or len(expected_rows) != len(candidate_ids)
+    ):
+        raise TierQTwoStageError("stage evidence candidate inventory drift")
+
+    matrices = open_role_matrices(
+        feature_receipt,
+        expected_contract=frozen,
+        expected_role=role,
+    )
+    exact_replays: dict[str, Any] = {}
+    policies: dict[str, ActiveRiskPoolPolicy] = {}
+    evaluated_records: list[dict[str, Any]] = []
+    candidate_hashes: dict[str, str] = {}
+    for candidate_id in candidate_ids:
+        binding = bindings[candidate_id]
+        sink: dict[str, Any] = {}
+        observed = _evaluate_candidate_role(
+            frozen,
+            role=role,
+            binding=binding,
+            matrices=matrices,
+            rule=dict(rules[binding.account_label]),
+            exact_replay_sink=sink,
+        )
+        prior = expected_rows[candidate_id]
+        if str(observed["candidate_result_hash"]) != str(
+            prior.get("candidate_result_hash") or ""
+        ):
+            raise TierQTwoStageError(
+                f"reconstructed candidate-result hash drift: {candidate_id}"
+            )
+        replay = sink.get(candidate_id)
+        if replay is None or replay.candidate.candidate_id != candidate_id:
+            raise TierQTwoStageError(
+                f"exact replay capture is incomplete: {candidate_id}"
+            )
+        exact_replays[candidate_id] = replay
+        policy_id = binding.policy.policy_id
+        if policy_id in policies:
+            raise TierQTwoStageError("stage evidence policy identity collision")
+        policies[policy_id] = binding.policy
+        candidate_hashes[candidate_id] = str(observed["candidate_result_hash"])
+        for wrapper_raw in observed.get("episode_evidence") or ():
+            wrapper = dict(wrapper_raw)
+            unsigned_wrapper = dict(wrapper)
+            record_hash = str(unsigned_wrapper.pop("record_hash", ""))
+            if not record_hash or stable_hash(unsigned_wrapper) != record_hash:
+                raise TierQTwoStageError(
+                    f"stage account-episode record hash drift: {candidate_id}"
+                )
+            if wrapper.get("coverage_state") != "FULL_COVERAGE":
+                continue
+            episode = wrapper.get("episode")
+            if not isinstance(episode, Mapping):
+                raise TierQTwoStageError(
+                    f"full-coverage stage episode is absent: {candidate_id}"
+                )
+            if str(episode.get("policy_id") or "") != policy_id:
+                raise TierQTwoStageError(
+                    f"stage account policy identity drift: {candidate_id}"
+                )
+            horizon_days = int(wrapper["horizon_trading_days"])
+            start_day = int(wrapper["start_day"])
+            evaluated_records.append(
+                {
+                    "policy_id": policy_id,
+                    "episode_id": f"{policy_id}:{start_day}",
+                    "scenario": str(wrapper["scenario"]),
+                    "horizon": f"{horizon_days}_TRADING_DAYS",
+                    "requested_duration_trading_days": horizon_days,
+                    "temporal_block": str(wrapper["temporal_block"]),
+                    "episode": dict(episode),
+                    "source_record_hash": record_hash,
+                }
+            )
+    if not evaluated_records:
+        raise TierQTwoStageError("stage reconstruction produced no exact episodes")
+    return {
+        "exact_replays": exact_replays,
+        "policies": policies,
+        "evaluated_policy_records": tuple(evaluated_records),
+        "candidate_result_hashes": candidate_hashes,
+    }
+
+
 def open_role_matrices(
     feature_receipt: Mapping[str, Any],
     *,
@@ -1731,6 +1878,7 @@ def _evaluate_candidate_role(
     binding: FrozenCandidateBinding,
     matrices: Mapping[str, FeatureMatrix],
     rule: Mapping[str, Any],
+    exact_replay_sink: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     candidate = binding.candidate
     expected_horizon = (
@@ -1799,6 +1947,10 @@ def _evaluate_candidate_role(
     replay = exact_sleeve_replay(
         binding.calibrated, events, eligible_session_days=calendar
     )
+    if exact_replay_sink is not None:
+        if exact_replay_sink:
+            raise TierQTwoStageError("exact replay sink must be empty")
+        exact_replay_sink[binding.candidate_id] = replay
     normal, normal_violations = exact._apply_session_contract(replay.normal_trajectories)
     stressed, stressed_violations = exact._apply_session_contract(replay.stressed_trajectories)
     if normal_violations or stressed_violations:
@@ -2092,6 +2244,7 @@ __all__ = [
     "evaluate_stage",
     "load_frozen_bindings",
     "open_role_matrices",
+    "reconstruct_stage_evidence_material",
     "tier_c_gate",
     "tier_g_gate",
     "verify_acquisition_receipt",

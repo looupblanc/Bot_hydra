@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import numpy as np
@@ -288,6 +289,46 @@ def test_deep_seals_all_required_datasets_with_event_direction(
     assert signals[0]["signal"]["direction"] == -1
     assert signals[0]["raw_feature_values_embedded"] is False
     assert receipt.dataset_row_counts["episodes"] == 2
+
+
+def test_seals_authoritative_reconstruction_with_explicit_provenance_flag(
+    tmp_path: Path,
+) -> None:
+    replay = _replay()
+    policy_id = replay.candidate.candidate_id
+    receipt = finalize_causal_target_velocity_evidence_bundle(
+        base_dir=tmp_path / "payload",
+        lightweight_manifest_path=tmp_path / "receipt.json",
+        campaign_manifest=_manifest(),
+        exact_replays={policy_id: replay},
+        policies={policy_id: _policy(replay)},
+        evaluated_policy_records=_records(replay),
+        data_fingerprints={"cached_feature_matrix:CL": "c" * 64},
+        provenance={
+            "access_ledger_sha256": "b" * 64,
+            "recorded_at_utc": "2026-07-17T00:01:00Z",
+            "market_data_role": "VIEWED_FINAL_DEVELOPMENT_RECONSTRUCTION",
+            "immutable_checksums": {"manifest": "e" * 64},
+        },
+        evidence_status="AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION",
+    )
+
+    manifest = verify_evidence_bundle(receipt.bundle_path, deep=True)
+    provenance = list(iter_evidence_records(receipt.bundle_path, "provenance"))
+    summary_path = (
+        Path(receipt.bundle_path)
+        / manifest["compact_outputs"]["campaign_summary"]["relative_path"]
+    )
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    assert receipt.evidence_status == "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION"
+    assert receipt.reconstruction_flag is True
+    assert manifest["reconstruction_flag"] is True
+    assert provenance[0]["reconstruction_flag"] is True
+    assert summary["evidence_status"] == (
+        "AUTHORITATIVE_DEVELOPMENT_RECONSTRUCTION"
+    )
+    assert summary["reconstruction_flag"] is True
+    assert summary["fresh_development_evidence"] is False
 
 
 def test_releases_terminal_collections_before_finalize_and_uses_shallow_followups(

@@ -222,10 +222,16 @@ def _implementation_hash_matches(
 
     if _sha256(target) == claimed:
         return True
-    # Only the stable manifest dispatcher and this validator may evolve
-    # additively after a terminal fast-pass campaign.  Never use ancestry as a
-    # blanket escape hatch for replay, feature, PnL, MLL, or evidence code.
+    # Only explicitly reviewed compatibility surfaces may evolve additively
+    # after a terminal fast-pass campaign.  Never use ancestry as a blanket
+    # escape hatch for replay, feature, PnL, MLL, or evidence code.
     if relative not in {
+        # The evidence adapter later gained an optional evidence-status
+        # parameter whose default remains FRESH_DEVELOPMENT_EVIDENCE plus
+        # reconstruction metadata for a distinct successor campaign.  The
+        # frozen 0029 blob remains authoritative for 0029; accepting that exact
+        # ancestor does not reinterpret or recompute any 0029 economics.
+        "hydra/evidence/causal_target_velocity_adapter.py",
         "hydra/production/fast_pass_manifest.py",
         # The terminal 0029 helper later gained additive, derived
         # concentration and passing-consistency fields.  Its frozen source

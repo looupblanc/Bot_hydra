@@ -313,6 +313,49 @@ def test_real_final_development_coverage_excludes_partial_split_session() -> Non
     }
 
 
+def test_real_final_development_reconstructs_exact_evidence_denominators() -> None:
+    root = Path(__file__).resolve().parents[1]
+
+    def read(relative: str) -> dict:
+        return json.loads((root / relative).read_text(encoding="utf-8"))
+
+    contract = read("config/research/tier_q_2026_two_stage_confirmation_v1.json")
+    acquisition = read("reports/data_access/tier_q_2026_acquisition_receipt.json")
+    feature = read(
+        "reports/economic_evolution/"
+        "autonomous_economic_discovery_director_0035_revision_02/"
+        "branch_results/tier_q_2026_two_stage/"
+        "final_development_feature_receipt.json"
+    )
+    expected = read(
+        "reports/economic_evolution/"
+        "autonomous_economic_discovery_director_0035_revision_02/"
+        "branch_results/tier_q_2026_two_stage/"
+        "final_development_result.json"
+    )
+    bindings, rules, _receipt = runner.load_frozen_bindings(root, contract)
+    material = runner.reconstruct_stage_evidence_material(
+        contract,
+        acquisition,
+        feature,
+        expected,
+        role=runner.FINAL_DEVELOPMENT,
+        bindings=bindings,
+        rules=rules,
+    )
+
+    exact_replays = material["exact_replays"]
+    records = material["evaluated_policy_records"]
+    assert len(material["candidate_result_hashes"]) == 5
+    assert len(exact_replays) == 5
+    assert sum(len(value.events) for value in exact_replays.values()) == 320
+    assert sum(len(value.normal_events) for value in exact_replays.values()) == 316
+    assert sum(len(value.stressed_events) for value in exact_replays.values()) == 316
+    assert len(material["policies"]) == 5
+    assert len(records) == 54
+    assert sum(len(row["episode"]["daily_path"]) for row in records) == 504
+
+
 def test_sparse_micro_gap_uses_first_real_micro_open_and_preserves_signal() -> None:
     candidate, calibrated = _micro_candidate()
     events, receipt = runner._remap_and_observe_execution_outcomes(
