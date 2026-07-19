@@ -446,6 +446,20 @@
       "worm_tag": "worm/selective-order-flow-veto-expansion-0034-post-purchase-causal-repair-2026-07-18"
     },
     {
+      "bounded_confirmation_acquisition": {
+        "actual_spend_usd": 1.847858808935,
+        "additional_authority_usd": 100.0,
+        "contract_hash": "15f7d65b7e4b8c58907a86eeed3c96ca1e49c3594937c1b98a3e3dadd99151c6",
+        "contract_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/fresh_confirmation_contract.json",
+        "controller_runtime_network_access_allowed": false,
+        "cumulative_actual_after_usd": 102.56857873201596,
+        "cumulative_hard_cap_usd": 200.720719923081,
+        "external_manifest_bound_acquisition_allowed": true,
+        "q4_access_allowed": false,
+        "receipt_hash": "517d7342514b3f9dc2caccb7a626a98e053b42141905ffc23bffda4869b55492",
+        "receipt_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/fresh_confirmation_acquisition_receipt.json",
+        "request_hash": "370bc62c9c6420224f880520c7e0ae8ed263cb3f634233dc955b5569e5c53219"
+      },
       "broker_or_orders_allowed": false,
       "campaign_id": "hydra_autonomous_economic_discovery_director_0035",
       "compute_contract": {
@@ -457,9 +471,9 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "b1cc678c88a1e5d72fefd87732d0633d5fcd03fa3eed9ff9e67711edf394faa8",
+      "manifest_file_sha256": "02671cd3ae2197ddc393c24a02564f8b6e0d3892e3e9f3d31f1ecb748033a660",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "4cf67a330f5387aa7824f428dd1f7f1e9a29c2e62614a3640ae5642c7f87c1a6",
+      "manifest_semantic_hash": "00dcb0ffffc205089dcadbed12a9a992cb793e56d93e0139be40a4cfb70f8e61",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -582,6 +596,22 @@
         "shared_execution_or_accounting_semantics_changed": false,
         "xfa_started": false
       },
+      "post_tier_g_xfa_breadth_confirmation_relay": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "breadth_tripwire_development_only": true,
+        "classification": "MASTER_CONTRACT_TIER_G_XFA_DIAGNOSTIC_BREADTH_AND_FRESH_CONFIRMATION_RELAY",
+        "fresh_confirmation_attempt_maximum": 1,
+        "implementation_commit": "95b2a88ca51e9276449e223cbdf3a26b74a4681d",
+        "old_manifest_hash": "4cf67a330f5387aa7824f428dd1f7f1e9a29c2e62614a3640ae5642c7f87c1a6",
+        "promotion_thresholds_changed": false,
+        "q4_access_allowed": false,
+        "scientific_policy_changed": false,
+        "seal_commit": "cdc2d105c8844f348df27ade53e566c800d50c37",
+        "tier_c_requires_exact_confirmation_gate": true,
+        "tier_f_requires_f0": true,
+        "xfa_diagnostic_development_only": true
+      },
       "post_reservation_pre_outcome_technical_repair": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
@@ -593,8 +623,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "09a2632186627b964821dd302ab52f03c80e8750",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-tier-g-development-relay-2026-07-19"
+      "worm_commit": "cdc2d105c8844f348df27ade53e566c800d50c37",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-tier-g-xfa-breadth-confirmation-relay-2026-07-19"
     }
   ],
   "governance": {
@@ -603,8 +633,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T08:34:00Z",
-  "queue_hash": "e29d373353b5f351195f2a1084e07cde427cdb6352a9c6344c6687f985e8b9f6",
+  "issued_at_utc": "2026-07-19T09:56:18Z",
+  "queue_hash": "1432436b4cad0618c8a0c4f26b071f59faa9467609e97ecacc8193c109c3933d",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
