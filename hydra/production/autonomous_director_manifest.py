@@ -125,6 +125,7 @@ def validate_autonomous_director_manifest(
     _validate_identity(manifest)
     _validate_implementation(manifest, root)
     _validate_runtime(manifest)
+    _validate_evidence_bundle(manifest)
     _validate_compute(manifest)
     _validate_governance(manifest)
     _validate_rule_snapshot(manifest, root)
@@ -197,6 +198,32 @@ def _validate_runtime(manifest: Mapping[str, Any]) -> None:
     ):
         raise AutonomousDirectorManifestError(
             "invalid stable autonomous-director runtime declaration"
+        )
+
+
+def _validate_evidence_bundle(manifest: Mapping[str, Any]) -> None:
+    evidence = _mapping(manifest, "evidence_bundle")
+    required = {
+        "component_signals",
+        "component_entries",
+        "component_exits",
+        "component_trades",
+        "account_policy_membership",
+        "account_daily_paths",
+        "episodes",
+        "provenance",
+    }
+    datasets = set(_tuple(evidence.get("required_datasets")))
+    if (
+        evidence.get("required") is not True
+        or evidence.get("atomic_single_writer_finalization") is not True
+        or evidence.get("exact_account_replay_required") is not True
+        or evidence.get("sentinel_economic_records_allowed") is not False
+        or evidence.get("destination") != "data/cache/evidence_bundles"
+        or not required <= datasets
+    ):
+        raise AutonomousDirectorManifestError(
+            "autonomous-director EvidenceBundle contract drift"
         )
 
 

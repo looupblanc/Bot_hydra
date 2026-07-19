@@ -107,6 +107,23 @@ def _fixture(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
             "worker_count": 2,
             "asynchronous_evidence_writer_count": 1,
         },
+        "evidence_bundle": {
+            "required": True,
+            "atomic_single_writer_finalization": True,
+            "destination": "data/cache/evidence_bundles",
+            "required_datasets": [
+                "component_signals",
+                "component_entries",
+                "component_exits",
+                "component_trades",
+                "account_policy_membership",
+                "account_daily_paths",
+                "episodes",
+                "provenance",
+            ],
+            "exact_account_replay_required": True,
+            "sentinel_economic_records_allowed": False,
+        },
         "compute_contract": {
             "host_logical_cpu_count": 4,
             "economic_process_slot_count": 3,
@@ -330,6 +347,7 @@ def test_autonomous_director_manifest_and_dispatch_accept_frozen_contract(
     ("field_path", "bad_value", "message"),
     [
         (("runtime", "worker_count"), 3, "runtime"),
+        (("evidence_bundle", "destination"), "reports/evidence", "EvidenceBundle"),
         (("compute_contract", "thread_limits", "OMP_NUM_THREADS"), "2", "thread"),
         (("governance", "orders_allowed"), True, "unsafe"),
         (
