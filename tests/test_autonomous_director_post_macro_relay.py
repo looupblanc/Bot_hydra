@@ -9,6 +9,7 @@ import pytest
 
 from hydra.compute.result_writer import AtomicResultWriter
 from hydra.economic_evolution.schema import stable_hash
+from hydra.production import autonomous_director_manifest as manifest_contract
 from hydra.production import autonomous_director_runtime as runtime
 
 
@@ -352,6 +353,71 @@ def test_source_safety_field_drift_fails_closed(tmp_path: Path) -> None:
     unsafe = {**core, "result_hash": stable_hash(core)}
     with pytest.raises(runtime.AutonomousDirectorRuntimeError):
         runtime._verify_post_macro_source(unsafe, card)
+
+
+def test_treasury_unevaluable_status_relays_without_false_alpha_verdict() -> None:
+    status = (
+        "TREASURY_CURVATURE_RISK_GRANULARITY_BLOCKED_AND_"
+        "COVERAGE_UNDERPOWERED"
+    )
+    worker_kind = "TREASURY_THREE_TENOR_CURVATURE_READ_ONLY"
+    manifest_statuses = manifest_contract._POST_MACRO_WORKER_CONTRACTS[
+        worker_kind
+    ]["statuses"]
+    runtime_statuses = runtime._POST_MACRO_WORKER_CONTRACTS[worker_kind][
+        "statuses"
+    ]
+    assert manifest_statuses == runtime_statuses
+    assert status in manifest_statuses
+
+    core = {
+        "schema": "hydra_treasury_three_tenor_curvature_tripwire_v1",
+        "status": status,
+        "evidence_role": "VIEWED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
+        "branch_gate": {
+            "economically_evaluable_account_point_count": 0,
+            "full_coverage_headline_account_point_count": 0,
+            "legal_quantity_account_point_count": 0,
+            "promotion_allowed": False,
+            "zero_serialized_economic_metrics_are_observed_rates": False,
+        },
+        "governance": {
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+            "promotion_allowed": False,
+            "tier_q_allowed": False,
+        },
+    }
+    source = {**core, "result_hash": stable_hash(core)}
+    card = {
+        "worker_kind": worker_kind,
+        "expected_schema": core["schema"],
+        "allowed_statuses": list(runtime_statuses),
+        "expected_fields": {
+            "evidence_role": core["evidence_role"],
+            "governance.q4_access_count_delta": 0,
+            "governance.broker_connections": 0,
+            "governance.orders": 0,
+            "branch_gate.economically_evaluable_account_point_count": 0,
+            "branch_gate.full_coverage_headline_account_point_count": 0,
+            "branch_gate.legal_quantity_account_point_count": 0,
+            "branch_gate.promotion_allowed": False,
+            "branch_gate.zero_serialized_economic_metrics_are_observed_rates": False,
+        },
+        "source_mode": "PREEXISTING_HASH_BOUND",
+        "preexisting_result_hash": source["result_hash"],
+    }
+
+    verified = runtime._verify_post_macro_source(source, card)
+    assert verified["status"] == status
+    assert verified["branch_gate"]["promotion_allowed"] is False
+    assert (
+        verified["branch_gate"][
+            "zero_serialized_economic_metrics_are_observed_rates"
+        ]
+        is False
+    )
 
 
 def test_pre_spawn_requires_the_frozen_kind_to_implementation_mapping(
