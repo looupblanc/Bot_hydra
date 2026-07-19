@@ -1,0 +1,272 @@
+{
+  "account_size_matrix": [
+    {
+      "account_label": "50K",
+      "integer_quantity_tier": 3
+    },
+    {
+      "account_label": "100K",
+      "integer_quantity_tier": 6
+    },
+    {
+      "account_label": "150K",
+      "integer_quantity_tier": 9
+    }
+  ],
+  "broker_connections": 0,
+  "calibration": {
+    "calibration_end_exclusive_ns": 1688342400000000000,
+    "calibration_hash": "843a4ac1960ec7ae0c21bfe4ac609be32f3308a8ab6622362914aee9ec4c84e2",
+    "context_threshold": 0.0005404570722667978,
+    "finite_context_observations": 5093,
+    "finite_trigger_observations": 5093,
+    "source_matrix_hash": "671b51a65921b623b9cf3541d86aae3e208a9b897ea9f27b5e860ed92d76550d",
+    "trigger_threshold": 0.0006040424729926386
+  },
+  "candidate": {
+    "adverse_r": 1.0,
+    "context_feature": "cross_index_breadth_consensus",
+    "context_operator": "SAME_SIGN",
+    "context_quantile": 0.5,
+    "cooldown_minutes": 60,
+    "cross_asset_reference_market": null,
+    "direction_rule": "TRIGGER_SIGN_CONTINUATION",
+    "execution_market": "MYM",
+    "favorable_r": 1.0,
+    "horizon": 60,
+    "market": "YM",
+    "mechanism": "BREADTH_CONFIRMED_CONTINUATION",
+    "risk_level": 1.0,
+    "session_code": 0,
+    "timeframe": "15m",
+    "trigger_feature": "cross_index_breadth_transition",
+    "trigger_operator": "ABS_GT",
+    "trigger_quantile": 0.55,
+    "version": 1
+  },
+  "candidate_fingerprint": "4561b186a9dad19051f1e83a7150b866fadc830f82110f1bb1576493f274b774",
+  "contract_hash": "4fd7975dc775e249517eac58511076637ac03e066ae94d71d15785015c37640a",
+  "data_partition": {
+    "candidate_modification_allowed": false,
+    "consumed_once": true,
+    "period": "2025-07-01:2025-10-01",
+    "recalibration_allowed": false,
+    "role": "FINAL_DEVELOPMENT",
+    "untouched_when_frozen": true,
+    "warmup_complete_sessions": 5
+  },
+  "data_request": {
+    "broker_or_order_capability": false,
+    "data_role": "FINAL_DEVELOPMENT",
+    "dataset": "GLBX.MDP3",
+    "date_interval": "HALF_OPEN",
+    "end": "2025-10-01",
+    "official_estimated_cost_usd": {
+      "definition": 0.000431466848,
+      "ohlcv": 1.586130782962,
+      "total": 1.58656224981
+    },
+    "q4_access_allowed": false,
+    "request_hash": "e97f48315503984645480bc99f4db51803c5940ea0e19a02b302f0cfc9c64181",
+    "schema": "ohlcv-1m",
+    "start": "2025-07-01",
+    "stype_in": "continuous",
+    "stype_out": "instrument_id",
+    "symbols": [
+      "YM.c.0",
+      "MYM.c.0",
+      "ES.c.0",
+      "NQ.c.0",
+      "RTY.c.0"
+    ]
+  },
+  "development_behavior_hash": "e2d14327561baf0779707566bc600130f3ac4c0ad3710d6d7262a8d19da6b37a",
+  "evidence_ceiling": "TIER_G_DEVELOPMENT",
+  "failure_action": "TOMBSTONE_EXACT_BREADTH_SPECIFICATION",
+  "horizons_trading_days": [
+    5,
+    10,
+    20
+  ],
+  "official_rule_snapshot": {
+    "file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+    "path": "/root/hydra-bot/config/rulesets/topstep_official_2026-07-19.json",
+    "retrieval_status": "OFFICIAL_CURRENT_SNAPSHOT",
+    "retrieved_at_utc": "2026-07-19T01:04:10Z",
+    "snapshot_id": "topstep_official_2026-07-19T010410Z"
+  },
+  "official_rule_snapshot_payload": {
+    "100K": {
+      "account_label": "100K",
+      "account_size_usd": 100000,
+      "consistency_target_fraction": 0.5,
+      "maximum_loss_limit_usd": 3000,
+      "maximum_micro_contracts": 100,
+      "maximum_mini_contracts": 10,
+      "minimum_trading_days": 2,
+      "no_activation_fee_usd": 0,
+      "no_activation_monthly_price_usd": 149,
+      "optional_daily_loss_limit_usd": 2000,
+      "profit_target_usd": 6000,
+      "special_contract_caps": {
+        "CL_QM_RB_HO": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "GC": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "MCL": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "MGC": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "SIL_MHG": {
+          "100K": 4,
+          "150K": 6,
+          "50K": 2
+        },
+        "SI_HG_PL": {
+          "100K": 0,
+          "150K": 0,
+          "50K": 0
+        }
+      },
+      "standard_activation_fee_usd": 149,
+      "standard_monthly_price_usd": 99
+    },
+    "150K": {
+      "account_label": "150K",
+      "account_size_usd": 150000,
+      "consistency_target_fraction": 0.5,
+      "maximum_loss_limit_usd": 4500,
+      "maximum_micro_contracts": 150,
+      "maximum_mini_contracts": 15,
+      "minimum_trading_days": 2,
+      "no_activation_fee_usd": 0,
+      "no_activation_monthly_price_usd": 229,
+      "optional_daily_loss_limit_usd": 3000,
+      "profit_target_usd": 9000,
+      "special_contract_caps": {
+        "CL_QM_RB_HO": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "GC": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "MCL": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "MGC": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "SIL_MHG": {
+          "100K": 4,
+          "150K": 6,
+          "50K": 2
+        },
+        "SI_HG_PL": {
+          "100K": 0,
+          "150K": 0,
+          "50K": 0
+        }
+      },
+      "standard_activation_fee_usd": 149,
+      "standard_monthly_price_usd": 199
+    },
+    "50K": {
+      "account_label": "50K",
+      "account_size_usd": 50000,
+      "consistency_target_fraction": 0.5,
+      "maximum_loss_limit_usd": 2000,
+      "maximum_micro_contracts": 50,
+      "maximum_mini_contracts": 5,
+      "minimum_trading_days": 2,
+      "no_activation_fee_usd": 0,
+      "no_activation_monthly_price_usd": 95,
+      "optional_daily_loss_limit_usd": 1000,
+      "profit_target_usd": 3000,
+      "special_contract_caps": {
+        "CL_QM_RB_HO": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "GC": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "MCL": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "MGC": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "SIL_MHG": {
+          "100K": 4,
+          "150K": 6,
+          "50K": 2
+        },
+        "SI_HG_PL": {
+          "100K": 0,
+          "150K": 0,
+          "50K": 0
+        }
+      },
+      "standard_activation_fee_usd": 149,
+      "standard_monthly_price_usd": 49
+    }
+  },
+  "orders": 0,
+  "prior_contract_hash": "15f7d65b7e4b8c58907a86eeed3c96ca1e49c3594937c1b98a3e3dadd99151c6",
+  "q4_access_count_delta": 0,
+  "schema": "hydra_frozen_breadth_q3_contract_v1",
+  "source_development": {
+    "horizon_trading_days": 10,
+    "normal_pass_count": 2,
+    "shared_normal_stressed_pass_blocks": [
+      "B3",
+      "B4"
+    ],
+    "stressed_mll_breach_rate": 0.0,
+    "stressed_net_total_usd": 8702.580622080888,
+    "stressed_pass_count": 2,
+    "tripwire_result_hash": "8f23bd4b1d27fdb77c9332a2ce77cab8e72caee056b2b3026d0b755c67ac364f"
+  },
+  "specification_fingerprint": "876cc7340587fdaae650fed0cad69d52c5a90098726b472ae1224ae456e1629d",
+  "specification_id": "breadth:YM:OPEN:BREADTH_CONFIRMED_CONTINUATION",
+  "status": "FROZEN_AWAITING_UNTOUCHED_Q3_ACQUISITION",
+  "tier_c_permitted": false,
+  "tier_g_gate": {
+    "all_stressed_passing_paths_consistency_compliant": true,
+    "matching_horizon_trading_days": 10,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "minimum_normal_passes": 1,
+    "minimum_stressed_passes": 1,
+    "no_retuning": true,
+    "positive_stressed_net_required": true,
+    "source_passes_in_at_least_two_blocks": true
+  }
+}
