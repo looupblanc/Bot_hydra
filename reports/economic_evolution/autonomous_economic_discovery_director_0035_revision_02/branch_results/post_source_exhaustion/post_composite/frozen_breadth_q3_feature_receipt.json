@@ -1,0 +1,53 @@
+{
+  "bundles": {
+    "ES": {
+      "bundle_hash": "99adad82db26627aeb9e321874e4dfa570ac6bd7ba00b616a7374911f599c576",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/frozen_breadth_q3/e88db28caff00cadf71d/feature_matrices/3a7ac02132f729054d2b725321fd6286cd17aa01914466a47bb7c1ed92f534e7",
+      "row_count": 83423
+    },
+    "NQ": {
+      "bundle_hash": "300cd584b1c42b281fabfa642a02641d5085bc7f707d0ec64e2f9b0b078ba9cc",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/frozen_breadth_q3/e88db28caff00cadf71d/feature_matrices/2a9fdfa8d0689b644068b8d65fd0171f9052b13fd2cbc99753f6375af52939e0",
+      "row_count": 83437
+    },
+    "RTY": {
+      "bundle_hash": "82a0e6c3f33170fe40b2e5894e04c7135874869fff3b181ac236f3b45eecc03b",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/frozen_breadth_q3/e88db28caff00cadf71d/feature_matrices/43f5cf0b3634121277ad57e7ad030aa79c95578e154ee60840354856494d6d58",
+      "row_count": 79275
+    },
+    "YM": {
+      "bundle_hash": "77535da44229b3c18c506594e5ae7cb966604e59e57b4acf9bd9740d5678303d",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/frozen_breadth_q3/e88db28caff00cadf71d/feature_matrices/ae4b81e9c571874525df09278d082f17caeaffab9cab6eb95440bd4a4fec7003",
+      "row_count": 80102
+    }
+  },
+  "contract_hash": "4fd7975dc775e249517eac58511076637ac03e066ae94d71d15785015c37640a",
+  "contract_map": {
+    "guard_receipt": {
+      "explicit_contract_count": 10,
+      "unmapped_contract_rows_excluded": 0,
+      "unsafe_roll_rows_excluded": 27812
+    },
+    "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+    "path": "/root/hydra-bot/data/cache/databento/frozen_breadth_q3/e88db28caff00cadf71d/explicit_contract_map.json",
+    "roll_map_hash": "1337a9e27e033d0f50d9ddd02a31089e45dd3f8a8cdcbaf2982f3eac774879af",
+    "sha256": "576e7f29d08abb74f20700fea42b974e18d9cd553216f76963b0544d4ef78a1b"
+  },
+  "data_role": "FINAL_DEVELOPMENT",
+  "q4_access_count_delta": 0,
+  "result_hash": "1f51bc773fe2a0764ba658575945e83d7b4ba64b409e0d53ab88e13f1fd08474",
+  "schema": "hydra_frozen_breadth_q3_features_v1",
+  "source_file_inventory_hash": "158f850a49e6379c4ae8018881831fd1e7f1fe23e7956d094d7a4656bbd6cf7c",
+  "source_files": [
+    {
+      "path": "/root/hydra-bot/data/cache/databento/frozen_breadth_q3/e88db28caff00cadf71d/normalized_ohlcv.parquet",
+      "rows": 434463,
+      "sha256": "42eb6b8647ddc798e39438ce6e232f11fb3f28bb822f05d0d120fe958ffc1ee1"
+    }
+  ],
+  "status": "BREADTH_Q3_FEATURE_BUNDLES_READY"
+}
