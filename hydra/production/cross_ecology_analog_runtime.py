@@ -1062,6 +1062,12 @@ def _load_terminal_result(
         or _read_json(source_path).get("result_hash") != scientific.get("result_hash")
     ):
         raise CrossEcologyAnalogRuntimeError("0036 terminal scientific source drift")
+    _validate_terminal_scientific_replay(
+        output,
+        manifest,
+        scientific,
+        source_path,
+    )
     source_result = _load_scientific_result(source_path, manifest)
     canonical = _canonical_material(source_result, manifest)
     if (
@@ -1238,6 +1244,52 @@ def _validate_terminal_semantics(
         or state_sequence != embedded_sequence
     ):
         raise CrossEcologyAnalogRuntimeError("0036 terminal semantic reconciliation drift")
+
+
+def _validate_terminal_scientific_replay(
+    output: Path,
+    manifest: Mapping[str, Any],
+    scientific: Mapping[str, Any],
+    source_path: Path,
+) -> None:
+    """Bind terminal source metadata to the frozen mode and one-run lease."""
+
+    source_mode = manifest["research_source"]["source_mode"]
+    generated = source_mode == "GENERATE_READ_ONLY_ONCE"
+    if (
+        scientific.get("source_mode") != source_mode
+        or scientific.get("economic_replay_executed_by_adapter") is not generated
+    ):
+        raise CrossEcologyAnalogRuntimeError("0036 terminal scientific source-mode drift")
+    lease_path = output / "scientific_replay_attempt.json"
+    if not generated:
+        if lease_path.is_file():
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 preexisting terminal source unexpectedly has a replay lease"
+            )
+        return
+    if not lease_path.is_file():
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 generated terminal source lacks its single-run lease"
+        )
+    lease = _read_hashed(lease_path, "attempt_hash")
+    _validate_replay_lease(lease, manifest)
+    if lease.get("status") != "COMPLETE":
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 generated terminal source lease is not COMPLETE"
+        )
+    source = _read_json(source_path)
+    actual_file_hash = _sha256(source_path)
+    actual_result_hash = source.get("result_hash")
+    if (
+        lease.get("result_file_sha256") != actual_file_hash
+        or lease.get("result_hash") != actual_result_hash
+        or scientific.get("file_sha256") != actual_file_hash
+        or scientific.get("result_hash") != actual_result_hash
+    ):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 terminal scientific replay lease/source hash drift"
+        )
 
 
 def _require_zero_fields(

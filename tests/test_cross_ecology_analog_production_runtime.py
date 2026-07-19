@@ -711,6 +711,86 @@ def test_replay_lease_requires_full_identity_and_safety() -> None:
             runtime._validate_replay_lease(broken, manifest)
 
 
+def test_terminal_generated_source_requires_complete_hash_bound_lease(
+    tmp_path: Path,
+) -> None:
+    root, _ = _copy_contract_project(tmp_path)
+    manifest = _manifest(root)
+    output = root / manifest["runtime"]["output_dir"]
+    output.mkdir(parents=True)
+    source_path = root / manifest["research_source"]["result_path"]
+    source_path.parent.mkdir(parents=True, exist_ok=True)
+    source_path.write_text(json.dumps({"result_hash": HASH_A}) + "\n")
+    source_sha = _sha(source_path)
+    scientific = {
+        "source_mode": "GENERATE_READ_ONLY_ONCE",
+        "economic_replay_executed_by_adapter": True,
+        "file_sha256": source_sha,
+        "result_hash": HASH_A,
+    }
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="lacks"):
+        runtime._validate_terminal_scientific_replay(
+            output, manifest, scientific, source_path
+        )
+
+    lease = {
+        "schema": runtime.REPLAY_LEASE_SCHEMA,
+        "campaign_id": contract.CAMPAIGN_ID,
+        "manifest_hash": manifest["manifest_hash"],
+        "source_commit": manifest["source_commit"],
+        "generation": 0,
+        "maximum_generations": 1,
+        "status": "RUNNING",
+        "authorization": contract.ROOT_AUTHORIZATION,
+        "runner_pid": 123,
+        **{field: 0 for field in runtime.SAFETY_COUNTER_FIELDS},
+    }
+
+    def write_lease(value: dict[str, Any]) -> None:
+        payload = dict(value)
+        payload["attempt_hash"] = stable_hash(payload)
+        (output / "scientific_replay_attempt.json").write_text(
+            json.dumps(payload, indent=2, sort_keys=True) + "\n"
+        )
+
+    write_lease(lease)
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="not COMPLETE"):
+        runtime._validate_terminal_scientific_replay(
+            output, manifest, scientific, source_path
+        )
+
+    complete = {
+        **lease,
+        "status": "COMPLETE",
+        "result_hash": HASH_A,
+        "result_file_sha256": HASH_B,
+    }
+    write_lease(complete)
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="hash drift"):
+        runtime._validate_terminal_scientific_replay(
+            output, manifest, scientific, source_path
+        )
+
+    complete["result_file_sha256"] = source_sha
+    write_lease(complete)
+    runtime._validate_terminal_scientific_replay(
+        output, manifest, scientific, source_path
+    )
+
+    wrong_mode = dict(scientific)
+    wrong_mode["source_mode"] = "PREEXISTING_HASH_BOUND"
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="source-mode"):
+        runtime._validate_terminal_scientific_replay(
+            output, manifest, wrong_mode, source_path
+        )
+    wrong_flag = dict(scientific)
+    wrong_flag["economic_replay_executed_by_adapter"] = False
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="source-mode"):
+        runtime._validate_terminal_scientific_replay(
+            output, manifest, wrong_flag, source_path
+        )
+
+
 def test_runtime_network_guard_and_terminal_safety(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
