@@ -1,0 +1,455 @@
+from __future__ import annotations
+
+import gzip
+import hashlib
+import json
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from hydra.economic_evolution.schema import stable_hash
+from hydra.mission import economic_evolution_manifest_runtime as manifest_runtime_module
+from hydra.mission.economic_evolution_manifest_runtime import (
+    EconomicEvolutionManifestRuntime,
+)
+from hydra.production import autonomous_director_runtime as director_runtime
+from hydra.production import runtime as production_runtime
+
+
+def _hashed(value: dict[str, Any], field: str) -> dict[str, Any]:
+    value = dict(value)
+    value.pop(field, None)
+    value[field] = stable_hash(value)
+    return value
+
+
+def _write_json(path: Path, value: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _episode(
+    policy_id: str,
+    *,
+    scenario: str,
+    horizon: int,
+    net: float,
+    minimum_buffer: float = 4_480.0,
+) -> dict[str, Any]:
+    return {
+        "policy_id": policy_id,
+        "scenario": scenario,
+        "horizon_trading_days": horizon,
+        "coverage_state": "FULL_COVERAGE",
+        "episode": {
+            "policy_id": policy_id,
+            "net_pnl": net,
+            "target_progress": net / 9_000.0,
+            "minimum_mll_buffer": minimum_buffer,
+            "mll_breached": False,
+            "maximum_mini_equivalent": 1.0,
+            "daily_path": [
+                {"day_pnl": net / 2.0},
+                {"day_pnl": net / 2.0},
+            ],
+        },
+    }
+
+
+def _write_gzip(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with gzip.open(path, "wt", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, sort_keys=True) + "\n")
+
+
+def _rule_snapshot(path: Path) -> None:
+    rules = {
+        "50K": {
+            "account_size_usd": 50_000,
+            "profit_target_usd": 3_000,
+            "maximum_loss_limit_usd": 2_000,
+            "maximum_mini_contracts": 5,
+            "consistency_target": 0.50,
+            "minimum_trading_days": 2,
+        },
+        "100K": {
+            "account_size_usd": 100_000,
+            "profit_target_usd": 6_000,
+            "maximum_loss_limit_usd": 3_000,
+            "maximum_mini_contracts": 10,
+            "consistency_target": 0.50,
+            "minimum_trading_days": 2,
+        },
+        "150K": {
+            "account_size_usd": 150_000,
+            "profit_target_usd": 9_000,
+            "maximum_loss_limit_usd": 4_500,
+            "maximum_mini_contracts": 15,
+            "consistency_target": 0.50,
+            "minimum_trading_days": 2,
+        },
+    }
+    _write_json(
+        path,
+        {
+            "parsed_rule_hash": "a" * 64,
+            "account_sizes_usd": [50_000, 100_000, 150_000],
+            "account_rules": rules,
+        },
+    )
+
+
+def _0034_result(path: Path, *, final_uplift: float = -5.0) -> None:
+    bundle_manifest = path.parent / "evidence_bundle/manifest.json"
+    bundle_sha = hashlib.sha256(b"{}\n").hexdigest()
+    bundle_manifest.parent.mkdir(parents=True, exist_ok=True)
+    bundle_manifest.write_text("{}\n", encoding="utf-8")
+    value = {
+        "status": "COMPLETE",
+        "campaign_id": "hydra_selective_order_flow_veto_expansion_0034",
+        "campaign_mode": "SELECTIVE_ORDER_FLOW_VETO_EXPANSION",
+        "decision": "LONG_SAMPLE_SELECTIVE_OVERLAY_WEAK",
+        "independently_confirmed": False,
+        "evidence_bundle": {
+            "manifest_path": str(bundle_manifest),
+            "manifest_sha256": bundle_sha,
+        },
+        "economic_summary": {
+            "long_sample": {
+                "role_results": {
+                    "VALIDATION": {
+                        "paired_stressed_uplift_usd": 20.0,
+                        "stressed_net_usd": 10.0,
+                        "baseline_stressed_net_usd": 0.0,
+                    },
+                    "FINAL_DEVELOPMENT": {
+                        "paired_stressed_uplift_usd": final_uplift,
+                        "stressed_net_usd": 15.0,
+                        "baseline_stressed_net_usd": 20.0,
+                    },
+                }
+            }
+        },
+    }
+    _write_json(path, _hashed(value, "result_hash"))
+
+
+def test_bounded_0034_decision_kills_incremental_veto_without_promotion(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "0034.json"
+    _0034_result(source)
+
+    result = director_runtime._exploitation_worker(str(source))
+
+    assert result["veto_incremental_gate_passed"] is False
+    assert result["baseline_retained_as_reference"] is True
+    assert result["baseline_independently_confirmed"] is False
+    assert result["promotion_status"] is None
+    assert result["fresh_confirmation_attempts_remaining"] == 1
+
+
+def test_legal_frontier_scans_gzip_and_keeps_upper_bound_non_promotable(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "episodes/policies.jsonl.gz"
+    rows: list[dict[str, Any]] = []
+    for horizon in (5, 10, 20):
+        rows.extend(
+            [
+                _episode("policy_fast", scenario="NORMAL", horizon=horizon, net=2_000.0),
+                _episode(
+                    "policy_fast",
+                    scenario="STRESSED_1_5X",
+                    horizon=horizon,
+                    net=1_800.0,
+                ),
+                _episode("policy_slow", scenario="NORMAL", horizon=horizon, net=100.0),
+                _episode(
+                    "policy_slow",
+                    scenario="STRESSED_1_5X",
+                    horizon=horizon,
+                    net=-100.0,
+                ),
+            ]
+        )
+    _write_gzip(source, rows)
+    rules = tmp_path / "rules.json"
+    _rule_snapshot(rules)
+
+    result = director_runtime._exploration_worker(
+        (str(source),), str(rules), (0.5, 1.0, 2.0), 256
+    )
+
+    assert result["selected_policy_ids"][0] == "policy_fast"
+    assert result["selected_policy_count"] == 2
+    assert result["episode_rows_read"] == len(rows)
+    assert any(
+        row["account_size_usd"] == 50_000
+        and row["scenario"] == "STRESSED_1_5X"
+        and row["passes"] > 0
+        for row in result["uniform_legal_frontier"]
+    )
+    assert result["non_deployable_upper_bound"]["promotable"] is False
+    assert result["causal_quality_tier_frontier"]["promotable"] is False
+    assert result["promotion_status"] is None
+
+
+def test_exact_result_metrics_count_only_chronological_exact_paths() -> None:
+    exact = {
+        "counters": {
+            "qd_selected_candidate_count": 2,
+            "exact_account_replays": 40,
+            "exact_normal_account_replays": 20,
+            "exact_stressed_account_replays": 20,
+        },
+        "best_exact_frontier_point": {"candidate_id": "candidate-a"},
+        "results": [
+            {
+                "frontier": [
+                    {
+                        "candidate_id": "candidate-a",
+                        "legally_executable": True,
+                        "account_rule_compliant": True,
+                        "normal": {"pass_count": 2, "pass_rate": 0.10},
+                        "stressed": {
+                            "pass_count": 1,
+                            "pass_rate": 0.05,
+                            "net_total_usd": 250.0,
+                        },
+                    }
+                ]
+            },
+            {
+                "frontier": [
+                    {
+                        "candidate_id": "candidate-b",
+                        "legally_executable": False,
+                        "normal": None,
+                        "stressed": None,
+                    }
+                ]
+            },
+        ],
+    }
+
+    metrics = director_runtime._exact_result_metrics({"EXACT_0029": exact})
+
+    assert metrics["exact_account_replays"] == 40
+    assert metrics["normal_pass_candidate_count"] == 1
+    assert metrics["stressed_pass_candidate_count"] == 1
+    assert metrics["positive_stressed_candidate_count"] == 1
+    assert metrics["best_stressed_pass_rate"] == pytest.approx(0.05)
+
+
+def test_dispatch_runs_two_worker_epoch_and_publishes_resumable_snapshots(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = tmp_path
+    manifest_path = root / "config/v7/director.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text("{}\n", encoding="utf-8")
+    source_0034 = root / "reports/source_0034/result.json"
+    _0034_result(source_0034)
+    episode_file = root / "data/episodes/test.jsonl.gz"
+    rows = [
+        _episode("policy_fast", scenario=scenario, horizon=horizon, net=1_800.0)
+        for horizon in (5, 10, 20)
+        for scenario in ("NORMAL", "STRESSED_1_5X")
+    ]
+    _write_gzip(episode_file, rows)
+    rule_path = root / "config/rules.json"
+    _rule_snapshot(rule_path)
+    (root / "mission/state").mkdir(parents=True, exist_ok=True)
+    (root / "mission/state/decision_ledger.jsonl").write_text("", encoding="utf-8")
+    _write_json(root / "mission/state/CURRENT_STATE.json", {})
+
+    manifest: dict[str, Any] = {
+        "campaign_id": "hydra_autonomous_economic_discovery_director_0035",
+        "campaign_mode": "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR",
+        "manifest_hash": "c" * 64,
+        "source_commit": "d" * 40,
+        "runtime": {
+            "output_dir": "reports/economic_evolution/director",
+            "worker_count": 2,
+            "asynchronous_evidence_writer_count": 1,
+        },
+        "official_rule_snapshot": {"path": "config/rules.json"},
+        "branch_portfolio": {
+            "lanes": [
+                {
+                    "source_result_path": source_0034.relative_to(root).as_posix(),
+                },
+                {
+                    "episode_source_globs": ["data/episodes/*.jsonl.gz"],
+                    "uniform_scale_factors": [0.5, 1.0, 2.0],
+                    "policy_maximum": 256,
+                },
+            ]
+        },
+    }
+    monkeypatch.setenv("HYDRA_PRODUCTION_TEST_MODE", "1")
+    monkeypatch.setattr(
+        production_runtime,
+        "load_and_validate_production_manifest",
+        lambda _: manifest,
+    )
+    monkeypatch.setattr(
+        director_runtime,
+        "load_and_validate_production_manifest",
+        lambda _: manifest,
+    )
+    monkeypatch.setattr(
+        director_runtime,
+        "validate_autonomous_director_manifest",
+        lambda *_args, **_kwargs: None,
+    )
+
+    state = production_runtime.run_production_manifest(
+        manifest_path,
+        contract_map_path=root / "contract.json",
+        cache_root=root / "cache",
+        stop_after="FIRST_EPOCH",
+    )
+
+    assert state["state"] == "ROBUSTNESS_ACTIVE"
+    assert state["stage"] == "NEXT_DISTINCT_BRANCHES_QUEUED"
+    assert state["worker_count"] == 2
+    assert len(state["next_branch_cards"]) == 2
+    assert all(row["status"] == "QUEUED" for row in state["next_branch_cards"])
+    output = root / manifest["runtime"]["output_dir"]
+    persisted_state = director_runtime._read_hashed(
+        output / "production_state.json", "state_hash"
+    )
+    persisted_kpis = director_runtime._read_hashed(
+        output / "production_kpis.json", "kpi_hash"
+    )
+    assert persisted_state["worker_count"] == 2
+    assert persisted_kpis["workers"] == {"compute": 2, "evidence_writer": 1}
+    assert persisted_kpis["normal_episodes_completed"] == persisted_kpis[
+        "stressed_episodes_completed"
+    ]
+    assert (root / "mission/state/AUTONOMOUS_BRANCH_STATE.json").is_file()
+    assert (root / "mission/state/ECONOMIC_SCORECARD.json").is_file()
+    assert len(
+        (root / "mission/state/decision_ledger.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ) == 2
+
+    status = production_runtime.read_live_status(manifest_path)
+    assert status["state"]["worker_count"] == 2
+
+
+def _production_queue_fixture(
+    root: Path, *, terminal_result: bool
+) -> tuple[EconomicEvolutionManifestRuntime, dict[str, Any], dict[str, Any], bytes]:
+    source_commit = "1" * 40
+    manifest: dict[str, Any] = {
+        "schema": "hydra_economic_production_manifest_v1",
+        "campaign_id": "terminal_worm_campaign",
+        "source_commit": source_commit,
+        "implementation_files": {"live.py": "0" * 64},
+        "runtime": {
+            "engine": "production_kernel_v1",
+            "runner": "scripts/run_economic_production_manifest.py",
+            "output_dir": "reports/economic_evolution/terminal_worm_campaign",
+            "result_name": "economic_production_result.json",
+            "worker_count": 2,
+            "asynchronous_evidence_writer_count": 1,
+        },
+    }
+    manifest["manifest_hash"] = stable_hash(manifest)
+    manifest_path = root / "config/v7/terminal_manifest.json"
+    _write_json(manifest_path, manifest)
+    manifest_bytes = manifest_path.read_bytes()
+    if terminal_result:
+        result = {
+            "schema": "hydra_economic_production_result_v1",
+            "campaign_id": manifest["campaign_id"],
+            "manifest_hash": manifest["manifest_hash"],
+            "source_commit": source_commit,
+            "status": "COMPLETE",
+        }
+        _write_json(
+            root
+            / "reports/economic_evolution/terminal_worm_campaign/economic_production_result.json",
+            _hashed(result, "result_hash"),
+        )
+    entry = {
+        "engine": "production_kernel_v1",
+        "campaign_id": manifest["campaign_id"],
+        "manifest_path": manifest_path.relative_to(root).as_posix(),
+        "manifest_file_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+        "manifest_semantic_hash": manifest["manifest_hash"],
+        "worm_tag": "worm/test-terminal",
+        "worm_commit": source_commit,
+    }
+    return (
+        EconomicEvolutionManifestRuntime(root, root / "mission/state"),
+        entry,
+        manifest,
+        manifest_bytes,
+    )
+
+
+def _mock_worm_git(
+    monkeypatch: pytest.MonkeyPatch, manifest_bytes: bytes, commit: str
+) -> None:
+    def check_output(args: list[str], **kwargs: Any) -> Any:
+        if args[1] == "show":
+            return manifest_bytes
+        return commit if kwargs.get("text") else commit.encode()
+
+    class Completed:
+        returncode = 0
+
+    monkeypatch.setattr(manifest_runtime_module.subprocess, "check_output", check_output)
+    monkeypatch.setattr(
+        manifest_runtime_module.subprocess,
+        "run",
+        lambda *_args, **_kwargs: Completed(),
+    )
+
+
+def test_completed_worm_manifest_skips_live_implementation_checksum(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runtime, entry, manifest, blob = _production_queue_fixture(
+        tmp_path, terminal_result=True
+    )
+    _mock_worm_git(monkeypatch, blob, str(manifest["source_commit"]))
+    monkeypatch.setattr(
+        manifest_runtime_module,
+        "load_and_validate_production_manifest",
+        lambda _path: (_ for _ in ()).throw(AssertionError("live validator called")),
+    )
+
+    loaded = runtime._verify_entry(entry)
+
+    assert loaded["manifest_hash"] == manifest["manifest_hash"]
+
+
+def test_active_worm_manifest_still_runs_live_implementation_validation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runtime, entry, manifest, blob = _production_queue_fixture(
+        tmp_path, terminal_result=False
+    )
+    _mock_worm_git(monkeypatch, blob, str(manifest["source_commit"]))
+    calls: list[Path] = []
+
+    def validate(path: Path) -> dict[str, Any]:
+        calls.append(Path(path))
+        return manifest
+
+    monkeypatch.setattr(
+        manifest_runtime_module, "load_and_validate_production_manifest", validate
+    )
+
+    loaded = runtime._verify_entry(entry)
+
+    assert calls == [tmp_path / entry["manifest_path"]]
+    assert loaded["manifest_hash"] == manifest["manifest_hash"]

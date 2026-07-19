@@ -276,7 +276,7 @@ class EconomicEvolutionManifestRuntime:
             "component_worker_count": 3,
             "account_worker_count": 3,
             "production_research_worker_count": (
-                3
+                int(_runtime_manifest(self._active_config).get("worker_count", 3))
                 if self._active_config is not None
                 and _is_production_like(self._active_config)
                 else 0
@@ -375,7 +375,31 @@ class EconomicEvolutionManifestRuntime:
         elif engine == "manifest_account_pair_v1":
             config = _load_and_verify_generic_account_pair_preregistration(path)
         elif engine == PRODUCTION_ENGINE:
-            config = load_and_validate_production_manifest(path)
+            # Completed WORM campaigns must remain verifiable after a later
+            # campaign extends the shared production dispatch.  Requiring an
+            # old manifest's implementation checksums to match the *live*
+            # checkout makes every safe append invalidate all terminal queue
+            # entries.  For terminal results, bind the immutable manifest
+            # semantically here and let the tagged blob, ancestry, result and
+            # deep EvidenceBundle checks below provide the authoritative
+            # verification.  Only the active/non-terminal manifest is checked
+            # against the live implementation surface.
+            immutable = _load_json(path)
+            claimed = str(immutable.get("manifest_hash") or "")
+            semantic_payload = dict(immutable)
+            semantic_payload.pop("manifest_hash", None)
+            if (
+                immutable.get("schema")
+                != "hydra_economic_production_manifest_v1"
+                or claimed != stable_hash(semantic_payload)
+            ):
+                raise EconomicEvolutionRuntimeError(
+                    "terminal production manifest semantic hash drift"
+                )
+            if self._immutable_production_result_exists(immutable):
+                config = immutable
+            else:
+                config = load_and_validate_production_manifest(path)
         else:
             config = load_and_validate_causal_target_velocity_manifest(path)
         if (
@@ -409,6 +433,48 @@ class EconomicEvolutionManifestRuntime:
         runtime_config = dict(config)
         runtime_config["_runtime_preregistration_path"] = str(path)
         return runtime_config
+
+    def _immutable_production_result_exists(
+        self, config: Mapping[str, Any]
+    ) -> bool:
+        """Return whether a manifest has a safely located terminal result.
+
+        This helper does not validate the result.  ``_load_result`` performs
+        the full hash, identity and EvidenceBundle verification before the
+        queue can advance past it.
+        """
+
+        runtime = _runtime_manifest(config)
+        output = (self.root / str(runtime.get("output_dir") or "")).resolve()
+        allowed = (self.root / "reports/economic_evolution").resolve()
+        if output != allowed and allowed not in output.parents:
+            raise EconomicEvolutionRuntimeError(
+                "terminal campaign output escapes economic reports"
+            )
+        result_name = str(runtime.get("result_name") or "")
+        if not result_name or Path(result_name).name != result_name:
+            raise EconomicEvolutionRuntimeError(
+                "terminal campaign result name is unsafe"
+            )
+        result_path = output / result_name
+        if not result_path.is_file():
+            return False
+        try:
+            result = _load_json(result_path)
+        except Exception:
+            # A partial/corrupt result is not terminal.  The live manifest must
+            # still pass the implementation closure before recovery can run.
+            return False
+        claimed = str(result.get("result_hash") or "")
+        payload = dict(result)
+        payload.pop("result_hash", None)
+        return bool(
+            result.get("status") == "COMPLETE"
+            and result.get("campaign_id") == config.get("campaign_id")
+            and result.get("manifest_hash") == config.get("manifest_hash")
+            and claimed
+            and claimed == stable_hash(payload)
+        )
 
     def _verify_production_deployment_ancestry(
         self,

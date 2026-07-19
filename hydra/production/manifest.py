@@ -111,6 +111,19 @@ def load_and_validate_production_manifest(path: str | Path) -> dict[str, Any]:
         except SelectiveVetoManifestError as exc:
             raise ProductionManifestError(str(exc)) from exc
         return manifest
+    if manifest.get("campaign_mode") == "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR":
+        from hydra.production.autonomous_director_manifest import (
+            AutonomousDirectorManifestError,
+            validate_autonomous_director_manifest,
+        )
+
+        try:
+            validate_autonomous_director_manifest(
+                manifest, manifest_path=resolved
+            )
+        except AutonomousDirectorManifestError as exc:
+            raise ProductionManifestError(str(exc)) from exc
+        return manifest
     if manifest.get("campaign_mode") == "ACTIVE_RISK_POOL":
         from hydra.production.active_risk_manifest import (
             ActiveRiskManifestError,

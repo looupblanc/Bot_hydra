@@ -1,0 +1,134 @@
+{
+  "schema": "hydra_topstep_official_rule_snapshot_v1",
+  "snapshot_id": "topstep_official_2026-07-19T010410Z",
+  "retrieved_at_utc": "2026-07-19T01:04:10Z",
+  "retrieval_status": "OFFICIAL_CURRENT_SNAPSHOT",
+  "account_sizes_usd": [50000, 100000, 150000],
+  "interpretation_boundary": "Research simulation only. No broker connection, order route, or real trading authorization.",
+  "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+  "parsed_rule_hash_algorithm": "sha256(canonical_json({combine,combine_common,xfa,product_restrictions}))",
+  "parsed_rule_fields": [
+    "combine",
+    "combine_common",
+    "xfa",
+    "product_restrictions"
+  ],
+  "combine": {
+    "50K": {
+      "account_size_usd": 50000,
+      "profit_target_usd": 3000,
+      "maximum_loss_limit_usd": 2000,
+      "maximum_mini_contracts": 5,
+      "maximum_micro_contracts": 50,
+      "consistency_target_fraction": 0.5,
+      "minimum_trading_days": 2,
+      "standard_monthly_price_usd": 49,
+      "standard_activation_fee_usd": 149,
+      "no_activation_monthly_price_usd": 95,
+      "no_activation_fee_usd": 0,
+      "optional_daily_loss_limit_usd": 1000
+    },
+    "100K": {
+      "account_size_usd": 100000,
+      "profit_target_usd": 6000,
+      "maximum_loss_limit_usd": 3000,
+      "maximum_mini_contracts": 10,
+      "maximum_micro_contracts": 100,
+      "consistency_target_fraction": 0.5,
+      "minimum_trading_days": 2,
+      "standard_monthly_price_usd": 99,
+      "standard_activation_fee_usd": 149,
+      "no_activation_monthly_price_usd": 149,
+      "no_activation_fee_usd": 0,
+      "optional_daily_loss_limit_usd": 2000
+    },
+    "150K": {
+      "account_size_usd": 150000,
+      "profit_target_usd": 9000,
+      "maximum_loss_limit_usd": 4500,
+      "maximum_mini_contracts": 15,
+      "maximum_micro_contracts": 150,
+      "consistency_target_fraction": 0.5,
+      "minimum_trading_days": 2,
+      "standard_monthly_price_usd": 199,
+      "standard_activation_fee_usd": 149,
+      "no_activation_monthly_price_usd": 229,
+      "no_activation_fee_usd": 0,
+      "optional_daily_loss_limit_usd": 3000
+    }
+  },
+  "combine_common": {
+    "maximum_loss_limit_mode": "EOD_BALANCE_LEVEL_REALTIME_REALIZED_AND_UNREALIZED_BREACH",
+    "maximum_loss_floor_lock": "STARTING_BALANCE",
+    "consistency_formula": "required_profit=max(base_profit_target,best_day_profit/0.50)",
+    "session_timezone": "America/Chicago",
+    "session_start_local": "17:00",
+    "mandatory_flatten_local": "15:10",
+    "overnight_positions_allowed": false,
+    "official_time_limit": null,
+    "reset_price_equals_monthly_price": true
+  },
+  "xfa": {
+    "starting_balance_usd": 0,
+    "starting_mll_by_account_usd": {
+      "50K": -2000,
+      "100K": -3000,
+      "150K": -4500
+    },
+    "mll_floor_after_first_payout_usd": 0,
+    "profit_split_trader_fraction": 0.9,
+    "standard": {
+      "winning_days_required": 5,
+      "winning_day_minimum_usd": 150,
+      "later_cycle_profit_minimum_usd": 0.01,
+      "payout_balance_fraction_cap": 0.5,
+      "payout_request_minimum_usd": 125,
+      "payout_cap_by_account_usd": {
+        "50K": 2000,
+        "100K": 3000,
+        "150K": 5000
+      }
+    },
+    "consistency": {
+      "minimum_traded_days": 3,
+      "largest_day_fraction": 0.4,
+      "consistency_resets_after_payout": true,
+      "payout_cap_by_account_usd": {
+        "50K": 3000,
+        "100K": 4000,
+        "150K": 6000
+      }
+    },
+    "scaling_plan_mini_contracts": {
+      "50K": [[0, 2], [1500, 3], [2000, 5]],
+      "100K": [[0, 3], [1500, 4], [2000, 5], [3000, 10]],
+      "150K": [[0, 3], [1500, 4], [2000, 5], [3000, 10], [4500, 15]]
+    },
+    "profile_specific_first_10000_split_exception": "UNKNOWN_NOT_ASSUMED"
+  },
+  "product_restrictions": {
+    "special_contract_caps": {
+      "CL_QM_RB_HO": {"50K": 3, "100K": 6, "150K": 9},
+      "MCL": {"50K": 30, "100K": 60, "150K": 90},
+      "GC": {"50K": 3, "100K": 6, "150K": 9},
+      "MGC": {"50K": 30, "100K": 60, "150K": 90},
+      "SI_HG_PL": {"50K": 0, "100K": 0, "150K": 0},
+      "SIL_MHG": {"50K": 2, "100K": 4, "150K": 6}
+    },
+    "25K_labs_availability": "UNCONFIRMED_NOT_SIMULATED"
+  },
+  "sources": [
+    {"url": "https://help.topstep.com/en/articles/8284197-trading-combine-parameters", "retrieved_at_utc": "2026-07-19T01:04:10Z", "document_sha256": "108306cf4a41cefe99ea328c4875ba2577e300e5b7722361b731c9faadca8028"},
+    {"url": "https://help.topstep.com/en/articles/8284204-what-is-the-maximum-loss-limit", "retrieved_at_utc": "2026-07-19T01:04:24Z", "document_sha256": "d028a933649226c016a267b10cd7563e3a7b97498bc774762560bdf550a04fbe"},
+    {"url": "https://help.topstep.com/en/articles/8284208-consistency-at-topstep", "retrieved_at_utc": "2026-07-19T01:04:37Z", "document_sha256": "d421a5f82556062e4932c0b5b07aa2affc62fa4816e3cfb8969fdace26899dc2"},
+    {"url": "https://help.topstep.com/en/articles/10490293-daily-loss-limit-in-the-trading-combine-and-express-funded-account", "retrieved_at_utc": "2026-07-19T01:04:51Z", "document_sha256": "5cbe3ba20a9710f9ae8eb327fbd279ee560fb5f8efdb89b4ea4cca4f2d73ba5e"},
+    {"url": "https://help.topstep.com/en/articles/8284206-when-and-what-products-can-i-trade", "retrieved_at_utc": "2026-07-19T01:05:05Z", "document_sha256": "55a1903859bf077ee18d3603cefb9a2b01041500c66372bdf74bb204efb35e53"},
+    {"url": "https://help.topstep.com/en/articles/14289835-topstep-pricing-and-payment-questions", "retrieved_at_utc": "2026-07-19T01:05:19Z", "document_sha256": "ed6a600e7896818ad30c3eaa6dc83356cd2a6a38d3f7e9bbd5cba187f589bf3"},
+    {"url": "https://help.topstep.com/en/articles/8284215-express-funded-account-parameters", "retrieved_at_utc": "2026-07-19T01:05:33Z", "document_sha256": "296def44b040dffaeaa3e5ab3e85b01a4fe9326d5b3b6b84cf8b61af498aa427"},
+    {"url": "https://help.topstep.com/en/articles/8284223-scaling-plan", "retrieved_at_utc": "2026-07-19T01:05:48Z", "document_sha256": "acdf56774f76415d457b258e06de2847a6139c150e29eea478e5567b95bbc278"},
+    {"url": "https://help.topstep.com/en/articles/8284233-topstep-payout-policy", "retrieved_at_utc": "2026-07-19T01:06:03Z", "document_sha256": "c07d85760aa754972c41170f7924b35bb46ece2c42bd9a9c02ec8af896933f6"},
+    {"url": "https://help.topstep.com/en/articles/12060405-back2funded", "retrieved_at_utc": "2026-07-19T01:06:19Z", "document_sha256": "afa50381f18915ced67eb43d2f18751830fbcae6cdf4a3136cb1cdaf051f2e47"},
+    {"url": "https://help.topstep.com/en/articles/13613539-risk-adjustments", "retrieved_at_utc": "2026-07-19T01:06:44Z", "document_sha256": "49106b79e99a456b7b5f5d98f2a4814c261fac207ec74f17575404f7d4da01ad"},
+    {"url": "https://help.topstep.com/en/articles/15520357-topstep-labs", "retrieved_at_utc": "2026-07-19T01:07:35Z", "document_sha256": "8ccaa37d2b00e213616a624cf8850c6a9bbb4e0a00813a6010679a91ae22b6e2"}
+  ]
+}
