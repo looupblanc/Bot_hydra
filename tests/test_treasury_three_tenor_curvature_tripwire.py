@@ -106,6 +106,21 @@ def test_frozen_lattice_is_exactly_eight_unique_outight_rules() -> None:
     assert {row.fill_policy for row in rules} == {"NEXT_TRADABLE_BELLY_OPEN"}
 
 
+def test_vectorized_row_identity_guard_matches_pandas_null_semantics() -> None:
+    frame = pd.DataFrame(
+        {
+            "a": ["x", "x", "x", None, None, "x", "x"],
+            "b": ["x", "y", None, "x", None, None, "x"],
+            "c": ["x", "x", "x", None, None, "y", None],
+        }
+    )
+    expected = frame.nunique(axis=1, dropna=True).eq(1)
+    observed = tripwire._rows_have_one_distinct_non_null_value(
+        frame, ["a", "b", "c"]
+    )
+    pd.testing.assert_series_equal(observed, expected)
+
+
 def test_real_audit_reads_metadata_not_outcomes(monkeypatch: pytest.MonkeyPatch) -> None:
     def forbidden_decode(*_args: object, **_kwargs: object) -> object:
         raise AssertionError("economic Parquet rows were decoded")

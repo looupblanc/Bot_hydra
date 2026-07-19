@@ -455,12 +455,14 @@ def prepare_curvature_features(
         raise TreasuryCurvatureError("empty or duplicate exact common triangle clock")
 
     session_columns = [f"{root_name}_session_id" for root_name in frames]
-    if not output[session_columns].nunique(axis=1).eq(1).all():
+    if not _rows_have_one_distinct_non_null_value(output, session_columns).all():
         raise TreasuryCurvatureError("triangle session identity mismatch")
     output["session_id"] = output[session_columns[0]].astype(str)
     aligned_rows_before_delivery = len(output)
     delivery_columns = [f"{root_name}_delivery_month" for root_name in frames]
-    delivery_synchronized = output[delivery_columns].astype(str).nunique(axis=1).eq(1)
+    delivery_synchronized = _rows_have_one_distinct_non_null_value(
+        output, delivery_columns
+    )
     mismatch_sessions = set(
         output.loc[~delivery_synchronized, "session_id"].astype(str)
     )
@@ -600,6 +602,30 @@ def prepare_curvature_features(
         "no_forward_fill": True,
     }
     return output, {**audit_core, "audit_hash": _stable_hash(audit_core)}
+
+
+def _rows_have_one_distinct_non_null_value(
+    frame: pd.DataFrame, columns: Sequence[str]
+) -> pd.Series:
+    """Vectorized equivalent of ``nunique(axis=1, dropna=True).eq(1)``.
+
+    The source columns can be Arrow-backed and contain millions of rows.  The
+    pandas row-wise implementation constructs one Series per row, which made
+    the bounded Treasury replay spend minutes in an identity guard before any
+    economic rule ran.  This implementation preserves the exact null behavior:
+    all-null rows are false, nulls beside one repeated value are ignored, and
+    two distinct non-null values are false.
+    """
+
+    if not columns:
+        return pd.Series(False, index=frame.index, dtype=bool)
+    values = frame.loc[:, list(columns)].to_numpy(dtype=object, na_value=None)
+    non_null = pd.notna(values)
+    has_value = non_null.any(axis=1)
+    first_position = non_null.argmax(axis=1)
+    first_value = values[np.arange(len(values)), first_position]
+    equal_or_null = ~non_null | (values == first_value[:, None])
+    return pd.Series(has_value & equal_or_null.all(axis=1), index=frame.index)
 
 
 def causal_intent(row: Mapping[str, Any], rule: CurvatureRule) -> int:
