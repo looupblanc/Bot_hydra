@@ -498,7 +498,7 @@
       "initial_data_purchase_allowed": false,
       "manifest_file_sha256": "d34c88bc020b3b6744f14f3e77870b8f5335e21cdfbd69aa6063a5a393522846",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "79ca7f31ac995afbbd3676d8f55b5df56fe0afa9b56a15eb975aa2009f777c8a",
+      "manifest_semantic_hash": "0667874871abea8b9ae919709432c7818b7a88987afa4936f744db9753a37b4d",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -637,6 +637,20 @@
         "tier_f_requires_f0": true,
         "xfa_diagnostic_development_only": true
       },
+      "post_breadth_branch_portfolio": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "classification": "BOUNDED_LEGAL_EXACT_TREASURY_CURVE_AND_SESSION_SAFE_PORTFOLIO",
+        "implementation_commit": "692cc2b55109e7208b5f2281ba3061d1385b9d37",
+        "legal_exact_evidence_ceiling": "E_DIAGNOSTIC",
+        "old_manifest_hash": "79ca7f31ac995afbbd3676d8f55b5df56fe0afa9b56a15eb975aa2009f777c8a",
+        "q4_access_allowed": false,
+        "session_safe_candidate_evidence_ceiling": "E_EXACT_DEVELOPMENT_TRIPWIRE",
+        "session_safe_fresh_confirmation_required": true,
+        "treasury_actual_cost_usd": 9.090267196298,
+        "treasury_evidence_ceiling": "E_DEVELOPMENT_TRIPWIRE",
+        "worker_maximum": 2
+      },
       "post_confirmation_branch_portfolio": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
@@ -694,8 +708,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T11:06:13Z",
-  "queue_hash": "182da5b3473f5cb4dfc1c61f0c913cd6d776fc6d374b50704cdfe13b479522df",
+  "issued_at_utc": "2026-07-19T12:28:12Z",
+  "queue_hash": "4516f66a4a0f204add762d93c0509ef7b1717d2d50c7b6b5fc40fdaf2f8c876e",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
