@@ -1,0 +1,31 @@
+{
+  "campaign_id": "hydra_autonomous_economic_discovery_director_0035",
+  "classification": "DERIVED_LIVE_SNAPSHOT_IDENTITY_ONLY",
+  "created_at_utc": "2026-07-19T13:49:48+00:00",
+  "economic_counters_changed": false,
+  "receipt_hash": "a5f68e3d0fda74a5c3bf6a279c5a6d9924c6905cbc08a257abb2864d7adaf331",
+  "rows": [
+    {
+      "economic_payload_hash": "c6be5e600f935c56c49bc8671a5dd18bbe9c8f013b24548f27d8d1c4d3aa3111",
+      "new_file_sha256": "6e3bd1dd728400961bea96b81dcdb5d7bca7d715de2dbf4998e10b669fc33f02",
+      "new_manifest_hash": "736be9721d4396418c6b0bb39c53bccf03f1ce2455f009389d645425e1527667",
+      "new_source_commit": "690d50a42a1cfec40f31158c45b785a4e3e471a9",
+      "old_file_sha256": "1f799453bfbbb74788fefc44f6a2eea40bf12e5739812c16279ae6c09001ff7a",
+      "old_manifest_hash": "97a48d539671bcb496c7ebfdceb4cda0be3e33073a0dc62137c21a40bba9a901",
+      "old_source_commit": "7bbe1bcc6a1270eb20843c64c55469b43a6d10d4",
+      "path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/production_state.json"
+    },
+    {
+      "economic_payload_hash": "2bdbd6dfb291f48ede9c4cb2e5d572765b559952b6f0c1d1195970caa9128daa",
+      "new_file_sha256": "d43c6d3ab73e3425f997de1894259911e1f74a7dd2aa625028522dc4847bce00",
+      "new_manifest_hash": "736be9721d4396418c6b0bb39c53bccf03f1ce2455f009389d645425e1527667",
+      "new_source_commit": "690d50a42a1cfec40f31158c45b785a4e3e471a9",
+      "old_file_sha256": "4a5ab1b3d59ccdb7e4c8429c2092eea774e8ba0c0a2efc573b768f52bfc0f68c",
+      "old_manifest_hash": "97a48d539671bcb496c7ebfdceb4cda0be3e33073a0dc62137c21a40bba9a901",
+      "old_source_commit": "7bbe1bcc6a1270eb20843c64c55469b43a6d10d4",
+      "path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/production_kpis.json"
+    }
+  ],
+  "schema": "hydra_live_snapshot_compatible_manifest_identity_migration_v1",
+  "scientific_policy_changed": false
+}
