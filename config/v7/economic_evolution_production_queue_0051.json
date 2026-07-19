@@ -457,9 +457,9 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "d395539c69910d7734de241d47c77b63f8d27c7e88f898a407cd6f9cc80de7b2",
+      "manifest_file_sha256": "07b734b0ed1e5b4a1e57bbba77e0b1e1d92a415552a101d43ac0dd8d75d9f51d",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "3fea73c0dab408fe02dfeb020c465947f175d1c1161a16afa4a85469a5e4c738",
+      "manifest_semantic_hash": "56d24b5cc5c858019623fed8bd4dc275b072a64edc97017e376e919a10ab9903",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -553,6 +553,18 @@
         "trade_concentration_not_inferred_from_daily_episode_summaries": true,
         "xfa_requires_authoritative_tier_g": true
       },
+      "post_checkpoint_pass_bank_envelope_repair": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "classification": "POST_RECONCILIATION_PASS_BANK_ENVELOPE_KEY_ADAPTER",
+        "economic_outcomes_changed": false,
+        "legacy_semantic_composite_preserved": true,
+        "old_manifest_hash": "3fea73c0dab408fe02dfeb020c465947f175d1c1161a16afa4a85469a5e4c738",
+        "repair_commit": "caad6914a7a3b847a3308ae46a2b8f32b3c41f5b",
+        "scientific_policy_changed": false,
+        "seal_commit": "920c4bbbe3b5490ddcef642cbf34f4ce31324c11",
+        "shared_execution_or_accounting_semantics_changed": false
+      },
       "post_reservation_pre_outcome_technical_repair": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
@@ -564,8 +576,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "a420b08bbd3a49a8c5bbe5d000b87b77b70eb659",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-semantic-graduation-relay-2026-07-19"
+      "worm_commit": "920c4bbbe3b5490ddcef642cbf34f4ce31324c11",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-pass-bank-envelope-repair-2026-07-19"
     }
   ],
   "governance": {
@@ -574,8 +586,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T08:00:00Z",
-  "queue_hash": "f7481852bb025898f1024ca9598c6c0dfda1670a87b6be63b1ad62ab1765957a",
+  "issued_at_utc": "2026-07-19T08:17:55Z",
+  "queue_hash": "a5c15b95918f9c3dafb51352ae59e2043baec20c6c7d50b24452e8ea85daa326",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
