@@ -71,7 +71,8 @@
     "00dcb0ffffc205089dcadbed12a9a992cb793e56d93e0139be40a4cfb70f8e61",
     "73fd717d654204d26b0050a9645b1b1b3ebee57f2bcda710113491e5e80899ba",
     "79ca7f31ac995afbbd3676d8f55b5df56fe0afa9b56a15eb975aa2009f777c8a",
-    "0667874871abea8b9ae919709432c7818b7a88987afa4936f744db9753a37b4d"
+    "0667874871abea8b9ae919709432c7818b7a88987afa4936f744db9753a37b4d",
+    "97a48d539671bcb496c7ebfdceb4cda0be3e33073a0dc62137c21a40bba9a901"
   ],
   "compute_contract": {
     "authoritative_writer_count": 1,
@@ -271,7 +272,7 @@
     "hydra/production/autonomous_director_manifest.py": "69dcd384d10149b56b001e4e45aded1f7dabef7af5c21a19bc9dcbb83279f21d",
     "hydra/production/autonomous_combine_candidate_bank.py": "ad73ddd66fb225a9dd56ff54b1127dc078acb0a6cf9557643d959644790d9ebe",
     "hydra/production/autonomous_consistency_account_policies.py": "5e8e1fe841b42036e43337099df15fb1339369305660fca4ef4feeab00a18e39",
-    "hydra/production/autonomous_director_runtime.py": "4e35ec21a416331d6c7af168f48fad68bc4e953567c6cef4ed9cea412db2ecb2",
+    "hydra/production/autonomous_director_runtime.py": "a3637b2110bc448c345c0ef91dbfef553da3412eaec8c861317f215a3247e5d1",
     "hydra/production/autonomous_event_time_matched_controls.py": "ab12eb7cf125c1b364c76fc664eda33e0758e93513df49597e3be392211019ad",
     "hydra/production/autonomous_event_time_safety_frontier.py": "c2212fd4b0115e33fec64c7d566f4a0876e858781e946b3dd42c375a0408a20e",
     "hydra/production/autonomous_exact_continuation.py": "c28380ff75986c4bc99dbc225d01dbbc1f93ceae380997843ad841247350b1c8",
@@ -296,6 +297,7 @@
     "hydra/propfirm/account_size_xfa.py": "3ab4ded9340c4e4957f708e3e7aff55085009d2cccdfcb72e29fae74e18df964",
     "hydra/research/clean_cross_asset_daily_tripwire.py": "d2ebbe4b3b9530bea2627ae013238a548405244559dc192a2d5eddce02aff389",
     "hydra/research/curve_relative_value_tripwire.py": "2c0cbcb8cc34c2722bc05b744f044be8a514d90c295bfab8b7047c2c77646b4f",
+    "hydra/research/scheduled_macro_release_tripwire.py": "494a20ee17d644cfa78f9f83db65d4f3bafe7c91b2451ca5855337a937ab418b",
     "scripts/acquire_session_safe_m2k_mym_confirmation.py": "6f197c04d5186d51d6c3af4ddef17590bc7a0ad556c690688db80cd46f50550c",
     "scripts/acquire_treasury_curve_tripwire.py": "023b328adb613e3b95481ebe5e3afc48256cd40e534f6c6635b38893392b6470",
     "scripts/acquire_fresh_confirmation_0035.py": "1cb5c1561be4d7cf3e3356a7f7618af63910031df957324e1b902bc2f2d17f26",
@@ -304,7 +306,7 @@
     "scripts/run_event_time_matched_controls.py": "96aaea22afd97545204abfb0c912ea273562678f8866be1dd1b96a4e9f91089b",
     "scripts/run_economic_production_manifest.py": "45e610a35ae5a260e628bc73fcd23634362c6cef0298707b2e6e97ff8762cc6f"
   },
-  "manifest_hash": "97a48d539671bcb496c7ebfdceb4cda0be3e33073a0dc62137c21a40bba9a901",
+  "manifest_hash": "736be9721d4396418c6b0bb39c53bccf03f1ce2455f009389d645425e1527667",
   "mission_state_contract": {
     "create_new_reporting_framework": false,
     "decision_ledger_append_only": true,
@@ -481,7 +483,7 @@
   "post_breadth_branch_portfolio": {
     "additional_manifest_count": 0,
     "additional_multiplicity_reserved": false,
-    "classification": "BOUNDED_LEGAL_TREASURY_SESSION_SAFE_AND_CROSS_ASSET_RELAY_PORTFOLIO",
+    "classification": "BOUNDED_LEGAL_TREASURY_SESSION_SAFE_CROSS_ASSET_AND_MACRO_RELAY_PORTFOLIO",
     "cross_asset_daily_decision_card_hash": "7c13b8262d20fc4900d32cdd5820c51d56e4270aaa1b469e56ab54e8a01234df",
     "cross_asset_daily_decision_card_path": "config/research/clean_cross_asset_daily_tripwire_decision_card_v1.json",
     "cross_asset_daily_evidence_ceiling": "E_DIAGNOSTIC_DEVELOPMENT",
@@ -490,6 +492,11 @@
     "legal_result_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_breadth_portfolio/frozen_legal_frontier_exact.json",
     "parent_only_authoritative_writer": true,
     "q4_access_allowed": false,
+    "scheduled_macro_release_decision_card_hash": "6f3b773473667fe6aae3c94e52ae9fe91db3c73d4eddab63aaf1c2d86c0d670b",
+    "scheduled_macro_release_decision_card_path": "config/research/scheduled_macro_release_causal_reaction_tripwire_v1.json",
+    "scheduled_macro_release_evidence_ceiling": "TIER_E_DEVELOPMENT_ONLY",
+    "scheduled_macro_release_expected_result_hash": "2992a8cfb8a870a9fdfff03e1bef0a007ca7bfcb7b30be5bcee485411dcb2b5d",
+    "scheduled_macro_release_result_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_breadth_portfolio/scheduled_macro_release_tripwire.json",
     "session_safe_candidate_evidence_ceiling": "E_EXACT_DEVELOPMENT_TRIPWIRE",
     "session_safe_confirmation_card_hash": "52703f6bcbeeb589873370cb98a5ce62252f7eec3993623c72d1e89b33f39ef8",
     "session_safe_confirmation_evidence_ceiling": "TIER_Q_ELIGIBLE_NOT_TIER_C",
@@ -503,6 +510,14 @@
     "treasury_evidence_ceiling": "E_DEVELOPMENT_TRIPWIRE",
     "treasury_input_contract_path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/input_contract.json",
     "treasury_result_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_breadth_portfolio/treasury_curve_tripwire.json",
+    "treasury_runtime_binding_repair": {
+      "acquisition_artifact_inventory_corrected": true,
+      "economic_outcomes_changed": false,
+      "implementation_commit": "58fa838fea806c0211050986322db6bb209952fb",
+      "repair_scope": "VERIFY_RAW_DBN_ROLL_MAP_CONSUMER_CONTRACT_AND_ROLL_SOURCE_CHAIN",
+      "scientific_policy_changed": false,
+      "shared_execution_or_accounting_semantics_changed": false
+    },
     "worker_maximum": 2
   },
   "post_confirmation_branch_portfolio": {
@@ -599,5 +614,5 @@
     "worker_count": 2
   },
   "schema": "hydra_economic_production_manifest_v1",
-  "source_commit": "7bbe1bcc6a1270eb20843c64c55469b43a6d10d4"
+  "source_commit": "690d50a42a1cfec40f31158c45b785a4e3e471a9"
 }

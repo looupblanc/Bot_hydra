@@ -496,9 +496,9 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "2503777182d66f29f099b5197fd0539a5fcae3aa3eebafa6356daa02c7936bfb",
+      "manifest_file_sha256": "e1387916a0bad25cd0a31c50be9812bb70481538e4139abc8978c298b6cde3b3",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "97a48d539671bcb496c7ebfdceb4cda0be3e33073a0dc62137c21a40bba9a901",
+      "manifest_semantic_hash": "736be9721d4396418c6b0bb39c53bccf03f1ce2455f009389d645425e1527667",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -640,23 +640,33 @@
       "post_breadth_branch_portfolio": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
-        "classification": "BOUNDED_LEGAL_TREASURY_SESSION_SAFE_AND_CROSS_ASSET_RELAY_PORTFOLIO",
+        "classification": "BOUNDED_LEGAL_TREASURY_SESSION_SAFE_CROSS_ASSET_AND_MACRO_RELAY_PORTFOLIO",
         "cross_asset_daily_evidence_ceiling": "E_DIAGNOSTIC_DEVELOPMENT",
         "cross_asset_daily_result_hash": "418b411d914726ad21d905dbe83d9effa7acda7638b77e2eba7456c72a281313",
         "cross_asset_daily_status": "CROSS_ASSET_DAILY_DIRECTION_TRANSFER_FALSIFIED",
-        "implementation_commit": "7bbe1bcc6a1270eb20843c64c55469b43a6d10d4",
+        "implementation_commit": "690d50a42a1cfec40f31158c45b785a4e3e471a9",
         "legal_exact_evidence_ceiling": "E_DIAGNOSTIC",
-        "old_manifest_hash": "0667874871abea8b9ae919709432c7818b7a88987afa4936f744db9753a37b4d",
+        "old_manifest_hash": "97a48d539671bcb496c7ebfdceb4cda0be3e33073a0dc62137c21a40bba9a901",
+        "prior_relay_manifest_hash": "0667874871abea8b9ae919709432c7818b7a88987afa4936f744db9753a37b4d",
         "q4_access_allowed": false,
         "session_safe_candidate_evidence_ceiling": "E_EXACT_DEVELOPMENT_TRIPWIRE",
         "session_safe_confirmation_actual_cost_usd": 6.535743542016,
         "session_safe_confirmation_result_hash": "209c6b114a2c7374c97a95d24b31d7e769463b06d60b135bc79d5d439b84e823",
         "session_safe_confirmation_status": "FRESH_REPLICATION_FAILED_BRANCH_CLOSED",
         "session_safe_fresh_confirmation_required": true,
+        "scheduled_macro_release_evidence_ceiling": "TIER_E_DEVELOPMENT_ONLY",
+        "scheduled_macro_release_result_hash": "2992a8cfb8a870a9fdfff03e1bef0a007ca7bfcb7b30be5bcee485411dcb2b5d",
+        "scheduled_macro_release_status": "SCHEDULED_MACRO_RELEASE_CAUSAL_REACTION_FALSIFIED",
         "cumulative_actual_spend_usd": 119.78115172013997,
         "remaining_authorized_budget_usd": 80.93956820294103,
         "treasury_actual_cost_usd": 9.090267196298,
         "treasury_evidence_ceiling": "E_DEVELOPMENT_TRIPWIRE",
+        "treasury_runtime_binding_repair": {
+          "economic_outcomes_changed": false,
+          "implementation_commit": "58fa838fea806c0211050986322db6bb209952fb",
+          "scientific_policy_changed": false,
+          "shared_execution_or_accounting_semantics_changed": false
+        },
         "worker_maximum": 2
       },
       "post_confirmation_branch_portfolio": {
@@ -717,7 +727,7 @@
     "q4_access_allowed": false
   },
   "issued_at_utc": "2026-07-19T12:28:12Z",
-  "queue_hash": "35d7f522827a57a6bd5c6d04679c8312167fad41c78eef9ce119db49710bb9b5",
+  "queue_hash": "093d7bd93a150d67b4d734546194e9ad8e604abd9c44c2b8ef2d11622e218155",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
