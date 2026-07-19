@@ -457,9 +457,9 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "856158c410794cfee8016e18bee1a75cbff62e1a4eb26887088ed1c7bfdb5021",
+      "manifest_file_sha256": "d395539c69910d7734de241d47c77b63f8d27c7e88f898a407cd6f9cc80de7b2",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "f468e25e5ab466f108d92fd050cb0053e4c573489b4f60bd709f98701553ef1e",
+      "manifest_semantic_hash": "3fea73c0dab408fe02dfeb020c465947f175d1c1161a16afa4a85469a5e4c738",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -529,6 +529,30 @@
         "two_read_only_book_shards": true,
         "xfa_requires_frozen_tier_g": true
       },
+      "post_book_graduation_semantic_reconciliation": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "authoritative_promotion_requires_unique_ledger_concentration_and_controls": true,
+        "combine_pass_observed_bank_capacity": 100,
+        "combine_pass_observed_bank_minimum_target": 50,
+        "consistency_direct_frozen_profile_count": 6,
+        "derived_graduation_classifier_semantics_corrected": true,
+        "development_pass_paths_must_be_consistency_compliant": true,
+        "event_time_safety_frozen_profile_count": 8,
+        "event_time_safety_source_candidate_count": 3,
+        "legacy_marginal_book_composite_hash": "c72ddbeac24bf1571aaa68d8f9db9ff52b260bc83955036c7526b133016929ef",
+        "legacy_marginal_book_evidence_preserved": true,
+        "old_manifest_hash": "f468e25e5ab466f108d92fd050cb0053e4c573489b4f60bd709f98701553ef1e",
+        "promotion_thresholds_changed": false,
+        "repair_commit": "a420b08bbd3a49a8c5bbe5d000b87b77b70eb659",
+        "scientific_policy_changed": false,
+        "semantic_reconciliation_code_commit": "ecc215a1f2f8731b5b76f5957e701d9931e4d82f",
+        "semantic_reconciliation_shard_count": 2,
+        "shared_execution_or_accounting_semantics_changed": false,
+        "single_day_concentration_from_overlapping_starts_is_diagnostic_only": true,
+        "trade_concentration_not_inferred_from_daily_episode_summaries": true,
+        "xfa_requires_authoritative_tier_g": true
+      },
       "post_reservation_pre_outcome_technical_repair": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
@@ -540,8 +564,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "4189237a2779e0c2864722886d79095147958603",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-combine-graduation-relay-2026-07-19"
+      "worm_commit": "a420b08bbd3a49a8c5bbe5d000b87b77b70eb659",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-semantic-graduation-relay-2026-07-19"
     }
   ],
   "governance": {
@@ -550,8 +574,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T07:03:00Z",
-  "queue_hash": "871c08916e2dbb8b66e86daf04af7589a645334910a3979d8bae93790b72b4ef",
+  "issued_at_utc": "2026-07-19T08:00:00Z",
+  "queue_hash": "f7481852bb025898f1024ca9598c6c0dfda1670a87b6be63b1ad62ab1765957a",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
