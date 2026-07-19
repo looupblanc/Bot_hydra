@@ -238,11 +238,54 @@ def test_exact_result_metrics_count_only_chronological_exact_paths() -> None:
 
     metrics = director_runtime._exact_result_metrics({"EXACT_0029": exact})
 
-    assert metrics["exact_account_replays"] == 40
+    assert metrics["exact_account_replays"] == 2
+    assert metrics["exact_account_episode_replays"] == 40
     assert metrics["normal_pass_candidate_count"] == 1
     assert metrics["stressed_pass_candidate_count"] == 1
     assert metrics["positive_stressed_candidate_count"] == 1
     assert metrics["best_stressed_pass_rate"] == pytest.approx(0.05)
+
+
+def test_artifact_compatibility_and_recurring_epoch_resume_are_non_mutating(
+    tmp_path: Path,
+) -> None:
+    old_hash = "a" * 64
+    manifest = {
+        "manifest_hash": "b" * 64,
+        "compatible_artifact_manifest_hashes": [old_hash],
+    }
+    assert director_runtime._artifact_manifest_compatible(
+        {"manifest_hash": old_hash}, manifest
+    )
+
+    output = tmp_path / "output"
+    branch = output / "branch_results"
+    branch.mkdir(parents=True)
+    for name in (
+        "epoch_0004_timeframe_000000.json",
+        "epoch_0004_mechanism_000000.json",
+    ):
+        _write_json(
+            branch / name,
+            director_runtime._with_hash({"candidate_count": 1}, "result_hash"),
+        )
+    prior = {"checkpoint_sequence": 7, "state": "ROBUSTNESS_ACTIVE"}
+    state, results = director_runtime._run_recurring_niche_epoch(
+        epoch=4,
+        root=tmp_path,
+        manifest=manifest,
+        output=output,
+        live_writer=object(),
+        branch_writer=object(),
+        initial_results={},
+        prior_state=prior,
+        started=0.0,
+        heartbeat_seconds=1.0,
+        dimensions=("TIMEFRAME", "MECHANISM"),
+        candidate_offset=0,
+    )
+    assert state == prior
+    assert set(results) == {"4:EXPLOITATION", "4:EXPLORATION"}
 
 
 def test_dispatch_runs_two_worker_epoch_and_publishes_resumable_snapshots(

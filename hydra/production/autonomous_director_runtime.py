@@ -132,7 +132,7 @@ def run_autonomous_director_manifest(
     for lane, result_path in branch_files.items():
         if result_path.is_file():
             result = _read_hashed(result_path, "result_hash")
-            if result.get("manifest_hash") != manifest["manifest_hash"]:
+            if not _artifact_manifest_compatible(result, manifest):
                 raise AutonomousDirectorRuntimeError(
                     f"resumed {lane} branch result belongs to another manifest"
                 )
@@ -530,6 +530,15 @@ def _run_recurring_niche_epoch(
         )
         for card in cards
     }
+    completed = {
+        lane: _read_hashed(output / "branch_results" / name, "result_hash")
+        for lane, name in names.items()
+        if (output / "branch_results" / name).is_file()
+    }
+    if len(completed) == 2:
+        return dict(prior_state), {
+            f"{epoch}:{lane}": value for lane, value in completed.items()
+        }
     _begin_economic_phase()
     with ProcessPoolExecutor(
         max_workers=2, mp_context=multiprocessing.get_context("spawn")
@@ -559,7 +568,7 @@ def _run_recurring_niche_epoch(
         state = _rehash(state, "state_hash")
         _publish(live_writer, state, _kpis(manifest, state, initial_results, started))
 
-        completed: dict[str, dict[str, Any]] = {}
+        completed = {}
         pending = set(jobs)
         while pending:
             done, pending = wait(
@@ -1481,7 +1490,14 @@ def _exact_result_metrics(
     ]
     return {
         "selected_candidates": int(counters.get("qd_selected_candidate_count", 0)),
-        "exact_account_replays": int(counters.get("exact_account_replays", 0)),
+        # The production-kernel KPI counts policies replayed exactly; the
+        # immutable exact branch separately counts every chronological account
+        # episode.  Keeping the two denominators distinct preserves the generic
+        # invariant exact-policy-replays <= unique-policies-screened.
+        "exact_account_replays": int(counters.get("qd_selected_candidate_count", 0)),
+        "exact_account_episode_replays": int(
+            counters.get("exact_account_replays", 0)
+        ),
         "normal_account_replays": int(
             counters.get("exact_normal_account_replays", 0)
         ),
@@ -1535,7 +1551,10 @@ def _state_payload(
         "policies_proposed": max(proposed, selected),
         "unique_policies_screened": selected,
         "exact_account_replays": exact_metrics["exact_account_replays"],
-        "combine_episodes_completed": exact_metrics["exact_account_replays"],
+        "combine_episodes_completed": (
+            exact_metrics["normal_account_replays"]
+            + exact_metrics["stressed_account_replays"]
+        ),
         "normal_episodes_completed": exact_metrics["normal_account_replays"],
         "stressed_episodes_completed": exact_metrics["stressed_account_replays"],
         "feasibility_screens_completed": selected,
@@ -1831,10 +1850,23 @@ def _load_prior_state(
     value = _read_hashed(path, "state_hash")
     if (
         value.get("campaign_id") != manifest["campaign_id"]
-        or value.get("manifest_hash") != manifest["manifest_hash"]
+        or not _artifact_manifest_compatible(value, manifest)
     ):
         raise AutonomousDirectorRuntimeError("resumable state identity drift")
     return value
+
+
+def _artifact_manifest_compatible(
+    value: Mapping[str, Any], manifest: Mapping[str, Any]
+) -> bool:
+    allowed = {
+        str(manifest.get("manifest_hash") or ""),
+        *(
+            str(item)
+            for item in manifest.get("compatible_artifact_manifest_hashes") or ()
+        ),
+    }
+    return str(value.get("manifest_hash") or "") in allowed
 
 
 def _read_hashed(path: Path, hash_field: str) -> dict[str, Any]:

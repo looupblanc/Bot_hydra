@@ -126,6 +126,7 @@ def validate_autonomous_director_manifest(
     _validate_implementation(manifest, root)
     _validate_runtime(manifest)
     _validate_evidence_bundle(manifest)
+    _validate_artifact_compatibility(manifest)
     _validate_compute(manifest)
     _validate_governance(manifest)
     _validate_rule_snapshot(manifest, root)
@@ -225,6 +226,27 @@ def _validate_evidence_bundle(manifest: Mapping[str, Any]) -> None:
         raise AutonomousDirectorManifestError(
             "autonomous-director EvidenceBundle contract drift"
         )
+
+
+def _validate_artifact_compatibility(manifest: Mapping[str, Any]) -> None:
+    raw = manifest.get("compatible_artifact_manifest_hashes") or []
+    if not isinstance(raw, (list, tuple)):
+        raise AutonomousDirectorManifestError("artifact compatibility drift")
+    values = tuple(str(item) for item in raw)
+    if (
+        len(values) > 8
+        or len(values) != len(set(values))
+        or str(manifest.get("manifest_hash") or "") in values
+        or any(not _SHA256.fullmatch(value) for value in values)
+    ):
+        raise AutonomousDirectorManifestError("artifact compatibility drift")
+    if values:
+        repair = _mapping(manifest, "post_launch_pre_economic_counter_repair")
+        if (
+            repair.get("economic_outcomes_changed") is not False
+            or repair.get("scientific_policy_changed") is not False
+        ):
+            raise AutonomousDirectorManifestError("artifact compatibility drift")
 
 
 def _validate_compute(manifest: Mapping[str, Any]) -> None:
