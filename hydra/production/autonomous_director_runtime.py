@@ -33,12 +33,19 @@ from hydra.production.autonomous_director_manifest import (
 from hydra.production.autonomous_exact_replay import (
     exact_0029_account_size_worker,
 )
+from hydra.production.autonomous_combine_candidate_bank import (
+    build_autonomous_combine_candidate_bank,
+)
 from hydra.production.autonomous_exact_continuation import (
     INITIAL_EXACT_COHORT_SIZE,
     audit_hazard_19327_tier_q,
     compose_remaining_0029_exact_results,
     plan_remaining_0029_exact_jobs,
     remaining_0029_exact_worker,
+)
+from hydra.production.autonomous_marginal_combine_books import (
+    build_autonomous_marginal_combine_books,
+    compose_autonomous_marginal_combine_book_shards,
 )
 from hydra.production.manifest import load_and_validate_production_manifest
 from hydra.production.runtime import PRODUCTION_KPI_SCHEMA, PRODUCTION_STATE_SCHEMA
@@ -1023,32 +1030,337 @@ def _run_post_source_exhaustion_epochs(
             relative_root / "exact_0029_composite.json", final_envelope
         )
         _append_decision_once(root, manifest, final_envelope)
+    continuation_paths = tuple(
+        branch_root
+        / relative_root
+        / f"exact_0029_offset_{offset:04d}.json"
+        for offset in sorted(completed)
+    )
+    return _run_post_composite_economic_relay(
+        root=root,
+        manifest=manifest,
+        output=output,
+        live_writer=live_writer,
+        branch_writer=branch_writer,
+        initial_results=initial_results,
+        prior_state=state,
+        started=started,
+        heartbeat_seconds=heartbeat_seconds,
+        initial_exact_path=initial_path,
+        continuation_paths=continuation_paths,
+        runtime_results=runtime_results,
+    )
+
+
+def _run_post_composite_economic_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    initial_results: Mapping[str, Mapping[str, Any]],
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    initial_exact_path: Path,
+    continuation_paths: Sequence[Path],
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Classify Tier-Q and exact-replay one two-worker marginal book wave.
+
+    Every worker is read-only.  The existing parent remains the sole writer,
+    and immutable envelopes make both the qualification and book shards
+    resumable after a controlled restart.
+    """
+
+    relative_root = Path("post_source_exhaustion/post_composite")
+    branch_root = output / "branch_results"
+    candidate_path = branch_root / relative_root / "combine_candidate_bank.json"
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+
+    if candidate_path.is_file():
+        envelope = _read_hashed(candidate_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "Combine candidate-bank envelope identity drift"
+            )
+        candidate_bank = _verified_inner_result(
+            envelope,
+            key="candidate_bank",
+            expected_schema="hydra_autonomous_combine_candidate_bank_v1",
+            expected_status="COMPLETE_READ_ONLY_DEVELOPMENT_CLASSIFICATION",
+        )
+    else:
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=1,
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                future = pool.submit(
+                    _candidate_bank_from_artifacts_worker,
+                    str(initial_exact_path),
+                    tuple(str(value) for value in continuation_paths),
+                )
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="TIER_Q_CANDIDATE_BANK_CLASSIFICATION_RUNNING",
+                    branch_results=results,
+                    next_action="CLASSIFY_EXACT_COMBINE_SURVIVORS_WITHOUT_PROMOTION",
+                )
+                state["active_economic_worker_processes"] = 1
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+                while not future.done():
+                    time.sleep(max(min(float(heartbeat_seconds), 5.0), 0.1))
+                    state = dict(state)
+                    state["checkpoint_sequence"] = int(state["checkpoint_sequence"]) + 1
+                    state["updated_at_utc"] = _utc_now()
+                    state = _rehash(state, "state_hash")
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+                candidate_bank = dict(future.result())
+        finally:
+            _end_economic_phase()
+        envelope = _post_source_envelope(
+            manifest,
+            lane_id="DIRECTOR",
+            branch_id="EXACT_COMBINE_CANDIDATE_BANK",
+            decision=str(candidate_bank["status"]),
+            payload_key="candidate_bank",
+            payload=candidate_bank,
+            next_action="RUN_TWO_SHARD_MARGINAL_COMBINE_BOOK_REPLAY",
+        )
+        branch_writer.write_json(relative_root / candidate_path.name, envelope)
+        _append_decision_once(root, manifest, envelope)
+
+    results["CANDIDATE_BANK"] = candidate_bank
+    shard_results: dict[int, dict[str, Any]] = {}
+    shard_paths = {
+        index: branch_root / relative_root / f"marginal_books_shard_{index:02d}.json"
+        for index in range(2)
+    }
+    for index, path in shard_paths.items():
+        if not path.is_file():
+            continue
+        envelope = _read_hashed(path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "marginal-book shard envelope identity drift"
+            )
+        shard = _verified_inner_result(
+            envelope,
+            key="marginal_book_shard",
+            expected_schema="hydra_autonomous_marginal_combine_books_v1",
+            expected_status="COMPLETE_BOUNDED_EXACT_MARGINAL_COMBINE_BOOK_BATCH",
+        )
+        if (
+            int(dict(shard.get("shard") or {}).get("shard_index", -1)) != index
+            or int(dict(shard.get("shard") or {}).get("shard_count", -1)) != 2
+        ):
+            raise AutonomousDirectorRuntimeError(
+                "marginal-book shard index/count drift"
+            )
+        shard_results[index] = shard
+
+    missing = [index for index in range(2) if index not in shard_results]
+    if missing:
+        future_index: dict[Any, int] = {}
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=len(missing),
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                for index in missing:
+                    future = pool.submit(
+                        _marginal_books_from_artifacts_worker,
+                        str(root),
+                        str(candidate_path),
+                        str(initial_exact_path),
+                        tuple(str(value) for value in continuation_paths),
+                        requested_book_count=256,
+                        shard_index=index,
+                        shard_count=2,
+                    )
+                    future_index[future] = index
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="MARGINAL_COMBINE_BOOK_EXACT_REPLAY_RUNNING",
+                    branch_results=results,
+                    next_action="EXACT_REPLAY_B1_B2_SELECTED_BOOKS_ON_B3_B4",
+                )
+                state["active_economic_worker_processes"] = len(future_index)
+                state["tier_q_candidate_count"] = int(
+                    dict(candidate_bank["counts"])["tier_q_contract_cleared_count"]
+                )
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+                pending = set(future_index)
+                while pending:
+                    done, pending = wait(
+                        pending,
+                        timeout=max(float(heartbeat_seconds), 0.1),
+                        return_when=FIRST_COMPLETED,
+                    )
+                    if not done:
+                        state = dict(state)
+                        state["checkpoint_sequence"] = int(state["checkpoint_sequence"]) + 1
+                        state["updated_at_utc"] = _utc_now()
+                        state = _rehash(state, "state_hash")
+                        _publish(
+                            live_writer,
+                            state,
+                            _kpis(manifest, state, results, started),
+                        )
+                        _write_mission_views(root, manifest, state, results)
+                        continue
+                    for future in done:
+                        index = future_index[future]
+                        shard = dict(future.result())
+                        envelope = _post_source_envelope(
+                            manifest,
+                            lane_id=(
+                                "EXPLOITATION" if index == 0 else "EXPLORATION"
+                            ),
+                            branch_id=f"MARGINAL_COMBINE_BOOK_SHARD_{index:02d}",
+                            decision=str(shard["status"]),
+                            payload_key="marginal_book_shard",
+                            payload=shard,
+                            next_action="COMPOSE_DISJOINT_BOOK_SHARDS",
+                        )
+                        branch_writer.write_json(
+                            relative_root / shard_paths[index].name, envelope
+                        )
+                        _append_decision_once(root, manifest, envelope)
+                        shard_results[index] = shard
+                    state = dict(state)
+                    state["active_economic_worker_processes"] = len(pending)
+                    state["checkpoint_sequence"] = int(state["checkpoint_sequence"]) + 1
+                    state["updated_at_utc"] = _utc_now()
+                    state = _rehash(state, "state_hash")
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+        finally:
+            _end_economic_phase()
+
+    book_composite = compose_autonomous_marginal_combine_book_shards(
+        [shard_results[index] for index in range(2)]
+    )
+    composite_path = branch_root / relative_root / "marginal_books_composite.json"
+    if composite_path.is_file():
+        envelope = _read_hashed(composite_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "marginal-book composite envelope identity drift"
+            )
+        persisted = _verified_inner_result(
+            envelope,
+            key="marginal_book_composite",
+            expected_schema="hydra_autonomous_marginal_combine_book_shards_v1",
+            expected_status="COMPLETE_RECONCILED_MARGINAL_COMBINE_BOOK_SHARDS",
+        )
+        if str(persisted["result_hash"]) != str(book_composite["result_hash"]):
+            raise AutonomousDirectorRuntimeError(
+                "marginal-book composite changed after persistence"
+            )
+        book_composite = persisted
+    else:
+        envelope = _post_source_envelope(
+            manifest,
+            lane_id="DIRECTOR",
+            branch_id="MARGINAL_COMBINE_BOOK_COMPOSITE",
+            decision=str(book_composite["status"]),
+            payload_key="marginal_book_composite",
+            payload=book_composite,
+            next_action=str(book_composite["next_action"]),
+        )
+        branch_writer.write_json(relative_root / composite_path.name, envelope)
+        _append_decision_once(root, manifest, envelope)
+
+    results["MARGINAL_BOOKS"] = book_composite
+    counts = dict(book_composite["counts"])
+    g_ready = int(counts.get("g_ready_count", 0)) + int(
+        counts.get("standalone_g_ready_count", 0)
+    )
+    next_action = (
+        "RUN_MATCHED_CONTROLS_AND_CONCENTRATION_FOR_G_READY_POLICIES"
+        if g_ready
+        else "DISPATCH_MATERIALLY_DISTINCT_FAILURE_GUIDED_ECONOMIC_BRANCH"
+    )
     state = _state_payload(
         manifest,
         sequence=int(state["checkpoint_sequence"]) + 1,
         state="ROBUSTNESS_ACTIVE",
-        stage="POST_SOURCE_EXHAUSTION_ECONOMIC_LANES_COMPLETE_AWAITING_RELAY",
-        branch_results=runtime_results,
-        next_action="DISPATCH_NEXT_RESEARCH_BOARD_EPOCH",
+        stage="MARGINAL_COMBINE_BOOK_WAVE_COMPLETE",
+        branch_results=results,
+        next_action=next_action,
     )
     state["active_economic_worker_processes"] = 0
     state["source_bank_exhausted"] = True
-    state["exact_0029_source_bank_exhausted"] = bool(
-        composite["source_bank_exhausted"]
+    state["exact_0029_source_bank_exhausted"] = True
+    state["tier_q_candidate_count"] = int(
+        dict(candidate_bank["counts"])["tier_q_contract_cleared_count"]
     )
+    state["g_precontrol_ready_count"] = g_ready
+    state["marginal_book_count"] = int(counts["primary_book_exact_replay_count"])
     state = _rehash(state, "state_hash")
-    _publish(live_writer, state, _kpis(manifest, state, runtime_results, started))
-    _write_mission_views(root, manifest, state, runtime_results)
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
     if os.environ.get("HYDRA_PRODUCTION_TEST_MODE") == "1":
         return state
+
+    # The next autonomous branch is implemented as a separate bounded relay.
+    # Until its immutable card is available, keep the same process alive and
+    # publish a truthful heartbeat rather than returning to empty source shards.
     while True:
         time.sleep(max(float(heartbeat_seconds), 1.0))
         state = dict(state)
         state["checkpoint_sequence"] = int(state["checkpoint_sequence"]) + 1
         state["updated_at_utc"] = _utc_now()
         state = _rehash(state, "state_hash")
-        _publish(live_writer, state, _kpis(manifest, state, runtime_results, started))
-        _write_mission_views(root, manifest, state, runtime_results)
+        _publish(live_writer, state, _kpis(manifest, state, results, started))
+        _write_mission_views(root, manifest, state, results)
+
+
+def _verified_inner_result(
+    envelope: Mapping[str, Any],
+    *,
+    key: str,
+    expected_schema: str,
+    expected_status: str,
+) -> dict[str, Any]:
+    value = dict(envelope.get(key) or {})
+    claimed = str(value.get("result_hash") or "")
+    payload = dict(value)
+    payload.pop("result_hash", None)
+    if (
+        not claimed
+        or stable_hash(payload) != claimed
+        or value.get("schema") != expected_schema
+        or value.get("status") != expected_status
+        or value.get("promotion_status") is not None
+    ):
+        raise AutonomousDirectorRuntimeError(
+            f"embedded economic result identity/hash drift: {key}"
+        )
+    return value
 
 
 def _post_source_envelope(
@@ -1100,6 +1412,74 @@ def _post_source_runtime_results(
     if event_result is not None:
         results["EVENT_TIME"] = dict(event_result)
     return results
+
+
+def _candidate_bank_from_artifacts_worker(
+    initial_exact_path: str,
+    continuation_paths: Sequence[str],
+) -> dict[str, Any]:
+    """Classify the sealed exact bank in a read-only worker process."""
+
+    initial = _read_hashed(Path(initial_exact_path), "result_hash")
+    continuations = [
+        _read_hashed(Path(value), "result_hash")
+        for value in sorted(str(path) for path in continuation_paths)
+    ]
+    result = build_autonomous_combine_candidate_bank(initial, continuations)
+    counts = dict(result.get("counts") or {})
+    if (
+        int(counts.get("authoritative_promotion_count", 0)) != 0
+        or int(counts.get("xfa_paths_started", 0)) != 0
+        or result.get("promotion_status") is not None
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "read-only candidate-bank worker attempted a status side effect"
+        )
+    return result
+
+
+def _marginal_books_from_artifacts_worker(
+    root_path: str,
+    candidate_bank_envelope_path: str,
+    initial_exact_path: str,
+    continuation_paths: Sequence[str],
+    *,
+    requested_book_count: int,
+    shard_index: int = 0,
+    shard_count: int = 1,
+) -> dict[str, Any]:
+    """Replay one deterministic marginal-book shard without durable writes."""
+
+    envelope = _read_hashed(Path(candidate_bank_envelope_path), "result_hash")
+    bank = dict(envelope.get("candidate_bank") or {})
+    initial = _read_hashed(Path(initial_exact_path), "result_hash")
+    continuations = [
+        _read_hashed(Path(value), "result_hash")
+        for value in sorted(str(path) for path in continuation_paths)
+    ]
+    result = build_autonomous_marginal_combine_books(
+        root_path,
+        bank,
+        initial,
+        continuations,
+        requested_book_count=int(requested_book_count),
+        maximum_components=6,
+        beam_width=64,
+        shard_index=int(shard_index),
+        shard_count=int(shard_count),
+    )
+    counts = dict(result.get("counts") or {})
+    if (
+        int(counts.get("authoritative_promotion_count", 0)) != 0
+        or int(counts.get("xfa_paths_started", 0)) != 0
+        or int(counts.get("registry_writes", 0)) != 0
+        or int(counts.get("database_writes", 0)) != 0
+        or result.get("promotion_status") is not None
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "read-only marginal-book worker attempted a status side effect"
+        )
+    return result
 
 
 def _exploitation_worker(result_path: str) -> dict[str, Any]:
@@ -1923,6 +2303,7 @@ def _exact_result_metrics(
 
     composite = branch_results.get("EXACT_0029_COMPOSITE") or {}
     event = branch_results.get("EVENT_TIME") or {}
+    marginal_books = branch_results.get("MARGINAL_BOOKS") or {}
     if composite:
         counters = dict(composite.get("aggregate_counters") or {})
         exact_ids = set(
@@ -1983,11 +2364,47 @@ def _exact_result_metrics(
                 normal_pass_ids.add(candidate_id)
             if any(int((cell.get("stressed") or {}).get("pass_count", 0)) > 0 for cell in cells):
                 stressed_pass_ids.add(candidate_id)
+        book_normal_rates: list[float] = []
+        book_stressed_rates: list[float] = []
+        positive_stressed_book_ids: set[str] = set()
+        for book in marginal_books.get("book_results") or ():
+            policy_id = str(book.get("policy_id") or "")
+            summaries = dict(book.get("summaries") or {})
+            normal_rows = list(dict(summaries.get("NORMAL") or {}).values())
+            stressed_rows = list(
+                dict(summaries.get("STRESSED_1_5X") or {}).values()
+            )
+            if any(int(row.get("pass_count", 0)) > 0 for row in normal_rows):
+                normal_pass_ids.add(policy_id)
+            if any(int(row.get("pass_count", 0)) > 0 for row in stressed_rows):
+                stressed_pass_ids.add(policy_id)
+            if any(float(row.get("net_total", 0.0)) > 0.0 for row in stressed_rows):
+                positive_stressed_book_ids.add(policy_id)
+            book_normal_rates.extend(
+                float(row.get("pass_rate", 0.0)) for row in normal_rows
+            )
+            book_stressed_rates.extend(
+                float(row.get("pass_rate", 0.0)) for row in stressed_rows
+            )
+        book_counts = dict(marginal_books.get("counts") or {})
+        book_episode_count = int(book_counts.get("completed_episode_count", 0))
+        if book_episode_count % 2:
+            raise AutonomousDirectorRuntimeError(
+                "marginal-book normal/stressed episode denominator drift"
+            )
+        normal_episodes += book_episode_count // 2
+        stressed_episodes += book_episode_count // 2
+        total_episodes += book_episode_count
+        selected += int(book_counts.get("supporting_policy_exact_replay_count", 0))
         best = composite.get("best_exact_frontier_point")
-        normal_best = float(((best or {}).get("normal") or {}).get("pass_rate", 0.0))
+        normal_best = max(
+            float(((best or {}).get("normal") or {}).get("pass_rate", 0.0)),
+            max(book_normal_rates, default=0.0),
+        )
         stressed_best = float(
             ((best or {}).get("stressed") or {}).get("pass_rate", 0.0)
         )
+        stressed_best = max(stressed_best, max(book_stressed_rates, default=0.0))
         return {
             "selected_candidates": selected,
             "exact_account_replays": selected,
@@ -1996,11 +2413,17 @@ def _exact_result_metrics(
             "stressed_account_replays": stressed_episodes,
             "normal_pass_candidate_count": len(normal_pass_ids),
             "stressed_pass_candidate_count": len(stressed_pass_ids),
-            "positive_stressed_candidate_count": 0,
+            "positive_stressed_candidate_count": len(positive_stressed_book_ids),
             "best_normal_pass_rate": normal_best,
             "best_stressed_pass_rate": stressed_best,
-            "median_normal_pass_rate": 0.0,
-            "median_stressed_pass_rate": 0.0,
+            "median_normal_pass_rate": (
+                statistics.median(book_normal_rates) if book_normal_rates else 0.0
+            ),
+            "median_stressed_pass_rate": (
+                statistics.median(book_stressed_rates)
+                if book_stressed_rates
+                else 0.0
+            ),
             "best_exact_frontier_point": best,
         }
 
@@ -2080,8 +2503,13 @@ def _state_payload(
 ) -> dict[str, Any]:
     exploration = branch_results.get("EXPLORATION") or {}
     exact_metrics = _exact_result_metrics(branch_results)
-    selected = int(exploration.get("selected_policy_count", 0))
-    proposed = int(exploration.get("eligible_policy_count", selected))
+    selected = max(
+        int(exploration.get("selected_policy_count", 0)),
+        int(exact_metrics["exact_account_replays"]),
+    )
+    proposed = max(
+        int(exploration.get("eligible_policy_count", selected)), selected
+    )
     payload = {
         "schema": PRODUCTION_STATE_SCHEMA,
         "campaign_id": manifest["campaign_id"],
@@ -2141,6 +2569,12 @@ def _kpis(
 ) -> dict[str, Any]:
     exploration = branch_results.get("EXPLORATION") or {}
     exact_metrics = _exact_result_metrics(branch_results)
+    candidate_counts = dict(
+        (branch_results.get("CANDIDATE_BANK") or {}).get("counts") or {}
+    )
+    book_counts = dict(
+        (branch_results.get("MARGINAL_BOOKS") or {}).get("counts") or {}
+    )
     frontier = list(exploration.get("uniform_legal_frontier") or ())
     stressed_points = [row for row in frontier if row.get("scenario") == "STRESSED_1_5X"]
     normal_points = [row for row in frontier if row.get("scenario") == "NORMAL"]
@@ -2185,6 +2619,17 @@ def _kpis(
         ),
         "candidates_promoted_96": 0,
         "confirmation_ready_candidates": 0,
+        "tier_q_candidate_count": int(
+            candidate_counts.get("tier_q_contract_cleared_count", 0)
+        ),
+        "g_precontrol_ready_count": int(book_counts.get("g_ready_count", 0))
+        + int(book_counts.get("standalone_g_ready_count", 0)),
+        "marginal_book_exact_replay_count": int(
+            book_counts.get("primary_book_exact_replay_count", 0)
+        ),
+        "marginally_accepted_book_count": int(
+            book_counts.get("marginally_accepted_count", 0)
+        ),
         "best_normal_pass_rate": exact_metrics["best_normal_pass_rate"],
         "best_stressed_pass_rate": exact_metrics["best_stressed_pass_rate"],
         "best_normal_summary_threshold_rate": max(
@@ -2263,24 +2708,44 @@ def _write_mission_views(
     exploration = branch_results.get("EXPLORATION") or {}
     exact_metrics = _exact_result_metrics(branch_results)
     exact_best = exact_metrics["best_exact_frontier_point"]
+    candidate_bank = branch_results.get("CANDIDATE_BANK") or {}
+    marginal_books = branch_results.get("MARGINAL_BOOKS") or {}
+    candidate_counts = dict(candidate_bank.get("counts") or {})
+    book_counts = dict(marginal_books.get("counts") or {})
+    tier_q_count = int(candidate_counts.get("tier_q_contract_cleared_count", 0))
+    g_precontrol_count = int(book_counts.get("g_ready_count", 0)) + int(
+        book_counts.get("standalone_g_ready_count", 0)
+    )
+    strongest_q = next(
+        (
+            row
+            for row in candidate_bank.get("candidates") or ()
+            if row.get("tier_q_contract_cleared") is True
+        ),
+        None,
+    )
     scorecard = {
         "schema": ECONOMIC_SCORECARD_SCHEMA,
         "campaign_id": manifest["campaign_id"],
         "manifest_hash": manifest["manifest_hash"],
         "updated_at_utc": _utc_now(),
-        "strongest_surviving_candidate": exact_best,
+        "strongest_surviving_candidate": strongest_q or exact_best,
         "strongest_diagnostic_shortlist_point": exploration.get(
             "best_deployable_frontier_point"
         ),
-        "evidence_tier": "E" if exact_best else None,
+        "evidence_tier": "Q" if strongest_q else ("E" if exact_best else None),
         "candidate_bank_counts": {
             "H": 0,
             "E": 47 + exact_metrics["selected_candidates"],
-            "Q": 0,
+            "Q": tier_q_count,
             "G": 0,
             "C": 0,
             "F": 0,
         },
+        "g_precontrol_ready_count": g_precontrol_count,
+        "marginal_book_policy_count": int(
+            book_counts.get("primary_book_exact_replay_count", 0)
+        ),
         "branch_decisions": {
             lane: (branch_results.get(lane) or {}).get("decision")
             for lane in ("EXPLOITATION", "EXPLORATION")

@@ -389,6 +389,91 @@ def test_source_bank_exhaustion_requires_both_completed_lanes_empty() -> None:
     )
 
 
+def test_post_composite_metrics_add_unique_book_evidence_denominators() -> None:
+    composite = {
+        "aggregate_counters": {
+            "exact_normal_account_replays": 10,
+            "exact_stressed_account_replays": 10,
+            "exact_account_replays": 20,
+        },
+        "completed_candidate_count": 2,
+        "source_inventory": {
+            "sealed_initial_candidate_ids": ["candidate-a", "candidate-b"]
+        },
+        "candidate_pass_sets": {
+            "normal": ["candidate-a"],
+            "stressed": ["candidate-a"],
+        },
+        "best_exact_frontier_point": {
+            "candidate_id": "candidate-a",
+            "normal": {"pass_rate": 0.10},
+            "stressed": {"pass_rate": 0.05},
+        },
+    }
+    book = {
+        "policy_id": "book-a",
+        "summaries": {
+            "NORMAL": {"5": {"pass_count": 1, "pass_rate": 0.25}},
+            "STRESSED_1_5X": {
+                "5": {"pass_count": 1, "pass_rate": 0.20, "net_total": 100.0}
+            },
+        },
+    }
+    metrics = director_runtime._exact_result_metrics(
+        {
+            "EXACT_0029_COMPOSITE": composite,
+            "MARGINAL_BOOKS": {
+                "book_results": [book],
+                "counts": {
+                    "completed_episode_count": 12,
+                    "supporting_policy_exact_replay_count": 3,
+                },
+            },
+        }
+    )
+
+    assert metrics["exact_account_replays"] == 5
+    assert metrics["exact_account_episode_replays"] == 32
+    assert metrics["normal_account_replays"] == 16
+    assert metrics["stressed_account_replays"] == 16
+    assert metrics["normal_pass_candidate_count"] == 2
+    assert metrics["stressed_pass_candidate_count"] == 2
+    assert metrics["best_normal_pass_rate"] == 0.25
+    assert metrics["best_stressed_pass_rate"] == 0.20
+
+
+def test_embedded_post_composite_result_requires_its_own_hash() -> None:
+    inner = director_runtime._with_hash(
+        {
+            "schema": "test-schema",
+            "status": "COMPLETE",
+            "promotion_status": None,
+        },
+        "result_hash",
+    )
+    envelope = {"payload": inner}
+
+    assert director_runtime._verified_inner_result(
+        envelope,
+        key="payload",
+        expected_schema="test-schema",
+        expected_status="COMPLETE",
+    ) == inner
+
+    changed = dict(inner)
+    changed["status"] = "FORGED"
+    with pytest.raises(
+        director_runtime.AutonomousDirectorRuntimeError,
+        match="embedded economic result identity/hash drift",
+    ):
+        director_runtime._verified_inner_result(
+            {"payload": changed},
+            key="payload",
+            expected_schema="test-schema",
+            expected_status="COMPLETE",
+        )
+
+
 def test_dispatch_runs_two_worker_epoch_and_publishes_resumable_snapshots(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

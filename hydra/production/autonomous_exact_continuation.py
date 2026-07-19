@@ -34,6 +34,10 @@ CONTINUATION_PLAN_SCHEMA = "hydra_autonomous_exact_0029_continuation_plan_v1"
 CONTINUATION_COMPOSITE_SCHEMA = (
     "hydra_autonomous_exact_0029_continuation_composite_v1"
 )
+AUTONOMOUS_BRANCH_RESULT_SCHEMA = "hydra_autonomous_economic_branch_result_v1"
+AUTONOMOUS_DIRECTOR_CAMPAIGN_ID = (
+    "hydra_autonomous_economic_discovery_director_0035"
+)
 QUALIFICATION_AUDIT_SCHEMA = "hydra_autonomous_tier_q_qualification_audit_v1"
 COMPACT_EVIDENCE_SCHEMA = "hydra_compact_exact_candidate_evidence_bundle_v1"
 
@@ -640,6 +644,40 @@ def _unwrap_exact_result(value: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _verify_continuation_result(value: Mapping[str, Any]) -> dict[str, Any]:
+    if value.get("schema") == AUTONOMOUS_BRANCH_RESULT_SCHEMA:
+        outer = dict(value)
+        claimed_outer_hash = str(outer.pop("result_hash", ""))
+        embedded = value.get("continuation_result")
+        if (
+            not claimed_outer_hash
+            or stable_hash(outer) != claimed_outer_hash
+            or value.get("status") != "COMPLETE"
+            or value.get("campaign_id") != AUTONOMOUS_DIRECTOR_CAMPAIGN_ID
+            or value.get("decision")
+            != "COMPLETE_READ_ONLY_EXACT_CONTINUATION_COHORT"
+            or value.get("read_only_worker") is not True
+            or value.get("evidence_tier") != "E"
+            or value.get("promotion_status") is not None
+            or not isinstance(embedded, Mapping)
+        ):
+            raise AutonomousExactContinuationError(
+                "live exact continuation envelope identity/hash drift"
+            )
+        _require_diagnostic_safety(value)
+        verified = _verify_continuation_payload(embedded)
+        expected_branch_id = (
+            "REMAINING_EXACT_0029_OFFSET_"
+            f"{int(verified['cohort_offset']):04d}"
+        )
+        if value.get("branch_id") != expected_branch_id:
+            raise AutonomousExactContinuationError(
+                "live exact continuation envelope cohort identity drift"
+            )
+        return verified
+    return _verify_continuation_payload(value)
+
+
+def _verify_continuation_payload(value: Mapping[str, Any]) -> dict[str, Any]:
     result = dict(value)
     claimed = str(result.pop("result_hash", ""))
     result.pop("runtime_seconds", None)

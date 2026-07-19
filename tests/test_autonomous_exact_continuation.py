@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 import pickle
 from pathlib import Path
 
@@ -130,6 +131,28 @@ def _continuation_wrapper(
     return {**core, "result_hash": stable_hash(core)}
 
 
+def _live_branch_envelope(
+    wrapped: dict[str, object], *, offset: int
+) -> dict[str, object]:
+    core: dict[str, object] = {
+        "schema": continuation.AUTONOMOUS_BRANCH_RESULT_SCHEMA,
+        "status": "COMPLETE",
+        "branch_id": f"REMAINING_EXACT_0029_OFFSET_{offset:04d}",
+        "campaign_id": continuation.AUTONOMOUS_DIRECTOR_CAMPAIGN_ID,
+        "lane_id": "EXPLOITATION",
+        "decision": "COMPLETE_READ_ONLY_EXACT_CONTINUATION_COHORT",
+        "evidence_tier": "E",
+        "promotion_status": None,
+        "read_only_worker": True,
+        "continuation_result": wrapped,
+        "data_purchase_count": 0,
+        "q4_access_count_delta": 0,
+        "broker_connections": 0,
+        "orders": 0,
+    }
+    return {**core, "result_hash": stable_hash(core)}
+
+
 def test_plan_uses_two_disjoint_cohorts_after_initial_32(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -238,6 +261,41 @@ def test_composer_exposes_unique_candidate_denominators_and_exhaustion() -> None
         continuation.AutonomousExactContinuationError, match="more than one"
     ):
         continuation.compose_remaining_0029_exact_results(initial, [first, first])
+
+
+def test_composer_verifies_live_envelope_then_embedded_continuation_hash() -> None:
+    candidate_ids = [f"candidate-{index:03d}" for index in range(34)]
+    inventory = _inventory(candidate_ids)
+    initial = _exact_result(candidate_ids[:32], offset=0, source_unique_count=34)
+    wrapped = _continuation_wrapper(
+        _exact_result(candidate_ids[32:], offset=32, source_unique_count=34),
+        inventory,
+    )
+    live = _live_branch_envelope(wrapped, offset=32)
+
+    composite = continuation.compose_remaining_0029_exact_results(initial, [live])
+
+    assert composite["source_bank_exhausted"] is True
+    assert composite["aggregate_counters"]["exact_candidate_count"] == 34
+
+    outer_tamper = deepcopy(live)
+    outer_tamper["lane_id"] = "EXPLORATION"
+    with pytest.raises(
+        continuation.AutonomousExactContinuationError,
+        match="envelope identity/hash drift",
+    ):
+        continuation.compose_remaining_0029_exact_results(initial, [outer_tamper])
+
+    inner_tamper = deepcopy(live)
+    inner_tamper["continuation_result"]["candidate_ids"] = ["forged"]  # type: ignore[index]
+    inner_core = dict(inner_tamper)
+    inner_core.pop("result_hash")
+    inner_tamper["result_hash"] = stable_hash(inner_core)
+    with pytest.raises(
+        continuation.AutonomousExactContinuationError,
+        match="continuation result identity/hash drift",
+    ):
+        continuation.compose_remaining_0029_exact_results(initial, [inner_tamper])
 
 
 def test_hazard_19327_remains_q_pending_on_uncleared_concentration() -> None:
