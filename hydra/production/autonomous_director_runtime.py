@@ -60,6 +60,7 @@ from hydra.production.autonomous_exact_continuation import (
     remaining_0029_exact_worker,
 )
 from hydra.production.autonomous_marginal_combine_books import (
+    COMPOSITE_SCHEMA as MARGINAL_BOOK_COMPOSITE_SCHEMA,
     build_autonomous_marginal_combine_books,
     compose_autonomous_marginal_combine_book_shards,
 )
@@ -2229,9 +2230,24 @@ def _combine_pass_bank_from_artifacts_worker(
     book_envelope = _read_hashed(
         Path(semantic_book_composite_envelope_path), "result_hash"
     )
+    # The semantic-reconciliation relay persists the immutable marginal-book
+    # composite under a distinct envelope key so the legacy evidence remains
+    # untouched.  The bank builder accepts either a direct composite or the
+    # original ``marginal_book_composite`` envelope; unwrap the reconciled
+    # payload explicitly instead of misclassifying a valid checkpoint as a
+    # missing source.
+    if "semantic_marginal_book_composite" in book_envelope:
+        book_source = _verified_inner_result(
+            book_envelope,
+            key="semantic_marginal_book_composite",
+            expected_schema=MARGINAL_BOOK_COMPOSITE_SCHEMA,
+            expected_status="COMPLETE_RECONCILED_MARGINAL_COMBINE_BOOK_SHARDS",
+        )
+    else:
+        book_source = book_envelope
     result = build_autonomous_combine_pass_observed_bank(
         candidate_envelope,
-        book_envelope,
+        book_source,
     )
     counts = dict(result.get("counts") or {})
     if (

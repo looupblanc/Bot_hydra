@@ -444,7 +444,6 @@ def test_post_composite_metrics_add_unique_book_evidence_denominators() -> None:
     assert metrics["best_normal_pass_rate"] == 0.25
     assert metrics["best_stressed_pass_rate"] == 0.20
 
-
 def test_post_book_metrics_include_consistency_direct_exact_work() -> None:
     composite = {
         "aggregate_counters": {
@@ -594,6 +593,60 @@ def test_post_consistency_metrics_include_event_time_safety_frontier() -> None:
     assert kpis["event_time_safety_candidate_count"] == 1
     assert kpis["event_time_safety_profile_count"] == 8
     assert kpis["event_time_safety_exact_episode_count"] == 20
+
+
+def test_pass_bank_worker_unwraps_semantic_reconciliation_envelope(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    semantic = _hashed(
+        {
+            "schema": director_runtime.MARGINAL_BOOK_COMPOSITE_SCHEMA,
+            "status": "COMPLETE_RECONCILED_MARGINAL_COMBINE_BOOK_SHARDS",
+            "promotion_status": None,
+            "book_results": [],
+        },
+        "result_hash",
+    )
+    candidate_envelope = {"candidate_bank": {"opaque": "candidate"}}
+    book_envelope = {"semantic_marginal_book_composite": semantic}
+    sources = {
+        "candidate.json": candidate_envelope,
+        "books.json": book_envelope,
+    }
+    observed: dict[str, object] = {}
+
+    monkeypatch.setattr(
+        director_runtime,
+        "_read_hashed",
+        lambda path, _field: sources[Path(path).name],
+    )
+
+    def fake_builder(candidate: object, books: object) -> dict[str, object]:
+        observed["candidate"] = candidate
+        observed["books"] = books
+        return {
+            "counts": {
+                "authoritative_promotion_count": 0,
+                "tier_g_count": 0,
+                "xfa_paths_started": 0,
+            },
+            "database_writes": 0,
+            "registry_writes": 0,
+            "promotion_status": None,
+        }
+
+    monkeypatch.setattr(
+        director_runtime,
+        "build_autonomous_combine_pass_observed_bank",
+        fake_builder,
+    )
+
+    director_runtime._combine_pass_bank_from_artifacts_worker(
+        "candidate.json", "books.json"
+    )
+
+    assert observed["candidate"] is candidate_envelope
+    assert observed["books"] == semantic
 
 
 def test_event_time_safety_runtime_worker_rejects_side_effects(
