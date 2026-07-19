@@ -1,0 +1,18 @@
+{
+  "artifact_hash": "30a27fc1f9eb381bd829ab9fef3c02d1155a68188216a8d4aad3cc63ef949b0e",
+  "artifact_path": "reports/research_tripwires/tier_q_q3_replication_hazard_1f3ff3e1f6d2b9d5e8eec1b3.json",
+  "candidate_id": "hazard_1f3ff3e1f6d2b9d5e8eec1b3",
+  "contract_hash": "a3e10e461e5efaddf4a7d3d3df7688f9a3226b416d3bea38d979e4669ba8fda2",
+  "decision": "KILL_Q3_REPLICATION_BRANCH_NO_PROMOTION",
+  "evidence_role": "FINAL_DEVELOPMENT_REPLICATION_NOT_TIER_C",
+  "promotion_status": null,
+  "q3_feature_receipt_hash": "1f51bc773fe2a0764ba658575945e83d7b4ba64b409e0d53ab88e13f1fd08474",
+  "recalibration_performed": false,
+  "retuning_performed": false,
+  "schema": "hydra_tier_q_q3_replication_tripwire_receipt_v1",
+  "source_full_result_hash": "a50902e33f4ae3086e64d5ef26fdacd16cf95d5d30acfd31ae9a73da13b2507b",
+  "source_level1_control_hash": "6a28c124b949fdae2361fe03835ccf76d0bcfcad79076223411eec1b0ca44022",
+  "status": "SEALED_FAIL_CLOSED_NO_G_OR_C_STATUS",
+  "tier_c_promoted": false,
+  "tier_g_promoted": false
+}

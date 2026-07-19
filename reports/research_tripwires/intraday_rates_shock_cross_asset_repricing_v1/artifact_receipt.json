@@ -1,0 +1,20 @@
+{
+  "branch_id": "INTRADAY_RATES_SHOCK_CROSS_ASSET_REPRICING_TRIPWIRE_V1",
+  "broker_connections": 0,
+  "decision_card_sha256": "fff734ba7d9369fed10521424875d59e21bc9c0d05299bd08eb5ab3c6ba57417",
+  "implementation_sha256": "bf19a07109054094f278d02a726f553fe842e3fb3836902b75aff524a87204a5",
+  "incremental_data_spend_usd": 0.0,
+  "logical_result_hash": "bd272c1041e5567352b1f1628f4e01ab41f4112e2a77bc6daa19a65cc0e2910d",
+  "mission_state_written": false,
+  "orders": 0,
+  "q4_access_count_delta": 0,
+  "receipt_hash": "bd540344ef7d95790f2445b57633509364fce58e5b0534dd97940f6a9177908f",
+  "report_path": "reports/research_tripwires/intraday_rates_shock_cross_asset_repricing_v1/intraday_rates_shock_report.md",
+  "report_sha256": "d5052383c95f02673bd1a7448dbe438399754d9656e665e7116ad93d3f3c8fce",
+  "result_file_sha256": "6ee803d197b4a31330e8b341c0878f3b3c6b68150f31dee59da4e0624ee3aed8",
+  "result_path": "reports/research_tripwires/intraday_rates_shock_cross_asset_repricing_v1/intraday_rates_shock_result.json",
+  "schema": "hydra_read_only_tripwire_artifact_receipt_v1",
+  "status": "INTRADAY_RATES_SHOCK_CROSS_ASSET_REPRICING_FALSIFIED",
+  "targeted_test_file_sha256": "fb230805b455304b06e6aa241d1ea5a7e9928485a61e546288c2ff1aaab9ae8c",
+  "targeted_test_result": "3_PASSED"
+}

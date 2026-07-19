@@ -1,0 +1,174 @@
+{
+  "account_label": "50K",
+  "artifact_hash": "ee4a27e8a3de2dd985ac5678ca814d13efe907d78d71b12a7e6c3a0988aa7fd1",
+  "authoritative_writes": 0,
+  "batch_stream_equal": true,
+  "broker_connections": 0,
+  "calendar": {
+    "first_session_day": 20277,
+    "last_session_day": 20362,
+    "non_overlapping_start_counts": {
+      "10": 5,
+      "20": 2,
+      "5": 11
+    },
+    "post_warmup_common_session_count": 58
+  },
+  "candidate_fingerprint": "0e4181808737ad6e9c8593ed6d23fa591617b69cc4df7bc587e1b76856a16726",
+  "candidate_id": "hazard_0e4181808737ad6e9c8593ed",
+  "cells": [
+    {
+      "data_censored_start_count": 2,
+      "full_coverage_start_count": 9,
+      "horizon_trading_days": 5,
+      "normal": {
+        "all_passing_paths_consistency_compliant": false,
+        "consistency_compliance_rate": 0.5555555555555556,
+        "episode_count": 9,
+        "minimum_mll_buffer_usd": 1055.772149757402,
+        "mll_breach_count": 0,
+        "mll_breach_rate": 0.0,
+        "net_median_usd": 0.0,
+        "net_total_usd": 107.92089508974459,
+        "pass_count": 0,
+        "pass_rate": 0.0,
+        "target_progress_median": 0.0,
+        "target_progress_p25": -0.24745000518100035
+      },
+      "stressed": {
+        "all_passing_paths_consistency_compliant": false,
+        "consistency_compliance_rate": 0.5555555555555556,
+        "episode_count": 9,
+        "minimum_mll_buffer_usd": 1049.022149757402,
+        "mll_breach_count": 0,
+        "mll_breach_rate": 0.0,
+        "net_median_usd": 0.0,
+        "net_total_usd": 40.42089508974459,
+        "pass_count": 0,
+        "pass_rate": 0.0,
+        "target_progress_median": 0.0,
+        "target_progress_p25": -0.24970000518100036
+      }
+    },
+    {
+      "data_censored_start_count": 1,
+      "full_coverage_start_count": 4,
+      "horizon_trading_days": 10,
+      "normal": {
+        "all_passing_paths_consistency_compliant": false,
+        "consistency_compliance_rate": 0.5,
+        "episode_count": 4,
+        "minimum_mll_buffer_usd": 1124.101518073665,
+        "mll_breach_count": 0,
+        "mll_breach_rate": 0.0,
+        "net_median_usd": -288.35847273630134,
+        "net_total_usd": -878.2111363797885,
+        "pass_count": 0,
+        "pass_rate": 0.0,
+        "target_progress_median": -0.09611949091210045,
+        "target_progress_p25": -0.25550050635784766
+      },
+      "stressed": {
+        "all_passing_paths_consistency_compliant": false,
+        "consistency_compliance_rate": 0.5,
+        "episode_count": 4,
+        "minimum_mll_buffer_usd": 1117.351518073665,
+        "mll_breach_count": 0,
+        "mll_breach_rate": 0.0,
+        "net_median_usd": -298.48347273630134,
+        "net_total_usd": -918.7111363797885,
+        "pass_count": 0,
+        "pass_rate": 0.0,
+        "target_progress_median": -0.09949449091210044,
+        "target_progress_p25": -0.2577505063578477
+      }
+    },
+    {
+      "data_censored_start_count": 1,
+      "full_coverage_start_count": 1,
+      "horizon_trading_days": 20,
+      "normal": {
+        "all_passing_paths_consistency_compliant": false,
+        "consistency_compliance_rate": 1.0,
+        "episode_count": 1,
+        "minimum_mll_buffer_usd": 1257.649984456999,
+        "mll_breach_count": 0,
+        "mll_breach_rate": 0.0,
+        "net_median_usd": -742.3500155430011,
+        "net_total_usd": -742.3500155430011,
+        "pass_count": 0,
+        "pass_rate": 0.0,
+        "target_progress_median": -0.24745000518100035,
+        "target_progress_p25": -0.24745000518100035
+      },
+      "stressed": {
+        "all_passing_paths_consistency_compliant": false,
+        "consistency_compliance_rate": 1.0,
+        "episode_count": 1,
+        "minimum_mll_buffer_usd": 1250.899984456999,
+        "mll_breach_count": 0,
+        "mll_breach_rate": 0.0,
+        "net_median_usd": -749.1000155430011,
+        "net_total_usd": -749.1000155430011,
+        "pass_count": 0,
+        "pass_rate": 0.0,
+        "target_progress_median": -0.24970000518100036,
+        "target_progress_p25": -0.24970000518100036
+      }
+    }
+  ],
+  "completed_event_count": 17,
+  "contract_hash": "dc0f102668bce39ad5c9b176069f8ce9377a20edc15e3b1227c1e7fdf3e459f1",
+  "data_purchase_count": 0,
+  "decision": "KILL_Q3_REPLICATION_BRANCH_NO_PROMOTION",
+  "emitted_intent_count": 17,
+  "evidence_role": "FINAL_DEVELOPMENT_REPLICATION_NOT_TIER_C",
+  "evidence_tier_after": "Q_FAILED_REPLICATION",
+  "frozen_control_comparison": {
+    "g_control_gate_results": {
+      "block_concentration_le_75pct": true,
+      "final_development_evidence_hash_complete": true,
+      "identity_best_parent_reconciled": true,
+      "multiple_normal_and_stressed_passes": true,
+      "multiple_temporal_contexts": true,
+      "not_worse_than_median_synthetic_pass_count": true,
+      "not_worse_than_median_synthetic_stressed_net": false,
+      "synthetic_controls_complete_and_exposure_matched": true,
+      "tier_q_source": true,
+      "unique_ledger_day_trade_event_concentration_le_50pct": true
+    },
+    "g_control_ready": false,
+    "median_synthetic_stressed_net_usd": 13320.572369277797,
+    "median_synthetic_stressed_pass_count": 3.0,
+    "observed_stressed_net_usd": 4230.017942889834,
+    "observed_stressed_pass_count": 3,
+    "source_control_result_hash": "323cdb8808aca0de4bc435135cb24eeb74563a1ff441eeaf7dbc09144388c7d2"
+  },
+  "integer_quantity_tier": 3,
+  "orders": 0,
+  "promotion_status": null,
+  "q4_access_count_delta": 0,
+  "recalibration_performed": false,
+  "retuning_performed": false,
+  "schema": "hydra_tier_q_q3_replication_tripwire_v1",
+  "selected_horizon_trading_days": 5,
+  "source_full_result_hash": "ac7414b0cbc32b55bc54bee038421dd8fb676f19a3f48d84b27633168f5ef2a7",
+  "status": "FINAL_DEVELOPMENT_REPLICATION_CONSUMED_ONCE",
+  "tier_c_promoted": false,
+  "tier_g_gate": {
+    "checks": {
+      "q3_controlled_stressed_mll": true,
+      "q3_full_coverage": true,
+      "q3_normal_pass": false,
+      "q3_positive_stressed_net": true,
+      "q3_stressed_pass": false,
+      "q3_stressed_passing_consistency": false,
+      "source_all_g_controls_true": false,
+      "source_tier_q": true
+    },
+    "passed": false,
+    "reason": "TIER_G_REPLICATION_GATE_FAILED",
+    "tier_c_permitted": false
+  },
+  "tier_g_promoted": false
+}

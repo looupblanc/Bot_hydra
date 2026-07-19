@@ -1,0 +1,134 @@
+{
+  "anti_resurrection": {
+    "canonical_fingerprint_schema": "hydra_canonical_cross_asset_structure_v1",
+    "exact_mechanism_class_collision_count": 0,
+    "mechanism_classes_checked": [
+      "intraday_rates_shock_cross_asset_repricing",
+      "duration_direction_continuation",
+      "target_underreaction_catchup",
+      "target_overreaction_reversal"
+    ],
+    "resurrection_permitted": false,
+    "v71g5_cross_clock_speed_leadership": "EXPLICITLY_REVIEWED_NO_IDENTITY_MATCH"
+  },
+  "branch_id": "INTRADAY_RATES_SHOCK_CROSS_ASSET_REPRICING_TRIPWIRE_V1",
+  "calendar_reconciliation": {
+    "calendar_counts": {
+      "DISCOVERY": {
+        "MGC": 257,
+        "MNQ": 258
+      },
+      "FINAL_DEVELOPMENT": {
+        "MGC": 131,
+        "MNQ": 131
+      },
+      "VALIDATION": {
+        "MGC": 63,
+        "MNQ": 63
+      }
+    },
+    "coverage_audit_hash": "8befff598e3b62414f2a56ee1b4930812576d8393414081503851462b6e03930",
+    "planned_roll_zero_trade_market_day_count": 84,
+    "policy": "TRUE_TARGET_SESSIONS_COUNT_ELAPSED_TIME_INDEPENDENT_OF_ROLL_ELIGIBILITY",
+    "roll_unsafe_session_policy": "PRESERVED_AS_ZERO_TRADE",
+    "unplanned_data_censored_market_day_count": 1,
+    "unplanned_gaps": [
+      {
+        "affected_non_overlapping_starts": {
+          "P10": 1,
+          "P20": 1,
+          "P5": 1
+        },
+        "market": "MGC",
+        "reason": "SOURCE_SESSION_MISSING",
+        "session_day": 20230619,
+        "temporal_role": "DISCOVERY"
+      }
+    ],
+    "validation_and_final_development": "FULL_COVERAGE_BOTH_MARKETS"
+  },
+  "consistency_semantics": {
+    "corrected_runtime_predicate": "bool(passes) and all(path.consistency_ok for path in passes)",
+    "no_pass_value": "NOT_APPLICABLE_NO_PASS",
+    "original_no_pass_true_fields_are_promotion_evidence": false,
+    "vacuous_true_for_empty_pass_set_permitted": false
+  },
+  "correction_scope": {
+    "account_episode_count_delta": 0,
+    "account_paths_recomputed": false,
+    "audit_only": true,
+    "economic_replay_performed": false,
+    "existing_artifacts_rewritten": false,
+    "signals_recomputed": false,
+    "trades_recomputed": false
+  },
+  "created_at": "2026-07-19T14:25:40Z",
+  "final_development_gate_audit": {
+    "by_market": {
+      "MGC": {
+        "cell_count": 130,
+        "normal_pass_count": 0,
+        "stressed_pass_count": 0
+      },
+      "MNQ": {
+        "cell_count": 74,
+        "normal_pass_count": 0,
+        "stressed_pass_count": 0
+      }
+    },
+    "jointly_mll_tolerant_primary_cell_count": 204,
+    "mll_tolerance": 0.1,
+    "normal_pass_count_across_jointly_mll_tolerant_cells": 0,
+    "stressed_pass_count_across_jointly_mll_tolerant_cells": 0
+  },
+  "global_family_tombstone_authorized": false,
+  "implementation_bindings": {
+    "audit_module_path": "hydra/research/intraday_rates_shock_cross_asset_tripwire.py",
+    "audit_module_sha256": "a220a20a5fe10b9a07e1854801bac69d929c817b2919b1689837da0829120fe8",
+    "decision_card_file_sha256": "38a4a1a64fe8bdb796263cb814bc86e9b7c6cac22abf1e6dc614f3f6b020089d",
+    "decision_card_hash": "918b633ac7d37c10bb66f3dc96329ff02b9a072d311e5a267b1e5c5ec856e314",
+    "decision_card_path": "config/research/intraday_rates_shock_cross_asset_repricing_tripwire_v1.json",
+    "targeted_test_path": "tests/test_intraday_rates_shock_cross_asset_tripwire.py",
+    "targeted_test_result": "7_PASSED",
+    "targeted_test_sha256": "9993fada8529f31f4bcef7f5c072543e3b42aa929e0b6b01366b5eea77bc5912"
+  },
+  "interpretation": [
+    "The prior roll-compressed P5/P10/P20 paths were optimistic fast-horizon upper bounds because roll-unsafe target sessions did not consume elapsed account time.",
+    "No MLL-tolerant final-development primary cell recorded a normal or stressed pass even under that optimistic construction.",
+    "MNQ is therefore falsified as an optimistic fast-horizon upper bound for this exact grammar.",
+    "One MGC Discovery source session is unobservable, so MGC and the global family remain coverage-limited diagnostics rather than a global tombstone.",
+    "The original result is non-promotable and creates no Tier-Q candidate."
+  ],
+  "market_reclassification": {
+    "MGC": "COVERAGE_LIMITED_NO_SAFE_PASS_DIAGNOSTIC",
+    "MNQ": "OPTIMISTIC_FAST_HORIZON_UPPER_BOUND_FALSIFIED"
+  },
+  "next_action": "PRESERVE_NON_PROMOTABLE_DIAGNOSTIC_AND_CONTINUE_MATERIALLY_DISTINCT_ECONOMIC_BRANCH",
+  "overall_status": "COVERAGE_INCONCLUSIVE_NO_SAFE_PASS_DIAGNOSTIC",
+  "promotion_authorized": false,
+  "receipt_hash": "8907b83fa56fd3896ce42209ea7e9e313b01cdb8400559d56df76eb673625520",
+  "receipt_type": "APPEND_ONLY_COVERAGE_AND_SAFETY_REQUALIFICATION",
+  "safety": {
+    "broker_connections": 0,
+    "incremental_data_spend_usd": 0.0,
+    "orders": 0,
+    "q4_access_count_delta": 0,
+    "tier_q_created": 0
+  },
+  "schema": "hydra_intraday_rates_shock_coverage_requalification_receipt_v1",
+  "scientific_reclassification": "COVERAGE_LIMITED_NO_SAFE_PASS_DIAGNOSTIC",
+  "source_artifact_receipt": {
+    "file_sha256": "1c62eec5fcffdcc8f3e3ecb9123addb3717cc67442490397d44a4bf84127084c",
+    "logical_receipt_hash": "bd540344ef7d95790f2445b57633509364fce58e5b0534dd97940f6a9177908f",
+    "path": "reports/research_tripwires/intraday_rates_shock_cross_asset_repricing_v1/artifact_receipt.json"
+  },
+  "source_git_head": "df0356cd03b1de85afe3904e5072461dd64af0bd",
+  "source_result": {
+    "account_cell_count": 3456,
+    "account_episode_count": 106200,
+    "file_sha256": "6ee803d197b4a31330e8b341c0878f3b3c6b68150f31dee59da4e0624ee3aed8",
+    "logical_result_hash": "bd272c1041e5567352b1f1628f4e01ab41f4112e2a77bc6daa19a65cc0e2910d",
+    "original_status": "INTRADAY_RATES_SHOCK_CROSS_ASSET_REPRICING_FALSIFIED",
+    "path": "reports/research_tripwires/intraday_rates_shock_cross_asset_repricing_v1/intraday_rates_shock_result.json"
+  }
+}

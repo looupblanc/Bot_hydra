@@ -1,0 +1,197 @@
+{
+  "schema": "hydra_autonomous_decision_card_v1",
+  "decision_id": "INTRADAY_RATES_SHOCK_CROSS_ASSET_REPRICING_TRIPWIRE_V1",
+  "created_at_utc": "2026-07-19T12:00:00Z",
+  "selected_branch": "INTRADAY_RATES_SHOCK_CROSS_ASSET_REPRICING_TRIPWIRE_V1",
+  "hypothesis": "A decision-time shock in the US Treasury duration complex creates a short-lived, executable repricing lag or overshoot in Nasdaq and gold micros that can improve 5/10/20-day Combine paths.",
+  "strongest_argument_against": "Liquid futures may incorporate the common rates shock synchronously, leaving no post-decision edge after conservative micro-contract costs.",
+  "evi_scorecard": {
+    "expected_information_gain_per_compute_minute": 8.7,
+    "expected_economic_upside": 7.8,
+    "data_cost_penalty": 0.0,
+    "implementation_cost_penalty": 1.4,
+    "overfitting_risk_penalty": 3.5,
+    "deployment_risk_penalty": 1.5,
+    "estimated_runtime_minutes": 20,
+    "estimated_data_cost_usd": 0.0
+  },
+  "materially_distinct_from": {
+    "treasury_curve_relative_value": "This branch does not trade an intra-Treasury curve spread; Treasury is a causal state source and the executable legs are MNQ or MGC.",
+    "cl_to_ym_daily_transfer": "This branch uses intraday 5/15-minute duration shocks and next-minute execution, not a completed prior-session directional transfer.",
+    "scheduled_macro_release_clock": "This branch is event-triggered by observed duration displacement and uses no CPI, payroll or FOMC calendar identity.",
+    "legacy_synchronous_cross_ecology_macro_completion": "The tombstoned class used ES pre-open confirmation into GC/CL after the cash open; this branch uses Treasury duration shocks into MNQ/MGC at any eligible US-session minute.",
+    "generic_ohlcv_grammar": "The acquired explicit-contract Treasury duration plane was not present in the mass legacy OHLCV source bank."
+  },
+  "cemetery_audit": {
+    "graveyard_path": "mission/state/graveyard.db",
+    "graveyard_sha256_at_selection": "3b2a32cf0ee2ba474bf53be895b95da6e3b0768d77c73b28681e7fa5a2bd101a",
+    "exact_mechanism_class_collision_count": 0,
+    "mechanism_classes_checked": [
+      "intraday_rates_shock_cross_asset_repricing",
+      "duration_direction_continuation",
+      "target_underreaction_catchup",
+      "target_overreaction_reversal"
+    ],
+    "canonical_fingerprint_schema": "hydra_canonical_cross_asset_structure_v1",
+    "forbidden_canonical_structural_fingerprints": [],
+    "adjacent_tombstones_reviewed": [
+      "synchronous_cross_ecology_macro_completion",
+      "extreme_index_leadership_spread_reversion",
+      "intraday_index_breadth_catchup",
+      "cross_ecology_delayed_risk_transfer",
+      "v71g5_cross_clock_speed_leadership",
+      "CONTEMPORANEOUS_CROSS_MARKET_OPPORTUNITY_DENSITY_V1"
+    ],
+    "resurrection_permitted": false
+  },
+  "smallest_decisive_falsification_experiment": {
+    "source_market": "ZN",
+    "execution_markets": [
+      "MNQ",
+      "MGC"
+    ],
+    "source_path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zn_explicit_contract_ohlcv.parquet",
+    "source_sha256": "8347100a5ad0fbd7b5281278764300028ac94dd60823dbbc39fd4056b4926d45",
+    "target_paths": [
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2023-01-01_2024-01-01.parquet",
+        "sha256": "19be0a539802cd06fea20425ef14feca529fd60ece7e9eb5a88837e1d4e01862"
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-01-01_2024-03-31.parquet",
+        "sha256": "4540b7585caa2798998bd39a7d787c948f1f7c82f1d692e55118c4d4fffc5911"
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-04-01_2024-07-01.parquet",
+        "sha256": "c1af5bb43aa0ac5b83d9d7bab8d20b2ef52c97089f7acccc8d19231ce9e647dc"
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-07-01_2024-10-01.parquet",
+        "sha256": "97914227a87a5cd6b1c90f11de2061054a66f0a2b313f8120b8831af06b6c85e"
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_GC-v-0_MGC-v-0_2023-01-01_2024-10-01.parquet",
+        "sha256": "6bca31351820713016426286de8ae3ce9f0350b6886f780cccc5565fd65da78d"
+      }
+    ],
+    "roll_map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+    "roll_map_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+    "rule_snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "rule_snapshot_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "data_start_inclusive": "2023-01-03",
+    "data_end_exclusive": "2024-10-01",
+    "temporal_roles": {
+      "DISCOVERY": [
+        "2023-01-03",
+        "2024-01-01"
+      ],
+      "VALIDATION": [
+        "2024-01-01",
+        "2024-04-01"
+      ],
+      "FINAL_DEVELOPMENT": [
+        "2024-04-01",
+        "2024-10-01"
+      ]
+    },
+    "source_lookback_minutes": [
+      5,
+      15
+    ],
+    "source_shock_z_threshold": 2.0,
+    "prior_volatility_window_minutes": 240,
+    "mechanisms": [
+      "DURATION_DIRECTION_CONTINUATION",
+      "TARGET_UNDERREACTION_CATCHUP",
+      "TARGET_OVERREACTION_REVERSAL"
+    ],
+    "underreaction_ratio_maximum": 0.5,
+    "overreaction_ratio_minimum": 1.5,
+    "holding_minutes": [
+      15,
+      30,
+      60
+    ],
+    "eligible_chicago_clock": [
+      "07:00",
+      "14:00"
+    ],
+    "maximum_discovery_selected_rules": 6,
+    "maximum_one_rule_per_target_mechanism": true,
+    "horizons_trading_days": [
+      5,
+      10,
+      20
+    ],
+    "account_sizes": [
+      "50K",
+      "100K",
+      "150K"
+    ],
+    "quantity_frontiers": {
+      "MNQ": [
+        1,
+        2,
+        4,
+        8,
+        12,
+        16,
+        24,
+        32,
+        40,
+        50,
+        75,
+        100,
+        150
+      ],
+      "MGC": [
+        1,
+        2,
+        4,
+        8,
+        12,
+        16,
+        24,
+        30,
+        40,
+        60,
+        90
+      ]
+    },
+    "normal_all_in_cost_per_micro_usd": {
+      "MNQ": 3.0,
+      "MGC": 4.0
+    },
+    "stressed_all_in_cost_per_micro_usd": {
+      "MNQ": 4.5,
+      "MGC": 6.0
+    },
+    "matched_control": "DIRECTION_FLIP_ON_IDENTICAL_EVENTS",
+    "status_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+    "promotion_allowed": false,
+    "independent_confirmation_claimed": false,
+    "q4_access_allowed": false,
+    "data_purchase_allowed": false,
+    "broker_allowed": false,
+    "orders_allowed": false,
+    "maximum_cpu_workers": 1
+  },
+  "frozen_gate": {
+    "minimum_discovery_stressed_net_usd": 0.0,
+    "minimum_validation_stressed_net_usd": 0.0,
+    "minimum_final_stressed_net_usd": 0.0,
+    "minimum_final_normal_passes": 1,
+    "minimum_final_stressed_passes": 1,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "minimum_passing_temporal_blocks": 2,
+    "passing_consistency_required": true,
+    "must_beat_direction_flip": true,
+    "headline_horizons_trading_days": [
+      5,
+      10,
+      20
+    ]
+  },
+  "next_materially_distinct_alternative": "CROSS_ASSET_VOLATILITY_CONVEXITY_WITHOUT_DIRECTION_TRANSFER",
+  "card_hash": "918b633ac7d37c10bb66f3dc96329ff02b9a072d311e5a267b1e5c5ec856e314"
+}
