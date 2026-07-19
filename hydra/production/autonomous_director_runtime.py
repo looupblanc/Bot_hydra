@@ -5367,13 +5367,23 @@ def _state_payload(
             "exact_account_replay_count": 0,
         }
     )
-    selected = max(
+    event_control_policy_replay_count = (
+        1 + event_control_counts["control_count"] if event_control else 0
+    )
+    breadth_account_policy_replay_count = len(
+        breadth_continuation.get("account_results") or ()
+    )
+    post_confirmation_policy_replay_count = (
+        event_control_policy_replay_count + breadth_account_policy_replay_count
+    )
+    base_selected = max(
         int(exploration.get("selected_policy_count", 0)),
         int(exact_metrics["exact_account_replays"]),
     )
+    selected = base_selected + post_confirmation_policy_replay_count
     proposed = max(
-        int(exploration.get("eligible_policy_count", selected)), selected
-    )
+        int(exploration.get("eligible_policy_count", base_selected)), base_selected
+    ) + post_confirmation_policy_replay_count
     payload = {
         "schema": PRODUCTION_STATE_SCHEMA,
         "campaign_id": manifest["campaign_id"],
@@ -5394,8 +5404,7 @@ def _state_payload(
         "unique_policies_screened": selected,
         "exact_account_replays": (
             exact_metrics["exact_account_replays"]
-            + breadth_continuation_counts["exact_account_replay_count"]
-            + (1 + event_control_counts["control_count"] if event_control else 0)
+            + post_confirmation_policy_replay_count
         ),
         "control_policy_replay_operations": int(
             exact_metrics.get("control_policy_replay_operations", 0)
@@ -5509,6 +5518,9 @@ def _state_payload(
         "frozen_breadth_exact_account_replay_count": breadth_continuation_counts[
             "exact_account_replay_count"
         ],
+        "frozen_breadth_account_policy_replay_count": (
+            breadth_account_policy_replay_count
+        ),
         "frozen_breadth_normal_episode_count": breadth_continuation_counts[
             "normal_episode_count"
         ],
@@ -5693,6 +5705,9 @@ def _kpis(
         ),
         "frozen_breadth_exact_account_replay_count": int(
             state.get("frozen_breadth_exact_account_replay_count", 0)
+        ),
+        "frozen_breadth_account_policy_replay_count": int(
+            state.get("frozen_breadth_account_policy_replay_count", 0)
         ),
         "frozen_breadth_status": str(
             state.get("frozen_breadth_status", "NOT_RUN")

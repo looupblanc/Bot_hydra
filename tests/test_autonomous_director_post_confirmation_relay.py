@@ -51,6 +51,7 @@ def test_post_confirmation_counts_enter_state_once() -> None:
     assert state["normal_episodes_completed"] == 260
     assert state["stressed_episodes_completed"] == 260
     assert state["exact_account_replays"] == 4
+    assert state["unique_policies_screened"] == 4
     assert state["control_policy_replay_operations"] == 3
 
 
@@ -66,4 +67,3 @@ def test_frozen_breadth_paths_fail_closed_outside_repository() -> None:
 
     with pytest.raises(runtime.AutonomousDirectorRuntimeError, match="escapes"):
         runtime._frozen_breadth_manifest_paths(ROOT, manifest)
-
