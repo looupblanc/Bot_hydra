@@ -1,0 +1,354 @@
+{
+  "api_requests": [
+    {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "ohlcv-1m",
+      "start": "2023-01-03",
+      "stype_in": "continuous",
+      "symbols": [
+        "CL.c.1"
+      ]
+    },
+    {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "definition",
+      "start": "2023-01-03",
+      "stype_in": "continuous",
+      "symbols": [
+        "CL.c.1"
+      ]
+    }
+  ],
+  "authoritative_cumulative_cap_usd": 200.720719923081,
+  "broker_connections": 0,
+  "bundle_id": "20276ee521b4ab025d7b",
+  "completed_at_utc": "2026-07-19T15:03:29.805741+00:00",
+  "contract_hash": "13e6ef4e9e1974f4974899eb96a49c366e7822bc2646bd60ba711f40f172dff4",
+  "cumulative_actual_before_usd": 126.65222162083097,
+  "decision_card_hash": "92557d96f4984570e1a2a06ebb1f33ad9e142ee1328a4ba755c0a699474c979e",
+  "download_status": "DOWNLOADED",
+  "economic_outcomes_generated": false,
+  "execute": true,
+  "files": [
+    {
+      "kind": "RAW_DBN_OHLCV_1M",
+      "path": "/root/hydra-bot/data/cache/databento/cl_front_second_term_structure/20276ee521b4ab025d7b/raw_ohlcv_1m.dbn.zst",
+      "sha256": "08354c001a7b78a7b41a872d5044de1224e5b73ae23c83fb91b3a2ac5dc4c543",
+      "size_bytes": 8119912
+    },
+    {
+      "kind": "RAW_DBN_DEFINITION",
+      "path": "/root/hydra-bot/data/cache/databento/cl_front_second_term_structure/20276ee521b4ab025d7b/raw_definition.dbn.zst",
+      "sha256": "e6b96800d8d75efd4859afd4fc91c2ad36207ef950646f01e546a814dde839f5",
+      "size_bytes": 127558
+    },
+    {
+      "kind": "SYMBOLOGY_RESOLUTION",
+      "path": "/root/hydra-bot/data/cache/databento/cl_front_second_term_structure/20276ee521b4ab025d7b/symbology_resolution.json",
+      "sha256": "8cb30808a390e4140a052e6f26abf55ac21f10852d64a5c4c4ae6dae09d5885a",
+      "size_bytes": 4934
+    }
+  ],
+  "market_data_downloaded": true,
+  "official_estimates": {
+    "definition": {
+      "billable_size_bytes": 197280,
+      "estimated_cost_usd": 0.00031234324,
+      "record_count": 548
+    },
+    "ohlcv-1m": {
+      "billable_size_bytes": 31155096,
+      "estimated_cost_usd": 2.031081095338,
+      "record_count": 556341
+    }
+  },
+  "official_total_billable_bytes": 31352376,
+  "official_total_cost_usd": 2.031393438578,
+  "official_total_record_count": 556889,
+  "orders": 0,
+  "projected_cumulative_estimate_usd": 128.68361505940896,
+  "q4_access_count_delta": 0,
+  "raw_immutable": true,
+  "receipt_hash": "048337824527fddf660214b13582723f31f3a6c9a8a6e4627ad06919f6228add",
+  "request_hash": "ecf431248ddd87b2495c952b14a703e6f00005630f47ae402c364e7dff2fc260",
+  "runtime_or_manifest_modified": false,
+  "schema": "hydra_cl_term_structure_acquisition_receipt_v1",
+  "symbology": {
+    "continuous_mapping": {
+      "CL.c.0": [
+        {
+          "d0": "2023-01-03",
+          "d1": "2023-01-22",
+          "s": "255319"
+        },
+        {
+          "d0": "2023-01-22",
+          "d1": "2023-02-22",
+          "s": "701062"
+        },
+        {
+          "d0": "2023-02-22",
+          "d1": "2023-03-22",
+          "s": "478168"
+        },
+        {
+          "d0": "2023-03-22",
+          "d1": "2023-04-21",
+          "s": "285817"
+        },
+        {
+          "d0": "2023-04-21",
+          "d1": "2023-05-23",
+          "s": "43576"
+        },
+        {
+          "d0": "2023-05-23",
+          "d1": "2023-06-21",
+          "s": "679928"
+        },
+        {
+          "d0": "2023-06-21",
+          "d1": "2023-07-21",
+          "s": "487604"
+        },
+        {
+          "d0": "2023-07-21",
+          "d1": "2023-08-23",
+          "s": "264692"
+        },
+        {
+          "d0": "2023-08-23",
+          "d1": "2023-09-21",
+          "s": "72299"
+        },
+        {
+          "d0": "2023-09-21",
+          "d1": "2023-10-22",
+          "s": "710431"
+        },
+        {
+          "d0": "2023-10-22",
+          "d1": "2023-11-21",
+          "s": "215236"
+        },
+        {
+          "d0": "2023-11-21",
+          "d1": "2023-12-20",
+          "s": "78460"
+        },
+        {
+          "d0": "2023-12-20",
+          "d1": "2024-01-23",
+          "s": "686071"
+        },
+        {
+          "d0": "2024-01-23",
+          "d1": "2024-02-21",
+          "s": "463194"
+        },
+        {
+          "d0": "2024-02-21",
+          "d1": "2024-03-21",
+          "s": "270851"
+        },
+        {
+          "d0": "2024-03-21",
+          "d1": "2024-04-23",
+          "s": "109044"
+        },
+        {
+          "d0": "2024-04-23",
+          "d1": "2024-05-22",
+          "s": "320510"
+        },
+        {
+          "d0": "2024-05-22",
+          "d1": "2024-06-21",
+          "s": "200430"
+        },
+        {
+          "d0": "2024-06-21",
+          "d1": "2024-07-23",
+          "s": "36956"
+        },
+        {
+          "d0": "2024-07-23",
+          "d1": "2024-08-21",
+          "s": "585200"
+        },
+        {
+          "d0": "2024-08-21",
+          "d1": "2024-09-22",
+          "s": "392826"
+        },
+        {
+          "d0": "2024-09-22",
+          "d1": "2024-10-01",
+          "s": "230943"
+        }
+      ],
+      "CL.c.1": [
+        {
+          "d0": "2023-01-03",
+          "d1": "2023-01-22",
+          "s": "701062"
+        },
+        {
+          "d0": "2023-01-22",
+          "d1": "2023-02-22",
+          "s": "478168"
+        },
+        {
+          "d0": "2023-02-22",
+          "d1": "2023-03-22",
+          "s": "285817"
+        },
+        {
+          "d0": "2023-03-22",
+          "d1": "2023-04-21",
+          "s": "43576"
+        },
+        {
+          "d0": "2023-04-21",
+          "d1": "2023-05-23",
+          "s": "679928"
+        },
+        {
+          "d0": "2023-05-23",
+          "d1": "2023-06-21",
+          "s": "487604"
+        },
+        {
+          "d0": "2023-06-21",
+          "d1": "2023-07-21",
+          "s": "264692"
+        },
+        {
+          "d0": "2023-07-21",
+          "d1": "2023-08-23",
+          "s": "72299"
+        },
+        {
+          "d0": "2023-08-23",
+          "d1": "2023-09-21",
+          "s": "710431"
+        },
+        {
+          "d0": "2023-09-21",
+          "d1": "2023-10-22",
+          "s": "215236"
+        },
+        {
+          "d0": "2023-10-22",
+          "d1": "2023-11-21",
+          "s": "78460"
+        },
+        {
+          "d0": "2023-11-21",
+          "d1": "2023-12-20",
+          "s": "686071"
+        },
+        {
+          "d0": "2023-12-20",
+          "d1": "2024-01-23",
+          "s": "463194"
+        },
+        {
+          "d0": "2024-01-23",
+          "d1": "2024-02-21",
+          "s": "270851"
+        },
+        {
+          "d0": "2024-02-21",
+          "d1": "2024-03-21",
+          "s": "109044"
+        },
+        {
+          "d0": "2024-03-21",
+          "d1": "2024-04-23",
+          "s": "320510"
+        },
+        {
+          "d0": "2024-04-23",
+          "d1": "2024-05-22",
+          "s": "200430"
+        },
+        {
+          "d0": "2024-05-22",
+          "d1": "2024-06-21",
+          "s": "36956"
+        },
+        {
+          "d0": "2024-06-21",
+          "d1": "2024-07-23",
+          "s": "585200"
+        },
+        {
+          "d0": "2024-07-23",
+          "d1": "2024-08-21",
+          "s": "392826"
+        },
+        {
+          "d0": "2024-08-21",
+          "d1": "2024-09-22",
+          "s": "230943"
+        },
+        {
+          "d0": "2024-09-22",
+          "d1": "2024-10-01",
+          "s": "258644"
+        }
+      ]
+    },
+    "coverage": {
+      "CL.c.0": {
+        "end": "2024-10-01",
+        "gap_count": 0,
+        "interval_count": 22,
+        "overlap_count": 0,
+        "start": "2023-01-03"
+      },
+      "CL.c.1": {
+        "end": "2024-10-01",
+        "gap_count": 0,
+        "interval_count": 22,
+        "overlap_count": 0,
+        "start": "2023-01-03"
+      }
+    },
+    "cross_rank_boundary_interval_count": 22,
+    "dataset": "GLBX.MDP3",
+    "date_interval": "HALF_OPEN",
+    "end": "2024-10-01",
+    "mapping_hash": "6295ac0b3ebdaff2d7534bdefc79caa422c8f420be212fa4a026874fa37e5a01",
+    "q4_access_count_delta": 0,
+    "same_instrument_interval_count": 0,
+    "schema": "hydra_cl_term_structure_symbology_v1",
+    "start": "2023-01-03"
+  },
+  "temporal_roles": [
+    {
+      "candidate_modification_allowed": true,
+      "end": "2024-01-22",
+      "fraction": 0.6,
+      "role": "DISCOVERY",
+      "start": "2023-01-03"
+    },
+    {
+      "candidate_modification_allowed": false,
+      "end": "2024-05-28",
+      "fraction": 0.2,
+      "role": "VALIDATION",
+      "start": "2024-01-22"
+    },
+    {
+      "candidate_modification_allowed": false,
+      "end": "2024-10-01",
+      "fraction": 0.2,
+      "role": "FINAL_DEVELOPMENT",
+      "start": "2024-05-28"
+    }
+  ]
+}
