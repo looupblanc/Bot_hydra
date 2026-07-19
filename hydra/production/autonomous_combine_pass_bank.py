@@ -22,6 +22,7 @@ SCHEMA = "hydra_autonomous_combine_pass_observed_development_bank_v1"
 MINIMUM_BANK_TARGET = 50
 MAXIMUM_BANK_CAPACITY = 100
 HORIZONS = (5, 10, 20)
+MAXIMUM_TIER_Q_MLL_BREACH_RATE = 0.10
 
 
 class AutonomousCombinePassBankError(RuntimeError):
@@ -56,6 +57,11 @@ def build_autonomous_combine_pass_observed_bank(
     _require_read_only_source(marginal_books, "marginal book composite")
 
     eligible: list[dict[str, Any]] = []
+    tier_q_component_ids = {
+        str(value.get("candidate_id") or "")
+        for value in candidate_bank.get("candidates", ())
+        if value.get("tier_q_contract_cleared") is True
+    }
     exact_observed_count = 0
     for value in candidate_bank.get("candidates", ()):
         row = _standalone_entry(value, candidate_bank)
@@ -70,7 +76,15 @@ def build_autonomous_combine_pass_observed_bank(
         if has_pass and value.get("marginally_accepted") is not True:
             rejected_non_marginal_pass_book_count += 1
             continue
-        row = _book_entry(value, marginal_books) if has_pass else None
+        row = (
+            _book_entry(
+                value,
+                marginal_books,
+                tier_q_component_ids=tier_q_component_ids,
+            )
+            if has_pass
+            else None
+        )
         if row is not None:
             accepted_book_count += 1
             eligible.append(row)
@@ -173,6 +187,15 @@ def build_autonomous_combine_pass_observed_bank(
         "deduplication": {
             "policy_spec_hash_unique": True,
             "episode_behavior_hash_unique": True,
+            "behavior_contract": "CANONICAL_ACCOUNT_EPISODE_SUMMARIES_V1",
+            "excluded_identity_metadata": [
+                "policy_id",
+                "policy_spec_hash",
+                "component_ids",
+                "legacy_episode_path_hash",
+                "legacy_episode_receipt_hash",
+                "source_metadata",
+            ],
             "exclusions": exclusions,
         },
         "evidence_role": "VIEWED_DEVELOPMENT_ONLY",
@@ -205,22 +228,18 @@ def _standalone_entry(
         "normal_and_stressed_same_cell"
     )):
         return None
-    cell = dict(value.get("best_observed_pass_cell") or {})
+    tier_q = value.get("tier_q_contract_cleared") is True
+    selected_cell_key = "best_safe_cell" if tier_q else "best_observed_pass_cell"
+    cell = dict(value.get(selected_cell_key) or {})
     if not _cell_has_paired_pass(cell):
         raise AutonomousCombinePassBankError(
-            "standalone paired-pass flag has no paired exact pass cell"
+            f"standalone paired-pass flag has no valid {selected_cell_key}"
         )
     candidate_id = _required(value, "candidate_id")
     policy_spec_hash = _required(value, "candidate_fingerprint")
     normal_hash = _required(dict(cell.get("normal") or {}), "episode_path_hash")
     stressed_hash = _required(
         dict(cell.get("stressed") or {}), "episode_path_hash"
-    )
-    behavior_hash = stable_hash(
-        {
-            "normal_episode_path_hash": normal_hash,
-            "stressed_episode_path_hash": stressed_hash,
-        }
     )
     horizon = int(cell.get("horizon_trading_days", 0))
     if horizon not in HORIZONS:
@@ -236,7 +255,12 @@ def _standalone_entry(
         "held_out_development": None,
         "held_out_status": "NOT_SEPARATELY_AVAILABLE_IN_COMPACT_EXACT_BANK",
     }
-    tier = "Q" if value.get("tier_q_contract_cleared") is True else "E"
+    behavior_hash = _canonical_episode_behavior_hash(
+        account_label=str(cell.get("account_label") or ""),
+        account_size_usd=cell.get("account_size_usd"),
+        horizons=horizons,
+    )
+    tier = "Q" if tier_q else "E"
     return _entry_core(
         policy_id=candidate_id,
         source_kind="EXACT_STANDALONE",
@@ -251,11 +275,13 @@ def _standalone_entry(
             "held_out_development_blocks": None,
             "held_out_partition_available": False,
         },
+        tier_q_gate_results=dict(value.get("tier_q_gate_results") or {}),
         policy_spec_hash=policy_spec_hash,
         episode_behavior_hash=behavior_hash,
         source_episode_receipt_hashes=[normal_hash, stressed_hash],
         source_result_hash=_required(value, "source_exact_result_hash"),
         extra_fingerprints={
+            "primary_evidence_cell": selected_cell_key,
             "realized_behavioral_fingerprint": value.get(
                 "realized_behavioral_fingerprint"
             ),
@@ -268,7 +294,10 @@ def _standalone_entry(
 
 
 def _book_entry(
-    value: Mapping[str, Any], source: Mapping[str, Any]
+    value: Mapping[str, Any],
+    source: Mapping[str, Any],
+    *,
+    tier_q_component_ids: set[str],
 ) -> dict[str, Any]:
     if value.get("authoritative_promotion_status") is not None or any(
         int(value.get(key, 0) or 0)
@@ -300,10 +329,19 @@ def _book_entry(
     ):
         raise AutonomousCombinePassBankError("included book has no paired pass")
     role = dict(value.get("selection_role_contract") or {})
-    tier = (
-        "Q"
-        if str(value.get("computed_development_tier") or "").startswith("Q")
-        else "E"
+    components = [str(item) for item in value.get("component_ids", ())]
+    q_gates = _recalculate_book_tier_q_gates(
+        value,
+        horizons=horizons,
+        components=components,
+        tier_q_component_ids=tier_q_component_ids,
+        evidence=evidence,
+    )
+    tier = "Q" if all(q_gates.values()) else "E"
+    behavior_hash = _canonical_episode_behavior_hash(
+        account_label=str(value.get("account_label") or ""),
+        account_size_usd=_account_size(str(value.get("account_label") or "")),
+        horizons=horizons,
     )
     return _entry_core(
         policy_id=policy_id,
@@ -311,7 +349,7 @@ def _book_entry(
         tier=tier,
         account_label=str(value.get("account_label") or ""),
         account_size_usd=_account_size(str(value.get("account_label") or "")),
-        components=[str(item) for item in value.get("component_ids", ())],
+        components=components,
         horizons=horizons,
         role_contract={
             "overall_role": str(source.get("evidence_role") or ""),
@@ -321,11 +359,13 @@ def _book_entry(
             ),
             "held_out_partition_available": True,
         },
+        tier_q_gate_results=q_gates,
         policy_spec_hash=spec_hash,
-        episode_behavior_hash=receipt_hash,
+        episode_behavior_hash=behavior_hash,
         source_episode_receipt_hashes=[receipt_hash],
         source_result_hash=_required(value, "result_hash"),
         extra_fingerprints={
+            "source_episode_receipt_hash": receipt_hash,
             "component_set_hash": stable_hash(sorted(value.get("component_ids", ()))),
             "governor_profile_id": value.get("governor_profile_id"),
             "marginal_contribution_hash": stable_hash(
@@ -333,6 +373,111 @@ def _book_entry(
             ),
         },
     )
+
+
+def _recalculate_book_tier_q_gates(
+    value: Mapping[str, Any],
+    *,
+    horizons: Mapping[str, Any],
+    components: Sequence[str],
+    tier_q_component_ids: set[str],
+    evidence: Mapping[str, Any],
+) -> dict[str, bool]:
+    safe_pairs = []
+    for horizon in HORIZONS:
+        pair = dict(dict(horizons.get(str(horizon)) or {}).get("overall") or {})
+        stressed = dict(pair.get("stressed") or {})
+        if (
+            _pair_has_pass(pair)
+            and float(stressed.get("net_total_usd") or -math.inf) > 0.0
+            and stressed.get("mll_breach_rate") is not None
+            and float(stressed["mll_breach_rate"])
+            <= MAXIMUM_TIER_Q_MLL_BREACH_RATE
+            and all(
+                int(dict(pair.get(scenario) or {}).get("episode_count") or 0) > 0
+                for scenario in ("normal", "stressed")
+            )
+        ):
+            safe_pairs.append(pair)
+    accounting_valid = bool(
+        int(evidence.get("record_count") or 0) > 0
+        and evidence.get("receipt_hash")
+        and int(value.get("completed_episode_count") or 0)
+        == int(evidence.get("record_count") or 0)
+        and value.get("signal_recomputation_performed") is False
+        and value.get("quantity_tiers_materialized_before_book_replay") is True
+        and value.get("additional_quantity_scaling") is False
+    )
+    return {
+        "causal_accounting_valid": accounting_valid,
+        "positive_stressed_economics": bool(safe_pairs),
+        "acceptable_mll": bool(safe_pairs),
+        "useful_target_velocity": bool(safe_pairs),
+        "tier_q_components_only": bool(
+            components
+            and all(component in tier_q_component_ids for component in components)
+        ),
+        "compact_evidence_bundle_complete": bool(
+            value.get("policy_spec_hash")
+            and evidence.get("receipt_hash")
+            and safe_pairs
+        ),
+        "behavioral_uniqueness_enforced_by_bank": True,
+    }
+
+
+def _canonical_episode_behavior_hash(
+    *,
+    account_label: str,
+    account_size_usd: Any,
+    horizons: Mapping[str, Any],
+) -> str:
+    """Hash policy-independent episode outcomes available in compact evidence.
+
+    Legacy episode/path receipts include ``policy_id`` and component metadata.
+    They remain recorded as provenance, but are deliberately excluded from the
+    behavioural identity.  This conservative compact canonicalisation can
+    merge economically identical policies even when their legacy receipt
+    hashes differ.
+    """
+
+    canonical_horizons: dict[str, Any] = {}
+    for horizon in HORIZONS:
+        value = dict(horizons.get(str(horizon)) or {})
+        overall = value.get("overall")
+        heldout = value.get("held_out_development")
+        if overall is None and heldout is None:
+            continue
+        canonical_horizons[str(horizon)] = {
+            "overall": _canonical_pair(dict(overall or {})),
+            "held_out_development": (
+                _canonical_pair(dict(heldout))
+                if isinstance(heldout, Mapping)
+                else None
+            ),
+        }
+    if not account_label or not canonical_horizons:
+        raise AutonomousCombinePassBankError(
+            "canonical episode behaviour lacks account or horizon evidence"
+        )
+    return stable_hash(
+        {
+            "account_label": account_label,
+            "account_size_usd": account_size_usd,
+            "horizons": canonical_horizons,
+        }
+    )
+
+
+def _canonical_pair(value: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        scenario: {
+            key: item
+            for key, item in dict(value.get(scenario) or {}).items()
+            if key != "episode_path_hash"
+        }
+        for scenario in ("normal", "stressed")
+    }
 
 
 def _entry_core(
@@ -345,6 +490,7 @@ def _entry_core(
     components: Sequence[str],
     horizons: Mapping[str, Any],
     role_contract: Mapping[str, Any],
+    tier_q_gate_results: Mapping[str, Any],
     policy_spec_hash: str,
     episode_behavior_hash: str,
     source_episode_receipt_hashes: Sequence[str],
@@ -367,9 +513,14 @@ def _entry_core(
         "components": list(components),
         "horizons": dict(horizons),
         "evidence_roles": dict(role_contract),
+        "tier_q_gate_results": dict(tier_q_gate_results),
+        "tier_q_contract_cleared": tier == "Q",
         "fingerprints": {
             "policy_spec_hash": policy_spec_hash,
             "episode_behavior_hash": episode_behavior_hash,
+            "episode_behavior_hash_contract": (
+                "CANONICAL_ACCOUNT_EPISODE_SUMMARIES_V1"
+            ),
             "source_episode_receipt_hashes": list(source_episode_receipt_hashes),
             "source_result_hash": source_result_hash,
             **dict(extra_fingerprints),
@@ -437,6 +588,7 @@ def _pair_has_pass(value: Mapping[str, Any]) -> bool:
 def _compact_scenario(value: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "episode_count": _first(value, "episode_count"),
+        "requested_start_count": _first(value, "requested_start_count"),
         "full_coverage_start_count": _first(value, "full_coverage_start_count"),
         "data_censored_count": _first(
             value, "data_censored_count", "data_censored_start_count"
@@ -455,8 +607,35 @@ def _compact_scenario(value: Mapping[str, Any]) -> dict[str, Any]:
         ),
         "target_progress_p25": _first(value, "target_progress_p25"),
         "target_progress_median": _first(value, "target_progress_median"),
+        "target_progress_p75": _first(value, "target_progress_p75"),
         "median_days_to_target": _first(value, "median_days_to_target"),
+        "accepted_event_count": _first(value, "accepted_event_count"),
+        "skipped_event_count": _first(value, "skipped_event_count"),
+        "best_day_concentration_max": _first(
+            value, "best_day_concentration_max"
+        ),
+        "maximum_mini_equivalent_max": _first(
+            value, "maximum_mini_equivalent_max"
+        ),
+        "maximum_mini_equivalent_mean": _first(
+            value, "maximum_mini_equivalent_mean"
+        ),
+        "maximum_net_directional_exposure_max": _first(
+            value, "maximum_net_directional_exposure_max"
+        ),
+        "maximum_net_directional_exposure_mean": _first(
+            value, "maximum_net_directional_exposure_mean"
+        ),
+        "mean_daily_contract_utilization": _first(
+            value, "mean_daily_contract_utilization"
+        ),
+        "mean_daily_maximum_mini_equivalent": _first(
+            value, "mean_daily_maximum_mini_equivalent"
+        ),
+        "terminal_distribution": dict(value.get("terminal_distribution") or {}),
+        "block_pass_counts": dict(value.get("block_pass_counts") or {}),
         "blocks_with_passes": list(value.get("blocks_with_passes") or ()),
+        "single_trade_domination": _first(value, "single_trade_domination"),
         "episode_path_hash": value.get("episode_path_hash"),
     }
 

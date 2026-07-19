@@ -43,7 +43,146 @@ def test_design_ranking_is_invariant_to_heldout_outcomes() -> None:
             summary["maximum_positive_session_day_aggregate_share"] = 1.0
 
     assert direct._design_rank(poisoned) == left
+    design_day_share_only = deepcopy(stronger)
+    design_day_share_only["summaries_by_role"]["DESIGN"]["STRESSED_1_5X"]["5"][
+        "maximum_positive_session_day_aggregate_share"
+    ] = 0.99
+    assert direct._design_rank(design_day_share_only) == left
     assert direct._design_rank(stronger) > direct._design_rank(weaker)
+
+
+def test_direct_policy_contribution_uses_design_only_and_requires_real_uplift() -> None:
+    identity = _fake_result(_spec("candidate", "identity_no_governor_v1"), None)
+    stronger = _fake_result(_spec("candidate", "consistency_direct_02"), None)
+
+    receipt = direct._direct_policy_contribution(stronger, identity)
+    assert all(receipt["gate_results"].values())
+    assert receipt["material_improvements"]
+    assert receipt["material_degradations"] == []
+    assert receipt["held_out_fields_used"] is False
+
+    poisoned = deepcopy(stronger)
+    for scenario in books.SCENARIOS:
+        for horizon in books.HORIZONS:
+            poisoned["summaries_by_role"]["HELD_OUT_DEVELOPMENT"][scenario][
+                str(horizon)
+            ]["net_total"] = -1_000_000.0
+            poisoned["summaries_by_role"]["HELD_OUT_DEVELOPMENT"][scenario][
+                str(horizon)
+            ]["pass_count"] = 0
+    assert direct._direct_policy_contribution(poisoned, identity) == receipt
+
+    identical = _fake_result(
+        _spec("candidate", "identity_equivalent_governor"), None
+    )
+    identical_receipt = direct._direct_policy_contribution(identical, identity)
+    assert identical_receipt["gate_results"] == {
+        "direct_policy_behavior_distinct_from_identity_on_b1_b2": False,
+        "direct_policy_material_design_uplift_vs_identity": False,
+        "direct_policy_no_material_design_degradation_vs_identity": True,
+    }
+
+    day_share_only = deepcopy(identity)
+    day_share_only["policy_id"] = "day-share-only"
+    day_share_only["summaries_by_role"]["DESIGN"]["STRESSED_1_5X"]["5"][
+        "maximum_positive_session_day_aggregate_share"
+    ] = 0.99
+    day_receipt = direct._direct_policy_contribution(day_share_only, identity)
+    assert day_receipt["gate_results"] == {
+        "direct_policy_behavior_distinct_from_identity_on_b1_b2": False,
+        "direct_policy_material_design_uplift_vs_identity": False,
+        "direct_policy_no_material_design_degradation_vs_identity": True,
+    }
+    assert day_receipt["material_improvements"] == []
+    assert day_receipt["material_degradations"] == []
+    assert day_receipt["diagnostics"] == {
+        "positive_session_day_aggregate_share_delta": pytest.approx(0.59),
+        "qualification": "OVERLAPPING_START_AGGREGATE_NOT_INDEPENDENT_CONCENTRATION",
+        "used_for_material_uplift": False,
+        "used_for_material_degradation": False,
+        "independent_concentration_control": "DEFERRED",
+    }
+
+
+def test_build_never_marks_identity_equivalent_governor_g_precontrol(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    bank = _bank(("q-a",))
+    context = _context(("q-a",))
+    composite = {"result_hash": bank["source_composite_result_hash"]}
+    monkeypatch.setattr(
+        books,
+        "_verified_exact_results",
+        lambda _initial, _continuations: (composite, ()),
+    )
+    monkeypatch.setattr(books, "_prepare_replay_context", lambda *a, **k: context)
+    monkeypatch.setattr(books, "_verify_context_matches_bank", lambda *a, **k: None)
+
+    def identity_equivalent(
+        spec: dict[str, object], replay_context: object
+    ) -> dict[str, object]:
+        forced = deepcopy(spec)
+        forced["governor_profile"] = {"profile_id": "consistency_direct_02"}
+        value = _fake_result(forced, replay_context)
+        value["policy_id"] = spec["policy_id"]
+        value["policy_spec_hash"] = spec["policy_spec_hash"]
+        value["governor_profile_id"] = spec["governor_profile"]["profile_id"]
+        value["result_hash"] = stable_hash(
+            {key: item for key, item in value.items() if key != "result_hash"}
+        )
+        return value
+
+    monkeypatch.setattr(books, "_evaluate_policy_spec", identity_equivalent)
+
+    result = direct.build_autonomous_consistency_account_policies(".", bank, {})
+    selected = result["selected_policy_results"][0]
+
+    assert selected["g_precontrol_ready"] is False
+    assert result["counts"]["g_precontrol_ready_count"] == 0
+    assert result["counts"]["direct_policy_contribution_cleared_count"] == 0
+    assert selected["g_precontrol_gate_results"][
+        "direct_policy_behavior_distinct_from_identity_on_b1_b2"
+    ] is False
+    assert selected["g_precontrol_gate_results"][
+        "direct_policy_material_design_uplift_vs_identity"
+    ] is False
+    assert "no_single_day_domination" not in selected["g_precontrol_gate_results"]
+    assert selected["g_precontrol_gate_results"][
+        "independent_day_concentration_control_deferred"
+    ] is True
+    assert selected["overlapping_start_day_share_diagnostic"]["qualification"] == (
+        "OVERLAPPING_START_AGGREGATE_NOT_INDEPENDENT_CONCENTRATION"
+    )
+    assert selected["overlapping_start_day_share_diagnostic"][
+        "used_for_g_precontrol"
+    ] is False
+
+
+def test_direct_policy_contribution_rejects_materially_worse_governor() -> None:
+    identity = _fake_result(_spec("candidate", "identity_no_governor_v1"), None)
+    worse = deepcopy(identity)
+    worse["policy_id"] = "worse-policy"
+    worse["policy_spec_hash"] = "worse-spec"
+    stressed5 = worse["summaries_by_role"]["DESIGN"]["STRESSED_1_5X"]["5"]
+    stressed5["pass_count"] = 0
+    stressed5["pass_rate"] = 0.0
+    stressed5["net_total"] = float(stressed5["net_total"]) - 500.0
+    stressed5["target_progress_p25"] = (
+        float(stressed5["target_progress_p25"]) - 0.10
+    )
+
+    receipt = direct._direct_policy_contribution(worse, identity)
+
+    assert receipt["gate_results"][
+        "direct_policy_behavior_distinct_from_identity_on_b1_b2"
+    ] is True
+    assert receipt["gate_results"][
+        "direct_policy_material_design_uplift_vs_identity"
+    ] is False
+    assert receipt["gate_results"][
+        "direct_policy_no_material_design_degradation_vs_identity"
+    ] is False
+    assert receipt["material_degradations"]
 
 
 def test_two_shards_are_deterministic_disjoint_and_composable(
@@ -78,6 +217,12 @@ def test_two_shards_are_deterministic_disjoint_and_composable(
     assert left_ids.isdisjoint(right_ids)
     assert left_ids | right_ids == set(whole["tier_q_component_ids"])
     assert whole["counts"]["direct_policy_exact_replay_count"] == 18
+    assert whole["counts"]["direct_policy_contribution_cleared_count"] == 3
+    assert all(
+        row["governor_profile_id"] == "consistency_direct_02"
+        and all(row["direct_policy_contribution"]["gate_results"].values())
+        for row in whole["selected_policy_results"]
+    )
     assert whole["counts"]["authoritative_promotion_count"] == 0
     assert whole["counts"]["xfa_paths_started"] == 0
 
@@ -288,12 +433,14 @@ def _fake_result(spec: dict[str, object], _context: object) -> dict[str, object]
 def _summary(
     *, component_id: str, pass_rate: float, blocks: tuple[str, ...]
 ) -> dict[str, object]:
+    pass_count = max(int(round(pass_rate * 10)), 0)
+    passed_blocks = list(blocks[: min(pass_count, len(blocks))])
     return {
         "requested_start_count": 10,
         "episode_count": 10,
         "full_coverage_start_count": 10,
         "data_censored_count": 0,
-        "pass_count": 2,
+        "pass_count": pass_count,
         "pass_rate": pass_rate,
         "net_total": 3_000.0,
         "net_median": 300.0,
@@ -304,13 +451,13 @@ def _summary(
         "mll_breach_rate": 0.0,
         "minimum_mll_buffer": 1_000.0,
         "consistency_rate": 0.5,
-        "passing_episode_count": 2,
+        "passing_episode_count": pass_count,
         "passing_consistency_rate": 1.0,
         "all_passing_paths_consistency_compliant": True,
         "passing_best_day_concentration_max": 0.50,
         "median_days_to_target": 5.0,
-        "block_pass_counts": {block: 1 for block in blocks},
-        "blocks_with_passes": list(blocks),
+        "block_pass_counts": {block: 1 for block in passed_blocks},
+        "blocks_with_passes": passed_blocks,
         "component_contribution": {component_id: 3_000.0},
         "best_day_concentration_max": 1_000.0,
         "maximum_positive_session_day_aggregate_share": 0.40,

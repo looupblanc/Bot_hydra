@@ -148,11 +148,13 @@ def test_g_gate_uses_passing_path_consistency_not_timeout_ratio() -> None:
     gates = books._g_ready_gates(compact)
 
     assert gates["all_passing_paths_consistency_compliant"] is True
-    assert gates["no_single_day_domination"] is True
+    assert gates[
+        "daily_concentration_deferred_to_authoritative_unique_ledger_control"
+    ] is True
     assert gates["trade_concentration_deferred_to_authoritative_control"] is True
 
 
-def test_g_gate_detects_unique_session_day_profit_domination() -> None:
+def test_g_gate_does_not_treat_overlapping_session_day_summary_as_authoritative() -> None:
     passed = _summary_episode(
         passed=True,
         consistency_ok=True,
@@ -201,7 +203,10 @@ def test_g_gate_detects_unique_session_day_profit_domination() -> None:
     gates = books._g_ready_gates(compact)
 
     assert gates["all_passing_paths_consistency_compliant"] is True
-    assert gates["no_single_day_domination"] is False
+    assert summary["maximum_positive_session_day_aggregate_share"] > 0.50
+    assert gates[
+        "daily_concentration_deferred_to_authoritative_unique_ledger_control"
+    ] is True
 
 
 def test_passing_path_consistency_invariant_fails_closed() -> None:

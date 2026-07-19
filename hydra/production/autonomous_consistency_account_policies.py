@@ -33,6 +33,10 @@ SCHEMA = "hydra_autonomous_consistency_direct_account_policies_v1"
 COMPOSITE_SCHEMA = "hydra_autonomous_consistency_direct_account_policy_shards_v1"
 MAXIMUM_PROFILES = 6
 MAXIMUM_CANDIDATES = 64
+MATERIAL_TARGET_PROGRESS_DELTA = 0.01
+MATERIAL_NET_DELTA_FLOOR_USD = 50.0
+MATERIAL_NET_DELTA_FRACTION = 0.01
+MATERIAL_MLL_RATE_DELTA = 0.01
 
 
 class AutonomousConsistencyAccountPolicyError(RuntimeError):
@@ -215,7 +219,10 @@ def build_autonomous_consistency_account_policies(
             alternatives.append(compact)
             profile_results.append(compact)
 
-        chosen = max(alternatives, key=_design_rank)
+        chosen = max(
+            alternatives,
+            key=lambda row: _direct_policy_selection_rank(row, baseline),
+        )
         selected = dict(chosen)
         selected["design_selection"] = _design_selection_receipt(
             chosen, alternatives, baseline
@@ -223,7 +230,18 @@ def build_autonomous_consistency_account_policies(
         selected["identity_control_comparison"] = _control_comparison(
             chosen, baseline
         )
+        contribution = _direct_policy_contribution(chosen, baseline)
+        selected["direct_policy_contribution"] = contribution
         gates = books._g_ready_gates(selected, singleton=True)
+        overlapping_day_gate = gates.pop("no_single_day_domination", None)
+        selected["overlapping_start_day_share_diagnostic"] = (
+            _overlapping_start_day_share_diagnostic(
+                selected,
+                legacy_gate_result=overlapping_day_gate,
+            )
+        )
+        gates["independent_day_concentration_control_deferred"] = True
+        gates.update(dict(contribution["gate_results"]))
         selected["g_precontrol_gate_results"] = gates
         selected["g_precontrol_ready"] = all(gates.values())
         selected["computed_development_tier"] = (
@@ -241,6 +259,11 @@ def build_autonomous_consistency_account_policies(
         str(row["policy_id"])
         for row in selected_results
         if row["g_precontrol_ready"] is True
+    )
+    contribution_ids = sorted(
+        str(row["policy_id"])
+        for row in selected_results
+        if all(dict(row["direct_policy_contribution"]["gate_results"]).values())
     )
     core: dict[str, Any] = {
         "schema": SCHEMA,
@@ -267,6 +290,10 @@ def build_autonomous_consistency_account_policies(
             ),
             "profile_selection_uses": "B1_B2_ONLY",
             "g_precontrol_evaluation_uses": "B3_B4_ONLY",
+            "direct_policy_contribution_evaluation_uses": "B1_B2_ONLY",
+            "direct_policy_requires_material_uplift_vs_identity": True,
+            "direct_policy_requires_distinct_design_behavior_vs_identity": True,
+            "direct_policy_forbids_material_design_degradation_vs_identity": True,
             "profile_maximum": MAXIMUM_PROFILES,
             "candidate_maximum": int(maximum_candidates),
             "no_signal_recomputation": True,
@@ -308,6 +335,7 @@ def build_autonomous_consistency_account_policies(
                 for row in profile_results + baseline_results
             ),
             "g_precontrol_ready_count": len(ready_ids),
+            "direct_policy_contribution_cleared_count": len(contribution_ids),
             "authoritative_promotion_count": 0,
             "xfa_paths_started": 0,
             "registry_writes": 0,
@@ -316,7 +344,10 @@ def build_autonomous_consistency_account_policies(
             "orders": 0,
             **books._pass_counters(selected_results),
         },
-        "candidate_ids": {"g_precontrol_ready": ready_ids},
+        "candidate_ids": {
+            "g_precontrol_ready": ready_ids,
+            "direct_policy_contribution_cleared": contribution_ids,
+        },
         "evidence_role": "VIEWED_DEVELOPMENT_ONLY",
         "promotion_status": None,
         "independent_confirmation_claimed": False,
@@ -418,6 +449,11 @@ def compose_autonomous_consistency_account_policy_shards(
         for row in ordered_selected
         if row["g_precontrol_ready"] is True
     )
+    contribution_ids = sorted(
+        str(row["policy_id"])
+        for row in ordered_selected
+        if all(dict(row["direct_policy_contribution"]["gate_results"]).values())
+    )
     counts = {
         "tier_q_input_count": int(dict(values[0]["counts"])["tier_q_input_count"]),
         "b1_b2_executable_candidate_count": len(inventory_ids),
@@ -436,6 +472,7 @@ def compose_autonomous_consistency_account_policy_shards(
             for row in ordered_profiles + ordered_baseline
         ),
         "g_precontrol_ready_count": len(ready_ids),
+        "direct_policy_contribution_cleared_count": len(contribution_ids),
         "authoritative_promotion_count": 0,
         "xfa_paths_started": 0,
         "registry_writes": 0,
@@ -469,7 +506,10 @@ def compose_autonomous_consistency_account_policy_shards(
         "profile_results": ordered_profiles,
         "selected_policy_results": ordered_selected,
         "counts": counts,
-        "candidate_ids": {"g_precontrol_ready": ready_ids},
+        "candidate_ids": {
+            "g_precontrol_ready": ready_ids,
+            "direct_policy_contribution_cleared": contribution_ids,
+        },
         "evidence_role": "VIEWED_DEVELOPMENT_ONLY",
         "promotion_status": None,
         "independent_confirmation_claimed": False,
@@ -491,10 +531,6 @@ def _design_rank(row: Mapping[str, Any]) -> tuple[Any, ...]:
         normal5.get("all_passing_paths_consistency_compliant", False)
         and stressed5.get("all_passing_paths_consistency_compliant", False)
     )
-    day_share = max(
-        float(normal5.get("maximum_positive_session_day_aggregate_share", 1.0)),
-        float(stressed5.get("maximum_positive_session_day_aggregate_share", 1.0)),
-    )
     mll = max(
         float(normal5.get("mll_breach_rate", 1.0)),
         float(stressed5.get("mll_breach_rate", 1.0)),
@@ -507,20 +543,35 @@ def _design_rank(row: Mapping[str, Any]) -> tuple[Any, ...]:
         float(stressed5.get("net_total", 0.0)) > 0.0,
         mll <= 0.10,
         passing_consistency,
-        day_share <= 0.50,
     )
     return (
         sum(gate_bits),
         int(passing_consistency),
-        int(day_share <= 0.50),
         int(mll <= 0.10),
         float(stressed5.get("pass_rate", 0.0)),
         float(normal5.get("pass_rate", 0.0)),
         float(stressed10.get("pass_rate", 0.0)),
         float(stressed5.get("target_progress_p25", 0.0)),
         float(stressed5.get("net_total", 0.0)),
-        -day_share,
         str(row["policy_id"]),
+    )
+
+
+def _direct_policy_selection_rank(
+    row: Mapping[str, Any], identity: Mapping[str, Any]
+) -> tuple[Any, ...]:
+    """Rank B1/B2 governors by honest contribution before absolute fitness."""
+
+    receipt = _direct_policy_contribution(row, identity)
+    gates = dict(receipt["gate_results"])
+    return (
+        int(all(gates.values())),
+        int(gates["direct_policy_no_material_design_degradation_vs_identity"]),
+        int(gates["direct_policy_material_design_uplift_vs_identity"]),
+        int(gates["direct_policy_behavior_distinct_from_identity_on_b1_b2"]),
+        len(receipt["material_improvements"]),
+        -len(receipt["material_degradations"]),
+        *_design_rank(row),
     )
 
 
@@ -538,6 +589,10 @@ def _design_selection_receipt(
         "selection_blocks": list(books.DESIGN_BLOCKS),
         "profile_policy_ids": sorted(str(row["policy_id"]) for row in alternatives),
         "design_rank": list(_design_rank(chosen)),
+        "direct_contribution_rank": list(
+            _direct_policy_selection_rank(chosen, baseline)
+        ),
+        "identity_is_control_not_promotable_direct_policy": True,
         "b3_b4_fields_used": False,
         "aggregate_summary_fields_used": False,
     }
@@ -568,6 +623,195 @@ def _control_comparison(
             ),
         }
     return output
+
+
+def _direct_policy_contribution(
+    candidate: Mapping[str, Any], baseline: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Require honest B1/B2 marginal value over the identity governor.
+
+    A singleton account governor is not exempt from marginal-contribution
+    evidence merely because sleeve membership did not change.  The governor
+    must produce a distinct design trajectory, improve at least one material
+    account metric, and avoid material degradation of the remaining frozen
+    metrics.  Held-out B3/B4 fields are intentionally absent from this receipt.
+    """
+
+    if tuple(candidate.get("component_ids") or ()) != tuple(
+        baseline.get("component_ids") or ()
+    ):
+        raise AutonomousConsistencyAccountPolicyError(
+            "direct policy and identity control do not share sleeve membership"
+        )
+    candidate_design = dict(
+        dict(candidate.get("summaries_by_role") or {}).get("DESIGN") or {}
+    )
+    baseline_design = dict(
+        dict(baseline.get("summaries_by_role") or {}).get("DESIGN") or {}
+    )
+    candidate_behavior_hash = stable_hash(
+        _design_behavior_projection(candidate_design)
+    )
+    baseline_behavior_hash = stable_hash(_design_behavior_projection(baseline_design))
+
+    rows: dict[str, tuple[Mapping[str, Any], Mapping[str, Any]]] = {}
+    for scenario in books.SCENARIOS:
+        for horizon in (5, 10):
+            key = f"{scenario}_{horizon}D"
+            rows[key] = (
+                _role_horizon_summary(candidate, "DESIGN", scenario, horizon),
+                _role_horizon_summary(baseline, "DESIGN", scenario, horizon),
+            )
+
+    metric_deltas: dict[str, Any] = {}
+    material_improvements: list[str] = []
+    material_degradations: list[str] = []
+    for key, (left, right) in rows.items():
+        pass_count_delta = int(left.get("pass_count", 0)) - int(
+            right.get("pass_count", 0)
+        )
+        pass_rate_delta = float(left.get("pass_rate", 0.0)) - float(
+            right.get("pass_rate", 0.0)
+        )
+        metric_deltas[f"{key}_pass_count"] = pass_count_delta
+        metric_deltas[f"{key}_pass_rate"] = pass_rate_delta
+        if pass_count_delta > 0:
+            material_improvements.append(f"{key}_PASS_COUNT")
+        elif pass_count_delta < 0:
+            material_degradations.append(f"{key}_PASS_COUNT")
+
+    stressed5, identity_stressed5 = rows["STRESSED_1_5X_5D"]
+    target_progress_delta = float(
+        stressed5.get("target_progress_p25", 0.0)
+    ) - float(identity_stressed5.get("target_progress_p25", 0.0))
+    net_delta = float(stressed5.get("net_total", 0.0)) - float(
+        identity_stressed5.get("net_total", 0.0)
+    )
+    net_materiality = max(
+        MATERIAL_NET_DELTA_FLOOR_USD,
+        abs(float(identity_stressed5.get("net_total", 0.0)))
+        * MATERIAL_NET_DELTA_FRACTION,
+    )
+    mll_delta = float(stressed5.get("mll_breach_rate", 1.0)) - float(
+        identity_stressed5.get("mll_breach_rate", 1.0)
+    )
+    day_share_delta = float(
+        stressed5.get("maximum_positive_session_day_aggregate_share", 1.0)
+    ) - float(
+        identity_stressed5.get(
+            "maximum_positive_session_day_aggregate_share", 1.0
+        )
+    )
+    metric_deltas.update(
+        {
+            "STRESSED_1_5X_5D_target_progress_p25": target_progress_delta,
+            "STRESSED_1_5X_5D_net_usd": net_delta,
+            "STRESSED_1_5X_5D_mll_breach_rate": mll_delta,
+            "STRESSED_1_5X_5D_positive_day_share": day_share_delta,
+        }
+    )
+    if target_progress_delta >= MATERIAL_TARGET_PROGRESS_DELTA:
+        material_improvements.append("STRESSED_1_5X_5D_TARGET_PROGRESS_P25")
+    elif target_progress_delta < -MATERIAL_TARGET_PROGRESS_DELTA:
+        material_degradations.append("STRESSED_1_5X_5D_TARGET_PROGRESS_P25")
+    if net_delta >= net_materiality:
+        material_improvements.append("STRESSED_1_5X_5D_NET")
+    elif net_delta < -net_materiality:
+        material_degradations.append("STRESSED_1_5X_5D_NET")
+    if mll_delta <= -MATERIAL_MLL_RATE_DELTA:
+        material_improvements.append("STRESSED_1_5X_5D_MLL")
+    elif mll_delta > MATERIAL_MLL_RATE_DELTA:
+        material_degradations.append("STRESSED_1_5X_5D_MLL")
+    gates = {
+        "direct_policy_behavior_distinct_from_identity_on_b1_b2": (
+            candidate_behavior_hash != baseline_behavior_hash
+        ),
+        "direct_policy_material_design_uplift_vs_identity": bool(
+            material_improvements
+        ),
+        "direct_policy_no_material_design_degradation_vs_identity": not bool(
+            material_degradations
+        ),
+    }
+    core = {
+        "schema": "hydra_consistency_direct_identity_contribution_v1",
+        "source_candidate_id": str(candidate.get("source_candidate_id") or ""),
+        "candidate_policy_id": str(candidate["policy_id"]),
+        "identity_control_policy_id": str(baseline["policy_id"]),
+        "design_blocks": list(books.DESIGN_BLOCKS),
+        "held_out_fields_used": False,
+        "candidate_design_behavior_hash": candidate_behavior_hash,
+        "identity_design_behavior_hash": baseline_behavior_hash,
+        "materiality_thresholds": {
+            "target_progress_p25_delta": MATERIAL_TARGET_PROGRESS_DELTA,
+            "net_delta_floor_usd": MATERIAL_NET_DELTA_FLOOR_USD,
+            "net_delta_fraction_of_identity": MATERIAL_NET_DELTA_FRACTION,
+            "realized_net_delta_threshold_usd": net_materiality,
+            "mll_breach_rate_delta": MATERIAL_MLL_RATE_DELTA,
+            "pass_count_delta": 1,
+        },
+        "metric_deltas": metric_deltas,
+        "diagnostics": {
+            "positive_session_day_aggregate_share_delta": day_share_delta,
+            "qualification": (
+                "OVERLAPPING_START_AGGREGATE_NOT_INDEPENDENT_CONCENTRATION"
+            ),
+            "used_for_material_uplift": False,
+            "used_for_material_degradation": False,
+            "independent_concentration_control": "DEFERRED",
+        },
+        "material_improvements": sorted(material_improvements),
+        "material_degradations": sorted(material_degradations),
+        "gate_results": gates,
+    }
+    return {**core, "contribution_hash": stable_hash(core)}
+
+
+def _design_behavior_projection(
+    design: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Exclude the overlapping-start day-share diagnostic from behavior gates."""
+
+    output: dict[str, Any] = {}
+    for scenario, raw_horizons in design.items():
+        horizons: dict[str, Any] = {}
+        for horizon, raw_summary in dict(raw_horizons or {}).items():
+            summary = dict(raw_summary or {})
+            summary.pop("maximum_positive_session_day_aggregate_share", None)
+            horizons[str(horizon)] = summary
+        output[str(scenario)] = horizons
+    return output
+
+
+def _overlapping_start_day_share_diagnostic(
+    row: Mapping[str, Any], *, legacy_gate_result: Any
+) -> dict[str, Any]:
+    normal = _role_horizon_summary(
+        row, "HELD_OUT_DEVELOPMENT", "NORMAL", 5
+    )
+    stressed = _role_horizon_summary(
+        row, "HELD_OUT_DEVELOPMENT", "STRESSED_1_5X", 5
+    )
+    core = {
+        "schema": "hydra_overlapping_start_day_share_diagnostic_v1",
+        "role": "HELD_OUT_DEVELOPMENT",
+        "horizon_trading_days": 5,
+        "normal_maximum_positive_session_day_aggregate_share": float(
+            normal.get("maximum_positive_session_day_aggregate_share", 0.0)
+        ),
+        "stressed_maximum_positive_session_day_aggregate_share": float(
+            stressed.get("maximum_positive_session_day_aggregate_share", 0.0)
+        ),
+        "legacy_gate_result": legacy_gate_result,
+        "qualification": (
+            "OVERLAPPING_START_AGGREGATE_NOT_INDEPENDENT_CONCENTRATION"
+        ),
+        "used_for_profile_selection": False,
+        "used_for_direct_policy_contribution": False,
+        "used_for_g_precontrol": False,
+        "independent_concentration_control": "DEFERRED",
+    }
+    return {**core, "diagnostic_hash": stable_hash(core)}
 
 
 def _verify_shard(value: Mapping[str, Any]) -> dict[str, Any]:
@@ -655,12 +899,17 @@ def _empty_result(
             "direct_policy_exact_replay_count": 0,
             "identity_control_exact_replay_count": 0,
             "g_precontrol_ready_count": 0,
+            "direct_policy_contribution_cleared_count": 0,
             "authoritative_promotion_count": 0,
             "xfa_paths_started": 0,
             "registry_writes": 0,
             "database_writes": 0,
             "broker_connections": 0,
             "orders": 0,
+        },
+        "candidate_ids": {
+            "g_precontrol_ready": [],
+            "direct_policy_contribution_cleared": [],
         },
         "promotion_status": None,
         "evidence_role": "VIEWED_DEVELOPMENT_ONLY",

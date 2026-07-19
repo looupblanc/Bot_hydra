@@ -17,10 +17,21 @@ from hydra.production.autonomous_marginal_combine_books import COMPOSITE_SCHEMA
 
 def test_real_capacity_shape_keeps_46_exacts_and_four_marginal_books() -> None:
     exacts = [
-        _exact_candidate(f"exact-{index:02d}", tier_q=index < 24)
+        _exact_candidate(
+            f"exact-{index:02d}",
+            tier_q=index < 24,
+            economic_offset=float(index),
+        )
         for index in range(46)
     ]
-    books = [_book(f"book-{index:02d}") for index in range(4)]
+    books = [
+        _book(
+            f"book-{index:02d}",
+            components=["exact-00", "exact-01"],
+            behavior_offset=float(index),
+        )
+        for index in range(4)
+    ]
 
     bank = build_autonomous_combine_pass_observed_bank(
         _candidate_bank(exacts), _marginal_composite(books)
@@ -103,8 +114,8 @@ def test_passes_in_different_horizons_do_not_create_a_paired_book_pass() -> None
 
 
 def test_duplicate_episode_behavior_retains_the_tier_q_policy() -> None:
-    lower = _exact_candidate("a-tier-e", tier_q=False, behavior="same")
-    higher = _exact_candidate("z-tier-q", tier_q=True, behavior="same")
+    lower = _exact_candidate("a-tier-e", tier_q=False, behavior="first-receipt")
+    higher = _exact_candidate("z-tier-q", tier_q=True, behavior="second-receipt")
 
     bank = build_autonomous_combine_pass_observed_bank(
         _candidate_bank([lower, higher]), _marginal_composite([])
@@ -124,6 +135,76 @@ def test_duplicate_episode_behavior_retains_the_tier_q_policy() -> None:
     ]
 
 
+def test_book_receipt_and_policy_metadata_do_not_define_behavior() -> None:
+    candidates = [
+        _exact_candidate("component-a"),
+        _exact_candidate("component-b"),
+    ]
+    first = _book(
+        "book-a", components=["component-a", "component-b"]
+    )
+    second = _book(
+        "book-b", components=["component-a", "component-b"]
+    )
+
+    bank = build_autonomous_combine_pass_observed_bank(
+        _candidate_bank(candidates), _marginal_composite([first, second])
+    )
+
+    retained_books = [
+        row
+        for row in bank["policies"]
+        if row["source_kind"] == "MARGINALLY_ACCEPTED_BOOK"
+    ]
+    assert [row["policy_id"] for row in retained_books] == ["book-a"]
+    exclusion = next(
+        row
+        for row in bank["deduplication"]["exclusions"]
+        if row["policy_id"] == "book-b"
+    )
+    assert exclusion["reason"] == "DUPLICATE_EPISODE_BEHAVIOR"
+
+
+def test_book_tier_q_is_recalculated_and_not_inferred_from_source_label() -> None:
+    source_candidate = _exact_candidate("known-q")
+    unsupported = _book(
+        "unsupported",
+        components=["unknown-a", "unknown-b"],
+        behavior_offset=1.0,
+    )
+    supported = _book("supported", components=["known-q"])
+
+    bank = build_autonomous_combine_pass_observed_bank(
+        _candidate_bank([source_candidate]),
+        _marginal_composite([unsupported, supported]),
+    )
+    by_id = {row["policy_id"]: row for row in bank["policies"]}
+
+    assert by_id["unsupported"]["evidence_tier"] == "E"
+    assert by_id["unsupported"]["tier_q_gate_results"][
+        "tier_q_components_only"
+    ] is False
+    assert by_id["supported"]["evidence_tier"] == "Q"
+
+
+def test_tier_q_standalone_uses_best_safe_cell_as_primary_evidence() -> None:
+    candidate = _exact_candidate("candidate-q")
+    observed = deepcopy(candidate["best_observed_pass_cell"])
+    observed["horizon_trading_days"] = 5
+    observed["normal"]["net_total_usd"] = 99_999.0
+    candidate["best_observed_pass_cell"] = observed
+
+    bank = build_autonomous_combine_pass_observed_bank(
+        _candidate_bank([candidate]), _marginal_composite([])
+    )
+    row = bank["policies"][0]
+
+    assert row["evidence_tier"] == "Q"
+    assert row["fingerprints"]["primary_evidence_cell"] == "best_safe_cell"
+    assert row["horizons"]["10"]["normal_and_stressed_pass_observed"] is True
+    assert row["horizons"]["5"]["overall"] is None
+
+
 def test_hash_drift_and_invalid_capacity_fail_closed() -> None:
     source = _candidate_bank([_exact_candidate("candidate")])
     drifted = deepcopy(source)
@@ -140,7 +221,11 @@ def test_hash_drift_and_invalid_capacity_fail_closed() -> None:
 
 
 def _exact_candidate(
-    candidate_id: str, *, tier_q: bool = True, behavior: str | None = None
+    candidate_id: str,
+    *,
+    tier_q: bool = True,
+    behavior: str | None = None,
+    economic_offset: float = 0.0,
 ) -> dict[str, object]:
     behavior = behavior or candidate_id
     cell = {
@@ -152,8 +237,8 @@ def _exact_candidate(
         "horizon_trading_days": 10,
         "full_coverage_start_count": 20,
         "data_censored_start_count": 0,
-        "normal": _scenario("normal", behavior),
-        "stressed": _scenario("stressed", behavior),
+        "normal": _scenario("normal", behavior, economic_offset),
+        "stressed": _scenario("stressed", behavior, economic_offset),
         "cell_hash": f"cell-{candidate_id}",
     }
     return {
@@ -171,7 +256,9 @@ def _exact_candidate(
     }
 
 
-def _scenario(scenario: str, behavior: str) -> dict[str, object]:
+def _scenario(
+    scenario: str, behavior: str, economic_offset: float
+) -> dict[str, object]:
     return {
         "episode_count": 20,
         "pass_count": 2,
@@ -179,7 +266,7 @@ def _scenario(scenario: str, behavior: str) -> dict[str, object]:
         "mll_breach_count": 0,
         "mll_breach_rate": 0.0,
         "consistency_compliance_rate": 0.80,
-        "net_total_usd": 5_000.0,
+        "net_total_usd": 5_000.0 + economic_offset,
         "net_median_usd": 100.0,
         "target_progress_p25": -0.10,
         "target_progress_median": 0.30,
@@ -189,10 +276,16 @@ def _scenario(scenario: str, behavior: str) -> dict[str, object]:
     }
 
 
-def _book(policy_id: str, *, marginally_accepted: bool = True) -> dict[str, object]:
+def _book(
+    policy_id: str,
+    *,
+    marginally_accepted: bool = True,
+    components: list[str] | None = None,
+    behavior_offset: float = 0.0,
+) -> dict[str, object]:
     summaries = {
         scenario: {
-            str(horizon): _book_scenario(scenario, horizon)
+            str(horizon): _book_scenario(scenario, horizon, behavior_offset)
             for horizon in (5, 10, 20)
         }
         for scenario in ("NORMAL", "STRESSED_1_5X")
@@ -205,7 +298,8 @@ def _book(policy_id: str, *, marginally_accepted: bool = True) -> dict[str, obje
         "policy_id": policy_id,
         "policy_spec_hash": f"book-spec-{policy_id}",
         "account_label": "50K",
-        "component_ids": [f"component-a-{policy_id}", f"component-b-{policy_id}"],
+        "component_ids": components
+        or [f"component-a-{policy_id}", f"component-b-{policy_id}"],
         "marginally_accepted": marginally_accepted,
         "marginal_contribution": {"accepted": marginally_accepted},
         "computed_development_tier": "Q_BOOK_DIAGNOSTIC",
@@ -214,6 +308,10 @@ def _book(policy_id: str, *, marginally_accepted: bool = True) -> dict[str, obje
             "record_count": 144,
             "receipt_hash": f"episode-receipt-{policy_id}",
         },
+        "completed_episode_count": 144,
+        "signal_recomputation_performed": False,
+        "quantity_tiers_materialized_before_book_replay": True,
+        "additional_quantity_scaling": False,
         "summaries": summaries,
         "summaries_by_role": roles,
         "selection_role_contract": {
@@ -228,14 +326,16 @@ def _book(policy_id: str, *, marginally_accepted: bool = True) -> dict[str, obje
     return _self_hashed(core)
 
 
-def _book_scenario(scenario: str, horizon: int) -> dict[str, object]:
+def _book_scenario(
+    scenario: str, horizon: int, behavior_offset: float
+) -> dict[str, object]:
     return {
         "episode_count": 20,
         "full_coverage_start_count": 20,
         "data_censored_count": 0,
         "pass_count": 1,
         "pass_rate": 0.05,
-        "net_total": 1_000.0,
+        "net_total": 1_000.0 + behavior_offset,
         "net_median": 50.0,
         "mll_breach_count": 0,
         "mll_breach_rate": 0.0,

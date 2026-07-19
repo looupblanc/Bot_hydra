@@ -426,13 +426,15 @@ def test_post_composite_metrics_add_unique_book_evidence_denominators() -> None:
                 "book_results": [book],
                 "counts": {
                     "completed_episode_count": 12,
+                    "primary_book_exact_replay_count": 1,
                     "supporting_policy_exact_replay_count": 3,
                 },
             },
         }
     )
 
-    assert metrics["exact_account_replays"] == 5
+    assert metrics["exact_account_replays"] == 3
+    assert metrics["control_policy_replay_operations"] == 3
     assert metrics["exact_account_episode_replays"] == 32
     assert metrics["normal_account_replays"] == 16
     assert metrics["stressed_account_replays"] == 16
@@ -487,7 +489,8 @@ def test_post_book_metrics_include_consistency_direct_exact_work() -> None:
         }
     )
 
-    assert metrics["exact_account_replays"] == 5
+    assert metrics["exact_account_replays"] == 4
+    assert metrics["control_policy_replay_operations"] == 1
     assert metrics["exact_account_episode_replays"] == 44
     assert metrics["normal_account_replays"] == 22
     assert metrics["stressed_account_replays"] == 22

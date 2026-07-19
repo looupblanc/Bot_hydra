@@ -1533,22 +1533,11 @@ def _g_ready_gates(
             and stressed5.get("all_passing_paths_consistency_compliant", False)
         ),
         "passes_in_two_held_out_blocks": len(passed_blocks) >= 2,
-        # This is a held-out economic-concentration control, distinct from the
-        # Topstep pass rule above.  It groups rolling-path observations by the
-        # actual session day before computing that day's positive-profit share.
-        # A near-zero-net timeout can therefore no longer manufacture an
-        # arbitrarily large best_day/net ratio and block every policy.
-        "no_single_day_domination": max(
-            float(
-                normal5.get("maximum_positive_session_day_aggregate_share", 1.0)
-            ),
-            float(
-                stressed5.get(
-                    "maximum_positive_session_day_aggregate_share", 1.0
-                )
-            ),
-        )
-        <= 0.50,
+        # Rolling starts reuse a given session day with different account
+        # histories.  Summing those observations is a useful diagnostic but is
+        # not an independent daily-concentration oracle.  The authoritative
+        # gate must therefore run on the canonical unique trade/day ledger.
+        "daily_concentration_deferred_to_authoritative_unique_ledger_control": True,
         # No trade-level claim is made from the account-summary daily rows.
         # Exact trade concentration remains mandatory before authoritative
         # promotion, while this read-only result remains a pre-control gate.

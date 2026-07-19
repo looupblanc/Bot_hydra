@@ -2966,7 +2966,7 @@ def _exact_result_metrics(
                 stressed_pass_ids.add(candidate_id)
         book_normal_rates: list[float] = []
         book_stressed_rates: list[float] = []
-        positive_stressed_book_ids: set[str] = set()
+        positive_stressed_policy_ids: set[str] = set(stressed_pass_ids)
         for book in marginal_books.get("book_results") or ():
             policy_id = str(book.get("policy_id") or "")
             summaries = dict(book.get("summaries") or {})
@@ -2979,7 +2979,7 @@ def _exact_result_metrics(
             if any(int(row.get("pass_count", 0)) > 0 for row in stressed_rows):
                 stressed_pass_ids.add(policy_id)
             if any(float(row.get("net_total", 0.0)) > 0.0 for row in stressed_rows):
-                positive_stressed_book_ids.add(policy_id)
+                positive_stressed_policy_ids.add(policy_id)
             book_normal_rates.extend(
                 float(row.get("pass_rate", 0.0)) for row in normal_rows
             )
@@ -3000,7 +3000,7 @@ def _exact_result_metrics(
             if any(int(row.get("pass_count", 0)) > 0 for row in stressed_rows):
                 stressed_pass_ids.add(policy_id)
             if any(float(row.get("net_total", 0.0)) > 0.0 for row in stressed_rows):
-                positive_stressed_book_ids.add(policy_id)
+                positive_stressed_policy_ids.add(policy_id)
             direct_normal_rates.extend(
                 float(row.get("pass_rate", 0.0)) for row in normal_rows
             )
@@ -3016,7 +3016,7 @@ def _exact_result_metrics(
         normal_episodes += book_episode_count // 2
         stressed_episodes += book_episode_count // 2
         total_episodes += book_episode_count
-        selected += int(book_counts.get("supporting_policy_exact_replay_count", 0))
+        selected += int(book_counts.get("primary_book_exact_replay_count", 0))
         direct_counts = dict(consistency_direct.get("counts") or {})
         direct_episode_count = int(direct_counts.get("completed_episode_count", 0))
         if direct_episode_count % 2:
@@ -3027,7 +3027,10 @@ def _exact_result_metrics(
         stressed_episodes += direct_episode_count // 2
         total_episodes += direct_episode_count
         selected += int(direct_counts.get("direct_policy_exact_replay_count", 0))
-        selected += int(direct_counts.get("identity_control_exact_replay_count", 0))
+        positive_stressed_policy_ids.update(stressed_pass_ids)
+        control_replay_operations = int(
+            book_counts.get("supporting_policy_exact_replay_count", 0)
+        ) + int(direct_counts.get("identity_control_exact_replay_count", 0))
         best = composite.get("best_exact_frontier_point")
         normal_best = max(
             float(((best or {}).get("normal") or {}).get("pass_rate", 0.0)),
@@ -3052,7 +3055,8 @@ def _exact_result_metrics(
             "stressed_account_replays": stressed_episodes,
             "normal_pass_candidate_count": len(normal_pass_ids),
             "stressed_pass_candidate_count": len(stressed_pass_ids),
-            "positive_stressed_candidate_count": len(positive_stressed_book_ids),
+            "positive_stressed_candidate_count": len(positive_stressed_policy_ids),
+            "control_policy_replay_operations": control_replay_operations,
             "best_normal_pass_rate": normal_best,
             "best_stressed_pass_rate": stressed_best,
             "median_normal_pass_rate": (
@@ -3119,6 +3123,7 @@ def _exact_result_metrics(
         "normal_pass_candidate_count": len(normal_pass_ids),
         "stressed_pass_candidate_count": len(stressed_pass_ids),
         "positive_stressed_candidate_count": len(positive_stressed_ids),
+        "control_policy_replay_operations": 0,
         "best_normal_pass_rate": max(normal_rates, default=0.0),
         "best_stressed_pass_rate": max(stressed_rates, default=0.0),
         "median_normal_pass_rate": statistics.median(normal_rates)
@@ -3174,6 +3179,9 @@ def _state_payload(
         "policies_proposed": max(proposed, selected),
         "unique_policies_screened": selected,
         "exact_account_replays": exact_metrics["exact_account_replays"],
+        "control_policy_replay_operations": int(
+            exact_metrics.get("control_policy_replay_operations", 0)
+        ),
         "combine_episodes_completed": (
             exact_metrics["normal_account_replays"]
             + exact_metrics["stressed_account_replays"]
@@ -3262,6 +3270,9 @@ def _kpis(
         "policies_proposed": proposed,
         "unique_policies_screened": screened,
         "exact_account_replays": exact,
+        "control_policy_replay_operations": int(
+            state.get("control_policy_replay_operations", 0)
+        ),
         "combine_episodes_completed": episodes,
         "normal_episodes_completed": int(state["normal_episodes_completed"]),
         "stressed_episodes_completed": int(state["stressed_episodes_completed"]),
