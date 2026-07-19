@@ -706,8 +706,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "e91140872c043e9ac6c0fe466c627e9188923c35",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-external-acquisition-safety-reconciled-2026-07-19"
+      "worm_commit": "babcd0777be812d3f043c50bc6197d1a8455908f",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-post-breadth-evidence-relays-2026-07-19"
     }
   ],
   "governance": {
@@ -717,7 +717,7 @@
     "q4_access_allowed": false
   },
   "issued_at_utc": "2026-07-19T12:28:12Z",
-  "queue_hash": "e09968e2c265570938eedce2ccff74ea7341245eb8ab44c4023bef39eedf4194",
+  "queue_hash": "35d7f522827a57a6bd5c6d04679c8312167fad41c78eef9ce119db49710bb9b5",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
