@@ -61,6 +61,7 @@
   "campaign_mode": "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR",
   "class_id": "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR_V1",
   "compatible_artifact_manifest_hashes": [
+    "56d24b5cc5c858019623fed8bd4dc275b072a64edc97017e376e919a10ab9903",
     "3fea73c0dab408fe02dfeb020c465947f175d1c1161a16afa4a85469a5e4c738",
     "f468e25e5ab466f108d92fd050cb0053e4c573489b4f60bd709f98701553ef1e",
     "e2a02b1732b4310c3b482e515baffb22d53068e64b474e43e64be8cc0bf1c886",
@@ -217,11 +218,13 @@
     "hydra/production/autonomous_director_manifest.py": "066997f1bb9dc7fe64843614ab5814b2c3008bdd868d876e6a1ae14ab04b7ca3",
     "hydra/production/autonomous_combine_candidate_bank.py": "ad73ddd66fb225a9dd56ff54b1127dc078acb0a6cf9557643d959644790d9ebe",
     "hydra/production/autonomous_consistency_account_policies.py": "5e8e1fe841b42036e43337099df15fb1339369305660fca4ef4feeab00a18e39",
-    "hydra/production/autonomous_director_runtime.py": "25eac8f5b90d0ba9488d72839383cb9d71047417ddaa8676695292cee98dada9",
+    "hydra/production/autonomous_director_runtime.py": "f6a21062610473584900aff45241070601927550b783a847770a1a0fd803cb7f",
     "hydra/production/autonomous_event_time_safety_frontier.py": "c2212fd4b0115e33fec64c7d566f4a0876e858781e946b3dd42c375a0408a20e",
     "hydra/production/autonomous_exact_continuation.py": "c28380ff75986c4bc99dbc225d01dbbc1f93ceae380997843ad841247350b1c8",
     "hydra/production/autonomous_exact_replay.py": "63aa48c5933aface3f677cce7dc53861ab1d0d7c6532e90acc0f9e61647e6236",
     "hydra/production/autonomous_marginal_combine_books.py": "460ac6292946c1a0fa2329bd28826ca693f0777d56b69cf65c21e176524619ed",
+    "hydra/production/autonomous_tier_g_controls.py": "5ae17b32b463eff000c4c39ef2428c4b34e1f58bfabbda7be1245a862e3f5d8e",
+    "hydra/production/autonomous_tier_g_graduation.py": "9f53075c544f42870dd01e38f1094c925b54291cdfc4bd09034d64732cd3b069",
     "hydra/production/fast_pass_runtime_helpers.py": "c86298e82c5ac02dbd7806a4bb4c9ac4acd74dcbd64e8be3b37d252fb082e52e",
     "hydra/production/graduated_xfa_relay.py": "85f9236a501632a893140fc8f37173fe84633f073c0ba6949dc6fa8183bdc643",
     "hydra/production/manifest.py": "eee4abb753f336f167f35c0e2bf9a0bb7f0fa2cc15494d0a1ee9ac5d110ea599",
@@ -229,7 +232,7 @@
     "hydra/production/v71_event_time_account_exploration.py": "6695ee682198cf784a6644202758d2fa31b45b47956c483d180ac0c1c7ad7acb",
     "scripts/run_economic_production_manifest.py": "45e610a35ae5a260e628bc73fcd23634362c6cef0298707b2e6e97ff8762cc6f"
   },
-  "manifest_hash": "56d24b5cc5c858019623fed8bd4dc275b072a64edc97017e376e919a10ab9903",
+  "manifest_hash": "4cf67a330f5387aa7824f428dd1f7f1e9a29c2e62614a3640ae5642c7f87c1a6",
   "mission_state_contract": {
     "create_new_reporting_framework": false,
     "decision_ledger_append_only": true,
@@ -370,6 +373,22 @@
     "scientific_policy_changed": false,
     "shared_execution_or_accounting_semantics_changed": false
   },
+  "post_checkpoint_tier_g_graduation_relay": {
+    "additional_manifest_count": 0,
+    "additional_multiplicity_reserved": false,
+    "candidate_control_count": 5,
+    "classification": "MASTER_CONTRACT_UNIQUE_LEDGER_TIER_G_DEVELOPMENT_GRADUATION",
+    "development_only": true,
+    "expected_control_composite_hash": "180cfe1d824580a746f6f248b877e14d369e9c14b720d2ae1663432c1d7c7139",
+    "expected_graduated_book_count": 4,
+    "expected_graduation_hash": "d0f879c32f0a60da03b117f98786c01760a2988bcf205b17ae5da0da32982162",
+    "independent_confirmation_claimed": false,
+    "old_manifest_hash": "56d24b5cc5c858019623fed8bd4dc275b072a64edc97017e376e919a10ab9903",
+    "repair_commit": "32614cb8d803356cd2ce6e2a667d8ba7949faa42",
+    "scientific_policy_changed": false,
+    "shared_execution_or_accounting_semantics_changed": false,
+    "xfa_started": false
+  },
   "post_reservation_pre_outcome_technical_repair": {
     "additional_manifest_count": 0,
     "additional_multiplicity_reserved": false,
@@ -408,5 +427,5 @@
     "worker_count": 2
   },
   "schema": "hydra_economic_production_manifest_v1",
-  "source_commit": "caad6914a7a3b847a3308ae46a2b8f32b3c41f5b"
+  "source_commit": "32614cb8d803356cd2ce6e2a667d8ba7949faa42"
 }
