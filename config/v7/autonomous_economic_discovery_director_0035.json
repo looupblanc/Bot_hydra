@@ -70,7 +70,8 @@
     "4cf67a330f5387aa7824f428dd1f7f1e9a29c2e62614a3640ae5642c7f87c1a6",
     "00dcb0ffffc205089dcadbed12a9a992cb793e56d93e0139be40a4cfb70f8e61",
     "73fd717d654204d26b0050a9645b1b1b3ebee57f2bcda710113491e5e80899ba",
-    "79ca7f31ac995afbbd3676d8f55b5df56fe0afa9b56a15eb975aa2009f777c8a"
+    "79ca7f31ac995afbbd3676d8f55b5df56fe0afa9b56a15eb975aa2009f777c8a",
+    "0667874871abea8b9ae919709432c7818b7a88987afa4936f744db9753a37b4d"
   ],
   "compute_contract": {
     "authoritative_writer_count": 1,
@@ -110,10 +111,13 @@
     "existing_data_first": true,
     "freeze_roles_before_purchase": true,
     "official_cost_estimate_before_purchase": true,
+    "cumulative_actual_usd": 119.78115172013997,
     "prior_cumulative_actual_usd": 100.720719923081,
     "protected_holdout_access_allowed": false,
     "q4_access_allowed": false,
     "silent_purchase_allowed": false,
+    "remaining_authorized_budget_usd": 80.93956820294103,
+    "session_safe_confirmation_actual_cost_usd": 6.535743542016,
     "treasury_curve_actual_cost_usd": 9.090267196298,
     "treasury_curve_end_exclusive": "2024-10-01",
     "treasury_curve_q4_access_count_delta": 0
@@ -267,7 +271,7 @@
     "hydra/production/autonomous_director_manifest.py": "69dcd384d10149b56b001e4e45aded1f7dabef7af5c21a19bc9dcbb83279f21d",
     "hydra/production/autonomous_combine_candidate_bank.py": "ad73ddd66fb225a9dd56ff54b1127dc078acb0a6cf9557643d959644790d9ebe",
     "hydra/production/autonomous_consistency_account_policies.py": "5e8e1fe841b42036e43337099df15fb1339369305660fca4ef4feeab00a18e39",
-    "hydra/production/autonomous_director_runtime.py": "e4ed99c1f5266cc7954d5fed5aa597b6de7f6608afa07136710a9967f9ff3e33",
+    "hydra/production/autonomous_director_runtime.py": "4e35ec21a416331d6c7af168f48fad68bc4e953567c6cef4ed9cea412db2ecb2",
     "hydra/production/autonomous_event_time_matched_controls.py": "ab12eb7cf125c1b364c76fc664eda33e0758e93513df49597e3be392211019ad",
     "hydra/production/autonomous_event_time_safety_frontier.py": "c2212fd4b0115e33fec64c7d566f4a0876e858781e946b3dd42c375a0408a20e",
     "hydra/production/autonomous_exact_continuation.py": "c28380ff75986c4bc99dbc225d01dbbc1f93ceae380997843ad841247350b1c8",
@@ -287,9 +291,12 @@
     "hydra/production/manifest.py": "eee4abb753f336f167f35c0e2bf9a0bb7f0fa2cc15494d0a1ee9ac5d110ea599",
     "hydra/production/runtime.py": "e9c2dd775a96db10181b9f5ae794c15b89963514e5373f70195bb90e57675a3b",
     "hydra/production/session_safe_fast_book_tripwire.py": "caee1ae2fc34b168243d1fc2bb1cf018d2a2d804b86de25fafe4f63ac90d5735",
+    "hydra/production/session_safe_m2k_mym_confirmation.py": "6510d98719d51b0d4ccabea6279764c58196a48360ed7715514ae3cb43b13d00",
     "hydra/production/v71_event_time_account_exploration.py": "6695ee682198cf784a6644202758d2fa31b45b47956c483d180ac0c1c7ad7acb",
     "hydra/propfirm/account_size_xfa.py": "3ab4ded9340c4e4957f708e3e7aff55085009d2cccdfcb72e29fae74e18df964",
-    "hydra/research/curve_relative_value_tripwire.py": "695ddcb293caf58bf945915cd1aa95b87db230ad0039d208ef71da76c3e24af7",
+    "hydra/research/clean_cross_asset_daily_tripwire.py": "d2ebbe4b3b9530bea2627ae013238a548405244559dc192a2d5eddce02aff389",
+    "hydra/research/curve_relative_value_tripwire.py": "2c0cbcb8cc34c2722bc05b744f044be8a514d90c295bfab8b7047c2c77646b4f",
+    "scripts/acquire_session_safe_m2k_mym_confirmation.py": "6f197c04d5186d51d6c3af4ddef17590bc7a0ad556c690688db80cd46f50550c",
     "scripts/acquire_treasury_curve_tripwire.py": "023b328adb613e3b95481ebe5e3afc48256cd40e534f6c6635b38893392b6470",
     "scripts/acquire_fresh_confirmation_0035.py": "1cb5c1561be4d7cf3e3356a7f7618af63910031df957324e1b902bc2f2d17f26",
     "scripts/acquire_frozen_breadth_q3.py": "08702fe1f4059d28a0bcf2ba8d13723177e8b1cea0c898b948a946ccf4c356ab",
@@ -297,7 +304,7 @@
     "scripts/run_event_time_matched_controls.py": "96aaea22afd97545204abfb0c912ea273562678f8866be1dd1b96a4e9f91089b",
     "scripts/run_economic_production_manifest.py": "45e610a35ae5a260e628bc73fcd23634362c6cef0298707b2e6e97ff8762cc6f"
   },
-  "manifest_hash": "0667874871abea8b9ae919709432c7818b7a88987afa4936f744db9753a37b4d",
+  "manifest_hash": "97a48d539671bcb496c7ebfdceb4cda0be3e33073a0dc62137c21a40bba9a901",
   "mission_state_contract": {
     "create_new_reporting_framework": false,
     "decision_ledger_append_only": true,
@@ -474,12 +481,21 @@
   "post_breadth_branch_portfolio": {
     "additional_manifest_count": 0,
     "additional_multiplicity_reserved": false,
-    "classification": "BOUNDED_LEGAL_EXACT_TREASURY_CURVE_AND_SESSION_SAFE_PORTFOLIO",
+    "classification": "BOUNDED_LEGAL_TREASURY_SESSION_SAFE_AND_CROSS_ASSET_RELAY_PORTFOLIO",
+    "cross_asset_daily_decision_card_hash": "7c13b8262d20fc4900d32cdd5820c51d56e4270aaa1b469e56ab54e8a01234df",
+    "cross_asset_daily_decision_card_path": "config/research/clean_cross_asset_daily_tripwire_decision_card_v1.json",
+    "cross_asset_daily_evidence_ceiling": "E_DIAGNOSTIC_DEVELOPMENT",
+    "cross_asset_daily_result_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_breadth_portfolio/clean_cross_asset_daily_tripwire.json",
     "legal_exact_evidence_ceiling": "E_DIAGNOSTIC",
     "legal_result_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_breadth_portfolio/frozen_legal_frontier_exact.json",
     "parent_only_authoritative_writer": true,
     "q4_access_allowed": false,
     "session_safe_candidate_evidence_ceiling": "E_EXACT_DEVELOPMENT_TRIPWIRE",
+    "session_safe_confirmation_card_hash": "52703f6bcbeeb589873370cb98a5ce62252f7eec3993623c72d1e89b33f39ef8",
+    "session_safe_confirmation_evidence_ceiling": "TIER_Q_ELIGIBLE_NOT_TIER_C",
+    "session_safe_confirmation_receipt_hash": "94473fea7df69d6a10f7dcf112a5e63a0a8b7baf3057727be062ddee844ab0e1",
+    "session_safe_confirmation_result_hash": "209c6b114a2c7374c97a95d24b31d7e769463b06d60b135bc79d5d439b84e823",
+    "session_safe_confirmation_status": "FRESH_REPLICATION_FAILED_BRANCH_CLOSED",
     "session_safe_fresh_confirmation_required": true,
     "session_safe_target_account": "50K",
     "session_safe_target_horizon_trading_days": 20,
@@ -583,5 +599,5 @@
     "worker_count": 2
   },
   "schema": "hydra_economic_production_manifest_v1",
-  "source_commit": "692cc2b55109e7208b5f2281ba3061d1385b9d37"
+  "source_commit": "7bbe1bcc6a1270eb20843c64c55469b43a6d10d4"
 }
