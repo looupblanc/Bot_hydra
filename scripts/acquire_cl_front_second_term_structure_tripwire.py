@@ -607,6 +607,138 @@ def _load_existing_receipt(
     return receipt
 
 
+def validate_acquisition_receipt(
+    root: str | Path,
+    *,
+    card_path: str | Path = CARD_PATH,
+    receipt_path: str | Path = DEFAULT_RECEIPT,
+    budget: DatabentoBudgetConfig | None = None,
+) -> dict[str, Any]:
+    """Validate the sealed acquisition locally without opening market data.
+
+    Economic runners call this gate before decoding either DBN artifact.  In
+    addition to the receipt and file hashes it reconciles the exact two spend
+    rows and three chronological-role access records.  It deliberately makes
+    no Databento request and performs no write.
+    """
+
+    project = Path(root).resolve()
+    card = load_and_validate_card(project, card_path)
+    card_hash = str(card["card_hash"])
+    contract = validate_frozen_contract(frozen_contract(card_hash), card_hash)
+    bundle_id = request_id_for(
+        {"request_hash": REQUEST_HASH, "card_hash": card_hash, "purpose": PURPOSE}
+    )
+    cfg = _bound_budget(project, budget)
+    paths = _paths(project, bundle_id, receipt_path)
+    if not paths["receipt"].is_file():
+        raise CLTermStructureAcquisitionError("sealed acquisition receipt unavailable")
+    receipt = _load_existing_receipt(
+        paths["receipt"],
+        bundle_id=bundle_id,
+        contract_hash=str(contract["contract_hash"]),
+        card_hash=card_hash,
+        budget=cfg,
+        paths=paths,
+    )
+
+    if (
+        receipt.get("api_requests") != contract["api_requests"]
+        or receipt.get("official_estimates") != EXPECTED
+        or receipt.get("temporal_roles") != [dict(row) for row in TEMPORAL_ROLES]
+        or receipt.get("q4_access_count_delta") != 0
+        or receipt.get("broker_connections") != 0
+        or receipt.get("orders") != 0
+        or receipt.get("market_data_downloaded") is not True
+        or receipt.get("raw_immutable") is not True
+        or receipt.get("runtime_or_manifest_modified") is not False
+    ):
+        raise CLTermStructureAcquisitionError("sealed acquisition semantic drift")
+
+    expected_files = {
+        "RAW_DBN_OHLCV_1M": paths["raw_ohlcv"],
+        "RAW_DBN_DEFINITION": paths["raw_definition"],
+        "SYMBOLOGY_RESOLUTION": paths["symbology"],
+    }
+    rows = list(receipt.get("files") or ())
+    if len(rows) != len(expected_files) or {str(row.get("kind")) for row in rows} != set(
+        expected_files
+    ):
+        raise CLTermStructureAcquisitionError("sealed acquisition file inventory drift")
+    for row in rows:
+        artifact = Path(str(row.get("path") or "")).resolve()
+        expected_path = expected_files[str(row["kind"])].resolve()
+        if (
+            artifact != expected_path
+            or int(row.get("size_bytes") or -1) != artifact.stat().st_size
+            or sha256_file(artifact) != str(row.get("sha256") or "")
+        ):
+            raise CLTermStructureAcquisitionError("sealed acquisition artifact receipt drift")
+
+    spend_rows = []
+    ledger = read_ledger(cfg.ledger_path)
+    for schema in EXPECTED:
+        request_id = _schema_request_id(bundle_id, schema)
+        matching = [row for row in ledger if row.get("request_id") == request_id]
+        if len(matching) != 1:
+            raise CLTermStructureAcquisitionError("sealed spend row cardinality drift")
+        row = matching[0]
+        file_kind = "RAW_DBN_OHLCV_1M" if schema == "ohlcv-1m" else "RAW_DBN_DEFINITION"
+        file_row = next(value for value in rows if value["kind"] == file_kind)
+        estimate = EXPECTED[schema]
+        if (
+            row.get("dataset") != DATASET
+            or row.get("schema") != schema
+            or row.get("symbols") != [SYMBOL]
+            or row.get("download_status") != "DOWNLOADED"
+            or row.get("checksum") != file_row["sha256"]
+            or not math.isclose(
+                float(row.get("actual_cost_usd") or 0.0),
+                float(estimate["estimated_cost_usd"]),
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            )
+        ):
+            raise CLTermStructureAcquisitionError("sealed spend row drift")
+        spend_rows.append(row)
+
+    access_rows = _jsonl(paths["access_ledger"])
+    verified_access: list[dict[str, Any]] = []
+    for role in TEMPORAL_ROLES:
+        marker = f"{bundle_id}:{role['role']}"
+        matching = [
+            row for row in access_rows if marker in set(row.get("candidate_ids") or ())
+        ]
+        expected_role = (
+            DataRole.DEVELOPMENT
+            if role["role"] == "DISCOVERY"
+            else DataRole.BLIND_VALIDATION
+        )
+        if len(matching) != 1:
+            raise CLTermStructureAcquisitionError("sealed access row cardinality drift")
+        row = matching[0]
+        if (
+            row.get("data_role") != expected_role.value
+            or row.get("parameters_mutable") != (expected_role == DataRole.DEVELOPMENT)
+            or row.get("freeze_manifest_hash") != card_hash
+            or row.get("period_accessed") != f"{role['start']}:{role['end']}"
+        ):
+            raise CLTermStructureAcquisitionError("sealed access row drift")
+        verified_access.append(row)
+
+    return {
+        **receipt,
+        "local_validation": {
+            "status": "SEALED_ACQUISITION_RECEIPT_VALID",
+            "network_requests": 0,
+            "writes": 0,
+            "spend_row_count": len(spend_rows),
+            "access_role_count": len(verified_access),
+            "artifact_count": len(rows),
+        },
+    }
+
+
 def _jsonl(path: Path) -> list[dict[str, Any]]:
     if not path.is_file():
         return []

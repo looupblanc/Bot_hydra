@@ -14,6 +14,7 @@ from scripts.acquire_cl_front_second_term_structure_tripwire import (
     estimate_or_acquire,
     frozen_contract,
     load_and_validate_card,
+    validate_acquisition_receipt,
 )
 
 
@@ -90,6 +91,20 @@ def test_card_and_request_are_immutably_bound() -> None:
         "market": "MCL.c.0",
         "fill": "NEXT_TRADABLE_OPEN",
         "roll_guard_true_sessions_each_side": 1,
+    }
+
+
+def test_real_sealed_receipt_reconciles_exact_ledgers_and_files() -> None:
+    result = validate_acquisition_receipt(PROJECT_ROOT)
+    assert result["receipt_hash"] == "048337824527fddf660214b13582723f31f3a6c9a8a6e4627ad06919f6228add"
+    assert result["bundle_id"] == "20276ee521b4ab025d7b"
+    assert result["local_validation"] == {
+        "status": "SEALED_ACQUISITION_RECEIPT_VALID",
+        "network_requests": 0,
+        "writes": 0,
+        "spend_row_count": 2,
+        "access_role_count": 3,
+        "artifact_count": 3,
     }
 
 

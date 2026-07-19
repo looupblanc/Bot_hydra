@@ -76,6 +76,37 @@ def test_appending_a_future_bar_cannot_change_prior_features() -> None:
     pd.testing.assert_frame_equal(before, after.iloc[:-1].reset_index(drop=True))
 
 
+def test_lookback_is_exact_elapsed_minutes_and_never_crosses_a_gap() -> None:
+    front = _rank_frame(offset=0.0, periods=100).drop(index=30).reset_index(drop=True)
+    second = _rank_frame(offset=0.5, periods=100).drop(index=30).reset_index(drop=True)
+    result = prepare_causal_source_features(front, second, lookback_minutes=15)
+    at_45 = result.loc[result["timestamp"].eq(pd.Timestamp("2024-01-02T14:45:00Z"))].iloc[0]
+    at_46 = result.loc[result["timestamp"].eq(pd.Timestamp("2024-01-02T14:46:00Z"))].iloc[0]
+    assert pd.isna(at_45["basis_change"])
+    assert pd.notna(at_46["basis_change"])
+    assert int(at_45["causal_segment_id"]) == int(at_46["causal_segment_id"])
+
+
+def test_delivery_and_spread_volatility_state_are_explicit() -> None:
+    front = _rank_frame(offset=0.0, periods=100)
+    second = _rank_frame(offset=0.5, periods=100)
+    front["rank_contract"] = "front_contract"
+    second["rank_contract"] = "second_contract"
+    front["days_to_delivery"] = 20.0
+    second["days_to_delivery"] = 50.0
+    result = prepare_causal_source_features(front, second, lookback_minutes=15)
+    assert {
+        "front_days_to_delivery",
+        "second_days_to_delivery",
+        "delivery_tenor_gap_days",
+        "roll_distance_adjusted_basis",
+        "roll_distance_adjusted_basis_innovation",
+        "current_spread_state",
+        "front_prior_realized_volatility",
+    }.issubset(result.columns)
+    assert result["delivery_tenor_gap_days"].eq(30.0).all()
+
+
 def test_roll_guard_abstains_and_mechanism_directions_are_opposite() -> None:
     rules = frozen_rule_specs()
     continuation = next(rule for rule in rules if rule.mechanism.endswith("CONTINUATION"))
