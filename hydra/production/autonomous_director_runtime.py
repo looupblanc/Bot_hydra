@@ -2872,10 +2872,9 @@ def _run_frozen_breadth_continuation_relay(
             "frozen_breadth_status": str(result["status"]),
             "frozen_breadth_runtime_network_access": False,
             "frozen_breadth_runtime_feature_cache_writes": 0,
-            "data_purchase_count": max(int(state.get("data_purchase_count", 0)), 1),
-            "new_data_purchase_count": max(
-                int(state.get("new_data_purchase_count", 0)), 1
-            ),
+            "data_purchase_count": 0,
+            "new_data_purchase_count": 0,
+            "external_manifest_bound_acquisition_count": 1,
             "independently_confirmed_tier_c_count": int(
                 state.get("independently_confirmed_tier_c_count", 0)
             ),
@@ -5446,8 +5445,15 @@ def _state_payload(
         "orders": 0,
         "q4_access_count_delta": 0,
         "q4_access_delta": 0,
-        "data_purchase_count": 1 if breadth_continuation else 0,
-        "new_data_purchase_count": 1 if breadth_continuation else 0,
+        # Network acquisition is deliberately external to the controller and
+        # reconciled by its manifest-bound receipt.  These two safety counters
+        # describe purchases made by the production worker itself and must
+        # therefore remain zero.
+        "data_purchase_count": 0,
+        "new_data_purchase_count": 0,
+        "external_manifest_bound_acquisition_count": (
+            1 if breadth_continuation else 0
+        ),
         "proof_windows_consumed": 0,
         "combine_pass_observed_bank_count": int(
             pass_counts.get("bank_policy_count", 0)

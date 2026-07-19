@@ -15,6 +15,12 @@ EVENT_CONTROL_RESULT = ROOT / (
     "branch_results/post_source_exhaustion/post_composite/"
     "event_time_matched_controls.json"
 )
+BREADTH_RESULT = ROOT / (
+    "reports/economic_evolution/"
+    "autonomous_economic_discovery_director_0035_revision_02/"
+    "branch_results/post_source_exhaustion/post_composite/"
+    "frozen_breadth_q3_result.json"
+)
 
 
 def _event_result() -> dict:
@@ -53,6 +59,8 @@ def test_post_confirmation_counts_enter_state_once() -> None:
     assert state["exact_account_replays"] == 4
     assert state["unique_policies_screened"] == 4
     assert state["control_policy_replay_operations"] == 3
+    assert state["data_purchase_count"] == 0
+    assert state["new_data_purchase_count"] == 0
 
 
 def test_frozen_breadth_paths_fail_closed_outside_repository() -> None:
@@ -67,3 +75,27 @@ def test_frozen_breadth_paths_fail_closed_outside_repository() -> None:
 
     with pytest.raises(runtime.AutonomousDirectorRuntimeError, match="escapes"):
         runtime._frozen_breadth_manifest_paths(ROOT, manifest)
+
+
+def test_external_breadth_receipt_never_inflates_worker_purchase_counter() -> None:
+    manifest = json.loads(
+        (ROOT / "config/v7/autonomous_economic_discovery_director_0035.json")
+        .read_text(encoding="utf-8")
+    )
+    wrapper = json.loads(BREADTH_RESULT.read_text(encoding="utf-8"))
+    state = runtime._state_payload(
+        manifest,
+        sequence=8,
+        state="ROBUSTNESS_ACTIVE",
+        stage="FROZEN_BREADTH_Q3_FALSIFIED",
+        branch_results={
+            "FROZEN_BREADTH_CONTINUATION": wrapper[
+                "frozen_breadth_continuation"
+            ]
+        },
+        next_action="CLOSE_EXACT_BREADTH_BRANCH",
+    )
+
+    assert state["data_purchase_count"] == 0
+    assert state["new_data_purchase_count"] == 0
+    assert state["external_manifest_bound_acquisition_count"] == 1
