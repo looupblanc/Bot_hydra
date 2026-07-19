@@ -457,9 +457,9 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "a5a7257da873075642e2183a987c452fd72f7b1e43d6bb8f6311390de4460bdd",
+      "manifest_file_sha256": "63bcaa0036364e0a3abafdbe63e50d0c5cdd6c6c2640e1d0d26e0e75bfc3d0a4",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "e592522c5ce7f78e4c1746a775b1bc04f09bbe928380a4a1961d591a6912c3d8",
+      "manifest_semantic_hash": "7c88239e2f2b07e441740e7f530834fc7b3b859529d04973fc9f41ec9ed39275",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -476,6 +476,17 @@
         "repair_commit": "9d2a2e4bc60fe6adfbc9eced71b94cdf1691fd06",
         "scientific_policy_changed": false
       },
+      "post_launch_pre_economic_counter_repair": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "classification": "POST_EXACT_DERIVED_KPI_DENOMINATOR_RECONCILIATION",
+        "economic_outcomes_changed": false,
+        "exact_branch_result_hash": "37897b6b86492c4a1464bd9b796912465d31c4a693de058c7d1a5a676264b934",
+        "immutable_exact_episode_replay_count": 95376,
+        "immutable_exact_policy_replay_count": 32,
+        "repair_commit": "5d29448bcf4a5d36811672f9b5189ca1552e1c72",
+        "scientific_policy_changed": false
+      },
       "post_reservation_pre_outcome_technical_repair": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
@@ -487,8 +498,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "9d2a2e4bc60fe6adfbc9eced71b94cdf1691fd06",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-pre-outcome-memory-repair-2026-07-19"
+      "worm_commit": "5d29448bcf4a5d36811672f9b5189ca1552e1c72",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-exact-counter-repair-2026-07-19"
     }
   ],
   "governance": {
@@ -497,8 +508,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T03:01:42Z",
-  "queue_hash": "dc607ad7a1db45e7446f1eea439d86cf13ee8ea4f4fb5c55176c75b6dcdb0808",
+  "issued_at_utc": "2026-07-19T03:13:25Z",
+  "queue_hash": "c3e49814007354976f4abc65cae8f343fa4831f8fb40138d99b253251516e734",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
