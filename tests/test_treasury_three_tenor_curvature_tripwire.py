@@ -543,6 +543,34 @@ def test_required_session_window_masks_missing_minute_and_censors_start() -> Non
     assert not tripwire._session_full_coverage_mask(missing).any()
 
 
+def test_out_of_scope_warmup_sessions_are_excluded_without_dropping_in_scope_censure() -> None:
+    card = tripwire._read_json(PROJECT_ROOT / tripwire.DEFAULT_CARD)
+    timestamps = pd.Series(
+        pd.to_datetime(["2022-12-30T12:00:00Z", "2023-01-03T12:00:00Z"], utc=True)
+    )
+    assert tripwire._role_scope_mask(timestamps, card).tolist() == [False, True]
+
+    frame = pd.DataFrame({"timestamp": [timestamps.iloc[1]]})
+    frame.attrs["canonical_session_calendar"] = [
+        {
+            "session_id": "2022-12-30",
+            "session_day": pd.Timestamp("2022-12-30").date().toordinal(),
+            "session_full_coverage": True,
+        },
+        {
+            "session_id": "2023-01-03",
+            "session_day": pd.Timestamp("2023-01-03").date().toordinal(),
+            "session_full_coverage": False,
+            "coverage_reason": "ROOT_SESSION_ABSENT_BEFORE_INNER_JOIN",
+        },
+    ]
+    tripwire._attach_canonical_calendar_roles(frame, card)
+    calendar = frame.attrs["canonical_session_calendar"]
+    assert [row["session_id"] for row in calendar] == ["2023-01-03"]
+    assert calendar[0]["temporal_role"] == "DISCOVERY"
+    assert calendar[0]["session_full_coverage"] is False
+
+
 def test_timing_control_is_five_bars_after_primary_entry_and_slope_sign_matches_card() -> None:
     frame = _prepared_execution_frame()
     rule = next(

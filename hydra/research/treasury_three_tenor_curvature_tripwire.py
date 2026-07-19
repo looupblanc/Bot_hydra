@@ -501,6 +501,15 @@ def run_economic_tripwire(
                     card["causal_contract"]["normalization_minimum_bars"]
                 ),
             )
+            # The bound source may contain warm-up or trailing sessions outside
+            # the preregistered economic roles.  They are valid feature-history
+            # inputs, but never economic observations and must not be assigned a
+            # role by extending the frozen dates.
+            source_attrs = dict(frame.attrs)
+            frame = frame.loc[_role_scope_mask(frame["timestamp"], card)].copy()
+            frame.attrs.update(source_attrs)
+            if frame.empty:
+                raise TreasuryCurvatureError("no rows fall inside frozen temporal roles")
             frame["temporal_role"] = _assign_roles(frame["timestamp"], card)
             _attach_canonical_calendar_roles(frame, card)
             prepared[(triangle.triangle_id, lookback)] = frame
@@ -1983,10 +1992,15 @@ def _attach_canonical_calendar_roles(
     calendar = [dict(row) for row in frame.attrs.get("canonical_session_calendar", ())]
     if not calendar:
         raise TreasuryCurvatureError("canonical pre-join session inventory absent")
+    timestamps = pd.Series(
+        [pd.Timestamp(str(row["session_id"]), tz="UTC") for row in calendar]
+    )
+    scoped = _role_scope_mask(timestamps, card)
+    calendar = [row for row, keep in zip(calendar, scoped, strict=True) if bool(keep)]
+    if not calendar:
+        raise TreasuryCurvatureError("canonical calendar has no in-scope sessions")
     for row in calendar:
-        timestamp = pd.Series(
-            [pd.Timestamp(str(row["session_id"]), tz="UTC")]
-        )
+        timestamp = pd.Series([pd.Timestamp(str(row["session_id"]), tz="UTC")])
         row["temporal_role"] = str(_assign_roles(timestamp, card).iloc[0])
     frame.attrs["canonical_session_calendar"] = calendar
 
@@ -2042,6 +2056,16 @@ def _prior_group_rolling(
             raise TreasuryCurvatureError("unknown prior rolling statistic")
         output.loc[idx] = result.to_numpy()
     return output
+
+
+def _role_scope_mask(timestamp: pd.Series, card: Mapping[str, Any]) -> pd.Series:
+    utc = pd.to_datetime(timestamp, utc=True)
+    selected = pd.Series(False, index=timestamp.index, dtype=bool)
+    for row in card["chronological_roles"]:
+        selected |= utc.ge(pd.Timestamp(row["start"], tz="UTC")) & utc.lt(
+            pd.Timestamp(row["end"], tz="UTC")
+        )
+    return selected
 
 
 def _assign_roles(timestamp: pd.Series, card: Mapping[str, Any]) -> pd.Series:
