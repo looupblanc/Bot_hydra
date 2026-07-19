@@ -552,6 +552,44 @@ def test_candidate_power_is_a_hard_gate() -> None:
     assert gate["checks"]["candidate_power_preflight"] is False
 
 
+def test_branch_gate_does_not_call_zero_quantity_censored_paths_falsified() -> None:
+    def point(*, quantity: int, full_coverage: int) -> dict[str, object]:
+        return {
+            "integer_quantity": quantity,
+            "controls": {
+                "PRIMARY": {
+                    scenario: {
+                        "FINAL_DEVELOPMENT": {
+                            "20": {"full_coverage_start_count": full_coverage}
+                        }
+                    }
+                    for scenario in tripwire.SCENARIOS
+                }
+            },
+            "gate": {"passed": False, "final_stressed_net_usd": 0.0},
+        }
+
+    power = {"passed": True}
+    blocked = tripwire._branch_gate(
+        [{"candidate_id": "c", "account_points": [point(quantity=0, full_coverage=0)]}],
+        power,
+    )
+    assert blocked["status"] == (
+        "TREASURY_CURVATURE_RISK_GRANULARITY_BLOCKED_AND_COVERAGE_UNDERPOWERED"
+    )
+    assert blocked["legal_quantity_account_point_count"] == 0
+    assert blocked["full_coverage_headline_account_point_count"] == 0
+    assert blocked["economically_evaluable_account_point_count"] == 0
+    assert blocked["zero_serialized_economic_metrics_are_observed_rates"] is False
+
+    evaluated = tripwire._branch_gate(
+        [{"candidate_id": "c", "account_points": [point(quantity=1, full_coverage=1)]}],
+        power,
+    )
+    assert evaluated["status"] == "TREASURY_CURVATURE_TO_BELLY_FALSIFIED"
+    assert evaluated["economically_evaluable_account_point_count"] == 1
+
+
 def test_primary_complete_is_not_truncated_to_common_control_coverage() -> None:
     frame = _prepared_execution_frame().iloc[:18].copy()
     rule = next(

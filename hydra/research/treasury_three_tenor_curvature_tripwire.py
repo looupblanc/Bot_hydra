@@ -2133,6 +2133,31 @@ def _power_preflight(
 def _branch_gate(
     decisions: Sequence[Mapping[str, Any]], power: Mapping[str, Any]
 ) -> dict[str, Any]:
+    account_points = tuple(
+        point for decision in decisions for point in decision["account_points"]
+    )
+    legal_points = tuple(
+        point for point in account_points if int(point["integer_quantity"]) > 0
+    )
+
+    def headline_has_full_coverage(point: Mapping[str, Any]) -> bool:
+        primary = point["controls"]["PRIMARY"]
+        return all(
+            int(
+                primary[scenario]["FINAL_DEVELOPMENT"][str(HEADLINE_HORIZON)][
+                    "full_coverage_start_count"
+                ]
+            )
+            > 0
+            for scenario in SCENARIOS
+        )
+
+    covered_points = tuple(
+        point for point in account_points if headline_has_full_coverage(point)
+    )
+    evaluable_points = tuple(
+        point for point in legal_points if headline_has_full_coverage(point)
+    )
     tier_e = sorted(
         f"{decision['candidate_id']}:{point['account_label']}:r{point['risk_fraction_of_initial_mll']}"
         for decision in decisions
@@ -2143,11 +2168,19 @@ def _branch_gate(
         status = "TREASURY_CURVATURE_TO_BELLY_GREEN_TIER_E"
     elif not power["passed"]:
         status = "TREASURY_CURVATURE_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+    elif not legal_points and not covered_points:
+        status = (
+            "TREASURY_CURVATURE_RISK_GRANULARITY_BLOCKED_"
+            "AND_COVERAGE_UNDERPOWERED"
+        )
+    elif not legal_points:
+        status = "TREASURY_CURVATURE_RISK_GRANULARITY_BLOCKED"
+    elif not evaluable_points:
+        status = "TREASURY_CURVATURE_COVERAGE_UNDERPOWERED"
     else:
         any_positive = any(
             float(point["gate"]["final_stressed_net_usd"]) > 0.0
-            for decision in decisions
-            for point in decision["account_points"]
+            for point in evaluable_points
         )
         status = (
             "TREASURY_CURVATURE_TO_BELLY_WEAK"
@@ -2160,6 +2193,13 @@ def _branch_gate(
         "tier_q_candidate_ids": [],
         "headline_horizon_trading_days": HEADLINE_HORIZON,
         "diagnostic_horizons_excluded_from_gate": list(DIAGNOSTIC_HORIZONS),
+        "account_point_count": len(account_points),
+        "legal_quantity_account_point_count": len(legal_points),
+        "full_coverage_headline_account_point_count": len(covered_points),
+        "economically_evaluable_account_point_count": len(evaluable_points),
+        "zero_serialized_economic_metrics_are_observed_rates": bool(
+            evaluable_points
+        ),
         "promotion_allowed": False,
     }
 
