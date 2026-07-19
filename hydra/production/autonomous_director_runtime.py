@@ -40,6 +40,7 @@ from hydra.production.autonomous_event_time_safety_frontier import (
     compose_autonomous_event_time_safety_frontier_shards,
 )
 from hydra.production.autonomous_combine_candidate_bank import (
+    SCHEMA as COMBINE_CANDIDATE_BANK_SCHEMA,
     build_autonomous_combine_candidate_bank,
 )
 from hydra.production.autonomous_combine_pass_bank import (
@@ -63,6 +64,17 @@ from hydra.production.autonomous_marginal_combine_books import (
     COMPOSITE_SCHEMA as MARGINAL_BOOK_COMPOSITE_SCHEMA,
     build_autonomous_marginal_combine_books,
     compose_autonomous_marginal_combine_book_shards,
+)
+from hydra.production.autonomous_tier_g_controls import (
+    COMPOSITE_SCHEMA as TIER_G_CONTROL_COMPOSITE_SCHEMA,
+    SCHEMA as TIER_G_CONTROL_SHARD_SCHEMA,
+    build_autonomous_tier_g_controls,
+    compose_autonomous_tier_g_control_shards,
+)
+from hydra.production.autonomous_tier_g_graduation import (
+    SCHEMA as TIER_G_GRADUATION_SCHEMA,
+    build_graduated_development_books,
+    verify_tier_g_development_graduation,
 )
 from hydra.production.manifest import load_and_validate_production_manifest
 from hydra.production.runtime import PRODUCTION_KPI_SCHEMA, PRODUCTION_STATE_SCHEMA
@@ -1765,10 +1777,31 @@ def _run_post_book_graduation_relay(
         heartbeat_seconds=heartbeat_seconds,
         runtime_results=results,
     )
+    (
+        state,
+        results,
+        tier_g_control_composite,
+        tier_g_graduation,
+    ) = _run_tier_g_control_relay(
+        root=root,
+        manifest=manifest,
+        output=output,
+        live_writer=live_writer,
+        branch_writer=branch_writer,
+        prior_state=state,
+        started=started,
+        heartbeat_seconds=heartbeat_seconds,
+        runtime_results=results,
+        candidate_bank_path=candidate_path,
+        initial_exact_path=initial_exact_path,
+        continuation_paths=continuation_paths,
+    )
 
     book_counts = dict(semantic_composite.get("counts") or {})
     direct_counts = dict(direct_composite.get("counts") or {})
     event_safety_counts = dict(event_safety_composite.get("counts") or {})
+    tier_g_control_counts = dict(tier_g_control_composite.get("counts") or {})
+    tier_g_graduation_counts = dict(tier_g_graduation.get("counts") or {})
     pass_counts = dict(pass_bank.get("counts") or {})
     book_ready = int(book_counts.get("g_ready_count", 0)) + int(
         book_counts.get("standalone_g_ready_count", 0)
@@ -1778,10 +1811,20 @@ def _run_post_book_graduation_relay(
         event_safety_counts.get("heldout_safety_precontrol_ready_count", 0)
     )
     g_precontrol = book_ready + direct_ready + event_safety_ready
+    tier_g_control_ready = int(
+        tier_g_control_counts.get("g_control_ready_count", 0)
+    )
+    graduated_tier_g = int(
+        tier_g_graduation_counts.get("graduated_development_book_count", 0)
+    )
     next_action = (
-        "RUN_TRADE_CONCENTRATION_AND_MATCHED_CONTROLS_FOR_PRECONTROL_SURVIVORS"
-        if g_precontrol
-        else "DISPATCH_MATERIALLY_DISTINCT_FAILURE_GUIDED_ECONOMIC_BRANCH"
+        "FREEZE_ACCOUNT_SIZE_AWARE_XFA_HANDOFF_FOR_TIER_G_BOOKS"
+        if graduated_tier_g
+        else (
+            "RUN_TRADE_CONCENTRATION_AND_MATCHED_CONTROLS_FOR_PRECONTROL_SURVIVORS"
+            if g_precontrol
+            else "DISPATCH_MATERIALLY_DISTINCT_FAILURE_GUIDED_ECONOMIC_BRANCH"
+        )
     )
     state = _state_payload(
         manifest,
@@ -1828,7 +1871,17 @@ def _run_post_book_graduation_relay(
             ),
             "event_time_safety_g_precontrol_ready_count": event_safety_ready,
             "g_precontrol_ready_count": g_precontrol,
-            "authoritative_tier_g_count": 0,
+            "tier_g_control_candidate_count": int(
+                tier_g_control_counts.get("selected_candidate_count", 0)
+            ),
+            "tier_g_control_exact_replay_count": int(
+                tier_g_control_counts.get("exact_account_replay_count", 0)
+            ),
+            "tier_g_control_synthetic_count": int(
+                tier_g_control_counts.get("synthetic_control_count", 0)
+            ),
+            "tier_g_control_ready_count": tier_g_control_ready,
+            "authoritative_tier_g_count": graduated_tier_g,
             "xfa_paths_started": 0,
         }
     )
@@ -2024,6 +2077,234 @@ def _run_event_time_safety_relay(
     _publish(live_writer, state, _kpis(manifest, state, results, started))
     _write_mission_views(root, manifest, state, results)
     return state, results, composite
+
+
+def _run_tier_g_control_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+    candidate_bank_path: Path,
+    initial_exact_path: Path,
+    continuation_paths: Sequence[Path],
+) -> tuple[
+    dict[str, Any],
+    dict[str, dict[str, Any]],
+    dict[str, Any],
+    dict[str, Any],
+]:
+    """Run/resume the two read-only unique-ledger Tier-G control shards."""
+
+    relative_root = Path("post_source_exhaustion/post_composite")
+    branch_root = output / "branch_results"
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    shards: dict[int, dict[str, Any]] = {}
+    shard_paths = {
+        index: branch_root / relative_root / f"tier_g_controls_shard_{index:02d}.json"
+        for index in range(2)
+    }
+    for index, path in shard_paths.items():
+        if not path.is_file():
+            continue
+        shards[index] = _read_relay_shard(
+            path,
+            manifest=manifest,
+            key="tier_g_controls_shard",
+            expected_schema=TIER_G_CONTROL_SHARD_SCHEMA,
+            expected_status="COMPLETE_READ_ONLY_TIER_G_CONTROL_SHARD",
+            expected_index=index,
+            expected_count=2,
+            label="Tier-G controls",
+        )
+
+    missing = [index for index in range(2) if index not in shards]
+    if missing:
+        future_index: dict[Any, int] = {}
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=len(missing),
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                for index in missing:
+                    future = pool.submit(
+                        _tier_g_controls_from_artifacts_worker,
+                        str(root),
+                        str(candidate_bank_path),
+                        str(initial_exact_path),
+                        tuple(str(value) for value in continuation_paths),
+                        shard_index=index,
+                        shard_count=2,
+                    )
+                    future_index[future] = index
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="TIER_G_UNIQUE_LEDGER_CONTROLS_RUNNING",
+                    branch_results=results,
+                    next_action="REPLAY_FIVE_TIER_Q_FINALISTS_WITH_EXACT_CONTROLS",
+                )
+                state["active_economic_worker_processes"] = len(future_index)
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+                pending = set(future_index)
+                while pending:
+                    done, pending = wait(
+                        pending,
+                        timeout=max(float(heartbeat_seconds), 0.1),
+                        return_when=FIRST_COMPLETED,
+                    )
+                    if not done:
+                        state = _heartbeat_state(state)
+                        _publish(
+                            live_writer,
+                            state,
+                            _kpis(manifest, state, results, started),
+                        )
+                        _write_mission_views(root, manifest, state, results)
+                        continue
+                    for future in done:
+                        index = future_index[future]
+                        shard = dict(future.result())
+                        envelope = _post_source_envelope(
+                            manifest,
+                            lane_id=(
+                                "EXPLOITATION" if index == 0 else "EXPLORATION"
+                            ),
+                            branch_id=f"TIER_G_CONTROLS_SHARD_{index:02d}",
+                            decision=str(shard["status"]),
+                            payload_key="tier_g_controls_shard",
+                            payload=shard,
+                            next_action="COMPOSE_TIER_G_CONTROL_SHARDS",
+                        )
+                        branch_writer.write_json(
+                            relative_root / shard_paths[index].name, envelope
+                        )
+                        _append_decision_once(root, manifest, envelope)
+                        shards[index] = shard
+                    state = _heartbeat_state(
+                        state,
+                        active_economic_worker_processes=len(pending),
+                    )
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+        finally:
+            _end_economic_phase()
+
+    composite = compose_autonomous_tier_g_control_shards(
+        [shards[index] for index in range(2)]
+    )
+    composite_path = branch_root / relative_root / "tier_g_controls_composite.json"
+    if composite_path.is_file():
+        envelope = _read_hashed(composite_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "Tier-G controls composite identity drift"
+            )
+        persisted = _verified_inner_result(
+            envelope,
+            key="tier_g_controls_composite",
+            expected_schema=TIER_G_CONTROL_COMPOSITE_SCHEMA,
+            expected_status="COMPLETE_RECONCILED_TIER_G_CONTROL_SHARDS",
+        )
+        if str(persisted["result_hash"]) != str(composite["result_hash"]):
+            raise AutonomousDirectorRuntimeError(
+                "Tier-G controls composite changed after persistence"
+            )
+        composite = persisted
+    else:
+        envelope = _post_source_envelope(
+            manifest,
+            lane_id="DIRECTOR",
+            branch_id="TIER_G_UNIQUE_LEDGER_CONTROLS_COMPOSITE",
+            decision=str(composite["status"]),
+            payload_key="tier_g_controls_composite",
+            payload=composite,
+            next_action=str(composite["next_action"]),
+        )
+        branch_writer.write_json(relative_root / composite_path.name, envelope)
+        _append_decision_once(root, manifest, envelope)
+
+    results["TIER_G_CONTROLS"] = composite
+    graduation = build_graduated_development_books(composite)
+    verify_tier_g_development_graduation(graduation)
+    graduation_path = (
+        branch_root / relative_root / "tier_g_development_graduation.json"
+    )
+    if graduation_path.is_file():
+        envelope = _read_hashed(graduation_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "Tier-G development graduation identity drift"
+            )
+        persisted = _verified_inner_result(
+            envelope,
+            key="tier_g_development_graduation",
+            expected_schema=TIER_G_GRADUATION_SCHEMA,
+            expected_status="COMPLETE_READ_ONLY_TIER_G_DEVELOPMENT_GRADUATION",
+        )
+        verify_tier_g_development_graduation(persisted)
+        if str(persisted["result_hash"]) != str(graduation["result_hash"]):
+            raise AutonomousDirectorRuntimeError(
+                "Tier-G development graduation changed after persistence"
+            )
+        graduation = persisted
+    else:
+        envelope = _post_source_envelope(
+            manifest,
+            lane_id="DIRECTOR",
+            branch_id="TIER_G_DEVELOPMENT_GRADUATION",
+            decision=str(graduation["status"]),
+            payload_key="tier_g_development_graduation",
+            payload=graduation,
+            next_action=str(graduation["next_action"]),
+        )
+        branch_writer.write_json(relative_root / graduation_path.name, envelope)
+        _append_decision_once(root, manifest, envelope)
+    results["TIER_G_GRADUATION"] = graduation
+    counts = dict(composite.get("counts") or {})
+    graduation_counts = dict(graduation.get("counts") or {})
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage="TIER_G_DEVELOPMENT_GRADUATION_PERSISTED",
+        branch_results=results,
+        next_action=str(graduation["next_action"]),
+    )
+    state["active_economic_worker_processes"] = 0
+    state["tier_g_control_candidate_count"] = int(
+        counts.get("selected_candidate_count", 0)
+    )
+    state["tier_g_control_exact_replay_count"] = int(
+        counts.get("exact_account_replay_count", 0)
+    )
+    state["tier_g_control_synthetic_count"] = int(
+        counts.get("synthetic_control_count", 0)
+    )
+    state["tier_g_control_ready_count"] = int(
+        counts.get("g_control_ready_count", 0)
+    )
+    state["authoritative_tier_g_count"] = int(
+        graduation_counts.get("graduated_development_book_count", 0)
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, composite, graduation
 
 
 def _heartbeat_state(
@@ -2337,6 +2618,57 @@ def _event_time_safety_from_root_worker(
     ):
         raise AutonomousDirectorRuntimeError(
             "read-only event-time safety worker attempted a status side effect"
+        )
+    return result
+
+
+def _tier_g_controls_from_artifacts_worker(
+    root_path: str,
+    candidate_bank_envelope_path: str,
+    initial_exact_path: str,
+    continuation_paths: Sequence[str],
+    *,
+    shard_index: int,
+    shard_count: int,
+) -> dict[str, Any]:
+    """Reconstruct one unique-ledger Tier-G control shard read-only."""
+
+    candidate_envelope = _read_hashed(
+        Path(candidate_bank_envelope_path), "result_hash"
+    )
+    bank = _verified_inner_result(
+        candidate_envelope,
+        key="candidate_bank",
+        expected_schema=COMBINE_CANDIDATE_BANK_SCHEMA,
+        expected_status="COMPLETE_READ_ONLY_DEVELOPMENT_CLASSIFICATION",
+    )
+    initial = _read_hashed(Path(initial_exact_path), "result_hash")
+    continuations = [
+        _read_hashed(Path(value), "result_hash")
+        for value in sorted(str(path) for path in continuation_paths)
+    ]
+    result = build_autonomous_tier_g_controls(
+        root_path,
+        bank,
+        initial,
+        continuations,
+        shard_index=int(shard_index),
+        shard_count=int(shard_count),
+    )
+    counts = dict(result.get("counts") or {})
+    if (
+        int(counts.get("authoritative_promotion_count", 0)) != 0
+        or int(counts.get("xfa_paths_started", 0)) != 0
+        or int(counts.get("registry_writes", 0)) != 0
+        or int(counts.get("database_writes", 0)) != 0
+        or int(counts.get("q4_access_count_delta", 0)) != 0
+        or int(counts.get("data_purchase_count", 0)) != 0
+        or int(counts.get("broker_connections", 0)) != 0
+        or int(counts.get("orders", 0)) != 0
+        or result.get("promotion_status") is not None
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "read-only Tier-G control worker attempted a status side effect"
         )
     return result
 
@@ -3165,6 +3497,7 @@ def _exact_result_metrics(
     marginal_books = branch_results.get("MARGINAL_BOOKS") or {}
     consistency_direct = branch_results.get("CONSISTENCY_DIRECT") or {}
     event_time_safety = branch_results.get("EVENT_TIME_SAFETY") or {}
+    tier_g_controls = branch_results.get("TIER_G_CONTROLS") or {}
     if composite:
         counters = dict(composite.get("aggregate_counters") or {})
         exact_ids = set(
@@ -3339,12 +3672,29 @@ def _exact_result_metrics(
         )
         safety_profile_count = int(safety_counts.get("profile_count", 0))
         selected += safety_candidate_count * safety_profile_count
+        tier_g_counts = dict(tier_g_controls.get("counts") or {})
+        tier_g_episode_count = int(
+            tier_g_counts.get("exact_account_replay_count", 0)
+        )
+        if tier_g_episode_count % 2:
+            raise AutonomousDirectorRuntimeError(
+                "Tier-G controls normal/stressed episode denominator drift"
+            )
+        normal_episodes += tier_g_episode_count // 2
+        stressed_episodes += tier_g_episode_count // 2
+        total_episodes += tier_g_episode_count
+        tier_g_candidate_count = int(
+            tier_g_counts.get("selected_candidate_count", 0)
+        )
+        selected += tier_g_candidate_count
         positive_stressed_policy_ids.update(stressed_pass_ids)
         control_replay_operations = int(
             book_counts.get("supporting_policy_exact_replay_count", 0)
         ) + int(
             direct_counts.get("identity_control_exact_replay_count", 0)
-        ) + safety_candidate_count
+        ) + safety_candidate_count + int(
+            tier_g_counts.get("synthetic_control_count", 0)
+        )
         best = composite.get("best_exact_frontier_point")
         normal_best = max(
             float(((best or {}).get("normal") or {}).get("pass_rate", 0.0)),

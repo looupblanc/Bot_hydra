@@ -692,6 +692,110 @@ def test_event_time_safety_runtime_worker_rejects_side_effects(
         )
 
 
+def test_tier_g_control_runtime_worker_rejects_side_effects(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    safe = {
+        "status": "COMPLETE_READ_ONLY_TIER_G_CONTROL_SHARD",
+        "counts": {
+            "authoritative_promotion_count": 0,
+            "xfa_paths_started": 0,
+            "registry_writes": 0,
+            "database_writes": 0,
+            "q4_access_count_delta": 0,
+            "data_purchase_count": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        },
+        "promotion_status": None,
+    }
+    monkeypatch.setattr(
+        director_runtime,
+        "_read_hashed",
+        lambda *_args, **_kwargs: {},
+    )
+    monkeypatch.setattr(
+        director_runtime,
+        "_verified_inner_result",
+        lambda *_args, **_kwargs: {"candidate": "bank"},
+    )
+    monkeypatch.setattr(
+        director_runtime,
+        "build_autonomous_tier_g_controls",
+        lambda *_args, **_kwargs: safe,
+    )
+
+    assert director_runtime._tier_g_controls_from_artifacts_worker(
+        ".",
+        "candidate.json",
+        "initial.json",
+        (),
+        shard_index=0,
+        shard_count=2,
+    ) == safe
+
+    unsafe = deepcopy(safe)
+    unsafe["counts"] = {**safe["counts"], "orders": 1}
+    monkeypatch.setattr(
+        director_runtime,
+        "build_autonomous_tier_g_controls",
+        lambda *_args, **_kwargs: unsafe,
+    )
+    with pytest.raises(
+        director_runtime.AutonomousDirectorRuntimeError,
+        match="Tier-G control worker attempted a status side effect",
+    ):
+        director_runtime._tier_g_controls_from_artifacts_worker(
+            ".",
+            "candidate.json",
+            "initial.json",
+            (),
+            shard_index=0,
+            shard_count=2,
+        )
+
+
+def test_exact_metrics_include_tier_g_control_episode_work() -> None:
+    composite = {
+        "aggregate_counters": {
+            "exact_normal_account_replays": 10,
+            "exact_stressed_account_replays": 10,
+            "exact_account_replays": 20,
+        },
+        "completed_candidate_count": 2,
+        "source_inventory": {
+            "sealed_initial_candidate_ids": ["candidate-a", "candidate-b"]
+        },
+        "candidate_pass_sets": {
+            "normal": ["candidate-a"],
+            "stressed": ["candidate-a"],
+        },
+        "best_exact_frontier_point": {
+            "candidate_id": "candidate-a",
+            "normal": {"pass_rate": 0.10},
+            "stressed": {"pass_rate": 0.05},
+        },
+    }
+    metrics = director_runtime._exact_result_metrics(
+        {
+            "EXACT_0029_COMPOSITE": composite,
+            "TIER_G_CONTROLS": {
+                "counts": {
+                    "selected_candidate_count": 5,
+                    "exact_account_replay_count": 504,
+                    "synthetic_control_count": 15,
+                }
+            },
+        }
+    )
+
+    assert metrics["exact_account_replays"] == 7
+    assert metrics["exact_account_episode_replays"] == 524
+    assert metrics["normal_account_replays"] == 262
+    assert metrics["stressed_account_replays"] == 262
+    assert metrics["control_policy_replay_operations"] == 15
+
+
 def test_embedded_post_composite_result_requires_its_own_hash() -> None:
     inner = director_runtime._with_hash(
         {
