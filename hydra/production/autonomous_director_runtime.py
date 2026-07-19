@@ -141,6 +141,11 @@ from hydra.research.curve_relative_value_tripwire import (
     WAITING_STATUS as TREASURY_CURVE_WAITING_STATUS,
     build_curve_relative_value_tripwire,
 )
+from hydra.research.clean_cross_asset_daily_tripwire import (
+    BRANCH_ID as CLEAN_CROSS_ASSET_DAILY_BRANCH_ID,
+    SCHEMA as CLEAN_CROSS_ASSET_DAILY_SCHEMA,
+    run_clean_cross_asset_daily_tripwire,
+)
 
 
 BRANCH_RESULT_SCHEMA = "hydra_autonomous_economic_branch_result_v1"
@@ -2088,6 +2093,19 @@ def _run_post_book_graduation_relay(
                 runtime_results=results,
             )
         )
+        state, results, _cross_asset_daily_tripwire = (
+            _run_clean_cross_asset_daily_tripwire_relay(
+                root=root,
+                manifest=manifest,
+                output=output,
+                live_writer=live_writer,
+                branch_writer=branch_writer,
+                prior_state=state,
+                started=started,
+                heartbeat_seconds=heartbeat_seconds,
+                runtime_results=results,
+            )
+        )
     elif os.environ.get("HYDRA_PRODUCTION_TEST_MODE") != "1":
         raise AutonomousDirectorRuntimeError(
             "post-confirmation branch portfolio is undeclared"
@@ -3715,6 +3733,180 @@ def _session_safe_confirmation_next_action(result: Mapping[str, Any]) -> str:
     return "CLOSE_SESSION_SAFE_REPAIR_AND_DISPATCH_DISTINCT_CAUSAL_BRANCH"
 
 
+def _run_clean_cross_asset_daily_tripwire_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    """Persist the frozen CL-to-YM tripwire once, then dispatch a new branch."""
+
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    section = dict(manifest.get("post_breadth_branch_portfolio") or {})
+    card_raw = str(
+        section.get("cross_asset_daily_decision_card_path")
+        or "config/research/clean_cross_asset_daily_tripwire_decision_card_v1.json"
+    )
+    result_raw = str(section.get("cross_asset_daily_result_path") or "").strip()
+    card_path = (root / card_raw).resolve()
+    result_path = (
+        (root / result_raw).resolve()
+        if result_raw
+        else (
+            output
+            / "branch_results"
+            / _POST_BREADTH_RELATIVE_ROOT
+            / "clean_cross_asset_daily_tripwire.json"
+        ).resolve()
+    )
+    _assert_within(root.resolve(), card_path)
+    relative_result = _relative_branch_artifact_path(
+        output, result_path, "clean cross-asset daily result"
+    )
+    if not card_path.is_file():
+        raise AutonomousDirectorRuntimeError(
+            "clean cross-asset daily decision card is absent"
+        )
+
+    result: dict[str, Any]
+    if result_path.is_file():
+        envelope = _read_hashed(result_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "clean cross-asset daily envelope identity drift"
+            )
+        result = _verify_clean_cross_asset_daily_tripwire_result(
+            _verified_inner_result(
+                envelope,
+                key="clean_cross_asset_daily_tripwire",
+                expected_schema=CLEAN_CROSS_ASSET_DAILY_SCHEMA,
+                expected_status=str(
+                    dict(envelope.get("clean_cross_asset_daily_tripwire") or {}).get(
+                        "status"
+                    )
+                ),
+            )
+        )
+    else:
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=1,
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                future = pool.submit(
+                    _clean_cross_asset_daily_tripwire_worker,
+                    str(root),
+                    str(card_path),
+                )
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="CLEAN_CROSS_ASSET_DAILY_TRIPWIRE_RUNNING",
+                    branch_results=results,
+                    next_action="RUN_FROZEN_CL_TO_YM_EXACT_ACCOUNT_TRIPWIRE_ONCE",
+                )
+                state.update(
+                    {
+                        "active_economic_worker_processes": 1,
+                        "cross_asset_daily_worker_limit": 1,
+                        "cross_asset_daily_parent_writer_only": True,
+                        "q4_access_count_delta": 0,
+                        "broker_connections": 0,
+                        "orders": 0,
+                    }
+                )
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+                while not future.done():
+                    wait(
+                        {future},
+                        timeout=max(min(float(heartbeat_seconds), 5.0), 0.1),
+                        return_when=FIRST_COMPLETED,
+                    )
+                    state = _heartbeat_state(
+                        state, active_economic_worker_processes=int(not future.done())
+                    )
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+                result = _verify_clean_cross_asset_daily_tripwire_result(
+                    dict(future.result())
+                )
+        finally:
+            _end_economic_phase()
+
+        expected_card_hash = str(
+            section.get("cross_asset_daily_decision_card_hash") or ""
+        )
+        actual_card_hash = str(
+            dict(result.get("source_bindings") or {}).get("decision_card_hash") or ""
+        )
+        if expected_card_hash and actual_card_hash != expected_card_hash:
+            raise AutonomousDirectorRuntimeError(
+                "clean cross-asset daily decision card differs from manifest freeze"
+            )
+        envelope = _post_source_envelope(
+            manifest,
+            lane_id="EXPLORATION",
+            branch_id=CLEAN_CROSS_ASSET_DAILY_BRANCH_ID,
+            decision=str(result["status"]),
+            payload_key="clean_cross_asset_daily_tripwire",
+            payload=result,
+            next_action=str(result["next_action"]),
+        )
+        branch_writer.write_json(relative_result, envelope)
+        _append_decision_once(root, manifest, envelope)
+
+    results["POST_BREADTH_CLEAN_CROSS_ASSET_DAILY"] = result
+    best = dict(result["best_safe_primary_cell"])
+    normal = dict(best["normal"])
+    stressed = dict(best["stressed"])
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage=str(result["status"]),
+        branch_results=results,
+        next_action=str(result["next_action"]),
+    )
+    state.update(
+        {
+            "active_economic_worker_processes": 0,
+            "cross_asset_daily_status": str(result["status"]),
+            "cross_asset_daily_event_count": int(result["event_count"]),
+            "cross_asset_daily_account_cell_count": int(result["account_cell_count"]),
+            "cross_asset_daily_best_safe_account_label": str(best["account_label"]),
+            "cross_asset_daily_best_safe_micro_quantity": int(best["micro_quantity"]),
+            "cross_asset_daily_best_safe_normal_pass_count": int(normal["pass_count"]),
+            "cross_asset_daily_best_safe_stressed_pass_count": int(stressed["pass_count"]),
+            "cross_asset_daily_best_safe_stressed_mll_breach_count": int(
+                stressed["mll_breach_count"]
+            ),
+            "cross_asset_daily_promotion_count": 0,
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        }
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, result
+
+
 def _session_safe_confirmation_feature_envelope(
     manifest: Mapping[str, Any], features: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -4869,6 +5061,18 @@ def _treasury_curve_tripwire_worker(payload: Mapping[str, Any]) -> dict[str, Any
     return _verify_treasury_curve_result(result, allow_waiting=True)
 
 
+def _clean_cross_asset_daily_tripwire_worker(
+    root_path: str, decision_card_path: str
+) -> dict[str, Any]:
+    """Run the frozen CL-to-YM exact tripwire without durable side effects."""
+
+    return _verify_clean_cross_asset_daily_tripwire_result(
+        run_clean_cross_asset_daily_tripwire(
+            root_path, decision_card_path=decision_card_path
+        )
+    )
+
+
 def _verify_event_time_matched_controls_result(
     value: Mapping[str, Any],
 ) -> dict[str, Any]:
@@ -5079,6 +5283,53 @@ def _verify_treasury_curve_result(
             raise AutonomousDirectorRuntimeError(
                 "Treasury account-size matrix denominator drift"
             )
+    return {**row, "result_hash": claimed}
+
+
+def _verify_clean_cross_asset_daily_tripwire_result(
+    value: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Keep the viewed cross-asset tripwire at its frozen Tier-E ceiling."""
+
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    gate = dict(row.get("frozen_gate") or {})
+    passed = gate.get("passed") is True
+    expected_status = (
+        "CROSS_ASSET_DAILY_TRIPWIRE_PASSED_DEVELOPMENT_ONLY"
+        if passed
+        else "CROSS_ASSET_DAILY_DIRECTION_TRANSFER_FALSIFIED"
+    )
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != CLEAN_CROSS_ASSET_DAILY_SCHEMA
+        or row.get("branch_id") != CLEAN_CROSS_ASSET_DAILY_BRANCH_ID
+        or row.get("status") != expected_status
+        or row.get("evidence_role") != "VIEWED_DEVELOPMENT_TRIPWIRE_ONLY"
+        or row.get("evidence_tier") != "E_DIAGNOSTIC_DEVELOPMENT"
+        or row.get("promotion_status") is not None
+        or row.get("independent_confirmation_claimed") is not False
+        or int(row.get("event_count", -1)) != 28
+        or int(row.get("account_cell_count", -1)) != 180
+        or set(dict(row.get("start_counts") or {})) != {"5", "10", "20"}
+        or not dict(gate.get("checks") or {})
+        or passed is not all(
+            bool(item) for item in dict(gate.get("checks") or {}).values()
+        )
+        or int(row.get("q4_access_count_delta", -1)) != 0
+        or not math.isclose(
+            float(row.get("incremental_data_spend_usd", -1.0)),
+            0.0,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        )
+        or int(row.get("broker_connections", -1)) != 0
+        or int(row.get("orders", -1)) != 0
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "clean cross-asset daily tripwire identity, ceiling, or safety drift"
+        )
     return {**row, "result_hash": claimed}
 
 
