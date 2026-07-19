@@ -1144,11 +1144,22 @@ def _summarize_sprint_episodes(
             "mll_breach_rate": 0.0,
             "minimum_mll_buffer": 4_500.0,
             "consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "passing_consistency_rate": 0.0,
+            "all_passing_paths_consistency_compliant": False,
+            "passing_best_day_concentration_max": 0.0,
             "median_days_to_target": None,
             "block_pass_counts": {},
             "component_contribution": {},
             "best_day_concentration_max": 0.0,
+            "maximum_positive_session_day_aggregate_share": 0.0,
+            "positive_session_day_aggregate_profit_denominator": 0.0,
+            "single_episode_day_observation_domination": False,
             "single_trade_domination": False,
+            "single_trade_domination_metric_qualification": (
+                "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;"
+                "NOT_TRADE_LEVEL_EVIDENCE"
+            ),
             "accepted_event_count": 0,
             "skipped_event_count": 0,
             "maximum_mini_equivalent_mean": 0.0,
@@ -1166,14 +1177,33 @@ def _summarize_sprint_episodes(
     breach = sum(row.mll_breached for row in episodes)
     contributions: dict[str, float] = defaultdict(float)
     daily_values: list[float] = []
+    daily_values_by_session_day: dict[int, float] = defaultdict(float)
     for episode in episodes:
         for component_id, value in episode.component_contribution.items():
             contributions[component_id] += float(value)
-        daily_values.extend(float(row.get("day_pnl", 0.0)) for row in episode.daily_path)
+        for daily_row in episode.daily_path:
+            value = float(daily_row.get("day_pnl", 0.0))
+            daily_values.append(value)
+            daily_values_by_session_day[int(daily_row["session_day"])] += value
     positive_daily = [max(value, 0.0) for value in daily_values]
     positive_sum = sum(positive_daily)
-    single_trade_domination = bool(
+    single_episode_day_observation_domination = bool(
         positive_sum > 0.0 and max(positive_daily, default=0.0) / positive_sum > 0.50
+    )
+    positive_session_days = {
+        session_day: max(value, 0.0)
+        for session_day, value in daily_values_by_session_day.items()
+    }
+    positive_session_day_total = sum(positive_session_days.values())
+    maximum_positive_session_day_aggregate_share = (
+        max(positive_session_days.values(), default=0.0)
+        / positive_session_day_total
+        if positive_session_day_total > 0.0
+        else 0.0
+    )
+    passing_episodes = [row for row in episodes if row.passed]
+    passing_consistency_count = sum(
+        bool(row.consistency_ok) for row in passing_episodes
     )
     passing_days = [row.days_to_target for row in episodes if row.days_to_target is not None]
     episode_maximum_mini = np.asarray(
@@ -1212,6 +1242,22 @@ def _summarize_sprint_episodes(
             min(row.minimum_mll_buffer for row in episodes)
         ),
         "consistency_rate": float(sum(row.consistency_ok for row in episodes) / count),
+        "passing_episode_count": len(passing_episodes),
+        "passing_consistency_rate": (
+            float(passing_consistency_count / len(passing_episodes))
+            if passing_episodes
+            else 0.0
+        ),
+        "all_passing_paths_consistency_compliant": bool(
+            passing_episodes
+            and passing_consistency_count == len(passing_episodes)
+        ),
+        "passing_best_day_concentration_max": float(
+            max(
+                (row.best_day_concentration for row in passing_episodes),
+                default=0.0,
+            )
+        ),
         "median_days_to_target": (
             float(median(passing_days)) if passing_days else None
         ),
@@ -1220,7 +1266,24 @@ def _summarize_sprint_episodes(
         "best_day_concentration_max": float(
             max(row.best_day_concentration for row in episodes)
         ),
-        "single_trade_domination": single_trade_domination,
+        "maximum_positive_session_day_aggregate_share": float(
+            maximum_positive_session_day_aggregate_share
+        ),
+        "positive_session_day_aggregate_profit_denominator": float(
+            positive_session_day_total
+        ),
+        "single_episode_day_observation_domination": (
+            single_episode_day_observation_domination
+        ),
+        # Compatibility only.  The historical field was built from daily PnL
+        # observations, not trade-level PnL, so it must not be used to claim a
+        # trade-concentration control.  Authoritative trade concentration is a
+        # later control over the immutable trade ledger.
+        "single_trade_domination": single_episode_day_observation_domination,
+        "single_trade_domination_metric_qualification": (
+            "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;"
+            "NOT_TRADE_LEVEL_EVIDENCE"
+        ),
         "accepted_event_count": int(sum(row.accepted_events for row in episodes)),
         "skipped_event_count": int(sum(row.skipped_events for row in episodes)),
         "maximum_mini_equivalent_mean": float(np.mean(episode_maximum_mini)),

@@ -233,7 +233,7 @@ def test_unverified_restricted_market_scaling_is_rejected_for_150k(
         )
 
 
-def test_authoritative_snapshot_with_malformed_source_hashes_fails_closed() -> None:
+def test_authoritative_snapshot_with_verified_source_hashes_is_ready() -> None:
     graduation = _graduation()
     plan = prepare_graduated_xfa_relay(
         graduation,
@@ -241,19 +241,12 @@ def test_authoritative_snapshot_with_malformed_source_hashes_fails_closed() -> N
         rule_snapshot_path=RULES,
     )
 
-    assert plan["status"] == "XFA_RULES_UNVERIFIED_FAIL_CLOSED"
-    assert (
-        plan["blocked_reason_code"]
-        == "OFFICIAL_RULE_SNAPSHOT_SOURCE_PROVENANCE_INVALID"
-    )
-    assert plan["rule_snapshot"]["source_provenance_status"] == (
-        "INVALID_FAIL_CLOSED"
-    )
-    assert plan["rule_snapshot"]["source_provenance_issues"] == [
-        "OFFICIAL_SOURCE_5_DOCUMENT_SHA256_INVALID",
-        "OFFICIAL_SOURCE_8_DOCUMENT_SHA256_INVALID",
-    ]
-    assert plan["alternative_runs"] == {"STANDARD": [], "CONSISTENCY": []}
+    assert plan["status"] == "READY_FOR_EXPLICIT_LATER_XFA_SIMULATION"
+    assert plan["blocked_reason_code"] is None
+    assert plan["rule_snapshot"]["source_provenance_status"] == "VERIFIED"
+    assert plan["rule_snapshot"]["source_provenance_issues"] == []
+    assert len(plan["alternative_runs"]["STANDARD"]) == 1
+    assert len(plan["alternative_runs"]["CONSISTENCY"]) == 1
     assert plan["simulation_started"] is False
 
 

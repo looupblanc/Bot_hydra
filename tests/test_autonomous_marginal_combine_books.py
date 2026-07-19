@@ -95,6 +95,134 @@ def test_g_ready_reads_heldout_not_design() -> None:
     ] is False
 
 
+def test_g_gate_uses_passing_path_consistency_not_timeout_ratio() -> None:
+    passed = _summary_episode(
+        passed=True,
+        consistency_ok=True,
+        best_day_concentration=0.50,
+        net_pnl=3_000.0,
+        daily_pnl=((21_000, 1_500.0), (21_001, 1_500.0)),
+    )
+    # Topstep expands the target for this unfinished path.  Its near-zero net
+    # makes best_day/net enormous, but it is not a failed consistency rule and
+    # cannot invalidate the separate, legally compliant pass above.
+    timeout = _summary_episode(
+        passed=False,
+        consistency_ok=False,
+        best_day_concentration=1_000.0,
+        net_pnl=1.0,
+        daily_pnl=((21_002, 1_000.0), (21_003, -999.0)),
+    )
+    summary = books._summarize_sprint_episodes(
+        ((passed, "B3"), (timeout, "B4")),
+        requested_start_count=2,
+        data_censored_count=0,
+    )
+
+    assert summary["consistency_rate"] == pytest.approx(0.50)
+    assert summary["passing_consistency_rate"] == pytest.approx(1.0)
+    assert summary["all_passing_paths_consistency_compliant"] is True
+    assert summary["best_day_concentration_max"] == pytest.approx(1_000.0)
+    assert summary["maximum_positive_session_day_aggregate_share"] == pytest.approx(
+        1_500.0 / 4_000.0
+    )
+
+    row = _fake_policy_result(
+        {
+            "policy_id": "timeout-safe",
+            "policy_spec_hash": "spec",
+            "policy_role": "MARGINAL_COMBINE_BOOK_CANDIDATE",
+            "account_label": "50K",
+            "component_ids": ["a", "b"],
+            "component_quantity_tiers": {"a": 2, "b": 2},
+            "governor_profile": _profile().__dict__,
+        },
+        None,
+    )
+    compact = books._compact_policy_result(row)
+    compact["marginally_accepted"] = True
+    for scenario in books.SCENARIOS:
+        compact["summaries_by_role"]["HELD_OUT_DEVELOPMENT"][scenario]["5"] = (
+            deepcopy(summary)
+        )
+    gates = books._g_ready_gates(compact)
+
+    assert gates["all_passing_paths_consistency_compliant"] is True
+    assert gates["no_single_day_domination"] is True
+    assert gates["trade_concentration_deferred_to_authoritative_control"] is True
+
+
+def test_g_gate_detects_unique_session_day_profit_domination() -> None:
+    passed = _summary_episode(
+        passed=True,
+        consistency_ok=True,
+        best_day_concentration=0.50,
+        net_pnl=3_000.0,
+        daily_pnl=((21_000, 1_500.0), (21_001, 1_500.0)),
+    )
+    timeout = _summary_episode(
+        passed=False,
+        consistency_ok=False,
+        best_day_concentration=2_000.0,
+        net_pnl=1.0,
+        # The same session day is economically dominant after rolling paths
+        # are grouped by their real session date.
+        daily_pnl=((21_000, 2_000.0), (21_002, -1_999.0)),
+    )
+    summary = books._summarize_sprint_episodes(
+        ((passed, "B3"), (timeout, "B4")),
+        requested_start_count=2,
+        data_censored_count=0,
+    )
+
+    assert summary["all_passing_paths_consistency_compliant"] is True
+    assert summary["maximum_positive_session_day_aggregate_share"] == pytest.approx(
+        3_500.0 / 5_000.0
+    )
+
+    row = _fake_policy_result(
+        {
+            "policy_id": "day-dominated",
+            "policy_spec_hash": "spec",
+            "policy_role": "MARGINAL_COMBINE_BOOK_CANDIDATE",
+            "account_label": "50K",
+            "component_ids": ["a", "b"],
+            "component_quantity_tiers": {"a": 2, "b": 2},
+            "governor_profile": _profile().__dict__,
+        },
+        None,
+    )
+    compact = books._compact_policy_result(row)
+    compact["marginally_accepted"] = True
+    for scenario in books.SCENARIOS:
+        compact["summaries_by_role"]["HELD_OUT_DEVELOPMENT"][scenario]["5"] = (
+            deepcopy(summary)
+        )
+    gates = books._g_ready_gates(compact)
+
+    assert gates["all_passing_paths_consistency_compliant"] is True
+    assert gates["no_single_day_domination"] is False
+
+
+def test_passing_path_consistency_invariant_fails_closed() -> None:
+    impossible_pass = _summary_episode(
+        passed=True,
+        consistency_ok=False,
+        best_day_concentration=0.75,
+        net_pnl=3_000.0,
+        daily_pnl=((21_000, 2_250.0), (21_001, 750.0)),
+    )
+    summary = books._summarize_sprint_episodes(
+        ((impossible_pass, "B3"),),
+        requested_start_count=1,
+        data_censored_count=0,
+    )
+
+    assert summary["passing_episode_count"] == 1
+    assert summary["passing_consistency_rate"] == 0.0
+    assert summary["all_passing_paths_consistency_compliant"] is False
+
+
 def test_b1_b2_cell_selection_is_invariant_to_b3_b4_outcomes() -> None:
     candidate = {
         "candidate_id": "causal",
@@ -629,16 +757,61 @@ def _summary(
         "mll_breach_rate": 0.0,
         "minimum_mll_buffer": 1_500.0,
         "consistency_rate": 1.0,
+        "passing_episode_count": int(pass_rate * 20),
+        "passing_consistency_rate": 1.0,
+        "all_passing_paths_consistency_compliant": True,
+        "passing_best_day_concentration_max": 0.25,
         "median_days_to_target": float(horizon),
         "block_pass_counts": {"B3": 1, "B4": 1},
         "component_contribution": {
             f"component-{index}": 100.0 for index in range(count)
         },
         "best_day_concentration_max": 0.25,
+        "maximum_positive_session_day_aggregate_share": 0.25,
+        "positive_session_day_aggregate_profit_denominator": 1_000.0,
+        "single_episode_day_observation_domination": False,
         "single_trade_domination": False,
+        "single_trade_domination_metric_qualification": (
+            "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;"
+            "NOT_TRADE_LEVEL_EVIDENCE"
+        ),
         "blocks_with_passes": ["B3", "B4"],
         "terminal_distribution": {},
     }
+
+
+def _summary_episode(
+    *,
+    passed: bool,
+    consistency_ok: bool,
+    best_day_concentration: float,
+    net_pnl: float,
+    daily_pnl: tuple[tuple[int, float], ...],
+) -> SimpleNamespace:
+    return SimpleNamespace(
+        target_progress=net_pnl / 3_000.0,
+        net_pnl=net_pnl,
+        passed=passed,
+        mll_breached=False,
+        component_contribution={"a": net_pnl / 2.0, "b": net_pnl / 2.0},
+        daily_path=tuple(
+            {
+                "session_day": session_day,
+                "day_pnl": value,
+                "exposure": {"maximum_mini_equivalent": 1.0},
+            }
+            for session_day, value in daily_pnl
+        ),
+        days_to_target=(2 if passed else None),
+        maximum_mini_equivalent=1.0,
+        maximum_net_directional_exposure=1.0,
+        consistency_ok=consistency_ok,
+        minimum_mll_buffer=1_500.0,
+        best_day_concentration=best_day_concentration,
+        accepted_events=1,
+        skipped_events=0,
+        terminal=SimpleNamespace(value="PASSED" if passed else "TIMEOUT"),
+    )
 
 
 def _raw_cell(

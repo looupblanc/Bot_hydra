@@ -442,6 +442,61 @@ def test_post_composite_metrics_add_unique_book_evidence_denominators() -> None:
     assert metrics["best_stressed_pass_rate"] == 0.20
 
 
+def test_post_book_metrics_include_consistency_direct_exact_work() -> None:
+    composite = {
+        "aggregate_counters": {
+            "exact_normal_account_replays": 10,
+            "exact_stressed_account_replays": 10,
+            "exact_account_replays": 20,
+        },
+        "completed_candidate_count": 2,
+        "source_inventory": {
+            "sealed_initial_candidate_ids": ["candidate-a", "candidate-b"]
+        },
+        "candidate_pass_sets": {
+            "normal": ["candidate-a"],
+            "stressed": ["candidate-a"],
+        },
+        "best_exact_frontier_point": {
+            "candidate_id": "candidate-a",
+            "normal": {"pass_rate": 0.10},
+            "stressed": {"pass_rate": 0.05},
+        },
+    }
+    direct_policy = {
+        "policy_id": "direct-a",
+        "summaries": {
+            "NORMAL": {"5": {"pass_count": 2, "pass_rate": 0.20}},
+            "STRESSED_1_5X": {
+                "5": {"pass_count": 1, "pass_rate": 0.10, "net_total": 250.0}
+            },
+        },
+    }
+
+    metrics = director_runtime._exact_result_metrics(
+        {
+            "EXACT_0029_COMPOSITE": composite,
+            "CONSISTENCY_DIRECT": {
+                "selected_policy_results": [direct_policy],
+                "counts": {
+                    "completed_episode_count": 24,
+                    "direct_policy_exact_replay_count": 2,
+                    "identity_control_exact_replay_count": 1,
+                },
+            },
+        }
+    )
+
+    assert metrics["exact_account_replays"] == 5
+    assert metrics["exact_account_episode_replays"] == 44
+    assert metrics["normal_account_replays"] == 22
+    assert metrics["stressed_account_replays"] == 22
+    assert metrics["normal_pass_candidate_count"] == 2
+    assert metrics["stressed_pass_candidate_count"] == 2
+    assert metrics["best_normal_pass_rate"] == 0.20
+    assert metrics["best_stressed_pass_rate"] == 0.10
+
+
 def test_embedded_post_composite_result_requires_its_own_hash() -> None:
     inner = director_runtime._with_hash(
         {
@@ -471,6 +526,103 @@ def test_embedded_post_composite_result_requires_its_own_hash() -> None:
             key="payload",
             expected_schema="test-schema",
             expected_status="COMPLETE",
+        )
+
+
+def test_relay_shard_resume_validates_manifest_hash_and_partition(
+    tmp_path: Path,
+) -> None:
+    manifest = {
+        "campaign_id": "hydra_autonomous_economic_discovery_director_0035",
+        "manifest_hash": "a" * 64,
+        "source_commit": "b" * 40,
+    }
+    inner = director_runtime._with_hash(
+        {
+            "schema": "test-shard-v1",
+            "status": "COMPLETE",
+            "shard": {"shard_index": 0, "shard_count": 2},
+            "promotion_status": None,
+        },
+        "result_hash",
+    )
+    envelope = director_runtime._post_source_envelope(
+        manifest,
+        lane_id="EXPLOITATION",
+        branch_id="TEST_RELAY_SHARD_00",
+        decision="COMPLETE",
+        payload_key="relay_shard",
+        payload=inner,
+        next_action="COMPOSE",
+    )
+    path = tmp_path / "relay_shard_00.json"
+    _write_json(path, envelope)
+    original = path.read_bytes()
+
+    first = director_runtime._read_relay_shard(
+        path,
+        manifest=manifest,
+        key="relay_shard",
+        expected_schema="test-shard-v1",
+        expected_status="COMPLETE",
+        expected_index=0,
+        expected_count=2,
+        label="test relay",
+    )
+    resumed = director_runtime._read_relay_shard(
+        path,
+        manifest=manifest,
+        key="relay_shard",
+        expected_schema="test-shard-v1",
+        expected_status="COMPLETE",
+        expected_index=0,
+        expected_count=2,
+        label="test relay",
+    )
+
+    assert first == resumed == inner
+    assert path.read_bytes() == original
+    with pytest.raises(
+        director_runtime.AutonomousDirectorRuntimeError,
+        match="index/count drift",
+    ):
+        director_runtime._read_relay_shard(
+            path,
+            manifest=manifest,
+            key="relay_shard",
+            expected_schema="test-shard-v1",
+            expected_status="COMPLETE",
+            expected_index=1,
+            expected_count=2,
+            label="test relay",
+        )
+
+
+def test_embedded_result_accepts_only_declared_status_set() -> None:
+    inner = director_runtime._with_hash(
+        {
+            "schema": "bank-v1",
+            "status": "SHORTAGE",
+            "promotion_status": None,
+        },
+        "result_hash",
+    )
+
+    assert director_runtime._verified_inner_result(
+        {"bank": inner},
+        key="bank",
+        expected_schema="bank-v1",
+        expected_status=("TARGET_REACHED", "SHORTAGE"),
+    ) == inner
+    with pytest.raises(
+        director_runtime.AutonomousDirectorRuntimeError,
+        match="embedded economic result identity/hash drift",
+    ):
+        director_runtime._verified_inner_result(
+            {"bank": inner},
+            key="bank",
+            expected_schema="bank-v1",
+            expected_status=("TARGET_REACHED",),
         )
 
 
