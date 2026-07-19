@@ -457,9 +457,9 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "a3ab88a4485670fc9dcb8eaebcd34a8bc995f65eedb2583c5410f27c52149fd5",
+      "manifest_file_sha256": "856158c410794cfee8016e18bee1a75cbff62e1a4eb26887088ed1c7bfdb5021",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "e2a02b1732b4310c3b482e515baffb22d53068e64b474e43e64be8cc0bf1c886",
+      "manifest_semantic_hash": "f468e25e5ab466f108d92fd050cb0053e4c573489b4f60bd709f98701553ef1e",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -502,6 +502,33 @@
         "scientific_policy_changed": false,
         "source_bank_candidate_count": 100000
       },
+      "post_exact_candidate_graduation_relay": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "classification": "MASTER_CONTRACT_TIER_Q_AND_MARGINAL_BOOK_RELAY",
+        "code_commit": "b2063cecc18fe9842c5711e0eaf735a48b6a58d9",
+        "exact_candidate_count": 176,
+        "exact_candidate_with_normal_and_stressed_pass_count": 46,
+        "exact_composite_result_hash": "000862a49ccaf0cfe69d3837c053d639c91cca7c5c993185d2ad4d6fda876841",
+        "expected_candidate_bank_hash": "4a91943724ccd691ac67e7c7936e41fe78bcaeb3ac8f80263bd4b3a82dd2b9a2",
+        "expected_tier_q_candidate_count": 24,
+        "held_out_blocks": [
+          "B3",
+          "B4"
+        ],
+        "marginal_book_maximum": 256,
+        "old_manifest_hash": "e2a02b1732b4310c3b482e515baffb22d53068e64b474e43e64be8cc0bf1c886",
+        "promotion_thresholds_changed": false,
+        "quantity_selection_blocks": [
+          "B1",
+          "B2"
+        ],
+        "repair_commit": "4189237a2779e0c2864722886d79095147958603",
+        "scientific_policy_changed": false,
+        "tier_q_requires_concentration": false,
+        "two_read_only_book_shards": true,
+        "xfa_requires_frozen_tier_g": true
+      },
       "post_reservation_pre_outcome_technical_repair": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
@@ -513,8 +540,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "697d35d2a4bae1a85960690b957629e6f67bdae2",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-source-exhaustion-reallocation-2026-07-19"
+      "worm_commit": "4189237a2779e0c2864722886d79095147958603",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-combine-graduation-relay-2026-07-19"
     }
   ],
   "governance": {
@@ -523,8 +550,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T06:16:44Z",
-  "queue_hash": "5e75bd6a5c6bb82f9547ace6cb83f4acd6e4f97abcc29c721e54224a74be3083",
+  "issued_at_utc": "2026-07-19T07:03:00Z",
+  "queue_hash": "871c08916e2dbb8b66e86daf04af7589a645334910a3979d8bae93790b72b4ef",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
