@@ -3,6 +3,7 @@ from __future__ import annotations
 import gzip
 import hashlib
 import json
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -498,6 +499,144 @@ def test_post_book_metrics_include_consistency_direct_exact_work() -> None:
     assert metrics["stressed_pass_candidate_count"] == 2
     assert metrics["best_normal_pass_rate"] == 0.20
     assert metrics["best_stressed_pass_rate"] == 0.10
+
+
+def test_post_consistency_metrics_include_event_time_safety_frontier() -> None:
+    composite = {
+        "aggregate_counters": {
+            "exact_normal_account_replays": 10,
+            "exact_stressed_account_replays": 10,
+            "exact_account_replays": 20,
+        },
+        "completed_candidate_count": 2,
+        "source_inventory": {
+            "sealed_initial_candidate_ids": ["candidate-a", "candidate-b"]
+        },
+        "candidate_pass_sets": {
+            "normal": ["candidate-a"],
+            "stressed": ["candidate-a"],
+        },
+        "best_exact_frontier_point": {
+            "candidate_id": "candidate-a",
+            "normal": {"pass_rate": 0.10},
+            "stressed": {"pass_rate": 0.05},
+        },
+    }
+    heldout = {
+        str(horizon): {
+            "BASE": {
+                "pass_count": 1 if horizon == 5 else 0,
+                "pass_rate": 0.25 if horizon == 5 else 0.0,
+                "net_total_usd": 100.0,
+            },
+            "STRESS_1_5X": {
+                "pass_count": 1 if horizon == 5 else 0,
+                "pass_rate": 0.20 if horizon == 5 else 0.0,
+                "net_total_usd": 80.0,
+            },
+        }
+        for horizon in (5, 10, 20)
+    }
+    event_safety = {
+        "candidate_results": [
+            {
+                "selected_result": {
+                    "policy_id": "event-safe-a",
+                    "roles": {"HELD_OUT_DEVELOPMENT": heldout},
+                }
+            }
+        ],
+        "counts": {
+            "selected_candidate_count": 1,
+            "profile_count": 8,
+            "exact_episode_count": 20,
+        },
+    }
+
+    results = {
+        "EXACT_0029_COMPOSITE": composite,
+        "EVENT_TIME_SAFETY": event_safety,
+    }
+    metrics = director_runtime._exact_result_metrics(results)
+
+    assert metrics["exact_account_replays"] == 10
+    assert metrics["exact_account_episode_replays"] == 40
+    assert metrics["normal_account_replays"] == 20
+    assert metrics["stressed_account_replays"] == 20
+    assert metrics["control_policy_replay_operations"] == 1
+    assert metrics["normal_pass_candidate_count"] == 2
+    assert metrics["stressed_pass_candidate_count"] == 2
+    assert metrics["best_normal_pass_rate"] == 0.25
+    assert metrics["best_stressed_pass_rate"] == 0.20
+
+    manifest = {
+        "campaign_id": "hydra_autonomous_economic_discovery_director_0035",
+        "manifest_hash": "a" * 64,
+        "source_commit": "b" * 40,
+    }
+    state = director_runtime._state_payload(
+        manifest,
+        sequence=1,
+        state="ROBUSTNESS_ACTIVE",
+        stage="EVENT_TIME_SAFETY_FRONTIER_RECONCILED",
+        branch_results=results,
+        next_action="TERMINALIZE_EVENT_TIME_SAFETY_REPAIR",
+    )
+    kpis = director_runtime._kpis(
+        manifest,
+        state,
+        results,
+        director_runtime.time.monotonic(),
+    )
+    assert state["event_time_safety_candidate_count"] == 1
+    assert state["event_time_safety_profile_count"] == 8
+    assert state["event_time_safety_exact_episode_count"] == 20
+    assert kpis["event_time_safety_candidate_count"] == 1
+    assert kpis["event_time_safety_profile_count"] == 8
+    assert kpis["event_time_safety_exact_episode_count"] == 20
+
+
+def test_event_time_safety_runtime_worker_rejects_side_effects(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    safe = {
+        "status": "COMPLETE_BOUNDED_EVENT_TIME_SAFETY_SHARD",
+        "counts": {
+            "authoritative_promotion_count": 0,
+            "xfa_paths_started": 0,
+            "registry_writes": 0,
+            "database_writes": 0,
+            "q4_access_count_delta": 0,
+            "data_purchase_count": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        },
+        "promotion_status": None,
+    }
+    monkeypatch.setattr(
+        director_runtime,
+        "build_autonomous_event_time_safety_frontier",
+        lambda *_args, **_kwargs: safe,
+    )
+
+    assert director_runtime._event_time_safety_from_root_worker(
+        ".", shard_index=0, shard_count=2
+    ) == safe
+
+    unsafe = deepcopy(safe)
+    unsafe["counts"] = {**safe["counts"], "orders": 1}
+    monkeypatch.setattr(
+        director_runtime,
+        "build_autonomous_event_time_safety_frontier",
+        lambda *_args, **_kwargs: unsafe,
+    )
+    with pytest.raises(
+        director_runtime.AutonomousDirectorRuntimeError,
+        match="event-time safety worker attempted a status side effect",
+    ):
+        director_runtime._event_time_safety_from_root_worker(
+            ".", shard_index=0, shard_count=2
+        )
 
 
 def test_embedded_post_composite_result_requires_its_own_hash() -> None:

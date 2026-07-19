@@ -33,6 +33,12 @@ from hydra.production.autonomous_director_manifest import (
 from hydra.production.autonomous_exact_replay import (
     exact_0029_account_size_worker,
 )
+from hydra.production.autonomous_event_time_safety_frontier import (
+    COMPOSITE_SCHEMA as EVENT_TIME_SAFETY_COMPOSITE_SCHEMA,
+    SCHEMA as EVENT_TIME_SAFETY_SHARD_SCHEMA,
+    build_autonomous_event_time_safety_frontier,
+    compose_autonomous_event_time_safety_frontier_shards,
+)
 from hydra.production.autonomous_combine_candidate_bank import (
     build_autonomous_combine_candidate_bank,
 )
@@ -1747,14 +1753,30 @@ def _run_post_book_graduation_relay(
         _append_decision_once(root, manifest, envelope)
     results["CONSISTENCY_DIRECT"] = direct_composite
 
+    state, results, event_safety_composite = _run_event_time_safety_relay(
+        root=root,
+        manifest=manifest,
+        output=output,
+        live_writer=live_writer,
+        branch_writer=branch_writer,
+        prior_state=state,
+        started=started,
+        heartbeat_seconds=heartbeat_seconds,
+        runtime_results=results,
+    )
+
     book_counts = dict(semantic_composite.get("counts") or {})
     direct_counts = dict(direct_composite.get("counts") or {})
+    event_safety_counts = dict(event_safety_composite.get("counts") or {})
     pass_counts = dict(pass_bank.get("counts") or {})
     book_ready = int(book_counts.get("g_ready_count", 0)) + int(
         book_counts.get("standalone_g_ready_count", 0)
     )
     direct_ready = int(direct_counts.get("g_precontrol_ready_count", 0))
-    g_precontrol = book_ready + direct_ready
+    event_safety_ready = int(
+        event_safety_counts.get("heldout_safety_precontrol_ready_count", 0)
+    )
+    g_precontrol = book_ready + direct_ready + event_safety_ready
     next_action = (
         "RUN_TRADE_CONCENTRATION_AND_MATCHED_CONTROLS_FOR_PRECONTROL_SURVIVORS"
         if g_precontrol
@@ -1794,6 +1816,16 @@ def _run_post_book_graduation_relay(
                 direct_counts.get("identity_control_exact_replay_count", 0)
             ),
             "consistency_direct_g_precontrol_ready_count": direct_ready,
+            "event_time_safety_candidate_count": int(
+                event_safety_counts.get("selected_candidate_count", 0)
+            ),
+            "event_time_safety_profile_count": int(
+                event_safety_counts.get("profile_count", 0)
+            ),
+            "event_time_safety_exact_episode_count": int(
+                event_safety_counts.get("exact_episode_count", 0)
+            ),
+            "event_time_safety_g_precontrol_ready_count": event_safety_ready,
             "g_precontrol_ready_count": g_precontrol,
             "authoritative_tier_g_count": 0,
             "xfa_paths_started": 0,
@@ -1810,6 +1842,187 @@ def _run_post_book_graduation_relay(
         state = _heartbeat_state(state)
         _publish(live_writer, state, _kpis(manifest, state, results, started))
         _write_mission_views(root, manifest, state, results)
+
+
+def _run_event_time_safety_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    """Run/resume the bounded event-time MLL safety frontier in two shards."""
+
+    relative_root = Path("post_source_exhaustion/post_composite")
+    branch_root = output / "branch_results"
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    shards: dict[int, dict[str, Any]] = {}
+    shard_paths = {
+        index: branch_root
+        / relative_root
+        / f"event_time_safety_shard_{index:02d}.json"
+        for index in range(2)
+    }
+    for index, path in shard_paths.items():
+        if not path.is_file():
+            continue
+        shards[index] = _read_relay_shard(
+            path,
+            manifest=manifest,
+            key="event_time_safety_shard",
+            expected_schema=EVENT_TIME_SAFETY_SHARD_SCHEMA,
+            expected_status="COMPLETE_BOUNDED_EVENT_TIME_SAFETY_SHARD",
+            expected_index=index,
+            expected_count=2,
+            label="event-time safety",
+        )
+
+    missing = [index for index in range(2) if index not in shards]
+    if missing:
+        future_index: dict[Any, int] = {}
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=len(missing),
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                for index in missing:
+                    future = pool.submit(
+                        _event_time_safety_from_root_worker,
+                        str(root),
+                        shard_index=index,
+                        shard_count=2,
+                    )
+                    future_index[future] = index
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="EVENT_TIME_SAFETY_FRONTIER_REPLAY_RUNNING",
+                    branch_results=results,
+                    next_action=(
+                        "TEST_BOUNDED_MICRO_CONTRACT_MLL_SAFETY_FRONTIER"
+                    ),
+                )
+                state["active_economic_worker_processes"] = len(future_index)
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+                pending = set(future_index)
+                while pending:
+                    done, pending = wait(
+                        pending,
+                        timeout=max(float(heartbeat_seconds), 0.1),
+                        return_when=FIRST_COMPLETED,
+                    )
+                    if not done:
+                        state = _heartbeat_state(state)
+                        _publish(
+                            live_writer,
+                            state,
+                            _kpis(manifest, state, results, started),
+                        )
+                        _write_mission_views(root, manifest, state, results)
+                        continue
+                    for future in done:
+                        index = future_index[future]
+                        shard = dict(future.result())
+                        envelope = _post_source_envelope(
+                            manifest,
+                            lane_id=(
+                                "EXPLOITATION" if index == 0 else "EXPLORATION"
+                            ),
+                            branch_id=f"EVENT_TIME_SAFETY_SHARD_{index:02d}",
+                            decision=str(shard["status"]),
+                            payload_key="event_time_safety_shard",
+                            payload=shard,
+                            next_action="COMPOSE_EVENT_TIME_SAFETY_SHARDS",
+                        )
+                        branch_writer.write_json(
+                            relative_root / shard_paths[index].name, envelope
+                        )
+                        _append_decision_once(root, manifest, envelope)
+                        shards[index] = shard
+                    state = _heartbeat_state(
+                        state,
+                        active_economic_worker_processes=len(pending),
+                    )
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+        finally:
+            _end_economic_phase()
+
+    composite = compose_autonomous_event_time_safety_frontier_shards(
+        [shards[index] for index in range(2)]
+    )
+    composite_path = branch_root / relative_root / "event_time_safety_composite.json"
+    if composite_path.is_file():
+        envelope = _read_hashed(composite_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "event-time safety composite identity drift"
+            )
+        persisted = _verified_inner_result(
+            envelope,
+            key="event_time_safety_composite",
+            expected_schema=EVENT_TIME_SAFETY_COMPOSITE_SCHEMA,
+            expected_status="COMPLETE_RECONCILED_EVENT_TIME_SAFETY_SHARDS",
+        )
+        if str(persisted["result_hash"]) != str(composite["result_hash"]):
+            raise AutonomousDirectorRuntimeError(
+                "event-time safety composite changed after persistence"
+            )
+        composite = persisted
+    else:
+        envelope = _post_source_envelope(
+            manifest,
+            lane_id="DIRECTOR",
+            branch_id="EVENT_TIME_SAFETY_FRONTIER_COMPOSITE",
+            decision=str(composite["status"]),
+            payload_key="event_time_safety_composite",
+            payload=composite,
+            next_action=str(composite["next_action"]),
+        )
+        branch_writer.write_json(relative_root / composite_path.name, envelope)
+        _append_decision_once(root, manifest, envelope)
+
+    results["EVENT_TIME_SAFETY"] = composite
+    counts = dict(composite.get("counts") or {})
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage="EVENT_TIME_SAFETY_FRONTIER_RECONCILED",
+        branch_results=results,
+        next_action=str(composite["next_action"]),
+    )
+    state["active_economic_worker_processes"] = 0
+    state["event_time_safety_candidate_count"] = int(
+        counts.get("selected_candidate_count", 0)
+    )
+    state["event_time_safety_profile_count"] = int(
+        counts.get("profile_count", 0)
+    )
+    state["event_time_safety_exact_episode_count"] = int(
+        counts.get("exact_episode_count", 0)
+    )
+    state["event_time_safety_g_precontrol_ready_count"] = int(
+        counts.get("heldout_safety_precontrol_ready_count", 0)
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, composite
 
 
 def _heartbeat_state(
@@ -2077,6 +2290,37 @@ def _consistency_direct_from_artifacts_worker(
     ):
         raise AutonomousDirectorRuntimeError(
             "read-only consistency-direct worker attempted a status side effect"
+        )
+    return result
+
+
+def _event_time_safety_from_root_worker(
+    root_path: str,
+    *,
+    shard_index: int,
+    shard_count: int,
+) -> dict[str, Any]:
+    """Evaluate one event-time safety shard without durable side effects."""
+
+    result = build_autonomous_event_time_safety_frontier(
+        root_path,
+        shard_index=int(shard_index),
+        shard_count=int(shard_count),
+    )
+    counts = dict(result.get("counts") or {})
+    if (
+        int(counts.get("authoritative_promotion_count", 0)) != 0
+        or int(counts.get("xfa_paths_started", 0)) != 0
+        or int(counts.get("registry_writes", 0)) != 0
+        or int(counts.get("database_writes", 0)) != 0
+        or int(counts.get("q4_access_count_delta", 0)) != 0
+        or int(counts.get("data_purchase_count", 0)) != 0
+        or int(counts.get("broker_connections", 0)) != 0
+        or int(counts.get("orders", 0)) != 0
+        or result.get("promotion_status") is not None
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "read-only event-time safety worker attempted a status side effect"
         )
     return result
 
@@ -2904,6 +3148,7 @@ def _exact_result_metrics(
     event = branch_results.get("EVENT_TIME") or {}
     marginal_books = branch_results.get("MARGINAL_BOOKS") or {}
     consistency_direct = branch_results.get("CONSISTENCY_DIRECT") or {}
+    event_time_safety = branch_results.get("EVENT_TIME_SAFETY") or {}
     if composite:
         counters = dict(composite.get("aggregate_counters") or {})
         exact_ids = set(
@@ -3007,6 +3252,43 @@ def _exact_result_metrics(
             direct_stressed_rates.extend(
                 float(row.get("pass_rate", 0.0)) for row in stressed_rows
             )
+        safety_normal_rates: list[float] = []
+        safety_stressed_rates: list[float] = []
+        for candidate in event_time_safety.get("candidate_results") or ():
+            selected_result = dict(candidate.get("selected_result") or {})
+            policy_id = str(selected_result.get("policy_id") or "")
+            heldout = dict(
+                dict(selected_result.get("roles") or {}).get(
+                    "HELD_OUT_DEVELOPMENT"
+                )
+                or {}
+            )
+            normal_rows = [
+                dict(dict(heldout.get(str(horizon)) or {}).get("BASE") or {})
+                for horizon in _HORIZONS
+            ]
+            stressed_rows = [
+                dict(
+                    dict(heldout.get(str(horizon)) or {}).get("STRESS_1_5X")
+                    or {}
+                )
+                for horizon in _HORIZONS
+            ]
+            if any(int(row.get("pass_count", 0)) > 0 for row in normal_rows):
+                normal_pass_ids.add(policy_id)
+            if any(int(row.get("pass_count", 0)) > 0 for row in stressed_rows):
+                stressed_pass_ids.add(policy_id)
+            if any(
+                float(row.get("net_total_usd", 0.0)) > 0.0
+                for row in stressed_rows
+            ):
+                positive_stressed_policy_ids.add(policy_id)
+            safety_normal_rates.extend(
+                float(row.get("pass_rate", 0.0)) for row in normal_rows
+            )
+            safety_stressed_rates.extend(
+                float(row.get("pass_rate", 0.0)) for row in stressed_rows
+            )
         book_counts = dict(marginal_books.get("counts") or {})
         book_episode_count = int(book_counts.get("completed_episode_count", 0))
         if book_episode_count % 2:
@@ -3027,15 +3309,32 @@ def _exact_result_metrics(
         stressed_episodes += direct_episode_count // 2
         total_episodes += direct_episode_count
         selected += int(direct_counts.get("direct_policy_exact_replay_count", 0))
+        safety_counts = dict(event_time_safety.get("counts") or {})
+        safety_episode_count = int(safety_counts.get("exact_episode_count", 0))
+        if safety_episode_count % 2:
+            raise AutonomousDirectorRuntimeError(
+                "event-time safety normal/stressed episode denominator drift"
+            )
+        normal_episodes += safety_episode_count // 2
+        stressed_episodes += safety_episode_count // 2
+        total_episodes += safety_episode_count
+        safety_candidate_count = int(
+            safety_counts.get("selected_candidate_count", 0)
+        )
+        safety_profile_count = int(safety_counts.get("profile_count", 0))
+        selected += safety_candidate_count * safety_profile_count
         positive_stressed_policy_ids.update(stressed_pass_ids)
         control_replay_operations = int(
             book_counts.get("supporting_policy_exact_replay_count", 0)
-        ) + int(direct_counts.get("identity_control_exact_replay_count", 0))
+        ) + int(
+            direct_counts.get("identity_control_exact_replay_count", 0)
+        ) + safety_candidate_count
         best = composite.get("best_exact_frontier_point")
         normal_best = max(
             float(((best or {}).get("normal") or {}).get("pass_rate", 0.0)),
             max(book_normal_rates, default=0.0),
             max(direct_normal_rates, default=0.0),
+            max(safety_normal_rates, default=0.0),
         )
         stressed_best = float(
             ((best or {}).get("stressed") or {}).get("pass_rate", 0.0)
@@ -3044,9 +3343,14 @@ def _exact_result_metrics(
             stressed_best,
             max(book_stressed_rates, default=0.0),
             max(direct_stressed_rates, default=0.0),
+            max(safety_stressed_rates, default=0.0),
         )
-        all_normal_rates = book_normal_rates + direct_normal_rates
-        all_stressed_rates = book_stressed_rates + direct_stressed_rates
+        all_normal_rates = (
+            book_normal_rates + direct_normal_rates + safety_normal_rates
+        )
+        all_stressed_rates = (
+            book_stressed_rates + direct_stressed_rates + safety_stressed_rates
+        )
         return {
             "selected_candidates": selected,
             "exact_account_replays": selected,
@@ -3153,6 +3457,9 @@ def _state_payload(
     direct_counts = dict(
         (branch_results.get("CONSISTENCY_DIRECT") or {}).get("counts") or {}
     )
+    event_safety_counts = dict(
+        (branch_results.get("EVENT_TIME_SAFETY") or {}).get("counts") or {}
+    )
     selected = max(
         int(exploration.get("selected_policy_count", 0)),
         int(exact_metrics["exact_account_replays"]),
@@ -3225,6 +3532,18 @@ def _state_payload(
         "consistency_direct_g_precontrol_ready_count": int(
             direct_counts.get("g_precontrol_ready_count", 0)
         ),
+        "event_time_safety_candidate_count": int(
+            event_safety_counts.get("selected_candidate_count", 0)
+        ),
+        "event_time_safety_profile_count": int(
+            event_safety_counts.get("profile_count", 0)
+        ),
+        "event_time_safety_exact_episode_count": int(
+            event_safety_counts.get("exact_episode_count", 0)
+        ),
+        "event_time_safety_g_precontrol_ready_count": int(
+            event_safety_counts.get("heldout_safety_precontrol_ready_count", 0)
+        ),
         "authoritative_tier_g_count": 0,
         "xfa_paths_started": 0,
     }
@@ -3250,6 +3569,9 @@ def _kpis(
     )
     direct_counts = dict(
         (branch_results.get("CONSISTENCY_DIRECT") or {}).get("counts") or {}
+    )
+    event_safety_counts = dict(
+        (branch_results.get("EVENT_TIME_SAFETY") or {}).get("counts") or {}
     )
     frontier = list(exploration.get("uniform_legal_frontier") or ())
     stressed_points = [row for row in frontier if row.get("scenario") == "STRESSED_1_5X"]
@@ -3303,7 +3625,10 @@ def _kpis(
         ),
         "g_precontrol_ready_count": int(book_counts.get("g_ready_count", 0))
         + int(book_counts.get("standalone_g_ready_count", 0))
-        + int(direct_counts.get("g_precontrol_ready_count", 0)),
+        + int(direct_counts.get("g_precontrol_ready_count", 0))
+        + int(
+            event_safety_counts.get("heldout_safety_precontrol_ready_count", 0)
+        ),
         "combine_pass_observed_bank_count": int(
             pass_counts.get("bank_policy_count", 0)
         ),
@@ -3324,6 +3649,18 @@ def _kpis(
         ),
         "consistency_direct_g_precontrol_ready_count": int(
             direct_counts.get("g_precontrol_ready_count", 0)
+        ),
+        "event_time_safety_candidate_count": int(
+            event_safety_counts.get("selected_candidate_count", 0)
+        ),
+        "event_time_safety_profile_count": int(
+            event_safety_counts.get("profile_count", 0)
+        ),
+        "event_time_safety_exact_episode_count": int(
+            event_safety_counts.get("exact_episode_count", 0)
+        ),
+        "event_time_safety_g_precontrol_ready_count": int(
+            event_safety_counts.get("heldout_safety_precontrol_ready_count", 0)
         ),
         "authoritative_tier_g_count": 0,
         "xfa_paths_started": 0,
@@ -3409,14 +3746,18 @@ def _write_mission_views(
     marginal_books = branch_results.get("MARGINAL_BOOKS") or {}
     pass_bank = branch_results.get("PASS_OBSERVED_BANK") or {}
     consistency_direct = branch_results.get("CONSISTENCY_DIRECT") or {}
+    event_time_safety = branch_results.get("EVENT_TIME_SAFETY") or {}
     candidate_counts = dict(candidate_bank.get("counts") or {})
     book_counts = dict(marginal_books.get("counts") or {})
     pass_counts = dict(pass_bank.get("counts") or {})
     direct_counts = dict(consistency_direct.get("counts") or {})
+    event_safety_counts = dict(event_time_safety.get("counts") or {})
     tier_q_count = int(candidate_counts.get("tier_q_contract_cleared_count", 0))
     g_precontrol_count = int(book_counts.get("g_ready_count", 0)) + int(
         book_counts.get("standalone_g_ready_count", 0)
-    ) + int(direct_counts.get("g_precontrol_ready_count", 0))
+    ) + int(direct_counts.get("g_precontrol_ready_count", 0)) + int(
+        event_safety_counts.get("heldout_safety_precontrol_ready_count", 0)
+    )
     strongest_q = next(
         (
             row
@@ -3458,6 +3799,15 @@ def _write_mission_views(
         ),
         "consistency_direct_g_precontrol_ready_count": int(
             direct_counts.get("g_precontrol_ready_count", 0)
+        ),
+        "event_time_safety_candidate_count": int(
+            event_safety_counts.get("selected_candidate_count", 0)
+        ),
+        "event_time_safety_profile_count": int(
+            event_safety_counts.get("profile_count", 0)
+        ),
+        "event_time_safety_g_precontrol_ready_count": int(
+            event_safety_counts.get("heldout_safety_precontrol_ready_count", 0)
         ),
         "branch_decisions": {
             lane: (branch_results.get(lane) or {}).get("decision")
