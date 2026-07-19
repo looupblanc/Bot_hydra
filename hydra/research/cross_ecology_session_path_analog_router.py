@@ -71,10 +71,46 @@ HORIZONS = (5, 10, 20)
 RISK_FRACTIONS = (0.1, 0.2, 0.3)
 MAP_TYPE = "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2"
 SESSION_TZ = "America/Chicago"
+ZERO_SIDE_EFFECT_COUNTER_FIELDS = (
+    "network_requests",
+    "data_purchase_count",
+    "q4_access_count_delta",
+    "broker_connections",
+    "orders",
+    "mission_database_writes",
+    "registry_writes",
+    "cemetery_writes",
+)
 
 
 class SessionPathAnalogError(RuntimeError):
     """The bounded router cannot preserve its frozen contract."""
+
+
+def _zero_side_effect_counters() -> dict[str, int]:
+    """Return the explicit closed-world counters required by persistence."""
+
+    return {field: 0 for field in ZERO_SIDE_EFFECT_COUNTER_FIELDS}
+
+
+def _require_exact_zero_side_effect_counters(
+    value: Mapping[str, Any], *, label: str
+) -> None:
+    for field in ZERO_SIDE_EFFECT_COUNTER_FIELDS:
+        counter = value.get(field)
+        if type(counter) is not int or counter != 0:
+            raise SessionPathAnalogError(
+                f"{label} must declare exact integer zero for {field}"
+            )
+
+
+def _closed_result_governance() -> dict[str, Any]:
+    return {
+        "incremental_data_spend_usd": 0.0,
+        **_zero_side_effect_counters(),
+        "tier_q_allowed": False,
+        "promotion_allowed": False,
+    }
 
 
 @dataclass(frozen=True, slots=True)
@@ -119,6 +155,9 @@ def load_decision_card(path: str | Path = DEFAULT_CARD) -> dict[str, Any]:
         raise SessionPathAnalogError("evidence ceiling drift")
     if card.get("governance", {}).get("tier_q_allowed") is not False:
         raise SessionPathAnalogError("Tier-Q must remain forbidden")
+    _require_exact_zero_side_effect_counters(
+        card.get("governance", {}), label="decision-card governance"
+    )
     if stable_hash(card.get("frozen_inputs")) != str(
         card.get("frozen_input_contract_hash") or ""
     ):
@@ -195,14 +234,7 @@ def audit_inputs(
         "economic_rows_read": 0,
         "economic_outcomes_read": 0,
         "parquet_row_groups_decoded": 0,
-        "network_requests": 0,
-        "data_purchase_count": 0,
-        "q4_access_count_delta": 0,
-        "broker_connections": 0,
-        "orders": 0,
-        "mission_database_writes": 0,
-        "registry_writes": 0,
-        "cemetery_writes": 0,
+        **_zero_side_effect_counters(),
         "tier_ceiling": "E",
         "tier_q_allowed": False,
         "promotion_allowed": False,
@@ -532,17 +564,7 @@ def run_economic_tripwire(
         "discovery_selected_candidates": [row["candidate_id"] for row in selected],
         "power_preflight": power,
         "branch_gate": gate,
-        "governance": {
-            "incremental_data_spend_usd": 0.0,
-            "q4_access_count_delta": 0,
-            "broker_connections": 0,
-            "orders": 0,
-            "mission_database_writes": 0,
-            "registry_writes": 0,
-            "cemetery_writes": 0,
-            "tier_q_allowed": False,
-            "promotion_allowed": False,
-        },
+        "governance": _closed_result_governance(),
     }
     return {**core, "result_hash": stable_hash(core)}
 
@@ -2253,6 +2275,8 @@ def _canonical_evidence_material(
     core = {
         "contract": EVIDENCE_BUNDLE_CONTRACT,
         "schema_version": 1,
+        "source_audit": _zero_side_effect_counters(),
+        "governance": _zero_side_effect_counters(),
         "identity": identity,
         "datasets": validated,
         "dataset_hashes": {
@@ -2278,6 +2302,19 @@ def _merge_canonical_evidence_materials(
 
     if not materials:
         raise SessionPathAnalogError("canonical campaign evidence has no candidate material")
+    for index, material in enumerate(materials):
+        source_audit = material.get("source_audit")
+        governance = material.get("governance")
+        if not isinstance(source_audit, Mapping) or not isinstance(governance, Mapping):
+            raise SessionPathAnalogError(
+                f"canonical evidence fragment {index} lacks closed governance counters"
+            )
+        _require_exact_zero_side_effect_counters(
+            source_audit, label=f"canonical fragment {index} source_audit"
+        )
+        _require_exact_zero_side_effect_counters(
+            governance, label=f"canonical fragment {index} governance"
+        )
     identities = [dict(material["identity"]) for material in materials]
     first = identities[0]
     invariant_fields = (
@@ -2359,6 +2396,8 @@ def _merge_canonical_evidence_materials(
     core = {
         "contract": EVIDENCE_BUNDLE_CONTRACT,
         "schema_version": 1,
+        "source_audit": _zero_side_effect_counters(),
+        "governance": _zero_side_effect_counters(),
         "identity": merged_identity,
         "datasets": validated,
         "dataset_hashes": {

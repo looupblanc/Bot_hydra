@@ -84,6 +84,10 @@ def test_card_self_hash_and_frozen_lattice() -> None:
     assert len({row.rule_id for row in rules}) == 6
     assert {row.panel for row in rules} == set(router.PANELS)
     assert {row.decision_clock_local for row in rules} == set(router.CLOCKS)
+    assert {
+        field: card["governance"][field]
+        for field in router.ZERO_SIDE_EFFECT_COUNTER_FIELDS
+    } == router._zero_side_effect_counters()
 
 
 def test_economic_runner_rejects_every_inexact_token() -> None:
@@ -592,6 +596,8 @@ def test_complete_evidence_bundle_contains_identity_and_row_material() -> None:
     ]["5"]["censored_start_ledger"]
     canonical = bundle["canonical_evidence_material"]
     assert canonical["contract"] == "HYDRA_EVIDENCE_BUNDLE_V1"
+    assert canonical["source_audit"] == router._zero_side_effect_counters()
+    assert canonical["governance"] == router._zero_side_effect_counters()
     assert canonical["identity"]["campaign_id"] == router.CAMPAIGN_ID
     assert canonical["adapter_requires_economic_replay"] is False
     assert canonical["datasets"]["component_trades"]
@@ -615,6 +621,8 @@ def test_complete_evidence_bundle_contains_identity_and_row_material() -> None:
     )["canonical_evidence_material"]
     merged = router._merge_canonical_evidence_materials([canonical, second])
     assert merged["identity"]["campaign_id"] == router.CAMPAIGN_ID
+    assert merged["source_audit"] == router._zero_side_effect_counters()
+    assert merged["governance"] == router._zero_side_effect_counters()
     assert len(merged["identity"]["policy_fingerprints"]) == 10
     assert len(merged["datasets"]["provenance"]) == 1
     assert _validate_relational_contract(
@@ -641,6 +649,11 @@ def test_audit_is_metadata_only_and_governance_closed(monkeypatch: pytest.Monkey
     assert result["tier_ceiling"] == "E"
     assert result["tier_q_allowed"] is False
     assert result["promotion_allowed"] is False
-    assert result["q4_access_count_delta"] == 0
-    assert result["broker_connections"] == 0
-    assert result["orders"] == 0
+    assert {
+        field: result[field] for field in router.ZERO_SIDE_EFFECT_COUNTER_FIELDS
+    } == router._zero_side_effect_counters()
+    governance = router._closed_result_governance()
+    assert {
+        field: governance[field]
+        for field in router.ZERO_SIDE_EFFECT_COUNTER_FIELDS
+    } == router._zero_side_effect_counters()

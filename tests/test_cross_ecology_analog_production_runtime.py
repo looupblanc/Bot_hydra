@@ -127,8 +127,12 @@ def _manifest(root: Path, *, source_mode: str = "GENERATE_READ_ONLY_ONCE") -> di
             "status_inheritance_allowed": False,
             "q4_access_count_delta": 0,
             "data_purchase_count": 0,
+            "network_requests": 0,
             "broker_connections": 0,
             "orders": 0,
+            "mission_database_writes": 0,
+            "registry_writes": 0,
+            "cemetery_writes": 0,
         },
     }
     value["manifest_hash"] = stable_hash(value)
@@ -313,9 +317,12 @@ def _datasets() -> dict[str, list[dict[str, Any]]]:
 
 def _canonical() -> dict[str, Any]:
     datasets = _datasets()
+    safety = {field: 0 for field in runtime.SAFETY_COUNTER_FIELDS}
     core = {
         "contract": "HYDRA_EVIDENCE_BUNDLE_V1",
         "schema_version": 1,
+        "source_audit": dict(safety),
+        "governance": dict(safety),
         "identity": _identity(),
         "datasets": datasets,
         "dataset_hashes": {key: stable_hash(value) for key, value in datasets.items()},
@@ -358,6 +365,14 @@ def _scientific(manifest: dict[str, Any]) -> dict[str, Any]:
             "decision_card_file_sha256": manifest["research_source"][
                 "decision_card_file_sha256"
             ],
+            "network_requests": 0,
+            "data_purchase_count": 0,
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+            "mission_database_writes": 0,
+            "registry_writes": 0,
+            "cemetery_writes": 0,
         },
         "candidate_decisions": [],
         "branch_gate": {"passed_candidate_ids": [], "candidate_gates": []},
@@ -365,6 +380,8 @@ def _scientific(manifest: dict[str, Any]) -> dict[str, Any]:
         "canonical_evidence_material_hash": canonical["canonical_material_hash"],
         "governance": {
             "incremental_data_spend_usd": 0.0,
+            "data_purchase_count": 0,
+            "network_requests": 0,
             "q4_access_count_delta": 0,
             "broker_connections": 0,
             "orders": 0,
@@ -416,6 +433,129 @@ def test_specialized_manifest_and_generic_dispatch_validate(
     assert loaded["campaign_ordinal"] == 36
 
 
+def test_preexisting_manifest_validation_does_not_open_economic_outcome(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, path = _copy_contract_project(tmp_path)
+    manifest = _manifest(root, source_mode="PREEXISTING_HASH_BOUND")
+    manifest["research_source"].update(
+        result_file_sha256=HASH_A,
+        result_hash=HASH_B,
+    )
+    manifest.pop("manifest_hash")
+    manifest["manifest_hash"] = stable_hash(manifest)
+    path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    outcome = root / manifest["research_source"]["result_path"]
+    assert not outcome.exists()
+    monkeypatch.setattr(contract, "_committed_implementation", lambda *_args: None)
+
+    # Structural discovery is valid even though the economic source does not
+    # exist yet.  Its content is a post-reservation runtime concern.
+    contract.validate_cross_ecology_analog_manifest(manifest, manifest_path=path)
+    assert not outcome.exists()
+
+
+def test_card_and_manifest_require_all_exact_zero_counters(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, path = _copy_contract_project(tmp_path)
+    card_path = root / "config/research/cross_ecology_session_path_analog_router_v1.json"
+    card = json.loads(card_path.read_text())
+    card["governance"]["network_requests"] = 1
+    card.pop("card_hash")
+    card["card_hash"] = stable_hash(card)
+    card_path.write_text(json.dumps(card, indent=2, sort_keys=True) + "\n")
+    manifest = _manifest(root)
+    path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    monkeypatch.setattr(contract, "_committed_implementation", lambda *_args: None)
+    with pytest.raises(contract.CrossEcologyAnalogManifestError, match="governance counters"):
+        contract.validate_cross_ecology_analog_manifest(manifest, manifest_path=path)
+
+    # Restore a valid copied card, then prove the production declaration itself
+    # is equally strict and does not int-coerce booleans/floats.
+    shutil.copy2(
+        ROOT / "config/research/cross_ecology_session_path_analog_router_v1.json",
+        card_path,
+    )
+    manifest = _manifest(root)
+    manifest["governance"]["registry_writes"] = 0.0
+    manifest.pop("manifest_hash")
+    manifest["manifest_hash"] = stable_hash(manifest)
+    path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    with pytest.raises(contract.CrossEcologyAnalogManifestError, match="counters"):
+        contract.validate_cross_ecology_analog_manifest(manifest, manifest_path=path)
+
+
+def test_reservation_failure_precedes_all_scientific_source_access(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, _ = _copy_contract_project(tmp_path)
+    manifest = _manifest(root, source_mode="PREEXISTING_HASH_BOUND")
+    manifest["research_source"].update(
+        result_file_sha256=HASH_A,
+        result_hash=HASH_B,
+    )
+    accessed = False
+
+    def no_reservation(*_args: object) -> None:
+        raise runtime.CrossEcologyAnalogRuntimeError("reservation missing")
+
+    def forbidden_source(*_args: object, **_kwargs: object) -> None:
+        nonlocal accessed
+        accessed = True
+        raise AssertionError("scientific outcome accessed before reservation")
+
+    monkeypatch.setattr(runtime, "_verify_multiplicity_reservation", no_reservation)
+    monkeypatch.setattr(runtime, "_load_scientific_result", forbidden_source)
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="reservation"):
+        runtime._obtain_scientific_result(
+            root,
+            root / manifest["runtime"]["output_dir"],
+            manifest,
+        )
+    assert accessed is False
+
+
+def test_status_proves_reservation_before_durable_existence_checks(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root, path = _copy_contract_project(tmp_path)
+    manifest = _manifest(root)
+    reserved = False
+    original_is_file = Path.is_file
+
+    def reserve(*_args: object) -> None:
+        nonlocal reserved
+        reserved = True
+
+    output = root / manifest["runtime"]["output_dir"]
+    guarded = {
+        (output / "economic_production_result.json").resolve(),
+        (output / "production_state.json").resolve(),
+    }
+
+    def guarded_is_file(candidate: Path) -> bool:
+        if candidate.resolve() in guarded and not reserved:
+            raise AssertionError("durable outcome existence checked before reservation")
+        return original_is_file(candidate)
+
+    monkeypatch.setattr(
+        "hydra.production.manifest.load_and_validate_production_manifest",
+        lambda _path: manifest,
+    )
+    monkeypatch.setattr(runtime, "validate_cross_ecology_analog_manifest", lambda *_a, **_k: None)
+    monkeypatch.setattr(runtime, "_verify_multiplicity_reservation", reserve)
+    monkeypatch.setattr(Path, "is_file", guarded_is_file)
+    monkeypatch.setenv("HYDRA_NETWORK_ACCESS_ALLOWED", "1")
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="NETWORK"):
+        runtime.read_cross_ecology_analog_status(path)
+    assert reserved is False
+    monkeypatch.setenv("HYDRA_NETWORK_ACCESS_ALLOWED", "0")
+    observed = runtime.read_cross_ecology_analog_status(path)
+    assert reserved is True
+    assert observed["state"] == "NOT_STARTED"
+
+
 def test_generic_runtime_dispatches_run_and_status(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -464,6 +604,7 @@ def test_preexisting_source_is_hash_bound_and_never_calls_router(
         "hydra.research.cross_ecology_session_path_analog_router.run_economic_tripwire",
         forbidden,
     )
+    monkeypatch.setattr(runtime, "_verify_multiplicity_reservation", lambda *_a: None)
     observed, executed = runtime._obtain_scientific_result(root, source_path.parent, manifest)
     assert observed == source_path
     assert executed is False
@@ -489,6 +630,7 @@ def test_generate_read_only_once_reuses_lease_result(
         "hydra.research.cross_ecology_session_path_analog_router.run_economic_tripwire",
         fake,
     )
+    monkeypatch.setattr(runtime, "_verify_multiplicity_reservation", lambda *_a: None)
     first, executed = runtime._obtain_scientific_result(root, output, manifest)
     second, resumed = runtime._obtain_scientific_result(root, output, manifest)
     assert first == second
@@ -508,11 +650,147 @@ def test_scientific_governance_and_canonical_hash_fail_closed(tmp_path: Path) ->
     with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="governance"):
         runtime._validate_scientific_payload(broken, manifest)
     broken = json.loads(json.dumps(scientific))
+    broken["source_audit"]["network_requests"] = 1
+    core = dict(broken)
+    core.pop("result_hash")
+    broken["result_hash"] = stable_hash(core)
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="source_audit"):
+        runtime._validate_scientific_payload(broken, manifest)
+    broken = json.loads(json.dumps(scientific))
     broken["canonical_evidence_material"]["datasets"]["component_trades"][0][
         "net_pnl"
     ] = 999.0
     with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="canonical"):
         runtime._canonical_material(broken, manifest)
+    broken_material = _canonical()
+    broken_material["source_audit"]["network_requests"] = 1
+    broken_material.pop("canonical_material_hash")
+    broken_material["canonical_material_hash"] = stable_hash(broken_material)
+    broken = _scientific(manifest)
+    broken["canonical_evidence_material"] = broken_material
+    broken["canonical_evidence_material_hash"] = broken_material[
+        "canonical_material_hash"
+    ]
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="source_audit"):
+        runtime._canonical_material(broken, manifest)
+
+
+def test_replay_lease_requires_full_identity_and_safety() -> None:
+    manifest = {"manifest_hash": HASH_A, "source_commit": SOURCE_COMMIT}
+    lease = {
+        "schema": runtime.REPLAY_LEASE_SCHEMA,
+        "campaign_id": contract.CAMPAIGN_ID,
+        "manifest_hash": HASH_A,
+        "source_commit": SOURCE_COMMIT,
+        "generation": 0,
+        "maximum_generations": 1,
+        "status": "RUNNING",
+        "authorization": contract.ROOT_AUTHORIZATION,
+        "runner_pid": 123,
+        "q4_access_count_delta": 0,
+        "data_purchase_count": 0,
+        "network_requests": 0,
+        "broker_connections": 0,
+        "orders": 0,
+        "mission_database_writes": 0,
+        "registry_writes": 0,
+        "cemetery_writes": 0,
+    }
+    runtime._validate_replay_lease(lease, manifest)
+    for field, invalid in (
+        ("campaign_id", "other"),
+        ("manifest_hash", HASH_B),
+        ("source_commit", "b" * 40),
+        ("maximum_generations", 2),
+        ("network_requests", 1),
+        ("status", "RETRY"),
+    ):
+        broken = dict(lease)
+        broken[field] = invalid
+        with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="lease"):
+            runtime._validate_replay_lease(broken, manifest)
+
+
+def test_runtime_network_guard_and_terminal_safety(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("HYDRA_NETWORK_ACCESS_ALLOWED", "1")
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="NETWORK"):
+        runtime._assert_closed_governance_environment()
+    monkeypatch.setenv("HYDRA_NETWORK_ACCESS_ALLOWED", "0")
+
+    metrics = _metrics()
+    manifest = {"manifest_hash": HASH_A, "source_commit": SOURCE_COMMIT}
+    kpis = runtime._kpis(
+        manifest,
+        state="COMPLETE",
+        sequence=2,
+        metrics=metrics,
+        elapsed=1.0,
+        cpu_seconds=1.0,
+        replay_executed=True,
+    )
+    action = runtime._next_action("SESSION_PATH_ANALOG_FALSIFIED", metrics)
+    state = {
+        "next_action": action["action"],
+        "stage": "TIER_E_BRANCH_DECISION_SEALED",
+        "checkpoint_sequence": 2,
+        "q4_access_count_delta": 0,
+        "data_purchase_count": 0,
+        "network_requests": 0,
+        "broker_connections": 0,
+        "orders": 0,
+        "mission_database_writes": 0,
+        "registry_writes": 0,
+        "cemetery_writes": 0,
+    }
+    result = {
+        "q4_access_delta": 0,
+        "new_data_purchase_count": 0,
+        "network_requests": 0,
+        "broker_connections": 0,
+        "orders": 0,
+        "mission_database_writes": 0,
+        "registry_writes": 0,
+        "cemetery_writes": 0,
+        "kpis": kpis,
+        "autonomous_next_action": action,
+        "development_only": True,
+        "independently_confirmed": False,
+        "status_inheritance": False,
+        "scientific_status": "SESSION_PATH_ANALOG_FALSIFIED",
+    }
+    runtime._validate_terminal_safety(result, state, kpis)
+    report = {
+        "metrics": metrics,
+        "scientific_status": "SESSION_PATH_ANALOG_FALSIFIED",
+        "autonomous_next_action": action,
+    }
+    scientific = {
+        "status": "SESSION_PATH_ANALOG_FALSIFIED",
+        "branch_gate": {"passed_candidate_ids": []},
+    }
+    runtime._validate_terminal_semantics(result, state, kpis, report, scientific)
+    broken = json.loads(json.dumps(result))
+    broken["autonomous_next_action"]["network_access_authorized"] = True
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="next-action"):
+        runtime._validate_terminal_safety(broken, state, kpis)
+    broken = json.loads(json.dumps(result))
+    broken["kpis"]["orders"] = 1
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="orders"):
+        runtime._validate_terminal_safety(broken, state, kpis)
+    broken_state = dict(state)
+    broken_state["stage"] = "OTHER"
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="semantic"):
+        runtime._validate_terminal_semantics(
+            result, broken_state, kpis, report, scientific
+        )
+    broken_report = json.loads(json.dumps(report))
+    broken_report["autonomous_next_action"]["action"] = "MUTATED"
+    with pytest.raises(runtime.CrossEcologyAnalogRuntimeError, match="semantic"):
+        runtime._validate_terminal_semantics(
+            result, state, kpis, broken_report, scientific
+        )
 
 
 def test_embedded_material_seals_deep_and_recovers_without_replay(tmp_path: Path) -> None:

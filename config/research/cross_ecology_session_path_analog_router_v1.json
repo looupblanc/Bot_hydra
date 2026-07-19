@@ -274,7 +274,15 @@
     "orders_allowed": false,
     "runtime_service_or_database_change_allowed": false,
     "registry_or_cemetery_write_allowed": false,
-    "authoritative_writer_change_allowed": false
+    "authoritative_writer_change_allowed": false,
+    "network_requests": 0,
+    "data_purchase_count": 0,
+    "q4_access_count_delta": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "mission_database_writes": 0,
+    "registry_writes": 0,
+    "cemetery_writes": 0
   },
   "branch_rule": {
     "when_green": "FREEZE_TIER_E_DIAGNOSTIC_AND_REQUIRE_SEPARATELY_FROZEN_UNSEEN_CONFIRMATION",
@@ -282,5 +290,5 @@
     "when_underpowered": "SESSION_PATH_ANALOG_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
     "when_falsified": "TOMBSTONE_EXACT_CROSS_ECOLOGY_SESSION_PATH_ANALOG_LATTICE_AND_REALLOCATE_TO_DISTINCT_INFORMATION_SOURCE"
   },
-  "card_hash": "4d11e9542496d9488492afc95ddbecb07119937a40cd56e1a30c92f22b688f4e"
+  "card_hash": "3e8b35051eae86f18c9216dbcc6954b43d7f1700fd34959e9ea883c4fce4cab0"
 }

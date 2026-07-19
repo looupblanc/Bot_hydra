@@ -48,6 +48,18 @@ from hydra.production.halving import build_final_result_payload
 STATE_SCHEMA = "hydra_economic_production_state_v1"
 KPI_SCHEMA = "hydra_economic_production_kpis_v1"
 RESULT_SCHEMA = "hydra_economic_production_result_v1"
+REPLAY_LEASE_SCHEMA = "hydra_cross_ecology_0036_single_run_lease_v1"
+REPLAY_LEASE_STATUSES = frozenset({"RUNNING", "COMPLETE"})
+SAFETY_COUNTER_FIELDS = (
+    "network_requests",
+    "data_purchase_count",
+    "q4_access_count_delta",
+    "broker_connections",
+    "orders",
+    "mission_database_writes",
+    "registry_writes",
+    "cemetery_writes",
+)
 
 
 class CrossEcologyAnalogRuntimeError(RuntimeError):
@@ -60,14 +72,15 @@ def read_cross_ecology_analog_status(manifest_path: str | Path) -> dict[str, Any
 
     manifest = load_and_validate_production_manifest(path)
     validate_cross_ecology_analog_manifest(manifest, manifest_path=path)
-    output = path.parents[2] / str(manifest["runtime"]["output_dir"])
+    root = path.parents[2]
+    _assert_closed_governance_environment()
+    _verify_multiplicity_reservation(root, manifest)
+    output = root / str(manifest["runtime"]["output_dir"])
     result_path = output / "economic_production_result.json"
     if result_path.is_file():
-        _verify_multiplicity_reservation(path.parents[2], manifest)
         return _load_terminal_result(result_path, manifest, output)
     state_path = output / "production_state.json"
     if state_path.is_file():
-        _verify_multiplicity_reservation(path.parents[2], manifest)
         return _read_snapshot(state_path, "state_hash", manifest)
     return {
         "campaign_id": CAMPAIGN_ID,
@@ -96,17 +109,16 @@ def run_cross_ecology_analog_manifest(
 
     manifest = load_and_validate_production_manifest(path)
     validate_cross_ecology_analog_manifest(manifest, manifest_path=path)
+    _assert_closed_governance_environment()
+    _verify_multiplicity_reservation(root, manifest)
     output = root / str(manifest["runtime"]["output_dir"])
     result_path = output / "economic_production_result.json"
 
     # A complete result is a read-only terminal state.  This branch deliberately
     # precedes mkdir, snapshot refreshes, receipts, and every other durable write.
     if result_path.is_file():
-        _verify_multiplicity_reservation(root, manifest)
         return _load_terminal_result(result_path, manifest, output)
 
-    _assert_closed_governance_environment()
-    _verify_multiplicity_reservation(root, manifest)
     _set_single_thread_libraries()
     output.mkdir(parents=True, exist_ok=True)
     started_wall = time.perf_counter()
@@ -201,6 +213,11 @@ def _obtain_scientific_result(
     *,
     production_manifest_path: str | Path | None = None,
 ) -> tuple[Path, bool]:
+    # This helper can be called independently of the outer runtime in tests or
+    # future adapters.  Re-prove the controller reservation here before even
+    # testing whether a generated/preexisting outcome file exists.  Economic
+    # source access must never be reachable through generic manifest loading.
+    _verify_multiplicity_reservation(root, manifest)
     source = manifest["research_source"]
     source_path = _inside(root, source["result_path"])
     if source["source_mode"] == "PREEXISTING_HASH_BOUND":
@@ -214,10 +231,17 @@ def _obtain_scientific_result(
                 "unleased generated scientific result; bind it PREEXISTING_HASH_BOUND"
             )
         lease = _read_hashed(lease_path, "attempt_hash")
-        if lease.get("generation") != 0 or lease.get("authorization") != ROOT_AUTHORIZATION:
-            raise CrossEcologyAnalogRuntimeError("0036 scientific replay lease drift")
+        _validate_replay_lease(lease, manifest)
         _load_scientific_result(source_path, manifest)
-        if lease.get("status") != "COMPLETE":
+        if lease.get("status") == "COMPLETE":
+            if (
+                lease.get("result_hash") != _read_json(source_path).get("result_hash")
+                or lease.get("result_file_sha256") != _sha256(source_path)
+            ):
+                raise CrossEcologyAnalogRuntimeError(
+                    "0036 completed scientific replay lease/result drift"
+                )
+        else:
             complete = dict(lease)
             complete.pop("attempt_hash", None)
             complete.update(
@@ -231,6 +255,7 @@ def _obtain_scientific_result(
 
     if lease_path.is_file():
         lease = _read_hashed(lease_path, "attempt_hash")
+        _validate_replay_lease(lease, manifest)
         if lease.get("status") == "RUNNING":
             raise CrossEcologyAnalogRuntimeError(
                 "0036 root-authorized replay already started without a durable result; relaunch forbidden"
@@ -238,7 +263,7 @@ def _obtain_scientific_result(
         raise CrossEcologyAnalogRuntimeError("0036 scientific replay lease/result mismatch")
 
     lease = {
-        "schema": "hydra_cross_ecology_0036_single_run_lease_v1",
+        "schema": REPLAY_LEASE_SCHEMA,
         "campaign_id": CAMPAIGN_ID,
         "manifest_hash": manifest["manifest_hash"],
         "source_commit": manifest["source_commit"],
@@ -249,8 +274,12 @@ def _obtain_scientific_result(
         "runner_pid": os.getpid(),
         "q4_access_count_delta": 0,
         "data_purchase_count": 0,
+        "network_requests": 0,
         "broker_connections": 0,
         "orders": 0,
+        "mission_database_writes": 0,
+        "registry_writes": 0,
+        "cemetery_writes": 0,
     }
     lease["attempt_hash"] = stable_hash(lease)
     _atomic_json(lease_path, lease)
@@ -354,6 +383,9 @@ def _validate_scientific_payload(
         or governance.get("promotion_allowed") is not False
     ):
         raise CrossEcologyAnalogRuntimeError("0036 scientific result identity drift")
+    _require_exact_zero_counters(
+        audit, SAFETY_COUNTER_FIELDS, "0036 scientific source_audit"
+    )
     manifest_file_sha = str(production.get("manifest_file_sha256") or "")
     if len(manifest_file_sha) != 64 or any(
         value not in "0123456789abcdef" for value in manifest_file_sha
@@ -361,20 +393,19 @@ def _validate_scientific_payload(
         raise CrossEcologyAnalogRuntimeError(
             "0036 scientific production-manifest file hash is invalid"
         )
-    for field in (
-        "incremental_data_spend_usd",
-        "q4_access_count_delta",
-        "broker_connections",
-        "orders",
-        "mission_database_writes",
-        "registry_writes",
-        "cemetery_writes",
+    _require_exact_zero_counters(
+        governance, SAFETY_COUNTER_FIELDS, "0036 scientific governance"
+    )
+    spend = governance.get("incremental_data_spend_usd")
+    if (
+        not isinstance(spend, (int, float))
+        or isinstance(spend, bool)
+        or not math.isfinite(float(spend))
+        or float(spend) != 0.0
     ):
-        value = governance.get(field)
-        if not isinstance(value, (int, float)) or isinstance(value, bool) or float(value) != 0.0:
-            raise CrossEcologyAnalogRuntimeError(
-                f"0036 scientific governance invariant violated: {field}"
-            )
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 scientific governance invariant violated: incremental_data_spend_usd"
+        )
 
 
 def _canonical_material(
@@ -388,6 +419,8 @@ def _canonical_material(
     identity = material.get("identity")
     datasets = material.get("datasets")
     hashes = material.get("dataset_hashes")
+    source_audit = material.get("source_audit")
+    governance = material.get("governance")
     if (
         material.get("contract") != "HYDRA_EVIDENCE_BUNDLE_V1"
         or int(material.get("schema_version", -1)) != 1
@@ -399,8 +432,16 @@ def _canonical_material(
         or set(datasets) != set(REQUIRED_DATASETS)
         or not isinstance(hashes, Mapping)
         or set(hashes) != set(REQUIRED_DATASETS)
+        or not isinstance(source_audit, Mapping)
+        or not isinstance(governance, Mapping)
     ):
         raise CrossEcologyAnalogRuntimeError("0036 canonical material contract drift")
+    _require_exact_zero_counters(
+        source_audit, SAFETY_COUNTER_FIELDS, "0036 canonical source_audit"
+    )
+    _require_exact_zero_counters(
+        governance, SAFETY_COUNTER_FIELDS, "0036 canonical governance"
+    )
     identity = validate_identity(identity)
     if (
         identity["campaign_id"] != CAMPAIGN_ID
@@ -649,7 +690,11 @@ def _next_action(status: str, metrics: Mapping[str, Any]) -> dict[str, Any]:
         "tier_q_allowed": False,
         "q4_access_authorized": False,
         "new_data_purchase_authorized": False,
+        "network_access_authorized": False,
         "broker_or_orders_authorized": False,
+        "mission_database_write_authorized": False,
+        "registry_write_authorized": False,
+        "cemetery_write_authorized": False,
     }
 
 
@@ -770,6 +815,10 @@ def _terminal_result(
             "evidence_tier_ceiling": "E",
             "tier_q_allowed": False,
             "promotion_allowed": False,
+            "network_requests": 0,
+            "mission_database_writes": 0,
+            "registry_writes": 0,
+            "cemetery_writes": 0,
         }
     )
     result["result_hash"] = stable_hash(result)
@@ -798,8 +847,12 @@ def _decision_report(
         "autonomous_next_action": _next_action(str(scientific["status"]), metrics),
         "q4_access_count_delta": 0,
         "data_purchase_count": 0,
+        "network_requests": 0,
         "broker_connections": 0,
         "orders": 0,
+        "mission_database_writes": 0,
+        "registry_writes": 0,
+        "cemetery_writes": 0,
     }
     return {**core, "decision_report_hash": stable_hash(core)}
 
@@ -882,6 +935,10 @@ def _write_state(
         "orders": 0,
         "q4_access_count_delta": 0,
         "data_purchase_count": 0,
+        "network_requests": 0,
+        "mission_database_writes": 0,
+        "registry_writes": 0,
+        "cemetery_writes": 0,
     }
     core["state_hash"] = stable_hash(core)
     _atomic_json(output / "production_state.json", core)
@@ -956,6 +1013,10 @@ def _kpis(
         "orders": 0,
         "q4_access_count_delta": 0,
         "data_purchase_count": 0,
+        "network_requests": 0,
+        "mission_database_writes": 0,
+        "registry_writes": 0,
+        "cemetery_writes": 0,
     }
     core["kpi_hash"] = stable_hash(core)
     return core
@@ -964,6 +1025,8 @@ def _kpis(
 def _load_terminal_result(
     result_path: Path, manifest: Mapping[str, Any], output: Path
 ) -> dict[str, Any]:
+    root = result_path.parents[3]
+    _verify_multiplicity_reservation(root, manifest)
     from hydra.production.runtime import load_and_verify_production_result
 
     result = load_and_verify_production_result(result_path, manifest, deep_evidence=True)
@@ -981,10 +1044,10 @@ def _load_terminal_result(
     kpis = _read_snapshot(output / "production_kpis.json", "kpi_hash", manifest)
     if state.get("state") != "COMPLETE" or kpis.get("state") != "COMPLETE":
         raise CrossEcologyAnalogRuntimeError("0036 terminal views are not COMPLETE")
+    _validate_terminal_safety(result, state, kpis)
     scientific = result.get("scientific_result")
     if not isinstance(scientific, Mapping):
         raise CrossEcologyAnalogRuntimeError("0036 terminal result omits scientific source")
-    root = result_path.parents[3]
     source_path = Path(str(scientific.get("path") or ""))
     if not source_path.is_absolute():
         source_path = (root / source_path).resolve()
@@ -1009,6 +1072,23 @@ def _load_terminal_result(
     report = _read_hashed(output / "decision_report.json", "decision_report_hash")
     if report.get("decision_report_hash") != result.get("decision_report_hash"):
         raise CrossEcologyAnalogRuntimeError("0036 terminal decision report drift")
+    _require_zero_fields(
+        report,
+        (
+            "q4_access_count_delta",
+            "data_purchase_count",
+            "network_requests",
+            "broker_connections",
+            "orders",
+            "mission_database_writes",
+            "registry_writes",
+            "cemetery_writes",
+        ),
+        "0036 terminal decision report",
+    )
+    if report.get("autonomous_next_action") != result.get("autonomous_next_action"):
+        raise CrossEcologyAnalogRuntimeError("0036 terminal decision next-action drift")
+    _validate_terminal_semantics(result, state, kpis, report, source_result)
     return result
 
 
@@ -1024,18 +1104,238 @@ def _read_snapshot(
         or value.get("source_commit") != manifest.get("source_commit")
     ):
         raise CrossEcologyAnalogRuntimeError(f"0036 {path.name} identity drift")
+    _require_zero_fields(
+        value,
+        (
+            "q4_access_count_delta",
+            "data_purchase_count",
+            "network_requests",
+            "broker_connections",
+            "orders",
+            "mission_database_writes",
+            "registry_writes",
+            "cemetery_writes",
+        ),
+        f"0036 {path.name}",
+    )
     return value
+
+
+def _validate_terminal_safety(
+    result: Mapping[str, Any],
+    state: Mapping[str, Any],
+    kpis: Mapping[str, Any],
+) -> None:
+    """Re-prove every closed safety surface on terminal resume."""
+
+    _require_zero_fields(
+        result,
+        (
+            "q4_access_delta",
+            "new_data_purchase_count",
+            "network_requests",
+            "broker_connections",
+            "orders",
+            "mission_database_writes",
+            "registry_writes",
+            "cemetery_writes",
+        ),
+        "0036 terminal result",
+    )
+    embedded_kpis = result.get("kpis")
+    if not isinstance(embedded_kpis, Mapping):
+        raise CrossEcologyAnalogRuntimeError("0036 terminal embedded KPIs are absent")
+    for label, value in (
+        ("terminal embedded KPIs", embedded_kpis),
+        ("terminal KPI sidecar", kpis),
+        ("terminal state sidecar", state),
+    ):
+        _require_zero_fields(
+            value,
+            (
+                "q4_access_count_delta",
+                "data_purchase_count",
+                "network_requests",
+                "broker_connections",
+                "orders",
+                "mission_database_writes",
+                "registry_writes",
+                "cemetery_writes",
+            ),
+            f"0036 {label}",
+        )
+    if embedded_kpis.get("kpi_hash") != kpis.get("kpi_hash"):
+        raise CrossEcologyAnalogRuntimeError("0036 terminal KPI sidecar drift")
+    next_action = result.get("autonomous_next_action")
+    if not isinstance(next_action, Mapping):
+        raise CrossEcologyAnalogRuntimeError("0036 terminal next action is absent")
+    if (
+        next_action.get("tier_q_allowed") is not False
+        or next_action.get("q4_access_authorized") is not False
+        or next_action.get("new_data_purchase_authorized") is not False
+        or next_action.get("network_access_authorized") is not False
+        or next_action.get("broker_or_orders_authorized") is not False
+        or next_action.get("mission_database_write_authorized") is not False
+        or next_action.get("registry_write_authorized") is not False
+        or next_action.get("cemetery_write_authorized") is not False
+        or state.get("next_action") != next_action.get("action")
+        or result.get("development_only") is not True
+        or result.get("independently_confirmed") is not False
+        or result.get("status_inheritance") is not False
+    ):
+        raise CrossEcologyAnalogRuntimeError("0036 terminal next-action safety drift")
+
+
+def _validate_terminal_semantics(
+    result: Mapping[str, Any],
+    state: Mapping[str, Any],
+    kpis: Mapping[str, Any],
+    report: Mapping[str, Any],
+    scientific: Mapping[str, Any],
+) -> None:
+    """Recompute the frozen branch decision instead of trusting rehashed views."""
+
+    metrics = report.get("metrics")
+    branch_gate = scientific.get("branch_gate")
+    if not isinstance(metrics, Mapping) or not isinstance(branch_gate, Mapping):
+        raise CrossEcologyAnalogRuntimeError("0036 terminal decision metrics are absent")
+    scientific_status = str(scientific.get("status") or "")
+    passed_ids = branch_gate.get("passed_candidate_ids")
+    if not isinstance(passed_ids, Sequence) or isinstance(passed_ids, (str, bytes)):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 terminal scientific branch gate is invalid"
+        )
+    frozen_passed_ids = [str(value) for value in passed_ids]
+    try:
+        expected_action = _next_action(
+            scientific_status,
+            {"tier_e_passed_candidate_ids": frozen_passed_ids},
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 terminal decision metrics are invalid"
+        ) from exc
+    state_sequence = state.get("checkpoint_sequence")
+    kpi_sequence = kpis.get("checkpoint_sequence")
+    embedded_kpis = result.get("kpis")
+    embedded_sequence = (
+        embedded_kpis.get("checkpoint_sequence")
+        if isinstance(embedded_kpis, Mapping)
+        else None
+    )
+    if (
+        result.get("scientific_status") != scientific_status
+        or report.get("scientific_status") != scientific_status
+        or metrics.get("tier_e_passed_candidate_ids") != frozen_passed_ids
+        or result.get("autonomous_next_action") != expected_action
+        or report.get("autonomous_next_action") != expected_action
+        or state.get("next_action") != expected_action["action"]
+        or state.get("stage") != "TIER_E_BRANCH_DECISION_SEALED"
+        or type(state_sequence) is not int
+        or type(kpi_sequence) is not int
+        or type(embedded_sequence) is not int
+        or state_sequence != kpi_sequence
+        or state_sequence != embedded_sequence
+    ):
+        raise CrossEcologyAnalogRuntimeError("0036 terminal semantic reconciliation drift")
+
+
+def _require_zero_fields(
+    value: Mapping[str, Any], fields: Sequence[str], label: str
+) -> None:
+    for field in fields:
+        observed = value.get(field)
+        if (
+            not isinstance(observed, (int, float))
+            or isinstance(observed, bool)
+            or not math.isfinite(float(observed))
+            or float(observed) != 0.0
+        ):
+            raise CrossEcologyAnalogRuntimeError(
+                f"{label} safety invariant violated: {field}"
+            )
+
+
+def _require_exact_zero_counters(
+    value: Mapping[str, Any], fields: Sequence[str], label: str
+) -> None:
+    for field in fields:
+        observed = value.get(field)
+        if type(observed) is not int or observed != 0:
+            raise CrossEcologyAnalogRuntimeError(
+                f"{label} must declare exact integer zero for {field}"
+            )
 
 
 def _assert_closed_governance_environment() -> None:
     for field in (
         "HYDRA_Q4_ACCESS_ALLOWED",
         "HYDRA_NEW_DATA_PURCHASE_ALLOWED",
+        "HYDRA_NETWORK_ACCESS_ALLOWED",
         "HYDRA_BROKER_CONNECTION_ALLOWED",
         "HYDRA_ORDERS_ALLOWED",
     ):
         if os.environ.get(field, "0") != "0":
             raise CrossEcologyAnalogRuntimeError(f"unsafe 0036 environment: {field}")
+
+
+def _validate_replay_lease(
+    lease: Mapping[str, Any], manifest: Mapping[str, Any]
+) -> None:
+    """Validate the complete single-run lease before any resumed source use."""
+
+    generation = lease.get("generation")
+    maximum = lease.get("maximum_generations")
+    runner_pid = lease.get("runner_pid")
+    status = lease.get("status")
+    if (
+        lease.get("schema") != REPLAY_LEASE_SCHEMA
+        or lease.get("campaign_id") != CAMPAIGN_ID
+        or lease.get("manifest_hash") != manifest.get("manifest_hash")
+        or lease.get("source_commit") != manifest.get("source_commit")
+        or not isinstance(generation, int)
+        or isinstance(generation, bool)
+        or generation != 0
+        or not isinstance(maximum, int)
+        or isinstance(maximum, bool)
+        or maximum != 1
+        or status not in REPLAY_LEASE_STATUSES
+        or lease.get("authorization") != ROOT_AUTHORIZATION
+        or not isinstance(runner_pid, int)
+        or isinstance(runner_pid, bool)
+        or runner_pid <= 0
+    ):
+        raise CrossEcologyAnalogRuntimeError("0036 scientific replay lease drift")
+    _require_zero_fields(
+        lease,
+        (
+            "q4_access_count_delta",
+            "data_purchase_count",
+            "network_requests",
+            "broker_connections",
+            "orders",
+            "mission_database_writes",
+            "registry_writes",
+            "cemetery_writes",
+        ),
+        "0036 scientific replay lease",
+    )
+    if status == "RUNNING":
+        if lease.get("result_hash") not in (None, "") or lease.get(
+            "result_file_sha256"
+        ) not in (None, ""):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 running scientific replay lease declares a result"
+            )
+        return
+    for field in ("result_hash", "result_file_sha256"):
+        observed = str(lease.get(field) or "")
+        if len(observed) != 64 or any(
+            character not in "0123456789abcdef" for character in observed
+        ):
+            raise CrossEcologyAnalogRuntimeError(
+                f"0036 completed scientific replay lease invalid: {field}"
+            )
 
 
 def _verify_multiplicity_reservation(

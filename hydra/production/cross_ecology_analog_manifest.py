@@ -69,6 +69,16 @@ _FORBIDDEN_GOVERNANCE_TRUE = (
     "tier_q_allowed",
     "promotion_allowed",
 )
+_GOVERNANCE_ZERO_COUNTER_FIELDS = (
+    "network_requests",
+    "data_purchase_count",
+    "q4_access_count_delta",
+    "broker_connections",
+    "orders",
+    "mission_database_writes",
+    "registry_writes",
+    "cemetery_writes",
+)
 
 
 class CrossEcologyAnalogManifestError(RuntimeError):
@@ -78,7 +88,14 @@ class CrossEcologyAnalogManifestError(RuntimeError):
 def validate_cross_ecology_analog_manifest(
     manifest: Mapping[str, Any], *, manifest_path: str | Path
 ) -> None:
-    """Validate 0036 without decoding market data or mutating mission state."""
+    """Validate the frozen 0036 structure without opening economic outcomes.
+
+    In particular, a ``PREEXISTING_HASH_BOUND`` scientific result is *not*
+    opened, hashed, or parsed here.  The production runtime may validate that
+    source only after the authoritative controller multiplicity reservation
+    has been proven.  This separation keeps generic manifest discovery from
+    becoming an unregistered economic-outcome access path.
+    """
 
     path = Path(manifest_path).resolve()
     root = _project_root(path)
@@ -199,6 +216,7 @@ def _research_source(manifest: Mapping[str, Any], root: Path) -> None:
     card = _load_json(card_path)
     card_payload = dict(card)
     card_claimed = str(card_payload.pop("card_hash", ""))
+    card_governance = card.get("governance")
     if (
         card.get("schema") != DECISION_CARD_SCHEMA
         or card.get("campaign_id") != CAMPAIGN_ID
@@ -208,8 +226,17 @@ def _research_source(manifest: Mapping[str, Any], root: Path) -> None:
         or source.get("frozen_input_contract_hash")
         != card.get("frozen_input_contract_hash")
         or source.get("root_authorization") != ROOT_AUTHORIZATION
+        or not isinstance(card_governance, Mapping)
     ):
         raise CrossEcologyAnalogManifestError("0036 decision-card binding drift")
+    if any(
+        type(card_governance.get(field)) is not int
+        or card_governance.get(field) != 0
+        for field in _GOVERNANCE_ZERO_COUNTER_FIELDS
+    ):
+        raise CrossEcologyAnalogManifestError(
+            "0036 decision-card governance counters drift"
+        )
 
     mode = str(source.get("source_mode") or "")
     if mode not in SOURCE_MODES:
@@ -219,25 +246,16 @@ def _research_source(manifest: Mapping[str, Any], root: Path) -> None:
     if result_path == allowed or allowed not in result_path.parents:
         raise CrossEcologyAnalogManifestError("0036 scientific result escapes reports")
     if mode == "PREEXISTING_HASH_BOUND":
-        if not result_path.is_file():
-            raise CrossEcologyAnalogManifestError("0036 bound scientific result is missing")
+        # Validate only the frozen declarations here.  File existence and
+        # content checks are outcome access and therefore belong exclusively
+        # to the post-reservation runtime path.
         expected_file = str(source.get("result_file_sha256") or "")
         expected_result = str(source.get("result_hash") or "")
-        result = _load_json(result_path)
-        core = dict(result)
-        observed_result = str(core.pop("result_hash", ""))
-        if (
-            not _SHA256.fullmatch(expected_file)
-            or _sha256(result_path) != expected_file
-            or not _SHA256.fullmatch(expected_result)
-            or observed_result != expected_result
-            or stable_hash(core) != expected_result
-            or result.get("schema") != SCIENTIFIC_RESULT_SCHEMA
-            or result.get("campaign_id") != CAMPAIGN_ID
-            or result.get("source_commit") != manifest.get("source_commit")
+        if not _SHA256.fullmatch(expected_file) or not _SHA256.fullmatch(
+            expected_result
         ):
             raise CrossEcologyAnalogManifestError(
-                "0036 preexisting scientific result binding drift"
+                "0036 preexisting scientific result binding declaration drift"
             )
     elif any(source.get(field) not in (None, "") for field in (
         "result_file_sha256",
@@ -315,13 +333,13 @@ def _governance(manifest: Mapping[str, Any]) -> None:
     governance = _mapping(manifest, "governance")
     if any(governance.get(field) is not False for field in _FORBIDDEN_GOVERNANCE_TRUE):
         raise CrossEcologyAnalogManifestError("0036 unsafe governance declaration")
-    if (
-        governance.get("tier_ceiling") != TIER_CEILING
-        or governance.get("independent_confirmation_claimed") is not False
-        or int(governance.get("q4_access_count_delta", -1)) != 0
-        or int(governance.get("data_purchase_count", -1)) != 0
-        or int(governance.get("broker_connections", -1)) != 0
-        or int(governance.get("orders", -1)) != 0
+    if governance.get("tier_ceiling") != TIER_CEILING or governance.get(
+        "independent_confirmation_claimed"
+    ) is not False:
+        raise CrossEcologyAnalogManifestError("0036 governance counters drift")
+    if any(
+        type(governance.get(field)) is not int or governance.get(field) != 0
+        for field in _GOVERNANCE_ZERO_COUNTER_FIELDS
     ):
         raise CrossEcologyAnalogManifestError("0036 governance counters drift")
 
