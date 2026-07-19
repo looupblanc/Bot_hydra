@@ -1,0 +1,147 @@
+{
+  "schema": "hydra_mgc_rates_target_vol_power_extension_decision_card_v1",
+  "decision_id": "MGC_RATES_TARGET_VOL_POWER_EXTENSION_20260719_V1",
+  "evidence_role": "BOUNDED_PRE_Q4_DEVELOPMENT_POWER_EXTENSION",
+  "parent_branch": "CROSS_ASSET_VOLATILITY_CONVEXITY_WITHOUT_DIRECTION_TRANSFER_V1",
+  "hypothesis": "The frozen rates-target volatility-gap MGC OCO candidate is underpowered rather than economically established. A preregistered longer pre-Q4 sample can decide the existing mechanism without changing its thresholds, direction contract, execution semantics, or account rules.",
+  "strongest_argument_against": "The existing MGC result has zero validation events, only six final-development events, negative final account economics, and may remain unproductive even after power is increased.",
+  "frozen_candidate": {
+    "candidate_id": "volconv_MGC_rates_target_vol_gap_oco_open_v1",
+    "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+    "execution_market": "MGC",
+    "source_markets": [
+      "ZN",
+      "TN"
+    ],
+    "session_role": "OPEN",
+    "candidate_count": 1,
+    "parameter_mutation_allowed": false,
+    "status_inheritance_allowed": false
+  },
+  "observed_power_basis": {
+    "event_counts": {
+      "DISCOVERY": 27,
+      "VALIDATION": 0,
+      "FINAL_DEVELOPMENT": 6
+    },
+    "true_session_counts": {
+      "DISCOVERY": 258,
+      "VALIDATION": 63,
+      "FINAL_DEVELOPMENT": 131
+    },
+    "pooled_event_count": 33,
+    "pooled_true_session_count": 452,
+    "pooled_event_rate": 0.07300884955752213,
+    "interpretation": "POWER_PLANNING_RATE_ONLY_NOT_AN_ECONOMIC_RESULT"
+  },
+  "data_contract": {
+    "dataset": "GLBX.MDP3",
+    "stype_in": "continuous",
+    "stype_out": "instrument_id",
+    "symbols": [
+      "ZN.c.0",
+      "TN.c.0",
+      "MGC.v.0"
+    ],
+    "start": "2015-09-01",
+    "end": "2021-11-04",
+    "date_interval": "HALF_OPEN",
+    "requests": [
+      {
+        "schema": "ohlcv-1m",
+        "records": 4350698,
+        "billable_bytes": 243639088,
+        "estimated_cost_usd": 15.883460789919
+      },
+      {
+        "schema": "definition",
+        "records": 5705,
+        "billable_bytes": 2053800,
+        "estimated_cost_usd": 0.003251675516
+      }
+    ],
+    "combined_records": 4356403,
+    "combined_billable_bytes": 245692888,
+    "combined_estimated_cost_usd": 15.886712465435,
+    "cost_source": "DATABENTO_HISTORICAL_METADATA_OFFICIAL_2026_07_19"
+  },
+  "chronological_roles": [
+    {
+      "role": "WARMUP_ONLY",
+      "start": "2015-09-01",
+      "end": "2015-10-01",
+      "candidate_modification_allowed": false,
+      "economic_outcomes_allowed": false
+    },
+    {
+      "role": "DISCOVERY",
+      "start": "2015-10-01",
+      "end": "2019-09-10",
+      "candidate_modification_allowed": true,
+      "economic_outcomes_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "start": "2019-09-10",
+      "end": "2020-06-24",
+      "candidate_modification_allowed": false,
+      "economic_outcomes_allowed": true
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "start": "2020-06-24",
+      "end": "2021-11-04",
+      "candidate_modification_allowed": false,
+      "economic_outcomes_allowed": true
+    }
+  ],
+  "power_thresholds": {
+    "DISCOVERY": 60,
+    "VALIDATION": 12,
+    "FINAL_DEVELOPMENT": 20,
+    "threshold_relaxation_allowed": false,
+    "meeting_expected_session_count_guarantees_event_count": false
+  },
+  "roll_and_definition_contract": {
+    "raw_contracts_may_be_guessed": false,
+    "definition_data_required": true,
+    "mgc_roll_policy": "MGC_VOLUME_FRONT_V0_FROM_DBN_CONTINUOUS_MAPPINGS_AND_DATE_AWARE_DEFINITIONS",
+    "treasury_roll_policy": "ZN_TN_EXPLICIT_DATE_INTERVALS_WITH_SAME_DELIVERY_SYNCHRONIZATION",
+    "coverage_policy": "EXACT_HALF_OPEN_NO_GAP_NO_OVERLAP",
+    "roll_artifacts_required_before_economic_replay": true
+  },
+  "budget_contract": {
+    "cumulative_hard_cap_usd": 200.720719923081,
+    "minimum_remaining_reserve_usd": 25.0,
+    "maximum_bundle_cost_usd": 15.886712465435,
+    "silent_purchase_allowed": false,
+    "explicit_execute_flag_required": true
+  },
+  "governance": {
+    "q4_2024_access_allowed": false,
+    "protected_holdout_access_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "outcome_read_before_acquisition_allowed": false,
+    "mission_state_writes_allowed": false,
+    "service_or_controller_changes_allowed": false,
+    "queue_changes_allowed": false,
+    "promotion_allowed": false
+  },
+  "outputs": {
+    "raw_ohlcv": "raw_ohlcv.dbn.zst",
+    "raw_definitions": "raw_definitions.dbn.zst",
+    "mgc_volume_front_roll_map": "mgc_volume_front_roll_map.json",
+    "zn_tn_delivery_sync_receipt": "zn_tn_delivery_sync_receipt.json",
+    "acquisition_receipt": "reports/data_access/mgc_rates_target_vol_power_extension_acquisition_receipt.json",
+    "spend_ledger": "reports/data_budget/databento_spend_ledger.jsonl",
+    "access_ledger": "reports/data_access/data_access_ledger.jsonl"
+  },
+  "next_branch_rule": {
+    "when_powered": "RUN_FROZEN_SINGLE_CANDIDATE_ECONOMIC_REPLAY_WITHOUT_RETUNING",
+    "when_underpowered": "CLOSE_POWER_EXTENSION_WITHOUT_THRESHOLD_RELAXATION",
+    "when_economically_falsified": "TOMBSTONE_EXACT_RATES_TARGET_VOL_GAP_MGC_OCO",
+    "when_integrity_fails": "FAIL_CLOSED_NO_ECONOMIC_REPLAY"
+  },
+  "card_hash": "dc8b4c275107f5c0b6e3b7c404cecf75ba11b9e586bfc2aa837b9f487d3c52b5"
+}
