@@ -457,9 +457,9 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "07b734b0ed1e5b4a1e57bbba77e0b1e1d92a415552a101d43ac0dd8d75d9f51d",
+      "manifest_file_sha256": "b1cc678c88a1e5d72fefd87732d0633d5fcd03fa3eed9ff9e67711edf394faa8",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "56d24b5cc5c858019623fed8bd4dc275b072a64edc97017e376e919a10ab9903",
+      "manifest_semantic_hash": "4cf67a330f5387aa7824f428dd1f7f1e9a29c2e62614a3640ae5642c7f87c1a6",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -565,6 +565,23 @@
         "seal_commit": "920c4bbbe3b5490ddcef642cbf34f4ce31324c11",
         "shared_execution_or_accounting_semantics_changed": false
       },
+      "post_checkpoint_tier_g_graduation_relay": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "candidate_control_count": 5,
+        "classification": "MASTER_CONTRACT_UNIQUE_LEDGER_TIER_G_DEVELOPMENT_GRADUATION",
+        "development_only": true,
+        "expected_control_composite_hash": "180cfe1d824580a746f6f248b877e14d369e9c14b720d2ae1663432c1d7c7139",
+        "expected_graduated_book_count": 4,
+        "expected_graduation_hash": "d0f879c32f0a60da03b117f98786c01760a2988bcf205b17ae5da0da32982162",
+        "independent_confirmation_claimed": false,
+        "old_manifest_hash": "56d24b5cc5c858019623fed8bd4dc275b072a64edc97017e376e919a10ab9903",
+        "repair_commit": "32614cb8d803356cd2ce6e2a667d8ba7949faa42",
+        "scientific_policy_changed": false,
+        "seal_commit": "09a2632186627b964821dd302ab52f03c80e8750",
+        "shared_execution_or_accounting_semantics_changed": false,
+        "xfa_started": false
+      },
       "post_reservation_pre_outcome_technical_repair": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
@@ -576,8 +593,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "920c4bbbe3b5490ddcef642cbf34f4ce31324c11",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-pass-bank-envelope-repair-2026-07-19"
+      "worm_commit": "09a2632186627b964821dd302ab52f03c80e8750",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-tier-g-development-relay-2026-07-19"
     }
   ],
   "governance": {
@@ -586,8 +603,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T08:17:55Z",
-  "queue_hash": "a5c15b95918f9c3dafb51352ae59e2043baec20c6c7d50b24452e8ea85daa326",
+  "issued_at_utc": "2026-07-19T08:34:00Z",
+  "queue_hash": "e29d373353b5f351195f2a1084e07cde427cdb6352a9c6344c6687f985e8b9f6",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
