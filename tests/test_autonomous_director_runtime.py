@@ -270,7 +270,7 @@ def test_artifact_compatibility_and_recurring_epoch_resume_are_non_mutating(
             director_runtime._with_hash({"candidate_count": 1}, "result_hash"),
         )
     prior = {"checkpoint_sequence": 7, "state": "ROBUSTNESS_ACTIVE"}
-    state, results = director_runtime._run_recurring_niche_epoch(
+    state, results, exhausted = director_runtime._run_recurring_niche_epoch(
         epoch=4,
         root=tmp_path,
         manifest=manifest,
@@ -286,6 +286,107 @@ def test_artifact_compatibility_and_recurring_epoch_resume_are_non_mutating(
     )
     assert state == prior
     assert set(results) == {"4:EXPLOITATION", "4:EXPLORATION"}
+    assert exhausted is False
+
+
+def test_recurring_empty_pair_seals_one_exhaustion_transition_and_stops_sharding(
+    tmp_path: Path,
+) -> None:
+    manifest = {
+        "campaign_id": "hydra_autonomous_economic_discovery_director_0035",
+        "manifest_hash": "b" * 64,
+        "source_commit": "c" * 40,
+    }
+    output = tmp_path / "output"
+    branch = output / "branch_results"
+    branch.mkdir(parents=True)
+    empty_results: dict[str, dict[str, Any]] = {}
+    for lane, dimension in (
+        ("EXPLOITATION", "TIMEFRAME"),
+        ("EXPLORATION", "MECHANISM"),
+    ):
+        value = director_runtime._with_hash(
+            {
+                "status": "COMPLETE_BOUNDED_EXISTING_EVIDENCE_FEASIBILITY",
+                "decision": "NO_POSITIVE_MEDIAN_STRESSED_NICHE",
+                "candidate_count": 0,
+                "candidate_offset": 100_608,
+                "niche_dimension": dimension,
+            },
+            "result_hash",
+        )
+        empty_results[lane] = value
+        _write_json(
+            branch / f"epoch_0528_{dimension.lower()}_100608.json",
+            value,
+        )
+
+    prior = {
+        "checkpoint_sequence": 41,
+        "state": "ROBUSTNESS_ACTIVE",
+        "successor_feasibility_screens_completed": 100_000,
+    }
+    live_writer = director_runtime.AtomicResultWriter(output, immutable=False)
+    branch_writer = director_runtime.AtomicResultWriter(branch)
+    call = dict(
+        epoch=528,
+        root=tmp_path,
+        manifest=manifest,
+        output=output,
+        live_writer=live_writer,
+        branch_writer=branch_writer,
+        initial_results={},
+        prior_state=prior,
+        started=0.0,
+        heartbeat_seconds=1.0,
+        dimensions=("TIMEFRAME", "MECHANISM"),
+        candidate_offset=100_608,
+    )
+
+    state, results, exhausted = director_runtime._run_recurring_niche_epoch(**call)
+
+    assert exhausted is True
+    assert set(results) == {"528:EXPLOITATION", "528:EXPLORATION"}
+    assert state["stage"] == "SOURCE_BANK_EXHAUSTED"
+    assert state["next_action"] == "DISPATCH_SUCCESSOR_ECONOMIC_LANES"
+    assert state["source_bank_exhausted"] is True
+    receipt_path = branch / "source_bank_exhausted.json"
+    first_receipt = receipt_path.read_bytes()
+    assert director_runtime._read_hashed(receipt_path, "result_hash")[
+        "decision"
+    ] == "SOURCE_BANK_EXHAUSTED"
+
+    call["prior_state"] = state
+    resumed, _, resumed_exhausted = director_runtime._run_recurring_niche_epoch(
+        **call
+    )
+
+    assert resumed_exhausted is True
+    assert resumed["stage"] == "SOURCE_BANK_EXHAUSTED"
+    assert receipt_path.read_bytes() == first_receipt
+    ledger = (tmp_path / "mission/state/decision_ledger.jsonl").read_text(
+        encoding="utf-8"
+    )
+    assert ledger.count('"decision":"SOURCE_BANK_EXHAUSTED"') == 1
+    assert not list(branch.glob("epoch_0529_*.json"))
+
+
+def test_source_bank_exhaustion_requires_both_completed_lanes_empty() -> None:
+    complete_empty = {
+        "status": "COMPLETE_BOUNDED_EXISTING_EVIDENCE_FEASIBILITY",
+        "candidate_count": 0,
+    }
+    complete_nonempty = {**complete_empty, "candidate_count": 1}
+
+    assert director_runtime._recurring_pair_exhausted(
+        {"EXPLOITATION": complete_empty, "EXPLORATION": complete_empty}
+    )
+    assert not director_runtime._recurring_pair_exhausted(
+        {"EXPLOITATION": complete_empty, "EXPLORATION": complete_nonempty}
+    )
+    assert not director_runtime._recurring_pair_exhausted(
+        {"EXPLOITATION": complete_empty}
+    )
 
 
 def test_dispatch_runs_two_worker_epoch_and_publishes_resumable_snapshots(

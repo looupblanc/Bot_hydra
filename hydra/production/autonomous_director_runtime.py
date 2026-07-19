@@ -33,8 +33,18 @@ from hydra.production.autonomous_director_manifest import (
 from hydra.production.autonomous_exact_replay import (
     exact_0029_account_size_worker,
 )
+from hydra.production.autonomous_exact_continuation import (
+    INITIAL_EXACT_COHORT_SIZE,
+    audit_hazard_19327_tier_q,
+    compose_remaining_0029_exact_results,
+    plan_remaining_0029_exact_jobs,
+    remaining_0029_exact_worker,
+)
 from hydra.production.manifest import load_and_validate_production_manifest
 from hydra.production.runtime import PRODUCTION_KPI_SCHEMA, PRODUCTION_STATE_SCHEMA
+from hydra.production.v71_event_time_account_exploration import (
+    event_time_account_exploration_worker,
+)
 
 
 BRANCH_RESULT_SCHEMA = "hydra_autonomous_economic_branch_result_v1"
@@ -302,7 +312,7 @@ def run_autonomous_director_manifest(
     while True:
         pair_index = (epoch - 4) % len(dimensions)
         shard_index = (epoch - 4) // len(dimensions)
-        state, results = _run_recurring_niche_epoch(
+        state, results, source_bank_exhausted = _run_recurring_niche_epoch(
             epoch=epoch,
             root=root,
             manifest=manifest,
@@ -317,6 +327,18 @@ def run_autonomous_director_manifest(
             candidate_offset=shard_index * 768,
         )
         successor_results.update(results)
+        if source_bank_exhausted:
+            return _run_post_source_exhaustion_epochs(
+                root=root,
+                manifest=manifest,
+                output=output,
+                live_writer=live_writer,
+                branch_writer=branch_writer,
+                initial_results=branch_results,
+                prior_state=state,
+                started=started,
+                heartbeat_seconds=heartbeat_seconds,
+            )
         epoch += 1
 
 
@@ -506,7 +528,7 @@ def _run_recurring_niche_epoch(
     heartbeat_seconds: float,
     dimensions: tuple[str, str],
     candidate_offset: int,
-) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], bool]:
     """Run two real, read-only economic niche screens on a disjoint shard."""
 
     cards = [
@@ -536,9 +558,26 @@ def _run_recurring_niche_epoch(
         if (output / "branch_results" / name).is_file()
     }
     if len(completed) == 2:
-        return dict(prior_state), {
+        results = {
             f"{epoch}:{lane}": value for lane, value in completed.items()
         }
+        if _recurring_pair_exhausted(completed):
+            state = _persist_source_bank_exhaustion(
+                epoch=epoch,
+                root=root,
+                manifest=manifest,
+                output=output,
+                live_writer=live_writer,
+                branch_writer=branch_writer,
+                initial_results=initial_results,
+                prior_state=prior_state,
+                started=started,
+                dimensions=dimensions,
+                candidate_offset=candidate_offset,
+                completed=completed,
+            )
+            return state, results, True
+        return dict(prior_state), results, False
     _begin_economic_phase()
     with ProcessPoolExecutor(
         max_workers=2, mp_context=multiprocessing.get_context("spawn")
@@ -632,7 +671,435 @@ def _run_recurring_niche_epoch(
     state = _rehash(state, "state_hash")
     _publish(live_writer, state, _kpis(manifest, state, initial_results, started))
     _write_mission_views(root, manifest, state, initial_results)
-    return state, {f"{epoch}:{key}": value for key, value in completed.items()}
+    results = {f"{epoch}:{key}": value for key, value in completed.items()}
+    if _recurring_pair_exhausted(completed):
+        state = _persist_source_bank_exhaustion(
+            epoch=epoch,
+            root=root,
+            manifest=manifest,
+            output=output,
+            live_writer=live_writer,
+            branch_writer=branch_writer,
+            initial_results=initial_results,
+            prior_state=state,
+            started=started,
+            dimensions=dimensions,
+            candidate_offset=candidate_offset,
+            completed=completed,
+        )
+        return state, results, True
+    return state, results, False
+
+
+def _recurring_pair_exhausted(
+    completed: Mapping[str, Mapping[str, Any]],
+) -> bool:
+    """Return true only for a complete two-lane shard with no candidates."""
+
+    return set(completed) == {"EXPLOITATION", "EXPLORATION"} and all(
+        value.get("status") == "COMPLETE_BOUNDED_EXISTING_EVIDENCE_FEASIBILITY"
+        and int(value.get("candidate_count", 0)) == 0
+        for value in completed.values()
+    )
+
+
+def _persist_source_bank_exhaustion(
+    *,
+    epoch: int,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    initial_results: Mapping[str, Mapping[str, Any]],
+    prior_state: Mapping[str, Any],
+    started: float,
+    dimensions: tuple[str, str],
+    candidate_offset: int,
+    completed: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Seal one idempotent source-bank transition for successor dispatch."""
+
+    receipt_name = "source_bank_exhausted.json"
+    receipt_path = output / "branch_results" / receipt_name
+    if receipt_path.is_file():
+        receipt = _read_hashed(receipt_path, "result_hash")
+        if (
+            not _artifact_manifest_compatible(receipt, manifest)
+            or receipt.get("decision") != "SOURCE_BANK_EXHAUSTED"
+        ):
+            raise AutonomousDirectorRuntimeError(
+                "source-bank exhaustion receipt identity drift"
+            )
+    else:
+        receipt = _with_hash(
+            {
+                "schema": BRANCH_RESULT_SCHEMA,
+                "campaign_id": manifest["campaign_id"],
+                "manifest_hash": manifest["manifest_hash"],
+                "source_commit": manifest["source_commit"],
+                "lane_id": "DIRECTOR",
+                "branch_id": "EXISTING_EVIDENCE_SOURCE_BANK",
+                "economic_epoch": int(epoch),
+                "status": "SOURCE_BANK_EXHAUSTED",
+                "decision": "SOURCE_BANK_EXHAUSTED",
+                "candidate_offset": int(candidate_offset),
+                "niche_dimensions": list(dimensions),
+                "candidate_counts": {
+                    lane: int(value.get("candidate_count", 0))
+                    for lane, value in sorted(completed.items())
+                },
+                "completed_pair_result_hashes": {
+                    lane: str(value.get("result_hash") or "")
+                    for lane, value in sorted(completed.items())
+                },
+                "completed_at_utc": _utc_now(),
+                "read_only_worker": False,
+                "q4_access_count_delta": 0,
+                "broker_connections": 0,
+                "orders": 0,
+                "data_purchase_count": 0,
+                "evidence_tier": None,
+                "promotion_status": None,
+                "next_materially_distinct_action": (
+                    "DISPATCH_SUCCESSOR_ECONOMIC_LANES"
+                ),
+            },
+            "result_hash",
+        )
+        branch_writer.write_json(receipt_name, receipt)
+    _append_decision_once(root, manifest, receipt)
+
+    state = _state_payload(
+        manifest,
+        sequence=int(prior_state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage="SOURCE_BANK_EXHAUSTED",
+        branch_results=initial_results,
+        next_action="DISPATCH_SUCCESSOR_ECONOMIC_LANES",
+    )
+    state["economic_epoch"] = int(epoch)
+    state["active_economic_worker_processes"] = 0
+    state["source_bank_exhausted"] = True
+    state["source_bank_exhaustion_candidate_offset"] = int(candidate_offset)
+    state["source_bank_exhaustion_receipt"] = {
+        "path": f"branch_results/{receipt_name}",
+        "result_hash": receipt["result_hash"],
+    }
+    state["successor_feasibility_screens_completed"] = int(
+        prior_state.get("successor_feasibility_screens_completed", 0)
+    )
+    state["next_branch_cards"] = [
+        {
+            "lane_id": "DIRECTOR",
+            "branch_id": "SUCCESSOR_ECONOMIC_LANES",
+            "status": "READY",
+            "source_decision": "SOURCE_BANK_EXHAUSTED",
+        }
+    ]
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, initial_results, started))
+    _write_mission_views(root, manifest, state, initial_results)
+    return state
+
+
+def _run_post_source_exhaustion_epochs(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    initial_results: Mapping[str, Mapping[str, Any]],
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+) -> dict[str, Any]:
+    """Consume the remaining immutable exact bank and one distinct event lane.
+
+    Workers remain read-only.  The parent is the sole durable writer and every
+    cohort is an immutable, resumable source-bank slice.  The first batch uses
+    one exact worker plus the event-time worker; later batches use at most two
+    exact workers.
+    """
+
+    branch_root = output / "branch_results"
+    initial_path = branch_root / "epoch_0002_exact_0029_account_race.json"
+    if not initial_path.is_file():
+        raise AutonomousDirectorRuntimeError("sealed initial exact result missing")
+    initial_exact = _read_hashed(initial_path, "result_hash")
+    if not _artifact_manifest_compatible(initial_exact, manifest):
+        raise AutonomousDirectorRuntimeError("initial exact result identity drift")
+
+    relative_root = Path("post_source_exhaustion")
+    completed: dict[int, dict[str, Any]] = {}
+    for path in sorted((branch_root / relative_root).glob("exact_0029_offset_*.json")):
+        envelope = _read_hashed(path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError("exact continuation identity drift")
+        continuation = dict(envelope.get("continuation_result") or {})
+        offset = int(continuation.get("cohort_offset", -1))
+        if offset in completed:
+            raise AutonomousDirectorRuntimeError("duplicate exact continuation offset")
+        completed[offset] = continuation
+
+    event_path = branch_root / relative_root / "v71_event_time_account_exploration.json"
+    event_result: dict[str, Any] | None = None
+    if event_path.is_file():
+        envelope = _read_hashed(event_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError("event-time result identity drift")
+        event_result = dict(envelope.get("event_time_result") or {})
+
+    audit_path = branch_root / relative_root / "hazard_19327_tier_q_audit.json"
+    if not audit_path.is_file():
+        audit = audit_hazard_19327_tier_q(initial_exact)
+        audit_envelope = _post_source_envelope(
+            manifest,
+            lane_id="EXPLOITATION",
+            branch_id="HAZARD_19327_NO_RETUNE_TIER_Q_AUDIT",
+            decision=str(audit["qualification_status"]),
+            payload_key="qualification_audit",
+            payload=audit,
+            next_action=str(audit["next_action"]),
+        )
+        branch_writer.write_json(relative_root / audit_path.name, audit_envelope)
+        _append_decision_once(root, manifest, audit_envelope)
+
+    state = dict(prior_state)
+    while True:
+        plan = plan_remaining_0029_exact_jobs(
+            root,
+            completed_cohort_offsets=tuple(sorted(completed)),
+            lane_count=2 if event_result is not None else 1,
+        )
+        jobs_to_run = list(plan["jobs"])
+        if not jobs_to_run and event_result is not None:
+            break
+
+        future_kind: dict[Any, tuple[str, Any]] = {}
+        _begin_economic_phase()
+        worker_count = len(jobs_to_run) + int(event_result is None)
+        with ProcessPoolExecutor(
+            max_workers=max(1, min(worker_count, 2)),
+            mp_context=multiprocessing.get_context("spawn"),
+        ) as pool:
+            for job in jobs_to_run:
+                future = pool.submit(
+                    remaining_0029_exact_worker, dict(job["worker_payload"])
+                )
+                future_kind[future] = ("EXACT", int(job["cohort_offset"]))
+            if event_result is None:
+                future = pool.submit(
+                    event_time_account_exploration_worker,
+                    {
+                        "root": str(root),
+                        "rule_snapshot_path": str(
+                            manifest["official_rule_snapshot"]["path"]
+                        ),
+                    },
+                )
+                future_kind[future] = ("EVENT_TIME", None)
+
+            runtime_results = _post_source_runtime_results(
+                initial_results, initial_exact, completed, event_result
+            )
+            state = _state_payload(
+                manifest,
+                sequence=int(state["checkpoint_sequence"]) + 1,
+                state="ROBUSTNESS_ACTIVE",
+                stage="POST_SOURCE_EXHAUSTION_ECONOMIC_LANES_RUNNING",
+                branch_results=runtime_results,
+                next_action="COMPLETE_REMAINING_EXACT_BANK_AND_EVENT_TIME_REPLAY",
+            )
+            state["active_economic_worker_processes"] = len(future_kind)
+            state["exact_0029_remaining_candidate_count"] = int(
+                plan["source_inventory"]["remaining_exact_candidate_count"]
+                - sum(len(row.get("candidate_ids") or ()) for row in completed.values())
+            )
+            state = _rehash(state, "state_hash")
+            _publish(live_writer, state, _kpis(manifest, state, runtime_results, started))
+            _write_mission_views(root, manifest, state, runtime_results)
+
+            pending = set(future_kind)
+            while pending:
+                done, pending = wait(
+                    pending,
+                    timeout=max(float(heartbeat_seconds), 0.1),
+                    return_when=FIRST_COMPLETED,
+                )
+                if not done:
+                    state = dict(state)
+                    state["checkpoint_sequence"] = int(state["checkpoint_sequence"]) + 1
+                    state["updated_at_utc"] = _utc_now()
+                    state = _rehash(state, "state_hash")
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, runtime_results, started),
+                    )
+                    _write_mission_views(root, manifest, state, runtime_results)
+                    continue
+                for future in done:
+                    kind, offset = future_kind[future]
+                    worker_result = dict(future.result())
+                    if kind == "EXACT":
+                        assert offset is not None
+                        envelope = _post_source_envelope(
+                            manifest,
+                            lane_id="EXPLOITATION",
+                            branch_id=f"REMAINING_EXACT_0029_OFFSET_{offset:04d}",
+                            decision="COMPLETE_READ_ONLY_EXACT_CONTINUATION_COHORT",
+                            payload_key="continuation_result",
+                            payload=worker_result,
+                            next_action="CONTINUE_DISJOINT_EXACT_SOURCE_BANK",
+                        )
+                        branch_writer.write_json(
+                            relative_root / f"exact_0029_offset_{offset:04d}.json",
+                            envelope,
+                        )
+                        _append_decision_once(root, manifest, envelope)
+                        completed[offset] = worker_result
+                    else:
+                        event_result = worker_result
+                        envelope = _post_source_envelope(
+                            manifest,
+                            lane_id="EXPLORATION",
+                            branch_id="V71_EVENT_TIME_ACCOUNT_SIZE_EXPLORATION",
+                            decision=str(worker_result["decision"]),
+                            payload_key="event_time_result",
+                            payload=worker_result,
+                            next_action="PRESERVE_TIER_E_AND_APPLY_FROZEN_MLL_GATE",
+                        )
+                        branch_writer.write_json(
+                            relative_root / event_path.name, envelope
+                        )
+                        _append_decision_once(root, manifest, envelope)
+                runtime_results = _post_source_runtime_results(
+                    initial_results, initial_exact, completed, event_result
+                )
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="POST_SOURCE_EXHAUSTION_ECONOMIC_LANES_RUNNING",
+                    branch_results=runtime_results,
+                    next_action="CONTINUE_STREAMING_EXACT_SOURCE_BANK",
+                )
+                state["active_economic_worker_processes"] = len(pending)
+                state = _rehash(state, "state_hash")
+                _publish(
+                    live_writer,
+                    state,
+                    _kpis(manifest, state, runtime_results, started),
+                )
+                _write_mission_views(root, manifest, state, runtime_results)
+        _end_economic_phase()
+
+    runtime_results = _post_source_runtime_results(
+        initial_results, initial_exact, completed, event_result
+    )
+    composite = runtime_results["EXACT_0029_COMPOSITE"]
+    composite_path = branch_root / relative_root / "exact_0029_composite.json"
+    if composite_path.is_file():
+        final_envelope = _read_hashed(composite_path, "result_hash")
+        if (
+            not _artifact_manifest_compatible(final_envelope, manifest)
+            or dict(final_envelope.get("exact_composite") or {}).get("result_hash")
+            != composite.get("result_hash")
+        ):
+            raise AutonomousDirectorRuntimeError("exact composite identity drift")
+    else:
+        final_envelope = _post_source_envelope(
+            manifest,
+            lane_id="DIRECTOR",
+            branch_id="EXACT_0029_SOURCE_BANK_COMPOSITE",
+            decision=str(composite["status"]),
+            payload_key="exact_composite",
+            payload=composite,
+            next_action="DISPATCH_NEXT_RESEARCH_BOARD_EPOCH",
+        )
+        branch_writer.write_json(
+            relative_root / "exact_0029_composite.json", final_envelope
+        )
+        _append_decision_once(root, manifest, final_envelope)
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage="POST_SOURCE_EXHAUSTION_ECONOMIC_LANES_COMPLETE_AWAITING_RELAY",
+        branch_results=runtime_results,
+        next_action="DISPATCH_NEXT_RESEARCH_BOARD_EPOCH",
+    )
+    state["active_economic_worker_processes"] = 0
+    state["source_bank_exhausted"] = True
+    state["exact_0029_source_bank_exhausted"] = bool(
+        composite["source_bank_exhausted"]
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, runtime_results, started))
+    _write_mission_views(root, manifest, state, runtime_results)
+    if os.environ.get("HYDRA_PRODUCTION_TEST_MODE") == "1":
+        return state
+    while True:
+        time.sleep(max(float(heartbeat_seconds), 1.0))
+        state = dict(state)
+        state["checkpoint_sequence"] = int(state["checkpoint_sequence"]) + 1
+        state["updated_at_utc"] = _utc_now()
+        state = _rehash(state, "state_hash")
+        _publish(live_writer, state, _kpis(manifest, state, runtime_results, started))
+        _write_mission_views(root, manifest, state, runtime_results)
+
+
+def _post_source_envelope(
+    manifest: Mapping[str, Any],
+    *,
+    lane_id: str,
+    branch_id: str,
+    decision: str,
+    payload_key: str,
+    payload: Mapping[str, Any],
+    next_action: str,
+) -> dict[str, Any]:
+    value = {
+        "schema": BRANCH_RESULT_SCHEMA,
+        "campaign_id": manifest["campaign_id"],
+        "manifest_hash": manifest["manifest_hash"],
+        "source_commit": manifest["source_commit"],
+        "lane_id": lane_id,
+        "branch_id": branch_id,
+        "status": "COMPLETE",
+        "decision": decision,
+        payload_key: dict(payload),
+        "completed_at_utc": _utc_now(),
+        "read_only_worker": True,
+        "evidence_tier": payload.get("evidence_tier", "E"),
+        "promotion_status": None,
+        "next_materially_distinct_action": next_action,
+        "q4_access_count_delta": 0,
+        "broker_connections": 0,
+        "orders": 0,
+        "data_purchase_count": 0,
+    }
+    return _with_hash(value, "result_hash")
+
+
+def _post_source_runtime_results(
+    initial_results: Mapping[str, Mapping[str, Any]],
+    initial_exact: Mapping[str, Any],
+    completed: Mapping[int, Mapping[str, Any]],
+    event_result: Mapping[str, Any] | None,
+) -> dict[str, dict[str, Any]]:
+    results = {key: dict(value) for key, value in initial_results.items()}
+    results["EXACT_0029"] = dict(initial_exact)
+    if completed:
+        results["EXACT_0029_COMPOSITE"] = compose_remaining_0029_exact_results(
+            initial_exact,
+            [completed[key] for key in sorted(completed)],
+        )
+    if event_result is not None:
+        results["EVENT_TIME"] = dict(event_result)
+    return results
 
 
 def _exploitation_worker(result_path: str) -> dict[str, Any]:
@@ -1453,6 +1920,89 @@ def _exact_result_metrics(
     branch_results: Mapping[str, Mapping[str, Any]],
 ) -> dict[str, Any]:
     """Extract only counters supported by exact chronological account paths."""
+
+    composite = branch_results.get("EXACT_0029_COMPOSITE") or {}
+    event = branch_results.get("EVENT_TIME") or {}
+    if composite:
+        counters = dict(composite.get("aggregate_counters") or {})
+        exact_ids = set(
+            str(value)
+            for values in dict(composite.get("candidate_pass_sets") or {}).values()
+            for value in values
+        )
+        exact_ids.update(
+            str(value)
+            for value in (
+                composite.get("source_inventory") or {}
+            ).get("sealed_initial_candidate_ids", ())
+        )
+        completed = int(composite.get("completed_candidate_count", 0))
+        if len(exact_ids) > completed:
+            raise AutonomousDirectorRuntimeError("exact candidate union drift")
+        event_counters = dict(event.get("counters") or {})
+        event_ids = {
+            str(value)
+            for value in (
+                event.get("source_population") or {}
+            ).get("selected_candidate_ids", ())
+        }
+        selected = completed + len(event_ids)
+        normal_episodes = int(counters.get("exact_normal_account_replays", 0)) + int(
+            event_counters.get("exact_normal_account_replays", 0)
+        )
+        stressed_episodes = int(
+            counters.get("exact_stressed_account_replays", 0)
+        ) + int(event_counters.get("exact_stressed_account_replays", 0))
+        total_episodes = int(counters.get("exact_account_replays", 0)) + int(
+            event_counters.get("exact_chronological_account_replays", 0)
+        )
+        if normal_episodes != stressed_episodes or total_episodes != (
+            normal_episodes + stressed_episodes
+        ):
+            raise AutonomousDirectorRuntimeError("exact episode denominator drift")
+        normal_pass_ids = set(
+            str(value)
+            for value in (
+                composite.get("candidate_pass_sets") or {}
+            ).get("normal", ())
+        )
+        stressed_pass_ids = set(
+            str(value)
+            for value in (
+                composite.get("candidate_pass_sets") or {}
+            ).get("stressed", ())
+        )
+        for candidate in event.get("candidate_results") or ():
+            cells = [
+                cell
+                for account in candidate.get("account_size_matrix") or ()
+                for cell in account.get("frontier") or ()
+            ]
+            candidate_id = str(candidate.get("candidate_id") or "")
+            if any(int((cell.get("normal") or {}).get("pass_count", 0)) > 0 for cell in cells):
+                normal_pass_ids.add(candidate_id)
+            if any(int((cell.get("stressed") or {}).get("pass_count", 0)) > 0 for cell in cells):
+                stressed_pass_ids.add(candidate_id)
+        best = composite.get("best_exact_frontier_point")
+        normal_best = float(((best or {}).get("normal") or {}).get("pass_rate", 0.0))
+        stressed_best = float(
+            ((best or {}).get("stressed") or {}).get("pass_rate", 0.0)
+        )
+        return {
+            "selected_candidates": selected,
+            "exact_account_replays": selected,
+            "exact_account_episode_replays": total_episodes,
+            "normal_account_replays": normal_episodes,
+            "stressed_account_replays": stressed_episodes,
+            "normal_pass_candidate_count": len(normal_pass_ids),
+            "stressed_pass_candidate_count": len(stressed_pass_ids),
+            "positive_stressed_candidate_count": 0,
+            "best_normal_pass_rate": normal_best,
+            "best_stressed_pass_rate": stressed_best,
+            "median_normal_pass_rate": 0.0,
+            "median_stressed_pass_rate": 0.0,
+            "best_exact_frontier_point": best,
+        }
 
     exact = branch_results.get("EXACT_0029") or {}
     counters = dict(exact.get("counters") or {})
