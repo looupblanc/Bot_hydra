@@ -457,9 +457,9 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "63bcaa0036364e0a3abafdbe63e50d0c5cdd6c6c2640e1d0d26e0e75bfc3d0a4",
+      "manifest_file_sha256": "a3ab88a4485670fc9dcb8eaebcd34a8bc995f65eedb2583c5410f27c52149fd5",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "7c88239e2f2b07e441740e7f530834fc7b3b859529d04973fc9f41ec9ed39275",
+      "manifest_semantic_hash": "e2a02b1732b4310c3b482e515baffb22d53068e64b474e43e64be8cc0bf1c886",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -487,6 +487,21 @@
         "repair_commit": "5d29448bcf4a5d36811672f9b5189ca1552e1c72",
         "scientific_policy_changed": false
       },
+      "post_source_bank_exhaustion_dispatch_repair": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "classification": "POST_SOURCE_BANK_EXHAUSTION_EMPTY_SHARD_DISPATCH_REPAIR",
+        "economic_outcomes_changed": false,
+        "event_time_frozen_candidate_count": 3,
+        "exact_branch_result_hash": "37897b6b86492c4a1464bd9b796912465d31c4a693de058c7d1a5a676264b934",
+        "old_manifest_hash": "7c88239e2f2b07e441740e7f530834fc7b3b859529d04973fc9f41ec9ed39275",
+        "prior_artifacts_immutable": true,
+        "remaining_exact_qd_candidate_count": 144,
+        "repair_commit": "697d35d2a4bae1a85960690b957629e6f67bdae2",
+        "repair_scope": "STOP_EMPTY_SHARDS_AND_DISPATCH_EXISTING_EXACT_PLUS_EVENT_TIME_EVIDENCE",
+        "scientific_policy_changed": false,
+        "source_bank_candidate_count": 100000
+      },
       "post_reservation_pre_outcome_technical_repair": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
@@ -498,8 +513,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "5d29448bcf4a5d36811672f9b5189ca1552e1c72",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-exact-counter-repair-2026-07-19"
+      "worm_commit": "697d35d2a4bae1a85960690b957629e6f67bdae2",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-source-exhaustion-reallocation-2026-07-19"
     }
   ],
   "governance": {
@@ -508,8 +523,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T03:13:25Z",
-  "queue_hash": "c3e49814007354976f4abc65cae8f343fa4831f8fb40138d99b253251516e734",
+  "issued_at_utc": "2026-07-19T06:16:44Z",
+  "queue_hash": "5e75bd6a5c6bb82f9547ace6cb83f4acd6e4f97abcc29c721e54224a74be3083",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
