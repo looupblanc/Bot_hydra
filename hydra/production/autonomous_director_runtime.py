@@ -148,6 +148,11 @@ from hydra.research.clean_cross_asset_daily_tripwire import (
     SCHEMA as CLEAN_CROSS_ASSET_DAILY_SCHEMA,
     run_clean_cross_asset_daily_tripwire,
 )
+from hydra.research.scheduled_macro_release_tripwire import (
+    BRANCH_ID as SCHEDULED_MACRO_RELEASE_BRANCH_ID,
+    SCHEMA as SCHEDULED_MACRO_RELEASE_SCHEMA,
+    run_scheduled_macro_release_tripwire,
+)
 
 
 BRANCH_RESULT_SCHEMA = "hydra_autonomous_economic_branch_result_v1"
@@ -2108,6 +2113,19 @@ def _run_post_book_graduation_relay(
                 runtime_results=results,
             )
         )
+        state, results, _scheduled_macro_release_tripwire = (
+            _run_scheduled_macro_release_tripwire_relay(
+                root=root,
+                manifest=manifest,
+                output=output,
+                live_writer=live_writer,
+                branch_writer=branch_writer,
+                prior_state=state,
+                started=started,
+                heartbeat_seconds=heartbeat_seconds,
+                runtime_results=results,
+            )
+        )
     elif os.environ.get("HYDRA_PRODUCTION_TEST_MODE") != "1":
         raise AutonomousDirectorRuntimeError(
             "post-confirmation branch portfolio is undeclared"
@@ -3909,6 +3927,171 @@ def _run_clean_cross_asset_daily_tripwire_relay(
     return state, results, result
 
 
+def _run_scheduled_macro_release_tripwire_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    """Persist the frozen public-release tripwire through the parent writer."""
+
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    section = dict(manifest.get("post_breadth_branch_portfolio") or {})
+    card_raw = str(
+        section.get("scheduled_macro_release_decision_card_path")
+        or "config/research/scheduled_macro_release_causal_reaction_tripwire_v1.json"
+    )
+    result_raw = str(
+        section.get("scheduled_macro_release_result_path") or ""
+    ).strip()
+    card_path = (root / card_raw).resolve()
+    result_path = (
+        (root / result_raw).resolve()
+        if result_raw
+        else (
+            output
+            / "branch_results"
+            / _POST_BREADTH_RELATIVE_ROOT
+            / "scheduled_macro_release_tripwire.json"
+        ).resolve()
+    )
+    _assert_within(root.resolve(), card_path)
+    relative_result = _relative_branch_artifact_path(
+        output, result_path, "scheduled macro release result"
+    )
+    if not card_path.is_file():
+        raise AutonomousDirectorRuntimeError(
+            "scheduled macro release decision card is absent"
+        )
+
+    result: dict[str, Any]
+    if result_path.is_file():
+        envelope = _read_hashed(result_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "scheduled macro release envelope identity drift"
+            )
+        result = _verify_scheduled_macro_release_tripwire_result(
+            _verified_inner_result(
+                envelope,
+                key="scheduled_macro_release_tripwire",
+                expected_schema=SCHEDULED_MACRO_RELEASE_SCHEMA,
+                expected_status=str(
+                    dict(envelope.get("scheduled_macro_release_tripwire") or {}).get(
+                        "status"
+                    )
+                ),
+            )
+        )
+    else:
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=1,
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                future = pool.submit(
+                    _scheduled_macro_release_tripwire_worker,
+                    str(root),
+                    str(card_path),
+                )
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="SCHEDULED_MACRO_RELEASE_TRIPWIRE_RUNNING",
+                    branch_results=results,
+                    next_action="RUN_FROZEN_PUBLIC_MACRO_RELEASE_TRIPWIRE_ONCE",
+                )
+                state.update(
+                    {
+                        "active_economic_worker_processes": 1,
+                        "scheduled_macro_release_worker_limit": 1,
+                        "scheduled_macro_release_parent_writer_only": True,
+                        "q4_access_count_delta": 0,
+                        "broker_connections": 0,
+                        "orders": 0,
+                    }
+                )
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+                while not future.done():
+                    wait(
+                        {future},
+                        timeout=max(min(float(heartbeat_seconds), 5.0), 0.1),
+                        return_when=FIRST_COMPLETED,
+                    )
+                    state = _heartbeat_state(
+                        state, active_economic_worker_processes=int(not future.done())
+                    )
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+                result = _verify_scheduled_macro_release_tripwire_result(
+                    dict(future.result())
+                )
+        finally:
+            _end_economic_phase()
+
+        expected_card_hash = str(
+            section.get("scheduled_macro_release_decision_card_hash") or ""
+        )
+        actual_card_hash = str(
+            dict(result.get("source_bindings") or {}).get("decision_card_hash") or ""
+        )
+        if expected_card_hash and actual_card_hash != expected_card_hash:
+            raise AutonomousDirectorRuntimeError(
+                "scheduled macro release decision card differs from manifest freeze"
+            )
+        envelope = _post_source_envelope(
+            manifest,
+            lane_id="EXPLORATION",
+            branch_id=SCHEDULED_MACRO_RELEASE_BRANCH_ID,
+            decision=str(result["status"]),
+            payload_key="scheduled_macro_release_tripwire",
+            payload=result,
+            next_action=str(result["next_action"]),
+        )
+        branch_writer.write_json(relative_result, envelope)
+        _append_decision_once(root, manifest, envelope)
+
+    results["POST_BREADTH_SCHEDULED_MACRO_RELEASE"] = result
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage=str(result["status"]),
+        branch_results=results,
+        next_action=str(result["next_action"]),
+    )
+    state.update(
+        {
+            "active_economic_worker_processes": 0,
+            "scheduled_macro_release_worker_limit": 1,
+            "scheduled_macro_release_parent_writer_only": True,
+            **_scheduled_macro_release_counts(results),
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        }
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, result
+
+
 def _session_safe_confirmation_feature_envelope(
     manifest: Mapping[str, Any], features: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -5075,6 +5258,18 @@ def _clean_cross_asset_daily_tripwire_worker(
     )
 
 
+def _scheduled_macro_release_tripwire_worker(
+    root_path: str, decision_card_path: str
+) -> dict[str, Any]:
+    """Run the frozen public-release tripwire without durable side effects."""
+
+    return _verify_scheduled_macro_release_tripwire_result(
+        run_scheduled_macro_release_tripwire(
+            root_path, decision_card_path=decision_card_path
+        )
+    )
+
+
 def _verify_event_time_matched_controls_result(
     value: Mapping[str, Any],
 ) -> dict[str, Any]:
@@ -5331,6 +5526,78 @@ def _verify_clean_cross_asset_daily_tripwire_result(
     ):
         raise AutonomousDirectorRuntimeError(
             "clean cross-asset daily tripwire identity, ceiling, or safety drift"
+        )
+    return {**row, "result_hash": claimed}
+
+
+def _verify_scheduled_macro_release_tripwire_result(
+    value: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Keep the viewed scheduled-release tripwire at its frozen Tier-E ceiling."""
+
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    allowed_statuses = {
+        "SCHEDULED_MACRO_RELEASE_TRIPWIRE_PASSED_TIER_E_DEVELOPMENT_ONLY",
+        "SCHEDULED_MACRO_RELEASE_CAUSAL_REACTION_FALSIFIED",
+    }
+    passing_ids = [str(value) for value in row.get("passing_candidate_ids") or ()]
+    selected = [dict(value) for value in row.get("selected_candidates") or ()]
+    evaluations = [dict(value) for value in row.get("evaluations") or ()]
+    screens = [dict(value) for value in row.get("candidate_screens") or ()]
+    expected_status = (
+        "SCHEDULED_MACRO_RELEASE_TRIPWIRE_PASSED_TIER_E_DEVELOPMENT_ONLY"
+        if passing_ids
+        else "SCHEDULED_MACRO_RELEASE_CAUSAL_REACTION_FALSIFIED"
+    )
+    selected_ids = [str(value.get("candidate_id") or "") for value in selected]
+    evaluated_ids = [str(value.get("candidate_id") or "") for value in evaluations]
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != SCHEDULED_MACRO_RELEASE_SCHEMA
+        or row.get("branch_id") != SCHEDULED_MACRO_RELEASE_BRANCH_ID
+        or row.get("status") not in allowed_statuses
+        or row.get("status") != expected_status
+        or row.get("economic_verdict") != row.get("status")
+        or row.get("evidence_role")
+        != "BOUNDED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY"
+        or row.get("evidence_ceiling") != "TIER_E_DEVELOPMENT_ONLY"
+        or row.get("promotion_status") is not None
+        or int(row.get("tier_q_created", -1)) != 0
+        or row.get("independent_confirmation_claimed") is not False
+        or int(row.get("official_release_count", -1)) != 56
+        or dict(row.get("official_release_counts") or {})
+        != {
+            "BLS_CPI": 21,
+            "BLS_EMPLOYMENT_SITUATION": 21,
+            "FOMC_STATEMENT": 14,
+        }
+        or sum(int(value) for value in dict(row.get("role_release_counts") or {}).values())
+        != 56
+        or int(row.get("candidate_lattice_count", -1)) != 96
+        or len(screens) != 96
+        or int(row.get("selected_candidate_count", -1)) != len(selected)
+        or len(selected) > 2
+        or any(not value for value in selected_ids)
+        or len(set(selected_ids)) != len(selected_ids)
+        or evaluated_ids != selected_ids
+        or len(set(passing_ids)) != len(passing_ids)
+        or not set(passing_ids).issubset(set(evaluated_ids))
+        or int(row.get("q4_access_count_delta", -1)) != 0
+        or not math.isclose(
+            float(row.get("incremental_data_spend_usd", -1.0)),
+            0.0,
+            rel_tol=0.0,
+            abs_tol=1e-12,
+        )
+        or int(row.get("broker_connections", -1)) != 0
+        or int(row.get("orders", -1)) != 0
+        or row.get("tombstoned_eia_inventory_grammar_resurrected") is not False
+        or not str(row.get("next_action") or "")
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "scheduled macro release tripwire identity, ceiling, denominator, or safety drift"
         )
     return {**row, "result_hash": claimed}
 
@@ -5833,6 +6100,40 @@ def _session_safe_confirmation_counts(
         }
     )
     return counts
+
+
+def _scheduled_macro_release_counts(
+    branch_results: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    raw = branch_results.get("POST_BREADTH_SCHEDULED_MACRO_RELEASE") or {}
+    if not raw:
+        return {
+            "scheduled_macro_release_status": "NOT_RUN",
+            "scheduled_macro_release_official_event_count": 0,
+            "scheduled_macro_release_candidate_screen_count": 0,
+            "scheduled_macro_release_selected_candidate_count": 0,
+            "scheduled_macro_release_passing_candidate_count": 0,
+            "scheduled_macro_release_tier_q_created_count": 0,
+        }
+    result = _verify_scheduled_macro_release_tripwire_result(raw)
+    return {
+        "scheduled_macro_release_status": str(result["status"]),
+        "scheduled_macro_release_official_event_count": int(
+            result["official_release_count"]
+        ),
+        "scheduled_macro_release_candidate_screen_count": int(
+            result["candidate_lattice_count"]
+        ),
+        "scheduled_macro_release_selected_candidate_count": int(
+            result["selected_candidate_count"]
+        ),
+        "scheduled_macro_release_passing_candidate_count": len(
+            result["passing_candidate_ids"]
+        ),
+        "scheduled_macro_release_tier_q_created_count": int(
+            result["tier_q_created"]
+        ),
+    }
 
 
 def _post_breadth_counts(
@@ -7354,6 +7655,7 @@ def _state_payload(
     session_safe_confirmation_counts = _session_safe_confirmation_counts(
         branch_results
     )
+    scheduled_macro_release_counts = _scheduled_macro_release_counts(branch_results)
     event_control = branch_results.get("EVENT_TIME_MATCHED_CONTROLS") or {}
     event_control_counts = (
         _event_time_control_counts(
@@ -7557,6 +7859,7 @@ def _state_payload(
         **post_breadth_counts,
         **session_safe_counts,
         **session_safe_confirmation_counts,
+        **scheduled_macro_release_counts,
     }
     return _rehash(payload, "state_hash")
 
@@ -7590,6 +7893,7 @@ def _kpis(
     session_safe_confirmation_counts = _session_safe_confirmation_counts(
         branch_results
     )
+    scheduled_macro_release_counts = _scheduled_macro_release_counts(branch_results)
     frontier = list(exploration.get("uniform_legal_frontier") or ())
     stressed_points = [row for row in frontier if row.get("scenario") == "STRESSED_1_5X"]
     normal_points = [row for row in frontier if row.get("scenario") == "NORMAL"]
@@ -7744,6 +8048,7 @@ def _kpis(
         **post_breadth_counts,
         **session_safe_counts,
         **session_safe_confirmation_counts,
+        **scheduled_macro_release_counts,
         "best_normal_pass_rate": exact_metrics["best_normal_pass_rate"],
         "best_stressed_pass_rate": exact_metrics["best_stressed_pass_rate"],
         "best_normal_summary_threshold_rate": max(
@@ -7832,6 +8137,9 @@ def _write_mission_views(
                 "POST_BREADTH_SESSION_SAFE_HORIZON_CUTOFF",
                 "POST_BREADTH_SESSION_SAFE_DROP_COMPONENT",
                 "POST_BREADTH_SESSION_SAFE_PORTFOLIO",
+                "POST_BREADTH_SESSION_SAFE_CONFIRMATION",
+                "POST_BREADTH_CLEAN_CROSS_ASSET_DAILY",
+                "POST_BREADTH_SCHEDULED_MACRO_RELEASE",
             )
             if key in branch_results
         },
