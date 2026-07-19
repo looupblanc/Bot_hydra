@@ -278,6 +278,7 @@ def prepare_curvature_features(
     }
     for root_name, frame in frames.items():
         _validate_root_frame(frame, root_name)
+    canonical_session_inventory = _canonical_session_inventory(frames)
 
     output: pd.DataFrame | None = None
     for root_name in (triangle.short_root, triangle.belly_root, triangle.long_root):
@@ -391,6 +392,27 @@ def prepare_curvature_features(
         & output["available_at"].eq(output["timestamp"] + pd.Timedelta(minutes=1))
     )
     output["session_full_coverage"] = _session_full_coverage_mask(output)
+    present_coverage = {
+        str(session_id): bool(rows["session_full_coverage"].all())
+        for session_id, rows in output.groupby("session_id", sort=True)
+    }
+    canonical_calendar: list[dict[str, Any]] = []
+    for row in canonical_session_inventory:
+        value = dict(row)
+        value["session_full_coverage"] = bool(
+            not value["missing_roots"]
+            and present_coverage.get(str(value["session_id"]), False)
+        )
+        if value["missing_roots"]:
+            value["coverage_reason"] = "ROOT_SESSION_ABSENT_BEFORE_INNER_JOIN"
+        elif str(value["session_id"]) in mismatch_sessions:
+            value["coverage_reason"] = "THREE_LEG_DELIVERY_MISMATCH"
+        elif not value["session_full_coverage"]:
+            value["coverage_reason"] = "INCOMPLETE_REQUIRED_SESSION_WINDOW"
+        else:
+            value["coverage_reason"] = "FULL_COVERAGE"
+        canonical_calendar.append(value)
+    output.attrs["canonical_session_calendar"] = canonical_calendar
     _validate_decision_columns(output.columns)
     audit_core = {
         "triangle_id": triangle.triangle_id,
@@ -399,6 +421,13 @@ def prepare_curvature_features(
         "exact_common_clock_rows_before_delivery_filter": aligned_rows_before_delivery,
         "delivery_mismatch_rows_excluded": aligned_rows_before_delivery - len(output),
         "delivery_mismatch_session_count": len(mismatch_sessions),
+        "canonical_union_session_count": len(canonical_calendar),
+        "canonical_full_coverage_session_count": sum(
+            bool(row["session_full_coverage"]) for row in canonical_calendar
+        ),
+        "canonical_censored_session_count": sum(
+            not bool(row["session_full_coverage"]) for row in canonical_calendar
+        ),
         "same_delivery_month_required": True,
         "roll_unsafe_rows": int(output["roll_unsafe"].sum()),
         "contract_segment_count": int(output["contract_segment"].nunique()),
@@ -473,6 +502,7 @@ def run_economic_tripwire(
                 ),
             )
             frame["temporal_role"] = _assign_roles(frame["timestamp"], card)
+            _attach_canonical_calendar_roles(frame, card)
             prepared[(triangle.triangle_id, lookback)] = frame
             feature_audits[f"{triangle.triangle_id}:lb{lookback}"] = feature_audit
 
@@ -1107,12 +1137,12 @@ def _evaluate_account_point(
     headline_days = set(
         controls["PRIMARY"]["STRESSED_1_5X"]["FINAL_DEVELOPMENT"][
             str(HEADLINE_HORIZON)
-        ]["headline_included_session_days"]
+        ]["headline_traversed_session_days"]
     )
     return {
         "account_label": account_label,
         "account_size_usd": int(account_rule["account_size_usd"]),
-        "risk_fraction_of_mll": risk_fraction,
+        "risk_fraction_of_initial_mll": risk_fraction,
         "integer_quantity": quantity,
         "sizing_freeze": sizing,
         "controls": controls,
@@ -1122,10 +1152,10 @@ def _evaluate_account_point(
         "trade_ledgers_hash": _stable_hash(trade_ledgers),
         "final_stressed_profit_concentration": _headline_profit_concentration(
             primary_stressed_events,
-            included_session_days=headline_days,
+            traversed_session_days=headline_days,
         ),
         "concentration_population": (
-            "FULL_COVERAGE_FINAL_DEVELOPMENT_HEADLINE_EPISODES_ONLY"
+            "ACTUALLY_TRAVERSED_DAILY_PATHS_FROM_FULL_COVERAGE_FINAL_DEVELOPMENT_HEADLINE_EPISODES_ONLY"
         ),
     }
 
@@ -1142,11 +1172,14 @@ def _freeze_discovery_sizing(
     )
     if not discovery:
         core = {
-            "policy": "DISCOVERY_ONLY_MAX_DECLARED_STOP_RISK",
+            "policy": "STATIC_INITIAL_MLL_FRACTION_WITH_DISCOVERY_ONLY_MAX_DECLARED_STOP_RISK",
             "discovery_event_count": 0,
             "maximum_declared_stop_risk_one_contract_usd": None,
-            "risk_budget_usd": float(account_rule["maximum_loss_limit_usd"])
+            "initial_mll_risk_budget_usd": float(
+                account_rule["maximum_loss_limit_usd"]
+            )
             * risk_fraction,
+            "initial_mll_fraction": float(risk_fraction),
             "integer_quantity": 0,
             "validation_or_final_inputs_used": False,
         }
@@ -1162,13 +1195,14 @@ def _freeze_discovery_sizing(
     by_risk = int(math.floor(budget / worst_declared))
     quantity = max(0, min(by_risk, int(account_rule["maximum_mini_contracts"])))
     core = {
-        "policy": "DISCOVERY_ONLY_MAX_DECLARED_STOP_RISK",
+        "policy": "STATIC_INITIAL_MLL_FRACTION_WITH_DISCOVERY_ONLY_MAX_DECLARED_STOP_RISK",
         "discovery_event_count": len(discovery),
         "discovery_opportunity_ids": sorted(
             str(row["opportunity_id"]) for row in discovery
         ),
         "maximum_declared_stop_risk_one_contract_usd": float(worst_declared),
-        "risk_budget_usd": float(budget),
+        "initial_mll_risk_budget_usd": float(budget),
+        "initial_mll_fraction": float(risk_fraction),
         "integer_quantity": quantity,
         "validation_or_final_inputs_used": False,
     }
@@ -1280,16 +1314,37 @@ def _account_role_matrix(
 ) -> dict[str, Any]:
     config = exact._account_config(account_rule)
     output: dict[str, Any] = {}
+    canonical_rows = frame.attrs.get("canonical_session_calendar")
+    if canonical_rows:
+        canonical_calendar = pd.DataFrame([dict(row) for row in canonical_rows])
+        required = {
+            "session_id",
+            "session_day",
+            "session_full_coverage",
+            "temporal_role",
+        }
+        if not required.issubset(canonical_calendar.columns):
+            raise TreasuryCurvatureError("canonical session calendar is incomplete")
+    else:
+        canonical_calendar = (
+            frame.loc[
+                :, ["session_id", "session_day", "session_full_coverage", "temporal_role"]
+            ]
+            .groupby(
+                ["session_id", "session_day", "temporal_role"],
+                as_index=False,
+                sort=True,
+            )
+            .agg(session_full_coverage=("session_full_coverage", "all"))
+        )
     for scenario in SCENARIOS:
         roles: dict[str, Any] = {}
         for role in ROLES:
             session_rows = (
-                frame.loc[
-                    frame["temporal_role"].eq(role),
+                canonical_calendar.loc[
+                    canonical_calendar["temporal_role"].eq(role),
                     ["session_id", "session_day", "session_full_coverage"],
                 ]
-                .groupby(["session_id", "session_day"], as_index=False, sort=True)
-                .agg(session_full_coverage=("session_full_coverage", "all"))
                 .sort_values("session_id", kind="mergesort")
             )
             days = tuple(int(value) for value in session_rows["session_day"])
@@ -1305,7 +1360,8 @@ def _account_role_matrix(
                 starts = tuple(days[position] for position in start_positions)
                 episodes_list: list[CombineEpisodeResult] = []
                 censored_starts: list[dict[str, Any]] = []
-                included_session_days: list[int] = []
+                full_coverage_episode_days: list[int] = []
+                traversed_session_days: list[int] = []
                 for position in start_positions:
                     episode_days = days[position : position + horizon]
                     incomplete = tuple(
@@ -1322,19 +1378,21 @@ def _account_role_matrix(
                             }
                         )
                         continue
-                    episodes_list.append(
-                        run_combine_episode(
-                            events_by_scenario[scenario],
-                            days,
-                            start_day=int(episode_days[0]),
-                            maximum_duration_days=horizon,
-                            config=config,
-                            maximum_mini_equivalent=float(
-                                account_rule["maximum_mini_contracts"]
-                            ),
-                        )
+                    episode = run_combine_episode(
+                        events_by_scenario[scenario],
+                        days,
+                        start_day=int(episode_days[0]),
+                        maximum_duration_days=horizon,
+                        config=config,
+                        maximum_mini_equivalent=float(
+                            account_rule["maximum_mini_contracts"]
+                        ),
                     )
-                    included_session_days.extend(int(day) for day in episode_days)
+                    episodes_list.append(episode)
+                    full_coverage_episode_days.extend(int(day) for day in episode_days)
+                    traversed_session_days.extend(
+                        int(row["session_day"]) for row in episode.daily_path
+                    )
                 episodes = tuple(episodes_list)
                 episode_ledger = [row.to_dict() for row in episodes]
                 summary = _episode_summary(episodes)
@@ -1348,8 +1406,13 @@ def _account_role_matrix(
                     "censored_start_ledger_hash": _stable_hash(censored_starts),
                     "episode_ledger": episode_ledger,
                     "episode_ledger_hash": _stable_hash(episode_ledger),
-                    "headline_included_session_days": sorted(
-                        set(included_session_days)
+                    "headline_full_coverage_episode_session_days": sorted(
+                        set(full_coverage_episode_days)
+                    )
+                    if horizon == HEADLINE_HORIZON
+                    else [],
+                    "headline_traversed_session_days": sorted(
+                        set(traversed_session_days)
                     )
                     if horizon == HEADLINE_HORIZON
                     else [],
@@ -1539,14 +1602,14 @@ def _profit_concentration(events: Sequence[TradePathEvent]) -> dict[str, float]:
 
 
 def _headline_profit_concentration(
-    events: Sequence[TradePathEvent], *, included_session_days: set[int]
+    events: Sequence[TradePathEvent], *, traversed_session_days: set[int]
 ) -> dict[str, float]:
     return _profit_concentration(
         tuple(
             row
             for row in events
             if str(row.regime).startswith("FINAL_DEVELOPMENT:")
-            and int(row.session_day) in included_session_days
+            and int(row.session_day) in traversed_session_days
         )
     )
 
@@ -1577,7 +1640,7 @@ def _branch_gate(
     decisions: Sequence[Mapping[str, Any]], power: Mapping[str, Any]
 ) -> dict[str, Any]:
     tier_e = sorted(
-        f"{decision['candidate_id']}:{point['account_label']}:r{point['risk_fraction_of_mll']}"
+        f"{decision['candidate_id']}:{point['account_label']}:r{point['risk_fraction_of_initial_mll']}"
         for decision in decisions
         for point in decision["account_points"]
         if point["gate"]["passed"]
@@ -1893,6 +1956,41 @@ def _session_full_coverage_mask(frame: pd.DataFrame) -> pd.Series:
     return frame["session_id"].astype(str).map(complete).fillna(False).astype(bool)
 
 
+def _canonical_session_inventory(
+    frames: Mapping[str, pd.DataFrame]
+) -> list[dict[str, Any]]:
+    """Freeze the pre-join union so absent sessions cannot compress P20."""
+
+    observed: dict[str, set[str]] = {}
+    for root_name, frame in frames.items():
+        for session_id in frame["session_id"].astype(str).unique():
+            observed.setdefault(str(session_id), set()).add(str(root_name))
+    all_roots = set(str(root_name) for root_name in frames)
+    return [
+        {
+            "session_id": session_id,
+            "session_day": _session_ordinal(session_id),
+            "observed_roots": sorted(observed[session_id]),
+            "missing_roots": sorted(all_roots - observed[session_id]),
+        }
+        for session_id in sorted(observed, key=_session_ordinal)
+    ]
+
+
+def _attach_canonical_calendar_roles(
+    frame: pd.DataFrame, card: Mapping[str, Any]
+) -> None:
+    calendar = [dict(row) for row in frame.attrs.get("canonical_session_calendar", ())]
+    if not calendar:
+        raise TreasuryCurvatureError("canonical pre-join session inventory absent")
+    for row in calendar:
+        timestamp = pd.Series(
+            [pd.Timestamp(str(row["session_id"]), tz="UTC")]
+        )
+        row["temporal_role"] = str(_assign_roles(timestamp, card).iloc[0])
+    frame.attrs["canonical_session_calendar"] = calendar
+
+
 def _prior_two_factor_betas(
     belly: pd.Series,
     short: pd.Series,
@@ -2056,7 +2154,7 @@ def _validate_card(card: Mapping[str, Any]) -> None:
         or int(account.get("headline_gate_horizon_trading_days", 0))
         != HEADLINE_HORIZON
         or account.get("headline_passes_counted_once") is not True
-        or tuple(float(row) for row in account.get("risk_fraction_of_current_mll_buffer", ()))
+        or tuple(float(row) for row in account.get("risk_fraction_of_initial_mll", ()))
         != RISK_FRACTIONS
     ):
         raise TreasuryCurvatureError("account frontier or headline horizon drift")
@@ -2086,6 +2184,8 @@ def _validate_card(card: Mapping[str, Any]) -> None:
     coverage = account.get("coverage_contract", {})
     if (
         sizing.get("role") != "DISCOVERY"
+        or sizing.get("policy")
+        != "STATIC_INTEGER_QUANTITY_FROM_INITIAL_MLL_FRACTION_AND_MAXIMUM_CAUSAL_DECLARED_STOP_RISK_OBSERVED_IN_DISCOVERY_ONLY"
         or sizing.get("validation_or_final_development_inputs_allowed") is not False
         or coverage.get("required_local_window_start") != "06:19"
         or coverage.get("required_local_window_end_inclusive") != "15:10"

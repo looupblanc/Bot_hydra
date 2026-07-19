@@ -188,14 +188,14 @@
       10
     ],
     "headline_gate_horizon_trading_days": 20,
-    "risk_fraction_of_current_mll_buffer": [
+    "risk_fraction_of_initial_mll": [
       0.1,
       0.2
     ],
     "maximum_concurrent_positions": 1,
     "sizing_freeze": {
       "role": "DISCOVERY",
-      "policy": "MAXIMUM_CAUSAL_DECLARED_STOP_RISK_OBSERVED_IN_DISCOVERY_ONLY",
+      "policy": "STATIC_INTEGER_QUANTITY_FROM_INITIAL_MLL_FRACTION_AND_MAXIMUM_CAUSAL_DECLARED_STOP_RISK_OBSERVED_IN_DISCOVERY_ONLY",
       "validation_or_final_development_inputs_allowed": false,
       "same_frozen_integer_quantity_for_primary_and_all_controls": true
     },
@@ -234,7 +234,7 @@
     "maximum_single_trade_profit_concentration": 0.5,
     "maximum_single_day_profit_concentration": 0.5,
     "candidate_power_preflight_required": true,
-    "concentration_population": "FULL_COVERAGE_FINAL_DEVELOPMENT_HEADLINE_EPISODES_ONLY",
+    "concentration_population": "ACTUALLY_TRAVERSED_DAILY_PATHS_FROM_FULL_COVERAGE_FINAL_DEVELOPMENT_HEADLINE_EPISODES_ONLY",
     "evidence_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC"
   },
   "economic_run_authorization": {
@@ -262,5 +262,5 @@
     "when_underpowered": "TREASURY_CURVATURE_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
     "when_falsified": "TOMBSTONE_EXACT_THREE_TENOR_CURVATURE_TO_BELLY_LATTICE_AND_REALLOCATE_TO_DISTINCT_INFORMATION_SOURCE"
   },
-  "card_hash": "434378384233b8a2fca75416e824eaf8eeda1180e7a20f68ed21682884818bf8"
+  "card_hash": "5ad2608d747af507a5aa9d5fcac01173824c98fc2067cb57618aeecb43050d9a"
 }

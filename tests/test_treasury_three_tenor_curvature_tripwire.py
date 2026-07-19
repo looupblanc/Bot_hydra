@@ -605,7 +605,7 @@ def test_concentration_uses_only_full_coverage_headline_days() -> None:
 
     result = tripwire._headline_profit_concentration(
         [event(1, 10.0), event(2, 10_000.0)],
-        included_session_days={1},
+        traversed_session_days={1},
     )
     assert result["maximum_single_trade_share"] == 1.0
 
