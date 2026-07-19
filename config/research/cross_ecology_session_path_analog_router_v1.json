@@ -1,0 +1,286 @@
+{
+  "schema": "hydra_autonomous_branch_decision_card_v1",
+  "campaign_id": "hydra_cross_ecology_session_path_analog_router_0036",
+  "decision_id": "CAUSAL_CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER_20260719_V1",
+  "selected_branch": "CAUSAL_CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER_V1",
+  "evidence_role": "PREREGISTERED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
+  "hypothesis": "A strictly prior-session analog library over the joint intraday path of equity index, metal and energy micros can identify a single target market and direction whose two-R target is more likely to arrive before its one-R adverse boundary than under own-path and matched null controls.",
+  "strongest_argument_against": "Cross-ecology paths may be unstable, sparse after exact roll and session guards, and too weak after executable costs to create useful account velocity.",
+  "why_materially_distinct": {
+    "mass_ohlcv_grammars": "This is a session-path nearest-analog router over five market ecologies, not a scalar indicator grammar or parameter expansion.",
+    "cross_index_direction_transfer": "The router can execute index, metal or energy micros and conditions on full path shape rather than transferring one market's direction.",
+    "curve_and_term_structure": "No Treasury curvature, adjacent spread, delivery basis or commodity term-structure signal is used.",
+    "microstructure": "No trades, quotes, order book, MBO teacher or selective-veto feature is used.",
+    "cemetery_resurrection_allowed": false
+  },
+  "smallest_decisive_falsification_experiment": {
+    "maximum_rule_count": 6,
+    "maximum_selected_candidates": 2,
+    "selection_role": "DISCOVERY_ONLY",
+    "one_selected_candidate_per_decision_clock": true,
+    "panels": [
+      "CROSS_ECOLOGY_PRICE_PATH",
+      "CROSS_ECOLOGY_PRICE_VOLUME_PATH",
+      "CROSS_ECOLOGY_RELATIVE_RANK_PATH"
+    ],
+    "decision_clocks_local": [
+      "08:35",
+      "10:05"
+    ],
+    "maximum_cpu_workers": 1,
+    "promotion_allowed": false
+  },
+  "frozen_inputs": {
+    "market_files": [
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2023-01-01_2024-01-01.parquet",
+        "sha256": "19be0a539802cd06fea20425ef14feca529fd60ece7e9eb5a88837e1d4e01862",
+        "size_bytes": 22748072,
+        "record_count": 1403681,
+        "symbols_used": ["MNQ"]
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-01-01_2024-03-31.parquet",
+        "sha256": "4540b7585caa2798998bd39a7d787c948f1f7c82f1d692e55118c4d4fffc5911",
+        "size_bytes": 4246706,
+        "record_count": 343090,
+        "symbols_used": ["MNQ"]
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-04-01_2024-07-01.parquet",
+        "sha256": "c1af5bb43aa0ac5b83d9d7bab8d20b2ef52c97089f7acccc8d19231ce9e647dc",
+        "size_bytes": 4455647,
+        "record_count": 353679,
+        "symbols_used": ["MNQ"]
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-07-01_2024-10-01.parquet",
+        "sha256": "97914227a87a5cd6b1c90f11de2061054a66f0a2b313f8120b8831af06b6c85e",
+        "size_bytes": 4589699,
+        "record_count": 358955,
+        "symbols_used": ["MNQ"]
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_GC-v-0_MGC-v-0_2023-01-01_2024-10-01.parquet",
+        "sha256": "6bca31351820713016426286de8ae3ce9f0350b6886f780cccc5565fd65da78d",
+        "size_bytes": 18655430,
+        "record_count": 1208477,
+        "symbols_used": ["MGC"]
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_2023-01-01_2024-10-01.parquet",
+        "sha256": "07b3093ed8ef5888898abc3e531e0b522273a6c2047489b60eb36b33afeaf374",
+        "size_bytes": 59218789,
+        "record_count": 3812778,
+        "symbols_used": ["M2K", "MYM", "MCL"]
+      }
+    ],
+    "roll_map": {
+      "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+      "sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+      "size_bytes": 117345,
+      "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2"
+    },
+    "rule_snapshot": {
+      "path": "config/rulesets/topstep_official_2026-07-19.json",
+      "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+      "size_bytes": 6849,
+      "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f"
+    },
+    "data_access_ledger": {
+      "path": "reports/data_access/data_access_ledger.jsonl",
+      "sha256": "ccd5e94eeebd8b59e8db9b533aa03f51c6c1be0f7e70eeb2b3bbe6932553ed7c",
+      "size_bytes": 320810
+    }
+  },
+  "frozen_input_contract_hash": "afe161a7f01a31db6e958cb8a407df3915d0490d6efbbbba603dd3029d0f8175",
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "start": "2023-01-03",
+      "end": "2024-01-01",
+      "candidate_modification_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "start": "2024-01-01",
+      "end": "2024-04-01",
+      "candidate_modification_allowed": false
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "start": "2024-04-01",
+      "end": "2024-10-01",
+      "candidate_modification_allowed": false
+    }
+  ],
+  "causal_contract": {
+    "execution_markets": ["MNQ", "MGC", "MCL", "M2K", "MYM"],
+    "source_available_at": "ONE_MINUTE_BAR_END_TIMESTAMP",
+    "decision_clocks_timezone": "America/Chicago",
+    "decision_clocks_local": ["08:35", "10:05"],
+    "path_lookback_minutes": 60,
+    "price_bins": 12,
+    "price_bin_minutes": 5,
+    "volume_bins": 6,
+    "volume_bin_minutes": 10,
+    "panel_feature_dimensions": {
+      "CROSS_ECOLOGY_PRICE_PATH": 36,
+      "CROSS_ECOLOGY_PRICE_VOLUME_PATH": 54,
+      "CROSS_ECOLOGY_RELATIVE_RANK_PATH": 25
+    },
+    "normalization": "PER_MARKET_AND_CLOCK_STRICTLY_PREVIOUS_20_COMPLETE_SESSIONS_MEDIAN_IQR",
+    "normalization_prior_sessions": 20,
+    "normalization_source_scope": "ALL_AVAILABLE_PRE_ROLE_AND_ROLE_SESSIONS_THEN_ECONOMIC_QUERY_FILTER",
+    "overnight_displacement": "IMMEDIATELY_PRIOR_RAW_TRADING_SESSION_15_09_CLOSE_TO_CURRENT_SESSION_07_00_OPEN_NEVER_PRIOR_SURVIVING_COMMON_DAY",
+    "analog_k": 25,
+    "analog_library": "DISCOVERY_OUTCOMES_ONLY",
+    "discovery_query_policy": "EXPANDING_WALK_FORWARD_STRICTLY_PRIOR_SESSION_DAYS",
+    "validation_and_final_query_policy": "FROZEN_FULL_DISCOVERY_LIBRARY_ONLY",
+    "analog_lcb_threshold": 0.52,
+    "target_r_multiple": 2.0,
+    "stop_r_multiple": 1.0,
+    "maximum_holding_minutes": 120,
+    "stop_distance": "MAX_FOUR_TICKS_OR_HALF_STRICTLY_PRIOR_20_SESSION_MEDIAN_PREDECISION_30_MINUTE_RANGE",
+    "entry": "NEXT_TRADABLE_MINUTE_OPEN_AFTER_DECISION_TIME",
+    "price_grid": "ENTRY_STOP_TARGET_AND_EXIT_PRICES_ROUNDED_TO_EXECUTION_MARKET_TICK_GRID",
+    "adverse_gap_fill": "EXECUTE_AT_ADVERSE_BAR_OPEN_WHEN_OPEN_GAPS_THROUGH_STOP",
+    "execution_path_coverage": "EXACT_CONTIGUOUS_ONE_MINUTE_PATH_FOR_FULL_120_MINUTES_UNLESS_A_VALID_TERMINAL_OCCURS_EARLIER",
+    "roll_or_session_boundary_before_terminal": "DATA_CENSORED",
+    "same_bar_stop_target_ambiguity": "STOP_FIRST",
+    "mandatory_flatten_local": "15:10",
+    "minimum_common_session_rows_07_00_TO_14_00": 390,
+    "normal_all_in_cost_per_micro_usd": {
+      "MNQ": 3.0,
+      "MGC": 4.0,
+      "MCL": 4.0,
+      "M2K": 3.0,
+      "MYM": 3.0
+    },
+    "stressed_cost_multiplier": 1.5,
+    "available_at_not_after_decision_required": true,
+    "future_outcomes_in_decision": false,
+    "future_coverage_in_eligibility": false,
+    "future_outcome_censor_policy": "PRESERVE_CAUSAL_SIGNAL_AND_DECISION_THEN_CENSOR_EVERY_AFFECTED_ACCOUNT_WINDOW_WITHOUT_DAILY_PATH",
+    "negative_shift_in_decision": false,
+    "backfill_across_decision": false
+  },
+  "controls": [
+    {
+      "id": "OWN_PATH_ONLY",
+      "matching": "same primary market, opportunity, decision time, quantity, horizon and costs"
+    },
+    {
+      "id": "SESSION_MARKET_EXPOSURE_MATCHED_RANDOM",
+      "matching": "same primary market, opportunity, decision time, quantity, horizon and costs; deterministic seeded direction"
+    },
+    {
+      "id": "ANALOG_LABEL_PERMUTATION",
+      "matching": "same primary market, opportunity, decision time, quantity, horizon and costs; Discovery labels deterministically permuted"
+    },
+    {
+      "id": "DIRECTION_FLIP",
+      "matching": "same primary market, opportunity, decision time, quantity, horizon and costs"
+    }
+  ],
+  "account_frontier": {
+    "account_sizes": ["50K", "100K", "150K"],
+    "horizons_trading_days": [5, 10, 20],
+    "risk_fraction_of_current_mll_buffer": [0.1, 0.2, 0.3],
+    "maximum_concurrent_positions": 1,
+    "daily_loss_guard_fraction_of_mll": 0.35,
+    "daily_profit_guard_fraction_of_base_target": 0.45,
+    "selection_role": "DISCOVERY_ONLY",
+    "exact_special_contract_caps_required": true,
+    "exact_mll_and_consistency_required": true,
+    "complete_non_overlapping_windows_only": true,
+    "canonical_calendar": "UNION_OF_RAW_TRADING_SESSION_DAYS_BEFORE_COMPLETENESS_FILTERS",
+    "incomplete_session_policy": "RETAIN_DAY_AND_CENSOR_ANY_NON_OVERLAPPING_WINDOW_CONTAINING_IT_WITHOUT_CALENDAR_COMPRESSION",
+    "matched_control_quantity_policy": "FREEZE_PRIMARY_DECISION_TIME_QUANTITY_PER_ACCOUNT_SCENARIO_AND_START"
+  },
+  "evidence_bundle_contract": {
+    "campaign_id": "hydra_cross_ecology_session_path_analog_router_0036",
+    "materialized_in_same_economic_run": true,
+    "second_replay_required_for_preexisting_adoption": false,
+    "authoritative_result_field": "canonical_evidence_material",
+    "canonical_fragments_merged_once_at_campaign_level": true,
+    "deep_relational_validation_required_before_adapter_no_replay": true,
+    "non_materialized_fragment_policy": "EXCLUDE_ZERO_TRADE_OR_ZERO_FULL_EPISODE_FRAGMENT_WITH_EXPLICIT_REASON_AND_NEVER_MARK_COMPLETE",
+    "canonical_censored_policy": "PRESERVE_EXACT_CENSORED_START_LEDGERS_OUTSIDE_CANONICAL_EPISODES_WHEN_NO_DAILY_PATH_EXISTS",
+    "required_material": [
+      "routed_event_ledgers_by_candidate_and_control",
+      "routed_trade_ledgers_by_candidate_control_and_scenario",
+      "individual_full_coverage_episode_ledgers",
+      "censored_start_ledgers",
+      "daily_account_paths",
+      "policy_specification_and_fingerprint",
+      "input_provenance_and_ledger_hashes"
+    ]
+  },
+  "power_preflight": {
+    "minimum_common_sessions": {
+      "DISCOVERY": 80,
+      "VALIDATION": 20,
+      "FINAL_DEVELOPMENT": 40
+    },
+    "minimum_candidate_events": {
+      "VALIDATION": 20,
+      "FINAL_DEVELOPMENT": 40
+    },
+    "when_underpowered": "SESSION_PATH_ANALOG_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+  },
+  "frozen_gate": {
+    "positive_stressed_validation_net_required": true,
+    "positive_stressed_final_development_net_required": true,
+    "minimum_validation_stressed_p10_or_p20_passes": 1,
+    "minimum_final_normal_p10_passes": 2,
+    "minimum_final_stressed_p10_or_p20_passes": 1,
+    "minimum_positive_markets_or_temporal_subblocks": 2,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "passing_consistency_required": true,
+    "maximum_single_trade_profit_concentration": 0.5,
+    "maximum_single_day_profit_concentration": 0.5,
+    "maximum_single_market_profit_concentration": 0.5,
+    "minimum_stressed_median_target_progress_uplift_percentage_points": 10.0,
+    "one_extra_stressed_pass_can_replace_progress_uplift": true,
+    "must_beat_each_matched_control": true,
+    "evidence_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC"
+  },
+  "cemetery_audit": {
+    "graveyard_path": "mission/state/graveyard.db",
+    "canonical_mechanism_class": "CAUSAL_CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER_V1",
+    "exact_mechanism_class_collision_count_at_selection": 0,
+    "graveyard_sha256_at_selection": "3b2a32cf0ee2ba474bf53be895b95da6e3b0768d77c73b28681e7fa5a2bd101a"
+  },
+  "economic_run_authorization": {
+    "default_mode": "AUDIT_ONLY_NO_OUTCOME_READ",
+    "required_cli_token": "ROOT_AUTHORIZED_CROSS_ECOLOGY_SESSION_ANALOG_REPLAY_V1",
+    "production_manifest_required": true,
+    "production_manifest_schema": "hydra_economic_production_manifest_v1",
+    "production_manifest_campaign_mode": "CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER",
+    "production_manifest_source_commit_policy": "FULL_COMMITTED_IMPLEMENTATION_BLOB_HASHES_SOURCE_COMMIT_MAY_BE_ANCESTOR_OF_LIVE_HEAD",
+    "precommit_audit_source_status": "PRECOMMIT_PENDING",
+    "root_fire_green_required": true
+  },
+  "governance": {
+    "tier_ceiling": "E",
+    "tier_q_allowed": false,
+    "promotion_allowed": false,
+    "independent_confirmation_claimed": false,
+    "q4_access_allowed": false,
+    "data_purchase_allowed": false,
+    "network_access_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "runtime_service_or_database_change_allowed": false,
+    "registry_or_cemetery_write_allowed": false,
+    "authoritative_writer_change_allowed": false
+  },
+  "branch_rule": {
+    "when_green": "FREEZE_TIER_E_DIAGNOSTIC_AND_REQUIRE_SEPARATELY_FROZEN_UNSEEN_CONFIRMATION",
+    "when_weak": "PRESERVE_DIAGNOSTIC_ONLY_WITHOUT_NEIGHBOR_K_CLOCK_OR_THRESHOLD_TUNING",
+    "when_underpowered": "SESSION_PATH_ANALOG_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
+    "when_falsified": "TOMBSTONE_EXACT_CROSS_ECOLOGY_SESSION_PATH_ANALOG_LATTICE_AND_REALLOCATE_TO_DISTINCT_INFORMATION_SOURCE"
+  },
+  "card_hash": "4d11e9542496d9488492afc95ddbecb07119937a40cd56e1a30c92f22b688f4e"
+}
