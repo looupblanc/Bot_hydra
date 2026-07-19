@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 import sqlite3
 from collections import Counter
 from dataclasses import asdict, dataclass
@@ -106,6 +107,166 @@ class CurvatureRule:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+class _CausalPathIndex:
+    """Immutable positional index for exact causal belly paths.
+
+    The production frames are dense ``RangeIndex`` tables.  Building the
+    validity frontier once turns the formerly repeated pandas path scans into
+    an O(1) contiguity query.  Price-bar inspection remains a bounded NumPy
+    slice (at most the preregistered 120 bars), preserving the exact stop-first
+    and next-open semantics without materialising a future-aware label.
+    """
+
+    __slots__ = (
+        "belly_root",
+        "length",
+        "timestamp_ns",
+        "open",
+        "high",
+        "low",
+        "delivery_aligned",
+        "roll_unsafe",
+        "run_end",
+    )
+
+    def __init__(self, frame: pd.DataFrame, *, belly_root: str) -> None:
+        length = len(frame)
+        expected_index = np.arange(length, dtype=np.int64)
+        observed_index = frame.index.to_numpy(dtype=np.int64, copy=False)
+        if not np.array_equal(observed_index, expected_index):
+            raise TreasuryCurvatureError(
+                "causal path index requires a dense zero-based RangeIndex"
+            )
+        required = {
+            "timestamp",
+            "session_id",
+            "local_minute",
+            "roll_unsafe",
+            f"{belly_root}_contract",
+            f"{belly_root}_open",
+            f"{belly_root}_high",
+            f"{belly_root}_low",
+        }
+        missing = sorted(required - set(frame.columns))
+        if missing:
+            raise TreasuryCurvatureError(
+                f"causal path index is missing columns: {missing}"
+            )
+
+        # pandas may preserve a microsecond source dtype.  Normalize explicitly
+        # so the integer clock and the frozen one-minute nanosecond constant
+        # cannot silently disagree.
+        timestamp_ns = (
+            pd.to_datetime(frame["timestamp"], utc=True)
+            .astype("datetime64[ns, UTC]")
+            .array.asi8.copy()
+        )
+        sessions = frame["session_id"].astype(str).to_numpy(copy=False)
+        contracts = frame[f"{belly_root}_contract"].astype(str).to_numpy(copy=False)
+        local_minutes = frame["local_minute"].to_numpy(dtype=np.int64, copy=False)
+        roll_unsafe = frame["roll_unsafe"].to_numpy(dtype=bool, copy=False)
+        delivery_columns = [
+            column
+            for column in frame.columns
+            if str(column).endswith("_delivery_month")
+        ]
+        if delivery_columns:
+            delivery = frame[delivery_columns].astype(str).to_numpy(copy=False)
+            delivery_aligned = np.all(delivery == delivery[:, :1], axis=1)
+        else:
+            delivery_aligned = np.ones(length, dtype=bool)
+        row_valid = (
+            ~roll_unsafe
+            & delivery_aligned
+            & (local_minutes <= SESSION_FLATTEN_MINUTE)
+        )
+
+        if length:
+            transition_good = np.ones(max(length - 1, 0), dtype=bool)
+            if length > 1:
+                transition_good &= np.diff(timestamp_ns) == 60_000_000_000
+                transition_good &= sessions[1:] == sessions[:-1]
+                transition_good &= contracts[1:] == contracts[:-1]
+                transition_good &= row_valid[1:] & row_valid[:-1]
+            boundary = np.zeros(length, dtype=bool)
+            if length > 1:
+                boundary[:-1] = ~transition_good
+            boundary[-1] = True
+            positions = np.arange(length, dtype=np.int64)
+            candidates = np.where(boundary, positions, length - 1)
+            run_end = np.minimum.accumulate(candidates[::-1])[::-1]
+            run_end = run_end.astype(np.int64, copy=False)
+            run_end[~row_valid] = positions[~row_valid] - 1
+        else:
+            run_end = np.empty(0, dtype=np.int64)
+
+        self.belly_root = str(belly_root)
+        self.length = int(length)
+        self.timestamp_ns = timestamp_ns
+        self.open = frame[f"{belly_root}_open"].to_numpy(dtype=float, copy=True)
+        self.high = frame[f"{belly_root}_high"].to_numpy(dtype=float, copy=True)
+        self.low = frame[f"{belly_root}_low"].to_numpy(dtype=float, copy=True)
+        self.delivery_aligned = np.asarray(delivery_aligned, dtype=bool).copy()
+        self.roll_unsafe = np.asarray(roll_unsafe, dtype=bool).copy()
+        self.run_end = run_end
+        for value in (
+            self.timestamp_ns,
+            self.open,
+            self.high,
+            self.low,
+            self.delivery_aligned,
+            self.roll_unsafe,
+            self.run_end,
+        ):
+            value.flags.writeable = False
+
+    def is_contiguous(self, start: int, end: int) -> bool:
+        """Return the legacy path-validity result in O(1)."""
+
+        return bool(
+            0 <= start <= end < self.length
+            and int(self.run_end[start]) >= end
+        )
+
+    def extrema(self, start: int, end_exclusive: int) -> tuple[float, float]:
+        """Return (low, high) for held bars; the exit-open bar is excluded."""
+
+        if not (0 <= start < end_exclusive <= self.length):
+            raise TreasuryCurvatureError("executable path has no held bar")
+        return (
+            float(np.min(self.low[start:end_exclusive])),
+            float(np.max(self.high[start:end_exclusive])),
+        )
+
+    def first_barrier_hit(
+        self,
+        start: int,
+        end_inclusive: int,
+        *,
+        direction: int,
+        stop_price: float,
+        target_price: float,
+    ) -> tuple[int, bool, bool] | None:
+        """Find the first frozen barrier hit with conservative stop priority."""
+
+        if end_inclusive < start:
+            return None
+        low = self.low[start : end_inclusive + 1]
+        high = self.high[start : end_inclusive + 1]
+        if direction > 0:
+            stop = low <= stop_price
+            target = high >= target_price
+        else:
+            stop = high >= stop_price
+            target = low <= target_price
+        hit = stop | target
+        offsets = np.flatnonzero(hit)
+        if offsets.size == 0:
+            return None
+        offset = int(offsets[0])
+        return start + offset, bool(stop[offset]), bool(target[offset])
 
 
 TRIANGLES: tuple[TriangleSpec, ...] = (
@@ -463,6 +624,8 @@ def run_economic_tripwire(
     *,
     authorization: str,
     card_path: str | Path = DEFAULT_CARD,
+    checkpoint_dir: str | Path | None = None,
+    resume: bool = True,
 ) -> dict[str, Any]:
     """Execute the bounded development replay after explicit root authorization."""
 
@@ -483,6 +646,7 @@ def run_economic_tripwire(
         project / card["frozen_inputs"]["rule_snapshot"]["path"]
     )
     prepared: dict[tuple[str, int], pd.DataFrame] = {}
+    path_indexes: dict[tuple[str, int], _CausalPathIndex] = {}
     feature_audits: dict[str, Any] = {}
     for triangle in TRIANGLES:
         for lookback in (15, 60):
@@ -513,18 +677,68 @@ def run_economic_tripwire(
             frame["temporal_role"] = _assign_roles(frame["timestamp"], card)
             _attach_canonical_calendar_roles(frame, card)
             prepared[(triangle.triangle_id, lookback)] = frame
+            path_indexes[(triangle.triangle_id, lookback)] = _CausalPathIndex(
+                frame,
+                belly_root=triangle.belly_root,
+            )
             feature_audits[f"{triangle.triangle_id}:lb{lookback}"] = feature_audit
 
-    decisions = [
-        _evaluate_rule(
-            prepared[(rule.triangle_id, rule.source_return_minutes)],
-            triangle=_triangle(rule.triangle_id),
-            rule=rule,
-            account_rules=account_rules,
-            card=card,
+    checkpoint_root: Path | None = None
+    checkpoint_contract_hash: str | None = None
+    if checkpoint_dir is not None:
+        checkpoint_root = _inside_output_path(project, checkpoint_dir)
+        checkpoint_root.mkdir(parents=True, exist_ok=True)
+        checkpoint_contract_hash = _stable_hash(
+            {
+                "schema": "hydra_treasury_curvature_checkpoint_contract_v1",
+                "branch_id": BRANCH_ID,
+                "decision_card_hash": card["card_hash"],
+                "source_audit_hash": audit["audit_hash"],
+                "official_rule_snapshot_hash": _stable_hash(rule_receipt),
+                "rule_specs": [row.to_dict() for row in frozen_rule_specs()],
+                "economic_runner_sha256": _sha256(Path(__file__).resolve()),
+            }
         )
-        for rule in frozen_rule_specs()
-    ]
+    decisions: list[dict[str, Any]] = []
+    for rule_index, rule in enumerate(frozen_rule_specs()):
+        checkpoint_path = (
+            checkpoint_root
+            / f"rule_{rule_index:02d}_{_stable_hash(rule.to_dict())[:16]}.json"
+            if checkpoint_root is not None
+            else None
+        )
+        if (
+            resume
+            and checkpoint_path is not None
+            and checkpoint_path.is_file()
+            and checkpoint_contract_hash is not None
+        ):
+            decision = _read_rule_checkpoint(
+                checkpoint_path,
+                contract_hash=checkpoint_contract_hash,
+                rule_index=rule_index,
+                rule=rule,
+            )
+        else:
+            decision = _evaluate_rule(
+                prepared[(rule.triangle_id, rule.source_return_minutes)],
+                triangle=_triangle(rule.triangle_id),
+                rule=rule,
+                account_rules=account_rules,
+                card=card,
+                path_index=path_indexes[
+                    (rule.triangle_id, rule.source_return_minutes)
+                ],
+            )
+            if checkpoint_path is not None and checkpoint_contract_hash is not None:
+                _write_rule_checkpoint(
+                    checkpoint_path,
+                    contract_hash=checkpoint_contract_hash,
+                    rule_index=rule_index,
+                    rule=rule,
+                    decision=decision,
+                )
+        decisions.append(decision)
     power = _power_preflight(decisions, card)
     branch_gate = _branch_gate(decisions, power)
     core = {
@@ -571,9 +785,13 @@ def _evaluate_rule(
     rule: CurvatureRule,
     account_rules: Mapping[str, Mapping[str, Any]],
     card: Mapping[str, Any],
+    path_index: _CausalPathIndex | None = None,
 ) -> dict[str, Any]:
     primary_complete, matched_by_control, decision_ledger = _build_matched_control_paths(
-        frame, triangle=triangle, rule=rule
+        frame,
+        triangle=triangle,
+        rule=rule,
+        path_index=path_index,
     )
     role_counts = {
         role: sum(
@@ -654,12 +872,20 @@ def _build_matched_control_paths(
     *,
     triangle: TriangleSpec,
     rule: CurvatureRule,
+    path_index: _CausalPathIndex | None = None,
 ) -> tuple[
     list[dict[str, Any]],
     dict[str, list[dict[str, Any]]],
     list[dict[str, Any]],
 ]:
     """Create common-complete path controls and retain every causal censor."""
+
+    index = path_index or _CausalPathIndex(
+        frame,
+        belly_root=triangle.belly_root,
+    )
+    if index.belly_root != triangle.belly_root or index.length != len(frame):
+        raise TreasuryCurvatureError("causal path index/frame binding drift")
 
     strength = frame["prior_only_curvature_z"].abs()
     previous = strength.shift(1)
@@ -701,6 +927,7 @@ def _build_matched_control_paths(
             rule=rule,
             signal_index=signal_index,
             direction=primary_direction,
+            path_index=index,
         )
         decisions.append(primary["decision"])
         if primary["event"] is None:
@@ -731,6 +958,7 @@ def _build_matched_control_paths(
                 declared_stop_distance_points=float(
                     primary_event["declared_stop_distance_points"]
                 ),
+                path_index=index,
             )
             decisions.append(replay["decision"])
             candidates[control] = replay["event"]
@@ -777,6 +1005,157 @@ def _build_matched_control_paths(
 
 
 def _replay_primary_path(
+    frame: pd.DataFrame,
+    *,
+    triangle: TriangleSpec,
+    rule: CurvatureRule,
+    signal_index: int,
+    direction: int,
+    path_index: _CausalPathIndex | None = None,
+) -> dict[str, Any]:
+    """Replay one primary opportunity through the immutable NumPy path index."""
+
+    control = "PRIMARY"
+    if direction == 0:
+        return {
+            "event": None,
+            "decision": _decision_record(
+                frame,
+                triangle=triangle,
+                rule=rule,
+                signal_index=signal_index,
+                control=control,
+                outcome_status="CAUSAL_ABSTAIN",
+                censor_reason="NO_CAUSAL_DIRECTION",
+            ),
+        }
+    index = path_index or _CausalPathIndex(
+        frame,
+        belly_root=triangle.belly_root,
+    )
+    if index.belly_root != triangle.belly_root or index.length != len(frame):
+        raise TreasuryCurvatureError("causal path index/frame binding drift")
+    entry_index = signal_index + 1
+    if not index.is_contiguous(signal_index, entry_index):
+        return {
+            "event": None,
+            "decision": _decision_record(
+                frame,
+                triangle=triangle,
+                rule=rule,
+                signal_index=signal_index,
+                control=control,
+                outcome_status="DATA_CENSORED",
+                censor_reason="CENSORED_NEXT_TRADABLE_ENTRY_UNAVAILABLE",
+            ),
+        }
+
+    tick = TREASURY_SPECS[triangle.belly_root].tick_size_points
+    entry_open = _tick_price(float(index.open[entry_index]), tick)
+    volatility = float(frame.at[signal_index, "prior_belly_volatility"])
+    stop_distance = _ceil_ticks(
+        max(4.0 * tick, 3.0 * math.sqrt(rule.holding_minutes) * volatility), tick
+    )
+    stop_price = _tick_price(entry_open - direction * stop_distance, tick)
+    target_price = _tick_price(
+        entry_open + direction * stop_distance * rule.target_r_multiple,
+        tick,
+    )
+
+    # The completed bar exactly ``holding_minutes`` after entry is the
+    # time-exit open.  Its high/low cannot participate in the barrier test.
+    time_exit_index = entry_index + rule.holding_minutes
+    time_exit_ns = int(index.timestamp_ns[entry_index]) + (
+        rule.holding_minutes * 60_000_000_000
+    )
+    contiguous_end = int(index.run_end[entry_index])
+    barrier_end = min(
+        contiguous_end,
+        time_exit_index - 1,
+        index.length - 1,
+    )
+    hit = index.first_barrier_hit(
+        entry_index,
+        barrier_end,
+        direction=direction,
+        stop_price=stop_price,
+        target_price=target_price,
+    )
+    trigger_index: int | None = None
+    trigger_reason: str | None = None
+    same_bar_ambiguous = False
+    exit_index: int | None = None
+    if hit is not None:
+        trigger_index, stop_hit, target_hit = hit
+        same_bar_ambiguous = bool(stop_hit and target_hit)
+        trigger_reason = "STOP" if stop_hit else "TARGET"
+        candidate_exit = trigger_index + 1
+        if index.is_contiguous(entry_index, candidate_exit):
+            exit_index = candidate_exit
+    elif (
+        time_exit_index < index.length
+        and index.is_contiguous(entry_index, time_exit_index)
+        and int(index.timestamp_ns[time_exit_index]) == time_exit_ns
+    ):
+        exit_index = time_exit_index
+        trigger_reason = "TIME"
+
+    if exit_index is None or trigger_reason is None:
+        return {
+            "event": None,
+            "decision": _decision_record(
+                frame,
+                triangle=triangle,
+                rule=rule,
+                signal_index=signal_index,
+                control=control,
+                outcome_status="DATA_CENSORED",
+                censor_reason=(
+                    "CENSORED_CAUSAL_EXIT_OPEN_UNAVAILABLE"
+                    if trigger_index is not None
+                    else "CENSORED_FUTURE_COVERAGE_TIME_EXIT"
+                ),
+            ),
+        }
+    opportunity_id = _stable_hash(
+        {
+            "rule_id": rule.rule_id,
+            "signal_time": frame.at[signal_index, "timestamp"].isoformat(),
+            "triangle_id": triangle.triangle_id,
+        }
+    )[:24]
+    event = _raw_path_event(
+        frame,
+        triangle=triangle,
+        rule=rule,
+        signal_index=signal_index,
+        entry_index=entry_index,
+        exit_index=exit_index,
+        direction=direction,
+        control=control,
+        opportunity_id=opportunity_id,
+        declared_stop_distance_points=stop_distance,
+        exit_reason=trigger_reason,
+        same_bar_ambiguous=same_bar_ambiguous,
+        trigger_index=trigger_index,
+        path_index=index,
+    )
+    return {
+        "event": event,
+        "decision": _decision_record(
+            frame,
+            triangle=triangle,
+            rule=rule,
+            signal_index=signal_index,
+            control=control,
+            outcome_status="EXECUTABLE_COMPLETE",
+            censor_reason=None,
+            event=event,
+        ),
+    }
+
+
+def _replay_primary_path_pandas_reference(
     frame: pd.DataFrame,
     *,
     triangle: TriangleSpec,
@@ -933,12 +1312,17 @@ def _replay_fixed_path_control(
     control: str,
     primary_opportunity_id: str,
     declared_stop_distance_points: float,
+    path_index: _CausalPathIndex | None = None,
 ) -> dict[str, Any]:
+    index = path_index or _CausalPathIndex(
+        frame,
+        belly_root=triangle.belly_root,
+    )
+    if index.belly_root != triangle.belly_root or index.length != len(frame):
+        raise TreasuryCurvatureError("causal path index/frame binding drift")
     entry_index = signal_index + entry_lag
     exit_index = entry_index + duration_bars
-    if direction == 0 or not _path_is_contiguous(
-        frame, signal_index, exit_index, belly_root=triangle.belly_root
-    ):
+    if direction == 0 or not index.is_contiguous(signal_index, exit_index):
         return {
             "event": None,
             "decision": _decision_record(
@@ -965,6 +1349,7 @@ def _replay_fixed_path_control(
         exit_reason="PRIMARY_PATH_DURATION_MATCH",
         same_bar_ambiguous=False,
         trigger_index=None,
+        path_index=index,
     )
     return {
         "event": event,
@@ -996,18 +1381,44 @@ def _raw_path_event(
     exit_reason: str,
     same_bar_ambiguous: bool,
     trigger_index: int | None,
+    path_index: _CausalPathIndex | None = None,
 ) -> dict[str, Any]:
     root_name = triangle.belly_root
     tick = TREASURY_SPECS[root_name].tick_size_points
     # The exit executes at ``exit_index`` open.  Its later high/low are not
     # observable before the position is flat and must never enter MLL extrema.
-    path = frame.loc[entry_index : exit_index - 1]
-    if path.empty:
+    index = path_index
+    if index is not None and (
+        index.belly_root != root_name or index.length != len(frame)
+    ):
+        raise TreasuryCurvatureError("causal path index/frame binding drift")
+    path = None if index is not None else frame.loc[entry_index : exit_index - 1]
+    if index is None and (path is None or path.empty):
         raise TreasuryCurvatureError("executable path has no held bar")
-    entry_open = _tick_price(float(frame.at[entry_index, f"{root_name}_open"]), tick)
-    exit_open = _tick_price(float(frame.at[exit_index, f"{root_name}_open"]), tick)
-    minimum = _tick_price(float(path[f"{root_name}_low"].min()), tick)
-    maximum = _tick_price(float(path[f"{root_name}_high"].max()), tick)
+    entry_open = _tick_price(
+        float(
+            index.open[entry_index]
+            if index is not None
+            else frame.at[entry_index, f"{root_name}_open"]
+        ),
+        tick,
+    )
+    exit_open = _tick_price(
+        float(
+            index.open[exit_index]
+            if index is not None
+            else frame.at[exit_index, f"{root_name}_open"]
+        ),
+        tick,
+    )
+    if index is not None:
+        raw_minimum, raw_maximum = index.extrema(entry_index, exit_index)
+    else:
+        assert path is not None
+        raw_minimum = float(path[f"{root_name}_low"].min())
+        raw_maximum = float(path[f"{root_name}_high"].max())
+    minimum = _tick_price(raw_minimum, tick)
+    maximum = _tick_price(raw_maximum, tick)
     event_id = _stable_hash(
         {
             "opportunity_id": opportunity_id,
@@ -1021,20 +1432,35 @@ def _raw_path_event(
     exit_local_minute = int(frame.at[exit_index, "local_minute"])
     entry_session = str(frame.at[entry_index, "session_id"])
     exit_session = str(frame.at[exit_index, "session_id"])
-    delivery_columns = (
-        f"{triangle.short_root}_delivery_month",
-        f"{triangle.belly_root}_delivery_month",
-        f"{triangle.long_root}_delivery_month",
-    )
-    same_delivery = frame.loc[entry_index:exit_index, list(delivery_columns)].astype(
-        str
-    ).nunique(axis=1).eq(1).all()
+    if index is not None:
+        same_delivery = bool(
+            np.all(index.delivery_aligned[entry_index : exit_index + 1])
+        )
+        no_roll_unsafe = not bool(
+            np.any(index.roll_unsafe[entry_index : exit_index + 1])
+        )
+    else:
+        delivery_columns = (
+            f"{triangle.short_root}_delivery_month",
+            f"{triangle.belly_root}_delivery_month",
+            f"{triangle.long_root}_delivery_month",
+        )
+        same_delivery = bool(
+            frame.loc[entry_index:exit_index, list(delivery_columns)]
+            .astype(str)
+            .nunique(axis=1)
+            .eq(1)
+            .all()
+        )
+        no_roll_unsafe = not bool(
+            frame.loc[entry_index:exit_index, "roll_unsafe"].astype(bool).any()
+        )
     session_compliant = bool(
         entry_session == exit_session
         and entry_local_minute >= EARLIEST_ENTRY_MINUTE
         and exit_local_minute <= SESSION_FLATTEN_MINUTE
         and same_delivery
-        and not frame.loc[entry_index:exit_index, "roll_unsafe"].astype(bool).any()
+        and no_roll_unsafe
     )
     return {
         "event_id": f"treasury_curvature:{event_id}",
@@ -2263,6 +2689,111 @@ def _inside_file(root: Path, value: str | Path) -> Path:
     if not resolved.is_file():
         raise TreasuryCurvatureError(f"required frozen input is absent: {resolved}")
     return resolved
+
+
+def _inside_output_path(root: Path, value: str | Path) -> Path:
+    path = Path(value)
+    resolved = (path if path.is_absolute() else root / path).resolve()
+    try:
+        resolved.relative_to(root)
+    except ValueError as exc:
+        raise TreasuryCurvatureError(f"path escapes repository: {value}") from exc
+    return resolved
+
+
+def _write_rule_checkpoint(
+    path: Path,
+    *,
+    contract_hash: str,
+    rule_index: int,
+    rule: CurvatureRule,
+    decision: Mapping[str, Any],
+) -> None:
+    if str(decision.get("candidate_id")) != rule.rule_id:
+        raise TreasuryCurvatureError("checkpoint candidate/rule binding drift")
+    decision_core = dict(decision)
+    claimed_candidate_hash = str(decision_core.pop("candidate_hash", ""))
+    if not claimed_candidate_hash or _stable_hash(decision_core) != claimed_candidate_hash:
+        raise TreasuryCurvatureError("checkpoint candidate payload is not self-consistent")
+    core = {
+        "schema": "hydra_treasury_curvature_rule_checkpoint_v1",
+        "branch_id": BRANCH_ID,
+        "contract_hash": str(contract_hash),
+        "rule_index": int(rule_index),
+        "rule_id": rule.rule_id,
+        "rule_hash": _stable_hash(rule.to_dict()),
+        "decision": dict(decision),
+        "decision_hash": _stable_hash(decision),
+    }
+    payload = {**core, "checkpoint_hash": _stable_hash(core)}
+    _atomic_json(path, payload)
+
+
+def _read_rule_checkpoint(
+    path: Path,
+    *,
+    contract_hash: str,
+    rule_index: int,
+    rule: CurvatureRule,
+) -> dict[str, Any]:
+    payload = _read_json(path)
+    core = dict(payload)
+    claimed_checkpoint_hash = str(core.pop("checkpoint_hash", ""))
+    if not claimed_checkpoint_hash or _stable_hash(core) != claimed_checkpoint_hash:
+        raise TreasuryCurvatureError("rule checkpoint self-hash drift")
+    expected = {
+        "schema": "hydra_treasury_curvature_rule_checkpoint_v1",
+        "branch_id": BRANCH_ID,
+        "contract_hash": str(contract_hash),
+        "rule_index": int(rule_index),
+        "rule_id": rule.rule_id,
+        "rule_hash": _stable_hash(rule.to_dict()),
+    }
+    if any(core.get(key) != value for key, value in expected.items()):
+        raise TreasuryCurvatureError("rule checkpoint contract binding drift")
+    decision = core.get("decision")
+    if not isinstance(decision, dict):
+        raise TreasuryCurvatureError("rule checkpoint decision is not an object")
+    if _stable_hash(decision) != str(core.get("decision_hash", "")):
+        raise TreasuryCurvatureError("rule checkpoint decision hash drift")
+    candidate_core = dict(decision)
+    claimed_candidate_hash = str(candidate_core.pop("candidate_hash", ""))
+    if (
+        str(decision.get("candidate_id")) != rule.rule_id
+        or not claimed_candidate_hash
+        or _stable_hash(candidate_core) != claimed_candidate_hash
+    ):
+        raise TreasuryCurvatureError("rule checkpoint candidate integrity drift")
+    return decision
+
+
+def _atomic_json(path: Path, value: Mapping[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = (
+        json.dumps(
+            value,
+            indent=2,
+            sort_keys=True,
+            allow_nan=False,
+            default=str,
+        )
+        + "\n"
+    )
+    temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        with temporary.open("w", encoding="utf-8") as handle:
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        directory = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
 
 
 def _read_json(path: Path) -> dict[str, Any]:

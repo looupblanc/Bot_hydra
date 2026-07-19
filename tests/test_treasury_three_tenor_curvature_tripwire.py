@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 from pathlib import Path
 
 import numpy as np
@@ -663,3 +664,179 @@ def test_account_matrix_persists_episode_ledgers_and_real_censures() -> None:
     assert len(headline["episode_ledger"]) == 1
     assert len(headline["episode_ledger_hash"]) == 64
     assert headline["censored_start_ledger"][0]["status"] == "DATA_CENSORED"
+
+
+def test_causal_path_index_matches_legacy_contiguity_on_random_windows() -> None:
+    rng = np.random.default_rng(20260719)
+    frame = _prepared_execution_frame()
+    frame.loc[70, "roll_unsafe"] = True
+    frame.loc[100:, "session_id"] = "2024-01-04"
+    frame.loc[130:, "ZF_contract"] = "ZFM4"
+    frame.loc[150, "ZF_delivery_month"] = "202406"
+    frame.loc[175:, "timestamp"] += pd.Timedelta(minutes=1)
+    frame["available_at"] = frame["timestamp"] + pd.Timedelta(minutes=1)
+    index = tripwire._CausalPathIndex(frame, belly_root="ZF")
+    for _ in range(2_000):
+        start = int(rng.integers(0, len(frame)))
+        end = min(len(frame) - 1, start + int(rng.integers(0, 45)))
+        expected = tripwire._path_is_contiguous(
+            frame,
+            start,
+            end,
+            belly_root="ZF",
+        )
+        assert index.is_contiguous(start, end) is expected
+
+
+def test_numpy_replay_is_exactly_legacy_equivalent_on_random_paths() -> None:
+    rng = np.random.default_rng(340031)
+    rules = [
+        row
+        for row in tripwire.frozen_rule_specs()
+        if row.triangle_id == "ZT_ZF_ZN"
+    ]
+    for _ in range(160):
+        frame = _prepared_execution_frame()
+        signal_index = int(rng.integers(2, 50))
+        direction = int(rng.choice((-1, 1)))
+        rule = rules[int(rng.integers(0, len(rules)))]
+        frame.loc[signal_index, "prior_belly_volatility"] = float(
+            rng.uniform(0.0001, 0.02)
+        )
+        base = frame["ZF_open"].to_numpy(dtype=float)
+        frame["ZF_high"] = base + rng.uniform(0.0, 0.20, len(frame))
+        frame["ZF_low"] = base - rng.uniform(0.0, 0.20, len(frame))
+
+        mutation = int(rng.integers(0, 6))
+        mutation_index = min(
+            len(frame) - 1,
+            signal_index + int(rng.integers(1, rule.holding_minutes + 3)),
+        )
+        if mutation == 1:
+            frame.loc[mutation_index, "roll_unsafe"] = True
+        elif mutation == 2:
+            frame.loc[mutation_index:, "session_id"] = "2024-01-04"
+        elif mutation == 3:
+            frame.loc[mutation_index:, "ZF_contract"] = "ZFM4"
+        elif mutation == 4:
+            frame.loc[mutation_index, "ZF_delivery_month"] = "202406"
+        elif mutation == 5:
+            frame.loc[mutation_index:, "timestamp"] += pd.Timedelta(minutes=1)
+            frame["available_at"] = frame["timestamp"] + pd.Timedelta(minutes=1)
+
+        expected = tripwire._replay_primary_path_pandas_reference(
+            frame,
+            triangle=tripwire.TRIANGLES[0],
+            rule=rule,
+            signal_index=signal_index,
+            direction=direction,
+        )
+        index = tripwire._CausalPathIndex(frame, belly_root="ZF")
+        observed = tripwire._replay_primary_path(
+            frame,
+            triangle=tripwire.TRIANGLES[0],
+            rule=rule,
+            signal_index=signal_index,
+            direction=direction,
+            path_index=index,
+        )
+        assert observed == expected
+
+
+@pytest.mark.parametrize("invalidity", ("NONE", "ROLL", "DELIVERY"))
+def test_indexed_raw_event_preserves_legacy_compliance_fields(
+    invalidity: str,
+) -> None:
+    frame = _prepared_execution_frame()
+    if invalidity == "ROLL":
+        frame.loc[12, "roll_unsafe"] = True
+    elif invalidity == "DELIVERY":
+        frame.loc[12, "ZF_delivery_month"] = "202406"
+    rule = next(
+        row
+        for row in tripwire.frozen_rule_specs()
+        if row.triangle_id == "ZT_ZF_ZN"
+        and row.mechanism.endswith("REVERSION")
+        and row.holding_minutes == 30
+    )
+    arguments = {
+        "triangle": tripwire.TRIANGLES[0],
+        "rule": rule,
+        "signal_index": 10,
+        "entry_index": 11,
+        "exit_index": 13,
+        "direction": -1,
+        "control": "PRIMARY",
+        "opportunity_id": "raw-differential",
+        "declared_stop_distance_points": 0.05,
+        "exit_reason": "TARGET",
+        "same_bar_ambiguous": False,
+        "trigger_index": 12,
+    }
+    expected = tripwire._raw_path_event(frame, **arguments)
+    observed = tripwire._raw_path_event(
+        frame,
+        **arguments,
+        path_index=tripwire._CausalPathIndex(frame, belly_root="ZF"),
+    )
+    assert observed == expected
+
+
+def test_rule_checkpoint_round_trip_is_exact_and_corruption_fails_closed(
+    tmp_path: Path,
+) -> None:
+    rule = tripwire.frozen_rule_specs()[0]
+    core = {
+        "candidate_id": rule.rule_id,
+        "account_points": [{"account_label": "50K", "passes": 0}],
+        "tier_e_gate_passed": False,
+    }
+    decision = {**core, "candidate_hash": tripwire._stable_hash(core)}
+    path = tmp_path / "rule.json"
+    tripwire._write_rule_checkpoint(
+        path,
+        contract_hash="a" * 64,
+        rule_index=0,
+        rule=rule,
+        decision=decision,
+    )
+    assert tripwire._read_rule_checkpoint(
+        path,
+        contract_hash="a" * 64,
+        rule_index=0,
+        rule=rule,
+    ) == decision
+
+    corrupted = json.loads(path.read_text(encoding="utf-8"))
+    corrupted["decision"]["account_points"][0]["passes"] = 1
+    path.write_text(json.dumps(corrupted), encoding="utf-8")
+    with pytest.raises(tripwire.TreasuryCurvatureError, match="self-hash drift"):
+        tripwire._read_rule_checkpoint(
+            path,
+            contract_hash="a" * 64,
+            rule_index=0,
+            rule=rule,
+        )
+
+
+def test_rule_checkpoint_cannot_resume_under_a_different_contract(
+    tmp_path: Path,
+) -> None:
+    rule = tripwire.frozen_rule_specs()[0]
+    core = {"candidate_id": rule.rule_id, "account_points": []}
+    decision = {**core, "candidate_hash": tripwire._stable_hash(core)}
+    path = tmp_path / "rule.json"
+    tripwire._write_rule_checkpoint(
+        path,
+        contract_hash="a" * 64,
+        rule_index=0,
+        rule=rule,
+        decision=decision,
+    )
+    with pytest.raises(tripwire.TreasuryCurvatureError, match="contract binding drift"):
+        tripwire._read_rule_checkpoint(
+            path,
+            contract_hash="b" * 64,
+            rule_index=0,
+            rule=rule,
+        )

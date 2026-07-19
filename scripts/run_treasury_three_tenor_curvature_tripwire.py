@@ -52,10 +52,25 @@ def main() -> int:
         "--output",
         help="optional local result JSON; rejected in audit-only mode",
     )
+    parser.add_argument(
+        "--checkpoint-dir",
+        help=(
+            "optional repository-local atomic rule-checkpoint directory; "
+            "economic replay remains strictly single-worker"
+        ),
+    )
+    parser.add_argument(
+        "--no-resume",
+        action="store_true",
+        help="ignore existing checkpoints and deterministically recompute them",
+    )
     args = parser.parse_args()
     if not args.run_economic_replay:
-        if args.output:
-            parser.error("--output is forbidden in read-only audit mode")
+        if args.output or args.checkpoint_dir or args.no_resume:
+            parser.error(
+                "--output/--checkpoint-dir/--no-resume are forbidden in "
+                "read-only audit mode"
+            )
         result = audit_inputs(args.root, card_path=args.card)
     else:
         if args.authorization != RUN_AUTHORIZATION:
@@ -64,6 +79,8 @@ def main() -> int:
             args.root,
             authorization=args.authorization,
             card_path=args.card,
+            checkpoint_dir=args.checkpoint_dir,
+            resume=not args.no_resume,
         )
     rendered = json.dumps(
         result,
