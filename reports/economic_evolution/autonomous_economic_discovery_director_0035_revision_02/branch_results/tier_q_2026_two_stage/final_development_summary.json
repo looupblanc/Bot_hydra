@@ -1,0 +1,76 @@
+{
+  "broker_connections": 0,
+  "candidate_count": 5,
+  "candidates": [
+    {
+      "candidate_id": "hazard_2641d5adb7bfee8dca07de2a",
+      "normal_episodes": 3,
+      "normal_passes": 0,
+      "resulting_evidence_tier": "Q_FINAL_DEVELOPMENT_FAILED",
+      "stressed_episodes": 3,
+      "stressed_mll_breach_rate": 0.0,
+      "stressed_net_usd": -96.25500000079046,
+      "stressed_passes": 0,
+      "stressed_target_progress_median": 0.019574999999912204
+    },
+    {
+      "candidate_id": "hazard_16a744e747cafb88a7e2c83b",
+      "normal_episodes": 3,
+      "normal_passes": 0,
+      "resulting_evidence_tier": "Q_FINAL_DEVELOPMENT_FAILED",
+      "stressed_episodes": 3,
+      "stressed_mll_breach_rate": 0.3333333333333333,
+      "stressed_net_usd": 614.6700000000419,
+      "stressed_passes": 0,
+      "stressed_target_progress_median": 0.15924000000000524
+    },
+    {
+      "candidate_id": "hazard_0a569f580a2540474116636c",
+      "normal_episodes": 3,
+      "normal_passes": 0,
+      "resulting_evidence_tier": "Q_FINAL_DEVELOPMENT_FAILED",
+      "stressed_episodes": 3,
+      "stressed_mll_breach_rate": 0.6666666666666666,
+      "stressed_net_usd": -87.11999999987165,
+      "stressed_passes": 0,
+      "stressed_target_progress_median": -0.2708815363257672
+    },
+    {
+      "candidate_id": "hazard_10ffb41856432af08259e32b",
+      "normal_episodes": 3,
+      "normal_passes": 1,
+      "resulting_evidence_tier": "Q_FINAL_DEVELOPMENT_FAILED",
+      "stressed_episodes": 3,
+      "stressed_mll_breach_rate": 0.0,
+      "stressed_net_usd": 5870.699999999852,
+      "stressed_passes": 1,
+      "stressed_target_progress_median": 0.008519999999982247
+    },
+    {
+      "candidate_id": "hazard_16f0da561bc98f2eb7d2efc4",
+      "normal_episodes": 15,
+      "normal_passes": 0,
+      "resulting_evidence_tier": "Q_FINAL_DEVELOPMENT_FAILED",
+      "stressed_episodes": 15,
+      "stressed_mll_breach_rate": 0.0,
+      "stressed_net_usd": -7411.019999999859,
+      "stressed_passes": 0,
+      "stressed_target_progress_median": -0.23362999999999737
+    }
+  ],
+  "confirmation_opened": false,
+  "contract_hash": "963df1c50fb92c404db39029abfc898f40da52e71237ed1e6bd6b1bd432d3e34",
+  "feature_receipt_hash": "f8952bd5093f7ddc0bbd91d3fd156e369ab153569f9b66c0d3a97e6cb519a8c3",
+  "orders": 0,
+  "q4_access_count_delta": 0,
+  "recalibration_performed": false,
+  "result_hash": "ef6c8d474faee39a6c42e66a5006a2cf68e49a3e373cf2cd9c9ac1086b05a561",
+  "retuning_performed": false,
+  "runner_file_sha256": "dfae5664ebc7aded38fb8937c5de93921d78ffa42f47b9c361eb1112c370fbf2",
+  "schema": "hydra_tier_q_2026_final_development_summary_v1",
+  "script_file_sha256": "8fc2610ff958f485d313ff7868f4de0b39b1776402e9a8039a38dd1957277bce",
+  "source_commit": "dd0b223b0fb48bf7f77aaba30110ca89db3a4c5b",
+  "status": "FINAL_DEVELOPMENT_COMPLETE",
+  "summary_hash": "0319759b4c6cd1aaef8c74d855dda14f614c793928fad283605aadc6229498a5",
+  "tier_g_candidate_ids": []
+}

@@ -1,0 +1,210 @@
+{
+  "broker_connections": 0,
+  "bundles": {
+    "CL": {
+      "bundle_hash": "2a327eee3bb319872d8b48de7cb6e76d83601a94e81ceb580b6c9a2f6f0adff9",
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_feature_matrices/400c7aa69f944d1881739f4ea57e4188c97ff58967365a5d3f5d2392c557ebe2",
+      "row_count": 87292
+    },
+    "ES": {
+      "bundle_hash": "19ab9937a414fb42d583aad32c2b50420ea5574965ebd237ec8cd046c05c94f3",
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_feature_matrices/22000df19068c0d63c8337325f36914a48e993a7a05c057fb953cea9f03b62c9",
+      "row_count": 109573
+    },
+    "M2K": {
+      "bundle_hash": "2feb499e9e5a9faa06caef650261e0921e02fa70ba9d6582b9f95177e8453d73",
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_feature_matrices/d64b8fc655ca0305ca10d947ba41e1b9eb29eea9b3f870e76e97dc3398518561",
+      "row_count": 107596
+    },
+    "MCL": {
+      "bundle_hash": "e0e6ad1b20a0f3a6176c1198e09e8947b38e615d98ce8e1a709e364b902e0a9c",
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_feature_matrices/a9d5d51cd773c5cf07c9820d97466ade362bafe919525c5905298717eb5728d7",
+      "row_count": 87743
+    },
+    "MES": {
+      "bundle_hash": "bef9781734257b6fafdac9a145717a986ba451e60d5a5ee6d665fbb4f9702e71",
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_feature_matrices/0b1b562981122d1738ea2db87c6bad1129da3be804287aecfd14af69c99c2866",
+      "row_count": 109575
+    },
+    "MNQ": {
+      "bundle_hash": "c63e3528120bba123d102c6143ece5d74450d4e8880caadf2eba895b13f58863",
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_feature_matrices/f0874124eae5d4b425c1649fcd63a57b2ad4bd17acf1d452d85efe5e9bc5a7cb",
+      "row_count": 109575
+    },
+    "MYM": {
+      "bundle_hash": "4b82923df9129dd7b036185420182be2bc9ca898e15cd23cebab0cc5ab2cada1",
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_feature_matrices/5677eaa2396700e9362bdf3f0f7972e2df2580039e555f0410d1d699696b3910",
+      "row_count": 108191
+    },
+    "NQ": {
+      "bundle_hash": "85880cd4fea763ccb85085b87e0dd3b13600393015b2f27cc753876fda881044",
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_feature_matrices/8e885ceb48a5c97e15ba075cc25220e98ac162c4db7f1848088349753cf42b2e",
+      "row_count": 109515
+    },
+    "RTY": {
+      "bundle_hash": "9d8ccf1096747c66f8ae111be77bb5428166e3392c5a07ffbabf233e0c4fc4d7",
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_feature_matrices/c93243a64a4fc3161d7f7d66a5d87d0ddc60ab127f8532ca138602fea905bd61",
+      "row_count": 107406
+    },
+    "YM": {
+      "bundle_hash": "0f508757f93e12b44ded6f46e49fe2c7a95f60cbabadc2642394388f1819b653",
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_feature_matrices/e16ee3656a83d56111c31dc7271f7be8d71e7fd2513a4702edefb88c31e57cc4",
+      "row_count": 107851
+    }
+  },
+  "confirmation_opened_after_tier_g": false,
+  "contract_hash": "963df1c50fb92c404db39029abfc898f40da52e71237ed1e6bd6b1bd432d3e34",
+  "contract_map": {
+    "guard_receipt": {
+      "explicit_contract_count": 26,
+      "unmapped_contract_rows_excluded": 0,
+      "unsafe_roll_rows_excluded": 92405
+    },
+    "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/explicit_contract_map.json",
+    "roll_map_hash": "a13d4f401ae205a094a5dabca64ae6b7e268089324a2baa08d896cd24ea138ab",
+    "sha256": "b8fb48a108e1c5ba8872b8904beef635bb6304c0a556ac3ade4c7aab34b9bd96"
+  },
+  "coverage_audit": {
+    "audit_hash": "649dd47fd33e61cdd4b7bab61bbf3a58090806b7b0f4109cb4ef693410450653",
+    "confirmation_file_opened": false,
+    "first_timestamp": "2026-01-01T23:00:00+00:00",
+    "good_friday_energy": {
+      "CL_rows": 0,
+      "MCL_rows": 0,
+      "classification": "CLOSED_ZERO_TRADE_NOT_CENSORED_NOT_SYNTHESIZED",
+      "session_day": "2026-04-03"
+    },
+    "last_timestamp": "2026-04-30T23:59:00+00:00",
+    "maximum_theoretical_non_overlapping_starts_before_warmup": {
+      "10": 8,
+      "20": 4,
+      "5": 17
+    },
+    "partial_split_session": {
+      "classification": "EXCLUDED_PARTIAL_LABEL_SESSION",
+      "eligible_as_episode_start": false,
+      "rows_by_root": {
+        "CL": 118,
+        "ES": 120,
+        "M2K": 116,
+        "MCL": 120,
+        "MES": 120,
+        "MNQ": 120,
+        "MYM": 120,
+        "NQ": 120,
+        "RTY": 113,
+        "YM": 118
+      },
+      "session_day": "2026-05-01"
+    },
+    "raw_row_count": 1136722,
+    "status": "FINAL_DEVELOPMENT_COVERAGE_PROVEN",
+    "synthetic_bar_count": 0,
+    "true_trading_day_count": 85,
+    "true_trading_day_first": "2026-01-02",
+    "true_trading_day_last": "2026-04-30"
+  },
+  "evaluation_period": [
+    "2026-01-01",
+    "2026-05-01"
+  ],
+  "gap_locality_audit": {
+    "audit_hash": "a55d1e27a31e6ee0503010f9d28867317d113f79a4c2c292e616dca69a54536c",
+    "contiguous_segment_count": 7741,
+    "feature_row_count": 1044317,
+    "gap_policy": "NO_TRADE_OR_CENSOR_ONLY_DECISION_FILL_OUTCOME_PATH_CROSSING_AN_UNEXPECTED_GAP",
+    "mapped_row_count": 1044317,
+    "market_session_count_retained": 791,
+    "noncontiguous_segment_count": 0,
+    "status": "GAPS_LOCALIZED_BY_CONTIGUOUS_SEGMENT",
+    "synthetic_fill_count": 0,
+    "whole_session_removed_by_gap_handling_count": 0
+  },
+  "orders": 0,
+  "q4_access_count_delta": 0,
+  "result_hash": "f8952bd5093f7ddc0bbd91d3fd156e369ab153569f9b66c0d3a97e6cb519a8c3",
+  "role": "FINAL_DEVELOPMENT",
+  "schema": "hydra_tier_q_2026_role_features_v2",
+  "source_execution_identity_receipt": {
+    "bindings": [
+      {
+        "candidate_id": "hazard_2641d5adb7bfee8dca07de2a",
+        "decision_and_execution_are_explicitly_separate": true,
+        "decision_bundle_hash": "9d8ccf1096747c66f8ae111be77bb5428166e3392c5a07ffbabf233e0c4fc4d7",
+        "decision_market": "RTY",
+        "execution_bundle_hash": "2feb499e9e5a9faa06caef650261e0921e02fa70ba9d6582b9f95177e8453d73",
+        "execution_market": "M2K",
+        "reference_bundle_hash": null,
+        "reference_market": null
+      },
+      {
+        "candidate_id": "hazard_16a744e747cafb88a7e2c83b",
+        "decision_and_execution_are_explicitly_separate": true,
+        "decision_bundle_hash": "85880cd4fea763ccb85085b87e0dd3b13600393015b2f27cc753876fda881044",
+        "decision_market": "NQ",
+        "execution_bundle_hash": "c63e3528120bba123d102c6143ece5d74450d4e8880caadf2eba895b13f58863",
+        "execution_market": "MNQ",
+        "reference_bundle_hash": null,
+        "reference_market": null
+      },
+      {
+        "candidate_id": "hazard_0a569f580a2540474116636c",
+        "decision_and_execution_are_explicitly_separate": true,
+        "decision_bundle_hash": "0f508757f93e12b44ded6f46e49fe2c7a95f60cbabadc2642394388f1819b653",
+        "decision_market": "YM",
+        "execution_bundle_hash": "4b82923df9129dd7b036185420182be2bc9ca898e15cd23cebab0cc5ab2cada1",
+        "execution_market": "MYM",
+        "reference_bundle_hash": "19ab9937a414fb42d583aad32c2b50420ea5574965ebd237ec8cd046c05c94f3",
+        "reference_market": "ES"
+      },
+      {
+        "candidate_id": "hazard_10ffb41856432af08259e32b",
+        "decision_and_execution_are_explicitly_separate": true,
+        "decision_bundle_hash": "2a327eee3bb319872d8b48de7cb6e76d83601a94e81ceb580b6c9a2f6f0adff9",
+        "decision_market": "CL",
+        "execution_bundle_hash": "e0e6ad1b20a0f3a6176c1198e09e8947b38e615d98ce8e1a709e364b902e0a9c",
+        "execution_market": "MCL",
+        "reference_bundle_hash": null,
+        "reference_market": null
+      },
+      {
+        "candidate_id": "hazard_16f0da561bc98f2eb7d2efc4",
+        "decision_and_execution_are_explicitly_separate": true,
+        "decision_bundle_hash": "19ab9937a414fb42d583aad32c2b50420ea5574965ebd237ec8cd046c05c94f3",
+        "decision_market": "ES",
+        "execution_bundle_hash": "bef9781734257b6fafdac9a145717a986ba451e60d5a5ee6d665fbb4f9702e71",
+        "execution_market": "MES",
+        "reference_bundle_hash": null,
+        "reference_market": null
+      }
+    ],
+    "decision_contract": "FEATURES_SIGNALS_DIRECTION_AND_DECISION_TIME_FROM_DECISION_MARKET",
+    "decision_markets": [
+      "CL",
+      "ES",
+      "NQ",
+      "RTY",
+      "YM"
+    ],
+    "execution_contract": "ROW_CONTRACT_SEGMENT_SESSION_FILL_AND_OUTCOMES_FROM_EXECUTION_MARKET",
+    "execution_markets": [
+      "M2K",
+      "MCL",
+      "MES",
+      "MNQ",
+      "MYM"
+    ],
+    "receipt_hash": "1acff8ed83d825ea5f288667b16ea38e3a6c4173c42de8afdf7b632465617dd5",
+    "status": "SOURCE_DECISION_AND_MICRO_EXECUTION_BUNDLES_BOUND"
+  },
+  "source_files": [
+    {
+      "path": "/root/hydra-bot/data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/final_development_2026.parquet",
+      "role": "FINAL_DEVELOPMENT_PARQUET",
+      "rows": 1136722,
+      "sha256": "0a21087e58cb6e498e6e26b3058a759cfb0b6300158355ac0399d03e1b7353a1"
+    }
+  ],
+  "source_inventory_hash": "4a38a0a3f2505a65a8ddd7414139887c78ba587bbbc1414f98d74acc50e7d70e",
+  "status": "CAUSAL_ROLE_FEATURE_BUNDLES_READY"
+}
