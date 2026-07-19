@@ -2,12 +2,101 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
+import numpy as np
 import pytest
 import pandas as pd
 
 from hydra.economic_evolution.schema import stable_hash
 from hydra.production import tier_q_2026_two_stage_runner as runner
+
+
+def _micro_candidate() -> tuple[runner.HazardCandidate, runner.CalibratedHazardCandidate]:
+    candidate = runner.HazardCandidate(
+        market="NQ",
+        execution_market="MNQ",
+        mechanism="COMPRESSION_TO_EXPANSION",
+        cross_asset_reference_market=None,
+        timeframe="1m",
+        session_code=0,
+        trigger_feature="rv_short_long_ratio",
+        trigger_operator="LT",
+        trigger_quantile=0.55,
+        context_feature=None,
+        context_operator=None,
+        context_quantile=None,
+        direction_rule="PAST_RETURN_CONTINUATION",
+        favorable_r=0.5,
+        adverse_r=0.5,
+        horizon=5,
+        risk_level=0.75,
+        cooldown_minutes=1,
+    )
+    calibrated = runner.CalibratedHazardCandidate(
+        candidate=candidate,
+        calibration_end_exclusive_ns=0,
+        trigger_threshold=1.0,
+        context_threshold=None,
+        finite_trigger_observations=100,
+        finite_context_observations=None,
+        source_matrix_hash="source-matrix",
+    )
+    return candidate, calibrated
+
+
+def _micro_matrix(
+    *,
+    contracts: tuple[int, ...] = (7, 7, 7, 7),
+    days: tuple[int, ...] = (0, 0, 0, 0),
+    volatility: float = 0.02,
+) -> runner.FeatureMatrix:
+    minute = runner.hazard.MINUTE_NS
+    # The missing timestamp at +1m represents no micro trade, not a fabricated
+    # zero-volume bar.  +2m is therefore the first real tradable open.
+    timestamp = np.asarray((0, 2 * minute, 4 * minute, 6 * minute), dtype=np.int64)
+    arrays = {
+        "timestamp_ns": timestamp,
+        "availability_ns": timestamp + minute,
+        "contract_code": np.asarray(contracts, dtype=np.int16),
+        "segment_code": np.asarray((10, 11, 12, 13), dtype=np.int64),
+        "session_day": np.asarray(days, dtype=np.int32),
+        "session_code": np.zeros(4, dtype=np.int16),
+        "bar_open": np.asarray((99.0, 100.0, 100.1, 100.2)),
+        "bar_high": np.asarray((99.1, 100.1, 100.2, 100.3)),
+        "bar_low": np.asarray((98.9, 99.9, 100.0, 100.1)),
+        "bar_close": np.asarray((99.0, 100.0, 100.1, 100.2)),
+        "feature__past_volatility": np.full(4, volatility, dtype=np.float64),
+    }
+    return runner.FeatureMatrix(
+        root=Path("."),
+        manifest={"row_count": 4, "bundle_hash": "micro-execution-matrix"},
+        arrays=arrays,
+    )
+
+
+def _source_intent(candidate: runner.HazardCandidate) -> runner.HazardIntent:
+    minute = runner.hazard.MINUTE_NS
+    return runner.HazardIntent(
+        candidate_id=candidate.candidate_id,
+        intent_namespace=candidate.candidate_id,
+        evidence_role="CANDIDATE",
+        control_id=None,
+        row_index=123,
+        market="NQ",
+        contract_code=99,
+        session_day=0,
+        session_code=0,
+        segment_code=99,
+        event_time_ns=0,
+        available_at_ns=minute,
+        decision_time_ns=minute,
+        order_submit_time_ns=minute,
+        entry_intent="ENTER_LONG_NEXT_TRADABLE_OPEN",
+        earliest_executable_time_ns=minute,
+        direction=1,
+        feature_fingerprint="frozen-source-feature",
+    )
 
 
 def _contract() -> dict:
@@ -222,3 +311,130 @@ def test_real_final_development_coverage_excludes_partial_split_session() -> Non
         "10": 8,
         "20": 4,
     }
+
+
+def test_sparse_micro_gap_uses_first_real_micro_open_and_preserves_signal() -> None:
+    candidate, calibrated = _micro_candidate()
+    events, receipt = runner._remap_and_observe_execution_outcomes(
+        calibrated,
+        _micro_matrix(),
+        (_source_intent(candidate),),
+    )
+    assert len(events) == 1
+    event = events[0]
+    assert event.feature_fingerprint == "frozen-source-feature"
+    assert event.direction == 1
+    assert event.decision_time_ns == runner.hazard.MINUTE_NS
+    assert event.execution_market == "MNQ"
+    assert event.contract_code == 7
+    assert event.fill_time_ns == 2 * runner.hazard.MINUTE_NS
+    assert event.raw_fill_price == 100.0
+    # The path later reaches the end of this tiny fixture.  The already-filled
+    # signal remains present and is censored; it is never silently suppressed.
+    assert str(event.outcome) == "CENSORED_FUTURE_COVERAGE"
+    assert event.censor_reason == "EXECUTION_DATA_END_BEFORE_TARGET_STOP_OR_EXIT"
+    assert receipt["source_intent_count"] == 1
+    assert receipt["execution_remapped_count"] == 1
+    assert receipt["execution_mapping_censored_count"] == 0
+    assert receipt["execution_fill_price_check_count"] == 1
+    assert receipt["execution_fill_price_mismatch_count"] == 0
+
+
+@pytest.mark.parametrize(
+    ("direction", "favorable", "adverse", "expected_target", "expected_stop"),
+    (
+        (1, 100.26, 99.74, 100.50, 99.50),
+        (-1, 99.74, 100.26, 99.50, 100.50),
+        (1, 100.25, 99.75, 100.25, 99.75),
+        (-1, 99.75, 100.25, 99.75, 100.25),
+        (1, 100.25000000000001, 99.74999999999999, 100.25, 99.75),
+    ),
+)
+def test_micro_barriers_quantize_outward_and_keep_aligned_levels(
+    direction: int,
+    favorable: float,
+    adverse: float,
+    expected_target: float,
+    expected_stop: float,
+) -> None:
+    target, stop = runner._outward_tick_barriers(
+        direction=direction,
+        tick_size=0.25,
+        favorable_price=favorable,
+        adverse_price=adverse,
+    )
+    assert target == expected_target
+    assert stop == expected_stop
+
+
+def test_micro_barrier_raw_exit_is_proven_tick_aligned() -> None:
+    candidate, calibrated = _micro_candidate()
+    events, receipt = runner._remap_and_observe_execution_outcomes(
+        calibrated,
+        _micro_matrix(volatility=0.001),
+        (_source_intent(candidate),),
+    )
+    assert len(events) == 1
+    assert events[0].raw_exit_price is not None
+    assert runner._is_tick_aligned(events[0].raw_exit_price, 0.25)
+    assert receipt["barrier_quantization_rule"]["rule_id"] == (
+        runner.BARRIER_QUANTIZATION_RULE_ID
+    )
+    assert receipt["barrier_quantization_rule_hash"] == (
+        runner.BARRIER_QUANTIZATION_RULE_HASH
+    )
+    assert receipt["barrier_tick_alignment_mismatch_count"] == 0
+    assert receipt["raw_exit_tick_alignment_check_count"] == 1
+    assert receipt["raw_exit_tick_alignment_mismatch_count"] == 0
+
+
+@pytest.mark.parametrize(
+    ("contracts", "days", "reason"),
+    (
+        ((7, 8, 8, 8), (0, 0, 0, 0), "EXECUTION_CONTRACT_CHANGED_BEFORE_FILL"),
+        ((7, 7, 7, 7), (0, 1, 1, 1), "EXECUTION_SESSION_CHANGED_BEFORE_FILL"),
+    ),
+)
+def test_sparse_micro_remap_censors_roll_or_session_before_fill(
+    contracts: tuple[int, ...],
+    days: tuple[int, ...],
+    reason: str,
+) -> None:
+    candidate, calibrated = _micro_candidate()
+    events, receipt = runner._remap_and_observe_execution_outcomes(
+        calibrated,
+        _micro_matrix(contracts=contracts, days=days),
+        (_source_intent(candidate),),
+    )
+    assert len(events) == 1
+    assert str(events[0].outcome) == "CENSORED_FUTURE_COVERAGE"
+    assert events[0].censor_reason == reason
+    assert events[0].fill_time_ns is None
+    assert receipt["source_intent_count"] == 1
+    assert receipt["execution_mapping_censored_count"] == 1
+
+
+def test_selected_horizon_excludes_any_start_containing_censored_event() -> None:
+    calendar = tuple(range(1, 11))
+    replay = SimpleNamespace(
+        eligible_session_days=calendar,
+        events=(
+            SimpleNamespace(
+                session_day=3,
+                outcome="CENSORED_FUTURE_COVERAGE",
+            ),
+        ),
+    )
+    coverage = runner._selected_horizon_coverage(
+        replay,
+        calendar,
+        ((1, "FD_A"), (6, "FD_B")),
+        horizon=5,
+    )
+    assert coverage["full"] == ((6, "FD_B"),)
+    assert len(coverage["data_censored_starts"]) == 1
+    rejected = coverage["data_censored_starts"][0]
+    assert rejected["start_day"] == 1
+    assert rejected["coverage_state"] == "DATA_CENSORED"
+    assert rejected["reasons"] == ["CENSORED_EVENT_IN_WINDOW"]
+    assert rejected["censored_session_days"] == [3]

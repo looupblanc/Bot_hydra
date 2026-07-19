@@ -23,7 +23,7 @@ for variable in (
     "OPENBLAS_NUM_THREADS",
     "NUMEXPR_NUM_THREADS",
 ):
-    os.environ.setdefault(variable, "1")
+    os.environ[variable] = "1"
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
