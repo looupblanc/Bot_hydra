@@ -121,6 +121,21 @@ def test_vectorized_row_identity_guard_matches_pandas_null_semantics() -> None:
     pd.testing.assert_series_equal(observed, expected)
 
 
+def test_vectorized_contract_identity_matches_pandas_row_join() -> None:
+    frame = pd.DataFrame(
+        {
+            "a": ["ZTH4", "ZTM4", "ZTZ4"],
+            "b": ["ZFH4", "ZFM4", "ZFZ4"],
+            "c": ["ZNH4", "ZNM4", "ZNZ4"],
+        }
+    )
+    expected = frame.astype(str).agg("|".join, axis=1)
+    observed = tripwire._join_columns_as_strings(
+        frame, ["a", "b", "c"], separator="|"
+    )
+    pd.testing.assert_series_equal(observed, expected)
+
+
 def test_real_audit_reads_metadata_not_outcomes(monkeypatch: pytest.MonkeyPatch) -> None:
     def forbidden_decode(*_args: object, **_kwargs: object) -> object:
         raise AssertionError("economic Parquet rows were decoded")

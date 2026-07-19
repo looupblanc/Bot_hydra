@@ -473,9 +473,11 @@ def prepare_curvature_features(
     output["local_minute"] = _local_minute(output["timestamp"])
     output["session_day"] = output["session_id"].map(_session_ordinal).astype(int)
 
-    contract_identity = output[
-        [f"{root_name}_contract" for root_name in frames]
-    ].astype(str).agg("|".join, axis=1)
+    contract_identity = _join_columns_as_strings(
+        output,
+        [f"{root_name}_contract" for root_name in frames],
+        separator="|",
+    )
     output["contract_segment"] = contract_identity.ne(contract_identity.shift()).cumsum()
     output["roll_unsafe"] = _roll_unsafe_mask(output, contract_identity)
     output["delivery_mismatch_session"] = output["session_id"].astype(str).isin(
@@ -626,6 +628,20 @@ def _rows_have_one_distinct_non_null_value(
     first_value = values[np.arange(len(values)), first_position]
     equal_or_null = ~non_null | (values == first_value[:, None])
     return pd.Series(has_value & equal_or_null.all(axis=1), index=frame.index)
+
+
+def _join_columns_as_strings(
+    frame: pd.DataFrame, columns: Sequence[str], *, separator: str
+) -> pd.Series:
+    """Vectorized equivalent of ``astype(str).agg(separator.join, axis=1)``."""
+
+    if not columns:
+        raise TreasuryCurvatureError("contract identity has no source columns")
+    result = frame[columns[0]].astype(str)
+    for column in columns[1:]:
+        result = result.str.cat(frame[column].astype(str), sep=separator)
+    result.name = None
+    return result
 
 
 def causal_intent(row: Mapping[str, Any], rule: CurvatureRule) -> int:
