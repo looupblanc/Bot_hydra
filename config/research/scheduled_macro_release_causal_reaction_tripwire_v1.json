@@ -1,0 +1,140 @@
+{
+  "schema": "hydra_autonomous_branch_decision_card_v1",
+  "decision_id": "SCHEDULED_MACRO_RELEASE_CAUSAL_REACTION_TRIPWIRE_20260719_V1",
+  "evidence_role": "BOUNDED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
+  "selected_branch": "SCHEDULED_MACRO_RELEASE_CAUSAL_REACTION_TRIPWIRE_V1",
+  "hypothesis": "A public, exogenously timed CPI, Employment Situation or FOMC statement creates a causal post-release displacement whose continuation or rejection can deliver materially greater legal account target velocity than an ordinary same-clock session response.",
+  "strongest_argument_against": "Only 56 releases exist before Q4, short reaction bars may be noise after costs, event concentration can create false account passes, and the same-clock placebo may explain any apparent edge.",
+  "explicit_non_resurrection": {
+    "excluded_release_families": [
+      "EIA_PETROLEUM_STATUS_REPORT",
+      "DOE_INVENTORY",
+      "ENERGY_INVENTORY"
+    ],
+    "tombstoned_grammar_resurrected": false,
+    "generic_ohlcv_grammar": false
+  },
+  "frozen_inputs": {
+    "official_calendar_path": "config/research/scheduled_macro_release_calendar_2023_2024_v1.json",
+    "official_calendar_sha256": "ba644383546770eb5084082dce87f70011439a58261df51b4510d6885afa5c59",
+    "core_ohlcv_path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_2023-01-01_2024-10-01.parquet",
+    "core_ohlcv_sha256": "07b3093ed8ef5888898abc3e531e0b522273a6c2047489b60eb36b33afeaf374",
+    "core_contract_map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+    "core_contract_map_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+    "core_contract_map_semantic_hash": "705ce6fe27bac7dea9cb9d492413a5112bb60765c66aa75d03f9711bef348208",
+    "core_contract_map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+    "metals_ohlcv_path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_GC-v-0_MGC-v-0_2023-01-01_2024-10-01.parquet",
+    "metals_ohlcv_sha256": "6bca31351820713016426286de8ae3ce9f0350b6886f780cccc5565fd65da78d",
+    "metals_contract_map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_01ba149449a494a7.json",
+    "metals_contract_map_sha256": "2ac275f4043ef210afa092be8e7f6676c0409c6e2ec5e41a01aecb37427f3815",
+    "metals_contract_map_semantic_hash": "01ba149449a494a7a118884813abe10de8845c215b7390dbfbfa9d9dff89de13",
+    "metals_contract_map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_VOLUME_RANK_V1",
+    "cost_model_path": "config/v7/phase0_g0_preregistration.json",
+    "cost_model_sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6",
+    "rule_snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "rule_snapshot_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+  },
+  "chronological_roles": {
+    "DISCOVERY": ["2023-01-01T00:00:00Z", "2024-01-01T00:00:00Z"],
+    "VALIDATION": ["2024-01-01T00:00:00Z", "2024-04-01T00:00:00Z"],
+    "FINAL_DEVELOPMENT": ["2024-04-01T00:00:00Z", "2024-10-01T00:00:00Z"]
+  },
+  "causal_contract": {
+    "release_families": [
+      "BLS_CPI",
+      "BLS_EMPLOYMENT_SITUATION",
+      "FOMC_STATEMENT"
+    ],
+    "signal_execution_pairs": [
+      {"signal_market": "YM", "execution_market": "MYM"},
+      {"signal_market": "GC", "execution_market": "MGC"}
+    ],
+    "reaction_observation_minutes": [1, 5],
+    "reaction_modes": ["CONTINUATION", "REJECTION"],
+    "holding_minutes": [15, 30, 60],
+    "release_scopes": [
+      "ALL_RELEASES",
+      "BLS_CPI",
+      "BLS_EMPLOYMENT_SITUATION",
+      "FOMC_STATEMENT"
+    ],
+    "decision_rule": "After all observation bars have completed, side is sign(last observation close - first observation open) for CONTINUATION and its negative for REJECTION; zero displacement abstains.",
+    "entry_rule": "Enter the execution micro at the first exact mapped tradable bar open at or after decision_time; no position exists before fill_time.",
+    "exit_rule": "Exit at the first exact mapped tradable bar open at or after fill_time plus the frozen holding duration.",
+    "conservative_round_turn_cost_usd": {
+      "MYM": {"NORMAL": 3.0, "STRESSED_1_5X": 4.5},
+      "MGC": {"NORMAL": 4.0, "STRESSED_1_5X": 6.0}
+    },
+    "cost_interpretation": "Frozen research commission plus one adverse tick per side under NORMAL; the entire normal all-in amount is multiplied by 1.5 under STRESSED_1_5X.",
+    "same_session_flatten_required": true,
+    "future_outcomes_in_decision": false
+  },
+  "controls": {
+    "direction_flip": "Opposite side on the identical official release events, fill clock, quantity and costs.",
+    "release_time_session_matched": "Same local release clock on the immediately preceding exact mapped trading session that contains no CPI, Employment Situation or FOMC release; identical reaction, execution and cost rules."
+  },
+  "discovery_selection": {
+    "maximum_selected_candidates": 2,
+    "maximum_per_execution_market": 1,
+    "candidate_order": [
+      "positive_discovery_stressed_net",
+      "discovery_stressed_net_usd",
+      "discovery_net_per_event_usd",
+      "event_count",
+      "candidate_id_lexical"
+    ],
+    "account_cell_order": [
+      "legal_mll_and_passing_consistency",
+      "stressed_20d_pass_count",
+      "normal_20d_pass_count",
+      "stressed_20d_median_target_progress",
+      "stressed_20d_net_usd",
+      "smaller_account_then_quantity"
+    ],
+    "selection_uses_validation_or_final_development": false
+  },
+  "account_frontier": {
+    "account_sizes": ["50K", "100K", "150K"],
+    "micro_quantities": [1, 2, 4, 8, 12, 16, 24, 32, 40, 50],
+    "horizons_trading_days": [5, 10, 20],
+    "maximum_mll_breach_rate": 0.1
+  },
+  "frozen_gate": {
+    "positive_stressed_validation_net": true,
+    "positive_stressed_final_development_net": true,
+    "maximum_normal_and_stressed_mll_breach_rate": 0.1,
+    "all_passing_paths_consistency_compliant": true,
+    "minimum_positive_release_types_or_temporal_contexts": 2,
+    "pass_route": {
+      "minimum_combined_normal_passes": 2,
+      "minimum_combined_stressed_passes": 1,
+      "eligible_horizons_trading_days": [5, 10, 20]
+    },
+    "predefined_target_progress_uplift_route": {
+      "headline_horizon_trading_days": 20,
+      "minimum_final_stressed_median_target_progress": 0.25,
+      "minimum_final_stressed_p25_target_progress": 0.0,
+      "minimum_absolute_median_uplift_over_each_control": 0.1
+    },
+    "must_beat_both_controls": true,
+    "evidence_ceiling": "TIER_E_DEVELOPMENT_ONLY"
+  },
+  "governance": {
+    "read_only": true,
+    "promotion_allowed": false,
+    "tier_q_allowed": false,
+    "q4_access_allowed": false,
+    "data_purchase_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "maximum_cpu_workers": 1
+  },
+  "expected_runtime_minutes": 10,
+  "expected_data_cost_usd": 0.0,
+  "expected_information_gain": "HIGH: a small exogenous-event clock directly distinguishes scheduled public-information reaction from the already-falsified generic OHLCV, curve and standalone order-flow branches.",
+  "next_branch_rule": {
+    "when_gate_passes": "PRESERVE_AS_TIER_E_AND_REQUIRE_ONE_GENUINELY_FRESH_CONFIRMATION_WITHOUT_RETUNING",
+    "when_gate_fails": "TOMBSTONE_THIS_EXACT_MACRO_REACTION_LATTICE_AND_REALLOCATE_TO_A_NON_EVENT_CLOCK_REPRESENTATION"
+  },
+  "card_hash": "6f3b773473667fe6aae3c94e52ae9fe91db3c73d4eddab63aaf1c2d86c0d670b"
+}
