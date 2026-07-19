@@ -460,6 +460,31 @@
         "receipt_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/fresh_confirmation_acquisition_receipt.json",
         "request_hash": "370bc62c9c6420224f880520c7e0ae8ed263cb3f634233dc955b5569e5c53219"
       },
+      "bounded_breadth_q3_acquisition": {
+        "contract_hash": "4fd7975dc775e249517eac58511076637ac03e066ae94d71d15785015c37640a",
+        "contract_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/frozen_breadth_q3_contract.json",
+        "controller_runtime_network_access_allowed": false,
+        "cumulative_actual_before_usd": 102.56857873201596,
+        "cumulative_hard_cap_usd": 200.720719923081,
+        "dataset": "GLBX.MDP3",
+        "end_exclusive": "2025-10-01",
+        "estimated_spend_usd": 1.58656224981,
+        "evidence_role": "FINAL_DEVELOPMENT",
+        "external_manifest_bound_acquisition_allowed": true,
+        "projected_cumulative_after_usd": 104.15514098182596,
+        "q4_access_allowed": false,
+        "receipt_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/frozen_breadth_q3_acquisition_receipt.json",
+        "request_hash": "e97f48315503984645480bc99f4db51803c5940ea0e19a02b302f0cfc9c64181",
+        "schema": "ohlcv-1m",
+        "start_inclusive": "2025-07-01",
+        "symbols": [
+          "YM.c.0",
+          "MYM.c.0",
+          "ES.c.0",
+          "NQ.c.0",
+          "RTY.c.0"
+        ]
+      },
       "broker_or_orders_allowed": false,
       "campaign_id": "hydra_autonomous_economic_discovery_director_0035",
       "compute_contract": {
@@ -471,9 +496,9 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "02671cd3ae2197ddc393c24a02564f8b6e0d3892e3e9f3d31f1ecb748033a660",
+      "manifest_file_sha256": "d37de4a334b5445da73ea53cf33ceb9e2aee4c7c730f2cfc6320e66a27fe5a58",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "00dcb0ffffc205089dcadbed12a9a992cb793e56d93e0139be40a4cfb70f8e61",
+      "manifest_semantic_hash": "033e1bfe7fe9a31b4158a9e94a3597a29a5be0b87d62e00df832318c59ba5d1a",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -612,6 +637,24 @@
         "tier_f_requires_f0": true,
         "xfa_diagnostic_development_only": true
       },
+      "post_confirmation_branch_portfolio": {
+        "additional_manifest_count": 0,
+        "additional_multiplicity_reserved": false,
+        "breadth_contract_hash": "4fd7975dc775e249517eac58511076637ac03e066ae94d71d15785015c37640a",
+        "breadth_evidence_ceiling": "TIER_G_DEVELOPMENT",
+        "classification": "POST_CONFIRMATION_MATERIALLY_DISTINCT_BREADTH_AND_EVENT_TIME_CONTROL_RELAY",
+        "event_time_controls_expected_hash": "a4a3f70e167b12bfbc0e64827014ff47cc767f2e53d1d9bcadfcb2db259a218e",
+        "implementation_commit": "9835b1520a983661e5c27d5f1fc3b91978b5b021",
+        "old_manifest_hash": "00dcb0ffffc205089dcadbed12a9a992cb793e56d93e0139be40a4cfb70f8e61",
+        "breadth_request_hash": "e97f48315503984645480bc99f4db51803c5940ea0e19a02b302f0cfc9c64181",
+        "promotion_thresholds_changed": false,
+        "q4_access_allowed": false,
+        "retuning_allowed": false,
+        "scientific_policy_changed": false,
+        "seal_commit": "183bacc740a1710008dad0d87cfc0b674a8addeb",
+        "shared_execution_or_accounting_semantics_changed": false,
+        "tier_c_promotion_allowed": false
+      },
       "post_reservation_pre_outcome_technical_repair": {
         "additional_manifest_count": 0,
         "additional_multiplicity_reserved": false,
@@ -623,8 +666,8 @@
         "scientific_policy_changed": false
       },
       "q4_access_allowed": false,
-      "worm_commit": "cdc2d105c8844f348df27ade53e566c800d50c37",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-tier-g-xfa-breadth-confirmation-relay-2026-07-19"
+      "worm_commit": "183bacc740a1710008dad0d87cfc0b674a8addeb",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-post-confirmation-breadth-relay-2026-07-19"
     }
   ],
   "governance": {
@@ -633,8 +676,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T09:56:18Z",
-  "queue_hash": "1432436b4cad0618c8a0c4f26b071f59faa9467609e97ecacc8193c109c3933d",
+  "issued_at_utc": "2026-07-19T10:43:36Z",
+  "queue_hash": "0f6db668bc25c4c90666b21fc550fa99a458975b83328552f03c999777271bc6",
   "queue_id": "hydra_economic_evolution_production_queue_0051",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
