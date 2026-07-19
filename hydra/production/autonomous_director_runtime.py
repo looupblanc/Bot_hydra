@@ -39,6 +39,11 @@ from hydra.production.autonomous_event_time_safety_frontier import (
     build_autonomous_event_time_safety_frontier,
     compose_autonomous_event_time_safety_frontier_shards,
 )
+from hydra.production.autonomous_event_time_matched_controls import (
+    SCHEMA as EVENT_TIME_MATCHED_CONTROLS_SCHEMA,
+    STATUS as EVENT_TIME_MATCHED_CONTROLS_STATUS,
+    event_time_matched_controls_worker,
+)
 from hydra.production.autonomous_combine_candidate_bank import (
     SCHEMA as COMBINE_CANDIDATE_BANK_SCHEMA,
     build_autonomous_combine_candidate_bank,
@@ -96,6 +101,12 @@ from hydra.production.fresh_confirmation_lane import (
     RESULT_SCHEMA as FRESH_CONFIRMATION_RESULT_SCHEMA,
     evaluate_fresh_confirmation,
     open_confirmation_matrices,
+)
+from hydra.production.frozen_breadth_continuation import (
+    SCHEMA as FROZEN_BREADTH_CONTINUATION_SCHEMA,
+    build_breadth_feature_bundles,
+    evaluate_breadth_continuation,
+    open_breadth_matrices,
 )
 from hydra.production.manifest import load_and_validate_production_manifest
 from hydra.production.runtime import PRODUCTION_KPI_SCHEMA, PRODUCTION_STATE_SCHEMA
@@ -1973,13 +1984,45 @@ def _run_post_book_graduation_relay(
         heartbeat_seconds=heartbeat_seconds,
         runtime_results=results,
     )
+    if manifest.get("post_confirmation_branch_portfolio"):
+        state, results, _event_time_controls = _run_event_time_matched_controls_relay(
+            root=root,
+            manifest=manifest,
+            output=output,
+            live_writer=live_writer,
+            branch_writer=branch_writer,
+            prior_state=state,
+            started=started,
+            heartbeat_seconds=heartbeat_seconds,
+            runtime_results=results,
+        )
+        state, results, _breadth_continuation = _run_frozen_breadth_continuation_relay(
+            root=root,
+            manifest=manifest,
+            output=output,
+            live_writer=live_writer,
+            branch_writer=branch_writer,
+            prior_state=state,
+            started=started,
+            heartbeat_seconds=heartbeat_seconds,
+            runtime_results=results,
+        )
+    elif os.environ.get("HYDRA_PRODUCTION_TEST_MODE") != "1":
+        raise AutonomousDirectorRuntimeError(
+            "post-confirmation branch portfolio is undeclared"
+        )
     if os.environ.get("HYDRA_PRODUCTION_TEST_MODE") == "1":
         return state
-    # The bounded relay has produced its durable decision.  Returning lets the
-    # existing manifest queue dispatch the already-frozen next economic action;
-    # an infinite zero-worker heartbeat here would strand the persistent
-    # controller in an economically idle state.
-    return state
+
+    # This manifest is intentionally persistent and has no terminal result.
+    # Returning here makes V17 relaunch the same completed checkpoint forever.
+    # Keep the single runner alive after the bounded branch decision so the
+    # controller remains healthy while the next frozen branch is prepared.
+    while True:
+        time.sleep(max(float(heartbeat_seconds), 1.0))
+        state = _heartbeat_state(state, active_economic_worker_processes=0)
+        _publish(live_writer, state, _kpis(manifest, state, results, started))
+        _write_mission_views(root, manifest, state, results)
 
 
 def _run_tier_g_xfa_and_breadth_relay(
@@ -2474,6 +2517,378 @@ def _run_fresh_confirmation_relay(
     _publish(live_writer, state, _kpis(manifest, state, results, started))
     _write_mission_views(root, manifest, state, results)
     return state, results, confirmation
+
+
+def _run_event_time_matched_controls_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    """Run/adopt the bounded compute-only event-time matched controls."""
+
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    section = dict(manifest.get("post_confirmation_branch_portfolio") or {})
+    raw_path = str(section.get("event_time_controls_result_path") or "").strip()
+    if not raw_path:
+        raise AutonomousDirectorRuntimeError(
+            "event-time matched-control result path is undeclared"
+        )
+    result_path = (root / raw_path).resolve()
+    try:
+        result_path.relative_to(root.resolve())
+    except ValueError as exc:
+        raise AutonomousDirectorRuntimeError(
+            "event-time matched-control result path escapes repository"
+        ) from exc
+
+    if result_path.is_file():
+        result = _verify_event_time_matched_controls_result(
+            _read_hashed(result_path, "result_hash")
+        )
+    else:
+        relative = _relative_branch_artifact_path(
+            output, result_path, "event-time matched-control result"
+        )
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=1,
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                future = pool.submit(
+                    event_time_matched_controls_worker,
+                    {
+                        "root": str(root),
+                        "source_composite_path": str(
+                            section.get("event_time_controls_source_path") or ""
+                        ),
+                        "rule_snapshot_path": str(
+                            manifest["official_rule_snapshot"]["path"]
+                        ),
+                    },
+                )
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="EVENT_TIME_MATCHED_CONTROLS_RUNNING",
+                    branch_results=results,
+                    next_action="RUN_FROZEN_EVENT_TIME_MATCHED_CONTROLS",
+                )
+                state["active_economic_worker_processes"] = 1
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+                while not future.done():
+                    time.sleep(max(min(float(heartbeat_seconds), 5.0), 0.1))
+                    state = _heartbeat_state(
+                        state, active_economic_worker_processes=1
+                    )
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+                result = _verify_event_time_matched_controls_result(
+                    dict(future.result())
+                )
+        finally:
+            _end_economic_phase()
+        branch_writer.write_json(relative, result)
+
+    expected_hash = str(section.get("event_time_controls_expected_hash") or "")
+    if expected_hash and str(result.get("result_hash") or "") != expected_hash:
+        raise AutonomousDirectorRuntimeError(
+            "event-time matched-control result differs from manifest freeze"
+        )
+    results["EVENT_TIME_MATCHED_CONTROLS"] = result
+    envelope = _post_source_envelope(
+        manifest,
+        lane_id="EXPLORATION",
+        branch_id="FROZEN_EVENT_TIME_MATCHED_CONTROLS",
+        decision=str(result["control_verdict"]),
+        payload_key="event_time_matched_controls",
+        payload=result,
+        next_action=str(result["next_action"]),
+    )
+    envelope_payload = dict(envelope)
+    envelope_payload.pop("result_hash", None)
+    envelope_payload["evidence_tier"] = "E_CONTROL_DIAGNOSTIC"
+    envelope = _with_hash(envelope_payload, "result_hash")
+    _append_decision_once(root, manifest, envelope)
+
+    counts = _event_time_control_counts(result)
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage=str(result["control_verdict"]),
+        branch_results=results,
+        next_action=str(result["next_action"]),
+    )
+    state.update(
+        {
+            "active_economic_worker_processes": 0,
+            "event_time_matched_control_count": counts["control_count"],
+            "event_time_matched_control_exact_episode_count": counts[
+                "exact_episode_count"
+            ],
+            "event_time_matched_controls_status": str(result["control_verdict"]),
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        }
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, result
+
+
+def _run_frozen_breadth_continuation_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    """Run the singleton frozen Q3 breadth continuation exactly once.
+
+    Network acquisition is deliberately external and manifest-bound.  The
+    parent process is the only feature/evidence writer; the spawned worker
+    receives immutable matrices and performs only economic replay.  A success
+    is capped at Tier G because this candidate was not already graduated when
+    the Q3 block was frozen.
+    """
+
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    paths, missing_declarations = _frozen_breadth_manifest_paths(root, manifest)
+    result_path = paths.get("result_path")
+    result: dict[str, Any] = {}
+
+    if result_path is not None and result_path.is_file():
+        envelope = _read_hashed(result_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "frozen-breadth continuation result identity drift"
+            )
+        result = _verify_frozen_breadth_continuation_result(
+            _verified_inner_result(
+                envelope,
+                key="frozen_breadth_continuation",
+                expected_schema=FROZEN_BREADTH_CONTINUATION_SCHEMA,
+                expected_status=str(
+                    dict(envelope.get("frozen_breadth_continuation") or {}).get(
+                        "status"
+                    )
+                ),
+            )
+        )
+        results["FROZEN_BREADTH_CONTINUATION"] = result
+
+    required = (
+        "contract_path",
+        "acquisition_receipt_path",
+        "feature_receipt_path",
+        "result_path",
+    )
+    missing_inputs = list(missing_declarations)
+    for key in required[:2]:
+        path = paths.get(key)
+        if path is not None and not path.is_file():
+            missing_inputs.append(key)
+    missing_inputs = sorted(set(missing_inputs))
+
+    if not result and missing_inputs:
+        state = _state_payload(
+            manifest,
+            sequence=int(state["checkpoint_sequence"]) + 1,
+            state="ROBUSTNESS_ACTIVE",
+            stage="FROZEN_BREADTH_Q3_ACQUISITION_REQUIRED",
+            branch_results=results,
+            next_action="ACQUIRE_EXACT_FROZEN_Q3_BREADTH_BUNDLE_THEN_RESUME",
+        )
+        state.update(
+            {
+                "active_economic_worker_processes": 0,
+                "frozen_breadth_missing_inputs": missing_inputs,
+                "frozen_breadth_status": "FROZEN_AWAITING_ACQUISITION",
+                "frozen_breadth_runtime_network_access": False,
+                "q4_access_count_delta": 0,
+            }
+        )
+        state = _rehash(state, "state_hash")
+        _publish(live_writer, state, _kpis(manifest, state, results, started))
+        _write_mission_views(root, manifest, state, results)
+        return state, results, {}
+
+    if not result:
+        feature_path = paths["feature_receipt_path"]
+        contract = _read_json_object(paths["contract_path"])
+        acquisition = _read_json_object(paths["acquisition_receipt_path"])
+        expected_contract_hash = str(
+            dict(
+                manifest.get("post_confirmation_branch_portfolio") or {}
+            ).get("breadth_contract_hash")
+            or ""
+        )
+        if expected_contract_hash and str(contract.get("contract_hash") or "") != expected_contract_hash:
+            raise AutonomousDirectorRuntimeError(
+                "frozen-breadth contract differs from manifest freeze"
+            )
+        if not feature_path.is_file():
+            inputs = dict(acquisition.get("feature_build_inputs") or {})
+            if not inputs:
+                raise AutonomousDirectorRuntimeError(
+                    "frozen-breadth acquisition lacks feature-build inputs"
+                )
+            _begin_economic_phase()
+            try:
+                feature_receipt = build_breadth_feature_bundles(
+                    contract,
+                    source_files=list(inputs.get("source_files") or ()),
+                    contract_map_path=str(inputs.get("contract_map_path") or ""),
+                    cache_root=str(inputs.get("cache_root") or ""),
+                )
+            finally:
+                _end_economic_phase()
+            relative_feature = _relative_branch_artifact_path(
+                output, feature_path, "frozen-breadth feature receipt"
+            )
+            branch_writer.write_json(relative_feature, feature_receipt)
+
+        if result_path is None:
+            raise AutonomousDirectorRuntimeError(
+                "frozen-breadth result path is undeclared"
+            )
+        relative_result = _relative_branch_artifact_path(
+            output, result_path, "frozen-breadth result"
+        )
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=1,
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                future = pool.submit(
+                    _frozen_breadth_continuation_worker,
+                    str(paths["contract_path"]),
+                    str(paths["acquisition_receipt_path"]),
+                    str(paths["feature_receipt_path"]),
+                    expected_contract_hash,
+                )
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="FROZEN_BREADTH_Q3_ECONOMIC_REPLAY_RUNNING",
+                    branch_results=results,
+                    next_action="EVALUATE_SINGLETON_BREADTH_CANDIDATE_WITHOUT_RETUNING",
+                )
+                state.update(
+                    {
+                        "active_economic_worker_processes": 1,
+                        "frozen_breadth_runtime_network_access": False,
+                        "frozen_breadth_runtime_feature_cache_writes": 0,
+                    }
+                )
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+                while not future.done():
+                    time.sleep(max(min(float(heartbeat_seconds), 5.0), 0.1))
+                    state = _heartbeat_state(
+                        state, active_economic_worker_processes=1
+                    )
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+                result = _verify_frozen_breadth_continuation_result(
+                    dict(future.result())
+                )
+        finally:
+            _end_economic_phase()
+
+        envelope = _post_source_envelope(
+            manifest,
+            lane_id="EXPLORATION",
+            branch_id="FROZEN_YM_OPEN_BREADTH_Q3_CONTINUATION",
+            decision=str(result["status"]),
+            payload_key="frozen_breadth_continuation",
+            payload=result,
+            next_action=str(result["next_action"]),
+        )
+        envelope_payload = dict(envelope)
+        envelope_payload.pop("result_hash", None)
+        envelope_payload["evidence_tier"] = (
+            "G" if result.get("tier_g_account_labels") else "E_FALSIFIED"
+        )
+        envelope = _with_hash(envelope_payload, "result_hash")
+        branch_writer.write_json(relative_result, envelope)
+        _append_decision_once(root, manifest, envelope)
+        results["FROZEN_BREADTH_CONTINUATION"] = result
+
+    counts = _frozen_breadth_counts(result)
+    tier_g_count = len(result.get("tier_g_account_labels") or ())
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage=(
+            "FROZEN_BREADTH_Q3_TIER_G_GRADUATED"
+            if tier_g_count
+            else "FROZEN_BREADTH_Q3_FALSIFIED"
+        ),
+        branch_results=results,
+        next_action=str(result["next_action"]),
+    )
+    state.update(
+        {
+            "active_economic_worker_processes": 0,
+            "frozen_breadth_normal_episode_count": counts["normal_episode_count"],
+            "frozen_breadth_stressed_episode_count": counts["stressed_episode_count"],
+            "frozen_breadth_exact_account_replay_count": counts[
+                "exact_account_replay_count"
+            ],
+            "frozen_breadth_tier_g_count": tier_g_count,
+            "frozen_breadth_status": str(result["status"]),
+            "frozen_breadth_runtime_network_access": False,
+            "frozen_breadth_runtime_feature_cache_writes": 0,
+            "data_purchase_count": max(int(state.get("data_purchase_count", 0)), 1),
+            "new_data_purchase_count": max(
+                int(state.get("new_data_purchase_count", 0)), 1
+            ),
+            "independently_confirmed_tier_c_count": int(
+                state.get("independently_confirmed_tier_c_count", 0)
+            ),
+            "forward_tier_f_count": int(state.get("forward_tier_f_count", 0)),
+            "q4_access_count_delta": 0,
+            "broker_connections": 0,
+            "orders": 0,
+        }
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, result
 
 
 def _run_event_time_safety_relay(
@@ -3376,6 +3791,182 @@ def _fresh_confirmation_worker(
         existing_result=None,
     )
     return _verify_fresh_confirmation_result(result)
+
+
+def _frozen_breadth_continuation_worker(
+    contract_path: str,
+    acquisition_receipt_path: str,
+    feature_receipt_path: str,
+    expected_contract_hash: str,
+) -> dict[str, Any]:
+    """Replay the immutable singleton breadth policy without side effects."""
+
+    contract = _read_json_object(Path(contract_path))
+    acquisition = _read_json_object(Path(acquisition_receipt_path))
+    feature_receipt = _read_json_object(Path(feature_receipt_path))
+    if expected_contract_hash and str(contract.get("contract_hash") or "") != str(
+        expected_contract_hash
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "frozen-breadth worker contract hash drift"
+        )
+    result = evaluate_breadth_continuation(
+        contract,
+        matrices=open_breadth_matrices(feature_receipt),
+        acquisition_receipt=acquisition,
+        existing_result=None,
+    )
+    return _verify_frozen_breadth_continuation_result(result)
+
+
+def _verify_event_time_matched_controls_result(
+    value: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Enforce the no-promotion, no-side-effect matched-control contract."""
+
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    counts = dict(row.get("counts") or {})
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != EVENT_TIME_MATCHED_CONTROLS_SCHEMA
+        or row.get("status") != EVENT_TIME_MATCHED_CONTROLS_STATUS
+        or row.get("evidence_tier") != "E"
+        or row.get("promotion_status") is not None
+        or row.get("control_verdict")
+        not in {
+            "EVENT_TIME_CONTROL_DISTINCT_DEVELOPMENT_ONLY",
+            "EVENT_TIME_MATCHED_CONTROLS_NOT_DISTINCT",
+        }
+        or int(counts.get("arm_count", -1)) != 4
+        or int(counts.get("control_count", -1)) != 3
+        or int(counts.get("authoritative_promotion_count", -1)) != 0
+        or int(counts.get("data_purchase_count", -1)) != 0
+        or int(counts.get("q4_access_count_delta", -1)) != 0
+        or int(counts.get("broker_connections", -1)) != 0
+        or int(counts.get("orders", -1)) != 0
+        or int(counts.get("registry_writes", -1)) != 0
+        or int(counts.get("database_writes", -1)) != 0
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "event-time matched-control result identity or safety drift"
+        )
+    controls = tuple(dict(row.get("control_contract") or {}).get("control_ids") or ())
+    if controls != (
+        "DIRECTION_FLIP",
+        "SESSION_EXPOSURE_MATCHED_DIRECTION_PERMUTATION",
+        "SESSION_MATCHED_TIMING_GRID",
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "event-time matched-control inventory drift"
+        )
+    return {**row, "result_hash": claimed}
+
+
+def _event_time_control_counts(value: Mapping[str, Any]) -> dict[str, int]:
+    counts = dict(value.get("counts") or {})
+    normal = 0
+    stressed = 0
+    for arm in dict(value.get("arms") or {}).values():
+        for horizons in dict(dict(arm).get("evaluation") or {}).values():
+            for scenarios in dict(horizons).values():
+                normal += int(
+                    dict(scenarios)
+                    .get("BASE", {})
+                    .get("episode_count", 0)
+                )
+                stressed += int(
+                    dict(scenarios)
+                    .get("STRESS_1_5X", {})
+                    .get("episode_count", 0)
+                )
+    exact = int(counts.get("exact_episode_count", 0))
+    if exact != normal + stressed:
+        raise AutonomousDirectorRuntimeError(
+            "event-time matched-control episode denominator does not reconcile"
+        )
+    return {
+        "control_count": int(counts.get("control_count", 0)),
+        "exact_episode_count": exact,
+        "normal_episode_count": normal,
+        "stressed_episode_count": stressed,
+    }
+
+
+def _verify_frozen_breadth_continuation_result(
+    value: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Reject result inflation, retuning, Q4 access, or a Tier-C claim."""
+
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    statuses = {
+        "BREADTH_CONTINUATION_TIER_G_GRADUATED",
+        "BREADTH_CONTINUATION_FALSIFIED_TOMBSTONE_EXACT_SPEC",
+    }
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != FROZEN_BREADTH_CONTINUATION_SCHEMA
+        or str(row.get("status")) not in statuses
+        or row.get("retuning_performed") is not False
+        or row.get("calibration_reused_without_recalibration") is not True
+        or row.get("tier_c_promoted") is not False
+        or row.get("evidence_ceiling") != "TIER_G_DEVELOPMENT"
+        or int(row.get("q4_access_count_delta", -1)) != 0
+        or int(row.get("broker_connections", -1)) != 0
+        or int(row.get("orders", -1)) != 0
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "frozen-breadth result identity or evidence ceiling drift"
+        )
+    account_results = [dict(item) for item in row.get("account_results") or ()]
+    labels = [str(item.get("account_label") or "") for item in account_results]
+    if sorted(labels) != ["100K", "150K", "50K"] or len(set(labels)) != 3:
+        raise AutonomousDirectorRuntimeError(
+            "frozen-breadth account-size denominator drift"
+        )
+    actual = sorted(
+        str(item["account_label"])
+        for item in account_results
+        if bool(item.get("tier_g_graduated"))
+    )
+    declared = [str(item) for item in row.get("tier_g_account_labels") or ()]
+    if declared != sorted(set(declared)) or declared != actual:
+        raise AutonomousDirectorRuntimeError(
+            "frozen-breadth Tier-G labels differ from exact gates"
+        )
+    if bool(declared) != (row.get("promotion_status") == "TIER_G"):
+        raise AutonomousDirectorRuntimeError(
+            "frozen-breadth promotion label drift"
+        )
+    if not declared and not isinstance(row.get("tombstone"), Mapping):
+        raise AutonomousDirectorRuntimeError(
+            "failed frozen-breadth branch lacks its exact tombstone"
+        )
+    return {**row, "result_hash": claimed}
+
+
+def _frozen_breadth_counts(value: Mapping[str, Any]) -> dict[str, int]:
+    normal = 0
+    stressed = 0
+    exact = 0
+    for account in value.get("account_results") or ():
+        for cell in dict(account).get("cells") or ():
+            row = dict(cell)
+            normal += int(dict(row.get("normal") or {}).get("episode_count", 0))
+            stressed += int(dict(row.get("stressed") or {}).get("episode_count", 0))
+            exact += int(row.get("exact_account_replays", 0))
+    if exact != normal + stressed:
+        raise AutonomousDirectorRuntimeError(
+            "frozen-breadth exact replay count does not reconcile"
+        )
+    return {
+        "normal_episode_count": normal,
+        "stressed_episode_count": stressed,
+        "exact_account_replay_count": exact,
+    }
 
 
 def _verify_fresh_confirmation_result(
@@ -4650,6 +5241,12 @@ def _relay_evidence_counts(
     fresh_verified = (
         _verify_fresh_confirmation_result(fresh) if fresh else {}
     )
+    continuation = branch_results.get("FROZEN_BREADTH_CONTINUATION") or {}
+    continuation_verified = (
+        _verify_frozen_breadth_continuation_result(continuation)
+        if continuation
+        else {}
+    )
     tier_c_ids = tuple(fresh_verified.get("tier_c_candidate_ids") or ())
     handoff_transitions = int(handoff_counts.get("ready_xfa_transition_count", 0))
     diagnostic_transitions = int(
@@ -4673,7 +5270,8 @@ def _relay_evidence_counts(
     return {
         "tier_g_count": int(
             graduation_counts.get("graduated_development_book_count", 0)
-        ),
+        )
+        + len(continuation_verified.get("tier_g_account_labels") or ()),
         "combine_to_xfa_transition_count": (
             diagnostic_transitions or handoff_transitions
         ),
@@ -4744,6 +5342,31 @@ def _state_payload(
         (branch_results.get("EVENT_TIME_SAFETY") or {}).get("counts") or {}
     )
     relay_counts = _relay_evidence_counts(branch_results)
+    event_control = branch_results.get("EVENT_TIME_MATCHED_CONTROLS") or {}
+    event_control_counts = (
+        _event_time_control_counts(
+            _verify_event_time_matched_controls_result(event_control)
+        )
+        if event_control
+        else {
+            "control_count": 0,
+            "exact_episode_count": 0,
+            "normal_episode_count": 0,
+            "stressed_episode_count": 0,
+        }
+    )
+    breadth_continuation = branch_results.get("FROZEN_BREADTH_CONTINUATION") or {}
+    breadth_continuation_counts = (
+        _frozen_breadth_counts(
+            _verify_frozen_breadth_continuation_result(breadth_continuation)
+        )
+        if breadth_continuation
+        else {
+            "normal_episode_count": 0,
+            "stressed_episode_count": 0,
+            "exact_account_replay_count": 0,
+        }
+    )
     selected = max(
         int(exploration.get("selected_policy_count", 0)),
         int(exact_metrics["exact_account_replays"]),
@@ -4769,16 +5392,32 @@ def _state_payload(
         ),
         "policies_proposed": max(proposed, selected),
         "unique_policies_screened": selected,
-        "exact_account_replays": exact_metrics["exact_account_replays"],
+        "exact_account_replays": (
+            exact_metrics["exact_account_replays"]
+            + breadth_continuation_counts["exact_account_replay_count"]
+            + (1 + event_control_counts["control_count"] if event_control else 0)
+        ),
         "control_policy_replay_operations": int(
             exact_metrics.get("control_policy_replay_operations", 0)
-        ),
+        )
+        + event_control_counts["control_count"],
         "combine_episodes_completed": (
             exact_metrics["normal_account_replays"]
             + exact_metrics["stressed_account_replays"]
+            + event_control_counts["exact_episode_count"]
+            + breadth_continuation_counts["normal_episode_count"]
+            + breadth_continuation_counts["stressed_episode_count"]
         ),
-        "normal_episodes_completed": exact_metrics["normal_account_replays"],
-        "stressed_episodes_completed": exact_metrics["stressed_account_replays"],
+        "normal_episodes_completed": (
+            exact_metrics["normal_account_replays"]
+            + event_control_counts["normal_episode_count"]
+            + breadth_continuation_counts["normal_episode_count"]
+        ),
+        "stressed_episodes_completed": (
+            exact_metrics["stressed_account_replays"]
+            + event_control_counts["stressed_episode_count"]
+            + breadth_continuation_counts["stressed_episode_count"]
+        ),
         "feasibility_screens_completed": selected,
         "source_episode_rows_reused": int(exploration.get("episode_rows_read", 0)),
         "completed_branch_count": len(branch_results),
@@ -4798,8 +5437,8 @@ def _state_payload(
         "orders": 0,
         "q4_access_count_delta": 0,
         "q4_access_delta": 0,
-        "data_purchase_count": 0,
-        "new_data_purchase_count": 0,
+        "data_purchase_count": 1 if breadth_continuation else 0,
+        "new_data_purchase_count": 1 if breadth_continuation else 0,
         "proof_windows_consumed": 0,
         "combine_pass_observed_bank_count": int(
             pass_counts.get("bank_policy_count", 0)
@@ -4860,6 +5499,28 @@ def _state_payload(
             "breadth_qualifying_cell_count"
         ],
         "cross_index_breadth_status": relay_counts["breadth_status"],
+        "event_time_matched_control_count": event_control_counts["control_count"],
+        "event_time_matched_control_exact_episode_count": event_control_counts[
+            "exact_episode_count"
+        ],
+        "event_time_matched_controls_status": str(
+            event_control.get("control_verdict") or "NOT_RUN"
+        ),
+        "frozen_breadth_exact_account_replay_count": breadth_continuation_counts[
+            "exact_account_replay_count"
+        ],
+        "frozen_breadth_normal_episode_count": breadth_continuation_counts[
+            "normal_episode_count"
+        ],
+        "frozen_breadth_stressed_episode_count": breadth_continuation_counts[
+            "stressed_episode_count"
+        ],
+        "frozen_breadth_tier_g_count": len(
+            breadth_continuation.get("tier_g_account_labels") or ()
+        ),
+        "frozen_breadth_status": str(
+            breadth_continuation.get("status") or "NOT_RUN"
+        ),
     }
     return _rehash(payload, "state_hash")
 
@@ -5021,6 +5682,21 @@ def _kpis(
             "breadth_qualifying_cell_count"
         ],
         "cross_index_breadth_status": relay_counts["breadth_status"],
+        "event_time_matched_control_count": int(
+            state.get("event_time_matched_control_count", 0)
+        ),
+        "event_time_matched_control_exact_episode_count": int(
+            state.get("event_time_matched_control_exact_episode_count", 0)
+        ),
+        "event_time_matched_controls_status": str(
+            state.get("event_time_matched_controls_status", "NOT_RUN")
+        ),
+        "frozen_breadth_exact_account_replay_count": int(
+            state.get("frozen_breadth_exact_account_replay_count", 0)
+        ),
+        "frozen_breadth_status": str(
+            state.get("frozen_breadth_status", "NOT_RUN")
+        ),
         "best_normal_pass_rate": exact_metrics["best_normal_pass_rate"],
         "best_stressed_pass_rate": exact_metrics["best_stressed_pass_rate"],
         "best_normal_summary_threshold_rate": max(
@@ -5062,7 +5738,7 @@ def _kpis(
         "broker_connections": 0,
         "orders": 0,
         "q4_access_count_delta": 0,
-        "data_purchase_count": 0,
+        "data_purchase_count": int(state.get("data_purchase_count", 0)),
     }
     return _rehash(payload, "kpi_hash")
 
@@ -5102,13 +5778,15 @@ def _write_mission_views(
                 "TIER_G_XFA_DIAGNOSTIC",
                 "CROSS_INDEX_BREADTH",
                 "FRESH_CONFIRMATION",
+                "EVENT_TIME_MATCHED_CONTROLS",
+                "FROZEN_BREADTH_CONTINUATION",
             )
             if key in branch_results
         },
         "q4_access_count_delta": 0,
         "broker_connections": 0,
         "orders": 0,
-        "data_purchase_count": 0,
+        "data_purchase_count": int(state.get("data_purchase_count", 0)),
     }
     writer.write_json(
         "AUTONOMOUS_BRANCH_STATE.json", _rehash(branch_state, "state_hash")
@@ -5293,6 +5971,13 @@ def _write_mission_views(
             "fresh_confirmation_status": relay_counts[
                 "fresh_confirmation_status"
             ],
+            "event_time_matched_controls_status": str(
+                state.get("event_time_matched_controls_status", "NOT_RUN")
+            ),
+            "frozen_breadth_status": str(
+                state.get("frozen_breadth_status", "NOT_RUN")
+            ),
+            "data_purchase_count": int(state.get("data_purchase_count", 0)),
             "tier_c_candidate_ids": relay_counts["tier_c_candidate_ids"],
         }
     )
@@ -5442,6 +6127,61 @@ def _fresh_confirmation_manifest_paths(
             ) from exc
         paths[key] = resolved
     return paths, tuple(sorted(missing))
+
+
+def _frozen_breadth_manifest_paths(
+    root: Path, manifest: Mapping[str, Any]
+) -> tuple[dict[str, Path], tuple[str, ...]]:
+    """Resolve the single post-confirmation breadth branch declarations."""
+
+    section = dict(manifest.get("post_confirmation_branch_portfolio") or {})
+    required = (
+        "breadth_contract_path",
+        "breadth_acquisition_receipt_path",
+        "breadth_feature_receipt_path",
+        "breadth_result_path",
+    )
+    output_keys = {
+        "breadth_contract_path": "contract_path",
+        "breadth_acquisition_receipt_path": "acquisition_receipt_path",
+        "breadth_feature_receipt_path": "feature_receipt_path",
+        "breadth_result_path": "result_path",
+    }
+    paths: dict[str, Path] = {}
+    missing: list[str] = []
+    project = root.resolve()
+    for manifest_key in required:
+        raw = str(section.get(manifest_key) or "").strip()
+        output_key = output_keys[manifest_key]
+        if not raw:
+            missing.append(output_key)
+            continue
+        candidate = Path(raw)
+        resolved = (
+            candidate.resolve()
+            if candidate.is_absolute()
+            else (project / candidate).resolve()
+        )
+        try:
+            resolved.relative_to(project)
+        except ValueError as exc:
+            raise AutonomousDirectorRuntimeError(
+                f"frozen-breadth path escapes repository: {manifest_key}"
+            ) from exc
+        paths[output_key] = resolved
+    return paths, tuple(sorted(missing))
+
+
+def _relative_branch_artifact_path(
+    output: Path, artifact: Path, label: str
+) -> Path:
+    branch_root = (output / "branch_results").resolve()
+    try:
+        return artifact.resolve().relative_to(branch_root)
+    except ValueError as exc:
+        raise AutonomousDirectorRuntimeError(
+            f"{label} must remain under branch_results"
+        ) from exc
 
 
 def _read_json_object(path: Path) -> dict[str, Any]:
