@@ -1,0 +1,234 @@
+{
+  "schema": "hydra_autonomous_branch_decision_card_v1",
+  "decision_id": "CL_FRONT_SECOND_TERM_STRUCTURE_TRIPWIRE_20260719_V1",
+  "selected_branch": "CL_FRONT_SECOND_TERM_STRUCTURE_INNOVATION_TO_MCL_OUTRIGHT_V1",
+  "evidence_role": "PREREGISTERED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
+  "hypothesis": "A causal innovation in the CL front-versus-second delivery basis, after removing the contemporaneous common outright move and known roll-distance state, reveals inventory scarcity or congestion that predicts an executable 30-to-120-minute displacement in the front contract. The source selects only a frozen MCL outright direction and never creates a two-leg accounting shortcut.",
+  "strongest_argument_against": "The front and second contracts may incorporate inventory information synchronously; apparent basis predictability may be a roll-stitch artifact, a scheduled EIA-release proxy, or too small after MCL costs to improve a Topstep account path.",
+  "why_materially_distinct": {
+    "treasury_curve_relative_value": "The terminal Treasury tripwire traded adjacent maturity-price spreads directly. This branch uses a within-commodity delivery-basis innovation only as information for a separately executable MCL front-month trade.",
+    "cross_asset_direction_transfer": "No external market direction is transferred. Both the information source and execution instrument represent the same crude-oil complex.",
+    "scheduled_energy_inventory": "Release identity, weekday, EIA timestamps, future inventory outcomes and post-release labels are forbidden decision features.",
+    "event_time_participation": "No mini-versus-micro participation divergence, event-count selector or event-time bar grammar is used.",
+    "cemetery_resurrection_allowed": false
+  },
+  "smallest_decisive_falsification_experiment": {
+    "maximum_rule_count": 8,
+    "mechanisms": [
+      "BASIS_RESIDUAL_CONTINUATION",
+      "BASIS_RESIDUAL_REVERSION"
+    ],
+    "source_lookbacks_minutes": [
+      15,
+      60
+    ],
+    "maximum_holding_minutes": [
+      30,
+      120
+    ],
+    "maximum_cpu_workers": 1,
+    "expected_runtime_minutes": [
+      25,
+      45
+    ],
+    "promotion_allowed": false
+  },
+  "frozen_inputs": {
+    "existing_front_and_execution": {
+      "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_2023-01-01_2024-10-01.parquet",
+      "sha256": "07b3093ed8ef5888898abc3e531e0b522273a6c2047489b60eb36b33afeaf374",
+      "required_symbols": [
+        "CL",
+        "MCL"
+      ]
+    },
+    "existing_front_roll_map": {
+      "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+      "sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda"
+    },
+    "required_second_delivery_request": {
+      "schema": "hydra_cl_front_second_term_structure_cost_request_v1",
+      "dataset": "GLBX.MDP3",
+      "symbols": [
+        "CL.c.1"
+      ],
+      "stype_in": "continuous",
+      "start_inclusive": "2023-01-03",
+      "end_exclusive": "2024-10-01",
+      "schemas": [
+        "ohlcv-1m",
+        "definition"
+      ],
+      "purchase": false,
+      "q4_access": false,
+      "request_hash": "ecf431248ddd87b2495c952b14a703e6f00005630f47ae402c364e7dff2fc260"
+    },
+    "official_cost_freeze": {
+      "ohlcv_1m": {
+        "record_count": 556341,
+        "billable_size_bytes": 31155096,
+        "estimated_cost_usd": 2.031081095338
+      },
+      "definition": {
+        "record_count": 548,
+        "billable_size_bytes": 197280,
+        "estimated_cost_usd": 0.00031234324
+      },
+      "total_record_count": 556889,
+      "total_billable_size_bytes": 31352376,
+      "total_estimated_cost_usd": 2.031393438578,
+      "source": "DATABENTO_HISTORICAL_METADATA_GET_COST_COUNT_SIZE"
+    },
+    "rule_snapshot": {
+      "path": "config/rulesets/topstep_official_2026-07-19.json",
+      "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+    }
+  },
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "start": "2023-01-03",
+      "end": "2024-01-22",
+      "fraction": 0.6,
+      "candidate_modification_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "start": "2024-01-22",
+      "end": "2024-05-28",
+      "fraction": 0.2,
+      "candidate_modification_allowed": false
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "start": "2024-05-28",
+      "end": "2024-10-01",
+      "fraction": 0.2,
+      "candidate_modification_allowed": false
+    }
+  ],
+  "causal_contract": {
+    "source_markets": [
+      "CL.c.0",
+      "CL.c.1"
+    ],
+    "execution_market": "MCL.c.0",
+    "decision_features": [
+      "log_front_second_basis",
+      "basis_change",
+      "front_return_minus_rolling_beta_times_second_return",
+      "same_local_minute_prior_session_robust_score",
+      "known_days_to_delivery",
+      "current_spread_and_volatility_state"
+    ],
+    "available_at_not_after_decision_required": true,
+    "entry": "NEXT_TRADABLE_MCL_BAR_OPEN_AFTER_COMPLETED_DECISION_BAR",
+    "exit": "NEXT_TRADABLE_MCL_BAR_OPEN_AFTER_CAUSAL_STOP_TARGET_OR_TIME_EXIT_DECISION",
+    "roll_guard": "EXCLUDE_ONE_TRUE_SESSION_BEFORE_AND_AFTER_EITHER_CL_RANK_ROLL",
+    "roll_fill_or_backfill": "FORBIDDEN",
+    "missing_interval": "DATA_CENSORED",
+    "scheduled_release_identity_allowed": false,
+    "future_outcomes_in_decision": false,
+    "two_leg_pnl_used": false,
+    "same_session_flatten_required": true,
+    "normal_all_in_cost_per_mcl_usd": 4.0,
+    "stressed_all_in_cost_per_mcl_usd": 6.0
+  },
+  "controls": [
+    {
+      "id": "FRONT_ONLY_RETURN_SHOCK",
+      "matching": "same target market, session, duty cycle, exposure and holding horizon"
+    },
+    {
+      "id": "BASIS_SIGN_FLIP",
+      "matching": "same source events and execution costs with frozen direction inversion"
+    },
+    {
+      "id": "SESSION_MATCHED_TIMING_NULL",
+      "matching": "same opportunity count, session minute, exposure and cost"
+    },
+    {
+      "id": "CARRY_LEVEL_ONLY",
+      "matching": "same account cells, using basis level without innovation"
+    }
+  ],
+  "account_frontier": {
+    "account_sizes": [
+      "50K",
+      "100K",
+      "150K"
+    ],
+    "horizons_trading_days": [
+      5,
+      10,
+      20
+    ],
+    "risk_fraction_of_current_mll_buffer": [
+      0.1,
+      0.2,
+      0.3
+    ],
+    "maximum_concurrent_positions": 1,
+    "exact_contract_limits_required": true,
+    "exact_mll_and_consistency_required": true
+  },
+  "power_preflight": {
+    "minimum_independent_events": {
+      "DISCOVERY": 80,
+      "VALIDATION": 20,
+      "FINAL_DEVELOPMENT": 20
+    },
+    "when_underpowered": "TERM_STRUCTURE_TRIPWIRE_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+  },
+  "frozen_gate": {
+    "positive_stressed_validation_net_required": true,
+    "positive_stressed_final_development_net_required": true,
+    "minimum_combined_final_normal_passes": 2,
+    "minimum_combined_final_stressed_passes": 1,
+    "qualifying_pass_horizons_trading_days": [
+      10,
+      20
+    ],
+    "minimum_positive_temporal_contexts": 2,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "passing_consistency_required": true,
+    "minimum_final_stressed_target_progress_p25": 0.0,
+    "minimum_median_target_progress_uplift_over_each_control": 0.1,
+    "one_extra_stressed_pass_can_replace_progress_uplift": true,
+    "maximum_single_trade_profit_concentration": 0.5,
+    "evidence_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC"
+  },
+  "acquisition_governance": {
+    "mode": "ONE_SHOT_IDEMPOTENT_EXPLICIT_EXECUTE_ONLY",
+    "default_command_is_dry_run": true,
+    "cumulative_hard_cap_usd": 200.720719923081,
+    "cumulative_actual_before_usd": 119.78115172013997,
+    "remaining_before_usd": 80.93956820294102,
+    "budget_ledger": "reports/data_budget/databento_spend_ledger.jsonl",
+    "data_access_ledger": "reports/data_access/data_access_ledger.jsonl",
+    "spend_record_per_schema": true,
+    "role_records": [
+      "DISCOVERY_AS_DEVELOPMENT_MUTABLE",
+      "VALIDATION_AS_BLIND_VALIDATION_IMMUTABLE",
+      "FINAL_DEVELOPMENT_AS_BLIND_VALIDATION_IMMUTABLE"
+    ]
+  },
+  "governance": {
+    "tier_ceiling": "E",
+    "tier_q_allowed": false,
+    "promotion_allowed": false,
+    "independent_confirmation_claimed": false,
+    "q4_access_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "runtime_service_or_database_change_allowed": false,
+    "authoritative_writer_change_allowed": false
+  },
+  "branch_rule": {
+    "when_green": "FREEZE_TIER_E_DIAGNOSTIC_AND_REQUIRE_A_SEPARATELY_FROZEN_UNSEEN_CONFIRMATION",
+    "when_weak": "PRESERVE_DIAGNOSTIC_ONLY_AND_DO_NOT_TUNE_NEIGHBORING_THRESHOLDS",
+    "when_falsified": "TOMBSTONE_EXACT_CL_FRONT_SECOND_INNOVATION_LATTICE_AND_REALLOCATE_TO_A_DISTINCT_INFORMATION_SOURCE",
+    "when_acquisition_drift": "FAIL_CLOSED_WITHOUT_DOWNLOAD"
+  },
+  "card_hash": "92557d96f4984570e1a2a06ebb1f33ad9e142ee1328a4ba755c0a699474c979e"
+}
