@@ -1,0 +1,266 @@
+{
+  "schema": "hydra_autonomous_branch_decision_card_v1",
+  "decision_id": "TREASURY_THREE_TENOR_CURVATURE_TO_BELLY_TRIPWIRE_20260719_V1",
+  "selected_branch": "TREASURY_THREE_TENOR_CURVATURE_TO_BELLY_OUTRIGHT_TRIPWIRE_V1",
+  "evidence_role": "PREREGISTERED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
+  "hypothesis": "A decision-time three-tenor Treasury curvature innovation, defined as the belly return unexplained by the short and long wings using prior-only coefficients, identifies temporary belly richness or cheapness that can support a causal outright ZF or ZN account path.",
+  "strongest_argument_against": "The Treasury curve may be too efficient at one-minute resolution, the previous adjacent-spread and rates-transfer branches failed, and outright belly execution reintroduces level duration and contract granularity that can consume the MLL.",
+  "why_materially_distinct": {
+    "terminal_adjacent_curve_branch": "The terminal branch directly traded two-leg adjacent maturity spreads. This branch observes a three-tenor residual orthogonal to prior level and slope estimates and executes one outright belly contract.",
+    "terminal_rates_transfer_branch": "No Treasury state is transferred to equities or metals; the information and execution instruments belong to the same curve triangle.",
+    "cl_term_structure_branch": "No commodity delivery-basis state or MCL execution is used.",
+    "cemetery_resurrection_allowed": false
+  },
+  "smallest_decisive_falsification_experiment": {
+    "maximum_rule_count": 8,
+    "triangles": [
+      {
+        "triangle_id": "ZT_ZF_ZN",
+        "short_root": "ZT",
+        "belly_root": "ZF",
+        "long_root": "ZN",
+        "execution_root": "ZF"
+      },
+      {
+        "triangle_id": "ZF_ZN_ZB",
+        "short_root": "ZF",
+        "belly_root": "ZN",
+        "long_root": "ZB",
+        "execution_root": "ZN"
+      }
+    ],
+    "mechanisms": [
+      "CURVATURE_RESIDUAL_REVERSION",
+      "CURVATURE_RESIDUAL_CONTINUATION"
+    ],
+    "lookback_holding_pairs_minutes": [
+      {
+        "source_return": 15,
+        "maximum_holding": 30
+      },
+      {
+        "source_return": 60,
+        "maximum_holding": 120
+      }
+    ],
+    "trigger_z": 2.0,
+    "target_r_multiple": 2.0,
+    "stop_r_multiple": 1.0,
+    "maximum_cpu_workers": 1,
+    "expected_runtime_minutes": [
+      25,
+      40
+    ],
+    "promotion_allowed": false
+  },
+  "frozen_inputs": {
+    "input_contract": {
+      "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/input_contract.json",
+      "sha256": "9e71aa2bf342dc9ddb0eee8a4d2c5214c4dba658d9001c304db4c7c1c61bb064",
+      "size_bytes": 2403,
+      "contract_hash": "b399c7f2a169c98b1cfd9c0aa954ecde9baa68b75f9c88ce32780f9f768681bb"
+    },
+    "roll_receipt": {
+      "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/roll_receipt.json",
+      "sha256": "2a05b442d0dbe2e51d61a79e5ef44d0a01864b109f1bb813094f339498efa9ca",
+      "size_bytes": 28362,
+      "policy": "EXPLICIT_CONTRACT_DELIVERY_SYNC_NO_FORWARD_FILL"
+    },
+    "root_files": {
+      "ZT": {
+        "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zt_explicit_contract_ohlcv.parquet",
+        "sha256": "28b99c104fdfe745fae3312e35a11fc7cd2e45cdd166393331ac94c7b5d8c761",
+        "size_bytes": 4730276,
+        "record_count": 353708
+      },
+      "ZF": {
+        "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zf_explicit_contract_ohlcv.parquet",
+        "sha256": "0c22d67bca3d5ac8d354a82e1007c84c9e9fd331192c60464738bd056caec050",
+        "size_bytes": 5358849,
+        "record_count": 384302
+      },
+      "ZN": {
+        "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zn_explicit_contract_ohlcv.parquet",
+        "sha256": "8347100a5ad0fbd7b5281278764300028ac94dd60823dbbc39fd4056b4926d45",
+        "size_bytes": 6124072,
+        "record_count": 465449
+      },
+      "ZB": {
+        "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zb_explicit_contract_ohlcv.parquet",
+        "sha256": "92e4763c678d6b45607824983f6a5cd7cca3d05c8afba40db324d6eb87d77d6e",
+        "size_bytes": 5549241,
+        "record_count": 425155
+      }
+    },
+    "rule_snapshot": {
+      "path": "config/rulesets/topstep_official_2026-07-19.json",
+      "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+      "size_bytes": 6849,
+      "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f"
+    }
+  },
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "start": "2023-01-03",
+      "end": "2024-01-22",
+      "candidate_modification_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "start": "2024-01-22",
+      "end": "2024-05-28",
+      "candidate_modification_allowed": false
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "start": "2024-05-28",
+      "end": "2024-10-01",
+      "candidate_modification_allowed": false
+    }
+  ],
+  "causal_contract": {
+    "source_available_at": "COMPLETED_BAR_TIMESTAMP_PLUS_ONE_MINUTE",
+    "prior_beta_estimator": "ROLLING_TWO_FACTOR_OLS_ON_PRIOR_COMPLETED_ONE_MINUTE_RETURNS",
+    "prior_beta_window_bars": 7800,
+    "prior_beta_minimum_bars": 1950,
+    "normalization_window_bars": 7800,
+    "normalization_minimum_bars": 1950,
+    "three_leg_delivery_alignment": "EXACT_SAME_DELIVERY_MONTH_AT_DECISION_AND_THROUGH_EXECUTION_PATH",
+    "decision_features": [
+      "short_return",
+      "belly_return",
+      "long_return",
+      "prior_beta_short",
+      "prior_beta_long",
+      "curvature_residual",
+      "prior_only_curvature_z",
+      "prior_belly_volatility",
+      "local_minute",
+      "contract_and_roll_state"
+    ],
+    "available_at_not_after_decision_required": true,
+    "entry": "NEXT_TRADABLE_BELLY_BAR_OPEN_AFTER_COMPLETED_DECISION_BAR",
+    "exit": "NEXT_TRADABLE_BELLY_BAR_OPEN_AFTER_CAUSAL_STOP_OR_TARGET_TRIGGER_OR_AT_FROZEN_TIME_EXIT",
+    "price_rounding": "ALL_FILL_STOP_AND_TARGET_PRICES_ON_EXECUTION_ROOT_TICK_GRID",
+    "same_bar_stop_target_ambiguity": "STOP_FIRST",
+    "normal_slippage_ticks_per_side": 1,
+    "stressed_slippage_ticks_per_side": 1,
+    "stressed_all_in_cost_multiplier": 1.5,
+    "stressed_cost_policy": "IDENTICAL_TICK_EXECUTABLE_FILL_PRICES_PLUS_EXPLICIT_FEE_SURCHARGE_TO_EXACTLY_1_5X_NORMAL_ALL_IN_COST",
+    "roll_guard": "EXCLUDE_TRUE_SESSION_BEFORE_OF_AND_AFTER_ANY_TRIANGLE_LEG_ROLL",
+    "roll_fill_or_backfill": "FORBIDDEN",
+    "missing_interval": "DATA_CENSORED_PRESERVE_DECISION",
+    "future_outcomes_in_decision": false,
+    "two_leg_or_synthetic_pnl_used": false,
+    "same_session_flatten_local": "15:10"
+  },
+  "controls": [
+    {
+      "id": "BELLY_LEVEL_ONLY",
+      "policy": "Use the contemporaneous completed-bar belly-return sign at each primary opportunity; no event resampling.",
+      "matching": "same primary opportunity IDs, account starts, quantity, entry clock, frozen holding duration and scenario costs"
+    },
+    {
+      "id": "NEAREST_ADJACENT_SLOPE",
+      "policy": "Use the completed-bar nearest-wing-minus-belly return sign at each primary opportunity; no adjacent-spread PnL.",
+      "matching": "same primary opportunity IDs, account starts, quantity, entry clock, frozen holding duration and scenario costs"
+    },
+    {
+      "id": "DIRECTION_FLIP",
+      "policy": "Invert the primary outright direction at the same opportunity.",
+      "matching": "same primary opportunity IDs, account starts, quantity, entry clock, frozen holding duration and scenario costs"
+    },
+    {
+      "id": "TIMING_DELAY_5_BARS",
+      "policy": "Delay the primary direction by exactly five tradable one-minute bars after the primary entry bar.",
+      "matching": "same primary opportunity IDs, account starts, quantity, exposure duration, session role and scenario costs; common-complete paths only for paired deltas"
+    }
+  ],
+  "account_frontier": {
+    "account_sizes": [
+      "50K",
+      "100K",
+      "150K"
+    ],
+    "diagnostic_horizons_trading_days": [
+      5,
+      10
+    ],
+    "headline_gate_horizon_trading_days": 20,
+    "risk_fraction_of_current_mll_buffer": [
+      0.1,
+      0.2
+    ],
+    "maximum_concurrent_positions": 1,
+    "sizing_freeze": {
+      "role": "DISCOVERY",
+      "policy": "MAXIMUM_CAUSAL_DECLARED_STOP_RISK_OBSERVED_IN_DISCOVERY_ONLY",
+      "validation_or_final_development_inputs_allowed": false,
+      "same_frozen_integer_quantity_for_primary_and_all_controls": true
+    },
+    "coverage_contract": {
+      "required_local_window_start": "06:19",
+      "required_local_window_end_inclusive": "15:10",
+      "required_minute_grid": "EXACT_ONE_MINUTE_NO_GAP",
+      "delivery_mismatch_or_roll_unsafe_session": "DATA_CENSORED",
+      "incomplete_headline_start_in_denominator": false
+    },
+    "exact_contract_limits_required": true,
+    "exact_mll_and_consistency_required": true,
+    "headline_passes_counted_once": true
+  },
+  "power_preflight": {
+    "minimum_independent_events": {
+      "DISCOVERY": 80,
+      "VALIDATION": 20,
+      "FINAL_DEVELOPMENT": 20
+    },
+    "when_underpowered": "TREASURY_CURVATURE_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+  },
+  "frozen_gate": {
+    "headline_horizon_trading_days": 20,
+    "positive_stressed_validation_net_required": true,
+    "positive_stressed_final_development_net_required": true,
+    "minimum_final_normal_passes": 2,
+    "minimum_final_stressed_passes": 1,
+    "minimum_positive_temporal_contexts": 2,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "passing_consistency_required": true,
+    "minimum_final_stressed_target_progress_p25": 0.0,
+    "must_beat_each_matched_control_in_stressed_net": true,
+    "must_beat_each_matched_control_in_median_target_progress": true,
+    "one_extra_stressed_pass_can_replace_progress_uplift": true,
+    "maximum_single_trade_profit_concentration": 0.5,
+    "maximum_single_day_profit_concentration": 0.5,
+    "candidate_power_preflight_required": true,
+    "concentration_population": "FULL_COVERAGE_FINAL_DEVELOPMENT_HEADLINE_EPISODES_ONLY",
+    "evidence_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC"
+  },
+  "economic_run_authorization": {
+    "default_mode": "AUDIT_ONLY_NO_OUTCOME_READ",
+    "required_cli_token": "ROOT_AUTHORIZED_TREASURY_CURVATURE_REPLAY_V1",
+    "root_fire_green_required": true
+  },
+  "governance": {
+    "tier_ceiling": "E",
+    "tier_q_allowed": false,
+    "promotion_allowed": false,
+    "independent_confirmation_claimed": false,
+    "q4_access_allowed": false,
+    "data_purchase_allowed": false,
+    "network_access_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "runtime_service_or_database_change_allowed": false,
+    "registry_or_cemetery_write_allowed": false,
+    "authoritative_writer_change_allowed": false
+  },
+  "branch_rule": {
+    "when_green": "FREEZE_TIER_E_DIAGNOSTIC_AND_REQUIRE_SEPARATELY_FROZEN_UNSEEN_CONFIRMATION",
+    "when_weak": "PRESERVE_DIAGNOSTIC_ONLY_WITHOUT_NEIGHBOR_THRESHOLD_TUNING",
+    "when_underpowered": "TREASURY_CURVATURE_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
+    "when_falsified": "TOMBSTONE_EXACT_THREE_TENOR_CURVATURE_TO_BELLY_LATTICE_AND_REALLOCATE_TO_DISTINCT_INFORMATION_SOURCE"
+  },
+  "card_hash": "434378384233b8a2fca75416e824eaf8eeda1180e7a20f68ed21682884818bf8"
+}
