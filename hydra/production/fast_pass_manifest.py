@@ -227,6 +227,12 @@ def _implementation_hash_matches(
     # blanket escape hatch for replay, feature, PnL, MLL, or evidence code.
     if relative not in {
         "hydra/production/fast_pass_manifest.py",
+        # The terminal 0029 helper later gained additive, derived
+        # concentration and passing-consistency fields.  Its frozen source
+        # blob remains the only implementation authorised for replaying 0029;
+        # accepting that committed ancestor preserves the terminal manifest
+        # without treating the newer derived schema as old economic evidence.
+        "hydra/production/fast_pass_runtime_helpers.py",
         "hydra/production/manifest.py",
         "hydra/production/runtime.py",
     }:

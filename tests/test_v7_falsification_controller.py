@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from hydra.data.budget import DATABENTO_AUTHORIZED_CUMULATIVE_CAP_USD
 from hydra.mission.experiment_queue import experiment_counts
 from hydra.mission.mission_state import (
     connect_state_readonly,
@@ -530,7 +531,9 @@ def test_running_v7_controller_renews_watchdog_lease(
     )
     assert snapshot["broker_order_capability"] is False
     heartbeat = heartbeat_status(controller.paths).payload
-    assert heartbeat["remaining_databento_budget_usd"] == 125.0
+    assert heartbeat["remaining_databento_budget_usd"] == (
+        DATABENTO_AUTHORIZED_CUMULATIVE_CAP_USD
+    )
     assert heartbeat["q4_access_count"] == 0
 
 

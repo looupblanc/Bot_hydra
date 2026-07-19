@@ -5,7 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from hydra.data.budget import DatabentoBudgetConfig
+from hydra.data.budget import (
+    DATABENTO_AUTHORIZED_CUMULATIVE_CAP_USD,
+    DATABENTO_AUTOMATIC_SAFETY_CEILING_USD,
+    DatabentoBudgetConfig,
+)
 from hydra.data.v7_d1_year_control import (
     D1YearControlError,
     EXPECTED_BILLABLE_SIZE_BYTES,
@@ -20,8 +24,8 @@ from hydra.data.v7_d1_year_control import (
 def test_constitution_data_budget_is_the_default() -> None:
     budget = DatabentoBudgetConfig()
 
-    assert budget.hard_cap_usd == 125.0
-    assert budget.safety_ceiling_usd == 123.0
+    assert budget.hard_cap_usd == DATABENTO_AUTHORIZED_CUMULATIVE_CAP_USD
+    assert budget.safety_ceiling_usd == DATABENTO_AUTOMATIC_SAFETY_CEILING_USD
 
 
 def test_year_control_plan_is_frozen_development_only() -> None:

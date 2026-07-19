@@ -12,12 +12,20 @@ from hydra.utils.config import project_path
 
 AUTO_UNDER_HARD_CAP = "AUTO_UNDER_HARD_CAP"
 
+# The original mission authority was USD 100.720719923081 of actual spend.
+# On 2026-07-19 the user explicitly authorised a further USD 100.  Keep the
+# cumulative ceiling exact so every downloader and the persistent governance
+# kernel share one fail-closed interpretation of that incremental authority.
+DATABENTO_INCREMENTAL_AUTHORITY_2026_07_19_USD = 100.0
+DATABENTO_AUTHORIZED_CUMULATIVE_CAP_USD = 200.720719923081
+DATABENTO_AUTOMATIC_SAFETY_CEILING_USD = 200.720719923081
+
 
 @dataclass(frozen=True)
 class DatabentoBudgetConfig:
     budget_start: str = "2026-07-10"
-    hard_cap_usd: float = 125.0
-    safety_ceiling_usd: float = 123.0
+    hard_cap_usd: float = DATABENTO_AUTHORIZED_CUMULATIVE_CAP_USD
+    safety_ceiling_usd: float = DATABENTO_AUTOMATIC_SAFETY_CEILING_USD
     ledger_path: str = "reports/data_budget/databento_spend_ledger.jsonl"
     summary_path: str = "reports/data_budget/databento_budget_summary.md"
 

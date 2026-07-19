@@ -173,6 +173,8 @@ def test_acquisition_rejects_cost_and_reserve_before_download(tmp_path: Path) ->
     base = tmp_path / "base.json"
     base.write_text("{}\n", encoding="utf-8")
     budget = DatabentoBudgetConfig(
+        hard_cap_usd=125.0,
+        safety_ceiling_usd=125.0,
         ledger_path=str(tmp_path / "ledger.jsonl"),
         summary_path=str(tmp_path / "summary.md"),
     )
@@ -198,9 +200,9 @@ def test_acquisition_rejects_cost_and_reserve_before_download(tmp_path: Path) ->
             start="2023-01-01",
             end="2024-01-01",
             estimated_cost_usd=0.0,
-                actual_cost_usd=100.0,
+            actual_cost_usd=100.0,
             cumulative_estimated_spend_usd=0.0,
-                cumulative_actual_spend_usd=100.0,
+            cumulative_actual_spend_usd=100.0,
             cache_hit=False,
             research_purpose="prior",
             candidate_tier="DATA",

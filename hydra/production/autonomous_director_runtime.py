@@ -76,6 +76,27 @@ from hydra.production.autonomous_tier_g_graduation import (
     build_graduated_development_books,
     verify_tier_g_development_graduation,
 )
+from hydra.production.autonomous_tier_g_xfa_diagnostic import (
+    SCHEMA as TIER_G_XFA_DIAGNOSTIC_SCHEMA,
+    STATUS as TIER_G_XFA_DIAGNOSTIC_STATUS,
+    build_autonomous_tier_g_xfa_diagnostic,
+    verify_autonomous_tier_g_xfa_diagnostic,
+)
+from hydra.production.autonomous_tier_g_xfa_handoff import (
+    SCHEMA as TIER_G_XFA_HANDOFF_SCHEMA,
+    STATUS as TIER_G_XFA_HANDOFF_STATUS,
+    build_tier_g_combine_xfa_handoffs,
+    verify_tier_g_combine_xfa_handoffs,
+)
+from hydra.production.cross_index_breadth_tripwire import (
+    SCHEMA as CROSS_INDEX_BREADTH_SCHEMA,
+    run_cross_index_breadth_tripwire,
+)
+from hydra.production.fresh_confirmation_lane import (
+    RESULT_SCHEMA as FRESH_CONFIRMATION_RESULT_SCHEMA,
+    evaluate_fresh_confirmation,
+    open_confirmation_matrices,
+)
 from hydra.production.manifest import load_and_validate_production_manifest
 from hydra.production.runtime import PRODUCTION_KPI_SCHEMA, PRODUCTION_STATE_SCHEMA
 from hydra.production.v71_event_time_account_exploration import (
@@ -1796,12 +1817,32 @@ def _run_post_book_graduation_relay(
         initial_exact_path=initial_exact_path,
         continuation_paths=continuation_paths,
     )
+    state, results, xfa_handoff, xfa_diagnostic, breadth_tripwire = (
+        _run_tier_g_xfa_and_breadth_relay(
+            root=root,
+            manifest=manifest,
+            output=output,
+            live_writer=live_writer,
+            branch_writer=branch_writer,
+            prior_state=state,
+            started=started,
+            heartbeat_seconds=heartbeat_seconds,
+            runtime_results=results,
+            candidate_bank_path=candidate_path,
+            initial_exact_path=initial_exact_path,
+            continuation_paths=continuation_paths,
+        )
+    )
 
     book_counts = dict(semantic_composite.get("counts") or {})
     direct_counts = dict(direct_composite.get("counts") or {})
     event_safety_counts = dict(event_safety_composite.get("counts") or {})
     tier_g_control_counts = dict(tier_g_control_composite.get("counts") or {})
     tier_g_graduation_counts = dict(tier_g_graduation.get("counts") or {})
+    xfa_handoff_counts = dict(xfa_handoff.get("counts") or {})
+    xfa_diagnostic_counts = dict(xfa_diagnostic.get("counts") or {})
+    breadth_counts = dict(breadth_tripwire.get("counts") or {})
+    breadth_gate = dict(breadth_tripwire.get("gate") or {})
     pass_counts = dict(pass_bank.get("counts") or {})
     book_ready = int(book_counts.get("g_ready_count", 0)) + int(
         book_counts.get("standalone_g_ready_count", 0)
@@ -1818,7 +1859,7 @@ def _run_post_book_graduation_relay(
         tier_g_graduation_counts.get("graduated_development_book_count", 0)
     )
     next_action = (
-        "FREEZE_ACCOUNT_SIZE_AWARE_XFA_HANDOFF_FOR_TIER_G_BOOKS"
+        "FREEZE_AND_RUN_ONE_UNTOUCHED_CONFIRMATION_FOR_TIER_G_AND_BREADTH_QUALIFIER"
         if graduated_tier_g
         else (
             "RUN_TRADE_CONCENTRATION_AND_MATCHED_CONTROLS_FOR_PRECONTROL_SURVIVORS"
@@ -1830,7 +1871,7 @@ def _run_post_book_graduation_relay(
         manifest,
         sequence=int(state["checkpoint_sequence"]) + 1,
         state="ROBUSTNESS_ACTIVE",
-        stage="POST_BOOK_GRADUATION_RELAY_COMPLETE_AWAITING_NEXT_BOUNDED_RELAY",
+        stage="POST_TIER_G_XFA_AND_BREADTH_RELAYS_COMPLETE",
         branch_results=results,
         next_action=next_action,
     )
@@ -1882,20 +1923,557 @@ def _run_post_book_graduation_relay(
             ),
             "tier_g_control_ready_count": tier_g_control_ready,
             "authoritative_tier_g_count": graduated_tier_g,
-            "xfa_paths_started": 0,
+            "combine_to_xfa_transition_count": int(
+                xfa_handoff_counts.get("ready_xfa_transition_count", 0)
+            ),
+            "xfa_paths_started": int(
+                xfa_diagnostic_counts.get("alternative_path_count", 0)
+            ),
+            "xfa_alternative_path_count": int(
+                xfa_diagnostic_counts.get("alternative_path_count", 0)
+            ),
+            "xfa_standard_path_count": int(
+                xfa_diagnostic_counts.get("standard_path_count", 0)
+            ),
+            "xfa_consistency_path_count": int(
+                xfa_diagnostic_counts.get("consistency_path_count", 0)
+            ),
+            "xfa_standard_first_payout_count": int(
+                xfa_diagnostic_counts.get("standard_first_payout_count", 0)
+            ),
+            "xfa_consistency_first_payout_count": int(
+                xfa_diagnostic_counts.get("consistency_first_payout_count", 0)
+            ),
+            "cross_index_breadth_primary_count": int(
+                breadth_counts.get("primary_candidate_count", 0)
+            ),
+            "cross_index_breadth_control_count": int(
+                breadth_counts.get("control_candidate_count", 0)
+            ),
+            "cross_index_breadth_exact_account_replay_count": int(
+                breadth_counts.get("exact_account_replays", 0)
+            ),
+            "cross_index_breadth_qualifying_cell_count": int(
+                breadth_gate.get("qualifying_cell_count", 0)
+            ),
+            "cross_index_breadth_status": str(breadth_tripwire["status"]),
         }
     )
     state = _rehash(state, "state_hash")
     _publish(live_writer, state, _kpis(manifest, state, results, started))
     _write_mission_views(root, manifest, state, results)
+    state, results, _fresh_confirmation = _run_fresh_confirmation_relay(
+        root=root,
+        manifest=manifest,
+        output=output,
+        live_writer=live_writer,
+        branch_writer=branch_writer,
+        prior_state=state,
+        started=started,
+        heartbeat_seconds=heartbeat_seconds,
+        runtime_results=results,
+    )
     if os.environ.get("HYDRA_PRODUCTION_TEST_MODE") == "1":
         return state
+    # The bounded relay has produced its durable decision.  Returning lets the
+    # existing manifest queue dispatch the already-frozen next economic action;
+    # an infinite zero-worker heartbeat here would strand the persistent
+    # controller in an economically idle state.
+    return state
 
-    while True:
-        time.sleep(max(float(heartbeat_seconds), 1.0))
-        state = _heartbeat_state(state)
+
+def _run_tier_g_xfa_and_breadth_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+    candidate_bank_path: Path,
+    initial_exact_path: Path,
+    continuation_paths: Sequence[Path],
+) -> tuple[
+    dict[str, Any],
+    dict[str, dict[str, Any]],
+    dict[str, Any],
+    dict[str, Any],
+    dict[str, Any],
+]:
+    """Persist one bounded XFA diagnostic and one distinct breadth tripwire.
+
+    The handoff reconstruction and breadth experiment are independent and run
+    concurrently when both are absent.  XFA simulation begins only after the
+    parent has durably persisted the verified handoff.  Workers receive no
+    writer, database, registry, broker, or order capability; all envelopes are
+    written by this parent process.
+    """
+
+    relative_root = Path("post_source_exhaustion/post_composite")
+    branch_root = output / "branch_results"
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    graduation = dict(results.get("TIER_G_GRADUATION") or {})
+    graduation_count = int(
+        dict(graduation.get("counts") or {}).get(
+            "graduated_development_book_count", 0
+        )
+    )
+    graduation_path = (
+        branch_root / relative_root / "tier_g_development_graduation.json"
+    )
+    handoff_path = branch_root / relative_root / "tier_g_xfa_handoff.json"
+    diagnostic_path = branch_root / relative_root / "tier_g_xfa_diagnostic.json"
+    breadth_path = branch_root / relative_root / "cross_index_breadth_tripwire.json"
+
+    handoff: dict[str, Any] = {}
+    breadth: dict[str, Any] = {}
+    if handoff_path.is_file():
+        envelope = _read_hashed(handoff_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError("Tier-G XFA handoff identity drift")
+        handoff = _verified_inner_result(
+            envelope,
+            key="tier_g_xfa_handoff",
+            expected_schema=TIER_G_XFA_HANDOFF_SCHEMA,
+            expected_status=TIER_G_XFA_HANDOFF_STATUS,
+        )
+        verify_tier_g_combine_xfa_handoffs(handoff)
+    if breadth_path.is_file():
+        envelope = _read_hashed(breadth_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "cross-index breadth tripwire identity drift"
+            )
+        breadth = _verify_breadth_tripwire_result(
+            dict(envelope.get("cross_index_breadth_tripwire") or {})
+        )
+
+    jobs_to_run: list[str] = []
+    if graduation_count and not handoff:
+        jobs_to_run.append("XFA_HANDOFF")
+    if not breadth:
+        jobs_to_run.append("BREADTH")
+    if jobs_to_run:
+        future_kind: dict[Any, str] = {}
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=min(len(jobs_to_run), 2),
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                if "XFA_HANDOFF" in jobs_to_run:
+                    future_kind[
+                        pool.submit(
+                            _tier_g_xfa_handoff_from_artifacts_worker,
+                            str(root),
+                            str(candidate_bank_path),
+                            str(initial_exact_path),
+                            tuple(str(value) for value in continuation_paths),
+                            str(graduation_path),
+                        )
+                    ] = "XFA_HANDOFF"
+                if "BREADTH" in jobs_to_run:
+                    future_kind[
+                        pool.submit(_cross_index_breadth_tripwire_worker, str(root))
+                    ] = "BREADTH"
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="TIER_G_XFA_HANDOFF_AND_BREADTH_RUNNING",
+                    branch_results=results,
+                    next_action=(
+                        "RECONSTRUCT_IMMUTABLE_COMBINE_TRANSITIONS_AND_RUN_"
+                        "DISTINCT_BREADTH_TRIPWIRE"
+                    ),
+                )
+                state["active_economic_worker_processes"] = len(future_kind)
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+                pending = set(future_kind)
+                while pending:
+                    done, pending = wait(
+                        pending,
+                        timeout=max(float(heartbeat_seconds), 0.1),
+                        return_when=FIRST_COMPLETED,
+                    )
+                    if not done:
+                        state = _heartbeat_state(
+                            state,
+                            active_economic_worker_processes=len(pending),
+                        )
+                        _publish(
+                            live_writer,
+                            state,
+                            _kpis(manifest, state, results, started),
+                        )
+                        _write_mission_views(root, manifest, state, results)
+                        continue
+                    for future in done:
+                        kind = future_kind[future]
+                        value = dict(future.result())
+                        if kind == "XFA_HANDOFF":
+                            handoff = verify_tier_g_combine_xfa_handoffs(value)
+                            envelope = _post_source_envelope(
+                                manifest,
+                                lane_id="EXPLOITATION",
+                                branch_id="TIER_G_ACCOUNT_SIZE_AWARE_XFA_HANDOFF",
+                                decision=str(handoff["status"]),
+                                payload_key="tier_g_xfa_handoff",
+                                payload=handoff,
+                                next_action=str(handoff["next_action"]),
+                            )
+                            branch_writer.write_json(
+                                relative_root / handoff_path.name, envelope
+                            )
+                            _append_decision_once(root, manifest, envelope)
+                            results["TIER_G_XFA_HANDOFF"] = handoff
+                        else:
+                            breadth = _verify_breadth_tripwire_result(value)
+                            envelope = _post_source_envelope(
+                                manifest,
+                                lane_id="EXPLORATION",
+                                branch_id="CROSS_INDEX_BREADTH_TRIPWIRE",
+                                decision=str(breadth["status"]),
+                                payload_key="cross_index_breadth_tripwire",
+                                payload=breadth,
+                                next_action=str(breadth["next_action"]),
+                            )
+                            branch_writer.write_json(
+                                relative_root / breadth_path.name, envelope
+                            )
+                            _append_decision_once(root, manifest, envelope)
+                            results["CROSS_INDEX_BREADTH"] = breadth
+                    state = _heartbeat_state(
+                        state,
+                        active_economic_worker_processes=len(pending),
+                    )
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+        finally:
+            _end_economic_phase()
+
+    if handoff:
+        results["TIER_G_XFA_HANDOFF"] = handoff
+    results["CROSS_INDEX_BREADTH"] = breadth
+
+    diagnostic: dict[str, Any] = {}
+    if graduation_count:
+        if not handoff:
+            raise AutonomousDirectorRuntimeError(
+                "graduated Tier-G books lack a verified XFA handoff"
+            )
+        if diagnostic_path.is_file():
+            envelope = _read_hashed(diagnostic_path, "result_hash")
+            if not _artifact_manifest_compatible(envelope, manifest):
+                raise AutonomousDirectorRuntimeError(
+                    "Tier-G XFA diagnostic identity drift"
+                )
+            diagnostic = _verified_inner_result(
+                envelope,
+                key="tier_g_xfa_diagnostic",
+                expected_schema=TIER_G_XFA_DIAGNOSTIC_SCHEMA,
+                expected_status=TIER_G_XFA_DIAGNOSTIC_STATUS,
+            )
+            verify_autonomous_tier_g_xfa_diagnostic(diagnostic)
+        else:
+            _begin_economic_phase()
+            try:
+                with ProcessPoolExecutor(
+                    max_workers=1,
+                    mp_context=multiprocessing.get_context("spawn"),
+                ) as pool:
+                    future = pool.submit(
+                        _tier_g_xfa_diagnostic_from_artifact_worker,
+                        str(handoff_path),
+                    )
+                    state = _state_payload(
+                        manifest,
+                        sequence=int(state["checkpoint_sequence"]) + 1,
+                        state="ROBUSTNESS_ACTIVE",
+                        stage="TIER_G_XFA_ALTERNATIVE_DIAGNOSTICS_RUNNING",
+                        branch_results=results,
+                        next_action=(
+                            "SIMULATE_STANDARD_AND_CONSISTENCY_AS_SEPARATE_"
+                            "DIAGNOSTIC_ALTERNATIVES"
+                        ),
+                    )
+                    state["active_economic_worker_processes"] = 1
+                    state = _rehash(state, "state_hash")
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+                    while not future.done():
+                        time.sleep(max(min(float(heartbeat_seconds), 5.0), 0.1))
+                        state = _heartbeat_state(
+                            state, active_economic_worker_processes=1
+                        )
+                        _publish(
+                            live_writer,
+                            state,
+                            _kpis(manifest, state, results, started),
+                        )
+                        _write_mission_views(root, manifest, state, results)
+                    diagnostic = verify_autonomous_tier_g_xfa_diagnostic(
+                        dict(future.result())
+                    )
+            finally:
+                _end_economic_phase()
+            envelope = _post_source_envelope(
+                manifest,
+                lane_id="EXPLOITATION",
+                branch_id="TIER_G_SEPARATE_XFA_ALTERNATIVE_DIAGNOSTIC",
+                decision=str(diagnostic["status"]),
+                payload_key="tier_g_xfa_diagnostic",
+                payload=diagnostic,
+                next_action=str(diagnostic["next_action"]),
+            )
+            branch_writer.write_json(
+                relative_root / diagnostic_path.name, envelope
+            )
+            _append_decision_once(root, manifest, envelope)
+        results["TIER_G_XFA_DIAGNOSTIC"] = diagnostic
+
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage="TIER_G_XFA_AND_BREADTH_RELAYS_PERSISTED",
+        branch_results=results,
+        next_action="FREEZE_ONE_UNTOUCHED_CONFIRMATION_CONTRACT",
+    )
+    state["active_economic_worker_processes"] = 0
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, handoff, diagnostic, breadth
+
+
+def _run_fresh_confirmation_relay(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    output: Path,
+    live_writer: AtomicResultWriter,
+    branch_writer: AtomicResultWriter,
+    prior_state: Mapping[str, Any],
+    started: float,
+    heartbeat_seconds: float,
+    runtime_results: Mapping[str, Mapping[str, Any]],
+) -> tuple[dict[str, Any], dict[str, dict[str, Any]], dict[str, Any]]:
+    """Consume one prewritten frozen confirmation package exactly once.
+
+    This relay deliberately has no acquisition, feature-building, cache-writing,
+    database, registry, broker, or order capability.  Its sole worker opens the
+    immutable YM/ES feature bundles read-only and evaluates the already-frozen
+    contract.  The parent remains the only writer and persists one envelope.
+    """
+
+    state = dict(prior_state)
+    results = {key: dict(value) for key, value in runtime_results.items()}
+    paths, missing_declarations = _fresh_confirmation_manifest_paths(root, manifest)
+    result_path = paths.get("result_path")
+    confirmation: dict[str, Any] = {}
+
+    if result_path is not None and result_path.is_file():
+        envelope = _read_hashed(result_path, "result_hash")
+        if not _artifact_manifest_compatible(envelope, manifest):
+            raise AutonomousDirectorRuntimeError(
+                "fresh-confirmation result identity drift"
+            )
+        confirmation = _verify_fresh_confirmation_result(
+            _verified_inner_result(
+                envelope,
+                key="fresh_confirmation_result",
+                expected_schema=FRESH_CONFIRMATION_RESULT_SCHEMA,
+                expected_status="CONFIRMATION_CONSUMED_ONCE",
+            )
+        )
+        results["FRESH_CONFIRMATION"] = confirmation
+
+    required_inputs = (
+        "contract_path",
+        "acquisition_receipt_path",
+        "feature_receipt_path",
+        "result_path",
+    )
+    missing_inputs = list(missing_declarations)
+    for key in required_inputs[:-1]:
+        path = paths.get(key)
+        if path is not None and not path.is_file():
+            missing_inputs.append(key)
+    missing_inputs = sorted(set(missing_inputs))
+
+    if not confirmation and missing_inputs:
+        state = _state_payload(
+            manifest,
+            sequence=int(state["checkpoint_sequence"]) + 1,
+            state="ROBUSTNESS_ACTIVE",
+            stage="FRESH_CONFIRMATION_ACQUISITION_REQUIRED",
+            branch_results=results,
+            next_action=(
+                "COMPLETE_PREWRITTEN_FRESH_CONFIRMATION_INPUTS_THEN_RESUME_"
+                "THE_SAME_BOUNDED_RELAY"
+            ),
+        )
+        state.update(
+            {
+                "active_economic_worker_processes": 0,
+                "fresh_confirmation_fail_closed": True,
+                "fresh_confirmation_missing_inputs": missing_inputs,
+                "fresh_confirmation_runtime_network_access": False,
+                "fresh_confirmation_runtime_feature_cache_writes": 0,
+            }
+        )
+        state = _rehash(state, "state_hash")
         _publish(live_writer, state, _kpis(manifest, state, results, started))
         _write_mission_views(root, manifest, state, results)
+        return state, results, {}
+
+    if not confirmation:
+        if result_path is None or result_path.name != "fresh_confirmation_result.json":
+            raise AutonomousDirectorRuntimeError(
+                "fresh-confirmation result path must end in fresh_confirmation_result.json"
+            )
+        branch_root = (output / "branch_results").resolve()
+        try:
+            relative_result_path = result_path.resolve().relative_to(branch_root)
+        except ValueError as exc:
+            raise AutonomousDirectorRuntimeError(
+                "fresh-confirmation result path must remain under branch_results"
+            ) from exc
+
+        contract = _read_json_object(paths["contract_path"])
+        expected_contract_hash = str(
+            dict(
+                manifest.get("fresh_confirmation")
+                or manifest.get("fresh_confirmation_contract")
+                or {}
+            ).get("contract_hash")
+            or ""
+        )
+        if expected_contract_hash and str(contract.get("contract_hash") or "") != expected_contract_hash:
+            raise AutonomousDirectorRuntimeError(
+                "fresh-confirmation contract hash differs from manifest freeze"
+            )
+
+        _begin_economic_phase()
+        try:
+            with ProcessPoolExecutor(
+                max_workers=1,
+                mp_context=multiprocessing.get_context("spawn"),
+            ) as pool:
+                future = pool.submit(
+                    _fresh_confirmation_worker,
+                    str(paths["contract_path"]),
+                    str(paths["acquisition_receipt_path"]),
+                    str(paths["feature_receipt_path"]),
+                    expected_contract_hash,
+                )
+                state = _state_payload(
+                    manifest,
+                    sequence=int(state["checkpoint_sequence"]) + 1,
+                    state="ROBUSTNESS_ACTIVE",
+                    stage="FRESH_CONFIRMATION_READ_ONLY_EVALUATION_RUNNING",
+                    branch_results=results,
+                    next_action="EVALUATE_FROZEN_CONFIRMATION_ONCE_WITHOUT_RETUNING",
+                )
+                state.update(
+                    {
+                        "active_economic_worker_processes": 1,
+                        "fresh_confirmation_runtime_network_access": False,
+                        "fresh_confirmation_runtime_feature_cache_writes": 0,
+                    }
+                )
+                state = _rehash(state, "state_hash")
+                _publish(live_writer, state, _kpis(manifest, state, results, started))
+                _write_mission_views(root, manifest, state, results)
+                while not future.done():
+                    time.sleep(max(min(float(heartbeat_seconds), 5.0), 0.1))
+                    state = _heartbeat_state(
+                        state, active_economic_worker_processes=1
+                    )
+                    _publish(
+                        live_writer,
+                        state,
+                        _kpis(manifest, state, results, started),
+                    )
+                    _write_mission_views(root, manifest, state, results)
+                confirmation = _verify_fresh_confirmation_result(
+                    dict(future.result())
+                )
+        finally:
+            _end_economic_phase()
+
+        tier_c_count = len(confirmation["tier_c_candidate_ids"])
+        next_action = (
+            "PROVE_F0_FOR_CONFIRMED_TIER_C_BOOKS"
+            if tier_c_count
+            else "DISPATCH_MATERIALLY_DISTINCT_EXPLORATION_AFTER_CONFIRMATION_FAILURE"
+        )
+        envelope = _post_source_envelope(
+            manifest,
+            lane_id="EXPLOITATION",
+            branch_id="FROZEN_TIER_G_FRESH_CONFIRMATION",
+            decision=str(confirmation["status"]),
+            payload_key="fresh_confirmation_result",
+            payload=confirmation,
+            next_action=next_action,
+        )
+        envelope_payload = dict(envelope)
+        envelope_payload.pop("result_hash", None)
+        envelope_payload["evidence_tier"] = (
+            "C" if tier_c_count else "G_CONFIRMATION_FAILED"
+        )
+        envelope = _with_hash(envelope_payload, "result_hash")
+        branch_writer.write_json(relative_result_path, envelope)
+        _append_decision_once(root, manifest, envelope)
+        results["FRESH_CONFIRMATION"] = confirmation
+
+    tier_c_count = len(confirmation.get("tier_c_candidate_ids") or ())
+    next_action = (
+        "PROVE_F0_FOR_CONFIRMED_TIER_C_BOOKS"
+        if tier_c_count
+        else "DISPATCH_MATERIALLY_DISTINCT_EXPLORATION_AFTER_CONFIRMATION_FAILURE"
+    )
+    state = _state_payload(
+        manifest,
+        sequence=int(state["checkpoint_sequence"]) + 1,
+        state="ROBUSTNESS_ACTIVE",
+        stage=(
+            "FRESH_CONFIRMATION_COMPLETE_TIER_C_GATE_PASSED"
+            if tier_c_count
+            else "FRESH_CONFIRMATION_COMPLETE_NO_TIER_C_PASSERS"
+        ),
+        branch_results=results,
+        next_action=next_action,
+    )
+    state.update(
+        {
+            "active_economic_worker_processes": 0,
+            "independently_confirmed_tier_c_count": tier_c_count,
+            "forward_tier_f_count": 0,
+            "fresh_confirmation_fail_closed": False,
+            "fresh_confirmation_runtime_network_access": False,
+            "fresh_confirmation_runtime_feature_cache_writes": 0,
+        }
+    )
+    state = _rehash(state, "state_hash")
+    _publish(live_writer, state, _kpis(manifest, state, results, started))
+    _write_mission_views(root, manifest, state, results)
+    return state, results, confirmation
 
 
 def _run_event_time_safety_relay(
@@ -2671,6 +3249,251 @@ def _tier_g_controls_from_artifacts_worker(
             "read-only Tier-G control worker attempted a status side effect"
         )
     return result
+
+
+def _tier_g_xfa_handoff_from_artifacts_worker(
+    root_path: str,
+    candidate_bank_envelope_path: str,
+    initial_exact_path: str,
+    continuation_paths: Sequence[str],
+    tier_g_graduation_envelope_path: str,
+) -> dict[str, Any]:
+    """Reconstruct exact post-Combine handoffs in a read-only worker."""
+
+    candidate_envelope = _read_hashed(
+        Path(candidate_bank_envelope_path), "result_hash"
+    )
+    candidate_bank = _verified_inner_result(
+        candidate_envelope,
+        key="candidate_bank",
+        expected_schema=COMBINE_CANDIDATE_BANK_SCHEMA,
+        expected_status="COMPLETE_READ_ONLY_DEVELOPMENT_CLASSIFICATION",
+    )
+    initial = _read_hashed(Path(initial_exact_path), "result_hash")
+    continuations = [
+        _read_hashed(Path(value), "result_hash")
+        for value in sorted(str(path) for path in continuation_paths)
+    ]
+    graduation_envelope = _read_hashed(
+        Path(tier_g_graduation_envelope_path), "result_hash"
+    )
+    graduation = _verified_inner_result(
+        graduation_envelope,
+        key="tier_g_development_graduation",
+        expected_schema=TIER_G_GRADUATION_SCHEMA,
+        expected_status="COMPLETE_READ_ONLY_TIER_G_DEVELOPMENT_GRADUATION",
+    )
+    verify_tier_g_development_graduation(graduation)
+    result = build_tier_g_combine_xfa_handoffs(
+        root_path,
+        candidate_bank,
+        initial,
+        continuations,
+        graduation,
+    )
+    verified = verify_tier_g_combine_xfa_handoffs(result)
+    counts = dict(verified.get("counts") or {})
+    if (
+        int(counts.get("xfa_simulations_started", -1)) != 0
+        or int(counts.get("database_writes", -1)) != 0
+        or int(counts.get("registry_writes", -1)) != 0
+        or int(counts.get("broker_connections", -1)) != 0
+        or int(counts.get("orders", -1)) != 0
+        or verified.get("promotion_status") is not None
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "read-only Tier-G XFA handoff worker attempted a status side effect"
+        )
+    return verified
+
+
+def _tier_g_xfa_diagnostic_from_artifact_worker(
+    tier_g_xfa_handoff_envelope_path: str,
+) -> dict[str, Any]:
+    """Run account-size-aware XFA alternatives without durable side effects."""
+
+    envelope = _read_hashed(
+        Path(tier_g_xfa_handoff_envelope_path), "result_hash"
+    )
+    handoff = _verified_inner_result(
+        envelope,
+        key="tier_g_xfa_handoff",
+        expected_schema=TIER_G_XFA_HANDOFF_SCHEMA,
+        expected_status=TIER_G_XFA_HANDOFF_STATUS,
+    )
+    verify_tier_g_combine_xfa_handoffs(handoff)
+    result = verify_autonomous_tier_g_xfa_diagnostic(
+        build_autonomous_tier_g_xfa_diagnostic(handoff)
+    )
+    counts = dict(result.get("counts") or {})
+    for field in (
+        "database_writes",
+        "registry_writes",
+        "broker_connections",
+        "orders",
+    ):
+        if int(counts.get(field, -1)) != 0:
+            raise AutonomousDirectorRuntimeError(
+                "read-only Tier-G XFA diagnostic worker attempted a side effect"
+            )
+    if result.get("promotion_status") is not None:
+        raise AutonomousDirectorRuntimeError(
+            "read-only Tier-G XFA diagnostic worker attempted a promotion"
+        )
+    return result
+
+
+def _cross_index_breadth_tripwire_worker(root_path: str) -> dict[str, Any]:
+    """Run the frozen cross-index experiment with no writer or status grant."""
+
+    return _verify_breadth_tripwire_result(
+        run_cross_index_breadth_tripwire(root_path)
+    )
+
+
+def _fresh_confirmation_worker(
+    contract_path: str,
+    acquisition_receipt_path: str,
+    feature_receipt_path: str,
+    expected_contract_hash: str,
+) -> dict[str, Any]:
+    """Evaluate immutable confirmation inputs with read-only feature matrices."""
+
+    contract = _read_json_object(Path(contract_path))
+    acquisition = _read_json_object(Path(acquisition_receipt_path))
+    feature_receipt = _read_json_object(Path(feature_receipt_path))
+    if expected_contract_hash and str(contract.get("contract_hash") or "") != str(
+        expected_contract_hash
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "fresh-confirmation worker contract hash drift"
+        )
+    matrices = open_confirmation_matrices(feature_receipt)
+    result = evaluate_fresh_confirmation(
+        contract,
+        matrices=matrices,
+        acquisition_receipt=acquisition,
+        existing_result=None,
+    )
+    return _verify_fresh_confirmation_result(result)
+
+
+def _verify_fresh_confirmation_result(
+    value: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Verify exact Tier-C passers without ever creating Tier-F evidence."""
+
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    if (
+        not claimed
+        or stable_hash(row) != claimed
+        or row.get("schema") != FRESH_CONFIRMATION_RESULT_SCHEMA
+        or row.get("status") != "CONFIRMATION_CONSUMED_ONCE"
+        or row.get("retuning_performed") is not False
+        or row.get("recalibration_performed") is not False
+        or row.get("independent_confirmation_claimed_only_for_gate_passers")
+        is not True
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "fresh-confirmation result identity or causal contract drift"
+        )
+    for field in ("q4_access_count_delta", "broker_connections", "orders"):
+        if int(row.get(field, -1)) != 0:
+            raise AutonomousDirectorRuntimeError(
+                "fresh-confirmation worker attempted a prohibited side effect"
+            )
+    results = [dict(item) for item in row.get("candidate_results") or ()]
+    identifiers = [str(item.get("candidate_id") or "") for item in results]
+    if not identifiers or len(set(identifiers)) != len(identifiers):
+        raise AutonomousDirectorRuntimeError(
+            "fresh-confirmation candidate denominator is empty or duplicated"
+        )
+    actual_passers = sorted(
+        str(item["candidate_id"])
+        for item in results
+        if bool(item.get("tier_c_promoted"))
+    )
+    declared_passers = [str(value) for value in row.get("tier_c_candidate_ids") or ()]
+    if declared_passers != sorted(set(declared_passers)) or declared_passers != actual_passers:
+        raise AutonomousDirectorRuntimeError(
+            "fresh-confirmation Tier-C count differs from exact gate passers"
+        )
+    for item in results:
+        gate = dict(item.get("tier_c_gate") or {})
+        promoted = bool(item.get("tier_c_promoted"))
+        if (
+            promoted != bool(gate.get("passed"))
+            or (promoted and str(item.get("evidence_tier")) != "C")
+            or (not promoted and str(item.get("evidence_tier")) == "C")
+        ):
+            raise AutonomousDirectorRuntimeError(
+                "fresh-confirmation candidate evidence tier drift"
+            )
+    forbidden = {
+        str(item.get("evidence_tier") or "")
+        for item in results
+        if str(item.get("evidence_tier") or "").startswith("F")
+    }
+    if forbidden or int(row.get("tier_f_count", 0)) != 0:
+        raise AutonomousDirectorRuntimeError(
+            "fresh-confirmation result attempted Tier-F inflation"
+        )
+    return {**row, "result_hash": claimed}
+
+
+def _verify_breadth_tripwire_result(value: Mapping[str, Any]) -> dict[str, Any]:
+    """Verify the tripwire's evidence hash and strict zero-side-effect contract."""
+
+    row = dict(value)
+    claimed = str(row.pop("result_hash", ""))
+    economic_payload = {
+        key: item
+        for key, item in row.items()
+        if key not in {"runtime_seconds", "completed_at_utc"}
+    }
+    allowed_statuses = {
+        "CROSS_INDEX_BREADTH_TRIPWIRE_GREEN_DEVELOPMENT_ONLY",
+        "CROSS_INDEX_BREADTH_TRIPWIRE_WEAK_DEVELOPMENT_ONLY",
+        "CROSS_INDEX_BREADTH_TRIPWIRE_FALSIFIED",
+        "NON_DECISIONAL_SUBSET_SMOKE_COMPLETE",
+    }
+    if (
+        row.get("schema") != CROSS_INDEX_BREADTH_SCHEMA
+        or str(row.get("status")) not in allowed_statuses
+        or not claimed
+        or stable_hash(economic_payload) != claimed
+        or row.get("promotion_status") is not None
+        or str(row.get("evidence_tier")) != "E_DIAGNOSTIC_DEVELOPMENT"
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "cross-index breadth result identity or evidence-tier drift"
+        )
+    counts = dict(row.get("counts") or {})
+    gate = dict(row.get("gate") or {})
+    for field in (
+        "authoritative_promotion_count",
+        "xfa_paths_started",
+        "broker_connections",
+        "orders",
+        "q4_access_count_delta",
+        "data_purchase_count",
+        "database_writes",
+        "registry_writes",
+    ):
+        if int(counts.get(field, -1)) != 0:
+            raise AutonomousDirectorRuntimeError(
+                "cross-index breadth worker attempted a side effect"
+            )
+    if (
+        int(gate.get("authoritative_promotion_count", -1)) != 0
+        or int(gate.get("xfa_paths_started", -1)) != 0
+        or gate.get("independent_confirmation_claimed") is not False
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "cross-index breadth gate attempted evidence inflation"
+        )
+    return {**row, "result_hash": claimed}
 
 
 def _exploitation_worker(result_path: str) -> dict[str, Any]:
@@ -3806,6 +4629,100 @@ def _exact_result_metrics(
     }
 
 
+def _relay_evidence_counts(
+    branch_results: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Return persisted relay counts without upgrading diagnostic evidence."""
+
+    graduation_counts = dict(
+        (branch_results.get("TIER_G_GRADUATION") or {}).get("counts") or {}
+    )
+    handoff_counts = dict(
+        (branch_results.get("TIER_G_XFA_HANDOFF") or {}).get("counts") or {}
+    )
+    diagnostic_counts = dict(
+        (branch_results.get("TIER_G_XFA_DIAGNOSTIC") or {}).get("counts") or {}
+    )
+    breadth = branch_results.get("CROSS_INDEX_BREADTH") or {}
+    breadth_counts = dict(breadth.get("counts") or {})
+    breadth_gate = dict(breadth.get("gate") or {})
+    fresh = branch_results.get("FRESH_CONFIRMATION") or {}
+    fresh_verified = (
+        _verify_fresh_confirmation_result(fresh) if fresh else {}
+    )
+    tier_c_ids = tuple(fresh_verified.get("tier_c_candidate_ids") or ())
+    handoff_transitions = int(handoff_counts.get("ready_xfa_transition_count", 0))
+    diagnostic_transitions = int(
+        diagnostic_counts.get("combine_transition_count", 0)
+    )
+    if (
+        handoff_transitions
+        and diagnostic_transitions
+        and handoff_transitions != diagnostic_transitions
+    ):
+        raise AutonomousDirectorRuntimeError(
+            "XFA handoff and diagnostic transition denominators differ"
+        )
+    standard_paths = int(diagnostic_counts.get("standard_path_count", 0))
+    consistency_paths = int(diagnostic_counts.get("consistency_path_count", 0))
+    alternative_paths = int(diagnostic_counts.get("alternative_path_count", 0))
+    if alternative_paths and alternative_paths != standard_paths + consistency_paths:
+        raise AutonomousDirectorRuntimeError(
+            "XFA alternative-path denominator does not reconcile"
+        )
+    return {
+        "tier_g_count": int(
+            graduation_counts.get("graduated_development_book_count", 0)
+        ),
+        "combine_to_xfa_transition_count": (
+            diagnostic_transitions or handoff_transitions
+        ),
+        "xfa_alternative_path_count": alternative_paths,
+        "xfa_standard_path_count": standard_paths,
+        "xfa_consistency_path_count": consistency_paths,
+        "xfa_standard_first_payout_count": int(
+            diagnostic_counts.get("standard_first_payout_count", 0)
+        ),
+        "xfa_consistency_first_payout_count": int(
+            diagnostic_counts.get("consistency_first_payout_count", 0)
+        ),
+        "xfa_standard_payout_cycle_count": int(
+            diagnostic_counts.get("standard_payout_cycle_count", 0)
+        ),
+        "xfa_consistency_payout_cycle_count": int(
+            diagnostic_counts.get("consistency_payout_cycle_count", 0)
+        ),
+        "xfa_standard_post_payout_survival_count": int(
+            diagnostic_counts.get("standard_post_payout_survival_count", 0)
+        ),
+        "xfa_consistency_post_payout_survival_count": int(
+            diagnostic_counts.get("consistency_post_payout_survival_count", 0)
+        ),
+        "breadth_primary_count": int(
+            breadth_counts.get("primary_candidate_count", 0)
+        ),
+        "breadth_control_count": int(
+            breadth_counts.get("control_candidate_count", 0)
+        ),
+        "breadth_exact_account_replay_count": int(
+            breadth_counts.get("exact_account_replays", 0)
+        ),
+        "breadth_qualifying_cell_count": int(
+            breadth_gate.get("qualifying_cell_count", 0)
+        ),
+        "breadth_status": str(breadth.get("status") or "NOT_RUN"),
+        # XFA and breadth artifacts remain diagnostics.  Only exact passers in
+        # the one-use frozen confirmation artifact can enter Tier C.
+        "tier_c_count": len(tier_c_ids),
+        "tier_c_candidate_ids": list(tier_c_ids),
+        "fresh_confirmation_status": str(
+            fresh_verified.get("status") or "NOT_RUN"
+        ),
+        # F0 and append-only forward are separate later gates.
+        "tier_f_count": 0,
+    }
+
+
 def _state_payload(
     manifest: Mapping[str, Any],
     *,
@@ -3826,6 +4743,7 @@ def _state_payload(
     event_safety_counts = dict(
         (branch_results.get("EVENT_TIME_SAFETY") or {}).get("counts") or {}
     )
+    relay_counts = _relay_evidence_counts(branch_results)
     selected = max(
         int(exploration.get("selected_policy_count", 0)),
         int(exact_metrics["exact_account_replays"]),
@@ -3910,8 +4828,38 @@ def _state_payload(
         "event_time_safety_g_precontrol_ready_count": int(
             event_safety_counts.get("heldout_safety_precontrol_ready_count", 0)
         ),
-        "authoritative_tier_g_count": 0,
-        "xfa_paths_started": 0,
+        "authoritative_tier_g_count": relay_counts["tier_g_count"],
+        "independently_confirmed_tier_c_count": relay_counts["tier_c_count"],
+        "forward_tier_f_count": relay_counts["tier_f_count"],
+        "fresh_confirmation_status": relay_counts[
+            "fresh_confirmation_status"
+        ],
+        "combine_to_xfa_transition_count": relay_counts[
+            "combine_to_xfa_transition_count"
+        ],
+        "xfa_paths_started": relay_counts["xfa_alternative_path_count"],
+        "xfa_alternative_path_count": relay_counts["xfa_alternative_path_count"],
+        "xfa_standard_path_count": relay_counts["xfa_standard_path_count"],
+        "xfa_consistency_path_count": relay_counts["xfa_consistency_path_count"],
+        "xfa_standard_first_payout_count": relay_counts[
+            "xfa_standard_first_payout_count"
+        ],
+        "xfa_consistency_first_payout_count": relay_counts[
+            "xfa_consistency_first_payout_count"
+        ],
+        "cross_index_breadth_primary_count": relay_counts[
+            "breadth_primary_count"
+        ],
+        "cross_index_breadth_control_count": relay_counts[
+            "breadth_control_count"
+        ],
+        "cross_index_breadth_exact_account_replay_count": relay_counts[
+            "breadth_exact_account_replay_count"
+        ],
+        "cross_index_breadth_qualifying_cell_count": relay_counts[
+            "breadth_qualifying_cell_count"
+        ],
+        "cross_index_breadth_status": relay_counts["breadth_status"],
     }
     return _rehash(payload, "state_hash")
 
@@ -3939,6 +4887,7 @@ def _kpis(
     event_safety_counts = dict(
         (branch_results.get("EVENT_TIME_SAFETY") or {}).get("counts") or {}
     )
+    relay_counts = _relay_evidence_counts(branch_results)
     frontier = list(exploration.get("uniform_legal_frontier") or ())
     stressed_points = [row for row in frontier if row.get("scenario") == "STRESSED_1_5X"]
     normal_points = [row for row in frontier if row.get("scenario") == "NORMAL"]
@@ -3985,7 +4934,12 @@ def _kpis(
             for row in stressed_points
         ),
         "candidates_promoted_96": 0,
-        "confirmation_ready_candidates": 0,
+        "confirmation_ready_candidates": relay_counts["tier_c_count"],
+        "independently_confirmed_tier_c_count": relay_counts["tier_c_count"],
+        "forward_tier_f_count": relay_counts["tier_f_count"],
+        "fresh_confirmation_status": relay_counts[
+            "fresh_confirmation_status"
+        ],
         "tier_q_candidate_count": int(
             candidate_counts.get("tier_q_contract_cleared_count", 0)
         ),
@@ -4028,8 +4982,45 @@ def _kpis(
         "event_time_safety_g_precontrol_ready_count": int(
             event_safety_counts.get("heldout_safety_precontrol_ready_count", 0)
         ),
-        "authoritative_tier_g_count": 0,
-        "xfa_paths_started": 0,
+        "authoritative_tier_g_count": relay_counts["tier_g_count"],
+        "combine_to_xfa_transition_count": relay_counts[
+            "combine_to_xfa_transition_count"
+        ],
+        "xfa_paths_started": relay_counts["xfa_alternative_path_count"],
+        "xfa_alternative_path_count": relay_counts["xfa_alternative_path_count"],
+        "xfa_standard_path_count": relay_counts["xfa_standard_path_count"],
+        "xfa_consistency_path_count": relay_counts["xfa_consistency_path_count"],
+        "xfa_standard_first_payout_count": relay_counts[
+            "xfa_standard_first_payout_count"
+        ],
+        "xfa_consistency_first_payout_count": relay_counts[
+            "xfa_consistency_first_payout_count"
+        ],
+        "xfa_standard_payout_cycle_count": relay_counts[
+            "xfa_standard_payout_cycle_count"
+        ],
+        "xfa_consistency_payout_cycle_count": relay_counts[
+            "xfa_consistency_payout_cycle_count"
+        ],
+        "xfa_standard_post_payout_survival_count": relay_counts[
+            "xfa_standard_post_payout_survival_count"
+        ],
+        "xfa_consistency_post_payout_survival_count": relay_counts[
+            "xfa_consistency_post_payout_survival_count"
+        ],
+        "cross_index_breadth_primary_count": relay_counts[
+            "breadth_primary_count"
+        ],
+        "cross_index_breadth_control_count": relay_counts[
+            "breadth_control_count"
+        ],
+        "cross_index_breadth_exact_account_replay_count": relay_counts[
+            "breadth_exact_account_replay_count"
+        ],
+        "cross_index_breadth_qualifying_cell_count": relay_counts[
+            "breadth_qualifying_cell_count"
+        ],
+        "cross_index_breadth_status": relay_counts["breadth_status"],
         "best_normal_pass_rate": exact_metrics["best_normal_pass_rate"],
         "best_stressed_pass_rate": exact_metrics["best_stressed_pass_rate"],
         "best_normal_summary_threshold_rate": max(
@@ -4097,6 +5088,23 @@ def _write_mission_views(
             for lane in ("EXPLOITATION", "EXPLORATION")
         },
         "next_branch_cards": state.get("next_branch_cards") or [],
+        "economic_relays": {
+            key: {
+                "status": (branch_results.get(key) or {}).get("status"),
+                "result_hash": (branch_results.get(key) or {}).get("result_hash"),
+                "evidence_role": (branch_results.get(key) or {}).get(
+                    "evidence_role"
+                ),
+            }
+            for key in (
+                "TIER_G_GRADUATION",
+                "TIER_G_XFA_HANDOFF",
+                "TIER_G_XFA_DIAGNOSTIC",
+                "CROSS_INDEX_BREADTH",
+                "FRESH_CONFIRMATION",
+            )
+            if key in branch_results
+        },
         "q4_access_count_delta": 0,
         "broker_connections": 0,
         "orders": 0,
@@ -4118,6 +5126,9 @@ def _write_mission_views(
     pass_counts = dict(pass_bank.get("counts") or {})
     direct_counts = dict(consistency_direct.get("counts") or {})
     event_safety_counts = dict(event_time_safety.get("counts") or {})
+    tier_g_graduation = branch_results.get("TIER_G_GRADUATION") or {}
+    fresh_confirmation = branch_results.get("FRESH_CONFIRMATION") or {}
+    relay_counts = _relay_evidence_counts(branch_results)
     tier_q_count = int(candidate_counts.get("tier_q_contract_cleared_count", 0))
     g_precontrol_count = int(book_counts.get("g_ready_count", 0)) + int(
         book_counts.get("standalone_g_ready_count", 0)
@@ -4132,23 +5143,46 @@ def _write_mission_views(
         ),
         None,
     )
+    graduated_books = list(tier_g_graduation.get("graduated_development_books") or ())
+    strongest_g = dict(graduated_books[0]) if graduated_books else None
+    tier_c_ids = set(str(value) for value in relay_counts["tier_c_candidate_ids"])
+    strongest_c = next(
+        (
+            dict(row)
+            for row in fresh_confirmation.get("candidate_results") or ()
+            if str(row.get("candidate_id") or "") in tier_c_ids
+        ),
+        None,
+    )
     scorecard = {
         "schema": ECONOMIC_SCORECARD_SCHEMA,
         "campaign_id": manifest["campaign_id"],
         "manifest_hash": manifest["manifest_hash"],
         "updated_at_utc": _utc_now(),
-        "strongest_surviving_candidate": strongest_q or exact_best,
+        "strongest_surviving_candidate": (
+            strongest_c or strongest_g or strongest_q or exact_best
+        ),
         "strongest_diagnostic_shortlist_point": exploration.get(
             "best_deployable_frontier_point"
         ),
-        "evidence_tier": "Q" if strongest_q else ("E" if exact_best else None),
+        "evidence_tier": (
+            "C_INDEPENDENTLY_CONFIRMED"
+            if strongest_c
+            else "G_DEVELOPMENT_ONLY"
+            if strongest_g
+            else "Q"
+            if strongest_q
+            else "E"
+            if exact_best
+            else None
+        ),
         "candidate_bank_counts": {
             "H": 0,
             "E": 47 + exact_metrics["selected_candidates"],
             "Q": tier_q_count,
-            "G": 0,
-            "C": 0,
-            "F": 0,
+            "G": relay_counts["tier_g_count"],
+            "C": relay_counts["tier_c_count"],
+            "F": relay_counts["tier_f_count"],
         },
         "g_precontrol_ready_count": g_precontrol_count,
         "combine_pass_observed_bank_count": int(
@@ -4175,11 +5209,54 @@ def _write_mission_views(
         "event_time_safety_g_precontrol_ready_count": int(
             event_safety_counts.get("heldout_safety_precontrol_ready_count", 0)
         ),
+        "combine_to_xfa_transition_count": relay_counts[
+            "combine_to_xfa_transition_count"
+        ],
+        "xfa_alternative_path_count": relay_counts["xfa_alternative_path_count"],
+        "xfa_standard_path_count": relay_counts["xfa_standard_path_count"],
+        "xfa_consistency_path_count": relay_counts["xfa_consistency_path_count"],
+        "xfa_standard_first_payout_count": relay_counts[
+            "xfa_standard_first_payout_count"
+        ],
+        "xfa_consistency_first_payout_count": relay_counts[
+            "xfa_consistency_first_payout_count"
+        ],
+        "xfa_standard_payout_cycle_count": relay_counts[
+            "xfa_standard_payout_cycle_count"
+        ],
+        "xfa_consistency_payout_cycle_count": relay_counts[
+            "xfa_consistency_payout_cycle_count"
+        ],
+        "xfa_standard_post_payout_survival_count": relay_counts[
+            "xfa_standard_post_payout_survival_count"
+        ],
+        "xfa_consistency_post_payout_survival_count": relay_counts[
+            "xfa_consistency_post_payout_survival_count"
+        ],
+        "cross_index_breadth_status": relay_counts["breadth_status"],
+        "cross_index_breadth_primary_count": relay_counts[
+            "breadth_primary_count"
+        ],
+        "cross_index_breadth_control_count": relay_counts[
+            "breadth_control_count"
+        ],
+        "cross_index_breadth_exact_account_replay_count": relay_counts[
+            "breadth_exact_account_replay_count"
+        ],
+        "cross_index_breadth_qualifying_cell_count": relay_counts[
+            "breadth_qualifying_cell_count"
+        ],
+        "fresh_confirmation_status": relay_counts[
+            "fresh_confirmation_status"
+        ],
+        "tier_c_candidate_ids": relay_counts["tier_c_candidate_ids"],
         "branch_decisions": {
             lane: (branch_results.get(lane) or {}).get("decision")
             for lane in ("EXPLOITATION", "EXPLORATION")
         },
-        "promotion_status": None,
+        "promotion_status": (
+            "TIER_C_INDEPENDENTLY_CONFIRMED" if strongest_c else None
+        ),
     }
     writer.write_json(
         "ECONOMIC_SCORECARD.json", _rehash(scorecard, "scorecard_hash")
@@ -4203,6 +5280,20 @@ def _write_mission_views(
             "q4_access_count_delta": 0,
             "broker_connections": 0,
             "orders": 0,
+            "authoritative_tier_g_count": relay_counts["tier_g_count"],
+            "independently_confirmed_tier_c_count": relay_counts["tier_c_count"],
+            "forward_tier_f_count": relay_counts["tier_f_count"],
+            "combine_to_xfa_transition_count": relay_counts[
+                "combine_to_xfa_transition_count"
+            ],
+            "xfa_alternative_path_count": relay_counts[
+                "xfa_alternative_path_count"
+            ],
+            "cross_index_breadth_status": relay_counts["breadth_status"],
+            "fresh_confirmation_status": relay_counts[
+                "fresh_confirmation_status"
+            ],
+            "tier_c_candidate_ids": relay_counts["tier_c_candidate_ids"],
         }
     )
     writer.write_json("CURRENT_STATE.json", _rehash(current, "state_hash"))
@@ -4311,6 +5402,53 @@ def _artifact_manifest_compatible(
         ),
     }
     return str(value.get("manifest_hash") or "") in allowed
+
+
+def _fresh_confirmation_manifest_paths(
+    root: Path, manifest: Mapping[str, Any]
+) -> tuple[dict[str, Path], tuple[str, ...]]:
+    """Resolve the sealed confirmation paths without requiring them to exist."""
+
+    section = dict(
+        manifest.get("fresh_confirmation")
+        or manifest.get("fresh_confirmation_contract")
+        or {}
+    )
+    required = (
+        "contract_path",
+        "acquisition_receipt_path",
+        "feature_receipt_path",
+        "result_path",
+    )
+    paths: dict[str, Path] = {}
+    missing: list[str] = []
+    project = root.resolve()
+    for key in required:
+        raw = str(section.get(key) or "").strip()
+        if not raw:
+            missing.append(key)
+            continue
+        candidate = Path(raw)
+        resolved = (
+            candidate.resolve()
+            if candidate.is_absolute()
+            else (project / candidate).resolve()
+        )
+        try:
+            resolved.relative_to(project)
+        except ValueError as exc:
+            raise AutonomousDirectorRuntimeError(
+                f"fresh-confirmation path escapes repository: {key}"
+            ) from exc
+        paths[key] = resolved
+    return paths, tuple(sorted(missing))
+
+
+def _read_json_object(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        raise AutonomousDirectorRuntimeError(f"JSON object expected: {path}")
+    return value
 
 
 def _read_hashed(path: Path, hash_field: str) -> dict[str, Any]:
