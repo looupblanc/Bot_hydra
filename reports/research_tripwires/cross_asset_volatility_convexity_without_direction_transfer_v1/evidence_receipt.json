@@ -1,0 +1,18 @@
+{
+  "branch_id": "CROSS_ASSET_VOLATILITY_CONVEXITY_WITHOUT_DIRECTION_TRANSFER_V1",
+  "broker_connections": 0,
+  "decision_card_hash": "f45b91ae0de70bddb645d14ea1c7cf353a6aead56d936171b2e9871a115589ce",
+  "incremental_data_spend_usd": 0.0,
+  "orders": 0,
+  "promotion_status": null,
+  "q4_access_count_delta": 0,
+  "receipt_hash": "efbfe807d6d262b8727dbc4868f592e37d2d0907c53471aaca86e463025dbac9",
+  "report_hash": "893d9a5fa229366a8722aeed4a41e3fdda4336c19e8e4dc81135f061530e7964",
+  "report_path": "reports/research_tripwires/cross_asset_volatility_convexity_without_direction_transfer_v1/decision_report.json",
+  "report_sha256": "1ac0e5e62fa3b2e9a57b6597c3fc53f3599fd245c5c0a67dd7eb98f487381488",
+  "result_hash": "6c1606be1285cc10b6f77b99eab3ea70cc80f7fbbcae55d6553874c6c8493bf5",
+  "result_path": "reports/research_tripwires/cross_asset_volatility_convexity_without_direction_transfer_v1/economic_result.json",
+  "result_sha256": "06d5f229010e4db65cc9e1195eccc75c11cd3a6d9664bd93c35e54e4894c12fe",
+  "schema": "hydra_cross_asset_volatility_convexity_evidence_receipt_v1",
+  "tier_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC"
+}

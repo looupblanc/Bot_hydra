@@ -1,0 +1,223 @@
+{
+  "schema": "hydra_autonomous_branch_decision_card_v1",
+  "decision_id": "CROSS_ASSET_VOLATILITY_CONVEXITY_WITHOUT_DIRECTION_TRANSFER_20260719_V1",
+  "evidence_role": "BOUNDED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
+  "selected_branch": "CROSS_ASSET_VOLATILITY_CONVEXITY_WITHOUT_DIRECTION_TRANSFER_V1",
+  "hypothesis": "A magnitude-only common volatility shock in the Treasury duration complex can identify a subsequent volatility expansion in a compressed MNQ or MGC market. The source determines only whether and when a frozen bilateral OCO is armed; direction is determined solely by the target market's own first unambiguous post-decision breakout.",
+  "strongest_argument_against": "Rates and target futures may incorporate common information synchronously, the target-only OCO may explain any apparent result, legacy volatility-expansion and cross-market density grammars failed, and only four independent final-development P20 starts exist per target.",
+  "evi_scorecard": {
+    "expected_information_gain_per_compute_minute": 9.0,
+    "expected_economic_upside": 7.5,
+    "data_cost_penalty": 0.0,
+    "implementation_cost_penalty": 1.8,
+    "overfitting_risk_penalty": 2.5,
+    "deployment_risk_penalty": 1.5,
+    "estimated_runtime_minutes_min": 8,
+    "estimated_runtime_minutes_max": 20,
+    "estimated_data_cost_usd": 0.0
+  },
+  "frozen_inputs": {
+    "source_files": [
+      {
+        "market": "ZN",
+        "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zn_explicit_contract_ohlcv.parquet",
+        "sha256": "8347100a5ad0fbd7b5281278764300028ac94dd60823dbbc39fd4056b4926d45"
+      },
+      {
+        "market": "TN",
+        "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/tn_explicit_contract_ohlcv.parquet",
+        "sha256": "aebd664d23a81d5d356c740570bc69e15e8f6556824e78d38360b7427d5003f1"
+      }
+    ],
+    "target_files": [
+      {
+        "markets": ["MNQ"],
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2023-01-01_2024-01-01.parquet",
+        "sha256": "19be0a539802cd06fea20425ef14feca529fd60ece7e9eb5a88837e1d4e01862"
+      },
+      {
+        "markets": ["MNQ"],
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-01-01_2024-03-31.parquet",
+        "sha256": "4540b7585caa2798998bd39a7d787c948f1f7c82f1d692e55118c4d4fffc5911"
+      },
+      {
+        "markets": ["MNQ"],
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-04-01_2024-07-01.parquet",
+        "sha256": "c1af5bb43aa0ac5b83d9d7bab8d20b2ef52c97089f7acccc8d19231ce9e647dc"
+      },
+      {
+        "markets": ["MNQ"],
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-07-01_2024-10-01.parquet",
+        "sha256": "97914227a87a5cd6b1c90f11de2061054a66f0a2b313f8120b8831af06b6c85e"
+      },
+      {
+        "markets": ["MGC"],
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_GC-v-0_MGC-v-0_2023-01-01_2024-10-01.parquet",
+        "sha256": "6bca31351820713016426286de8ae3ce9f0350b6886f780cccc5565fd65da78d"
+      }
+    ],
+    "target_roll_map_path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+    "target_roll_map_sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+    "treasury_roll_receipt_path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/roll_receipt.json",
+    "treasury_roll_receipt_sha256": "2a05b442d0dbe2e51d61a79e5ef44d0a01864b109f1bb813094f339498efa9ca",
+    "rule_snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "rule_snapshot_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+  },
+  "chronological_roles": {
+    "DISCOVERY": ["2023-01-03", "2024-01-01"],
+    "VALIDATION": ["2024-01-01", "2024-04-01"],
+    "FINAL_DEVELOPMENT": ["2024-04-01", "2024-10-01"]
+  },
+  "causal_contract": {
+    "source_markets": ["ZN", "TN"],
+    "execution_markets": ["MNQ", "MGC"],
+    "data_start_inclusive": "2023-01-03T00:00:00Z",
+    "data_end_exclusive": "2024-10-01T00:00:00Z",
+    "source_rv_minutes": 15,
+    "normalization_prior_true_sessions": 20,
+    "normalization": "SAME_LOCAL_MINUTE_PRIOR_20_TRUE_SESSIONS_ROLLING_MEDIAN_IQR",
+    "session_roles_chicago": {
+      "OPEN": ["07:00", "10:00"],
+      "MID": ["10:00", "13:45"]
+    },
+    "minimum_observed_minutes_for_complete_session": 400,
+    "calendar_inventory_window_chicago": ["07:00", "14:00"],
+    "maximum_events_per_session": 3,
+    "event_reset_minutes": 60,
+    "source_roll_guard_true_sessions_each_side": 1,
+    "roll_unsafe_policy": "TRUE_SESSION_RETAINED_ZERO_TRADE",
+    "unexpected_gap_policy": "DATA_CENSORED",
+    "decision_rule": "Source features contain only absolute or squared returns. A completed source state may arm a target OCO but cannot select direction.",
+    "entry_rule": "All OCO entry, stop and target levels are frozen at decision_time. No fill is allowed on the completed decision bar; the earliest executable bar is the next tradable target bar.",
+    "entry_double_touch_policy": "AMBIGUOUS_BOTH_TOUCH_ABSTAIN",
+    "exit_double_touch_policy": "STOP_FIRST_CONSERVATIVE",
+    "source_sign_flip_invariance_required": true,
+    "same_session_flatten_required": true,
+    "future_outcomes_in_decision": false,
+    "mechanisms": [
+      {
+        "mechanism": "COMMON_RATES_VOL_SHOCK_COIL_OCO",
+        "source_score_minimum": 2.0,
+        "source_target_score_gap_minimum": null,
+        "target_range_quantile": 0.35,
+        "target_vol_quantile": null,
+        "oco_lookback_minutes": 15,
+        "oco_valid_minutes": 15,
+        "stop_range_fraction": 0.5,
+        "minimum_stop_ticks": 4,
+        "target_r_multiple": 2.5,
+        "maximum_holding_minutes": 30
+      },
+      {
+        "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+        "source_score_minimum": 1.5,
+        "source_target_score_gap_minimum": 1.5,
+        "target_range_quantile": null,
+        "target_vol_quantile": 0.5,
+        "oco_lookback_minutes": 30,
+        "oco_valid_minutes": 30,
+        "stop_range_fraction": 0.5,
+        "minimum_stop_ticks": 4,
+        "target_r_multiple": 3.0,
+        "maximum_holding_minutes": 60
+      }
+    ],
+    "normal_all_in_cost_per_micro_usd": {"MNQ": 3.0, "MGC": 4.0},
+    "stressed_all_in_cost_per_micro_usd": {"MNQ": 4.5, "MGC": 6.0}
+  },
+  "power_preflight": {
+    "minimum_independent_events_per_target": {
+      "DISCOVERY": 60,
+      "VALIDATION": 12,
+      "FINAL_DEVELOPMENT": 20
+    },
+    "when_underpowered": "VOL_CONVEXITY_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+  },
+  "account_frontier": {
+    "account_sizes": ["50K", "100K", "150K"],
+    "risk_fraction_of_current_mll_buffer": [0.1, 0.2, 0.3],
+    "horizons_trading_days": [5, 10, 20],
+    "maximum_concurrent_positions": 1,
+    "daily_loss_guard_fraction_of_mll": 0.35,
+    "daily_profit_guard_fraction_of_base_target": 0.45,
+    "special_micro_caps": {
+      "MGC": {"50K": 30, "100K": 60, "150K": 90}
+    }
+  },
+  "controls": [
+    "TARGET_ONLY_DUTY_MATCHED_OCO",
+    "SOURCE_SHIFT_5_TRUE_SESSIONS",
+    "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO",
+    "SOURCE_MAGNITUDE_PERMUTATION"
+  ],
+  "discovery_selection": {
+    "maximum_selected_candidates": 2,
+    "maximum_per_execution_market": 1,
+    "selection_uses_validation_or_final_development": false
+  },
+  "frozen_gate": {
+    "minimum_distinct_positive_targets": 2,
+    "positive_stressed_validation_net_required": true,
+    "positive_stressed_final_development_net_required": true,
+    "minimum_combined_final_normal_passes": 2,
+    "minimum_combined_final_stressed_passes": 1,
+    "minimum_positive_quarter_or_market_contexts": 2,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "passing_consistency_required": true,
+    "minimum_final_stressed_target_progress_p25": 0.0,
+    "minimum_median_target_progress_uplift_over_each_control": 0.1,
+    "one_extra_pass_can_replace_progress_uplift": true,
+    "maximum_single_trade_profit_concentration": 0.5,
+    "evidence_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC"
+  },
+  "cemetery_audit": {
+    "graveyard_path": "mission/state/graveyard.db",
+    "graveyard_sha256_at_selection": "3b2a32cf0ee2ba474bf53be895b95da6e3b0768d77c73b28681e7fa5a2bd101a",
+    "canonical_mechanism_class": "cross_asset_volatility_magnitude_armed_target_oco_v1",
+    "exact_mechanism_class_collision_count": 0,
+    "adjacent_tombstones_reviewed": [
+      "topstep_volatility_expansion_limited_risk",
+      "CONTEMPORANEOUS_CROSS_MARKET_OPPORTUNITY_DENSITY_V1",
+      "v71g5_cross_clock_speed_leadership",
+      "intraday_index_breadth_catchup",
+      "extreme_index_leadership_spread_reversion",
+      "cross_ecology_delayed_risk_transfer"
+    ],
+    "forbidden_neighbor_features": [
+      "source_return_sign",
+      "source_direction_transfer",
+      "curve_relative_value_position",
+      "calendar_release_identity",
+      "target_underreaction_direction",
+      "cross_index_directional_breadth",
+      "target_only_volatility_expansion_entry",
+      "opportunity_density_allocator"
+    ],
+    "resurrection_permitted": false
+  },
+  "governance": {
+    "status_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+    "promotion_allowed": false,
+    "tier_q_allowed": false,
+    "independent_confirmation_claimed": false,
+    "q4_access_allowed": false,
+    "data_purchase_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "maximum_cpu_workers": 1,
+    "mission_state_writes_allowed": false
+  },
+  "expected_runtime": {
+    "input_rows_approximate": 2104767,
+    "candidate_specification_count": 8,
+    "runtime_minutes_one_worker": [8, 20],
+    "maximum_rss_gb": 3.0
+  },
+  "next_branch_rule": {
+    "when_green": "FREEZE_TIER_E_DIAGNOSTIC_AND_REQUIRE_GENUINELY_FRESH_CONFIRMATION_WITHOUT_RETUNING",
+    "when_weak": "PRESERVE_DIAGNOSTIC_ONLY_AND_DO_NOT_TUNE_NEIGHBORING_THRESHOLDS",
+    "when_falsified": "TOMBSTONE_EXACT_MAGNITUDE_ARMED_OCO_LATTICE_AND_REALLOCATE_TO_MATERIALLY_DISTINCT_INFORMATION",
+    "when_underpowered": "REPORT_POWER_LIMIT_WITHOUT_THRESHOLD_RELAXATION"
+  },
+  "card_hash": "f45b91ae0de70bddb645d14ea1c7cf353a6aead56d936171b2e9871a115589ce"
+}

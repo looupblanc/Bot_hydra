@@ -1,0 +1,128 @@
+{
+  "branch_gate": {
+    "checks": {
+      "power": false
+    },
+    "passed": false,
+    "status": "VOL_CONVEXITY_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+  },
+  "branch_id": "CROSS_ASSET_VOLATILITY_CONVEXITY_WITHOUT_DIRECTION_TRANSFER_V1",
+  "decision": "VOL_CONVEXITY_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
+  "economic_summary": {
+    "candidates": [
+      {
+        "account_label": "100K",
+        "candidate_id": "volconv_MNQ_rates_target_vol_gap_oco_open_v1",
+        "gate_passed": false,
+        "horizon_trading_days": 5,
+        "market": "MNQ",
+        "minimum_mll_buffer_usd": 2121.5,
+        "normal_net_usd": -974.25,
+        "normal_passes": 0,
+        "risk_fraction": 0.1,
+        "stressed_mll_breach_rate": 0.0,
+        "stressed_net_usd": -1076.25,
+        "stressed_passes": 0,
+        "stressed_target_progress_median": 0.0,
+        "stressed_target_progress_p25": 0.0
+      },
+      {
+        "account_label": "150K",
+        "candidate_id": "volconv_MGC_rates_target_vol_gap_oco_open_v1",
+        "gate_passed": false,
+        "horizon_trading_days": 5,
+        "market": "MGC",
+        "minimum_mll_buffer_usd": 1916.0,
+        "normal_net_usd": -1968.0000000000582,
+        "normal_passes": 0,
+        "risk_fraction": 0.3,
+        "stressed_mll_breach_rate": 0.0,
+        "stressed_net_usd": -2300.000000000058,
+        "stressed_passes": 0,
+        "stressed_target_progress_median": 0.0,
+        "stressed_target_progress_p25": 0.0
+      }
+    ],
+    "combined_final_normal_passes": 0,
+    "combined_final_stressed_passes": 0,
+    "positive_final_stressed_candidate_count": 0
+  },
+  "evidence_tier_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+  "next_action": "REPORT_POWER_LIMIT_WITHOUT_THRESHOLD_RELAXATION",
+  "power_preflight": {
+    "candidates": {
+      "volconv_MGC_rates_target_vol_gap_oco_open_v1": {
+        "checks": {
+          "DISCOVERY": false,
+          "FINAL_DEVELOPMENT": false,
+          "VALIDATION": false
+        },
+        "event_counts": {
+          "DISCOVERY": 27,
+          "FINAL_DEVELOPMENT": 6,
+          "VALIDATION": 0
+        }
+      },
+      "volconv_MNQ_rates_target_vol_gap_oco_open_v1": {
+        "checks": {
+          "DISCOVERY": false,
+          "FINAL_DEVELOPMENT": false,
+          "VALIDATION": false
+        },
+        "event_counts": {
+          "DISCOVERY": 53,
+          "FINAL_DEVELOPMENT": 15,
+          "VALIDATION": 5
+        }
+      }
+    },
+    "passed": false,
+    "thresholds": {
+      "DISCOVERY": 60,
+      "FINAL_DEVELOPMENT": 20,
+      "VALIDATION": 12
+    }
+  },
+  "proposal_count": 8,
+  "report_hash": "893d9a5fa229366a8722aeed4a41e3fdda4336c19e8e4dc81135f061530e7964",
+  "runtime_seconds": 769.6935465930728,
+  "safety": {
+    "authoritative_mission_writes": 0,
+    "broker_connections": 0,
+    "data_purchase_count": 0,
+    "incremental_data_spend_usd": 0.0,
+    "orders": 0,
+    "q4_access_count_delta": 0
+  },
+  "schema": "hydra_cross_asset_volatility_convexity_decision_report_v1",
+  "selected_candidates": [
+    {
+      "candidate_id": "volconv_MNQ_rates_target_vol_gap_oco_open_v1",
+      "discovery_event_count": 53,
+      "discovery_normal_net_one_micro_usd": 51.75,
+      "discovery_stressed_net_one_micro_usd": -27.75,
+      "execution_market": "MNQ",
+      "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+      "session_role": "OPEN",
+      "source_markets": [
+        "ZN",
+        "TN"
+      ],
+      "structural_fingerprint": "7943d92e010761bc81d489941bf3aa713dce92c1b71e2010fefa9fe7ac70775e"
+    },
+    {
+      "candidate_id": "volconv_MGC_rates_target_vol_gap_oco_open_v1",
+      "discovery_event_count": 27,
+      "discovery_normal_net_one_micro_usd": 250.50000000001273,
+      "discovery_stressed_net_one_micro_usd": 196.50000000001273,
+      "execution_market": "MGC",
+      "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+      "session_role": "OPEN",
+      "source_markets": [
+        "ZN",
+        "TN"
+      ],
+      "structural_fingerprint": "5a4c4cfa065ce3322f4acf0ef0e286b9b672d4d46d1bd7a0fc55df57a828816f"
+    }
+  ]
+}

@@ -1,0 +1,4084 @@
+{
+  "authoritative_mission_writes": 0,
+  "branch_gate": {
+    "checks": {
+      "power": false
+    },
+    "passed": false,
+    "status": "VOL_CONVEXITY_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+  },
+  "branch_id": "CROSS_ASSET_VOLATILITY_CONVEXITY_WITHOUT_DIRECTION_TRANSFER_V1",
+  "broker_connections": 0,
+  "candidate_results": [
+    {
+      "candidate_id": "volconv_MNQ_rates_target_vol_gap_oco_open_v1",
+      "control_match_counts": {
+        "PRIMARY": 73,
+        "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": 73,
+        "SOURCE_MAGNITUDE_PERMUTATION": 67,
+        "SOURCE_SHIFT_5_TRUE_SESSIONS": 69,
+        "TARGET_ONLY_DUTY_MATCHED_OCO": 73
+      },
+      "discovery_frontier_cell_count": 27,
+      "evaluations": {
+        "DISCOVERY": {
+          "PRIMARY": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 21,
+            "full_coverage_start_count": 30,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8333333333333334,
+              "data_censored_count": 21,
+              "episode_count": 30,
+              "full_coverage_episode_count": 30,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2153.25,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -1499.5,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.037510416666666664,
+              "terminal_distribution": {
+                "TIMEOUT": 30
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8333333333333334,
+              "data_censored_count": 21,
+              "episode_count": 30,
+              "full_coverage_episode_count": 30,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2114.25,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -1822.5,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.039531250000000004,
+              "terminal_distribution": {
+                "TIMEOUT": 30
+              }
+            },
+            "total_preregistered_start_count": 51
+          },
+          "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 21,
+            "full_coverage_start_count": 30,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8,
+              "data_censored_count": 21,
+              "episode_count": 30,
+              "full_coverage_episode_count": 30,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2334.75,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -1674.5,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.04696875,
+              "terminal_distribution": {
+                "TIMEOUT": 30
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8,
+              "data_censored_count": 21,
+              "episode_count": 30,
+              "full_coverage_episode_count": 30,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2307.75,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -1946.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.0479375,
+              "terminal_distribution": {
+                "TIMEOUT": 30
+              }
+            },
+            "total_preregistered_start_count": 51
+          },
+          "SOURCE_MAGNITUDE_PERMUTATION": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 21,
+            "full_coverage_start_count": 30,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8333333333333334,
+              "data_censored_count": 21,
+              "episode_count": 30,
+              "full_coverage_episode_count": 30,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2088.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 22.75,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 30
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8666666666666667,
+              "data_censored_count": 21,
+              "episode_count": 30,
+              "full_coverage_episode_count": 30,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2059.5,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -326.75,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.0023437500000000003,
+              "terminal_distribution": {
+                "TIMEOUT": 30
+              }
+            },
+            "total_preregistered_start_count": 51
+          },
+          "SOURCE_SHIFT_5_TRUE_SESSIONS": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 21,
+            "full_coverage_start_count": 30,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8,
+              "data_censored_count": 21,
+              "episode_count": 30,
+              "full_coverage_episode_count": 30,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2037.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 1162.75,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 30
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8,
+              "data_censored_count": 21,
+              "episode_count": 30,
+              "full_coverage_episode_count": 30,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2006.5,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 897.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 30
+              }
+            },
+            "total_preregistered_start_count": 51
+          },
+          "TARGET_ONLY_DUTY_MATCHED_OCO": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 21,
+            "full_coverage_start_count": 30,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8,
+              "data_censored_count": 21,
+              "episode_count": 30,
+              "full_coverage_episode_count": 30,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2334.75,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -1674.5,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.04696875,
+              "terminal_distribution": {
+                "TIMEOUT": 30
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8,
+              "data_censored_count": 21,
+              "episode_count": 30,
+              "full_coverage_episode_count": 30,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2307.75,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -1946.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.0479375,
+              "terminal_distribution": {
+                "TIMEOUT": 30
+              }
+            },
+            "total_preregistered_start_count": 51
+          }
+        },
+        "FINAL_DEVELOPMENT": {
+          "PRIMARY": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 9,
+            "full_coverage_start_count": 17,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8823529411764706,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2134.25,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -974.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8823529411764706,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2121.5,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -1076.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "total_preregistered_start_count": 26
+          },
+          "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 9,
+            "full_coverage_start_count": 17,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8235294117647058,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2635.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -386.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.033166666666666664,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8235294117647058,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2631.25,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -458.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.033666666666666664,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "total_preregistered_start_count": 26
+          },
+          "SOURCE_MAGNITUDE_PERMUTATION": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 9,
+            "full_coverage_start_count": 17,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8235294117647058,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2505.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.75,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8235294117647058,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2493.75,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -83.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "total_preregistered_start_count": 26
+          },
+          "SOURCE_SHIFT_5_TRUE_SESSIONS": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 9,
+            "full_coverage_start_count": 17,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8235294117647058,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2484.5,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 659.5,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8823529411764706,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2469.5,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 578.5,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "total_preregistered_start_count": 26
+          },
+          "TARGET_ONLY_DUTY_MATCHED_OCO": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 9,
+            "full_coverage_start_count": 17,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8235294117647058,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2635.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -386.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.033166666666666664,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8235294117647058,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2631.25,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -458.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.033666666666666664,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "total_preregistered_start_count": 26
+          }
+        },
+        "VALIDATION": {
+          "PRIMARY": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 5,
+            "full_coverage_start_count": 7,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8571428571428571,
+              "data_censored_count": 5,
+              "episode_count": 7,
+              "full_coverage_episode_count": 7,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2579.75,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 362.75,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 7
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8571428571428571,
+              "data_censored_count": 5,
+              "episode_count": 7,
+              "full_coverage_episode_count": 7,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2564.75,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 337.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 7
+              }
+            },
+            "total_preregistered_start_count": 12
+          },
+          "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 5,
+            "full_coverage_start_count": 7,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 5,
+              "episode_count": 7,
+              "full_coverage_episode_count": 7,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2622.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -570.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.023875000000000004,
+              "terminal_distribution": {
+                "TIMEOUT": 7
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 5,
+              "episode_count": 7,
+              "full_coverage_episode_count": 7,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2619.75,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -586.75,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.024625,
+              "terminal_distribution": {
+                "TIMEOUT": 7
+              }
+            },
+            "total_preregistered_start_count": 12
+          },
+          "SOURCE_MAGNITUDE_PERMUTATION": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 5,
+            "full_coverage_start_count": 7,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 5,
+              "episode_count": 7,
+              "full_coverage_episode_count": 7,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2762.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -235.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 7
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 5,
+              "episode_count": 7,
+              "full_coverage_episode_count": 7,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2759.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -241.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 7
+              }
+            },
+            "total_preregistered_start_count": 12
+          },
+          "SOURCE_SHIFT_5_TRUE_SESSIONS": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 5,
+            "full_coverage_start_count": 7,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.7142857142857143,
+              "data_censored_count": 5,
+              "episode_count": 7,
+              "full_coverage_episode_count": 7,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2712.5,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 663.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 7
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.7142857142857143,
+              "data_censored_count": 5,
+              "episode_count": 7,
+              "full_coverage_episode_count": 7,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2708.75,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 637.75,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 7
+              }
+            },
+            "total_preregistered_start_count": 12
+          },
+          "TARGET_ONLY_DUTY_MATCHED_OCO": {
+            "account_label": "100K",
+            "account_size_usd": 100000,
+            "data_censored_start_count": 5,
+            "full_coverage_start_count": 7,
+            "horizon_trading_days": 5,
+            "market": "MNQ",
+            "micro_cap": 100,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 5,
+              "episode_count": 7,
+              "full_coverage_episode_count": 7,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2622.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -570.25,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.023875000000000004,
+              "terminal_distribution": {
+                "TIMEOUT": 7
+              }
+            },
+            "risk_fraction": 0.1,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 5,
+              "episode_count": 7,
+              "full_coverage_episode_count": 7,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2619.75,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -586.75,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.024625,
+              "terminal_distribution": {
+                "TIMEOUT": 7
+              }
+            },
+            "total_preregistered_start_count": 12
+          }
+        }
+      },
+      "event_attribution": {
+        "DISCOVERY": {
+          "event_count": 53,
+          "long_count": 26,
+          "normal_net_one_micro_usd": 51.75,
+          "short_count": 27,
+          "stop_count": 32,
+          "stressed_net_one_micro_usd": -27.75,
+          "target_count": 5
+        },
+        "FINAL_DEVELOPMENT": {
+          "event_count": 15,
+          "long_count": 6,
+          "normal_net_one_micro_usd": -231.0,
+          "short_count": 9,
+          "stop_count": 10,
+          "stressed_net_one_micro_usd": -253.5,
+          "target_count": 2
+        },
+        "VALIDATION": {
+          "event_count": 5,
+          "long_count": 2,
+          "normal_net_one_micro_usd": 20.75,
+          "short_count": 3,
+          "stop_count": 3,
+          "stressed_net_one_micro_usd": 13.25,
+          "target_count": 1
+        }
+      },
+      "evidence_tier": "E_EXECUTABLE_DIAGNOSTIC",
+      "execution_market": "MNQ",
+      "frozen_discovery_cell": {
+        "account_label": "100K",
+        "account_size_usd": 100000,
+        "horizon_trading_days": 5,
+        "micro_cap": 100,
+        "risk_fraction": 0.1
+      },
+      "gate": {
+        "checks": {
+          "beats_all_controls": false,
+          "controlled_mll": true,
+          "no_single_trade_domination": true,
+          "nonnegative_final_p25": true,
+          "passing_consistency": true,
+          "positive_final_stressed": false,
+          "positive_multiple_quarters": false,
+          "positive_validation_stressed": true
+        },
+        "control_beats": {
+          "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": false,
+          "SOURCE_MAGNITUDE_PERMUTATION": false,
+          "SOURCE_SHIFT_5_TRUE_SESSIONS": false,
+          "TARGET_ONLY_DUTY_MATCHED_OCO": false
+        },
+        "passed": false,
+        "positive_quarter_count": 0,
+        "proposal": {
+          "candidate_id": "volconv_MNQ_rates_target_vol_gap_oco_open_v1",
+          "discovery_event_count": 53,
+          "discovery_normal_net_one_micro_usd": 51.75,
+          "discovery_stressed_net_one_micro_usd": -27.75,
+          "execution_market": "MNQ",
+          "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+          "session_role": "OPEN",
+          "source_markets": [
+            "ZN",
+            "TN"
+          ],
+          "structural_fingerprint": "7943d92e010761bc81d489941bf3aa713dce92c1b71e2010fefa9fe7ac70775e"
+        },
+        "single_trade_profit_concentration": 0.32079646017699115
+      },
+      "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+      "promotion_status": null,
+      "session_role": "OPEN"
+    },
+    {
+      "candidate_id": "volconv_MGC_rates_target_vol_gap_oco_open_v1",
+      "control_match_counts": {
+        "PRIMARY": 33,
+        "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": 33,
+        "SOURCE_MAGNITUDE_PERMUTATION": 31,
+        "SOURCE_SHIFT_5_TRUE_SESSIONS": 33,
+        "TARGET_ONLY_DUTY_MATCHED_OCO": 33
+      },
+      "discovery_frontier_cell_count": 27,
+      "evaluations": {
+        "DISCOVERY": {
+          "PRIMARY": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 23,
+            "full_coverage_start_count": 28,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.75,
+              "data_censored_count": 23,
+              "episode_count": 28,
+              "full_coverage_episode_count": 28,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2408.000000000029,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 7068.500000000349,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 28
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.75,
+              "data_censored_count": 23,
+              "episode_count": 28,
+              "full_coverage_episode_count": 28,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2345.000000000029,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 5461.500000000349,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 28
+              }
+            },
+            "total_preregistered_start_count": 51
+          },
+          "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 23,
+            "full_coverage_start_count": 28,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8928571428571429,
+              "data_censored_count": 23,
+              "episode_count": 28,
+              "full_coverage_episode_count": 28,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 1137.0000000000582,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -2087.5000000003783,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.04663888888888647,
+              "terminal_distribution": {
+                "TIMEOUT": 28
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8928571428571429,
+              "data_censored_count": 23,
+              "episode_count": 28,
+              "full_coverage_episode_count": 28,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 1061.5000000000582,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -3193.0000000003783,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.05758333333332767,
+              "terminal_distribution": {
+                "TIMEOUT": 28
+              }
+            },
+            "total_preregistered_start_count": 51
+          },
+          "SOURCE_MAGNITUDE_PERMUTATION": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 23,
+            "full_coverage_start_count": 28,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.7857142857142857,
+              "data_censored_count": 23,
+              "episode_count": 28,
+              "full_coverage_episode_count": 28,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 1742.0000000003492,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 5354.000000000087,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 28
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.7857142857142857,
+              "data_censored_count": 23,
+              "episode_count": 28,
+              "full_coverage_episode_count": 28,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 1540.0000000003492,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 4082.0000000000873,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 28
+              }
+            },
+            "total_preregistered_start_count": 51
+          },
+          "SOURCE_SHIFT_5_TRUE_SESSIONS": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 23,
+            "full_coverage_start_count": 28,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.75,
+              "data_censored_count": 23,
+              "episode_count": 28,
+              "full_coverage_episode_count": 28,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2187.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 9956.499999999854,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 28
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.75,
+              "data_censored_count": 23,
+              "episode_count": 28,
+              "full_coverage_episode_count": 28,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2043.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 7965.4999999998545,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 28
+              }
+            },
+            "total_preregistered_start_count": 51
+          },
+          "TARGET_ONLY_DUTY_MATCHED_OCO": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 23,
+            "full_coverage_start_count": 28,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8928571428571429,
+              "data_censored_count": 23,
+              "episode_count": 28,
+              "full_coverage_episode_count": 28,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 1137.0000000000582,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -2087.5000000003783,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.04663888888888647,
+              "terminal_distribution": {
+                "TIMEOUT": 28
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8928571428571429,
+              "data_censored_count": 23,
+              "episode_count": 28,
+              "full_coverage_episode_count": 28,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 1061.5000000000582,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -3193.0000000003783,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": -0.05758333333332767,
+              "terminal_distribution": {
+                "TIMEOUT": 28
+              }
+            },
+            "total_preregistered_start_count": 51
+          }
+        },
+        "FINAL_DEVELOPMENT": {
+          "PRIMARY": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 9,
+            "full_coverage_start_count": 17,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.9411764705882353,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 1954.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -1968.0000000000582,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.9411764705882353,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 1916.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -2300.000000000058,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "total_preregistered_start_count": 26
+          },
+          "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 9,
+            "full_coverage_start_count": 17,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.9411764705882353,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2952.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -2163.5000000001455,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.9411764705882353,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2957.5,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -2460.0000000001455,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "total_preregistered_start_count": 26
+          },
+          "SOURCE_MAGNITUDE_PERMUTATION": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 9,
+            "full_coverage_start_count": 17,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8235294117647058,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 3235.000000000029,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 5416.999999999971,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8235294117647058,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 3189.000000000029,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 5138.999999999971,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "total_preregistered_start_count": 26
+          },
+          "SOURCE_SHIFT_5_TRUE_SESSIONS": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 9,
+            "full_coverage_start_count": 17,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8823529411764706,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 3132.0000000001455,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 4603.0000000001455,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.8823529411764706,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 3094.0000000001455,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 4239.0000000001455,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "total_preregistered_start_count": 26
+          },
+          "TARGET_ONLY_DUTY_MATCHED_OCO": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 9,
+            "full_coverage_start_count": 17,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.9411764705882353,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2952.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -2163.5000000001455,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 0.9411764705882353,
+              "data_censored_count": 9,
+              "episode_count": 17,
+              "full_coverage_episode_count": 17,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 2957.5,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": -2460.0000000001455,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 17
+              }
+            },
+            "total_preregistered_start_count": 26
+          }
+        },
+        "VALIDATION": {
+          "PRIMARY": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 6,
+            "full_coverage_start_count": 6,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 6,
+              "episode_count": 6,
+              "full_coverage_episode_count": 6,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 4500.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 6
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 6,
+              "episode_count": 6,
+              "full_coverage_episode_count": 6,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 4500.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 6
+              }
+            },
+            "total_preregistered_start_count": 12
+          },
+          "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 6,
+            "full_coverage_start_count": 6,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 6,
+              "episode_count": 6,
+              "full_coverage_episode_count": 6,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 4500.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 6
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 6,
+              "episode_count": 6,
+              "full_coverage_episode_count": 6,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 4500.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 6
+              }
+            },
+            "total_preregistered_start_count": 12
+          },
+          "SOURCE_MAGNITUDE_PERMUTATION": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 6,
+            "full_coverage_start_count": 6,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 6,
+              "episode_count": 6,
+              "full_coverage_episode_count": 6,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 4500.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 6
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 6,
+              "episode_count": 6,
+              "full_coverage_episode_count": 6,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 4500.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 6
+              }
+            },
+            "total_preregistered_start_count": 12
+          },
+          "SOURCE_SHIFT_5_TRUE_SESSIONS": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 6,
+            "full_coverage_start_count": 6,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 6,
+              "episode_count": 6,
+              "full_coverage_episode_count": 6,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 4500.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 6
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 6,
+              "episode_count": 6,
+              "full_coverage_episode_count": 6,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 4500.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 6
+              }
+            },
+            "total_preregistered_start_count": 12
+          },
+          "TARGET_ONLY_DUTY_MATCHED_OCO": {
+            "account_label": "150K",
+            "account_size_usd": 150000,
+            "data_censored_start_count": 6,
+            "full_coverage_start_count": 6,
+            "horizon_trading_days": 5,
+            "market": "MGC",
+            "micro_cap": 90,
+            "normal": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 6,
+              "episode_count": 6,
+              "full_coverage_episode_count": 6,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 4500.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 6
+              }
+            },
+            "risk_fraction": 0.3,
+            "stressed": {
+              "all_passing_paths_consistency_compliant": false,
+              "consistency_compliance_rate": 1.0,
+              "data_censored_count": 6,
+              "episode_count": 6,
+              "full_coverage_episode_count": 6,
+              "median_days_to_target": null,
+              "minimum_mll_buffer_usd": 4500.0,
+              "mll_breach_count": 0,
+              "mll_breach_rate": 0.0,
+              "net_median_usd": 0.0,
+              "net_total_usd": 0.0,
+              "pass_count": 0,
+              "pass_count_by_block": {},
+              "pass_rate": 0.0,
+              "target_progress_median": 0.0,
+              "target_progress_p25": 0.0,
+              "terminal_distribution": {
+                "TIMEOUT": 6
+              }
+            },
+            "total_preregistered_start_count": 12
+          }
+        }
+      },
+      "event_attribution": {
+        "DISCOVERY": {
+          "event_count": 27,
+          "long_count": 10,
+          "normal_net_one_micro_usd": 250.50000000001273,
+          "short_count": 17,
+          "stop_count": 9,
+          "stressed_net_one_micro_usd": 196.50000000001273,
+          "target_count": 4
+        },
+        "FINAL_DEVELOPMENT": {
+          "event_count": 6,
+          "long_count": 5,
+          "normal_net_one_micro_usd": -34.0,
+          "short_count": 1,
+          "stop_count": 4,
+          "stressed_net_one_micro_usd": -46.0,
+          "target_count": 0
+        },
+        "VALIDATION": {
+          "event_count": 0,
+          "long_count": 0,
+          "normal_net_one_micro_usd": 0,
+          "short_count": 0,
+          "stop_count": 0,
+          "stressed_net_one_micro_usd": 0,
+          "target_count": 0
+        }
+      },
+      "evidence_tier": "E_EXECUTABLE_DIAGNOSTIC",
+      "execution_market": "MGC",
+      "frozen_discovery_cell": {
+        "account_label": "150K",
+        "account_size_usd": 150000,
+        "horizon_trading_days": 5,
+        "micro_cap": 90,
+        "risk_fraction": 0.3
+      },
+      "gate": {
+        "checks": {
+          "beats_all_controls": false,
+          "controlled_mll": true,
+          "no_single_trade_domination": false,
+          "nonnegative_final_p25": true,
+          "passing_consistency": true,
+          "positive_final_stressed": false,
+          "positive_multiple_quarters": false,
+          "positive_validation_stressed": false
+        },
+        "control_beats": {
+          "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": false,
+          "SOURCE_MAGNITUDE_PERMUTATION": false,
+          "SOURCE_SHIFT_5_TRUE_SESSIONS": false,
+          "TARGET_ONLY_DUTY_MATCHED_OCO": false
+        },
+        "passed": false,
+        "positive_quarter_count": 1,
+        "proposal": {
+          "candidate_id": "volconv_MGC_rates_target_vol_gap_oco_open_v1",
+          "discovery_event_count": 27,
+          "discovery_normal_net_one_micro_usd": 250.50000000001273,
+          "discovery_stressed_net_one_micro_usd": 196.50000000001273,
+          "execution_market": "MGC",
+          "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+          "session_role": "OPEN",
+          "source_markets": [
+            "ZN",
+            "TN"
+          ],
+          "structural_fingerprint": "5a4c4cfa065ce3322f4acf0ef0e286b9b672d4d46d1bd7a0fc55df57a828816f"
+        },
+        "single_trade_profit_concentration": 0.60377358490565
+      },
+      "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+      "promotion_status": null,
+      "session_role": "OPEN"
+    }
+  ],
+  "cemetery_audit": {
+    "adjacent_tombstones_reviewed": [
+      "topstep_volatility_expansion_limited_risk",
+      "CONTEMPORANEOUS_CROSS_MARKET_OPPORTUNITY_DENSITY_V1",
+      "v71g5_cross_clock_speed_leadership",
+      "intraday_index_breadth_catchup",
+      "extreme_index_leadership_spread_reversion",
+      "cross_ecology_delayed_risk_transfer"
+    ],
+    "canonical_mechanism_class": "cross_asset_volatility_magnitude_armed_target_oco_v1",
+    "exact_collision_count": 0,
+    "forbidden_neighbor_features": [
+      "source_return_sign",
+      "source_direction_transfer",
+      "curve_relative_value_position",
+      "calendar_release_identity",
+      "target_underreaction_direction",
+      "cross_index_directional_breadth",
+      "target_only_volatility_expansion_entry",
+      "opportunity_density_allocator"
+    ],
+    "graveyard_sha256": "3b2a32cf0ee2ba474bf53be895b95da6e3b0768d77c73b28681e7fa5a2bd101a",
+    "resurrection_detected": false
+  },
+  "coverage": {
+    "DISCOVERY": {
+      "MGC": {
+        "calendar_policy": "OBSERVED_EXCHANGE_SESSION_ORDER_NO_WEEKDAY_SYNTHESIS",
+        "data_censored_day_count": 65,
+        "data_censored_days": [
+          20230116,
+          20230130,
+          20230131,
+          20230220,
+          20230302,
+          20230303,
+          20230306,
+          20230307,
+          20230308,
+          20230309,
+          20230310,
+          20230313,
+          20230314,
+          20230315,
+          20230316,
+          20230317,
+          20230320,
+          20230330,
+          20230331,
+          20230407,
+          20230529,
+          20230530,
+          20230531,
+          20230601,
+          20230602,
+          20230605,
+          20230606,
+          20230607,
+          20230608,
+          20230609,
+          20230612,
+          20230613,
+          20230614,
+          20230615,
+          20230616,
+          20230619,
+          20230703,
+          20230704,
+          20230728,
+          20230904,
+          20230905,
+          20230906,
+          20230907,
+          20230908,
+          20230911,
+          20230912,
+          20230913,
+          20230914,
+          20230915,
+          20230918,
+          20231123,
+          20231124,
+          20231129,
+          20231130,
+          20231201,
+          20231204,
+          20231205,
+          20231206,
+          20231207,
+          20231208,
+          20231211,
+          20231212,
+          20231213,
+          20231214,
+          20231215
+        ],
+        "data_censored_reasons_by_day": {
+          "20230116": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230130": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230131": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230220": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230302": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230303": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230306": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230307": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230308": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230309": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230310": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230313": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230314": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230315": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230316": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230317": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230320": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230330": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230331": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230407": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230529": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230530": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230531": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230601": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230602": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230605": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230606": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230607": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230608": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230609": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230612": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230613": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230614": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230615": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230616": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230619": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230703": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230704": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230728": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230904": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230905": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230906": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230907": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230908": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230911": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230912": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230913": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230914": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230915": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230918": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231123": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20231124": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20231129": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20231130": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231201": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231204": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231205": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231206": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231207": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231208": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231211": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231212": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231213": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231214": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231215": [
+            "SOURCE_MINUTE_GAP"
+          ]
+        },
+        "roll_unsafe_zero_trade_count": 41,
+        "roll_unsafe_zero_trade_days": [
+          20230223,
+          20230224,
+          20230227,
+          20230228,
+          20230301,
+          20230321,
+          20230322,
+          20230323,
+          20230424,
+          20230425,
+          20230426,
+          20230427,
+          20230428,
+          20230620,
+          20230621,
+          20230622,
+          20230626,
+          20230627,
+          20230628,
+          20230629,
+          20230630,
+          20230828,
+          20230829,
+          20230830,
+          20230831,
+          20230901,
+          20230919,
+          20230920,
+          20230921,
+          20231026,
+          20231027,
+          20231030,
+          20231031,
+          20231101,
+          20231218,
+          20231219,
+          20231220,
+          20231226,
+          20231227,
+          20231228,
+          20231229
+        ],
+        "status": "DATA_CENSORED",
+        "true_session_count": 258,
+        "true_session_days": [
+          20230103,
+          20230104,
+          20230105,
+          20230106,
+          20230109,
+          20230110,
+          20230111,
+          20230112,
+          20230113,
+          20230116,
+          20230117,
+          20230118,
+          20230119,
+          20230120,
+          20230123,
+          20230124,
+          20230125,
+          20230126,
+          20230127,
+          20230130,
+          20230131,
+          20230201,
+          20230202,
+          20230203,
+          20230206,
+          20230207,
+          20230208,
+          20230209,
+          20230210,
+          20230213,
+          20230214,
+          20230215,
+          20230216,
+          20230217,
+          20230220,
+          20230221,
+          20230222,
+          20230223,
+          20230224,
+          20230227,
+          20230228,
+          20230301,
+          20230302,
+          20230303,
+          20230306,
+          20230307,
+          20230308,
+          20230309,
+          20230310,
+          20230313,
+          20230314,
+          20230315,
+          20230316,
+          20230317,
+          20230320,
+          20230321,
+          20230322,
+          20230323,
+          20230324,
+          20230327,
+          20230328,
+          20230329,
+          20230330,
+          20230331,
+          20230403,
+          20230404,
+          20230405,
+          20230406,
+          20230407,
+          20230410,
+          20230411,
+          20230412,
+          20230413,
+          20230414,
+          20230417,
+          20230418,
+          20230419,
+          20230420,
+          20230421,
+          20230424,
+          20230425,
+          20230426,
+          20230427,
+          20230428,
+          20230501,
+          20230502,
+          20230503,
+          20230504,
+          20230505,
+          20230508,
+          20230509,
+          20230510,
+          20230511,
+          20230512,
+          20230515,
+          20230516,
+          20230517,
+          20230518,
+          20230519,
+          20230522,
+          20230523,
+          20230524,
+          20230525,
+          20230526,
+          20230529,
+          20230530,
+          20230531,
+          20230601,
+          20230602,
+          20230605,
+          20230606,
+          20230607,
+          20230608,
+          20230609,
+          20230612,
+          20230613,
+          20230614,
+          20230615,
+          20230616,
+          20230619,
+          20230620,
+          20230621,
+          20230622,
+          20230623,
+          20230626,
+          20230627,
+          20230628,
+          20230629,
+          20230630,
+          20230703,
+          20230704,
+          20230705,
+          20230706,
+          20230707,
+          20230710,
+          20230711,
+          20230712,
+          20230713,
+          20230714,
+          20230717,
+          20230718,
+          20230719,
+          20230720,
+          20230721,
+          20230724,
+          20230725,
+          20230726,
+          20230727,
+          20230728,
+          20230731,
+          20230801,
+          20230802,
+          20230803,
+          20230804,
+          20230807,
+          20230808,
+          20230809,
+          20230810,
+          20230811,
+          20230814,
+          20230815,
+          20230816,
+          20230817,
+          20230818,
+          20230821,
+          20230822,
+          20230823,
+          20230824,
+          20230825,
+          20230828,
+          20230829,
+          20230830,
+          20230831,
+          20230901,
+          20230904,
+          20230905,
+          20230906,
+          20230907,
+          20230908,
+          20230911,
+          20230912,
+          20230913,
+          20230914,
+          20230915,
+          20230918,
+          20230919,
+          20230920,
+          20230921,
+          20230922,
+          20230925,
+          20230926,
+          20230927,
+          20230928,
+          20230929,
+          20231002,
+          20231003,
+          20231004,
+          20231005,
+          20231006,
+          20231009,
+          20231010,
+          20231011,
+          20231012,
+          20231013,
+          20231016,
+          20231017,
+          20231018,
+          20231019,
+          20231020,
+          20231023,
+          20231024,
+          20231025,
+          20231026,
+          20231027,
+          20231030,
+          20231031,
+          20231101,
+          20231102,
+          20231103,
+          20231106,
+          20231107,
+          20231108,
+          20231109,
+          20231110,
+          20231113,
+          20231114,
+          20231115,
+          20231116,
+          20231117,
+          20231120,
+          20231121,
+          20231122,
+          20231123,
+          20231124,
+          20231127,
+          20231128,
+          20231129,
+          20231130,
+          20231201,
+          20231204,
+          20231205,
+          20231206,
+          20231207,
+          20231208,
+          20231211,
+          20231212,
+          20231213,
+          20231214,
+          20231215,
+          20231218,
+          20231219,
+          20231220,
+          20231221,
+          20231222,
+          20231226,
+          20231227,
+          20231228,
+          20231229
+        ]
+      },
+      "MNQ": {
+        "calendar_policy": "OBSERVED_EXCHANGE_SESSION_ORDER_NO_WEEKDAY_SYNTHESIS",
+        "data_censored_day_count": 55,
+        "data_censored_days": [
+          20230116,
+          20230220,
+          20230227,
+          20230228,
+          20230301,
+          20230302,
+          20230303,
+          20230306,
+          20230307,
+          20230308,
+          20230309,
+          20230310,
+          20230313,
+          20230314,
+          20230315,
+          20230407,
+          20230529,
+          20230531,
+          20230601,
+          20230602,
+          20230605,
+          20230606,
+          20230607,
+          20230608,
+          20230609,
+          20230612,
+          20230613,
+          20230614,
+          20230703,
+          20230704,
+          20230830,
+          20230831,
+          20230901,
+          20230904,
+          20230905,
+          20230906,
+          20230907,
+          20230908,
+          20230911,
+          20230912,
+          20230913,
+          20231123,
+          20231124,
+          20231129,
+          20231130,
+          20231201,
+          20231204,
+          20231205,
+          20231206,
+          20231207,
+          20231208,
+          20231211,
+          20231212,
+          20231213,
+          20231226
+        ],
+        "data_censored_reasons_by_day": {
+          "20230116": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230220": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230227": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230228": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230301": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230302": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230303": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230306": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230307": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230308": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230309": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230310": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230313": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230314": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230315": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230407": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230529": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230531": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230601": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230602": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230605": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230606": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230607": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230608": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230609": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230612": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230613": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230614": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230703": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230704": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230830": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230831": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230901": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230904": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20230905": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230906": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230907": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230908": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230911": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230912": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20230913": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231123": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20231124": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20231129": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231130": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231201": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231204": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231205": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231206": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231207": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231208": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231211": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231212": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231213": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20231226": [
+            "SOURCE_MINUTE_GAP"
+          ]
+        },
+        "roll_unsafe_zero_trade_count": 23,
+        "roll_unsafe_zero_trade_days": [
+          20230316,
+          20230317,
+          20230320,
+          20230321,
+          20230322,
+          20230323,
+          20230615,
+          20230616,
+          20230619,
+          20230620,
+          20230621,
+          20230622,
+          20230914,
+          20230915,
+          20230918,
+          20230919,
+          20230920,
+          20230921,
+          20231214,
+          20231215,
+          20231218,
+          20231219,
+          20231220
+        ],
+        "status": "DATA_CENSORED",
+        "true_session_count": 258,
+        "true_session_days": [
+          20230103,
+          20230104,
+          20230105,
+          20230106,
+          20230109,
+          20230110,
+          20230111,
+          20230112,
+          20230113,
+          20230116,
+          20230117,
+          20230118,
+          20230119,
+          20230120,
+          20230123,
+          20230124,
+          20230125,
+          20230126,
+          20230127,
+          20230130,
+          20230131,
+          20230201,
+          20230202,
+          20230203,
+          20230206,
+          20230207,
+          20230208,
+          20230209,
+          20230210,
+          20230213,
+          20230214,
+          20230215,
+          20230216,
+          20230217,
+          20230220,
+          20230221,
+          20230222,
+          20230223,
+          20230224,
+          20230227,
+          20230228,
+          20230301,
+          20230302,
+          20230303,
+          20230306,
+          20230307,
+          20230308,
+          20230309,
+          20230310,
+          20230313,
+          20230314,
+          20230315,
+          20230316,
+          20230317,
+          20230320,
+          20230321,
+          20230322,
+          20230323,
+          20230324,
+          20230327,
+          20230328,
+          20230329,
+          20230330,
+          20230331,
+          20230403,
+          20230404,
+          20230405,
+          20230406,
+          20230407,
+          20230410,
+          20230411,
+          20230412,
+          20230413,
+          20230414,
+          20230417,
+          20230418,
+          20230419,
+          20230420,
+          20230421,
+          20230424,
+          20230425,
+          20230426,
+          20230427,
+          20230428,
+          20230501,
+          20230502,
+          20230503,
+          20230504,
+          20230505,
+          20230508,
+          20230509,
+          20230510,
+          20230511,
+          20230512,
+          20230515,
+          20230516,
+          20230517,
+          20230518,
+          20230519,
+          20230522,
+          20230523,
+          20230524,
+          20230525,
+          20230526,
+          20230529,
+          20230530,
+          20230531,
+          20230601,
+          20230602,
+          20230605,
+          20230606,
+          20230607,
+          20230608,
+          20230609,
+          20230612,
+          20230613,
+          20230614,
+          20230615,
+          20230616,
+          20230619,
+          20230620,
+          20230621,
+          20230622,
+          20230623,
+          20230626,
+          20230627,
+          20230628,
+          20230629,
+          20230630,
+          20230703,
+          20230704,
+          20230705,
+          20230706,
+          20230707,
+          20230710,
+          20230711,
+          20230712,
+          20230713,
+          20230714,
+          20230717,
+          20230718,
+          20230719,
+          20230720,
+          20230721,
+          20230724,
+          20230725,
+          20230726,
+          20230727,
+          20230728,
+          20230731,
+          20230801,
+          20230802,
+          20230803,
+          20230804,
+          20230807,
+          20230808,
+          20230809,
+          20230810,
+          20230811,
+          20230814,
+          20230815,
+          20230816,
+          20230817,
+          20230818,
+          20230821,
+          20230822,
+          20230823,
+          20230824,
+          20230825,
+          20230828,
+          20230829,
+          20230830,
+          20230831,
+          20230901,
+          20230904,
+          20230905,
+          20230906,
+          20230907,
+          20230908,
+          20230911,
+          20230912,
+          20230913,
+          20230914,
+          20230915,
+          20230918,
+          20230919,
+          20230920,
+          20230921,
+          20230922,
+          20230925,
+          20230926,
+          20230927,
+          20230928,
+          20230929,
+          20231002,
+          20231003,
+          20231004,
+          20231005,
+          20231006,
+          20231009,
+          20231010,
+          20231011,
+          20231012,
+          20231013,
+          20231016,
+          20231017,
+          20231018,
+          20231019,
+          20231020,
+          20231023,
+          20231024,
+          20231025,
+          20231026,
+          20231027,
+          20231030,
+          20231031,
+          20231101,
+          20231102,
+          20231103,
+          20231106,
+          20231107,
+          20231108,
+          20231109,
+          20231110,
+          20231113,
+          20231114,
+          20231115,
+          20231116,
+          20231117,
+          20231120,
+          20231121,
+          20231122,
+          20231123,
+          20231124,
+          20231127,
+          20231128,
+          20231129,
+          20231130,
+          20231201,
+          20231204,
+          20231205,
+          20231206,
+          20231207,
+          20231208,
+          20231211,
+          20231212,
+          20231213,
+          20231214,
+          20231215,
+          20231218,
+          20231219,
+          20231220,
+          20231221,
+          20231222,
+          20231226,
+          20231227,
+          20231228,
+          20231229
+        ]
+      }
+    },
+    "FINAL_DEVELOPMENT": {
+      "MGC": {
+        "calendar_policy": "OBSERVED_EXCHANGE_SESSION_ORDER_NO_WEEKDAY_SYNTHESIS",
+        "data_censored_day_count": 29,
+        "data_censored_days": [
+          20240520,
+          20240527,
+          20240530,
+          20240531,
+          20240603,
+          20240604,
+          20240605,
+          20240606,
+          20240607,
+          20240610,
+          20240611,
+          20240612,
+          20240613,
+          20240614,
+          20240704,
+          20240730,
+          20240731,
+          20240902,
+          20240903,
+          20240904,
+          20240905,
+          20240906,
+          20240909,
+          20240910,
+          20240911,
+          20240912,
+          20240913,
+          20240916,
+          20240917
+        ],
+        "data_censored_reasons_by_day": {
+          "20240520": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240527": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240530": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240531": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240603": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240604": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240605": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240606": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240607": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240610": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240611": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240612": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240613": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240614": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240704": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240730": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240731": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240902": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240903": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240904": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240905": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240906": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240909": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240910": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240911": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240912": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240913": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240916": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240917": [
+            "SOURCE_MINUTE_GAP"
+          ]
+        },
+        "roll_unsafe_zero_trade_count": 21,
+        "roll_unsafe_zero_trade_days": [
+          20240425,
+          20240426,
+          20240429,
+          20240430,
+          20240501,
+          20240617,
+          20240618,
+          20240619,
+          20240624,
+          20240625,
+          20240626,
+          20240627,
+          20240628,
+          20240826,
+          20240827,
+          20240828,
+          20240829,
+          20240830,
+          20240918,
+          20240919,
+          20240920
+        ],
+        "status": "DATA_CENSORED",
+        "true_session_count": 131,
+        "true_session_days": [
+          20240401,
+          20240402,
+          20240403,
+          20240404,
+          20240405,
+          20240408,
+          20240409,
+          20240410,
+          20240411,
+          20240412,
+          20240415,
+          20240416,
+          20240417,
+          20240418,
+          20240419,
+          20240422,
+          20240423,
+          20240424,
+          20240425,
+          20240426,
+          20240429,
+          20240430,
+          20240501,
+          20240502,
+          20240503,
+          20240506,
+          20240507,
+          20240508,
+          20240509,
+          20240510,
+          20240513,
+          20240514,
+          20240515,
+          20240516,
+          20240517,
+          20240520,
+          20240521,
+          20240522,
+          20240523,
+          20240524,
+          20240527,
+          20240528,
+          20240529,
+          20240530,
+          20240531,
+          20240603,
+          20240604,
+          20240605,
+          20240606,
+          20240607,
+          20240610,
+          20240611,
+          20240612,
+          20240613,
+          20240614,
+          20240617,
+          20240618,
+          20240619,
+          20240620,
+          20240621,
+          20240624,
+          20240625,
+          20240626,
+          20240627,
+          20240628,
+          20240701,
+          20240702,
+          20240703,
+          20240704,
+          20240705,
+          20240708,
+          20240709,
+          20240710,
+          20240711,
+          20240712,
+          20240715,
+          20240716,
+          20240717,
+          20240718,
+          20240719,
+          20240722,
+          20240723,
+          20240724,
+          20240725,
+          20240726,
+          20240729,
+          20240730,
+          20240731,
+          20240801,
+          20240802,
+          20240805,
+          20240806,
+          20240807,
+          20240808,
+          20240809,
+          20240812,
+          20240813,
+          20240814,
+          20240815,
+          20240816,
+          20240819,
+          20240820,
+          20240821,
+          20240822,
+          20240823,
+          20240826,
+          20240827,
+          20240828,
+          20240829,
+          20240830,
+          20240902,
+          20240903,
+          20240904,
+          20240905,
+          20240906,
+          20240909,
+          20240910,
+          20240911,
+          20240912,
+          20240913,
+          20240916,
+          20240917,
+          20240918,
+          20240919,
+          20240920,
+          20240923,
+          20240924,
+          20240925,
+          20240926,
+          20240927,
+          20240930
+        ]
+      },
+      "MNQ": {
+        "calendar_policy": "OBSERVED_EXCHANGE_SESSION_ORDER_NO_WEEKDAY_SYNTHESIS",
+        "data_censored_day_count": 30,
+        "data_censored_days": [
+          20240520,
+          20240527,
+          20240530,
+          20240531,
+          20240603,
+          20240604,
+          20240605,
+          20240606,
+          20240607,
+          20240610,
+          20240611,
+          20240612,
+          20240613,
+          20240614,
+          20240703,
+          20240704,
+          20240829,
+          20240830,
+          20240902,
+          20240903,
+          20240904,
+          20240905,
+          20240906,
+          20240909,
+          20240910,
+          20240911,
+          20240912,
+          20240913,
+          20240916,
+          20240917
+        ],
+        "data_censored_reasons_by_day": {
+          "20240520": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240527": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240530": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240531": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240603": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240604": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240605": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240606": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240607": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240610": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240611": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240612": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240613": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240614": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240703": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240704": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240829": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240830": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240902": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240903": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240904": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240905": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240906": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240909": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240910": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240911": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240912": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240913": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240916": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240917": [
+            "SOURCE_MINUTE_GAP"
+          ]
+        },
+        "roll_unsafe_zero_trade_count": 14,
+        "roll_unsafe_zero_trade_days": [
+          20240617,
+          20240618,
+          20240619,
+          20240620,
+          20240621,
+          20240624,
+          20240625,
+          20240626,
+          20240918,
+          20240919,
+          20240920,
+          20240923,
+          20240924,
+          20240925
+        ],
+        "status": "DATA_CENSORED",
+        "true_session_count": 131,
+        "true_session_days": [
+          20240401,
+          20240402,
+          20240403,
+          20240404,
+          20240405,
+          20240408,
+          20240409,
+          20240410,
+          20240411,
+          20240412,
+          20240415,
+          20240416,
+          20240417,
+          20240418,
+          20240419,
+          20240422,
+          20240423,
+          20240424,
+          20240425,
+          20240426,
+          20240429,
+          20240430,
+          20240501,
+          20240502,
+          20240503,
+          20240506,
+          20240507,
+          20240508,
+          20240509,
+          20240510,
+          20240513,
+          20240514,
+          20240515,
+          20240516,
+          20240517,
+          20240520,
+          20240521,
+          20240522,
+          20240523,
+          20240524,
+          20240527,
+          20240528,
+          20240529,
+          20240530,
+          20240531,
+          20240603,
+          20240604,
+          20240605,
+          20240606,
+          20240607,
+          20240610,
+          20240611,
+          20240612,
+          20240613,
+          20240614,
+          20240617,
+          20240618,
+          20240619,
+          20240620,
+          20240621,
+          20240624,
+          20240625,
+          20240626,
+          20240627,
+          20240628,
+          20240701,
+          20240702,
+          20240703,
+          20240704,
+          20240705,
+          20240708,
+          20240709,
+          20240710,
+          20240711,
+          20240712,
+          20240715,
+          20240716,
+          20240717,
+          20240718,
+          20240719,
+          20240722,
+          20240723,
+          20240724,
+          20240725,
+          20240726,
+          20240729,
+          20240730,
+          20240731,
+          20240801,
+          20240802,
+          20240805,
+          20240806,
+          20240807,
+          20240808,
+          20240809,
+          20240812,
+          20240813,
+          20240814,
+          20240815,
+          20240816,
+          20240819,
+          20240820,
+          20240821,
+          20240822,
+          20240823,
+          20240826,
+          20240827,
+          20240828,
+          20240829,
+          20240830,
+          20240902,
+          20240903,
+          20240904,
+          20240905,
+          20240906,
+          20240909,
+          20240910,
+          20240911,
+          20240912,
+          20240913,
+          20240916,
+          20240917,
+          20240918,
+          20240919,
+          20240920,
+          20240923,
+          20240924,
+          20240925,
+          20240926,
+          20240927,
+          20240930
+        ]
+      }
+    },
+    "VALIDATION": {
+      "MGC": {
+        "calendar_policy": "OBSERVED_EXCHANGE_SESSION_ORDER_NO_WEEKDAY_SYNTHESIS",
+        "data_censored_day_count": 15,
+        "data_censored_days": [
+          20240115,
+          20240130,
+          20240219,
+          20240304,
+          20240305,
+          20240306,
+          20240307,
+          20240308,
+          20240311,
+          20240312,
+          20240313,
+          20240314,
+          20240315,
+          20240327,
+          20240328
+        ],
+        "data_censored_reasons_by_day": {
+          "20240115": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240130": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240219": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240304": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240305": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240306": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240307": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240308": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240311": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240312": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240313": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240314": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240315": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240327": [
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240328": [
+            "TARGET_MINUTE_GAP"
+          ]
+        },
+        "roll_unsafe_zero_trade_count": 8,
+        "roll_unsafe_zero_trade_days": [
+          20240226,
+          20240227,
+          20240228,
+          20240229,
+          20240301,
+          20240318,
+          20240319,
+          20240320
+        ],
+        "status": "DATA_CENSORED",
+        "true_session_count": 63,
+        "true_session_days": [
+          20240102,
+          20240103,
+          20240104,
+          20240105,
+          20240108,
+          20240109,
+          20240110,
+          20240111,
+          20240112,
+          20240115,
+          20240116,
+          20240117,
+          20240118,
+          20240119,
+          20240122,
+          20240123,
+          20240124,
+          20240125,
+          20240126,
+          20240129,
+          20240130,
+          20240131,
+          20240201,
+          20240202,
+          20240205,
+          20240206,
+          20240207,
+          20240208,
+          20240209,
+          20240212,
+          20240213,
+          20240214,
+          20240215,
+          20240216,
+          20240219,
+          20240220,
+          20240221,
+          20240222,
+          20240223,
+          20240226,
+          20240227,
+          20240228,
+          20240229,
+          20240301,
+          20240304,
+          20240305,
+          20240306,
+          20240307,
+          20240308,
+          20240311,
+          20240312,
+          20240313,
+          20240314,
+          20240315,
+          20240318,
+          20240319,
+          20240320,
+          20240321,
+          20240322,
+          20240325,
+          20240326,
+          20240327,
+          20240328
+        ]
+      },
+      "MNQ": {
+        "calendar_policy": "OBSERVED_EXCHANGE_SESSION_ORDER_NO_WEEKDAY_SYNTHESIS",
+        "data_censored_day_count": 13,
+        "data_censored_days": [
+          20240115,
+          20240219,
+          20240228,
+          20240229,
+          20240301,
+          20240304,
+          20240305,
+          20240306,
+          20240307,
+          20240308,
+          20240311,
+          20240312,
+          20240313
+        ],
+        "data_censored_reasons_by_day": {
+          "20240115": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240219": [
+            "SOURCE_MINUTE_GAP",
+            "TARGET_MINUTE_GAP"
+          ],
+          "20240228": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240229": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240301": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240304": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240305": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240306": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240307": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240308": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240311": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240312": [
+            "SOURCE_MINUTE_GAP"
+          ],
+          "20240313": [
+            "SOURCE_MINUTE_GAP"
+          ]
+        },
+        "roll_unsafe_zero_trade_count": 5,
+        "roll_unsafe_zero_trade_days": [
+          20240314,
+          20240315,
+          20240318,
+          20240319,
+          20240320
+        ],
+        "status": "DATA_CENSORED",
+        "true_session_count": 63,
+        "true_session_days": [
+          20240102,
+          20240103,
+          20240104,
+          20240105,
+          20240108,
+          20240109,
+          20240110,
+          20240111,
+          20240112,
+          20240115,
+          20240116,
+          20240117,
+          20240118,
+          20240119,
+          20240122,
+          20240123,
+          20240124,
+          20240125,
+          20240126,
+          20240129,
+          20240130,
+          20240131,
+          20240201,
+          20240202,
+          20240205,
+          20240206,
+          20240207,
+          20240208,
+          20240209,
+          20240212,
+          20240213,
+          20240214,
+          20240215,
+          20240216,
+          20240219,
+          20240220,
+          20240221,
+          20240222,
+          20240223,
+          20240226,
+          20240227,
+          20240228,
+          20240229,
+          20240301,
+          20240304,
+          20240305,
+          20240306,
+          20240307,
+          20240308,
+          20240311,
+          20240312,
+          20240313,
+          20240314,
+          20240315,
+          20240318,
+          20240319,
+          20240320,
+          20240321,
+          20240322,
+          20240325,
+          20240326,
+          20240327,
+          20240328
+        ]
+      }
+    }
+  },
+  "data_purchase_count": 0,
+  "decision": "VOL_CONVEXITY_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
+  "economic_summary": {
+    "candidates": [
+      {
+        "account_label": "100K",
+        "candidate_id": "volconv_MNQ_rates_target_vol_gap_oco_open_v1",
+        "gate_passed": false,
+        "horizon_trading_days": 5,
+        "market": "MNQ",
+        "minimum_mll_buffer_usd": 2121.5,
+        "normal_net_usd": -974.25,
+        "normal_passes": 0,
+        "risk_fraction": 0.1,
+        "stressed_mll_breach_rate": 0.0,
+        "stressed_net_usd": -1076.25,
+        "stressed_passes": 0,
+        "stressed_target_progress_median": 0.0,
+        "stressed_target_progress_p25": 0.0
+      },
+      {
+        "account_label": "150K",
+        "candidate_id": "volconv_MGC_rates_target_vol_gap_oco_open_v1",
+        "gate_passed": false,
+        "horizon_trading_days": 5,
+        "market": "MGC",
+        "minimum_mll_buffer_usd": 1916.0,
+        "normal_net_usd": -1968.0000000000582,
+        "normal_passes": 0,
+        "risk_fraction": 0.3,
+        "stressed_mll_breach_rate": 0.0,
+        "stressed_net_usd": -2300.000000000058,
+        "stressed_passes": 0,
+        "stressed_target_progress_median": 0.0,
+        "stressed_target_progress_p25": 0.0
+      }
+    ],
+    "combined_final_normal_passes": 0,
+    "combined_final_stressed_passes": 0,
+    "positive_final_stressed_candidate_count": 0
+  },
+  "event_construction": {
+    "AMBIGUOUS_BOTH_TOUCH_ABSTAIN": 42,
+    "DATA_CENSORED": 122,
+    "OCO_TIMEOUT_NO_FILL": 1484,
+    "TRADE_CREATED": 11762,
+    "decision_bar_fill_count": 0,
+    "opportunity_consolidated_count": 328660,
+    "roll_unsafe_trade_count": 0
+  },
+  "event_counts": {
+    "volconv_MGC_common_rates_vol_shock_coil_oco_mid_v1": {
+      "PRIMARY": 15,
+      "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": 15,
+      "SOURCE_MAGNITUDE_PERMUTATION": 9,
+      "SOURCE_SHIFT_5_TRUE_SESSIONS": 5,
+      "TARGET_ONLY_DUTY_MATCHED_OCO": 15
+    },
+    "volconv_MGC_common_rates_vol_shock_coil_oco_open_v1": {
+      "PRIMARY": 10,
+      "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": 10,
+      "SOURCE_MAGNITUDE_PERMUTATION": 10,
+      "SOURCE_SHIFT_5_TRUE_SESSIONS": 8,
+      "TARGET_ONLY_DUTY_MATCHED_OCO": 10
+    },
+    "volconv_MGC_rates_target_vol_gap_oco_mid_v1": {
+      "PRIMARY": 16,
+      "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": 16,
+      "SOURCE_MAGNITUDE_PERMUTATION": 12,
+      "SOURCE_SHIFT_5_TRUE_SESSIONS": 9,
+      "TARGET_ONLY_DUTY_MATCHED_OCO": 16
+    },
+    "volconv_MGC_rates_target_vol_gap_oco_open_v1": {
+      "PRIMARY": 33,
+      "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": 33,
+      "SOURCE_MAGNITUDE_PERMUTATION": 31,
+      "SOURCE_SHIFT_5_TRUE_SESSIONS": 33,
+      "TARGET_ONLY_DUTY_MATCHED_OCO": 33
+    },
+    "volconv_MNQ_common_rates_vol_shock_coil_oco_mid_v1": {
+      "PRIMARY": 16,
+      "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": 16,
+      "SOURCE_MAGNITUDE_PERMUTATION": 15,
+      "SOURCE_SHIFT_5_TRUE_SESSIONS": 12,
+      "TARGET_ONLY_DUTY_MATCHED_OCO": 16
+    },
+    "volconv_MNQ_common_rates_vol_shock_coil_oco_open_v1": {
+      "PRIMARY": 32,
+      "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": 32,
+      "SOURCE_MAGNITUDE_PERMUTATION": 28,
+      "SOURCE_SHIFT_5_TRUE_SESSIONS": 27,
+      "TARGET_ONLY_DUTY_MATCHED_OCO": 32
+    },
+    "volconv_MNQ_rates_target_vol_gap_oco_mid_v1": {
+      "PRIMARY": 40,
+      "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": 40,
+      "SOURCE_MAGNITUDE_PERMUTATION": 34,
+      "SOURCE_SHIFT_5_TRUE_SESSIONS": 35,
+      "TARGET_ONLY_DUTY_MATCHED_OCO": 40
+    },
+    "volconv_MNQ_rates_target_vol_gap_oco_open_v1": {
+      "PRIMARY": 73,
+      "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": 73,
+      "SOURCE_MAGNITUDE_PERMUTATION": 67,
+      "SOURCE_SHIFT_5_TRUE_SESSIONS": 69,
+      "TARGET_ONLY_DUTY_MATCHED_OCO": 73
+    }
+  },
+  "evidence_role": "VIEWED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
+  "evidence_tier_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+  "incremental_data_spend_usd": 0.0,
+  "independent_confirmation_claimed": false,
+  "integrity": {
+    "authoritative_mission_writes": 0,
+    "broker_connections": 0,
+    "data_purchase_count": 0,
+    "decision_bar_fill_count": 0,
+    "entry_double_touch_policy": "AMBIGUOUS_BOTH_TOUCH_ABSTAIN",
+    "exit_double_touch_policy": "STOP_FIRST_CONSERVATIVE",
+    "future_outcome_decision_field_count": 0,
+    "incremental_data_spend_usd": 0.0,
+    "oco_levels_frozen_before_activation": true,
+    "orders": 0,
+    "q4_access_count_delta": 0,
+    "q4_row_count": 0,
+    "roll_unsafe_trade_count": 0,
+    "source_direction_field_count": 0,
+    "source_sign_flip_invariance": {
+      "compared_row_count": 409403,
+      "decision_source_direction_fields": [],
+      "original_feature_hash": "ad6fdd4e720c94379d0e8018565fafd4486fbbdb6151c9e1b72567efd445e3f5",
+      "passed": true,
+      "source_sign_flipped_feature_hash": "ad6fdd4e720c94379d0e8018565fafd4486fbbdb6151c9e1b72567efd445e3f5"
+    },
+    "target_mapping_proof": {
+      "explicit_contract_count": 19,
+      "unmapped_contract_rows_excluded": 0,
+      "unsafe_roll_rows_excluded": 111477
+    }
+  },
+  "next_action": "REPORT_POWER_LIMIT_WITHOUT_THRESHOLD_RELAXATION",
+  "orders": 0,
+  "power_preflight": {
+    "candidates": {
+      "volconv_MGC_rates_target_vol_gap_oco_open_v1": {
+        "checks": {
+          "DISCOVERY": false,
+          "FINAL_DEVELOPMENT": false,
+          "VALIDATION": false
+        },
+        "event_counts": {
+          "DISCOVERY": 27,
+          "FINAL_DEVELOPMENT": 6,
+          "VALIDATION": 0
+        }
+      },
+      "volconv_MNQ_rates_target_vol_gap_oco_open_v1": {
+        "checks": {
+          "DISCOVERY": false,
+          "FINAL_DEVELOPMENT": false,
+          "VALIDATION": false
+        },
+        "event_counts": {
+          "DISCOVERY": 53,
+          "FINAL_DEVELOPMENT": 15,
+          "VALIDATION": 5
+        }
+      }
+    },
+    "passed": false,
+    "thresholds": {
+      "DISCOVERY": 60,
+      "FINAL_DEVELOPMENT": 20,
+      "VALIDATION": 12
+    }
+  },
+  "promotion_status": null,
+  "proposal_count": 8,
+  "q4_access_count_delta": 0,
+  "result_hash": "6c1606be1285cc10b6f77b99eab3ea70cc80f7fbbcae55d6553874c6c8493bf5",
+  "role_calendar_counts": {
+    "DISCOVERY": {
+      "MGC": 258,
+      "MNQ": 258
+    },
+    "FINAL_DEVELOPMENT": {
+      "MGC": 131,
+      "MNQ": 131
+    },
+    "VALIDATION": {
+      "MGC": 63,
+      "MNQ": 63
+    }
+  },
+  "runtime_seconds": 769.6935465930728,
+  "schema": "hydra_cross_asset_volatility_convexity_tripwire_v1",
+  "selected_candidate_count": 2,
+  "selected_candidates": [
+    {
+      "candidate_id": "volconv_MNQ_rates_target_vol_gap_oco_open_v1",
+      "discovery_event_count": 53,
+      "discovery_normal_net_one_micro_usd": 51.75,
+      "discovery_stressed_net_one_micro_usd": -27.75,
+      "execution_market": "MNQ",
+      "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+      "session_role": "OPEN",
+      "source_markets": [
+        "ZN",
+        "TN"
+      ],
+      "structural_fingerprint": "7943d92e010761bc81d489941bf3aa713dce92c1b71e2010fefa9fe7ac70775e"
+    },
+    {
+      "candidate_id": "volconv_MGC_rates_target_vol_gap_oco_open_v1",
+      "discovery_event_count": 27,
+      "discovery_normal_net_one_micro_usd": 250.50000000001273,
+      "discovery_stressed_net_one_micro_usd": 196.50000000001273,
+      "execution_market": "MGC",
+      "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+      "session_role": "OPEN",
+      "source_markets": [
+        "ZN",
+        "TN"
+      ],
+      "structural_fingerprint": "5a4c4cfa065ce3322f4acf0ef0e286b9b672d4d46d1bd7a0fc55df57a828816f"
+    }
+  ],
+  "source_bindings": {
+    "decision_card_hash": "f45b91ae0de70bddb645d14ea1c7cf353a6aead56d936171b2e9871a115589ce",
+    "decision_card_path": "config/research/cross_asset_volatility_convexity_without_direction_transfer_v1.json",
+    "rule_snapshot": {
+      "file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+      "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+      "path": "/root/hydra-bot/config/rulesets/topstep_official_2026-07-19.json",
+      "retrieval_status": "OFFICIAL_CURRENT_SNAPSHOT",
+      "retrieved_at_utc": "2026-07-19T01:04:10Z",
+      "snapshot_id": "topstep_official_2026-07-19T010410Z"
+    },
+    "verified_files": [
+      {
+        "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zn_explicit_contract_ohlcv.parquet",
+        "sha256": "8347100a5ad0fbd7b5281278764300028ac94dd60823dbbc39fd4056b4926d45",
+        "size_bytes": 6124072
+      },
+      {
+        "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/tn_explicit_contract_ohlcv.parquet",
+        "sha256": "aebd664d23a81d5d356c740570bc69e15e8f6556824e78d38360b7427d5003f1",
+        "size_bytes": 5872099
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2023-01-01_2024-01-01.parquet",
+        "sha256": "19be0a539802cd06fea20425ef14feca529fd60ece7e9eb5a88837e1d4e01862",
+        "size_bytes": 22748072
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-01-01_2024-03-31.parquet",
+        "sha256": "4540b7585caa2798998bd39a7d787c948f1f7c82f1d692e55118c4d4fffc5911",
+        "size_bytes": 4246706
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-04-01_2024-07-01.parquet",
+        "sha256": "c1af5bb43aa0ac5b83d9d7bab8d20b2ef52c97089f7acccc8d19231ce9e647dc",
+        "size_bytes": 4455647
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-07-01_2024-10-01.parquet",
+        "sha256": "97914227a87a5cd6b1c90f11de2061054a66f0a2b313f8120b8831af06b6c85e",
+        "size_bytes": 4589699
+      },
+      {
+        "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_GC-v-0_MGC-v-0_2023-01-01_2024-10-01.parquet",
+        "sha256": "6bca31351820713016426286de8ae3ce9f0350b6886f780cccc5565fd65da78d",
+        "size_bytes": 18655430
+      },
+      {
+        "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+        "sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda",
+        "size_bytes": 117345
+      },
+      {
+        "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/roll_receipt.json",
+        "sha256": "2a05b442d0dbe2e51d61a79e5ef44d0a01864b109f1bb813094f339498efa9ca",
+        "size_bytes": 28362
+      },
+      {
+        "path": "config/rulesets/topstep_official_2026-07-19.json",
+        "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+        "size_bytes": 6849
+      }
+    ]
+  },
+  "status": "VOL_CONVEXITY_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+}
