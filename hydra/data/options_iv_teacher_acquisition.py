@@ -38,7 +38,7 @@ DATASET = "GLBX.MDP3"
 SYMBOLS = ("ES.OPT", "NQ.OPT")
 SCHEMAS = ("statistics", "definition")
 STYPE_IN = "parent"
-STYPE_OUT = "raw_symbol"
+STYPE_OUT = "instrument_id"
 START = "2024-09-03"
 END = "2024-10-01"
 Q4_START = "2024-10-01"
@@ -46,7 +46,7 @@ MAX_INCREMENTAL_USD = 0.70
 CAMPAIGN_ID = "OPTIONS_IV_TEACHER_STUDENT_TRIPWIRE_V1"
 MANIFEST_PATH = "config/research/options_iv_teacher_student_tripwire_v1.json"
 EXPECTED_MANIFEST_HASH = (
-    "6528a47f270d775e7fd34a492e34f864d104ea433951ee2518d7cbbc37558df2"
+    "5b245d49b37c4dad88423c6bb55c51a5983ee2f09a93d7a3ca19ed66da8372bf"
 )
 EXPECTED_ESTIMATES = {
     "statistics": {

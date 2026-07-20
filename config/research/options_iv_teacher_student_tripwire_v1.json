@@ -3,9 +3,9 @@
   "branch_id": "OPTIONS_IV_TEACHER_STUDENT_TRIPWIRE_V1",
   "created_at_utc": "2026-07-20T23:21:23Z",
   "manifest_revision": {
-    "revision": 1,
-    "supersedes_hash": "723019b5baaca70906a9ec90f87476f200bfc7a406d2be0f8b883f016cca58f4",
-    "reason": "Correct official statistics record-count and billable-byte metadata after the fail-closed dry run; no market data or economic outcome was accessed.",
+    "revision": 2,
+    "supersedes_hash": "6528a47f270d775e7fd34a492e34f864d104ea433951ee2518d7cbbc37558df2",
+    "reason": "Use instrument_id output because Databento rejects parent-to-raw_symbol resolution; the request failed before any market-data transfer or economic access.",
     "scientific_contract_changed": false
   },
   "decision_card": {
@@ -32,7 +32,7 @@
     "dataset": "GLBX.MDP3",
     "symbols": ["ES.OPT", "NQ.OPT"],
     "stype_in": "parent",
-    "stype_out": "raw_symbol",
+    "stype_out": "instrument_id",
     "schemas": ["statistics", "definition"],
     "start": "2024-09-03",
     "end_exclusive": "2024-10-01",
@@ -220,5 +220,5 @@
     "no_xfa_before_clean_combine_survivors": true,
     "frozen_manifest_before_purchase": true
   },
-  "manifest_hash": "6528a47f270d775e7fd34a492e34f864d104ea433951ee2518d7cbbc37558df2"
+  "manifest_hash": "5b245d49b37c4dad88423c6bb55c51a5983ee2f09a93d7a3ca19ed66da8372bf"
 }

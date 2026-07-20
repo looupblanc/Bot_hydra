@@ -161,7 +161,7 @@ def test_execute_is_atomic_hashed_and_idempotent(tmp_path: Path) -> None:
     assert result["q4_access_count_delta"] == 0
     assert result["teacher_only"] is True
     assert [row["schema"] for row in client.timeseries.calls] == list(SCHEMAS)
-    assert all(row["stype_out"] == "raw_symbol" for row in client.timeseries.calls)
+    assert all(row["stype_out"] == "instrument_id" for row in client.timeseries.calls)
     assert len((tmp_path / "spend.jsonl").read_text().splitlines()) == 2
     assert len((tmp_path / "access.jsonl").read_text().splitlines()) == 3
     for row in result["files"]:
@@ -182,7 +182,7 @@ def test_tampered_dbn_or_rehashed_manifest_mutation_is_rejected(tmp_path: Path) 
         estimate_or_acquire(client=_Client(), execute=True, **_kwargs(tmp_path))
 
     manifest = json.loads((PROJECT_ROOT / MANIFEST_PATH).read_text(encoding="utf-8"))
-    manifest["data_contract"]["stype_out"] = "instrument_id"
+    manifest["data_contract"]["stype_out"] = "raw_symbol"
     core = dict(manifest)
     core.pop("manifest_hash")
     manifest["manifest_hash"] = stable_hash(core)
