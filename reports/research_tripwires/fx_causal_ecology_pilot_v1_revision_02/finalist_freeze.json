@@ -1,0 +1,135 @@
+{
+  "confirmation_unread_at_freeze": true,
+  "created_at_utc": "2026-07-20T05:24:38.241666+00:00",
+  "final_development_unread_at_freeze": true,
+  "finalists": [
+    {
+      "account_cell": "150K:0.10",
+      "policy": {
+        "base": {
+          "lookback_minutes": 60,
+          "mechanism": "SESSION_TRANSITION_RESIDUAL",
+          "session": "ASIA_00_06",
+          "z_threshold": 2.0
+        },
+        "holding_minutes": 30,
+        "stop_atr": 1.5,
+        "target_r": 2.0
+      },
+      "policy_id": "fx_exact_607d4840208db7099337"
+    },
+    {
+      "account_cell": "150K:0.10",
+      "policy": {
+        "base": {
+          "lookback_minutes": 240,
+          "mechanism": "SESSION_TRANSITION_RESIDUAL",
+          "session": "LONDON_06_12",
+          "z_threshold": 2.0
+        },
+        "holding_minutes": 30,
+        "stop_atr": 1.0,
+        "target_r": 2.0
+      },
+      "policy_id": "fx_exact_73f394ba7e1de9a71949"
+    },
+    {
+      "account_cell": "150K:0.10",
+      "policy": {
+        "base": {
+          "lookback_minutes": 240,
+          "mechanism": "SESSION_TRANSITION_RESIDUAL",
+          "session": "LONDON_06_12",
+          "z_threshold": 2.0
+        },
+        "holding_minutes": 120,
+        "stop_atr": 1.0,
+        "target_r": 2.0
+      },
+      "policy_id": "fx_exact_e8bfb1ef990d5142acd3"
+    },
+    {
+      "account_cell": "150K:0.10",
+      "policy": {
+        "base": {
+          "lookback_minutes": 240,
+          "mechanism": "SESSION_TRANSITION_RESIDUAL",
+          "session": "LONDON_06_12",
+          "z_threshold": 2.0
+        },
+        "holding_minutes": 360,
+        "stop_atr": 1.0,
+        "target_r": 2.0
+      },
+      "policy_id": "fx_exact_bd0d2f6b67c97d82f128"
+    },
+    {
+      "account_cell": "100K:0.10",
+      "policy": {
+        "base": {
+          "lookback_minutes": 240,
+          "mechanism": "SESSION_TRANSITION_RESIDUAL",
+          "session": "LONDON_06_12",
+          "z_threshold": 2.0
+        },
+        "holding_minutes": 30,
+        "stop_atr": 1.0,
+        "target_r": 1.5
+      },
+      "policy_id": "fx_exact_842e5789b9aa0f3fb412"
+    },
+    {
+      "account_cell": "100K:0.10",
+      "policy": {
+        "base": {
+          "lookback_minutes": 240,
+          "mechanism": "SESSION_TRANSITION_RESIDUAL",
+          "session": "LONDON_06_12",
+          "z_threshold": 2.0
+        },
+        "holding_minutes": 120,
+        "stop_atr": 1.0,
+        "target_r": 1.5
+      },
+      "policy_id": "fx_exact_7aeb2c6ab12b01b24195"
+    },
+    {
+      "account_cell": "100K:0.10",
+      "policy": {
+        "base": {
+          "lookback_minutes": 240,
+          "mechanism": "SESSION_TRANSITION_RESIDUAL",
+          "session": "LONDON_06_12",
+          "z_threshold": 2.0
+        },
+        "holding_minutes": 360,
+        "stop_atr": 1.0,
+        "target_r": 1.5
+      },
+      "policy_id": "fx_exact_3ebe30525ffc4609e9f8"
+    },
+    {
+      "account_cell": "150K:0.10",
+      "policy": {
+        "base": {
+          "lookback_minutes": 60,
+          "mechanism": "SESSION_TRANSITION_RESIDUAL",
+          "session": "ASIA_00_06",
+          "z_threshold": 2.0
+        },
+        "holding_minutes": 120,
+        "stop_atr": 1.5,
+        "target_r": 2.0
+      },
+      "policy_id": "fx_exact_6db638884fdbeebdabbe"
+    }
+  ],
+  "freeze_hash": "746dde0c4905c64b9fb20060b9d7711a69cee47e10bec198a22231cae4c03428",
+  "manifest_hash": "3544a8396fd64808ec8f2d56befd99f2b4168abe3e8c6cc40f40e376f0394388",
+  "panel_hash": "63b95f1e69264a37af48dc407d8ef78dc2badec0034078b9ac28984ede2e0bf6",
+  "schema": "hydra_fx_causal_ecology_finalist_freeze_v1",
+  "selection_roles": [
+    "DISCOVERY",
+    "VALIDATION"
+  ]
+}

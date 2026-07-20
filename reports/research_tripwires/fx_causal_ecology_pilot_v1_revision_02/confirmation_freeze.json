@@ -1,0 +1,13 @@
+{
+  "candidate_ids": [],
+  "cells": {},
+  "confirmation_role": [
+    "2024-01-01",
+    "2024-10-01"
+  ],
+  "created_at_utc": "2026-07-20T05:24:43.274748+00:00",
+  "evaluated_once": true,
+  "finalist_freeze_hash": "746dde0c4905c64b9fb20060b9d7711a69cee47e10bec198a22231cae4c03428",
+  "freeze_hash": "1ea4fa84feea097b43d1f2f1e6bbac3312f6fe6da75d74e051a1f80cbe80bf04",
+  "schema": "hydra_fx_causal_ecology_confirmation_freeze_v1"
+}

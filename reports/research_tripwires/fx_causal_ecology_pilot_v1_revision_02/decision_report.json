@@ -1,0 +1,83 @@
+{
+  "schema": "hydra_fx_causal_ecology_pilot_v1_decision_report",
+  "created_at_utc": "2026-07-20T05:28:11Z",
+  "status": "FX_CAUSAL_ECOLOGY_FALSIFIED",
+  "economic_result_path": "reports/research_tripwires/fx_causal_ecology_pilot_v1_revision_02/economic_result.json",
+  "economic_result_hash": "504b1aed5e80011b331931d2d12460cefd5b3f548a1f0771bb129693ef47c324",
+  "manifest_hash": "3544a8396fd64808ec8f2d56befd99f2b4168abe3e8c6cc40f40e376f0394388",
+  "invalid_predecessor": {
+    "status": "QUARANTINED_DO_NOT_USE",
+    "cause": "mandatory session flatten was incorrectly applied to all bars after 15:10 CT, including the next overnight session",
+    "receipt_path": "reports/research_tripwires/fx_causal_ecology_pilot_v1/INVALID_DO_NOT_USE_session_flatten_scope_receipt.json"
+  },
+  "data": {
+    "markets": ["6E", "6B", "6J", "6A"],
+    "bars": 3146810,
+    "panel_timestamps": 967650,
+    "first_timestamp": "2018-01-02T00:09:00+00:00",
+    "last_timestamp": "2024-09-30T23:56:00+00:00",
+    "confirmation_opened": false,
+    "q4_rows": 0
+  },
+  "production": {
+    "base_proposals": 108,
+    "selected_base_policies": 24,
+    "exact_discovery_replays": 288,
+    "validation_policies": 24,
+    "final_development_policies": 8,
+    "runtime_seconds": 338.8243589170743
+  },
+  "economics": {
+    "cheap_screen_stressed_positive": 0,
+    "discovery_exact_stressed_positive": 0,
+    "validation_stressed_positive": 0,
+    "final_development_stressed_positive": 0,
+    "validation_best_normal_net_one_contract_usd": -424.7992793895179,
+    "validation_best_stressed_net_one_contract_usd": -659.51568805488,
+    "final_best_normal_net_one_contract_usd": -335.10503328021684,
+    "final_best_stressed_net_one_contract_usd": -585.8550332802168,
+    "final_stressed_net_median_usd": -950.8282326945207,
+    "final_selected_account_starts_per_scenario": {
+      "P5": 408,
+      "P10": 200,
+      "P20": 96
+    },
+    "final_selected_account_passes_normal": {"P5": 0, "P10": 0, "P20": 0},
+    "final_selected_account_passes_stressed": {"P5": 0, "P10": 0, "P20": 0},
+    "final_selected_account_mll_breaches_normal": {"P5": 0, "P10": 0, "P20": 0},
+    "final_selected_account_mll_breaches_stressed": {"P5": 0, "P10": 0, "P20": 0},
+    "final_p20_median_of_policy_median_target_progress_normal_pct": -1.008,
+    "final_p20_median_of_policy_median_target_progress_stressed_pct": -2.812,
+    "final_p20_best_policy_median_target_progress_normal_pct": -0.671,
+    "final_p20_best_policy_median_target_progress_stressed_pct": -2.02,
+    "final_minimum_mll_buffer_normal_usd": 1680.63,
+    "final_minimum_mll_buffer_stressed_usd": 1502.11,
+    "tier_q": 0,
+    "tier_g": 0,
+    "tier_c": 0
+  },
+  "block_result": {
+    "B1": {"normal_passes": 0, "stressed_passes": 0},
+    "B2": {"normal_passes": 0, "stressed_passes": 0},
+    "B3": {"normal_passes": 0, "stressed_passes": 0},
+    "B4": {"normal_passes": 0, "stressed_passes": 0}
+  },
+  "matched_controls": {
+    "direction_flip_stressed_net_range_usd": [-1130.231481282101, -693.5578304830753],
+    "pooled_random_direction_stressed_net_range_usd": [-1164.91898128212, -614.8589668466722],
+    "session_delay_stressed_net_range_usd": [-989.5588541231363, -746.1075323459856]
+  },
+  "integrity": {
+    "causal_wall_clock_lookbacks": true,
+    "roll_safe_features_and_exits": true,
+    "next_observed_tradable_open_required": true,
+    "price_interpolation": false,
+    "confirmation_evaluated_once": 0,
+    "q4_access_delta": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "targeted_tests": "5 passed"
+  },
+  "decision": "TOMBSTONE_FX_RESIDUAL_GRAMMAR",
+  "next_action": "START_DIRECTION_NEUTRAL_SCHEDULED_RELEASE_BRACKET_PREFLIGHT_WITH_EXISTING_DATA; ESTIMATE_TARGETED_TBBO_ONLY_IF_NO_PURCHASE_PREFLIGHT_SHOWS_SIGNAL"
+}

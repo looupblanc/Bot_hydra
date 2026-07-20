@@ -1,0 +1,72 @@
+{
+  "actual_before_usd": 144.570327524844,
+  "broker_connections": 0,
+  "bundle_id": "9a2ae71aabd3a11c8b7f",
+  "created_at_utc": "2026-07-20T04:59:26.832633+00:00",
+  "download_status": "DOWNLOADED",
+  "execute": true,
+  "files": [
+    {
+      "kind": "ohlcv-1m",
+      "path": "/root/hydra-bot/data/cache/databento/fx_causal_ecology/9a2ae71aabd3a11c8b7f/raw_ohlcv.dbn.zst",
+      "sha256": "ea055647b648d7c49e8efb85ba9bd6a30b17ec1aaa5ba0a0ab663dd15fd7cbe8",
+      "size_bytes": 40688959
+    },
+    {
+      "kind": "definition",
+      "path": "/root/hydra-bot/data/cache/databento/fx_causal_ecology/9a2ae71aabd3a11c8b7f/raw_definition.dbn.zst",
+      "sha256": "4accf4d291799914091ffec1d4e6d2c808a3e98ad11bd4aacddceea14470c2dd",
+      "size_bytes": 850220
+    }
+  ],
+  "manifest_hash": "3544a8396fd64808ec8f2d56befd99f2b4168abe3e8c6cc40f40e376f0394388",
+  "network_requests": {
+    "definition": true,
+    "ohlcv-1m": true
+  },
+  "official_costs_usd": {
+    "definition": 0.004829350859,
+    "ohlcv-1m": 11.488325148821
+  },
+  "official_records": {
+    "definition": 8473,
+    "ohlcv-1m": 3146810
+  },
+  "orders": 0,
+  "projected_actual_usd": 156.063482024524,
+  "projected_estimated_usd": 156.063482024524,
+  "q4_access_count_delta": 0,
+  "raw_immutable": true,
+  "receipt_hash": "9be76dcaa08514cf49b21e521d8b8e7d0f166de927be1385fb6d3e8104bc53b9",
+  "requests": {
+    "definition": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "definition",
+      "start": "2018-01-02",
+      "stype_in": "continuous",
+      "symbols": [
+        "6E.c.0",
+        "6B.c.0",
+        "6J.c.0",
+        "6A.c.0"
+      ]
+    },
+    "ohlcv-1m": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "ohlcv-1m",
+      "start": "2018-01-02",
+      "stype_in": "continuous",
+      "symbols": [
+        "6E.c.0",
+        "6B.c.0",
+        "6J.c.0",
+        "6A.c.0"
+      ]
+    }
+  },
+  "reserve_after_usd": 44.657237898556986,
+  "schema": "hydra_fx_causal_ecology_acquisition_receipt_v1",
+  "total_cost_usd": 11.49315449968
+}

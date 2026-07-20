@@ -1,0 +1,99 @@
+{
+  "schema": "hydra_fx_causal_ecology_pilot_v1",
+  "campaign_role": "MATERIALLY_DISTINCT_EXPLORATION_LANE",
+  "created_at_utc": "2026-07-20T04:37:45Z",
+  "source_commit": "f83be4217914366a1c8993490eb5dbdb50d900de",
+  "manifest_hash_contract": "sha256(canonical_json_without_manifest_hash)",
+  "manifest_hash": "3544a8396fd64808ec8f2d56befd99f2b4168abe3e8c6cc40f40e376f0394388",
+  "hypothesis": "Cross-sectional USD-factor residual dislocation and continuation/reversion around Asia, London and US session transitions can provide causal multi-regime payoff density that is materially distinct from the exhausted index-energy-metals OHLCV families.",
+  "strongest_argument_against": "Minute OHLCV may not contain enough incremental information after costs, and continuous futures rolls can create synthetic cross-sectional moves unless explicit definitions and roll-safe guards are enforced.",
+  "smallest_decisive_experiment": "A bounded causal grammar on four Topstep-permitted currency futures, with discovery-only selection, frozen validation/final-development/confirmation roles, next-open fills, exact stop-risk sizing and matched pooled nulls.",
+  "expected_runtime_minutes": 90,
+  "expected_information_gain_score_0_10": 8.0,
+  "expected_economic_upside_score_0_10": 7.0,
+  "overfitting_risk_score_0_10": 5.0,
+  "deployment_risk_score_0_10": 2.0,
+  "next_materially_distinct_alternative": "Direction-neutral post-scheduled-release bracket using targeted TBBO only after a no-purchase causal event preflight.",
+  "official_rule_snapshot": {
+    "path": "config/rulesets/topstep_official_2026-07-19.json",
+    "file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+    "status": "OFFICIAL_CURRENT_SNAPSHOT",
+    "product_permission_source": "https://help.topstep.com/en/articles/8284206-when-and-what-products-can-i-trade"
+  },
+  "data_contract": {
+    "provider": "Databento",
+    "dataset": "GLBX.MDP3",
+    "symbols": ["6E.c.0", "6B.c.0", "6J.c.0", "6A.c.0"],
+    "stype_in": "continuous",
+    "stype_out": "instrument_id",
+    "start": "2018-01-02",
+    "end_exclusive": "2024-10-01",
+    "schemas": ["ohlcv-1m", "definition"],
+    "q4_access": false,
+    "estimated_cost_usd": {
+      "ohlcv-1m": 11.488325148821,
+      "definition": 0.004829350859,
+      "total": 11.49315449968
+    },
+    "estimated_records": {
+      "ohlcv-1m": 3146810,
+      "definition": 8473
+    },
+    "cumulative_actual_before_usd": 144.570327524844,
+    "authoritative_cap_usd": 200.720719923081,
+    "minimum_reserve_after_purchase_usd": 25.0,
+    "projected_reserve_usd": 44.657237898557
+  },
+  "temporal_roles": [
+    {"role": "DISCOVERY", "start": "2018-01-02", "end": "2022-01-01", "candidate_modification_allowed": true},
+    {"role": "VALIDATION", "start": "2022-01-01", "end": "2023-01-01", "candidate_modification_allowed": false},
+    {"role": "FINAL_DEVELOPMENT", "start": "2023-01-01", "end": "2024-01-01", "candidate_modification_allowed": false},
+    {"role": "CONFIRMATION", "start": "2024-01-01", "end": "2024-10-01", "candidate_modification_allowed": false, "evaluate_once_after_policy_freeze": true}
+  ],
+  "causal_contract": {
+    "features": "completed bars at or before decision_time only",
+    "entry": "next tradable one-minute bar open after completed signal bar",
+    "exit": "first causal stop, target, time-stop or mandatory session flatten event",
+    "continuous_roll_guard": "no position across symbol mapping discontinuity; suppress transition bar",
+    "future_labels_in_decision": false,
+    "negative_shifts_in_decision": false,
+    "exact_declared_stop_risk_required": true
+  },
+  "bounded_grammar": {
+    "mechanisms": ["USD_FACTOR_RESIDUAL_REVERSION", "USD_FACTOR_RESIDUAL_CONTINUATION", "SESSION_TRANSITION_RESIDUAL", "CROSS_SECTIONAL_DISPERSION_BREAKOUT"],
+    "sessions_utc": ["ASIA_00_06", "LONDON_06_12", "US_12_20"],
+    "feature_lookbacks_minutes": [15, 60, 240],
+    "entry_z_thresholds": [1.0, 1.5, 2.0],
+    "holding_minutes": [30, 120, 360],
+    "stop_atr_multipliers": [0.75, 1.0, 1.5],
+    "target_r_multipliers": [1.0, 1.5, 2.0],
+    "risk_fraction_of_mll": [0.1, 0.2, 0.3],
+    "maximum_simultaneous_positions": 2,
+    "maximum_selected_candidates": 24
+  },
+  "controls": ["POOLED_NICHE_NULL", "DIRECTION_FLIP", "SESSION_MATCHED_RANDOM_TIMING"],
+  "account_sizes": [50000, 100000, 150000],
+  "headline_windows_trading_days": [5, 10, 20],
+  "promotion_gates": {
+    "tier_q": "positive stressed economics, acceptable exact MLL and consistency, useful target velocity, behavioral uniqueness, complete evidence bundle",
+    "tier_g": "multiple complete normal and stressed passes across more than one temporal context, no single-day/trade domination, frozen final-development",
+    "tier_c": "confirmation block evaluated once after freeze and passed without retuning"
+  },
+  "branch_rules": {
+    "green": "freeze qualifying candidates and proceed through exact account replay; no XFA until clean Combine graduates exist",
+    "weak": "preserve informative mechanisms and run one materially distinct bounded repair",
+    "falsified": "tombstone exact FX residual grammar and start the preregistered release-bracket alternative"
+  },
+  "safety": {
+    "live_trading": false,
+    "broker_connections": 0,
+    "orders": 0,
+    "xfa": false,
+    "q4_access_count_delta": 0,
+    "new_service": false,
+    "new_controller": false,
+    "new_database": false,
+    "new_registry_writer": false
+  }
+}

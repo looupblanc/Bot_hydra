@@ -1,0 +1,13 @@
+{
+  "schema": "hydra_fx_causal_ecology_invalid_result_receipt_v1",
+  "invalid_result_file": "reports/research_tripwires/fx_causal_ecology_pilot_v1/economic_result.json",
+  "invalid_result_hash": "866b68b4695f1fff3587eeec3949b06adecf9915e0924ba8991125dcebb1bdac",
+  "status": "INVALID_DO_NOT_USE_EXECUTION_MODEL_DEFECT",
+  "exact_cause": "The mandatory 15:10 CT flatten mask was implemented as every local time after 15:10, instead of the bounded 15:10-to-17:00 close interval. Overnight opportunities therefore exited on their entry bar.",
+  "economic_consequence": "All v1 FX pass, PnL, target-progress, MLL and tier counts are non-promotional and must not be interpreted.",
+  "repair_scope": "Session close mask only; candidate grammar, temporal roles, costs, account rules and acquired data remain unchanged.",
+  "q4_access_count_delta": 0,
+  "broker_connections": 0,
+  "orders": 0,
+  "receipt_hash": "e7da11b320f54c3a0913d0d69341b35b51fb9e7925bb3df529a9a3357c3bdc86"
+}
