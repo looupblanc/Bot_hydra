@@ -1,0 +1,476 @@
+{
+  "broker_connections": 0,
+  "database_writes": 0,
+  "fresh_role_blocker": "B3_B4_WERE_EVALUATED_ONCE_AFTER_B1_B2_SELECTION;_THEY_ARE_DEFENSIBLE_HELD_OUT_DEVELOPMENT_BUT_NOT_FRESH_CONFIRMATION",
+  "fresh_untouched_role_available": false,
+  "frozen_policy_ids": [
+    "hazard_09ee35bc24190bb213469e6a",
+    "hazard_10ffb41856432af08259e32b",
+    "hazard_294627b596f6b477df6de5ac"
+  ],
+  "frozen_profile_ids": {
+    "hazard_09ee35bc24190bb213469e6a": "pnl_state_fast_ladder",
+    "hazard_10ffb41856432af08259e32b": "pnl_state_fast_ladder",
+    "hazard_294627b596f6b477df6de5ac": "pnl_state_fast_ladder"
+  },
+  "next_role": "GENUINELY_NEW_OR_PREVIOUSLY_UNTOUCHED_CONFIRMATION_DATA_REQUIRED",
+  "orders": 0,
+  "promotion_status": null,
+  "registry_writes": 0,
+  "result_hash": "4a2d31c311a0cfcbfc63a6d23721fc9809e38c672eebd9aaeacf0215750e0fed",
+  "results": [
+    {
+      "evidence_role": "HELD_OUT_DEVELOPMENT_ALREADY_VIEWED_ONCE",
+      "fresh_confirmation_claimed": false,
+      "policy_id": "hazard_09ee35bc24190bb213469e6a",
+      "post_selection_blocks": [
+        "B3",
+        "B4"
+      ],
+      "profile_mutated": false,
+      "results": {
+        "10": {
+          "NORMAL": {
+            "blocks": {
+              "B3": {
+                "episode_count": 5,
+                "mll_breach_count": 0,
+                "net_total_usd": 5704.633980426224,
+                "pass_count": 1,
+                "target_progress_median": -0.11322603159932139
+              },
+              "B4": {
+                "episode_count": 5,
+                "mll_breach_count": 0,
+                "net_total_usd": -1870.5532208884251,
+                "pass_count": 0,
+                "target_progress_median": -0.1393101292187445
+              }
+            },
+            "episode_count": 10,
+            "mll_breach_count": 0,
+            "net_total_usd": 3834.080759537799,
+            "pass_count": 1
+          },
+          "STRESSED_1_5X": {
+            "blocks": {
+              "B3": {
+                "episode_count": 5,
+                "mll_breach_count": 0,
+                "net_total_usd": 5568.508980426224,
+                "pass_count": 1,
+                "target_progress_median": -0.11416353159932138
+              },
+              "B4": {
+                "episode_count": 5,
+                "mll_breach_count": 0,
+                "net_total_usd": -2001.0532208884251,
+                "pass_count": 0,
+                "target_progress_median": -0.1402476292187445
+              }
+            },
+            "episode_count": 10,
+            "mll_breach_count": 0,
+            "net_total_usd": 3567.455759537799,
+            "pass_count": 1
+          }
+        },
+        "20": {
+          "NORMAL": {
+            "blocks": {
+              "B3": {
+                "episode_count": 2,
+                "mll_breach_count": 0,
+                "net_total_usd": -1742.9661512129678,
+                "pass_count": 0,
+                "target_progress_median": -0.14524717926774733
+              },
+              "B4": {
+                "episode_count": 2,
+                "mll_breach_count": 0,
+                "net_total_usd": -2462.821555803079,
+                "pass_count": 0,
+                "target_progress_median": -0.2052351296502566
+              }
+            },
+            "episode_count": 4,
+            "mll_breach_count": 0,
+            "net_total_usd": -4205.787707016047,
+            "pass_count": 0
+          },
+          "STRESSED_1_5X": {
+            "blocks": {
+              "B3": {
+                "episode_count": 2,
+                "mll_breach_count": 0,
+                "net_total_usd": -1774.4661512129678,
+                "pass_count": 0,
+                "target_progress_median": -0.14787217926774732
+              },
+              "B4": {
+                "episode_count": 2,
+                "mll_breach_count": 0,
+                "net_total_usd": -2503.321555803079,
+                "pass_count": 0,
+                "target_progress_median": -0.20861012965025658
+              }
+            },
+            "episode_count": 4,
+            "mll_breach_count": 0,
+            "net_total_usd": -4277.787707016047,
+            "pass_count": 0
+          }
+        },
+        "5": {
+          "NORMAL": {
+            "blocks": {
+              "B3": {
+                "episode_count": 11,
+                "mll_breach_count": 0,
+                "net_total_usd": 6809.450509060698,
+                "pass_count": 1,
+                "target_progress_median": -0.11322603159932139
+              },
+              "B4": {
+                "episode_count": 11,
+                "mll_breach_count": 0,
+                "net_total_usd": 3177.016680644054,
+                "pass_count": 0,
+                "target_progress_median": -0.1202369577131564
+              }
+            },
+            "episode_count": 22,
+            "mll_breach_count": 0,
+            "net_total_usd": 9986.467189704752,
+            "pass_count": 1
+          },
+          "STRESSED_1_5X": {
+            "blocks": {
+              "B3": {
+                "episode_count": 11,
+                "mll_breach_count": 0,
+                "net_total_usd": 6576.575509060698,
+                "pass_count": 1,
+                "target_progress_median": -0.11416353159932138
+              },
+              "B4": {
+                "episode_count": 11,
+                "mll_breach_count": 0,
+                "net_total_usd": 4388.982493730917,
+                "pass_count": 0,
+                "target_progress_median": -0.1211744577131564
+              }
+            },
+            "episode_count": 22,
+            "mll_breach_count": 0,
+            "net_total_usd": 10965.558002791615,
+            "pass_count": 1
+          }
+        }
+      },
+      "retuning_performed": false,
+      "selected_profile_id": "pnl_state_fast_ladder",
+      "selection_blocks": [
+        "B1",
+        "B2"
+      ],
+      "source_policy_result_hash": "c6463a4a94cf6bfc2e4cf03d0c4360631b080129233af4417e4ec7a251f6d664",
+      "validation_hash": "0d8b3c5c3bf71400353cd779185921f2bc99e685d7f6434505f10856b5245901"
+    },
+    {
+      "evidence_role": "HELD_OUT_DEVELOPMENT_ALREADY_VIEWED_ONCE",
+      "fresh_confirmation_claimed": false,
+      "policy_id": "hazard_10ffb41856432af08259e32b",
+      "post_selection_blocks": [
+        "B3",
+        "B4"
+      ],
+      "profile_mutated": false,
+      "results": {
+        "10": {
+          "NORMAL": {
+            "blocks": {
+              "B3": {
+                "episode_count": 2,
+                "mll_breach_count": 0,
+                "net_total_usd": -1668.1840683635091,
+                "pass_count": 0,
+                "target_progress_median": -0.2780306780605849
+              },
+              "B4": {
+                "episode_count": 3,
+                "mll_breach_count": 0,
+                "net_total_usd": -2266.0189518958578,
+                "pass_count": 0,
+                "target_progress_median": -0.32211548313003
+              }
+            },
+            "episode_count": 5,
+            "mll_breach_count": 0,
+            "net_total_usd": -3934.203020259367,
+            "pass_count": 0
+          },
+          "STRESSED_1_5X": {
+            "blocks": {
+              "B3": {
+                "episode_count": 2,
+                "mll_breach_count": 0,
+                "net_total_usd": -2044.8241232612418,
+                "pass_count": 0,
+                "target_progress_median": -0.3408040205435403
+              },
+              "B4": {
+                "episode_count": 3,
+                "mll_breach_count": 0,
+                "net_total_usd": -2452.0189518964107,
+                "pass_count": 0,
+                "target_progress_median": -0.333115483130064
+              }
+            },
+            "episode_count": 5,
+            "mll_breach_count": 0,
+            "net_total_usd": -4496.8430751576525,
+            "pass_count": 0
+          }
+        },
+        "20": {
+          "NORMAL": {
+            "blocks": {
+              "B3": {},
+              "B4": {}
+            },
+            "episode_count": 0,
+            "mll_breach_count": 0,
+            "net_total_usd": 0.0,
+            "pass_count": 0
+          },
+          "STRESSED_1_5X": {
+            "blocks": {
+              "B3": {},
+              "B4": {}
+            },
+            "episode_count": 0,
+            "mll_breach_count": 0,
+            "net_total_usd": 0.0,
+            "pass_count": 0
+          }
+        },
+        "5": {
+          "NORMAL": {
+            "blocks": {
+              "B3": {
+                "episode_count": 8,
+                "mll_breach_count": 0,
+                "net_total_usd": -2779.915968542744,
+                "pass_count": 0,
+                "target_progress_median": -0.10615759908825931
+              },
+              "B4": {
+                "episode_count": 8,
+                "mll_breach_count": 0,
+                "net_total_usd": -4750.450785368346,
+                "pass_count": 0,
+                "target_progress_median": -0.21772680113479145
+              }
+            },
+            "episode_count": 16,
+            "mll_breach_count": 0,
+            "net_total_usd": -7530.36675391109,
+            "pass_count": 0
+          },
+          "STRESSED_1_5X": {
+            "blocks": {
+              "B3": {
+                "episode_count": 8,
+                "mll_breach_count": 0,
+                "net_total_usd": -2379.361165083057,
+                "pass_count": 0,
+                "target_progress_median": -0.09889523036508763
+              },
+              "B4": {
+                "episode_count": 8,
+                "mll_breach_count": 0,
+                "net_total_usd": -5175.700785369569,
+                "pass_count": 0,
+                "target_progress_median": -0.23322680113483754
+              }
+            },
+            "episode_count": 16,
+            "mll_breach_count": 0,
+            "net_total_usd": -7555.061950452626,
+            "pass_count": 0
+          }
+        }
+      },
+      "retuning_performed": false,
+      "selected_profile_id": "pnl_state_fast_ladder",
+      "selection_blocks": [
+        "B1",
+        "B2"
+      ],
+      "source_policy_result_hash": "a8c36f723639eafa4472c0262fdf2f12281e61b2ef40e06f163d9442ecc892c8",
+      "validation_hash": "783013c0d368458c1c5807bc9e8b8adce0c2aeda5371f8350ef1ce0fb06458a5"
+    },
+    {
+      "evidence_role": "HELD_OUT_DEVELOPMENT_ALREADY_VIEWED_ONCE",
+      "fresh_confirmation_claimed": false,
+      "policy_id": "hazard_294627b596f6b477df6de5ac",
+      "post_selection_blocks": [
+        "B3",
+        "B4"
+      ],
+      "profile_mutated": false,
+      "results": {
+        "10": {
+          "NORMAL": {
+            "blocks": {
+              "B3": {
+                "episode_count": 5,
+                "mll_breach_count": 0,
+                "net_total_usd": -742.7069767760258,
+                "pass_count": 0,
+                "target_progress_median": -0.12752370719406464
+              },
+              "B4": {
+                "episode_count": 5,
+                "mll_breach_count": 0,
+                "net_total_usd": 48.05708013612457,
+                "pass_count": 1,
+                "target_progress_median": -0.5327451156497724
+              }
+            },
+            "episode_count": 10,
+            "mll_breach_count": 0,
+            "net_total_usd": -694.6498966399013,
+            "pass_count": 1
+          },
+          "STRESSED_1_5X": {
+            "blocks": {
+              "B3": {
+                "episode_count": 5,
+                "mll_breach_count": 0,
+                "net_total_usd": -717.2462569965573,
+                "pass_count": 0,
+                "target_progress_median": -0.08428680060090846
+              },
+              "B4": {
+                "episode_count": 5,
+                "mll_breach_count": 0,
+                "net_total_usd": 786.3198961329326,
+                "pass_count": 1,
+                "target_progress_median": -0.32431552584939105
+              }
+            },
+            "episode_count": 10,
+            "mll_breach_count": 0,
+            "net_total_usd": 69.07363913637528,
+            "pass_count": 1
+          }
+        },
+        "20": {
+          "NORMAL": {
+            "blocks": {
+              "B3": {
+                "episode_count": 2,
+                "mll_breach_count": 0,
+                "net_total_usd": -1778.4943258502608,
+                "pass_count": 0,
+                "target_progress_median": -0.29641572097504343
+              },
+              "B4": {
+                "episode_count": 2,
+                "mll_breach_count": 0,
+                "net_total_usd": 5119.218640295148,
+                "pass_count": 1,
+                "target_progress_median": 0.7601594649142965
+              }
+            },
+            "episode_count": 4,
+            "mll_breach_count": 0,
+            "net_total_usd": 3340.7243144448876,
+            "pass_count": 1
+          },
+          "STRESSED_1_5X": {
+            "blocks": {
+              "B3": {
+                "episode_count": 2,
+                "mll_breach_count": 0,
+                "net_total_usd": -1916.9368484839724,
+                "pass_count": 0,
+                "target_progress_median": -0.31948947474732875
+              },
+              "B4": {
+                "episode_count": 2,
+                "mll_breach_count": 0,
+                "net_total_usd": 5066.718640295148,
+                "pass_count": 1,
+                "target_progress_median": 0.7545072926654068
+              }
+            },
+            "episode_count": 4,
+            "mll_breach_count": 0,
+            "net_total_usd": 3149.781791811176,
+            "pass_count": 1
+          }
+        },
+        "5": {
+          "NORMAL": {
+            "blocks": {
+              "B3": {
+                "episode_count": 11,
+                "mll_breach_count": 0,
+                "net_total_usd": -614.3581832308191,
+                "pass_count": 0,
+                "target_progress_median": -0.030578656033081644
+              },
+              "B4": {
+                "episode_count": 11,
+                "mll_breach_count": 0,
+                "net_total_usd": -142.88371262834698,
+                "pass_count": 0,
+                "target_progress_median": -0.24071558051304115
+              }
+            },
+            "episode_count": 22,
+            "mll_breach_count": 0,
+            "net_total_usd": -757.2418958591661,
+            "pass_count": 0
+          },
+          "STRESSED_1_5X": {
+            "blocks": {
+              "B3": {
+                "episode_count": 11,
+                "mll_breach_count": 0,
+                "net_total_usd": -776.3581832308191,
+                "pass_count": 0,
+                "target_progress_median": -0.039578656033081645
+              },
+              "B4": {
+                "episode_count": 11,
+                "mll_breach_count": 0,
+                "net_total_usd": -223.1969153518221,
+                "pass_count": 0,
+                "target_progress_median": -0.24846558051304116
+              }
+            },
+            "episode_count": 22,
+            "mll_breach_count": 0,
+            "net_total_usd": -999.5550985826412,
+            "pass_count": 0
+          }
+        }
+      },
+      "retuning_performed": false,
+      "selected_profile_id": "pnl_state_fast_ladder",
+      "selection_blocks": [
+        "B1",
+        "B2"
+      ],
+      "source_policy_result_hash": "c5edc18ef69279d55cd5de577df8098a4451bfae76161d2a5a914da7632ebe8b",
+      "validation_hash": "c2742bac487f0ebd47a3565386af6db2b39d0033085af6541579d0c73ad986a6"
+    }
+  ],
+  "schema": "hydra_pnl_state_chronological_validation_v1",
+  "source_reconciled_result_hash": "02236c9997d064bc9712584fec3060ee20e923e03811b1c00804821cd2cd3817",
+  "status": "DYNAMIC_SURVIVORS_FROZEN_HELD_OUT_DEVELOPMENT_SEALED"
+}

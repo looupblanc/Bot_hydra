@@ -1,0 +1,264 @@
+{
+  "alternative_path_count": 142,
+  "alternative_summaries": {
+    "CONSISTENCY": {
+      "account_closed_before_first_payout_count": 36,
+      "data_censored_before_first_payout_count": 15,
+      "first_payout_count": 20,
+      "first_payout_rate_per_successful_combine": 0.28169014084507044,
+      "path_count": 71,
+      "payout_cycles_total": 24,
+      "post_payout_survival": {
+        "checkpoint_unit": "TRADING_DAYS_AFTER_FIRST_PAYOUT",
+        "checkpoints": {
+          "30": {
+            "data_censored_before_checkpoint_count": 7,
+            "demonstrated_survival_rate_all_first_payout_paths": 0.3,
+            "evaluable_count": 13,
+            "failed_before_or_on_checkpoint_count": 7,
+            "survival_rate_among_evaluable": 0.46153846153846156,
+            "survived_count": 6
+          },
+          "60": {
+            "data_censored_before_checkpoint_count": 13,
+            "demonstrated_survival_rate_all_first_payout_paths": 0.0,
+            "evaluable_count": 7,
+            "failed_before_or_on_checkpoint_count": 7,
+            "survival_rate_among_evaluable": 0.0,
+            "survived_count": 0
+          },
+          "90": {
+            "data_censored_before_checkpoint_count": 13,
+            "demonstrated_survival_rate_all_first_payout_paths": 0.0,
+            "evaluable_count": 7,
+            "failed_before_or_on_checkpoint_count": 7,
+            "survival_rate_among_evaluable": 0.0,
+            "survived_count": 0
+          }
+        },
+        "first_payout_path_count": 20
+      },
+      "terminal_distribution": {
+        "DATA_CENSORED": 28,
+        "MLL_BREACHED": 43
+      },
+      "trader_net_payout_per_first_payout_path_usd": 2010.5700412027788,
+      "trader_net_payout_per_successful_combine_usd": 566.3577580852898,
+      "trader_net_payout_total_usd": 40211.40082405558
+    },
+    "STANDARD": {
+      "account_closed_before_first_payout_count": 31,
+      "data_censored_before_first_payout_count": 13,
+      "first_payout_count": 27,
+      "first_payout_rate_per_successful_combine": 0.38028169014084506,
+      "path_count": 71,
+      "payout_cycles_total": 42,
+      "post_payout_survival": {
+        "checkpoint_unit": "TRADING_DAYS_AFTER_FIRST_PAYOUT",
+        "checkpoints": {
+          "30": {
+            "data_censored_before_checkpoint_count": 3,
+            "demonstrated_survival_rate_all_first_payout_paths": 0.14814814814814814,
+            "evaluable_count": 24,
+            "failed_before_or_on_checkpoint_count": 20,
+            "survival_rate_among_evaluable": 0.16666666666666666,
+            "survived_count": 4
+          },
+          "60": {
+            "data_censored_before_checkpoint_count": 7,
+            "demonstrated_survival_rate_all_first_payout_paths": 0.0,
+            "evaluable_count": 20,
+            "failed_before_or_on_checkpoint_count": 20,
+            "survival_rate_among_evaluable": 0.0,
+            "survived_count": 0
+          },
+          "90": {
+            "data_censored_before_checkpoint_count": 7,
+            "demonstrated_survival_rate_all_first_payout_paths": 0.0,
+            "evaluable_count": 20,
+            "failed_before_or_on_checkpoint_count": 20,
+            "survival_rate_among_evaluable": 0.0,
+            "survived_count": 0
+          }
+        },
+        "first_payout_path_count": 27
+      },
+      "terminal_distribution": {
+        "DATA_CENSORED": 20,
+        "MLL_BREACHED": 51
+      },
+      "trader_net_payout_per_first_payout_path_usd": 1572.8510654908926,
+      "trader_net_payout_per_successful_combine_usd": 598.1264615247056,
+      "trader_net_payout_total_usd": 42466.9787682541
+    }
+  },
+  "best_nonnegative_buffer_ev_per_new_combine_attempt": {
+    "aggregate_hash": "167249f0433fcba93bdf670fc1a24a01f790fd65b1ccfb6df81cd3f622561c3b",
+    "alternative_value_not_additive": true,
+    "combine_attempt_count": 20,
+    "combine_pass_count": 2,
+    "expected_trader_payout_per_new_combine_attempt_usd": 384.4610065509291,
+    "expected_trader_payout_per_successful_combine_usd": 3844.610065509291,
+    "first_payout_count": 2,
+    "first_payout_rate_per_successful_combine": 1.0,
+    "horizon_trading_days": 10,
+    "minimum_mll_buffer_usd": 400.0853794446916,
+    "path": "CONSISTENCY",
+    "payout_cycles_total": 3,
+    "policy_id": "hazard_19327ab34a21d623c654a6cc",
+    "terminal_distribution": {
+      "DATA_CENSORED": 2
+    },
+    "trader_net_payout_total_usd": 7689.220131018582
+  },
+  "clean_normal_combine_transition_count": 71,
+  "fresh_confirmation_claimed": false,
+  "full_120_day_post_payout_survivor_count": 0,
+  "maximum_observed_post_payout_trading_days": 41,
+  "nonnegative_buffer_payout_policy_horizons": [
+    {
+      "aggregate_hash": "167249f0433fcba93bdf670fc1a24a01f790fd65b1ccfb6df81cd3f622561c3b",
+      "alternative_value_not_additive": true,
+      "combine_attempt_count": 20,
+      "combine_pass_count": 2,
+      "expected_trader_payout_per_new_combine_attempt_usd": 384.4610065509291,
+      "expected_trader_payout_per_successful_combine_usd": 3844.610065509291,
+      "first_payout_count": 2,
+      "first_payout_rate_per_successful_combine": 1.0,
+      "horizon_trading_days": 10,
+      "minimum_mll_buffer_usd": 400.0853794446916,
+      "path": "CONSISTENCY",
+      "payout_cycles_total": 3,
+      "policy_id": "hazard_19327ab34a21d623c654a6cc",
+      "terminal_distribution": {
+        "DATA_CENSORED": 2
+      },
+      "trader_net_payout_total_usd": 7689.220131018582
+    },
+    {
+      "aggregate_hash": "7d914afc3ef3bdae0f93a80b09cbe140264469b0235ab221fb28dc3e2e0eec0a",
+      "alternative_value_not_additive": true,
+      "combine_attempt_count": 20,
+      "combine_pass_count": 2,
+      "expected_trader_payout_per_new_combine_attempt_usd": 352.80734157418914,
+      "expected_trader_payout_per_successful_combine_usd": 3528.0734157418915,
+      "first_payout_count": 2,
+      "first_payout_rate_per_successful_combine": 1.0,
+      "horizon_trading_days": 10,
+      "minimum_mll_buffer_usd": 400.0853794446916,
+      "path": "STANDARD",
+      "payout_cycles_total": 5,
+      "policy_id": "hazard_19327ab34a21d623c654a6cc",
+      "terminal_distribution": {
+        "DATA_CENSORED": 2
+      },
+      "trader_net_payout_total_usd": 7056.146831483783
+    },
+    {
+      "aggregate_hash": "9a57fbf54d375631f82409691bf20d9442fc0eba23f23aff4366db35554fefd5",
+      "alternative_value_not_additive": true,
+      "combine_attempt_count": 8,
+      "combine_pass_count": 1,
+      "expected_trader_payout_per_new_combine_attempt_usd": 195.88603835893258,
+      "expected_trader_payout_per_successful_combine_usd": 1567.0883068714606,
+      "first_payout_count": 1,
+      "first_payout_rate_per_successful_combine": 1.0,
+      "horizon_trading_days": 20,
+      "minimum_mll_buffer_usd": 153.42993534779066,
+      "path": "STANDARD",
+      "payout_cycles_total": 2,
+      "policy_id": "hazard_23cf467f9b8d33256da1ed74",
+      "terminal_distribution": {
+        "DATA_CENSORED": 1
+      },
+      "trader_net_payout_total_usd": 1567.0883068714606
+    },
+    {
+      "aggregate_hash": "adaae7f2fdfdde78d4fefa7c61ce2260c4cb888bed2fb5adf4db695938d8f007",
+      "alternative_value_not_additive": true,
+      "combine_attempt_count": 43,
+      "combine_pass_count": 1,
+      "expected_trader_payout_per_new_combine_attempt_usd": 125.5813953488372,
+      "expected_trader_payout_per_successful_combine_usd": 5400.0,
+      "first_payout_count": 1,
+      "first_payout_rate_per_successful_combine": 1.0,
+      "horizon_trading_days": 5,
+      "minimum_mll_buffer_usd": 1450.698465478957,
+      "path": "STANDARD",
+      "payout_cycles_total": 3,
+      "policy_id": "autonomous_marginal_book_b09b8e7b30f90b34737eb724",
+      "terminal_distribution": {
+        "DATA_CENSORED": 1
+      },
+      "trader_net_payout_total_usd": 5400.0
+    },
+    {
+      "aggregate_hash": "3c7cb7d0f9c9efe0951b738e558a836cc77c529ddc563c5e98a6bb16b723130f",
+      "alternative_value_not_additive": true,
+      "combine_attempt_count": 43,
+      "combine_pass_count": 1,
+      "expected_trader_payout_per_new_combine_attempt_usd": 62.7906976744186,
+      "expected_trader_payout_per_successful_combine_usd": 2700.0,
+      "first_payout_count": 1,
+      "first_payout_rate_per_successful_combine": 1.0,
+      "horizon_trading_days": 5,
+      "minimum_mll_buffer_usd": 1252.5283620346759,
+      "path": "CONSISTENCY",
+      "payout_cycles_total": 1,
+      "policy_id": "autonomous_marginal_book_b09b8e7b30f90b34737eb724",
+      "terminal_distribution": {
+        "DATA_CENSORED": 1
+      },
+      "trader_net_payout_total_usd": 2700.0
+    },
+    {
+      "aggregate_hash": "1c00b7ed8d7f486ecad288fdad8ab957ab75903dadd77fe29bdc74e4ded00e61",
+      "alternative_value_not_additive": true,
+      "combine_attempt_count": 43,
+      "combine_pass_count": 1,
+      "expected_trader_payout_per_new_combine_attempt_usd": 34.91094213159867,
+      "expected_trader_payout_per_successful_combine_usd": 1501.1705116587427,
+      "first_payout_count": 1,
+      "first_payout_rate_per_successful_combine": 1.0,
+      "horizon_trading_days": 5,
+      "minimum_mll_buffer_usd": 76.89429521892464,
+      "path": "CONSISTENCY",
+      "payout_cycles_total": 1,
+      "policy_id": "hazard_16f0da561bc98f2eb7d2efc4",
+      "terminal_distribution": {
+        "DATA_CENSORED": 1
+      },
+      "trader_net_payout_total_usd": 1501.1705116587427
+    },
+    {
+      "aggregate_hash": "7559031f37aa0ecb1f7da81c644959dd9614a1a46d2e2135b16c22bd763ba75f",
+      "alternative_value_not_additive": true,
+      "combine_attempt_count": 44,
+      "combine_pass_count": 1,
+      "expected_trader_payout_per_new_combine_attempt_usd": 28.924735135590648,
+      "expected_trader_payout_per_successful_combine_usd": 1272.6883459659884,
+      "first_payout_count": 1,
+      "first_payout_rate_per_successful_combine": 1.0,
+      "horizon_trading_days": 5,
+      "minimum_mll_buffer_usd": 474.64233768793815,
+      "path": "CONSISTENCY",
+      "payout_cycles_total": 1,
+      "policy_id": "hazard_294627b596f6b477df6de5ac",
+      "terminal_distribution": {
+        "DATA_CENSORED": 1
+      },
+      "trader_net_payout_total_usd": 1272.6883459659884
+    }
+  ],
+  "post_payout_survival_zero_explanation": "NO_PATH_WITH_A_PAYOUT_REACHED_SURVIVED_HORIZON_AT_120_DAYS;_PATHS_EITHER_BREACHED_MLL_OR_WERE_DATA_CENSORED_BEFORE_120_DAYS",
+  "promotion_status": null,
+  "result_hash": "e19c26c42cf677188679f5d875ac3178bc3190bf0b7cc1d60fbe11bd73321c08",
+  "schema": "hydra_pnl_state_xfa_decision_summary_v1",
+  "selected_path": null,
+  "source_validation_result_hash": "4a2d31c311a0cfcbfc63a6d23721fc9809e38c672eebd9aaeacf0215750e0fed",
+  "source_xfa_result_hash": "6a1f474355b18797e1b9efecff34692f3b6d2edeac31ac9207694c6f651ac85c",
+  "standard_and_consistency_are_alternatives": true,
+  "status": "COMPLETE_SEPARATE_XFA_ALTERNATIVE_DECISION_SUMMARY",
+  "sum_standard_and_consistency_ev_allowed": false,
+  "validation_status": "DYNAMIC_SURVIVORS_FROZEN_HELD_OUT_DEVELOPMENT_SEALED"
+}
