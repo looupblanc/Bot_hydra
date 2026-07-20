@@ -1,0 +1,80 @@
+{
+  "schema": "hydra_direction_neutral_release_bracket_preflight_v1",
+  "branch_role": "MATERIALLY_DISTINCT_EXPLORATION_PREFLIGHT",
+  "created_at_utc": "2026-07-20T05:33:50Z",
+  "source_commit": "7765fc7da7e58a1daa8aacbefa6f18f8e9d8bc7f",
+  "manifest_hash_contract": "sha256(canonical_json_without_manifest_hash)",
+  "manifest_hash": "ead8bff3b8421e766fc86622d8a478aaa454ff2ce649a0ded0d6d6e363cfadaf",
+  "hypothesis": "A direction-neutral, predeclared OCO breakout bracket around exogenously scheduled US macro releases can capture discontinuous FX futures displacement without predicting direction and can deliver materially greater target velocity than the falsified cross-sectional residual grammar.",
+  "strongest_argument_against": "One-minute OHLCV cannot order both bracket touches inside one bar and conservative ambiguity handling plus stop-market costs may eliminate the apparent release edge.",
+  "smallest_decisive_experiment": "Freeze official release times and a finite OCO lattice, screen on 2023 discovery, validate on late-2023, and open 2024 pre-Q4 FX outcomes once only for policies positive under stressed costs in both earlier roles.",
+  "data": {
+    "fx_acquisition_receipt": "reports/data_access/fx_causal_ecology_acquisition_receipt.json",
+    "fx_acquisition_receipt_file_sha256": "72e9664b3abe20d1ba5f91dce99d775086de351b459529d2fe19c33089b19731",
+    "release_calendar": "config/research/scheduled_macro_release_calendar_2023_2024_v1.json",
+    "release_calendar_sha256": "ba644383546770eb5084082dce87f70011439a58261df51b4510d6885afa5c59",
+    "markets": ["6E", "6B", "6J", "6A"],
+    "q4_access": false,
+    "new_purchase_usd": 0.0
+  },
+  "official_rule_snapshot": {
+    "path": "config/rulesets/topstep_official_2026-07-19.json",
+    "file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f"
+  },
+  "temporal_roles": [
+    {"role": "DISCOVERY", "start": "2023-01-01", "end": "2023-09-01", "candidate_modification_allowed": true},
+    {"role": "VALIDATION", "start": "2023-09-01", "end": "2024-01-01", "candidate_modification_allowed": false},
+    {"role": "FINAL_DEVELOPMENT", "start": "2024-01-01", "end": "2024-10-01", "candidate_modification_allowed": false, "evaluate_once_after_freeze": true}
+  ],
+  "causal_contract": {
+    "direction_selection": "NONE; both sides of one OCO bracket are frozen before the scheduled release",
+    "feature_cutoff": "only bars with timestamp strictly before release_time may set bracket levels",
+    "order_activation": "bracket becomes active at the frozen scheduled release timestamp",
+    "entry": "first observed one-minute bar touching exactly one side; gap fills use the worse of trigger and bar open",
+    "dual_touch": "conservative immediate full-stop loss; never discard an ambiguous volatile event",
+    "exit": "first causal stop, target, time-stop, roll guard or mandatory session flatten",
+    "continuous_roll_guard": "lookback and position must retain one explicit instrument_id",
+    "future_outcomes_in_decision": false,
+    "negative_shift_in_decision": false,
+    "price_interpolation": false
+  },
+  "frozen_lattice": {
+    "release_scopes": ["ALL_RELEASES", "BLS_CPI", "BLS_EMPLOYMENT_SITUATION", "FOMC_STATEMENT"],
+    "lookback_minutes": [5, 15],
+    "trigger_buffer_range_fraction": [0.0, 0.25],
+    "trigger_window_minutes": [1, 5],
+    "stop_range_fraction": [0.5, 1.0],
+    "target_r": [1.0, 2.0],
+    "maximum_holding_minutes": [5, 15, 30],
+    "account_risk_fraction_of_mll": [0.1, 0.2, 0.3],
+    "account_sizes": ["50K", "100K", "150K"]
+  },
+  "selection": {
+    "maximum_validation_policies": 24,
+    "maximum_final_development_policies": 8,
+    "minimum_discovery_trades": 4,
+    "minimum_validation_trades": 2,
+    "maximum_per_root_release_scope": 3,
+    "deduplicate_exact_trade_paths": true
+  },
+  "controls": {
+    "prior_trading_day_same_clock": true,
+    "control_offset_calendar_days": -1,
+    "identical_bracket_and_cost_rules": true
+  },
+  "decision_policy": {
+    "signal": "At least one frozen finalist has positive stressed net in validation and final-development, positive paired stressed uplift over its prior-day same-clock control, no MLL breach, and nonzero account target progress.",
+    "weak": "Gross release displacement is positive but no finalist survives stressed execution and matched timing control.",
+    "falsified": "No policy is positive under stressed costs in both discovery and validation, or every opened finalist fails final-development/control economics.",
+    "signal_next_action": "ESTIMATE_TARGETED_TBBO_RELEASE_WINDOWS_WITHOUT_PURCHASE",
+    "weak_or_falsified_next_action": "TOMBSTONE_DIRECTION_NEUTRAL_RELEASE_BRACKET_REPRESENTATION"
+  },
+  "safety": {
+    "broker_connections": 0,
+    "orders": 0,
+    "q4_access_count_delta": 0,
+    "new_data_purchase_usd": 0.0,
+    "controller_or_service_changes": false
+  }
+}

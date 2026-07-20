@@ -1,0 +1,2196 @@
+{
+  "acquisition_receipt_hash": "9be76dcaa08514cf49b21e521d8b8e7d0f166de927be1385fb6d3e8104bc53b9",
+  "calendar": {
+    "artifact_id": "SCHEDULED_MACRO_RELEASE_CALENDAR_2023_2024_V1",
+    "event_count": 56,
+    "sha256": "ba644383546770eb5084082dce87f70011439a58261df51b4510d6885afa5c59"
+  },
+  "completed_at_utc": "2026-07-20T05:44:09.304221+00:00",
+  "confirmation_opened": false,
+  "counts": {
+    "broker_connections": 0,
+    "data_purchases": 0,
+    "final_development_policies": 0,
+    "orders": 0,
+    "proposals": 1536,
+    "q4_access_count_delta": 0,
+    "signal_policies": 0,
+    "tier_c": 0,
+    "tier_g": 0,
+    "tier_q": 0,
+    "validation_policies": 12
+  },
+  "discovery": [
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_0e74fd67faa8c18ca32d",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "8854b0fb6c9838945ac57e34f5fda0c3f2888af0e0004338f78d858a06dde2b5"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_cfb23937d86328ee69d5",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "3639d0fff7a420a5964a8132ae9acb3e4965710578b8bc0ccc475e66e6dc5d0e"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_28bc6b6ab276149bba31",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "eec5371656f78fbb52ad174b48376d2b9c6a260781e56e210f44e0ae7dffa06d"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_bb63b7e8c4944ee72d1e",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "96151a883a8799f82779f7e339699f88a960817f4072533d87e72bfb8ab92cf0"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_d778ce37b56b7f462e38",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "da3e88b9f43f538ee6d722c07bcaa424fbce062d876bd40761900542b70bcc42"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_f40628cc0cdd123131da",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "623aaf938bf2abc20feeaec53978692f395fd2f30f0087513bb2dc7e6fe0c92e"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_5bd41a6a7778e5d36e3e",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "a946bc68e7617aa05562fe7290385f130ab7948eac4a51b771320137a2b4a88c"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_428946750a8465d7b47c",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "bdf9e562f4de3a8c15d77ad8ff33768dcde97c883ba16182ef3f7a051965805f"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_ca928ea92f6e4177ca67",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "9816b29ac404fbdc1ef72dff706275e8b1f675d5717256f241f03cf0d5c44ff4"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_781cba170356d1219e8f",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "88023e02aea29be6551922bc6333023d56dfaa734ee9b89fb55bf604020cd9b5"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_06ff09573617666aecaf",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "6af805a11f99dad76cc261c77882fbfbbd3380c80d9a29cfd825a0c370e18303"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 249.9999999999898,
+      "median_stressed_trade": 94.2499999999949,
+      "normal_net_one_contract": 208.9999999999898,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 5,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_da98e9a3f074b3bf7586",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 143.73962825365646,
+      "stressed_net_one_contract": 188.4999999999898,
+      "trade_count": 2,
+      "trade_hash": "4a056bf68b95e7688a5f57a702e3ee68bf7c324e4fd14c4c0bf2ce4b6a8e212a"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_63e5238dbd3d82aa96ac",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "a250772588922841bb545ba3ba0fd9cc495b4da22b2672b0ea4291d4298a9144"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_c3b2bdb4826fe49941c0",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "f2d40da81845680eb1b21f4bdf224973fd7e42947d7e0eef8b8f35e8210b3d18"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_35561f6fff82d3d9e715",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "e65465c48908a74ed5e87c9b6884551b64cf95e2e125444c9fd7fbd4aa232c62"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_ceb2df163d2f07719807",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "942e6eec4f4ca99f9032e5791fb801c748a173e264d48b63c90dddcbef4266d6"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_e9e0cd0b6f618d429297",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "234f2ca235fa584650d9579c6154746e3de1aa4d7737efc058695ebc32ee3ae1"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_3fe9b266da82aac4dd6f",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "e8648a52df8f4de12a73e7a6239fa1c5f8f32a8abb61238cf868ffc5d1317806"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_520254ad60440cf1ab94",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "91c34ed826b57c5ef30841ef21183333b97576083239a9e5f76c93f1cc4a12bb"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_2dd79842cfda8ee34c5c",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "451724be0a16f3098264d12611d1f6ae98311c106b943577eca09d3053f036e6"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_6fc179276bcf3137a8e4",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "0e03fc3aef269e6d47b483ca4bff209c64048a91693efc12fe83fd20a6de2396"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_3c62237d34cb67704c4f",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "e8f68426080c816d78ef1282e44e8de2c97aab5af6fee011b2097e6c9fcf0a67"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_6f13af9d65fe4a915604",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "a56a22a021d0260d4cd2e4380cc781acb2344ff4240b1b35695f1443c2946418"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 0,
+        "eligible_brackets": 1,
+        "missing_lookback": 4,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 5,
+        "triggered_trades": 1
+      },
+      "gross_one_contract": 149.99999999999824,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 129.49999999999824,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "FOMC_STATEMENT",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_5ddb708b424bf0c39b74",
+      "positive_stressed_trade_rate": 1.0,
+      "score": 125.72499999999815,
+      "stressed_net_one_contract": 119.24999999999824,
+      "trade_count": 1,
+      "trade_hash": "b8e3fc266bf5389c3459fc8b72ae559694d9cc5e5634a72f4d3b169eb6686ea6"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_50e7992d91db582165a5",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "17ea03ba7f72b2be7e1d66b122535256a58a8677380e50fb7f07b6f26ca77d93"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_bbbfe734b21b442d321b",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "5d399ae3ce7a376fd02950c3e014f28b31aafd268f2bb4f8b4ce3f02df879fed"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_7087e1e7f7e7b7f8cd5b",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "63f21614c7889cf7b1da2a446c6967b00873930c00b329f118c59f32645115a9"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_36743b09e6d1f945a76e",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "52711a2b4cc65e50c40e0c346abd4affa1600dba576cccf1da69f84a21eb15e7"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_e95ec9e2dd1fdc5764bb",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "6825e8f8835eae439a50edf5727be956678ee35381c9feb482a5db036f3bef0d"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_01db125de9b603520e9d",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "a89fee63a1ff5a2e0ef79d5a85b6b36254105e84c2e68ffba114ab752f12feca"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_881151087bf73f0a5126",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "45ca869e851060194770d611ba003d5d8c4c658e70853b18533265cf9d3da9e2"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_08f1ddda60898bc11195",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "5d633e8a565ad110f57e38608235b6d9a49d11c0a4d0aa17e4660e85523e5824"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_15370148833cfd629d7f",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "d8693672fce60dccd814a6084d292b0d96db83add9cf7459c5b652f3bc7bd423"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_7e2eeea64ccbff37b5cf",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "038206f2cf31681737ca252050f776d572f72dc0b83a144f0ea9975a5fc009db"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_e5114864589959a7a1b0",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "a52d7c01aa67b3987281e3595577aa45e213ca7c1e7b123b0b29862ca12c927b"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 1,
+        "eligible_brackets": 2,
+        "missing_lookback": 6,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 8,
+        "triggered_trades": 2
+      },
+      "gross_one_contract": 218.74999999999108,
+      "median_stressed_trade": 78.62499999999554,
+      "normal_net_one_contract": 177.74999999999108,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "BLS_CPI",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_066c1a724520c97691ea",
+      "positive_stressed_trade_rate": 0.5,
+      "score": 120.08004134157783,
+      "stressed_net_one_contract": 157.24999999999108,
+      "trade_count": 2,
+      "trade_hash": "140747ba7920b965c16f239446a1b68ad0348ed833d42451e08ff76da1f31591"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_d8505d3c6803ed144cbb",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "60cfa80a49ac2115ede1b75377ad2e5bbcda1fc778601430e238d81a2c493c85"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_296828ebf309c883cb16",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "337c48563771df76c88a8c87bd3efea0f6c23bddbe734450f939e0d2fbd6b0b2"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_819404d8d0fe12c6eb53",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "a7165b22e44ad85b8ec60d4cc2c77a08ada675650c07522166b7a4b39c7983cc"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_45df0c2950dd9459340c",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "3a8441018a222ded790a303121074d02a397824353090abd9c1ee766bbabe0b1"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_816c2ada8add312cac1a",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "7264a6ecc7c06497ce9fc0d3d21338be34b627189322f6c91e6200a27436bf5b"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_cf18ad5833b8735c4b98",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "2043fcc58e6840b768b83677c52ae84ae6c6e86b2763418189e77a4e9edd9e5b"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_25d71627148cafd33697",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "a1af3247fb7f2acbb3cc2ebaf3bc8b7f808e9f97eac846c2697f7888ce1c2aa8"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_83fd975ff4a2fa24113a",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "a814e5b4da68c444b938cca1bf74dca93812ed603277be99a982cd22518554f1"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_0ad43c00846e32c983ac",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "c9edae48a5ba7a57adfcc438c2f300c0e36d3d2983d63b447cf1142b6e8f879e"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_fd6cdeea6bb0dfb1af0f",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "80081b2362339e9ca6bbd2a009b6fc63c177638b2a0c59699adc69826c54d893"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_10fb73fd9fa51f248c9f",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "0bda79b32a7b94d853739fba86c567cd526d868f2a7b2cd689110774e5b26289"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 2,
+        "eligible_brackets": 5,
+        "missing_lookback": 16,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 21,
+        "triggered_trades": 5
+      },
+      "gross_one_contract": 387.49999999998636,
+      "median_stressed_trade": 119.24999999999824,
+      "normal_net_one_contract": 284.99999999998636,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_59c61d56d274cd7e8fe0",
+      "positive_stressed_trade_rate": 0.6,
+      "score": 118.78617794810839,
+      "stressed_net_one_contract": 233.7499999999864,
+      "trade_count": 5,
+      "trade_hash": "df2904916379285d1fcd970c1460399ecd2b37ab3ddf0c91e93454d0a38f4902"
+    }
+  ],
+  "final_development": [],
+  "manifest_hash": "ead8bff3b8421e766fc86622d8a478aaa454ff2ce649a0ded0d6d6e363cfadaf",
+  "next_action": "TOMBSTONE_DIRECTION_NEUTRAL_RELEASE_BRACKET_REPRESENTATION",
+  "result_hash": "32dd3c425cdf8ae9d33d6763f5519b1d9a420cfd00d2b24ccf508738d2da09ea",
+  "runtime_seconds": 46.52897780900821,
+  "schema": "hydra_direction_neutral_release_bracket_preflight_v1_economic_result",
+  "signal_policy_ids": [],
+  "source_commit": "7765fc7da7e58a1daa8aacbefa6f18f8e9d8bc7f",
+  "status": "RELEASE_BRACKET_PREFLIGHT_FALSIFIED",
+  "validation": [
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 2,
+          "eligible_brackets": 5,
+          "missing_lookback": 16,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 5
+        },
+        "gross_one_contract": 387.49999999998636,
+        "median_stressed_trade": 119.24999999999824,
+        "normal_net_one_contract": 284.99999999998636,
+        "policy": {
+          "holding_minutes": 5,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6J",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.25,
+          "trigger_window_minutes": 5
+        },
+        "policy_id": "release_oco_fd6cdeea6bb0dfb1af0f",
+        "positive_stressed_trade_rate": 0.6,
+        "score": 118.78617794810839,
+        "stressed_net_one_contract": 233.7499999999864,
+        "trade_count": 5,
+        "trade_hash": "80081b2362339e9ca6bbd2a009b6fc63c177638b2a0c59699adc69826c54d893"
+      },
+      "gross_one_contract": 12.499999999990848,
+      "median_stressed_trade": -74.50000000000038,
+      "normal_net_one_contract": -110.50000000000915,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_fd6cdeea6bb0dfb1af0f",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -75.74370595978864,
+      "stressed_net_one_contract": -172.00000000000915,
+      "trade_count": 6,
+      "trade_hash": "ae006b99d029fa64c2ab9108233eece4fe50580aea9d1e5d7985a4d2285c53fe"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 2,
+          "eligible_brackets": 5,
+          "missing_lookback": 16,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 5
+        },
+        "gross_one_contract": 387.49999999998636,
+        "median_stressed_trade": 119.24999999999824,
+        "normal_net_one_contract": 284.99999999998636,
+        "policy": {
+          "holding_minutes": 5,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6J",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.0,
+          "trigger_window_minutes": 1
+        },
+        "policy_id": "release_oco_d8505d3c6803ed144cbb",
+        "positive_stressed_trade_rate": 0.6,
+        "score": 118.78617794810839,
+        "stressed_net_one_contract": 233.7499999999864,
+        "trade_count": 5,
+        "trade_hash": "60cfa80a49ac2115ede1b75377ad2e5bbcda1fc778601430e238d81a2c493c85"
+      },
+      "gross_one_contract": 12.499999999990848,
+      "median_stressed_trade": -74.50000000000038,
+      "normal_net_one_contract": -110.50000000000915,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_d8505d3c6803ed144cbb",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -75.74370595978864,
+      "stressed_net_one_contract": -172.00000000000915,
+      "trade_count": 6,
+      "trade_hash": "de7f31a7f6d175f1ab17df71929a82347b174105763c5f90053f7dd71c6064ff"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 2,
+          "eligible_brackets": 5,
+          "missing_lookback": 16,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 5
+        },
+        "gross_one_contract": 387.49999999998636,
+        "median_stressed_trade": 119.24999999999824,
+        "normal_net_one_contract": 284.99999999998636,
+        "policy": {
+          "holding_minutes": 30,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6J",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.0,
+          "trigger_window_minutes": 5
+        },
+        "policy_id": "release_oco_cf18ad5833b8735c4b98",
+        "positive_stressed_trade_rate": 0.6,
+        "score": 118.78617794810839,
+        "stressed_net_one_contract": 233.7499999999864,
+        "trade_count": 5,
+        "trade_hash": "2043fcc58e6840b768b83677c52ae84ae6c6e86b2763418189e77a4e9edd9e5b"
+      },
+      "gross_one_contract": 12.499999999990848,
+      "median_stressed_trade": -74.50000000000038,
+      "normal_net_one_contract": -110.50000000000915,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6J",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_cf18ad5833b8735c4b98",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -75.74370595978864,
+      "stressed_net_one_contract": -172.00000000000915,
+      "trade_count": 6,
+      "trade_hash": "c7d48d7be1022b20c73c9e4f08becad7d464b08293374e9d39ffa6e3d6bf945b"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 1,
+          "eligible_brackets": 4,
+          "missing_lookback": 17,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 4
+        },
+        "gross_one_contract": 219.99999999999795,
+        "median_stressed_trade": 48.00000000000119,
+        "normal_net_one_contract": 107.99999999999797,
+        "policy": {
+          "holding_minutes": 5,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6A",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.0,
+          "trigger_window_minutes": 5
+        },
+        "policy_id": "release_oco_e2101d332ef86d59cacd",
+        "positive_stressed_trade_rate": 0.75,
+        "score": 31.399999999998883,
+        "stressed_net_one_contract": 51.99999999999797,
+        "trade_count": 4,
+        "trade_hash": "e0cb04e63b6b03b7004767ffe622b47f96057fcf08fe49347c2116fcf23c3826"
+      },
+      "gross_one_contract": -100.0000000000001,
+      "median_stressed_trade": -92.00000000000004,
+      "normal_net_one_contract": -268.0000000000001,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6A",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_e2101d332ef86d59cacd",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -157.10339824327986,
+      "stressed_net_one_contract": -352.0000000000001,
+      "trade_count": 6,
+      "trade_hash": "801195827352509aca0562fe2d33353ddae3b309904a97ed7b223f6caf4f2393"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 3,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 0,
+          "eligible_brackets": 4,
+          "missing_lookback": 17,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 4
+        },
+        "gross_one_contract": 219.99999999999795,
+        "median_stressed_trade": 48.00000000000119,
+        "normal_net_one_contract": 107.99999999999797,
+        "policy": {
+          "holding_minutes": 5,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6A",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.25,
+          "trigger_window_minutes": 5
+        },
+        "policy_id": "release_oco_e12db5d712a90b916c3a",
+        "positive_stressed_trade_rate": 0.75,
+        "score": 31.399999999998883,
+        "stressed_net_one_contract": 51.99999999999797,
+        "trade_count": 4,
+        "trade_hash": "b7aca07c8f5405ac0ef8b02c28c27afc6d73538bbddfca6236bb31efd80d1e79"
+      },
+      "gross_one_contract": -100.0000000000001,
+      "median_stressed_trade": -92.00000000000004,
+      "normal_net_one_contract": -268.0000000000001,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6A",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.25,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_e12db5d712a90b916c3a",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -157.10339824327986,
+      "stressed_net_one_contract": -352.0000000000001,
+      "trade_count": 6,
+      "trade_hash": "7024e092604cf752a9da1a49a02a9f95d0b19cce385463a2f292082cc947001f"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 1,
+          "eligible_brackets": 4,
+          "missing_lookback": 17,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 4
+        },
+        "gross_one_contract": 219.99999999999795,
+        "median_stressed_trade": 48.00000000000119,
+        "normal_net_one_contract": 107.99999999999797,
+        "policy": {
+          "holding_minutes": 15,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6A",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.0,
+          "trigger_window_minutes": 5
+        },
+        "policy_id": "release_oco_df7278df741ca93fc844",
+        "positive_stressed_trade_rate": 0.75,
+        "score": 31.399999999998883,
+        "stressed_net_one_contract": 51.99999999999797,
+        "trade_count": 4,
+        "trade_hash": "aedcfb75592ba2cb8c2721cbf47faa824d4c4db5c31708dc577259438971e31a"
+      },
+      "gross_one_contract": -100.0000000000001,
+      "median_stressed_trade": -92.00000000000004,
+      "normal_net_one_contract": -268.0000000000001,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6A",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_df7278df741ca93fc844",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -157.10339824327986,
+      "stressed_net_one_contract": -352.0000000000001,
+      "trade_count": 6,
+      "trade_hash": "068e1025b8e67da3eedb5a899dfa29f61dcc4648b174653f5daf0560a0c3cb96"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 3,
+          "eligible_brackets": 5,
+          "missing_lookback": 16,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 5
+        },
+        "gross_one_contract": -12.499999999998614,
+        "median_stressed_trade": -80.74999999999449,
+        "normal_net_one_contract": -114.99999999999861,
+        "policy": {
+          "holding_minutes": 15,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6B",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.0,
+          "trigger_window_minutes": 5
+        },
+        "policy_id": "release_oco_eec357a9b916231a12f3",
+        "positive_stressed_trade_rate": 0.4,
+        "score": -80.0992602518673,
+        "stressed_net_one_contract": -166.2499999999986,
+        "trade_count": 5,
+        "trade_hash": "02642b5115931970e33da3a3fa1e44f755d3b51af51c46a1a2c8227bb37541ba"
+      },
+      "gross_one_contract": -37.50000000000973,
+      "median_stressed_trade": -99.49999999999936,
+      "normal_net_one_contract": -160.50000000000972,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6B",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_eec357a9b916231a12f3",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -98.65612048298206,
+      "stressed_net_one_contract": -222.00000000000972,
+      "trade_count": 6,
+      "trade_hash": "4816bd062e0b7da78f28f33753e1f58b603257afbfb148e0db6124f08caa8dea"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 3,
+          "eligible_brackets": 5,
+          "missing_lookback": 16,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 5
+        },
+        "gross_one_contract": -12.499999999998614,
+        "median_stressed_trade": -80.74999999999449,
+        "normal_net_one_contract": -114.99999999999861,
+        "policy": {
+          "holding_minutes": 15,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6B",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.0,
+          "trigger_window_minutes": 1
+        },
+        "policy_id": "release_oco_d6e58343a3d0e57f6a6d",
+        "positive_stressed_trade_rate": 0.4,
+        "score": -80.0992602518673,
+        "stressed_net_one_contract": -166.2499999999986,
+        "trade_count": 5,
+        "trade_hash": "7b82240b10584bf54497551239341ad550b5d214145e90852c8a0568552bb4e6"
+      },
+      "gross_one_contract": -37.50000000000973,
+      "median_stressed_trade": -99.49999999999936,
+      "normal_net_one_contract": -160.50000000000972,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6B",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_d6e58343a3d0e57f6a6d",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -98.65612048298206,
+      "stressed_net_one_contract": -222.00000000000972,
+      "trade_count": 6,
+      "trade_hash": "f958f802cc3c82fe40125aa95385e4e46ceb18e64fecd602c1c015507c4046ac"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 3,
+          "eligible_brackets": 5,
+          "missing_lookback": 16,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 5
+        },
+        "gross_one_contract": -12.499999999998614,
+        "median_stressed_trade": -80.74999999999449,
+        "normal_net_one_contract": -114.99999999999861,
+        "policy": {
+          "holding_minutes": 5,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6B",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.0,
+          "trigger_window_minutes": 1
+        },
+        "policy_id": "release_oco_adb8ab3fef598791a684",
+        "positive_stressed_trade_rate": 0.4,
+        "score": -80.0992602518673,
+        "stressed_net_one_contract": -166.2499999999986,
+        "trade_count": 5,
+        "trade_hash": "654a51478e9383203bcd1326580a946fd8228210a71b1380b0d93d29f11da9d7"
+      },
+      "gross_one_contract": -37.50000000000973,
+      "median_stressed_trade": -99.49999999999936,
+      "normal_net_one_contract": -160.50000000000972,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6B",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_adb8ab3fef598791a684",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -98.65612048298206,
+      "stressed_net_one_contract": -222.00000000000972,
+      "trade_count": 6,
+      "trade_hash": "a54fec4bd48fa5be27c3554d35cfbb38b93261a11fea9bae1ad147f5698f29b4"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 3,
+          "eligible_brackets": 5,
+          "missing_lookback": 16,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 5
+        },
+        "gross_one_contract": -156.24999999996894,
+        "median_stressed_trade": -118.24999999999037,
+        "normal_net_one_contract": -258.74999999996896,
+        "policy": {
+          "holding_minutes": 5,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6E",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.0,
+          "trigger_window_minutes": 5
+        },
+        "policy_id": "release_oco_b32a23160caf4f0ee2da",
+        "positive_stressed_trade_rate": 0.4,
+        "score": -151.5737146049715,
+        "stressed_net_one_contract": -309.99999999996896,
+        "trade_count": 5,
+        "trade_hash": "5e2b20ea342720cfecc3721126c7900c77f570813d716b93c7f8b64957d8d1dc"
+      },
+      "gross_one_contract": -168.75000000002302,
+      "median_stressed_trade": -90.1250000000004,
+      "normal_net_one_contract": -291.750000000023,
+      "policy": {
+        "holding_minutes": 5,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6E",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_b32a23160caf4f0ee2da",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -158.80120860637015,
+      "stressed_net_one_contract": -353.250000000023,
+      "trade_count": 6,
+      "trade_hash": "2cd5e4b4c214d956142cfe2ae04d17780879f752fcf2d0afba348967f8849861"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 3,
+          "eligible_brackets": 5,
+          "missing_lookback": 16,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 5
+        },
+        "gross_one_contract": -156.24999999996894,
+        "median_stressed_trade": -118.24999999999037,
+        "normal_net_one_contract": -258.74999999996896,
+        "policy": {
+          "holding_minutes": 30,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6E",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.0,
+          "trigger_window_minutes": 5
+        },
+        "policy_id": "release_oco_8abe582ae2b477e43d34",
+        "positive_stressed_trade_rate": 0.4,
+        "score": -151.5737146049715,
+        "stressed_net_one_contract": -309.99999999996896,
+        "trade_count": 5,
+        "trade_hash": "9f494207138a8d0ef10396550cb365f12721be5e87b8ce95fa28e663a34eb13d"
+      },
+      "gross_one_contract": -168.75000000002302,
+      "median_stressed_trade": -90.1250000000004,
+      "normal_net_one_contract": -291.750000000023,
+      "policy": {
+        "holding_minutes": 30,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6E",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 5
+      },
+      "policy_id": "release_oco_8abe582ae2b477e43d34",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -158.80120860637015,
+      "stressed_net_one_contract": -353.250000000023,
+      "trade_count": 6,
+      "trade_hash": "37ccf97da4172a197193fd2feeedb37a2ce20841425bcfe1e438e5c7e2e5dc31"
+    },
+    {
+      "diagnostics": {
+        "dual_touch_losses": 4,
+        "eligible_brackets": 6,
+        "missing_lookback": 5,
+        "no_trigger": 0,
+        "roll_rejected": 0,
+        "scheduled_events": 11,
+        "triggered_trades": 6
+      },
+      "discovery": {
+        "diagnostics": {
+          "dual_touch_losses": 3,
+          "eligible_brackets": 5,
+          "missing_lookback": 16,
+          "no_trigger": 0,
+          "roll_rejected": 0,
+          "scheduled_events": 21,
+          "triggered_trades": 5
+        },
+        "gross_one_contract": -156.24999999996894,
+        "median_stressed_trade": -118.24999999999037,
+        "normal_net_one_contract": -258.74999999996896,
+        "policy": {
+          "holding_minutes": 15,
+          "lookback_minutes": 15,
+          "release_scope": "ALL_RELEASES",
+          "root": "6E",
+          "stop_range_fraction": 1.0,
+          "target_r": 2.0,
+          "trigger_buffer_fraction": 0.0,
+          "trigger_window_minutes": 1
+        },
+        "policy_id": "release_oco_760ee53c96c3aaea2e65",
+        "positive_stressed_trade_rate": 0.4,
+        "score": -151.5737146049715,
+        "stressed_net_one_contract": -309.99999999996896,
+        "trade_count": 5,
+        "trade_hash": "bb1f6f8da18142b9a3645f0e7acdc531b62c549be288bd213446eea3c325b6d0"
+      },
+      "gross_one_contract": -168.75000000002302,
+      "median_stressed_trade": -90.1250000000004,
+      "normal_net_one_contract": -291.750000000023,
+      "policy": {
+        "holding_minutes": 15,
+        "lookback_minutes": 15,
+        "release_scope": "ALL_RELEASES",
+        "root": "6E",
+        "stop_range_fraction": 1.0,
+        "target_r": 2.0,
+        "trigger_buffer_fraction": 0.0,
+        "trigger_window_minutes": 1
+      },
+      "policy_id": "release_oco_760ee53c96c3aaea2e65",
+      "positive_stressed_trade_rate": 0.3333333333333333,
+      "score": -158.80120860637015,
+      "stressed_net_one_contract": -353.250000000023,
+      "trade_count": 6,
+      "trade_hash": "3e3a72ae62d229ccddde033413e33d64f5da1f8850f29f9ced57bd5217e3cb6f"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "created_at_utc": "2026-07-20T05:47:33.182527+00:00",
+  "final_development_opened_after_this_freeze": false,
+  "final_development_role": [
+    "2024-01-01",
+    "2024-10-01"
+  ],
+  "manifest_hash": "ead8bff3b8421e766fc86622d8a478aaa454ff2ce649a0ded0d6d6e363cfadaf",
+  "policies": [],
+  "policy_ids": [],
+  "schema": "hydra_direction_neutral_release_bracket_preflight_v1_finalist_freeze"
+}

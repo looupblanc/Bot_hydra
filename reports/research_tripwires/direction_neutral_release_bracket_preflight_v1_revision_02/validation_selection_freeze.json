@@ -1,0 +1,143 @@
+{
+  "calendar_sha256": "ba644383546770eb5084082dce87f70011439a58261df51b4510d6885afa5c59",
+  "created_at_utc": "2026-07-20T05:47:33.091428+00:00",
+  "final_development_opened": false,
+  "manifest_hash": "ead8bff3b8421e766fc86622d8a478aaa454ff2ce649a0ded0d6d6e363cfadaf",
+  "policies": [
+    {
+      "holding_minutes": 5,
+      "lookback_minutes": 15,
+      "release_scope": "ALL_RELEASES",
+      "root": "6J",
+      "stop_range_fraction": 1.0,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.25,
+      "trigger_window_minutes": 5
+    },
+    {
+      "holding_minutes": 5,
+      "lookback_minutes": 15,
+      "release_scope": "ALL_RELEASES",
+      "root": "6J",
+      "stop_range_fraction": 1.0,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.0,
+      "trigger_window_minutes": 1
+    },
+    {
+      "holding_minutes": 5,
+      "lookback_minutes": 5,
+      "release_scope": "ALL_RELEASES",
+      "root": "6J",
+      "stop_range_fraction": 1.0,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.0,
+      "trigger_window_minutes": 1
+    },
+    {
+      "holding_minutes": 5,
+      "lookback_minutes": 15,
+      "release_scope": "ALL_RELEASES",
+      "root": "6A",
+      "stop_range_fraction": 1.0,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.0,
+      "trigger_window_minutes": 5
+    },
+    {
+      "holding_minutes": 5,
+      "lookback_minutes": 15,
+      "release_scope": "ALL_RELEASES",
+      "root": "6A",
+      "stop_range_fraction": 1.0,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.25,
+      "trigger_window_minutes": 5
+    },
+    {
+      "holding_minutes": 5,
+      "lookback_minutes": 5,
+      "release_scope": "ALL_RELEASES",
+      "root": "6A",
+      "stop_range_fraction": 1.0,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.25,
+      "trigger_window_minutes": 1
+    },
+    {
+      "holding_minutes": 15,
+      "lookback_minutes": 15,
+      "release_scope": "ALL_RELEASES",
+      "root": "6B",
+      "stop_range_fraction": 1.0,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.0,
+      "trigger_window_minutes": 5
+    },
+    {
+      "holding_minutes": 30,
+      "lookback_minutes": 15,
+      "release_scope": "ALL_RELEASES",
+      "root": "6B",
+      "stop_range_fraction": 1.0,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.25,
+      "trigger_window_minutes": 1
+    },
+    {
+      "holding_minutes": 5,
+      "lookback_minutes": 15,
+      "release_scope": "ALL_RELEASES",
+      "root": "6B",
+      "stop_range_fraction": 0.5,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.0,
+      "trigger_window_minutes": 1
+    },
+    {
+      "holding_minutes": 5,
+      "lookback_minutes": 15,
+      "release_scope": "ALL_RELEASES",
+      "root": "6E",
+      "stop_range_fraction": 1.0,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.0,
+      "trigger_window_minutes": 5
+    },
+    {
+      "holding_minutes": 5,
+      "lookback_minutes": 5,
+      "release_scope": "ALL_RELEASES",
+      "root": "6E",
+      "stop_range_fraction": 1.0,
+      "target_r": 2.0,
+      "trigger_buffer_fraction": 0.0,
+      "trigger_window_minutes": 5
+    },
+    {
+      "holding_minutes": 5,
+      "lookback_minutes": 5,
+      "release_scope": "ALL_RELEASES",
+      "root": "6E",
+      "stop_range_fraction": 0.5,
+      "target_r": 1.0,
+      "trigger_buffer_fraction": 0.25,
+      "trigger_window_minutes": 5
+    }
+  ],
+  "policy_ids": [
+    "release_oco_fd6cdeea6bb0dfb1af0f",
+    "release_oco_d8505d3c6803ed144cbb",
+    "release_oco_f4bda504d3712ca33de1",
+    "release_oco_e2101d332ef86d59cacd",
+    "release_oco_e12db5d712a90b916c3a",
+    "release_oco_fe2fd6f60827bf1c0cfd",
+    "release_oco_eec357a9b916231a12f3",
+    "release_oco_ac6c5c5fd1710bdb3cd1",
+    "release_oco_f71ee8f17f3ba7a01693",
+    "release_oco_b32a23160caf4f0ee2da",
+    "release_oco_d8173495ba7d6d32f924",
+    "release_oco_f6138424adc974722947"
+  ],
+  "schema": "hydra_direction_neutral_release_bracket_preflight_v1_validation_selection_freeze"
+}

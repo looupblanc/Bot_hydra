@@ -1,0 +1,15 @@
+{
+  "schema": "hydra_invalid_economic_result_receipt_v1",
+  "created_at_utc": "2026-07-20T05:46:16Z",
+  "status": "INVALID_DO_NOT_USE",
+  "result_hash": "32dd3c425cdf8ae9d33d6763f5519b1d9a420cfd00d2b24ccf508738d2da09ea",
+  "economic_result_file_sha256": "50ea2c5127462eef49c28d04ee0611d7cd7ba4de0c47b9eb2e992dcdba0bde4c",
+  "cause": "trade_hash included trade_id, which embeds policy_id, so execution-equivalent candidates were not behaviorally deduplicated before validation selection",
+  "economic_outcomes_modified": false,
+  "manifest_modified": false,
+  "repair_scope": "exclude trade_id from behavioral hash and rerun only the affected deterministic selection/economic slice under the same frozen manifest",
+  "final_development_was_opened": false,
+  "q4_access_count_delta": 0,
+  "broker_connections": 0,
+  "orders": 0
+}
