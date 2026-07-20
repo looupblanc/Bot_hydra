@@ -46,12 +46,12 @@ MAX_INCREMENTAL_USD = 0.70
 CAMPAIGN_ID = "OPTIONS_IV_TEACHER_STUDENT_TRIPWIRE_V1"
 MANIFEST_PATH = "config/research/options_iv_teacher_student_tripwire_v1.json"
 EXPECTED_MANIFEST_HASH = (
-    "723019b5baaca70906a9ec90f87476f200bfc7a406d2be0f8b883f016cca58f4"
+    "6528a47f270d775e7fd34a492e34f864d104ea433951ee2518d7cbbc37558df2"
 )
 EXPECTED_ESTIMATES = {
     "statistics": {
-        "record_count": 48_718,
-        "billable_size_bytes": 3_117_952,
+        "record_count": 7_307_175,
+        "billable_size_bytes": 467_659_200,
         "estimated_cost_usd": 0.435541570187,
     },
     "definition": {

@@ -2,6 +2,12 @@
   "schema": "hydra_options_iv_teacher_student_tripwire_manifest_v1",
   "branch_id": "OPTIONS_IV_TEACHER_STUDENT_TRIPWIRE_V1",
   "created_at_utc": "2026-07-20T23:21:23Z",
+  "manifest_revision": {
+    "revision": 1,
+    "supersedes_hash": "723019b5baaca70906a9ec90f87476f200bfc7a406d2be0f8b883f016cca58f4",
+    "reason": "Correct official statistics record-count and billable-byte metadata after the fail-closed dry run; no market data or economic outcome was accessed.",
+    "scientific_contract_changed": false
+  },
   "decision_card": {
     "hypothesis": "Exchange-published option implied-volatility states contain causal regime information that improves the stressed economics of meso-horizon ES/NQ structural opportunities, and at least half of that incremental utility can be distilled into a futures-only L1-deployable student.",
     "strongest_argument_against": "Twenty sessions may be underpowered, option statistics may be sparse or endogenous to traded contracts, and the useful state may not be reproducible from futures-only deployment inputs.",
@@ -45,8 +51,8 @@
     },
     "official_estimates": {
       "statistics": {
-        "record_count": 48718,
-        "billable_size_bytes": 3117952,
+        "record_count": 7307175,
+        "billable_size_bytes": 467659200,
         "estimated_cost_usd": 0.435541570187
       },
       "definition": {
@@ -214,5 +220,5 @@
     "no_xfa_before_clean_combine_survivors": true,
     "frozen_manifest_before_purchase": true
   },
-  "manifest_hash": "723019b5baaca70906a9ec90f87476f200bfc7a406d2be0f8b883f016cca58f4"
+  "manifest_hash": "6528a47f270d775e7fd34a492e34f864d104ea433951ee2518d7cbbc37558df2"
 }
