@@ -290,6 +290,86 @@ def test_artifact_compatibility_and_recurring_epoch_resume_are_non_mutating(
     assert exhausted is False
 
 
+def test_director_prior_state_uses_exact_snapshot_binding_when_declared(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "reports/economic_evolution/director"
+    state_core = {
+        "schema": director_runtime.PRODUCTION_STATE_SCHEMA,
+        "campaign_id": "hydra_autonomous_economic_discovery_director_0035",
+        "manifest_hash": "a" * 64,
+        "source_commit": "1" * 40,
+        "checkpoint_sequence": 7,
+        "state": "ROBUSTNESS_ACTIVE",
+    }
+    state = _hashed(state_core, "state_hash")
+    _write_json(output / "production_state.json", state)
+    manifest = {
+        "campaign_id": state["campaign_id"],
+        "manifest_hash": "b" * 64,
+        "source_commit": "2" * 40,
+        "compatible_artifact_manifest_hashes": [state["manifest_hash"]],
+        "runtime": {
+            "output_dir": output.relative_to(tmp_path).as_posix(),
+        },
+        "resumable_snapshot_compatibility": {
+            "schema": "hydra_resumable_snapshot_compatibility_v1",
+            "classification": "HASH_BOUND_TECHNICAL_REVISION_RESUME_ONLY",
+            "economic_outcomes_changed": False,
+            "scientific_policy_changed": False,
+            "bindings": [
+                {
+                    "path": (
+                        output.relative_to(tmp_path) / "production_state.json"
+                    ).as_posix(),
+                    "schema": director_runtime.PRODUCTION_STATE_SCHEMA,
+                    "hash_field": "state_hash",
+                    "manifest_hash": state["manifest_hash"],
+                    "source_commit": state["source_commit"],
+                    "snapshot_hash": state["state_hash"],
+                }
+            ],
+        },
+    }
+
+    assert director_runtime._load_prior_state(
+        output, manifest, root=tmp_path
+    ) == state
+
+    drifted = dict(state)
+    drifted["source_commit"] = "3" * 40
+    drifted = _hashed(drifted, "state_hash")
+    _write_json(output / "production_state.json", drifted)
+    with pytest.raises(
+        director_runtime.AutonomousDirectorRuntimeError,
+        match="identity drift",
+    ):
+        director_runtime._load_prior_state(output, manifest, root=tmp_path)
+
+
+def test_director_prior_state_preserves_legacy_manifest_compatibility_without_contract(
+    tmp_path: Path,
+) -> None:
+    output = tmp_path / "reports/economic_evolution/director"
+    state = _hashed(
+        {
+            "campaign_id": "hydra_autonomous_economic_discovery_director_0035",
+            "manifest_hash": "a" * 64,
+            "source_commit": "legacy-unbound-source",
+        },
+        "state_hash",
+    )
+    _write_json(output / "production_state.json", state)
+    manifest = {
+        "campaign_id": state["campaign_id"],
+        "manifest_hash": "b" * 64,
+        "source_commit": "2" * 40,
+        "compatible_artifact_manifest_hashes": [state["manifest_hash"]],
+    }
+
+    assert director_runtime._load_prior_state(output, manifest) == state
+
+
 def test_recurring_empty_pair_seals_one_exhaustion_transition_and_stops_sharding(
     tmp_path: Path,
 ) -> None:

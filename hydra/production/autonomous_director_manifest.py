@@ -27,6 +27,23 @@ CAMPAIGN_ID = "hydra_autonomous_economic_discovery_director_0035"
 CLASS_ID = "AUTONOMOUS_ECONOMIC_DISCOVERY_DIRECTOR_V1"
 RUNTIME_VERSION = "hydra_autonomous_economic_discovery_director_runtime_v1"
 ARTIFACT_COMPATIBILITY_LIMIT = 13
+RESUMABLE_SNAPSHOT_COMPATIBILITY_SCHEMA = (
+    "hydra_resumable_snapshot_compatibility_v1"
+)
+RESUMABLE_SNAPSHOT_COMPATIBILITY_CLASSIFICATION = (
+    "HASH_BOUND_TECHNICAL_REVISION_RESUME_ONLY"
+)
+
+_RESUMABLE_SNAPSHOT_SPECS = {
+    "production_state.json": (
+        "hydra_economic_production_state_v1",
+        "state_hash",
+    ),
+    "production_kpis.json": (
+        "hydra_economic_production_kpis_v1",
+        "kpi_hash",
+    ),
+}
 
 _POST_MACRO_WORKER_IMPLEMENTATIONS = {
     "TIER_Q_2026_FINAL_DEVELOPMENT_READ_ONLY": (
@@ -326,6 +343,137 @@ def _validate_artifact_compatibility(manifest: Mapping[str, Any]) -> None:
             or repair.get("scientific_policy_changed") is not False
         ):
             raise AutonomousDirectorManifestError("artifact compatibility drift")
+    _validate_resumable_snapshot_compatibility(manifest, set(values))
+
+
+def _validate_resumable_snapshot_compatibility(
+    manifest: Mapping[str, Any], compatible_manifest_hashes: set[str]
+) -> None:
+    """Validate an optional, exact legacy live-snapshot resume binding.
+
+    Immutable branch artifacts may use the broader compatibility list.  Mutable
+    live checkpoints must never inherit that permission: every legacy state/KPI
+    identity is bound independently to its repository path and payload hash.
+    """
+
+    raw = manifest.get("resumable_snapshot_compatibility")
+    if raw is None:
+        return
+    if not isinstance(raw, Mapping):
+        raise AutonomousDirectorManifestError(
+            "resumable snapshot compatibility drift"
+        )
+    section = dict(raw)
+    if set(section) != {
+        "schema",
+        "classification",
+        "economic_outcomes_changed",
+        "scientific_policy_changed",
+        "bindings",
+    } or (
+        section.get("schema") != RESUMABLE_SNAPSHOT_COMPATIBILITY_SCHEMA
+        or section.get("classification")
+        != RESUMABLE_SNAPSHOT_COMPATIBILITY_CLASSIFICATION
+        or section.get("economic_outcomes_changed") is not False
+        or section.get("scientific_policy_changed") is not False
+    ):
+        raise AutonomousDirectorManifestError(
+            "resumable snapshot compatibility drift"
+        )
+
+    bindings = section.get("bindings")
+    if not isinstance(bindings, (list, tuple)) or len(bindings) != len(
+        _RESUMABLE_SNAPSHOT_SPECS
+    ):
+        raise AutonomousDirectorManifestError(
+            "resumable snapshot compatibility drift"
+        )
+    runtime = _mapping(manifest, "runtime")
+    output = Path(str(runtime.get("output_dir") or ""))
+    expected_paths = {
+        (output / name).as_posix(): (schema, hash_field)
+        for name, (schema, hash_field) in _RESUMABLE_SNAPSHOT_SPECS.items()
+    }
+    observed_paths: set[str] = set()
+    observed_identities: set[tuple[str, str]] = set()
+    for raw_binding in bindings:
+        if not isinstance(raw_binding, Mapping):
+            raise AutonomousDirectorManifestError(
+                "resumable snapshot compatibility drift"
+            )
+        binding = dict(raw_binding)
+        if set(binding) != {
+            "path",
+            "schema",
+            "hash_field",
+            "manifest_hash",
+            "source_commit",
+            "snapshot_hash",
+        }:
+            raise AutonomousDirectorManifestError(
+                "resumable snapshot compatibility drift"
+            )
+        path = str(binding.get("path") or "")
+        expected = expected_paths.get(path)
+        manifest_hash = str(binding.get("manifest_hash") or "")
+        source_commit = str(binding.get("source_commit") or "")
+        snapshot_hash = str(binding.get("snapshot_hash") or "")
+        if (
+            expected is None
+            or path in observed_paths
+            or binding.get("schema") != expected[0]
+            or binding.get("hash_field") != expected[1]
+            or manifest_hash not in compatible_manifest_hashes
+            or manifest_hash == str(manifest.get("manifest_hash") or "")
+            or not _GIT_SHA.fullmatch(source_commit)
+            or not _SHA256.fullmatch(snapshot_hash)
+        ):
+            raise AutonomousDirectorManifestError(
+                "resumable snapshot compatibility drift"
+            )
+        observed_paths.add(path)
+        observed_identities.add((manifest_hash, source_commit))
+    if observed_paths != set(expected_paths) or len(observed_identities) != 1:
+        raise AutonomousDirectorManifestError(
+            "resumable snapshot compatibility drift"
+        )
+
+
+def resumable_snapshot_identity_matches(
+    snapshot: Mapping[str, Any],
+    manifest: Mapping[str, Any],
+    *,
+    path: str,
+    schema: str,
+    hash_field: str,
+) -> bool:
+    """Match current identity or one fully bound legacy resumable snapshot."""
+
+    if (
+        snapshot.get("schema") == schema
+        and snapshot.get("campaign_id") == manifest.get("campaign_id")
+        and snapshot.get("manifest_hash") == manifest.get("manifest_hash")
+        and snapshot.get("source_commit") == manifest.get("source_commit")
+    ):
+        return True
+    section = manifest.get("resumable_snapshot_compatibility")
+    if not isinstance(section, Mapping):
+        return False
+    for raw_binding in section.get("bindings") or ():
+        if not isinstance(raw_binding, Mapping):
+            continue
+        if (
+            raw_binding.get("path") == path
+            and raw_binding.get("schema") == schema
+            and raw_binding.get("hash_field") == hash_field
+            and snapshot.get("schema") == schema
+            and snapshot.get("campaign_id") == manifest.get("campaign_id")
+            and snapshot.get("manifest_hash") == raw_binding.get("manifest_hash")
+            and snapshot.get("source_commit") == raw_binding.get("source_commit")
+            and snapshot.get(hash_field) == raw_binding.get("snapshot_hash")
+        ):
+            return True
+    return False
 
 
 def _validate_compute(manifest: Mapping[str, Any]) -> None:

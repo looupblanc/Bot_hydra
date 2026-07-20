@@ -19,6 +19,8 @@ from hydra.production.autonomous_director_manifest import (
     EXPLORATION_BRANCH,
     MANIFEST_SCHEMA,
     RUNTIME_VERSION,
+    RESUMABLE_SNAPSHOT_COMPATIBILITY_CLASSIFICATION,
+    RESUMABLE_SNAPSHOT_COMPATIBILITY_SCHEMA,
     AutonomousDirectorManifestError,
     validate_autonomous_director_manifest,
 )
@@ -335,6 +337,41 @@ def _mutate(
     )
 
 
+def _add_resumable_snapshot_compatibility(manifest: dict[str, Any]) -> None:
+    old_manifest_hash = "a" * 64
+    old_source_commit = "a" * 40
+    manifest["compatible_artifact_manifest_hashes"] = [old_manifest_hash]
+    manifest["post_launch_pre_economic_counter_repair"] = {
+        "economic_outcomes_changed": False,
+        "scientific_policy_changed": False,
+    }
+    output = Path(manifest["runtime"]["output_dir"])
+    manifest["resumable_snapshot_compatibility"] = {
+        "schema": RESUMABLE_SNAPSHOT_COMPATIBILITY_SCHEMA,
+        "classification": RESUMABLE_SNAPSHOT_COMPATIBILITY_CLASSIFICATION,
+        "economic_outcomes_changed": False,
+        "scientific_policy_changed": False,
+        "bindings": [
+            {
+                "path": (output / "production_state.json").as_posix(),
+                "schema": "hydra_economic_production_state_v1",
+                "hash_field": "state_hash",
+                "manifest_hash": old_manifest_hash,
+                "source_commit": old_source_commit,
+                "snapshot_hash": "1" * 64,
+            },
+            {
+                "path": (output / "production_kpis.json").as_posix(),
+                "schema": "hydra_economic_production_kpis_v1",
+                "hash_field": "kpi_hash",
+                "manifest_hash": old_manifest_hash,
+                "source_commit": old_source_commit,
+                "snapshot_hash": "2" * 64,
+            },
+        ],
+    }
+
+
 def test_autonomous_director_manifest_and_dispatch_accept_frozen_contract(
     tmp_path: Path,
 ) -> None:
@@ -365,6 +402,50 @@ def test_artifact_compatibility_capacity_preserves_bounded_repairs(
     manifest["compatible_artifact_manifest_hashes"].append("f" * 64)
     _rehash(manifest)
     with pytest.raises(AutonomousDirectorManifestError, match="compatibility"):
+        validate_autonomous_director_manifest(manifest, manifest_path=path)
+
+
+def test_resumable_snapshot_compatibility_accepts_only_exact_bound_pair(
+    tmp_path: Path,
+) -> None:
+    path, manifest = _fixture(tmp_path)
+    _add_resumable_snapshot_compatibility(manifest)
+    _rehash(manifest)
+    path.write_text(json.dumps(manifest, sort_keys=True) + "\n", encoding="utf-8")
+
+    validate_autonomous_director_manifest(manifest, manifest_path=path)
+
+
+@pytest.mark.parametrize(
+    ("binding_index", "field", "bad_value"),
+    [
+        (0, "path", "reports/economic_evolution/elsewhere/production_state.json"),
+        (0, "schema", "wrong_state_schema"),
+        (0, "hash_field", "kpi_hash"),
+        (0, "manifest_hash", "f" * 64),
+        (0, "source_commit", "a" * 39),
+        (0, "snapshot_hash", "1" * 63),
+        (1, "source_commit", "b" * 40),
+    ],
+)
+def test_resumable_snapshot_compatibility_rejects_identity_or_path_drift(
+    tmp_path: Path,
+    binding_index: int,
+    field: str,
+    bad_value: str,
+) -> None:
+    path, manifest = _fixture(tmp_path)
+    _add_resumable_snapshot_compatibility(manifest)
+    manifest["resumable_snapshot_compatibility"]["bindings"][binding_index][
+        field
+    ] = bad_value
+    _rehash(manifest)
+    path.write_text(json.dumps(manifest, sort_keys=True) + "\n", encoding="utf-8")
+
+    with pytest.raises(
+        AutonomousDirectorManifestError,
+        match="resumable snapshot compatibility",
+    ):
         validate_autonomous_director_manifest(manifest, manifest_path=path)
 
 

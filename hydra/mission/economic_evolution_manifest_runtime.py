@@ -38,6 +38,9 @@ from hydra.production.causal_target_velocity_manifest import (
     CAUSAL_TARGET_VELOCITY_ENGINE,
     load_and_validate_causal_target_velocity_manifest,
 )
+from hydra.production.autonomous_director_manifest import (
+    resumable_snapshot_identity_matches,
+)
 from hydra.research.economic_evolution_opportunity_density_campaign import (
     load_and_verify_opportunity_density_preregistration,
     load_and_verify_opportunity_density_result,
@@ -985,11 +988,18 @@ class EconomicEvolutionManifestRuntime:
         claimed = snapshot.get(hash_field)
         payload = dict(snapshot)
         payload.pop(hash_field, None)
+        try:
+            relative_path = path.resolve().relative_to(self.root).as_posix()
+        except ValueError:
+            relative_path = ""
         if (
-            snapshot.get("schema") != schema
-            or snapshot.get("campaign_id") != config.get("campaign_id")
-            or snapshot.get("manifest_hash") != _manifest_revision(config)
-            or snapshot.get("source_commit") != config.get("source_commit")
+            not resumable_snapshot_identity_matches(
+                snapshot,
+                config,
+                path=relative_path,
+                schema=schema,
+                hash_field=hash_field,
+            )
             or not isinstance(claimed, str)
             or claimed != stable_hash(payload)
         ):

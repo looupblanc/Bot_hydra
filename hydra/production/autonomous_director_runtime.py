@@ -33,6 +33,7 @@ from hydra.production.autonomous_director_manifest import (
     ACCOUNT_SIZES_USD,
     CAMPAIGN_ID,
     RUNTIME_VERSION,
+    resumable_snapshot_identity_matches,
     validate_autonomous_director_manifest,
 )
 from hydra.production.autonomous_exact_replay import (
@@ -388,7 +389,7 @@ def run_autonomous_director_manifest(
     branch_writer = AtomicResultWriter(output / "branch_results")
     started = time.monotonic()
 
-    prior = _load_prior_state(output, manifest)
+    prior = _load_prior_state(output, manifest, root=root)
     _initialize_runtime_measurement(prior, started)
     sequence = int(prior.get("checkpoint_sequence", 0)) if prior else 0
     branch_files = {
@@ -9826,16 +9827,35 @@ def _publish(
 
 
 def _load_prior_state(
-    output: Path, manifest: Mapping[str, Any]
+    output: Path,
+    manifest: Mapping[str, Any],
+    *,
+    root: Path | None = None,
 ) -> dict[str, Any] | None:
     path = output / "production_state.json"
     if not path.is_file():
         return None
     value = _read_hashed(path, "state_hash")
-    if (
-        value.get("campaign_id") != manifest["campaign_id"]
-        or not _artifact_manifest_compatible(value, manifest)
-    ):
+    strict_contract = manifest.get("resumable_snapshot_compatibility")
+    if strict_contract is None:
+        identity_matches = (
+            value.get("campaign_id") == manifest["campaign_id"]
+            and _artifact_manifest_compatible(value, manifest)
+        )
+    else:
+        project_root = root.resolve() if root is not None else output.parents[2]
+        try:
+            relative_path = path.resolve().relative_to(project_root).as_posix()
+        except ValueError:
+            relative_path = ""
+        identity_matches = resumable_snapshot_identity_matches(
+            value,
+            manifest,
+            path=relative_path,
+            schema=PRODUCTION_STATE_SCHEMA,
+            hash_field="state_hash",
+        )
+    if not identity_matches:
         raise AutonomousDirectorRuntimeError("resumable state identity drift")
     return value
 

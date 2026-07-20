@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import hashlib
 import shutil
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -139,6 +140,38 @@ def _kpis(config: dict[str, Any], **overrides: Any) -> dict[str, Any]:
     value.update(overrides)
     value["kpi_hash"] = stable_hash(value)
     return value
+
+
+def _bind_legacy_live_snapshots(
+    config: dict[str, Any],
+    state: dict[str, Any],
+    kpis: dict[str, Any],
+) -> None:
+    output = Path(config["runtime"]["output_dir"])
+    config["resumable_snapshot_compatibility"] = {
+        "schema": "hydra_resumable_snapshot_compatibility_v1",
+        "classification": "HASH_BOUND_TECHNICAL_REVISION_RESUME_ONLY",
+        "economic_outcomes_changed": False,
+        "scientific_policy_changed": False,
+        "bindings": [
+            {
+                "path": (output / PRODUCTION_STATE_NAME).as_posix(),
+                "schema": PRODUCTION_STATE_SCHEMA,
+                "hash_field": "state_hash",
+                "manifest_hash": state["manifest_hash"],
+                "source_commit": state["source_commit"],
+                "snapshot_hash": state["state_hash"],
+            },
+            {
+                "path": (output / PRODUCTION_KPI_NAME).as_posix(),
+                "schema": PRODUCTION_KPI_SCHEMA,
+                "hash_field": "kpi_hash",
+                "manifest_hash": kpis["manifest_hash"],
+                "source_commit": kpis["source_commit"],
+                "snapshot_hash": kpis["kpi_hash"],
+            },
+        ],
+    }
 
 
 def _terminal_result(config: dict[str, Any]) -> dict[str, Any]:
@@ -302,6 +335,83 @@ def test_production_live_kpis_enforce_hash_workers_and_safety(tmp_path: Path) ->
     _write_json(path, unsafe)
     with pytest.raises(EconomicEvolutionRuntimeError, match="orders"):
         runtime._load_production_kpis(config, output)
+
+
+def test_hash_bound_legacy_state_and_kpis_resume_without_identity_rewrite(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    legacy = deepcopy(config)
+    legacy["manifest_hash"] = "b" * 64
+    legacy["source_commit"] = "d" * 40
+    state = _state(legacy)
+    kpis = _kpis(legacy)
+    _bind_legacy_live_snapshots(config, state, kpis)
+    runtime = EconomicEvolutionManifestRuntime(tmp_path, tmp_path / "mission/state")
+    output, _ = runtime._paths(config)
+    _write_json(output / PRODUCTION_STATE_NAME, state)
+    _write_json(output / PRODUCTION_KPI_NAME, kpis)
+
+    assert runtime._production_resume_state(config, output) == state
+    assert runtime._load_production_kpis(config, output) == kpis
+    assert json.loads((output / PRODUCTION_STATE_NAME).read_text()) == state
+
+
+def test_compatible_artifact_hash_alone_never_authorizes_generic_live_state(
+    tmp_path: Path,
+) -> None:
+    config = _config(tmp_path)
+    legacy = deepcopy(config)
+    legacy["manifest_hash"] = "b" * 64
+    legacy["source_commit"] = "d" * 40
+    config["compatible_artifact_manifest_hashes"] = [legacy["manifest_hash"]]
+    runtime = EconomicEvolutionManifestRuntime(tmp_path, tmp_path / "mission/state")
+    output, _ = runtime._paths(config)
+    _write_json(output / PRODUCTION_STATE_NAME, _state(legacy))
+
+    with pytest.raises(EconomicEvolutionRuntimeError, match="integrity failure"):
+        runtime._production_resume_state(config, output)
+
+
+@pytest.mark.parametrize(
+    ("target", "field", "bad_value"),
+    [
+        ("binding", "path", "reports/economic_evolution/wrong/production_state.json"),
+        ("binding", "source_commit", "e" * 40),
+        ("binding", "manifest_hash", "e" * 64),
+        ("binding", "snapshot_hash", "e" * 64),
+        ("snapshot", "source_commit", "e" * 40),
+        ("snapshot", "manifest_hash", "e" * 64),
+    ],
+)
+def test_hash_bound_legacy_live_state_rejects_each_identity_drift(
+    tmp_path: Path,
+    target: str,
+    field: str,
+    bad_value: str,
+) -> None:
+    config = _config(tmp_path)
+    legacy = deepcopy(config)
+    legacy["manifest_hash"] = "b" * 64
+    legacy["source_commit"] = "d" * 40
+    state = _state(legacy)
+    kpis = _kpis(legacy)
+    _bind_legacy_live_snapshots(config, state, kpis)
+    if target == "binding":
+        config["resumable_snapshot_compatibility"]["bindings"][0][field] = (
+            bad_value
+        )
+    else:
+        state[field] = bad_value
+        state["state_hash"] = stable_hash(
+            {key: value for key, value in state.items() if key != "state_hash"}
+        )
+    runtime = EconomicEvolutionManifestRuntime(tmp_path, tmp_path / "mission/state")
+    output, _ = runtime._paths(config)
+    _write_json(output / PRODUCTION_STATE_NAME, state)
+
+    with pytest.raises(EconomicEvolutionRuntimeError, match="integrity failure"):
+        runtime._production_resume_state(config, output)
 
 
 def test_production_deployment_requires_source_worm_head_ancestry(
