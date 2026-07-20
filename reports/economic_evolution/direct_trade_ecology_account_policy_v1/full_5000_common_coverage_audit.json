@@ -1,0 +1,75 @@
+{
+  "account_calendar_session_count": 309,
+  "audit_hash": "bd0b81001eacf511c28902f1f348e47b39c01cba448849ff8b77039e3b5ebf46",
+  "censored_opportunity_count": 3168,
+  "censored_session_day_count": 297,
+  "censored_signal_semantics": "SIGNAL_AND_INTENT_PRESERVED;IF_ACCEPTED_EPISODE_DATA_CENSORED;NEVER_ABSTAIN_OR_FLAT",
+  "consolidated_opportunity_count": 142503,
+  "coverage_complete_source_cohort": {
+    "common_grid_hash": "c36d5874a6b8a2d89d98fe7efc926a6ff881ae64905b8442958d343eb4656557",
+    "evidence_role": "OUTCOME_AVAILABILITY_COHORT_DIAGNOSTIC_ONLY",
+    "excluded": 2143,
+    "included": 2857
+  },
+  "data_purchase_count": 0,
+  "full_5000_common_outcome_starts": {
+    "B2": {
+      "P10": [],
+      "P20": [],
+      "P5": []
+    },
+    "B3": {
+      "P10": [],
+      "P20": [],
+      "P5": []
+    }
+  },
+  "headline_status": "COVERAGE_LIMITED_ZERO_COMMON_B2_B3_ACCOUNT_START",
+  "input_eligible_common_starts": {
+    "B2": {
+      "P10": [19657, 19719],
+      "P20": [],
+      "P5": [19657, 19664, 19671, 19692, 19719, 19727]
+    },
+    "B3": {
+      "P10": [19779, 19809],
+      "P20": [],
+      "P5": [19779, 19786, 19809, 19817, 19824, 19845, 19852]
+    }
+  },
+  "promotion_eligible": false,
+  "q4_access_count": 0,
+  "raw_event_count": 1031029,
+  "representative_source_count": 2212,
+  "retention_bias": {
+    "horizon": {
+      "15": 0.791,
+      "30": 0.712,
+      "5": 0.878,
+      "60": 0.497,
+      "OVERNIGHT": 0.06,
+      "SESSION": 0.356
+    },
+    "mechanism": {
+      "COMPRESSION": 0.745,
+      "CROSS_ASSET": 0.596,
+      "DIRECTIONAL_RELEASE": 0.57,
+      "DISPLACEMENT": 0.545,
+      "EXHAUSTION": 0.55,
+      "FAILED_CONTINUATION": 0.681,
+      "INDEPENDENT_DENSITY": 0.402,
+      "MULTI_TF": 0.566,
+      "PARTICIPATION_DENSITY": 0.458,
+      "RANGE_BREAKOUT": 0.496
+    },
+    "session_code": {
+      "-1": 0.428,
+      "-2": 0.06,
+      "0": 0.903,
+      "1": 0.473,
+      "2": 0.451
+    }
+  },
+  "schema": "hydra_direct_trade_ecology_full_universe_coverage_audit_v1",
+  "source_stage2_count": 5000
+}

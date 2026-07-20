@@ -1,0 +1,22 @@
+{
+  "actions": [
+    "ABSTAIN",
+    "0.5X",
+    "1.0X",
+    "1.5X"
+  ],
+  "censored_opportunity_rule": "ASSUME_ABSTAIN_ZERO_CONTRIBUTION_FOR_NON_DEPLOYABLE_UPPER_BOUND_ONLY",
+  "data_purchase": false,
+  "decision_card_hash": "6fbe36d2338e5e6024e68e84ed6ea853811f2665f9e6c45bea90cab4e0c23bb3",
+  "deployable": false,
+  "hypothesis": "A hindsight selector over consolidated causal opportunities can reach a legal Combine target on B1/B2.",
+  "next_branch_if_feasible": "CHRONOLOGICAL_CROSS_FITTED_DEPLOYABLE_POLICY",
+  "next_branch_if_infeasible": "CLOSE_CURRENT_OPPORTUNITY_GEOMETRY",
+  "oracle_action_rule": "1.5X_IF_STRESSED_NET_POSITIVE_ELSE_ABSTAIN",
+  "promotion_eligible": false,
+  "q4_access": false,
+  "schema": "hydra_direct_trade_ecology_decision_card_v1",
+  "selection_uses_future_outcome": true,
+  "smallest_decisive_experiment": "NON_DEPLOYABLE_ORACLE_B1_B2_EXACT_50K_100K_150K_P5_P10_P20",
+  "strongest_argument_against": "The accumulated opportunities may lack sufficient payoff geometry even under perfect selection."
+}
