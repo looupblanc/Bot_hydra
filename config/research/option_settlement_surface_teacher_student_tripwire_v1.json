@@ -1,0 +1,209 @@
+{
+  "schema": "hydra_option_settlement_surface_teacher_student_manifest_v1",
+  "branch_id": "OPTION_SETTLEMENT_SURFACE_TEACHER_STUDENT_TRIPWIRE_V1",
+  "created_at_utc": "2026-07-20T23:48:55Z",
+  "decision_card": {
+    "hypothesis": "A causally available prior-session option settlement surface identifies when a fixed ES/NQ opening structural trade should be taken or rejected, and a futures-only student can retain a material part of that paired stressed utility.",
+    "strongest_argument_against": "Daily option settlements may add no information beyond prior futures volatility, twenty sessions are underpowered, and any useful teacher state may be impossible to distill into deployable futures-only inputs.",
+    "smallest_decisive_experiment": "Seventy-six frozen next-session opportunities across two markets and two directionally fixed structural anchors, one bounded settlement-surface teacher, paired baseline controls, and one discovery-only futures student over 12/4/4 chronological sessions.",
+    "expected_runtime_minutes": [15, 45],
+    "expected_information_gain": 0.86,
+    "expected_economic_upside": 0.58,
+    "incremental_data_cost_usd": 0.0,
+    "implementation_cost": 0.18,
+    "overfitting_risk": 0.46,
+    "deployment_risk": 0.31,
+    "next_materially_distinct_alternative": "A non-equity-index settlement/curve-state policy if neither the teacher nor the futures-only student adds paired stressed utility; do not search adjacent settlement thresholds."
+  },
+  "predecessor": {
+    "branch_id": "OPTIONS_IV_TEACHER_STUDENT_TRIPWIRE_V1",
+    "terminal_status": "OPTIONS_IV_REQUIRED_STATISTIC_UNAVAILABLE",
+    "terminal_result_hash": "bdc31242ee2f2a3f2714fbe94e69408b72d307187663334b38454d685c772344",
+    "reuse_boundary": "Reuse immutable raw statistics and definitions only; no signal, trade, account, economic or promotion result exists to inherit."
+  },
+  "frozen_inputs": {
+    "acquisition_receipt_path": "reports/data_access/options_iv_teacher_pilot_acquisition_receipt.json",
+    "acquisition_receipt_file_sha256": "36e43a3657fda3bfcf16ec226efe911bb421fb180efe072bf7a1d5c1a6de466e",
+    "acquisition_receipt_hash": "66f7d13ef8673996c53972a43791dc686cbe54c18d7a7a0dcc7cdf50419a6876",
+    "statistics_path": "data/cache/databento/options_iv_teacher_pilot/a6e5a0c4933d34880b9a/raw_statistics.dbn.zst",
+    "statistics_sha256": "280598e561dfeb7461c3abbdd896cddca14df0569ab684ae39ea45fbcbf35f9a",
+    "definition_path": "data/cache/databento/options_iv_teacher_pilot/a6e5a0c4933d34880b9a/raw_definition.dbn.zst",
+    "definition_sha256": "923c9c54d44a2fc56a322e032b9ed6eb0d9df16c9e4c62993a4ef21ec0f612db",
+    "underlying_ohlcv_path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-07-01_2024-10-01.dbn.zst",
+    "underlying_ohlcv_sha256": "d609fccf70bf533102cf8c8e5406a60643decc77f4573505edeab47db5e3e889",
+    "start": "2024-09-03",
+    "end_exclusive": "2024-10-01",
+    "q4_2024_access": false,
+    "incremental_purchase_usd": 0.0
+  },
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "sessions": ["2024-09-03", "2024-09-04", "2024-09-05", "2024-09-06", "2024-09-09", "2024-09-10", "2024-09-11", "2024-09-12", "2024-09-13", "2024-09-16", "2024-09-17", "2024-09-18"],
+      "candidate_modification_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "sessions": ["2024-09-19", "2024-09-20", "2024-09-23", "2024-09-24"],
+      "candidate_modification_allowed": false
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "sessions": ["2024-09-25", "2024-09-26", "2024-09-27", "2024-09-30"],
+      "candidate_modification_allowed": false
+    }
+  ],
+  "settlement_surface_contract": {
+    "required_stat_type": 3,
+    "definition_join": "LATEST_DEFINITION_TS_RECV_LESS_THAN_OR_EQUAL_TO_SETTLEMENT_TS_RECV_PER_INSTRUMENT_ID",
+    "instrument_class": ["C", "P"],
+    "user_defined_instrument": "N",
+    "underlying_prefixes": ["ES", "NQ"],
+    "minimum_days_to_expiry_inclusive": 5,
+    "maximum_front_days_to_expiry_inclusive": 140,
+    "maximum_second_days_to_expiry_inclusive": 260,
+    "maximum_terms_per_market_session": 2,
+    "minimum_complete_call_put_pairs_per_term": 5,
+    "robust_forward": "MEDIAN_OF_STRIKE_PLUS_CALL_MINUS_PUT_AT_MATCHED_STRIKES",
+    "robust_forward_moneyness_absolute_log_maximum": 0.10,
+    "atm_moneyness_absolute_log_maximum": 0.03,
+    "wing_moneyness": 0.02,
+    "surface_features": [
+      "ATM_STRADDLE_VOL_PROXY",
+      "DOWNSIDE_UPSIDE_WING_PREMIUM_SKEW",
+      "FRONT_NEXT_TERM_SLOPE",
+      "ES_NQ_SURFACE_LEVEL_DIFFERENCE"
+    ],
+    "availability_time": "MAXIMUM_SETTLEMENT_TS_RECV_USED_BY_SNAPSHOT",
+    "trading_use": "NEXT_TRADING_SESSION_ONLY",
+    "same_session_use_allowed": false,
+    "missing_surface": "ABSTAIN_DATA_UNAVAILABLE"
+  },
+  "structural_opportunities": {
+    "markets": ["ES", "NQ"],
+    "families": [
+      "OPENING_FIFTEEN_MINUTE_DISPLACEMENT_CONTINUATION",
+      "SESSION_VWAP_SIXTY_MINUTE_DISPLACEMENT_CONTINUATION"
+    ],
+    "rth_open_local_chicago": "08:30",
+    "decision_local_chicago_by_family": {
+      "OPENING_FIFTEEN_MINUTE_DISPLACEMENT_CONTINUATION": "08:45",
+      "SESSION_VWAP_SIXTY_MINUTE_DISPLACEMENT_CONTINUATION": "10:00"
+    },
+    "entry": "NEXT_TRADABLE_1M_OPEN_STRICTLY_AFTER_DECISION",
+    "direction_continuation": "SIGN_OF_CAUSAL_ANCHOR_DISPLACEMENT",
+    "minimum_absolute_displacement_ticks": 1,
+    "maximum_one_initial_position_per_market_family_session": 1,
+    "stop_distance": "MAX_OF_FOUR_TICKS_AND_MINIMUM_OF_TRAILING_FIFTEEN_ONE_MINUTE_MEDIAN_TRUE_RANGE_AND_300_USD_DIVIDED_BY_POINT_VALUE",
+    "target_stop_multiple": 1.5,
+    "maximum_holding_minutes_by_family": {
+      "OPENING_FIFTEEN_MINUTE_DISPLACEMENT_CONTINUATION": 30,
+      "SESSION_VWAP_SIXTY_MINUTE_DISPLACEMENT_CONTINUATION": 60
+    },
+    "contracts": 1,
+    "expected_opportunity_capacity": 76
+  },
+  "teacher_policy_contract": {
+    "status": "TEACHER_ONLY_UNDEPLOYABLE",
+    "action_space": ["ABSTAIN", "TRADE_1X"],
+    "features": [
+      "ATM_STRADDLE_VOL_PROXY",
+      "DOWNSIDE_UPSIDE_WING_PREMIUM_SKEW",
+      "FRONT_NEXT_TERM_SLOPE",
+      "ES_NQ_SURFACE_LEVEL_DIFFERENCE"
+    ],
+    "model": "L2_REGULARIZED_LOGISTIC_REGRESSION",
+    "regularization_c": 1.0,
+    "trade_probability_threshold": 0.55,
+    "economic_label": "BASELINE_STRESSED_TARGET_REACHED_BEFORE_STOP",
+    "training_role": "DISCOVERY_ONLY",
+    "minimum_trade_coverage_fraction": 0.2,
+    "maximum_abstention_fraction": 0.8,
+    "maximum_selected_teacher_policies": 1,
+    "selection_objective": "DISCOVERY_LOWER_CONFIDENCE_BOUND_PAIRED_STRESSED_UPLIFT"
+  },
+  "student_contract": {
+    "status": "L1_DEPLOYABLE_ONLY_IF_GATE_PASSES",
+    "action_space": ["ABSTAIN", "TRADE_1X"],
+    "model": "L2_REGULARIZED_LOGISTIC_REGRESSION",
+    "regularization_c": 1.0,
+    "trade_probability_threshold": 0.5,
+    "training_role": "DISCOVERY_ONLY",
+    "teacher_action_is_training_label_only": true,
+    "teacher_or_option_feature_at_inference_allowed": false,
+    "maximum_feature_count": 8,
+    "features": [
+      "PRIOR_SESSION_RETURN",
+      "PRIOR_SESSION_DOWNSIDE_SEMIVARIANCE_RATIO",
+      "OVERNIGHT_GAP_DIVIDED_BY_PRIOR_RANGE",
+      "CAUSAL_ANCHOR_DISPLACEMENT_DIVIDED_BY_ATR",
+      "PRIOR_ES_NQ_RETURN_DIVERGENCE",
+      "CURRENT_ES_NQ_DISPLACEMENT_DIVERGENCE"
+    ]
+  },
+  "causal_and_execution_contract": {
+    "decision_features_available_at_or_before_decision": true,
+    "future_label_eligibility": false,
+    "negative_shift_allowed": false,
+    "backfill_allowed": false,
+    "fill_model": "NEXT_TRADABLE_1M_OPEN_AFTER_DECISION_V1",
+    "normal_round_turn_fees_usd": {"ES": 5.28, "NQ": 5.28},
+    "normal_extra_slippage_ticks_per_side": 0,
+    "stressed_extra_slippage_ticks_per_side": 1,
+    "same_bar_stop_target": "STOP_FIRST",
+    "session_timezone": "America/Chicago",
+    "mandatory_flatten_local": "15:10",
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "paired_controls": [
+    "UNGATED_STRUCTURAL_BASELINE",
+    "DIRECTION_FLIP",
+    "DUTY_CYCLE_MATCHED_RANDOM_GATE"
+  ],
+  "selection_gate": {
+    "minimum_total_independent_opportunities": 40,
+    "minimum_validation_independent_opportunities": 8,
+    "minimum_final_independent_opportunities": 8,
+    "teacher_paired_stressed_uplift_validation_minimum_exclusive": 0,
+    "teacher_paired_stressed_uplift_final_minimum_exclusive": 0,
+    "student_paired_stressed_uplift_validation_minimum_exclusive": 0,
+    "student_paired_stressed_uplift_final_minimum_exclusive": 0,
+    "teacher_and_student_stressed_net_validation_minimum_exclusive": 0,
+    "teacher_and_student_stressed_net_final_minimum_exclusive": 0,
+    "student_minimum_teacher_uplift_retention_fraction": 0.5,
+    "minimum_distinct_markets_or_anchor_families": 2,
+    "maximum_single_trade_or_day_positive_profit_share": 0.35,
+    "maximum_event_level_50k_mll_breach_count": 0,
+    "success_status": "OPTION_SETTLEMENT_STUDENT_TRIPWIRE_GREEN_TIER_E_ONLY",
+    "teacher_failure_status": "OPTION_SETTLEMENT_TEACHER_NO_INCREMENT",
+    "student_failure_status": "OPTION_SETTLEMENT_DEPLOYMENT_INCOMPATIBLE",
+    "coverage_failure_status": "OPTION_SETTLEMENT_COVERAGE_UNDERPOWERED",
+    "tier_q_allowed": false,
+    "combine_replay_allowed": false,
+    "xfa_allowed": false,
+    "neighbor_threshold_retry_after_failure": false
+  },
+  "official_rule_evidence": {
+    "snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "snapshot_file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f"
+  },
+  "budget": {
+    "authoritative_cumulative_cap_usd": 200.720719923081,
+    "cumulative_actual_before_usd": 192.17549553961098,
+    "incremental_purchase_usd": 0.0,
+    "remaining_actual_usd": 8.54522438347002
+  },
+  "governance": {
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "single_authoritative_writer": true,
+    "no_broker": true,
+    "no_orders": true,
+    "no_live_trading": true,
+    "no_q4_access": true,
+    "no_combine_or_xfa_before_tripwire_gate": true
+  },
+  "manifest_hash": "e9fac9c1ec7370e0373326a8cf09b179f788e6ad5fc9133291877d161730b311"
+}
