@@ -1,0 +1,134 @@
+{
+  "schema": "hydra_autonomous_graduation_cohort_manifest_v1",
+  "campaign_id": "AUTONOMOUS_GRADUATION_COHORT_0035_R02_V1",
+  "purpose": "HASH_BOUND_READ_ONLY_5_10_20_COMBINE_REPLAY_WITH_PASS_TRIGGERED_DIAGNOSTIC_XFA",
+  "manifest_hash": "32c32b69e4a743eadbd1c005d613744db3ab02e6bba5a7939498995e62c3f016",
+  "source_contract": {
+    "candidate_bank_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/combine_candidate_bank.json",
+    "candidate_bank_file_sha256": "3f7c5954397ea0163b6c95b63c8b1529adb69baad2f9661ee2073b84560f3fb3",
+    "candidate_bank_hash": "4a91943724ccd691ac67e7c7936e41fe78bcaeb3ac8f80263bd4b3a82dd2b9a2",
+    "marginal_book_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/marginal_books_semantic_reconciliation_composite.json",
+    "marginal_book_file_sha256": "6712c54b995d15630301e82ef202b7c6f2510fba191be1d1b47d51d7bee7bcf4",
+    "marginal_book_hash": "c45ca03fc9536861a2899a6be4b434fcec7cfa00f4ab7786cc2a6f26a11571bc",
+    "fresh_confirmation_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/fresh_confirmation_result.json",
+    "fresh_confirmation_file_sha256": "e5dc6ac4555e3c109c4fc885ad68119af6a3de579f608236af15d1a23939d103",
+    "fresh_confirmation_result_hash": "dfcbc1ecfedd043254cee941b11d545e3c93943a2d29639f29a408c5d1b6dd54",
+    "fast_pass_manifest_path": "config/v7/fast_pass_factory_0029.json",
+    "fast_pass_manifest_hash": "47465e3c7ee39c76660fb57b83db709c799d11ba22b1a49b9cac01dd437a31ec",
+    "frozen_grid_hash": "32d94dddf0c183400118557302b0f7094e7ed9ab1d2b04cbf60ac8b4e16900b5",
+    "official_rule_snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "official_rule_snapshot_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+    "tier_q_2026_contract_path": "config/research/tier_q_2026_two_stage_confirmation_v1.json",
+    "tier_q_2026_contract_file_sha256": "7c264a9a35965a32fef4502b57d229899dba4b39ceb2783a3e1a5d7d5806e20d",
+    "tier_q_2026_contract_hash": "963df1c50fb92c404db39029abfc898f40da52e71237ed1e6bd6b1bd432d3e34",
+    "tier_q_2026_final_development_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/tier_q_2026_two_stage/final_development_result.json",
+    "tier_q_2026_final_development_file_sha256": "06a9c91bf42f84ff37c5965d9e357712b0d64d2bd2dbf1e4cf6f8dc3a29bc44e",
+    "confirmation_partition": "MAY_01_TO_JUL_19_2026_SEALED_UNOPENED",
+    "confirmation_evaluated": false
+  },
+  "evaluation_contract": {
+    "horizons_trading_days": [5, 10, 20],
+    "requested_non_overlapping_start_counts": {"5": 52, "10": 24, "20": 12},
+    "headline_denominator": "FULL_COVERAGE_ONLY",
+    "cross_horizon_starts_are_not_independent": true,
+    "stage_48_claimed": false,
+    "stage_96_claimed": false,
+    "normal_costs": true,
+    "stressed_costs_1_5x": true,
+    "exact_mll": true,
+    "exact_consistency": true,
+    "read_only": true
+  },
+  "development_gate": {
+    "minimum_normal_passes_same_horizon": 3,
+    "minimum_stressed_passes_same_horizon": 2,
+    "minimum_blocks_with_stressed_passes": 2,
+    "maximum_stressed_mll_breach_rate": 0.10,
+    "positive_stressed_net": true,
+    "all_passing_paths_consistency_compliant": true,
+    "maximum_unique_day_trade_event_profit_share": 0.50,
+    "gate_role": "VIEWED_DEVELOPMENT_ONLY",
+    "promotion_target": "G_DEVELOPMENT_ONLY"
+  },
+  "cohort": [
+    {
+      "kind": "MARGINAL_BOOK",
+      "candidate_id": "autonomous_marginal_book_74271a65d77ce0c7fe144170",
+      "candidate_fingerprint": "e06ce0c3fe4d4de3bd8e3c370510815ac7cd3aa418b494080ce1468f35940e60",
+      "behavioral_fingerprint": "c5ac0c9b925c557385dc9893bd5c529d0a331d0c680fb6043dc92a313aae89c1",
+      "qd_cell": "book_qd_74271a65d77ce0c7fe144170",
+      "account_label": "50K",
+      "component_ids": ["hazard_187b1bace916c254bb483d6d", "hazard_0df449d78eadc5bce054eb2c"],
+      "governor_profile_id": "fast_pass_governor_04",
+      "source_result_hash": "a3f559ef82814446f8fc69997b5ba1aa005113f1dcc0723e4024457d016b0a73"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_01340d634a288f435a06760c", "candidate_fingerprint": "01340d634a288f435a06760c31fa06419af2e4ff3cb15e28d9a5f328f843f21d", "behavioral_fingerprint": "68388fa519bcb0947787f77a5b3d45279197cb9cc15224ac5b6dc04191bff1c2", "qd_cell": "realized_qd_1b3cd4ec54507253807685f4", "selected_cell_hash": "16d044842db2141c29afba484e7c2a4ca1642612659bf1c387026d34b45ae1aa", "account_label": "50K", "compact_bundle_hash": "595df7dadb80b08a3903ce156487d4e95b157a21c58a3080dc1732e89a6babd7"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_03bc777e62c6335af8780028", "candidate_fingerprint": "03bc777e62c6335af87800286c6d876ba2b7ba01d873f8f03974d9787893747d", "behavioral_fingerprint": "f4af78a789a76cd271811a80c9b6612272f50b502cc65cfae92d2a3bdb7bf236", "qd_cell": "realized_qd_4485123c17501f3856b94a41", "selected_cell_hash": "f7dfed0b1db3ff2ae3abe66e32b86675f3a4f896a156949297400c37275ee707", "account_label": "50K", "compact_bundle_hash": "8d9f6b9589b05860b59b76ac78e10911f4ac2a1142934fab2482d15c6e56e7af"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_09ee35bc24190bb213469e6a", "candidate_fingerprint": "09ee35bc24190bb213469e6a400ad209e4726a63de5d48bb5023759f78667f96", "behavioral_fingerprint": "569b9780b5158a54bb3fcb42adfb45264464516da6e4b67eec1f8f62bd2b3f33", "qd_cell": "realized_qd_06074d30fd01f469bd3902b8", "selected_cell_hash": "0149d45ed294be78be521f3cedb1ca1417bea37251b6dab6b1e1500c65e08b2d", "account_label": "100K", "compact_bundle_hash": "d1208d781060a1729f0f5f5894d0c3aad30e1e02def7ba643064bd88b925c8b1"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_0df449d78eadc5bce054eb2c", "candidate_fingerprint": "0df449d78eadc5bce054eb2c5b64304d95c7385f52006d3e412e419cab9f22fa", "behavioral_fingerprint": "27b5e11fd9eb443febc826850a3ab81fbf1b93be9fb460b59901975981d3ffe6", "qd_cell": "realized_qd_7a6aa5b9fe4e6de001806def", "selected_cell_hash": "516b7444a08c5e23e24b51a3f37f942a494d5dd47e369fa6e6e704105c07f1c0", "account_label": "150K", "compact_bundle_hash": "a8f996ebd68661d407e1d59e9b42d5f1595419575de55dfcc45af484c8664ed3"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_11d0fa817a785d264adb2e96", "candidate_fingerprint": "11d0fa817a785d264adb2e96eca519f26de217ea9d73a2834fdd5029acf6dda4", "behavioral_fingerprint": "0dfd94c77ff023f05212fd52e1463d9f3f8a9683a7190935169aba0d1bfa6458", "qd_cell": "realized_qd_ad44343e6e07abb769d4eb29", "selected_cell_hash": "7e0509aeeab4006b09d83011ab33bbd0155a171b5c23b311f12cea0db1e478e8", "account_label": "50K", "compact_bundle_hash": "0d2cd86b08dc3ebe113ebdc9cc8ef4b2a6910a99cdd21c14d0da27e0985b99bd"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_142801996c93954cbd7e75b9", "candidate_fingerprint": "142801996c93954cbd7e75b982d23f9eda374d430eca04db0e255d5a1cde91e7", "behavioral_fingerprint": "ac21a589ef87f92c51cd85ddd0eb6b0996f6a5c299596e260d4fe0c68ab884af", "qd_cell": "realized_qd_6b7b5181f43f8a38deacc190", "selected_cell_hash": "903fec04c8c89c8b8b45039394edc57887afe4a4a869dfba275c5a3e79e53660", "account_label": "50K", "compact_bundle_hash": "792774b2dd6b955739ef93f8c2a4701a729e0c404d3859dc98fb29b7dbc2adba"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_1f3ff3e1f6d2b9d5e8eec1b3", "candidate_fingerprint": "1f3ff3e1f6d2b9d5e8eec1b341ce4ad3412a69073b364c33bf42ca6f256122f1", "behavioral_fingerprint": "09db56901f737157976b61a628c92e2311e0107ca377afc693ed59415748c91a", "qd_cell": "realized_qd_4f17797715bc7b8e287bb58b", "selected_cell_hash": "73a7caabc5ca77564538ec982be2ede0fe414cece580f97a553bc53432e91e2c", "account_label": "50K", "compact_bundle_hash": "b7aa629a619f2a7b115c0bdea68d634ee520f9fabaad55f5d91197ef5b514e9d"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_23cf467f9b8d33256da1ed74", "candidate_fingerprint": "23cf467f9b8d33256da1ed749cb5ba7b20c8f779bf633e543cd7f954cdd2d3ff", "behavioral_fingerprint": "906bfa4ae58a26eaac43c06c672adc60c68ff57dd4fd8b3bc571fb1857f6c998", "qd_cell": "realized_qd_7977f0465cdaaf6b0b65a7f4", "selected_cell_hash": "8567ac516e55d73e5f778d10c812f26d9c156fad60c1be85fced65af0b408481", "account_label": "50K", "compact_bundle_hash": "92c38fd62e36af11a5ec998f64dd92ee9552e41a3c5819ccd1d1d91aa0cf0cc2"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_294627b596f6b477df6de5ac", "candidate_fingerprint": "294627b596f6b477df6de5ac65c7d8d1f74900ae42d0267f18e129204ccdddfc", "behavioral_fingerprint": "e5f0e89de7b630b752f511ced54b30c621d07772758a9b5bb039335751561f01", "qd_cell": "realized_qd_6e758fd1773b902997851253", "selected_cell_hash": "720ce3e2db4763253fcb9af5fcc6b4c39345528c109ca1a27a5da2a58de9c5b7", "account_label": "50K", "compact_bundle_hash": "773aba2ed87c485e4e519c829ae7bdbccdffb964f31ac4895fa66a883e40ef49"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_2a34338b0805cd6e21bd2a00", "candidate_fingerprint": "2a34338b0805cd6e21bd2a000e13cc3816109925f9bfdeec54084f1244e13bb9", "behavioral_fingerprint": "c2392a551c5e8ef427aab9672b28b4edefdaf30d3de3331065b018a25f996659", "qd_cell": "realized_qd_8c81a2867cd5bb3621376b40", "selected_cell_hash": "837170f448df1d4e0b4b601fe7724bd8751b4443595068abee3cbe235cec843e", "account_label": "100K", "compact_bundle_hash": "a8733b97cb6b00754418b145f72649b1c411f28e4bf674803eeb8efff3fbe60c"
+    },
+    {
+      "kind": "STANDALONE", "candidate_id": "hazard_324b4ea1349b603c4651a7fb", "candidate_fingerprint": "324b4ea1349b603c4651a7fb2002991d09780d6e40ba0f88f1eab17639c9fb45", "behavioral_fingerprint": "d41385e68682888b672f9cb1a8140874765d99d054e0db2a9bea48fbd131392f", "qd_cell": "realized_qd_ca6c56d9e2c603ab313a2840", "selected_cell_hash": "897879e5c0dd76fb4d8527092b19ac0a371fbef6865e30eb5913bba4acced7cb", "account_label": "50K", "compact_bundle_hash": "2f367f0a2dc73acaf958817824ed12026baec4615f872f1f09b066d139fc2bc2"
+    }
+  ],
+  "excluded_candidate_ids": {
+    "failed_fresh_confirmation": [
+      "hazard_020ae195ccef8e39b1907e38",
+      "hazard_19327ab34a21d623c654a6cc",
+      "hazard_1f49e74c20f7bad315dd5cee",
+      "hazard_367100adab5fe2a69a4f3257"
+    ],
+    "failed_2026_final_development": [
+      "hazard_2641d5adb7bfee8dca07de2a",
+      "hazard_16a744e747cafb88a7e2c83b",
+      "hazard_0a569f580a2540474116636c",
+      "hazard_10ffb41856432af08259e32b",
+      "hazard_16f0da561bc98f2eb7d2efc4"
+    ],
+    "control_evaluated_no_incremental_information": [
+      "hazard_0e4181808737ad6e9c8593ed"
+    ]
+  },
+  "xfa_contract": {
+    "trigger": "UNIQUE_EXACT_TARGET_REACHED_COMBINE_PATH_ONLY",
+    "paths": ["STANDARD", "CONSISTENCY"],
+    "paths_are_alternatives": true,
+    "sum_expected_values": false,
+    "evidence_role": "DIAGNOSTIC_FROM_VIEWED_DEVELOPMENT",
+    "promotion_allowed": false
+  },
+  "side_effect_contract": {
+    "registry_writes": 0,
+    "mission_database_writes": 0,
+    "q4_access": 0,
+    "confirmation_partition_reads": 0,
+    "data_purchase": 0,
+    "broker_connections": 0,
+    "orders": 0
+  }
+}
