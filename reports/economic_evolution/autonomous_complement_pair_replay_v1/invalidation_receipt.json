@@ -1,0 +1,11 @@
+{
+  "authoritative_result_hash": "fa6d25b9c00cad17539144fb38b0b55c2e19c7068842a4c968d911cd2b200cab",
+  "invalid_result_file": "INVALID_DO_NOT_USE_epsilon_risk_charge_economic_result.json",
+  "invalid_result_file_sha256": "6808112abf696f0b6055cb2ca4339d1ccad4906fb809055a8f7484fbf94036e5",
+  "invalid_result_hash": "652320c10edd93f818409ac2b1fbf28235f7f14232ced86b2c83bbb8d2ce5e64",
+  "invalidated_before_authoritative_use": true,
+  "promotion_or_status_effect": "NONE",
+  "reason": "NON_CAUSAL_EPSILON_NOMINAL_RISK_CHARGE_REPLACED_BY_MAX_DECISION_TIME_DECLARED_STOP_RISK",
+  "schema": "hydra_autonomous_complement_pair_invalidation_receipt_v1",
+  "status": "INVALID_RESULT_QUARANTINED_DO_NOT_USE"
+}

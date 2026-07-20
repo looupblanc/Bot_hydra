@@ -1,0 +1,35 @@
+{
+  "branch_id": "INTRADAY_CROSS_INDEX_DISPERSION_RESIDUAL_V1",
+  "counts": {
+    "broker_connections": 0,
+    "data_purchase_count": 0,
+    "database_writes": 0,
+    "evaluated_cell_count": 8,
+    "exact_account_replays": 118272,
+    "frozen_cell_count": 8,
+    "incremental_data_spend_usd": 0.0,
+    "orders": 0,
+    "primary_opportunity_count": 2004,
+    "q4_access_count_delta": 0,
+    "registry_writes": 0,
+    "xfa_paths_started": 0
+  },
+  "gate": {
+    "authoritative_promotion_count": 0,
+    "independent_confirmation_claimed": false,
+    "next_action": "PRESERVE_DIAGNOSTIC_AND_RETURN_TO_MATERIALLY_DISTINCT_BRANCH_BOARD",
+    "qualifying_cell_count": 0,
+    "qualifying_cell_ids": [],
+    "status": "INTRADAY_CROSS_INDEX_DISPERSION_RESIDUAL_WEAK_DEVELOPMENT",
+    "weak_cell_ids": [
+      "dispersion_residual:continuation_leader:5m:mid",
+      "dispersion_residual:continuation_leader:15m:open",
+      "dispersion_residual:continuation_leader:15m:mid"
+    ]
+  },
+  "next_action": "PRESERVE_DIAGNOSTIC_AND_RETURN_TO_MATERIALLY_DISTINCT_BRANCH_BOARD",
+  "report_hash": "78c697da13e54b22ae31917063819e73faec72beddd8df9f33823c471e3b071d",
+  "result_hash": "72b3be8d1aa3723c1521f36cf3f1ec51268af9c745fc32084b2b5829866962cf",
+  "schema": "hydra_intraday_cross_index_dispersion_residual_report_v1",
+  "status": "INTRADAY_CROSS_INDEX_DISPERSION_RESIDUAL_WEAK_DEVELOPMENT"
+}

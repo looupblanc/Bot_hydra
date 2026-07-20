@@ -1,0 +1,379 @@
+{
+  "broker_connections": 0,
+  "candidate_ids": [
+    "hazard_11d0fa817a785d264adb2e96",
+    "hazard_1f3ff3e1f6d2b9d5e8eec1b3"
+  ],
+  "confirmation_partition_reads": 0,
+  "coverage": {
+    "10": {
+      "data_censored_start_count": 6,
+      "full_coverage_by_block": {
+        "B1": 3,
+        "B2": 5,
+        "B3": 5,
+        "B4": 5
+      },
+      "full_coverage_start_count": 18,
+      "full_coverage_starts": [
+        {
+          "session_day": 19555,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19569,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19583,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19657,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19671,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19685,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19719,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19734,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19779,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19809,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19824,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19838,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19852,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19907,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19921,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19935,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19949,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19963,
+          "temporal_block": "B4"
+        }
+      ],
+      "headline_denominator_excludes_censored": true,
+      "requested_start_count": 24,
+      "within_horizon_non_overlapping": true
+    },
+    "20": {
+      "data_censored_start_count": 5,
+      "full_coverage_by_block": {
+        "B1": 1,
+        "B2": 2,
+        "B3": 2,
+        "B4": 2
+      },
+      "full_coverage_start_count": 7,
+      "full_coverage_starts": [
+        {
+          "session_day": 19569,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19657,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19719,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19809,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19838,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19921,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19949,
+          "temporal_block": "B4"
+        }
+      ],
+      "headline_denominator_excludes_censored": true,
+      "requested_start_count": 12,
+      "within_horizon_non_overlapping": true
+    },
+    "5": {
+      "data_censored_start_count": 11,
+      "full_coverage_by_block": {
+        "B1": 8,
+        "B2": 11,
+        "B3": 11,
+        "B4": 11
+      },
+      "full_coverage_start_count": 41,
+      "full_coverage_starts": [
+        {
+          "session_day": 19541,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19555,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19562,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19569,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19576,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19583,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19590,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19604,
+          "temporal_block": "B1"
+        },
+        {
+          "session_day": 19657,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19664,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19671,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19678,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19685,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19692,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19719,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19727,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19734,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19741,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19748,
+          "temporal_block": "B2"
+        },
+        {
+          "session_day": 19779,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19786,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19809,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19817,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19824,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19831,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19838,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19845,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19852,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19859,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19866,
+          "temporal_block": "B3"
+        },
+        {
+          "session_day": 19907,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19914,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19921,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19928,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19935,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19942,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19949,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19956,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19963,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19970,
+          "temporal_block": "B4"
+        },
+        {
+          "session_day": 19977,
+          "temporal_block": "B4"
+        }
+      ],
+      "headline_denominator_excludes_censored": true,
+      "requested_start_count": 52,
+      "within_horizon_non_overlapping": true
+    }
+  },
+  "coverage_hash": "588eb678f7e020c89d55264dd3513acb27a78191f46ba24f9a3ef3e2bbec290a",
+  "database_writes": 0,
+  "manifest_hash": "265c0c42a961c38da28935dd002c9c3995fe53d43e718a1dc2a0a32a7b77e374",
+  "orders": 0,
+  "pair_policy": {
+    "actual_stop_risk_available": false,
+    "aggregate_open_risk_ceiling": 2000.0,
+    "component_priority": [
+      "hazard_11d0fa817a785d264adb2e96",
+      "hazard_1f3ff3e1f6d2b9d5e8eec1b3"
+    ],
+    "concurrency_scaling": "PROPORTIONAL",
+    "daily_consistency_profit_guard": 1500.0,
+    "daily_loss_guard": 1000.0,
+    "future_outcome_fields_used": false,
+    "maximum_concurrent_sleeves": 2,
+    "maximum_mini_equivalent": 5.0,
+    "maximum_mll_buffer_fraction": 1.0,
+    "nominal_risk_charge_per_mini": {
+      "hazard_11d0fa817a785d264adb2e96": 2605.5229113373107,
+      "hazard_1f3ff3e1f6d2b9d5e8eec1b3": 1440.7760735947127
+    },
+    "outbound_order_capability": false,
+    "policy_id": "autonomous_complement_pair_11d0fa_1f3ff3_prudent_v1",
+    "policy_version": "hydra_active_risk_pool_governor_v1",
+    "preserve_sole_sleeve_nominal_risk": true,
+    "protected_mll_buffer": 0.0,
+    "risk_measure": "DECLARED_NOMINAL_RISK_UTILISATION",
+    "same_instrument_conflict_rule": "PRIORITY",
+    "schema": "hydra_active_risk_pool_policy_v1",
+    "static_risk_tier": 1.0,
+    "structural_fingerprint": "5f1ef506390f92fba18ea04bcbd1bfc8c390680c3d0962bbfb6cc2d78fa09c24",
+    "target_protection_distance": 300.0,
+    "target_protection_mode": "SCALE_50"
+  },
+  "pair_policy_hash": "8a1f0b77934d3d5ed5636a15a863006bc9f7758589d9099b7268e5053f52c3e0",
+  "preflight_hash": "6478c6419a8530c71289354ee0aada4f879bf02c6b7059245d7c198676eba9d1",
+  "q4_access_count_delta": 0,
+  "registry_writes": 0,
+  "risk_charge_contract_hash": "0b3d0f7cb42434a06951d6c2fa53eecc730c277aa03af72c9d02f5f33dd38268",
+  "runtime_provenance": {
+    "adapter_module_sha256": "d0a688ffd4b2f48cd05f2b998847389d60c189d9c4dd0425f5f62e3b97cb6e0e",
+    "manifest_file_sha256": "d43927e0bb3055939c3bf821c4a16579d4f5c40de6cf88352b7162742eebd493",
+    "runner_script_sha256": "4a1ff49cf2906b4424a9f3c898f367084aa470e5f7cba4354e94f8e76839ef7d",
+    "runtime_provenance_hash": "fe63a5a179f3570a0294a1905b6530b8ddee0e061e73542437bb4be51fdd86e2",
+    "source_commit": "5cb8879f97cddca27dbd8b932fc81fe76ca1da12"
+  },
+  "runtime_provenance_hash": "fe63a5a179f3570a0294a1905b6530b8ddee0e061e73542437bb4be51fdd86e2",
+  "schema": "hydra_autonomous_complement_pair_preflight_v1",
+  "source_candidate_frozen_policy_hashes": {
+    "hazard_11d0fa817a785d264adb2e96": "185918bb3ff2aea1ff83fca7e15a3679abf1861b74dc5586e46f52427e3d7cea",
+    "hazard_1f3ff3e1f6d2b9d5e8eec1b3": "bf065f4d9321dcaac772bb63c3ef364f4ddad7e3211d5a4018372730405bb9da"
+  },
+  "source_candidate_result_hashes": {
+    "hazard_11d0fa817a785d264adb2e96": "c8ed6ed6663ec5493195bb3f17a996fd2294b8fcb8368dd9a2c1a8c13304b695",
+    "hazard_1f3ff3e1f6d2b9d5e8eec1b3": "7c7137cbe54d9bc3b1b887f57b1ed23563b7f8c976c89d3a41abb0b66bb5e2ca"
+  },
+  "source_cohort_preflight_hash": "ac83242533b55a7fc4027d3fff38841ab2caf5caa6de8b306253f0dd74d41b15",
+  "source_cohort_result_hash": "1dd5f4c10c5820d85c4aea6fe45ce1e94a32de4084bbdbaa38bd2acb486f6ddf",
+  "status": "PASS_FROZEN_COMPLEMENT_PAIR_PREFLIGHT"
+}

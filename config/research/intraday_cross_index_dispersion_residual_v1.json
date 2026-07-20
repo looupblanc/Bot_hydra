@@ -1,0 +1,90 @@
+{
+  "schema": "hydra_intraday_cross_index_dispersion_residual_manifest_v1",
+  "branch_id": "INTRADAY_CROSS_INDEX_DISPERSION_RESIDUAL_V1",
+  "created_at_utc": "2026-07-20T03:54:13Z",
+  "hypothesis": "A causal 5/15-minute cross-index residual-dispersion shock contains either leader continuation or laggard catch-up information that improves complete 5/10/20-day Combine paths after conservative costs.",
+  "materially_distinct_from": {
+    "cross_index_breadth_tripwire": "The prior branch required a 15-minute three-peer unanimity transition for a fixed target. This branch routes each shock dynamically to the residual leader or laggard, includes 5-minute and 15-minute clocks, and never uses unanimity.",
+    "static_cross_asset_direction_transfer": "Direction and market role are derived from the contemporaneously completed cross-section; no external market transfers a future direction."
+  },
+  "source": {
+    "manifest_path": "config/v7/fast_pass_factory_0029_revision_05.json",
+    "manifest_sha256": "8a2b730c37d6dbe8a5bdf341dce91455966a4d204dd8f0f63669efc4d653432e",
+    "state_markets": ["ES", "NQ", "RTY", "YM"],
+    "execution_market_by_state": {
+      "ES": "MES",
+      "NQ": "MNQ",
+      "RTY": "M2K",
+      "YM": "MYM"
+    },
+    "rule_snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "rule_snapshot_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+  },
+  "causal_contract": {
+    "feature_names": ["ctx_5m_return", "ctx_15m_return"],
+    "timeframes_minutes": [5, 15],
+    "normalization": "STRICTLY_PRIOR_EXPANDING_ZSCORE_PER_MARKET",
+    "common_factor": "CROSS_SECTIONAL_MEDIAN_OF_CAUSAL_ZSCORES",
+    "dispersion": "MAX_RESIDUAL_MINUS_MIN_RESIDUAL",
+    "leader_direction": "SIGN(COMMON_FACTOR); leader is argmax SIGN(COMMON_FACTOR)*RESIDUAL",
+    "laggard_direction": "SIGN(COMMON_FACTOR); laggard is argmin SIGN(COMMON_FACTOR)*RESIDUAL",
+    "threshold_quantile": 0.9,
+    "threshold_role": "ROWS_STRICTLY_BEFORE_FROZEN_EVALUATION_START",
+    "minimum_absolute_common_z": 0.1,
+    "cooldown_minutes": 60,
+    "fill": "DECIDE_AFTER_COMPLETED_BAR_AND_FILL_AT_NEXT_TRADABLE_OPEN",
+    "favorable_r": 1.0,
+    "adverse_r": 1.0,
+    "maximum_holding_minutes": 60,
+    "future_outcomes_in_decision": false
+  },
+  "frozen_cells": {
+    "mechanisms": ["CONTINUATION_LEADER", "CONVERGENCE_LAGGARD"],
+    "timeframes_minutes": [5, 15],
+    "session_roles": {"OPEN": 0, "MID": 1},
+    "expected_cell_count": 8
+  },
+  "matched_controls": [
+    "DIRECTION_FLIP_IDENTICAL_OPPORTUNITY",
+    "RANK_SWAP_STOP_RISK_MATCHED_OPPORTUNITY",
+    "DELAY_ONE_CLOCK_IDENTICAL_MARKET_SESSION"
+  ],
+  "account_evaluation": {
+    "account_sizes": ["50K", "100K", "150K"],
+    "horizons_trading_days": [5, 10, 20],
+    "normal_and_stressed": true,
+    "micro_quantity_frontier": [4, 8, 16, 32, 48, 64, 96, 120, 148],
+    "design_blocks": ["B1", "B2"],
+    "held_out_development_blocks": ["B3", "B4"],
+    "headline_full_coverage_only": true
+  },
+  "frozen_gate": {
+    "minimum_held_out_stressed_passes": 2,
+    "minimum_held_out_normal_passes": 2,
+    "minimum_held_out_stressed_passing_blocks": 2,
+    "maximum_held_out_stressed_mll_breach_rate": 0.1,
+    "minimum_held_out_stressed_net_usd": 0.0,
+    "require_passing_consistency": true,
+    "require_positive_stressed_uplift_over_every_control": true,
+    "maximum_matched_control_stop_risk_error_fraction": 0.25,
+    "same_horizon_required": true
+  },
+  "governance": {
+    "evidence_role": "VIEWED_DEVELOPMENT_ONLY",
+    "evidence_tier_ceiling": "TIER_Q_DEVELOPMENT_QUALIFIED",
+    "independent_confirmation_claimed": false,
+    "q4_access_allowed": false,
+    "data_purchase_allowed": false,
+    "broker_allowed": false,
+    "orders_allowed": false,
+    "database_writes_allowed": false,
+    "registry_writes_allowed": false,
+    "maximum_cpu_workers": 1
+  },
+  "next_branch_rule": {
+    "GREEN": "FREEZE_QUALIFYING_CELL_AND_REQUIRE_ONE_GENUINELY_FRESH_CONFIRMATION",
+    "WEAK": "PRESERVE_DIAGNOSTIC_AND_RETURN_TO_MATERIALLY_DISTINCT_BRANCH_BOARD",
+    "FALSIFIED": "TOMBSTONE_EXACT_DISPERSION_RESIDUAL_GRAMMAR_AND_SELECT_DISTINCT_BRANCH"
+  },
+  "manifest_hash": "8359fc9e47fd94945aa87139ad7d2209e4d56efcf7d96b1bc796807d899b5cf2"
+}
