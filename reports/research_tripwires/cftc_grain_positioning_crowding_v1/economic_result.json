@@ -1,0 +1,1838 @@
+{
+  "account_replay_executed": false,
+  "actual_incremental_spend_usd": 0.0,
+  "all_candidate_results": [
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZC",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_7d6e6f9e2d633b6af78a",
+      "control": "PRIMARY",
+      "event_hash": "1a11f6b582b56abfa788eeb59bec637062259aedb23c8021eb6274965263a0c5",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 142,
+          "event_path_hash": "1a11f6b582b56abfa788eeb59bec637062259aedb23c8021eb6274965263a0c5",
+          "gross_pnl_usd": 3893.75,
+          "lower_quartile_stressed_event_usd": -142.78,
+          "maximum_positive_day_profit_share": 0.050207235981741094,
+          "maximum_single_trade_positive_profit_share": 0.050207235981741094,
+          "median_stressed_event_usd": -67.78,
+          "minimum_open_pnl_stressed_usd": -315.14,
+          "normal_net_usd": 3143.9900000000002,
+          "positive_stressed_event_rate": 0.4154929577464789,
+          "role": "DISCOVERY",
+          "stop_count": 53,
+          "stressed_edge_to_cost_ratio": 0.9055737994678772,
+          "stressed_net_per_event_usd": -4.9278873239436605,
+          "stressed_net_usd": -699.7599999999998,
+          "target_count": 39
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZC",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_c5d499901e6361bcae98",
+      "control": "PRIMARY",
+      "event_hash": "9999df4991288d02bd2acd91b6cd6ab0ace098ab72d6bf23bb9744efeec01f57",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 142,
+          "event_path_hash": "9999df4991288d02bd2acd91b6cd6ab0ace098ab72d6bf23bb9744efeec01f57",
+          "gross_pnl_usd": 3487.5,
+          "lower_quartile_stressed_event_usd": -142.78,
+          "maximum_positive_day_profit_share": 0.06919852526770619,
+          "maximum_single_trade_positive_profit_share": 0.06919852526770619,
+          "median_stressed_event_usd": -67.78,
+          "minimum_open_pnl_stressed_usd": -315.14,
+          "normal_net_usd": 2737.7400000000002,
+          "positive_stressed_event_rate": 0.3732394366197183,
+          "role": "DISCOVERY",
+          "stop_count": 56,
+          "stressed_edge_to_cost_ratio": 0.8110917818668949,
+          "stressed_net_per_event_usd": -8.449014084507041,
+          "stressed_net_usd": -1199.7599999999998,
+          "target_count": 19
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZC",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_9e06ff1e744b4bd26a72",
+      "control": "PRIMARY",
+      "event_hash": "b45da6d2961fa06e0a5175024e4fdae5d613a52855ae9671ab150313c9f7be19",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 93,
+          "event_path_hash": "b45da6d2961fa06e0a5175024e4fdae5d613a52855ae9671ab150313c9f7be19",
+          "gross_pnl_usd": 2550.0,
+          "lower_quartile_stressed_event_usd": -130.28,
+          "maximum_positive_day_profit_share": 0.07513502934861643,
+          "maximum_single_trade_positive_profit_share": 0.07513502934861643,
+          "median_stressed_event_usd": -67.78,
+          "minimum_open_pnl_stressed_usd": -315.14,
+          "normal_net_usd": 2058.96,
+          "positive_stressed_event_rate": 0.41935483870967744,
+          "role": "DISCOVERY",
+          "stop_count": 36,
+          "stressed_edge_to_cost_ratio": 0.9055269101291175,
+          "stressed_net_per_event_usd": -3.8687096774193432,
+          "stressed_net_usd": -359.78999999999985,
+          "target_count": 24
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZC",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_bd53a8e6dd000422b858",
+      "control": "PRIMARY",
+      "event_hash": "f57ceaa87be5cdd9380489d37a1f05effdbc3e6a99c22bfdea1108b9fb7700ef",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 93,
+          "event_path_hash": "f57ceaa87be5cdd9380489d37a1f05effdbc3e6a99c22bfdea1108b9fb7700ef",
+          "gross_pnl_usd": 2600.0,
+          "lower_quartile_stressed_event_usd": -130.28,
+          "maximum_positive_day_profit_share": 0.09954339699126205,
+          "maximum_single_trade_positive_profit_share": 0.09954339699126205,
+          "median_stressed_event_usd": -67.78,
+          "minimum_open_pnl_stressed_usd": -315.14,
+          "normal_net_usd": 2108.96,
+          "positive_stressed_event_rate": 0.3978494623655914,
+          "role": "DISCOVERY",
+          "stop_count": 37,
+          "stressed_edge_to_cost_ratio": 0.9232823397394924,
+          "stressed_net_per_event_usd": -3.3982795698924617,
+          "stressed_net_usd": -316.03999999999985,
+          "target_count": 13
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZC",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_f2c742a6e7838fdb4243",
+      "control": "PRIMARY",
+      "event_hash": "698df7c2f33e5b6cf775daa0cb9861e33e53f9da42c101ee04cef0dd1a6b1fe8",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 39,
+          "event_path_hash": "698df7c2f33e5b6cf775daa0cb9861e33e53f9da42c101ee04cef0dd1a6b1fe8",
+          "gross_pnl_usd": 662.5,
+          "lower_quartile_stressed_event_usd": -149.03,
+          "maximum_positive_day_profit_share": 0.1748638770257354,
+          "maximum_single_trade_positive_profit_share": 0.1748638770257354,
+          "median_stressed_event_usd": -5.28,
+          "minimum_open_pnl_stressed_usd": -602.64,
+          "normal_net_usd": 456.58000000000027,
+          "positive_stressed_event_rate": 0.48717948717948717,
+          "role": "DISCOVERY",
+          "stop_count": 12,
+          "stressed_edge_to_cost_ratio": 0.5610032855739593,
+          "stressed_net_per_event_usd": -28.196666666666662,
+          "stressed_net_usd": -1099.6699999999998,
+          "target_count": 11
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZC",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_a0f2c728661a87c70592",
+      "control": "PRIMARY",
+      "event_hash": "8b7e0f3f1e1616300798c7a2b0c6ddc8c6e11153ee3700966f3acd372fc0fd9d",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 39,
+          "event_path_hash": "8b7e0f3f1e1616300798c7a2b0c6ddc8c6e11153ee3700966f3acd372fc0fd9d",
+          "gross_pnl_usd": -637.5,
+          "lower_quartile_stressed_event_usd": -167.78,
+          "maximum_positive_day_profit_share": 0.22087888565607236,
+          "maximum_single_trade_positive_profit_share": 0.22087888565607236,
+          "median_stressed_event_usd": -42.78,
+          "minimum_open_pnl_stressed_usd": -602.64,
+          "normal_net_usd": -843.4199999999997,
+          "positive_stressed_event_rate": 0.4358974358974359,
+          "role": "DISCOVERY",
+          "stop_count": 14,
+          "stressed_edge_to_cost_ratio": -0.5398333502692816,
+          "stressed_net_per_event_usd": -43.42102564102562,
+          "stressed_net_usd": -1693.4199999999998,
+          "target_count": 4
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZC",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_32b2e1f85ba10dc4bc01",
+      "control": "PRIMARY",
+      "event_hash": "dafd5492675b213fdb4cf84ccf4f20d387fb564b10c80e271aac2f20da3acdff",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 27,
+          "event_path_hash": "dafd5492675b213fdb4cf84ccf4f20d387fb564b10c80e271aac2f20da3acdff",
+          "gross_pnl_usd": 1137.5,
+          "lower_quartile_stressed_event_usd": -167.78,
+          "maximum_positive_day_profit_share": 0.22182511750414385,
+          "maximum_single_trade_positive_profit_share": 0.22182511750414385,
+          "median_stressed_event_usd": 7.22,
+          "minimum_open_pnl_stressed_usd": -602.64,
+          "normal_net_usd": 994.9400000000002,
+          "positive_stressed_event_rate": 0.5555555555555556,
+          "role": "DISCOVERY",
+          "stop_count": 8,
+          "stressed_edge_to_cost_ratio": 1.391335192524096,
+          "stressed_net_per_event_usd": -12.455925925925916,
+          "stressed_net_usd": -336.30999999999983,
+          "target_count": 9
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZC",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_52529046e227da5f5a94",
+      "control": "PRIMARY",
+      "event_hash": "068b2a1556f392ea7c9c028000e571c695b7aecdac966f82f1d47dfafced8e14",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 27,
+          "event_path_hash": "068b2a1556f392ea7c9c028000e571c695b7aecdac966f82f1d47dfafced8e14",
+          "gross_pnl_usd": -325.0,
+          "lower_quartile_stressed_event_usd": -180.28,
+          "maximum_positive_day_profit_share": 0.2981603758440975,
+          "maximum_single_trade_positive_profit_share": 0.2981603758440975,
+          "median_stressed_event_usd": -5.28,
+          "minimum_open_pnl_stressed_usd": -602.64,
+          "normal_net_usd": -467.55999999999983,
+          "positive_stressed_event_rate": 0.48148148148148145,
+          "role": "DISCOVERY",
+          "stop_count": 10,
+          "stressed_edge_to_cost_ratio": -0.39752434072117027,
+          "stressed_net_per_event_usd": -36.76148148148147,
+          "stressed_net_usd": -992.5599999999998,
+          "target_count": 2
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZC",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_3e2d149190183492ecb3",
+      "control": "PRIMARY",
+      "event_hash": "ac8d27cb3034327642e336babb394dfeef368ae37100dbb747a0ce1a25d1a707",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 143,
+          "event_path_hash": "ac8d27cb3034327642e336babb394dfeef368ae37100dbb747a0ce1a25d1a707",
+          "gross_pnl_usd": 1168.75,
+          "lower_quartile_stressed_event_usd": -142.78,
+          "maximum_positive_day_profit_share": 0.04937152306100007,
+          "maximum_single_trade_positive_profit_share": 0.04937152306100007,
+          "median_stressed_event_usd": -67.78,
+          "minimum_open_pnl_stressed_usd": -890.14,
+          "normal_net_usd": 413.71000000000055,
+          "positive_stressed_event_rate": 0.40559440559440557,
+          "role": "DISCOVERY",
+          "stop_count": 57,
+          "stressed_edge_to_cost_ratio": 0.2699166751346408,
+          "stressed_net_per_event_usd": -24.07370629370629,
+          "stressed_net_usd": -3442.5399999999995,
+          "target_count": 34
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZC",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_d407718bb357d4d364e2",
+      "control": "PRIMARY",
+      "event_hash": "54b87f8a02d0cdb09d973d517d2bf12c09a3fc868c58b9cffed76aa5814b2db9",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 143,
+          "event_path_hash": "54b87f8a02d0cdb09d973d517d2bf12c09a3fc868c58b9cffed76aa5814b2db9",
+          "gross_pnl_usd": -450.0,
+          "lower_quartile_stressed_event_usd": -142.78,
+          "maximum_positive_day_profit_share": 0.06938482490683165,
+          "maximum_single_trade_positive_profit_share": 0.06938482490683165,
+          "median_stressed_event_usd": -80.28,
+          "minimum_open_pnl_stressed_usd": -890.14,
+          "normal_net_usd": -1205.0399999999995,
+          "positive_stressed_event_rate": 0.38461538461538464,
+          "role": "DISCOVERY",
+          "stop_count": 60,
+          "stressed_edge_to_cost_ratio": -0.10392513695023603,
+          "stressed_net_per_event_usd": -30.54223776223776,
+          "stressed_net_usd": -4367.539999999999,
+          "target_count": 15
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZC",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_e0c0a6d702ddd4e00e8a",
+      "control": "PRIMARY",
+      "event_hash": "1a8d0854f7154fc8d1546173e7e347a24b7c6b5d1db03241c365f83f04ea3990",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 103,
+          "event_path_hash": "1a8d0854f7154fc8d1546173e7e347a24b7c6b5d1db03241c365f83f04ea3990",
+          "gross_pnl_usd": 868.75,
+          "lower_quartile_stressed_event_usd": -155.28,
+          "maximum_positive_day_profit_share": 0.0603594853620803,
+          "maximum_single_trade_positive_profit_share": 0.0603594853620803,
+          "median_stressed_event_usd": -67.78,
+          "minimum_open_pnl_stressed_usd": -890.14,
+          "normal_net_usd": 324.91000000000054,
+          "positive_stressed_event_rate": 0.42718446601941745,
+          "role": "DISCOVERY",
+          "stop_count": 45,
+          "stressed_edge_to_cost_ratio": 0.27854907593848993,
+          "stressed_net_per_event_usd": -21.78485436893203,
+          "stressed_net_usd": -2243.8399999999992,
+          "target_count": 26
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZC",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_46457126774ac9c2cd9d",
+      "control": "PRIMARY",
+      "event_hash": "e8d0dfe3b1b2de8e05a77872f9a23473740edd534be28f8287d2548e82b07542",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 103,
+          "event_path_hash": "e8d0dfe3b1b2de8e05a77872f9a23473740edd534be28f8287d2548e82b07542",
+          "gross_pnl_usd": -1025.0,
+          "lower_quartile_stressed_event_usd": -161.53,
+          "maximum_positive_day_profit_share": 0.08871137555139218,
+          "maximum_single_trade_positive_profit_share": 0.08871137555139218,
+          "median_stressed_event_usd": -80.28,
+          "minimum_open_pnl_stressed_usd": -890.14,
+          "normal_net_usd": -1568.8399999999995,
+          "positive_stressed_event_rate": 0.39805825242718446,
+          "role": "DISCOVERY",
+          "stop_count": 48,
+          "stressed_edge_to_cost_ratio": -0.32864783060368596,
+          "stressed_net_per_event_usd": -33.313980582524266,
+          "stressed_net_usd": -3431.3399999999997,
+          "target_count": 9
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZC",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_2f743a0509494cbd7578",
+      "control": "PRIMARY",
+      "event_hash": "45043dfffb797a3a858ccb12feac381f2890295e301fcc39b5a6c34f7996c4f7",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 52,
+          "event_path_hash": "45043dfffb797a3a858ccb12feac381f2890295e301fcc39b5a6c34f7996c4f7",
+          "gross_pnl_usd": -887.5,
+          "lower_quartile_stressed_event_usd": -174.03,
+          "maximum_positive_day_profit_share": 0.12833709947490773,
+          "maximum_single_trade_positive_profit_share": 0.12833709947490773,
+          "median_stressed_event_usd": -92.78,
+          "minimum_open_pnl_stressed_usd": -790.14,
+          "normal_net_usd": -1162.0599999999997,
+          "positive_stressed_event_rate": 0.38461538461538464,
+          "role": "DISCOVERY",
+          "stop_count": 18,
+          "stressed_edge_to_cost_ratio": -0.563649527487044,
+          "stressed_net_per_event_usd": -56.36173076923076,
+          "stressed_net_usd": -2930.8099999999995,
+          "target_count": 13
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZC",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_98670a4fb8cc1e55d00f",
+      "control": "PRIMARY",
+      "event_hash": "97aba9418647e05e1b0a694ba74baf86139ecc1819e876224939a8e080b87587",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 52,
+          "event_path_hash": "97aba9418647e05e1b0a694ba74baf86139ecc1819e876224939a8e080b87587",
+          "gross_pnl_usd": -1075.0,
+          "lower_quartile_stressed_event_usd": -174.03,
+          "maximum_positive_day_profit_share": 0.13092416249914365,
+          "maximum_single_trade_positive_profit_share": 0.13092416249914365,
+          "median_stressed_event_usd": -92.78,
+          "minimum_open_pnl_stressed_usd": -790.14,
+          "normal_net_usd": -1349.5599999999997,
+          "positive_stressed_event_rate": 0.38461538461538464,
+          "role": "DISCOVERY",
+          "stop_count": 19,
+          "stressed_edge_to_cost_ratio": -0.6827304135758562,
+          "stressed_net_per_event_usd": -59.36653846153844,
+          "stressed_net_usd": -3087.0599999999995,
+          "target_count": 6
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZC",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_e64b2d091efc5f8038c7",
+      "control": "PRIMARY",
+      "event_hash": "c35156fb68df0c11eff652297b1d6d1a8c4d79d3b9a6d23240ac810041835040",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 25,
+          "event_path_hash": "c35156fb68df0c11eff652297b1d6d1a8c4d79d3b9a6d23240ac810041835040",
+          "gross_pnl_usd": 543.75,
+          "lower_quartile_stressed_event_usd": -205.28,
+          "maximum_positive_day_profit_share": 0.18582579302682495,
+          "maximum_single_trade_positive_profit_share": 0.18582579302682495,
+          "median_stressed_event_usd": -17.78,
+          "minimum_open_pnl_stressed_usd": -352.64,
+          "normal_net_usd": 411.75000000000017,
+          "positive_stressed_event_rate": 0.48,
+          "role": "DISCOVERY",
+          "stop_count": 7,
+          "stressed_edge_to_cost_ratio": 0.7182959048877147,
+          "stressed_net_per_event_usd": -14.279999999999987,
+          "stressed_net_usd": -356.9999999999998,
+          "target_count": 8
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZC",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_e05e478908e4abf710b1",
+      "control": "PRIMARY",
+      "event_hash": "bd24a3ae34d99f8d062b1598a244762db5137228f374916244c1253904ee4579",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 25,
+          "event_path_hash": "bd24a3ae34d99f8d062b1598a244762db5137228f374916244c1253904ee4579",
+          "gross_pnl_usd": 600.0,
+          "lower_quartile_stressed_event_usd": -205.28,
+          "maximum_positive_day_profit_share": 0.18652703085196715,
+          "maximum_single_trade_positive_profit_share": 0.18652703085196715,
+          "median_stressed_event_usd": -17.78,
+          "minimum_open_pnl_stressed_usd": -352.64,
+          "normal_net_usd": 468.0000000000002,
+          "positive_stressed_event_rate": 0.48,
+          "role": "DISCOVERY",
+          "stop_count": 7,
+          "stressed_edge_to_cost_ratio": 0.7926023778071334,
+          "stressed_net_per_event_usd": -17.279999999999983,
+          "stressed_net_usd": -431.9999999999997,
+          "target_count": 4
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZS",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_bc398349237843ca3f98",
+      "control": "PRIMARY",
+      "event_hash": "510888c0ea82d9f45ad16ea1e73eaaaa602c570d309f18cdc1f9aeab2326b87f",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 117,
+          "event_path_hash": "510888c0ea82d9f45ad16ea1e73eaaaa602c570d309f18cdc1f9aeab2326b87f",
+          "gross_pnl_usd": 2031.25,
+          "lower_quartile_stressed_event_usd": -267.78,
+          "maximum_positive_day_profit_share": 0.05433727519093373,
+          "maximum_single_trade_positive_profit_share": 0.05433727519093373,
+          "median_stressed_event_usd": -142.78,
+          "minimum_open_pnl_stressed_usd": -727.64,
+          "normal_net_usd": 1413.4900000000016,
+          "positive_stressed_event_rate": 0.42735042735042733,
+          "role": "DISCOVERY",
+          "stop_count": 48,
+          "stressed_edge_to_cost_ratio": 0.573352414501688,
+          "stressed_net_per_event_usd": -9.446666666666648,
+          "stressed_net_usd": -1105.2599999999984,
+          "target_count": 32
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZS",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_f1e769e70557c0832911",
+      "control": "PRIMARY",
+      "event_hash": "a212320e806bdfac71b9351143367088b48196d9ca868b47ed3663b82f41df30",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 117,
+          "event_path_hash": "a212320e806bdfac71b9351143367088b48196d9ca868b47ed3663b82f41df30",
+          "gross_pnl_usd": 2150.0,
+          "lower_quartile_stressed_event_usd": -267.78,
+          "maximum_positive_day_profit_share": 0.07207849850992328,
+          "maximum_single_trade_positive_profit_share": 0.07207849850992328,
+          "median_stressed_event_usd": -142.78,
+          "minimum_open_pnl_stressed_usd": -727.64,
+          "normal_net_usd": 1532.2400000000014,
+          "positive_stressed_event_rate": 0.4017094017094017,
+          "role": "DISCOVERY",
+          "stop_count": 49,
+          "stressed_edge_to_cost_ratio": 0.6068714787340943,
+          "stressed_net_per_event_usd": -11.04923076923075,
+          "stressed_net_usd": -1292.7599999999984,
+          "target_count": 18
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_a250dc5bec00a258c291",
+      "control": "PRIMARY",
+      "event_hash": "e9b209b9d7f737a53ffa7c3360eafe70764eae9c6f5815772302cdee05ecd6e0",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 68,
+          "event_path_hash": "e9b209b9d7f737a53ffa7c3360eafe70764eae9c6f5815772302cdee05ecd6e0",
+          "gross_pnl_usd": 1643.75,
+          "lower_quartile_stressed_event_usd": -255.28,
+          "maximum_positive_day_profit_share": 0.06601301918551512,
+          "maximum_single_trade_positive_profit_share": 0.06601301918551512,
+          "median_stressed_event_usd": -142.78,
+          "minimum_open_pnl_stressed_usd": -627.64,
+          "normal_net_usd": 1284.710000000001,
+          "positive_stressed_event_rate": 0.4264705882352941,
+          "role": "DISCOVERY",
+          "stop_count": 31,
+          "stressed_edge_to_cost_ratio": 0.7983089206620562,
+          "stressed_net_per_event_usd": -5.647647058823505,
+          "stressed_net_usd": -384.0399999999991,
+          "target_count": 19
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_09ea721285445adb20b3",
+      "control": "PRIMARY",
+      "event_hash": "0b9f67c58139687f58d54bf10b3fb53161af13e87b354281a23d5582ce635adf",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 68,
+          "event_path_hash": "0b9f67c58139687f58d54bf10b3fb53161af13e87b354281a23d5582ce635adf",
+          "gross_pnl_usd": 1450.0,
+          "lower_quartile_stressed_event_usd": -255.28,
+          "maximum_positive_day_profit_share": 0.08957422930551288,
+          "maximum_single_trade_positive_profit_share": 0.08957422930551288,
+          "median_stressed_event_usd": -142.78,
+          "minimum_open_pnl_stressed_usd": -627.64,
+          "normal_net_usd": 1090.9600000000007,
+          "positive_stressed_event_rate": 0.39705882352941174,
+          "role": "DISCOVERY",
+          "stop_count": 32,
+          "stressed_edge_to_cost_ratio": 0.7042116714585438,
+          "stressed_net_per_event_usd": -11.162352941176447,
+          "stressed_net_usd": -759.0399999999992,
+          "target_count": 10
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZS",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_9b47a1d5d8ae3286b8ff",
+      "control": "PRIMARY",
+      "event_hash": "cb85498e2c0183f8929f23ebc975034e62a9a48345f0c1efd1b8affe6794b19a",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 65,
+          "event_path_hash": "cb85498e2c0183f8929f23ebc975034e62a9a48345f0c1efd1b8affe6794b19a",
+          "gross_pnl_usd": 1187.5,
+          "lower_quartile_stressed_event_usd": -217.78,
+          "maximum_positive_day_profit_share": 0.07694605238812677,
+          "maximum_single_trade_positive_profit_share": 0.07694605238812677,
+          "median_stressed_event_usd": -55.28,
+          "minimum_open_pnl_stressed_usd": -727.64,
+          "normal_net_usd": 844.3000000000009,
+          "positive_stressed_event_rate": 0.46153846153846156,
+          "role": "DISCOVERY",
+          "stop_count": 22,
+          "stressed_edge_to_cost_ratio": 0.6033431561833147,
+          "stressed_net_per_event_usd": -13.35692307692305,
+          "stressed_net_usd": -868.1999999999992,
+          "target_count": 14
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZS",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_1d17b31e718eef396c43",
+      "control": "PRIMARY",
+      "event_hash": "c6048edb4caa57154d9d00952b1f249a7720ff7a7db93801ccffefc1f9a51907",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 65,
+          "event_path_hash": "c6048edb4caa57154d9d00952b1f249a7720ff7a7db93801ccffefc1f9a51907",
+          "gross_pnl_usd": 1412.5,
+          "lower_quartile_stressed_event_usd": -217.78,
+          "maximum_positive_day_profit_share": 0.09114388005227222,
+          "maximum_single_trade_positive_profit_share": 0.09114388005227222,
+          "median_stressed_event_usd": -55.28,
+          "minimum_open_pnl_stressed_usd": -727.64,
+          "normal_net_usd": 1069.3000000000009,
+          "positive_stressed_event_rate": 0.4461538461538462,
+          "role": "DISCOVERY",
+          "stop_count": 23,
+          "stressed_edge_to_cost_ratio": 0.7176608068285744,
+          "stressed_net_per_event_usd": -14.318461538461511,
+          "stressed_net_usd": -930.6999999999992,
+          "target_count": 9
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_f5b7b13f490cd3b2cd33",
+      "control": "PRIMARY",
+      "event_hash": "47fd0065e067b6b9110d0cde8297f19aff1dd4340c0be46f9a974f1daa72b7a0",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 19,
+          "event_path_hash": "47fd0065e067b6b9110d0cde8297f19aff1dd4340c0be46f9a974f1daa72b7a0",
+          "gross_pnl_usd": 187.5,
+          "lower_quartile_stressed_event_usd": -236.52999999999997,
+          "maximum_positive_day_profit_share": 0.1973869654659255,
+          "maximum_single_trade_positive_profit_share": 0.1973869654659255,
+          "median_stressed_event_usd": 44.72,
+          "minimum_open_pnl_stressed_usd": -527.64,
+          "normal_net_usd": 87.18000000000023,
+          "positive_stressed_event_rate": 0.5263157894736842,
+          "role": "DISCOVERY",
+          "stop_count": 7,
+          "stressed_edge_to_cost_ratio": 0.3259055829799068,
+          "stressed_net_per_event_usd": -12.51684210526313,
+          "stressed_net_usd": -237.81999999999977,
+          "target_count": 5
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_8beb8910a4512187a37e",
+      "control": "PRIMARY",
+      "event_hash": "261553bf204507d3a4c7ad888ec3887ac1d430d8dcdeb9f65a4797caf79e8005",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 19,
+          "event_path_hash": "261553bf204507d3a4c7ad888ec3887ac1d430d8dcdeb9f65a4797caf79e8005",
+          "gross_pnl_usd": -412.5,
+          "lower_quartile_stressed_event_usd": -267.78,
+          "maximum_positive_day_profit_share": 0.19959477383575808,
+          "maximum_single_trade_positive_profit_share": 0.19959477383575808,
+          "median_stressed_event_usd": -117.78,
+          "minimum_open_pnl_stressed_usd": -527.64,
+          "normal_net_usd": -512.8199999999997,
+          "positive_stressed_event_rate": 0.47368421052631576,
+          "role": "DISCOVERY",
+          "stop_count": 8,
+          "stressed_edge_to_cost_ratio": -0.716992282555795,
+          "stressed_net_per_event_usd": -45.4115789473684,
+          "stressed_net_usd": -862.8199999999998,
+          "target_count": 2
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZS",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_2250c543a3b277aae0b0",
+      "control": "PRIMARY",
+      "event_hash": "3a7591a4bd24d35f851dbc83e3dbfa7a2a04013ed34a8829412ee3f7931e448a",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 164,
+          "event_path_hash": "3a7591a4bd24d35f851dbc83e3dbfa7a2a04013ed34a8829412ee3f7931e448a",
+          "gross_pnl_usd": -1531.25,
+          "lower_quartile_stressed_event_usd": -242.78,
+          "maximum_positive_day_profit_share": 0.05349718397541734,
+          "maximum_single_trade_positive_profit_share": 0.05349718397541734,
+          "median_stressed_event_usd": -99.03,
+          "minimum_open_pnl_stressed_usd": -777.64,
+          "normal_net_usd": -2397.1699999999983,
+          "positive_stressed_event_rate": 0.40853658536585363,
+          "role": "DISCOVERY",
+          "stop_count": 68,
+          "stressed_edge_to_cost_ratio": -0.3083517253600541,
+          "stressed_net_per_event_usd": -43.4278658536585,
+          "stressed_net_usd": -7122.169999999998,
+          "target_count": 30
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZS",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_8763ca6f3b20269fc5f0",
+      "control": "PRIMARY",
+      "event_hash": "f1c3bd1e89f324e95b8c6e95d475de01b96231fb2eaf1105c524b4ed7fdf2923",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 164,
+          "event_path_hash": "f1c3bd1e89f324e95b8c6e95d475de01b96231fb2eaf1105c524b4ed7fdf2923",
+          "gross_pnl_usd": -2375.0,
+          "lower_quartile_stressed_event_usd": -245.905,
+          "maximum_positive_day_profit_share": 0.05008034931142881,
+          "maximum_single_trade_positive_profit_share": 0.05008034931142881,
+          "median_stressed_event_usd": -117.78,
+          "minimum_open_pnl_stressed_usd": -777.64,
+          "normal_net_usd": -3240.9199999999983,
+          "positive_stressed_event_rate": 0.39634146341463417,
+          "role": "DISCOVERY",
+          "stop_count": 70,
+          "stressed_edge_to_cost_ratio": -0.4782598189257982,
+          "stressed_net_per_event_usd": -46.89585365853655,
+          "stressed_net_usd": -7690.919999999998,
+          "target_count": 15
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_9920f87a9a8f96907540",
+      "control": "PRIMARY",
+      "event_hash": "1ec3f0960ed0e1e3b3e98e16e96ba9c45ee36d544b53294760214e18713c274a",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 82,
+          "event_path_hash": "1ec3f0960ed0e1e3b3e98e16e96ba9c45ee36d544b53294760214e18713c274a",
+          "gross_pnl_usd": -1462.5,
+          "lower_quartile_stressed_event_usd": -264.655,
+          "maximum_positive_day_profit_share": 0.10459944327221216,
+          "maximum_single_trade_positive_profit_share": 0.10459944327221216,
+          "median_stressed_event_usd": -124.03,
+          "minimum_open_pnl_stressed_usd": -615.14,
+          "normal_net_usd": -1895.4599999999991,
+          "positive_stressed_event_rate": 0.4024390243902439,
+          "role": "DISCOVERY",
+          "stop_count": 35,
+          "stressed_edge_to_cost_ratio": -0.5890147243612462,
+          "stressed_net_per_event_usd": -49.4873170731707,
+          "stressed_net_usd": -4057.959999999999,
+          "target_count": 16
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_2b99a8e50ca8d46d032c",
+      "control": "PRIMARY",
+      "event_hash": "6a3599cd7f4070b5cd6cf62f079f109e8f1ad0e1fe794985e1f564256de7c3f2",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 82,
+          "event_path_hash": "6a3599cd7f4070b5cd6cf62f079f109e8f1ad0e1fe794985e1f564256de7c3f2",
+          "gross_pnl_usd": -1700.0,
+          "lower_quartile_stressed_event_usd": -264.655,
+          "maximum_positive_day_profit_share": 0.09437686559060647,
+          "maximum_single_trade_positive_profit_share": 0.09437686559060647,
+          "median_stressed_event_usd": -124.03,
+          "minimum_open_pnl_stressed_usd": -615.14,
+          "normal_net_usd": -2132.959999999999,
+          "positive_stressed_event_rate": 0.4024390243902439,
+          "role": "DISCOVERY",
+          "stop_count": 35,
+          "stressed_edge_to_cost_ratio": -0.6846666881464059,
+          "stressed_net_per_event_usd": -46.89585365853657,
+          "stressed_net_usd": -3845.459999999999,
+          "target_count": 7
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZS",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_1c99d5bd82e506824a9d",
+      "control": "PRIMARY",
+      "event_hash": "cf09eed6beaba52de87b4355745383accab5a88a511b80b74f86919b4d8ddb5c",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 46,
+          "event_path_hash": "cf09eed6beaba52de87b4355745383accab5a88a511b80b74f86919b4d8ddb5c",
+          "gross_pnl_usd": 5225.0,
+          "lower_quartile_stressed_event_usd": -205.28,
+          "maximum_positive_day_profit_share": 0.1670898751444484,
+          "maximum_single_trade_positive_profit_share": 0.1670898751444484,
+          "median_stressed_event_usd": 69.72,
+          "minimum_open_pnl_stressed_usd": -777.64,
+          "normal_net_usd": 4982.120000000001,
+          "positive_stressed_event_rate": 0.5869565217391305,
+          "role": "DISCOVERY",
+          "stop_count": 15,
+          "stressed_edge_to_cost_ratio": 3.751220492791913,
+          "stressed_net_per_event_usd": 91.18739130434784,
+          "stressed_net_usd": 4194.620000000001,
+          "target_count": 14
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZS",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_fd53a280929a499171df",
+      "control": "PRIMARY",
+      "event_hash": "aec3363d4affc40a1f996e68bd4a6d7346d9303dde2ac54a0ebda782faeb3742",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 46,
+          "event_path_hash": "aec3363d4affc40a1f996e68bd4a6d7346d9303dde2ac54a0ebda782faeb3742",
+          "gross_pnl_usd": 2325.0,
+          "lower_quartile_stressed_event_usd": -242.78,
+          "maximum_positive_day_profit_share": 0.2077166056128412,
+          "maximum_single_trade_positive_profit_share": 0.2077166056128412,
+          "median_stressed_event_usd": 50.97,
+          "minimum_open_pnl_stressed_usd": -777.64,
+          "normal_net_usd": 2082.1200000000003,
+          "positive_stressed_event_rate": 0.5217391304347826,
+          "role": "DISCOVERY",
+          "stop_count": 17,
+          "stressed_edge_to_cost_ratio": 1.6692033771753487,
+          "stressed_net_per_event_usd": 26.513478260869594,
+          "stressed_net_usd": 1219.6200000000006,
+          "target_count": 6
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_cc48c0a7ae2282a40aa9",
+      "control": "PRIMARY",
+      "event_hash": "bcb588e7539393d34b4e29a388c60cec8d532813c0ba3918f6c3e1ca25ba18e0",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 23,
+          "event_path_hash": "bcb588e7539393d34b4e29a388c60cec8d532813c0ba3918f6c3e1ca25ba18e0",
+          "gross_pnl_usd": 3756.25,
+          "lower_quartile_stressed_event_usd": -180.28,
+          "maximum_positive_day_profit_share": 0.2875585735620389,
+          "maximum_single_trade_positive_profit_share": 0.2875585735620389,
+          "median_stressed_event_usd": 57.22,
+          "minimum_open_pnl_stressed_usd": -315.14,
+          "normal_net_usd": 3634.8100000000004,
+          "positive_stressed_event_rate": 0.5652173913043478,
+          "role": "DISCOVERY",
+          "stop_count": 8,
+          "stressed_edge_to_cost_ratio": 5.39350123485153,
+          "stressed_net_per_event_usd": 142.27434782608702,
+          "stressed_net_usd": 3272.3100000000004,
+          "target_count": 9
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_7c2b29319d608b1affe8",
+      "control": "PRIMARY",
+      "event_hash": "9726f555077623d8d54bc1305f635d06527ab310ebfe21a5e9eba22c34dfa689",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 23,
+          "event_path_hash": "9726f555077623d8d54bc1305f635d06527ab310ebfe21a5e9eba22c34dfa689",
+          "gross_pnl_usd": 2025.0,
+          "lower_quartile_stressed_event_usd": -230.28,
+          "maximum_positive_day_profit_share": 0.3504546722718481,
+          "maximum_single_trade_positive_profit_share": 0.3504546722718481,
+          "median_stressed_event_usd": -67.78,
+          "minimum_open_pnl_stressed_usd": -515.14,
+          "normal_net_usd": 1903.5600000000002,
+          "positive_stressed_event_rate": 0.4782608695652174,
+          "role": "DISCOVERY",
+          "stop_count": 9,
+          "stressed_edge_to_cost_ratio": 2.9076445924989947,
+          "stressed_net_per_event_usd": 65.37217391304351,
+          "stressed_net_usd": 1503.5600000000004,
+          "target_count": 5
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZW",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_75b3ed96434406b7954c",
+      "control": "PRIMARY",
+      "event_hash": "8667d5a86e73d1eaa6eeb63d4042e8cdfd85ca2544bf52bad105d4ac4d92217c",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 117,
+          "event_path_hash": "8667d5a86e73d1eaa6eeb63d4042e8cdfd85ca2544bf52bad105d4ac4d92217c",
+          "gross_pnl_usd": -3375.0,
+          "lower_quartile_stressed_event_usd": -242.78,
+          "maximum_positive_day_profit_share": 0.0683004634166171,
+          "maximum_single_trade_positive_profit_share": 0.0683004634166171,
+          "median_stressed_event_usd": -117.78,
+          "minimum_open_pnl_stressed_usd": -665.14,
+          "normal_net_usd": -3992.759999999999,
+          "positive_stressed_event_rate": 0.36752136752136755,
+          "role": "DISCOVERY",
+          "stop_count": 52,
+          "stressed_edge_to_cost_ratio": -0.9526470887104969,
+          "stressed_net_per_event_usd": -68.63470085470082,
+          "stressed_net_usd": -8030.259999999999,
+          "target_count": 23
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZW",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_4ab93e1a52752ceea119",
+      "control": "PRIMARY",
+      "event_hash": "c27a6fedca639fd8b71c0d8689c9b4c7e394f07b66c150b5a1b2d580827357c1",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 117,
+          "event_path_hash": "c27a6fedca639fd8b71c0d8689c9b4c7e394f07b66c150b5a1b2d580827357c1",
+          "gross_pnl_usd": -3212.5,
+          "lower_quartile_stressed_event_usd": -242.78,
+          "maximum_positive_day_profit_share": 0.056537411293110476,
+          "maximum_single_trade_positive_profit_share": 0.056537411293110476,
+          "median_stressed_event_usd": -117.78,
+          "minimum_open_pnl_stressed_usd": -665.14,
+          "normal_net_usd": -3830.259999999999,
+          "positive_stressed_event_rate": 0.36752136752136755,
+          "role": "DISCOVERY",
+          "stop_count": 53,
+          "stressed_edge_to_cost_ratio": -0.9067788955503618,
+          "stressed_net_per_event_usd": -60.5150427350427,
+          "stressed_net_usd": -7080.259999999998,
+          "target_count": 15
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZW",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_f10895a379fe936468de",
+      "control": "PRIMARY",
+      "event_hash": "1a28def86f48d8e6aeb8edd4da8e5e1e0f51138f523f548578615f1eeab8e319",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 59,
+          "event_path_hash": "1a28def86f48d8e6aeb8edd4da8e5e1e0f51138f523f548578615f1eeab8e319",
+          "gross_pnl_usd": -3256.25,
+          "lower_quartile_stressed_event_usd": -255.28,
+          "maximum_positive_day_profit_share": 0.16961999086107776,
+          "maximum_single_trade_positive_profit_share": 0.16961999086107776,
+          "median_stressed_event_usd": -142.78,
+          "minimum_open_pnl_stressed_usd": -502.64,
+          "normal_net_usd": -3567.7699999999995,
+          "positive_stressed_event_rate": 0.3559322033898305,
+          "role": "DISCOVERY",
+          "stop_count": 29,
+          "stressed_edge_to_cost_ratio": -1.822677607863332,
+          "stressed_net_per_event_usd": -92.99186440677963,
+          "stressed_net_usd": -5486.5199999999995,
+          "target_count": 10
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZW",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_c26eccbb48c7390eeabb",
+      "control": "PRIMARY",
+      "event_hash": "d8603838f8cadd428303d85d8e4ad9d0614a30fd27de5e0333bb764d72a311ff",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 59,
+          "event_path_hash": "d8603838f8cadd428303d85d8e4ad9d0614a30fd27de5e0333bb764d72a311ff",
+          "gross_pnl_usd": -3300.0,
+          "lower_quartile_stressed_event_usd": -255.28,
+          "maximum_positive_day_profit_share": 0.13775073226360546,
+          "maximum_single_trade_positive_profit_share": 0.13775073226360546,
+          "median_stressed_event_usd": -142.78,
+          "minimum_open_pnl_stressed_usd": -502.64,
+          "normal_net_usd": -3611.5199999999995,
+          "positive_stressed_event_rate": 0.3559322033898305,
+          "role": "DISCOVERY",
+          "stop_count": 29,
+          "stressed_edge_to_cost_ratio": -1.847166558448828,
+          "stressed_net_per_event_usd": -85.15288135593217,
+          "stressed_net_usd": -5024.0199999999995,
+          "target_count": 6
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZW",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_830c7635254bb83d7959",
+      "control": "PRIMARY",
+      "event_hash": "48abde0ce309f33a3fa60e7efe3b4745c6544574ffff6dcfa2bc6272df2f256c",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 37,
+          "event_path_hash": "48abde0ce309f33a3fa60e7efe3b4745c6544574ffff6dcfa2bc6272df2f256c",
+          "gross_pnl_usd": -1875.0,
+          "lower_quartile_stressed_event_usd": -217.78,
+          "maximum_positive_day_profit_share": 0.16148418322983757,
+          "maximum_single_trade_positive_profit_share": 0.16148418322983757,
+          "median_stressed_event_usd": -155.28,
+          "minimum_open_pnl_stressed_usd": -502.64,
+          "normal_net_usd": -2070.3599999999997,
+          "positive_stressed_event_rate": 0.32432432432432434,
+          "role": "DISCOVERY",
+          "stop_count": 17,
+          "stressed_edge_to_cost_ratio": -1.6735692098968187,
+          "stressed_net_per_event_usd": -73.1854054054054,
+          "stressed_net_usd": -2707.8599999999997,
+          "target_count": 7
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZW",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_f3b51b4fe564dea19481",
+      "control": "PRIMARY",
+      "event_hash": "66b2d73248a644daed489d7a4e7434b51d3a09bcc81c71e28d3cddf10328ccf1",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 37,
+          "event_path_hash": "66b2d73248a644daed489d7a4e7434b51d3a09bcc81c71e28d3cddf10328ccf1",
+          "gross_pnl_usd": -1850.0,
+          "lower_quartile_stressed_event_usd": -217.78,
+          "maximum_positive_day_profit_share": 0.2119174570817899,
+          "maximum_single_trade_positive_profit_share": 0.2119174570817899,
+          "median_stressed_event_usd": -155.28,
+          "minimum_open_pnl_stressed_usd": -502.64,
+          "normal_net_usd": -2045.36,
+          "positive_stressed_event_rate": 0.2972972972972973,
+          "role": "DISCOVERY",
+          "stop_count": 17,
+          "stressed_edge_to_cost_ratio": -1.651254953764861,
+          "stressed_net_per_event_usd": -73.1854054054054,
+          "stressed_net_usd": -2707.8599999999997,
+          "target_count": 4
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZW",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_5ea1b656057974607879",
+      "control": "PRIMARY",
+      "event_hash": "d274d1dd14f77813c8cdf8ce61e8678bb948adb12e8a0aca813311d0356ed241",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 17,
+          "event_path_hash": "d274d1dd14f77813c8cdf8ce61e8678bb948adb12e8a0aca813311d0356ed241",
+          "gross_pnl_usd": -856.25,
+          "lower_quartile_stressed_event_usd": -192.78,
+          "maximum_positive_day_profit_share": 0.41256204845923233,
+          "maximum_single_trade_positive_profit_share": 0.41256204845923233,
+          "median_stressed_event_usd": -155.28,
+          "minimum_open_pnl_stressed_usd": -352.64,
+          "normal_net_usd": -946.01,
+          "positive_stressed_event_rate": 0.29411764705882354,
+          "role": "DISCOVERY",
+          "stop_count": 9,
+          "stressed_edge_to_cost_ratio": -1.66339653430725,
+          "stressed_net_per_event_usd": -73.29470588235291,
+          "stressed_net_usd": -1246.01,
+          "target_count": 2
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZW",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_e029c44491835d77e2b4",
+      "control": "PRIMARY",
+      "event_hash": "50ef25ca2ce1e79c48d532e14f0c93c03046889d259c1478df86c87421aea3f6",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 17,
+          "event_path_hash": "50ef25ca2ce1e79c48d532e14f0c93c03046889d259c1478df86c87421aea3f6",
+          "gross_pnl_usd": -725.0,
+          "lower_quartile_stressed_event_usd": -192.78,
+          "maximum_positive_day_profit_share": 0.44159846769980843,
+          "maximum_single_trade_positive_profit_share": 0.44159846769980843,
+          "median_stressed_event_usd": -155.28,
+          "minimum_open_pnl_stressed_usd": -352.64,
+          "normal_net_usd": -814.76,
+          "positive_stressed_event_rate": 0.29411764705882354,
+          "role": "DISCOVERY",
+          "stop_count": 9,
+          "stressed_edge_to_cost_ratio": -1.4084233429170876,
+          "stressed_net_per_event_usd": -65.5741176470588,
+          "stressed_net_usd": -1114.76,
+          "target_count": 1
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZW",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_05ed8913f9de4706e2e5",
+      "control": "PRIMARY",
+      "event_hash": "2047d1d65aea68e8607bc4c66f98d1374ed2a45d27f9ef4f563eaca717b1eb82",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 141,
+          "event_path_hash": "2047d1d65aea68e8607bc4c66f98d1374ed2a45d27f9ef4f563eaca717b1eb82",
+          "gross_pnl_usd": 737.5,
+          "lower_quartile_stressed_event_usd": -217.78,
+          "maximum_positive_day_profit_share": 0.04523840990313824,
+          "maximum_single_trade_positive_profit_share": 0.04523840990313824,
+          "median_stressed_event_usd": -117.78,
+          "minimum_open_pnl_stressed_usd": -702.64,
+          "normal_net_usd": -6.979999999998766,
+          "positive_stressed_event_rate": 0.4326241134751773,
+          "role": "DISCOVERY",
+          "stop_count": 62,
+          "stressed_edge_to_cost_ratio": 0.17273766360306173,
+          "stressed_net_per_event_usd": -26.91120567375885,
+          "stressed_net_usd": -3794.4799999999987,
+          "target_count": 34
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZW",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_9a078b77ee90fb0037e0",
+      "control": "PRIMARY",
+      "event_hash": "46ffc47e24c35ad4504d2f9947d6f43a70ae6d7e081d4e00475638c3196e2f71",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 141,
+          "event_path_hash": "46ffc47e24c35ad4504d2f9947d6f43a70ae6d7e081d4e00475638c3196e2f71",
+          "gross_pnl_usd": 75.0,
+          "lower_quartile_stressed_event_usd": -217.78,
+          "maximum_positive_day_profit_share": 0.0433311354495814,
+          "maximum_single_trade_positive_profit_share": 0.0433311354495814,
+          "median_stressed_event_usd": -117.78,
+          "minimum_open_pnl_stressed_usd": -702.64,
+          "normal_net_usd": -669.4799999999989,
+          "positive_stressed_event_rate": 0.41843971631205673,
+          "role": "DISCOVERY",
+          "stop_count": 62,
+          "stressed_edge_to_cost_ratio": 0.017566542061328308,
+          "stressed_net_per_event_usd": -31.521134751773033,
+          "stressed_net_usd": -4444.479999999999,
+          "target_count": 18
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZW",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_a12a09639925f5d6dc81",
+      "control": "PRIMARY",
+      "event_hash": "547100b4bdd18d0f549d9c9173d2f96bf935c5b1d808167fb5941f7d93a36d3c",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 69,
+          "event_path_hash": "547100b4bdd18d0f549d9c9173d2f96bf935c5b1d808167fb5941f7d93a36d3c",
+          "gross_pnl_usd": 143.75,
+          "lower_quartile_stressed_event_usd": -192.78,
+          "maximum_positive_day_profit_share": 0.07510887543998117,
+          "maximum_single_trade_positive_profit_share": 0.07510887543998117,
+          "median_stressed_event_usd": -117.78,
+          "minimum_open_pnl_stressed_usd": -590.14,
+          "normal_net_usd": -220.56999999999945,
+          "positive_stressed_event_rate": 0.42028985507246375,
+          "role": "DISCOVERY",
+          "stop_count": 30,
+          "stressed_edge_to_cost_ratio": 0.06880228974020255,
+          "stressed_net_per_event_usd": -28.015507246376796,
+          "stressed_net_usd": -1933.0699999999995,
+          "target_count": 16
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZW",
+        "mechanism": "PRODUCER_MANAGED_DIVERGENCE",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_11ca0d3aa3c48592e721",
+      "control": "PRIMARY",
+      "event_hash": "9241b8b0df55190787b63b21c627446adb535a768005c29a64d33e0820252c33",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 69,
+          "event_path_hash": "9241b8b0df55190787b63b21c627446adb535a768005c29a64d33e0820252c33",
+          "gross_pnl_usd": 312.5,
+          "lower_quartile_stressed_event_usd": -192.78,
+          "maximum_positive_day_profit_share": 0.0886856495221181,
+          "maximum_single_trade_positive_profit_share": 0.0886856495221181,
+          "median_stressed_event_usd": -117.78,
+          "minimum_open_pnl_stressed_usd": -590.14,
+          "normal_net_usd": -51.81999999999945,
+          "positive_stressed_event_rate": 0.42028985507246375,
+          "role": "DISCOVERY",
+          "stop_count": 30,
+          "stressed_edge_to_cost_ratio": 0.14957019508739686,
+          "stressed_net_per_event_usd": -26.656811594202885,
+          "stressed_net_usd": -1839.3199999999995,
+          "target_count": 9
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZW",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_10330cd4cd8497c69b8a",
+      "control": "PRIMARY",
+      "event_hash": "e97d640cc7d083f6fcb6ac3750b9401c447d56ed356d741b5b00ebdc8d109882",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 51,
+          "event_path_hash": "e97d640cc7d083f6fcb6ac3750b9401c447d56ed356d741b5b00ebdc8d109882",
+          "gross_pnl_usd": 1100.0,
+          "lower_quartile_stressed_event_usd": -217.78,
+          "maximum_positive_day_profit_share": 0.11090517465997324,
+          "maximum_single_trade_positive_profit_share": 0.11090517465997324,
+          "median_stressed_event_usd": -117.78,
+          "minimum_open_pnl_stressed_usd": -502.64,
+          "normal_net_usd": 830.7200000000005,
+          "positive_stressed_event_rate": 0.39215686274509803,
+          "role": "DISCOVERY",
+          "stop_count": 23,
+          "stressed_edge_to_cost_ratio": 0.712306058486803,
+          "stressed_net_per_event_usd": -11.162352941176456,
+          "stressed_net_usd": -569.2799999999995,
+          "target_count": 12
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZW",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_39c2c7e46ac2f900e06e",
+      "control": "PRIMARY",
+      "event_hash": "dc2a888667cf5bce2ac7cad22af40a8a7c3038bc0e9d0aebc1644a8246d22f49",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 51,
+          "event_path_hash": "dc2a888667cf5bce2ac7cad22af40a8a7c3038bc0e9d0aebc1644a8246d22f49",
+          "gross_pnl_usd": 300.0,
+          "lower_quartile_stressed_event_usd": -217.78,
+          "maximum_positive_day_profit_share": 0.125791436030532,
+          "maximum_single_trade_positive_profit_share": 0.125791436030532,
+          "median_stressed_event_usd": -117.78,
+          "minimum_open_pnl_stressed_usd": -502.64,
+          "normal_net_usd": 30.720000000000397,
+          "positive_stressed_event_rate": 0.37254901960784315,
+          "role": "DISCOVERY",
+          "stop_count": 23,
+          "stressed_edge_to_cost_ratio": 0.194265288678219,
+          "stressed_net_per_event_usd": -23.662352941176458,
+          "stressed_net_usd": -1206.7799999999995,
+          "target_count": 4
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZW",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_34a1a48967053f034340",
+      "control": "PRIMARY",
+      "event_hash": "37f53f8c79336206e0f653f9ef2ae183d94562fe5378c66b5d7fcd194cb1b4e1",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 21,
+          "event_path_hash": "37f53f8c79336206e0f653f9ef2ae183d94562fe5378c66b5d7fcd194cb1b4e1",
+          "gross_pnl_usd": 2012.5,
+          "lower_quartile_stressed_event_usd": -167.78,
+          "maximum_positive_day_profit_share": 0.21663612920738326,
+          "maximum_single_trade_positive_profit_share": 0.21663612920738326,
+          "median_stressed_event_usd": -5.28,
+          "minimum_open_pnl_stressed_usd": -502.64,
+          "normal_net_usd": 1901.6200000000003,
+          "positive_stressed_event_rate": 0.47619047619047616,
+          "role": "DISCOVERY",
+          "stop_count": 6,
+          "stressed_edge_to_cost_ratio": 3.1649053280493176,
+          "stressed_net_per_event_usd": 45.31523809523812,
+          "stressed_net_usd": 951.6200000000002,
+          "target_count": 5
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZW",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_08708c8eb525e8bec629",
+      "control": "PRIMARY",
+      "event_hash": "0f24dabad1809948b371528eb12952711035cac55775373d38c4e3639346289e",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 21,
+          "event_path_hash": "0f24dabad1809948b371528eb12952711035cac55775373d38c4e3639346289e",
+          "gross_pnl_usd": 912.5,
+          "lower_quartile_stressed_event_usd": -167.78,
+          "maximum_positive_day_profit_share": 0.2704879952426968,
+          "maximum_single_trade_positive_profit_share": 0.2704879952426968,
+          "median_stressed_event_usd": -42.78,
+          "minimum_open_pnl_stressed_usd": -502.64,
+          "normal_net_usd": 801.6200000000001,
+          "positive_stressed_event_rate": 0.42857142857142855,
+          "role": "DISCOVERY",
+          "stop_count": 6,
+          "stressed_edge_to_cost_ratio": 1.435019186009939,
+          "stressed_net_per_event_usd": 2.458095238095264,
+          "stressed_net_usd": 51.620000000000175,
+          "target_count": 0
+        }
+      }
+    }
+  ],
+  "best_diagnostics_by_discovery": [
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZS",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_1c99d5bd82e506824a9d",
+      "control": "PRIMARY",
+      "event_hash": "cf09eed6beaba52de87b4355745383accab5a88a511b80b74f86919b4d8ddb5c",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 46,
+          "event_path_hash": "cf09eed6beaba52de87b4355745383accab5a88a511b80b74f86919b4d8ddb5c",
+          "gross_pnl_usd": 5225.0,
+          "lower_quartile_stressed_event_usd": -205.28,
+          "maximum_positive_day_profit_share": 0.1670898751444484,
+          "maximum_single_trade_positive_profit_share": 0.1670898751444484,
+          "median_stressed_event_usd": 69.72,
+          "minimum_open_pnl_stressed_usd": -777.64,
+          "normal_net_usd": 4982.120000000001,
+          "positive_stressed_event_rate": 0.5869565217391305,
+          "role": "DISCOVERY",
+          "stop_count": 15,
+          "stressed_edge_to_cost_ratio": 3.751220492791913,
+          "stressed_net_per_event_usd": 91.18739130434784,
+          "stressed_net_usd": 4194.620000000001,
+          "target_count": 14
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_cc48c0a7ae2282a40aa9",
+      "control": "PRIMARY",
+      "event_hash": "bcb588e7539393d34b4e29a388c60cec8d532813c0ba3918f6c3e1ca25ba18e0",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 23,
+          "event_path_hash": "bcb588e7539393d34b4e29a388c60cec8d532813c0ba3918f6c3e1ca25ba18e0",
+          "gross_pnl_usd": 3756.25,
+          "lower_quartile_stressed_event_usd": -180.28,
+          "maximum_positive_day_profit_share": 0.2875585735620389,
+          "maximum_single_trade_positive_profit_share": 0.2875585735620389,
+          "median_stressed_event_usd": 57.22,
+          "minimum_open_pnl_stressed_usd": -315.14,
+          "normal_net_usd": 3634.8100000000004,
+          "positive_stressed_event_rate": 0.5652173913043478,
+          "role": "DISCOVERY",
+          "stop_count": 8,
+          "stressed_edge_to_cost_ratio": 5.39350123485153,
+          "stressed_net_per_event_usd": 142.27434782608702,
+          "stressed_net_usd": 3272.3100000000004,
+          "target_count": 9
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_7c2b29319d608b1affe8",
+      "control": "PRIMARY",
+      "event_hash": "9726f555077623d8d54bc1305f635d06527ab310ebfe21a5e9eba22c34dfa689",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 23,
+          "event_path_hash": "9726f555077623d8d54bc1305f635d06527ab310ebfe21a5e9eba22c34dfa689",
+          "gross_pnl_usd": 2025.0,
+          "lower_quartile_stressed_event_usd": -230.28,
+          "maximum_positive_day_profit_share": 0.3504546722718481,
+          "maximum_single_trade_positive_profit_share": 0.3504546722718481,
+          "median_stressed_event_usd": -67.78,
+          "minimum_open_pnl_stressed_usd": -515.14,
+          "normal_net_usd": 1903.5600000000002,
+          "positive_stressed_event_rate": 0.4782608695652174,
+          "role": "DISCOVERY",
+          "stop_count": 9,
+          "stressed_edge_to_cost_ratio": 2.9076445924989947,
+          "stressed_net_per_event_usd": 65.37217391304351,
+          "stressed_net_usd": 1503.5600000000004,
+          "target_count": 5
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.8,
+        "market": "ZS",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_fd53a280929a499171df",
+      "control": "PRIMARY",
+      "event_hash": "aec3363d4affc40a1f996e68bd4a6d7346d9303dde2ac54a0ebda782faeb3742",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 46,
+          "event_path_hash": "aec3363d4affc40a1f996e68bd4a6d7346d9303dde2ac54a0ebda782faeb3742",
+          "gross_pnl_usd": 2325.0,
+          "lower_quartile_stressed_event_usd": -242.78,
+          "maximum_positive_day_profit_share": 0.2077166056128412,
+          "maximum_single_trade_positive_profit_share": 0.2077166056128412,
+          "median_stressed_event_usd": 50.97,
+          "minimum_open_pnl_stressed_usd": -777.64,
+          "normal_net_usd": 2082.1200000000003,
+          "positive_stressed_event_rate": 0.5217391304347826,
+          "role": "DISCOVERY",
+          "stop_count": 17,
+          "stressed_edge_to_cost_ratio": 1.6692033771753487,
+          "stressed_net_per_event_usd": 26.513478260869594,
+          "stressed_net_usd": 1219.6200000000006,
+          "target_count": 6
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZW",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_34a1a48967053f034340",
+      "control": "PRIMARY",
+      "event_hash": "37f53f8c79336206e0f653f9ef2ae183d94562fe5378c66b5d7fcd194cb1b4e1",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 21,
+          "event_path_hash": "37f53f8c79336206e0f653f9ef2ae183d94562fe5378c66b5d7fcd194cb1b4e1",
+          "gross_pnl_usd": 2012.5,
+          "lower_quartile_stressed_event_usd": -167.78,
+          "maximum_positive_day_profit_share": 0.21663612920738326,
+          "maximum_single_trade_positive_profit_share": 0.21663612920738326,
+          "median_stressed_event_usd": -5.28,
+          "minimum_open_pnl_stressed_usd": -502.64,
+          "normal_net_usd": 1901.6200000000003,
+          "positive_stressed_event_rate": 0.47619047619047616,
+          "role": "DISCOVERY",
+          "stop_count": 6,
+          "stressed_edge_to_cost_ratio": 3.1649053280493176,
+          "stressed_net_per_event_usd": 45.31523809523812,
+          "stressed_net_usd": 951.6200000000002,
+          "target_count": 5
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZW",
+        "mechanism": "POSITION_CHANGE_MOMENTUM",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_08708c8eb525e8bec629",
+      "control": "PRIMARY",
+      "event_hash": "0f24dabad1809948b371528eb12952711035cac55775373d38c4e3639346289e",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 21,
+          "event_path_hash": "0f24dabad1809948b371528eb12952711035cac55775373d38c4e3639346289e",
+          "gross_pnl_usd": 912.5,
+          "lower_quartile_stressed_event_usd": -167.78,
+          "maximum_positive_day_profit_share": 0.2704879952426968,
+          "maximum_single_trade_positive_profit_share": 0.2704879952426968,
+          "median_stressed_event_usd": -42.78,
+          "minimum_open_pnl_stressed_usd": -502.64,
+          "normal_net_usd": 801.6200000000001,
+          "positive_stressed_event_rate": 0.42857142857142855,
+          "role": "DISCOVERY",
+          "stop_count": 6,
+          "stressed_edge_to_cost_ratio": 1.435019186009939,
+          "stressed_net_per_event_usd": 2.458095238095264,
+          "stressed_net_usd": 51.620000000000175,
+          "target_count": 0
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZS",
+        "mechanism": "CROWDING_UNWIND",
+        "target_stop_multiple": 1.5
+      },
+      "candidate_id": "cftc_grain_f5b7b13f490cd3b2cd33",
+      "control": "PRIMARY",
+      "event_hash": "47fd0065e067b6b9110d0cde8297f19aff1dd4340c0be46f9a974f1daa72b7a0",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 19,
+          "event_path_hash": "47fd0065e067b6b9110d0cde8297f19aff1dd4340c0be46f9a974f1daa72b7a0",
+          "gross_pnl_usd": 187.5,
+          "lower_quartile_stressed_event_usd": -236.52999999999997,
+          "maximum_positive_day_profit_share": 0.1973869654659255,
+          "maximum_single_trade_positive_profit_share": 0.1973869654659255,
+          "median_stressed_event_usd": 44.72,
+          "minimum_open_pnl_stressed_usd": -527.64,
+          "normal_net_usd": 87.18000000000023,
+          "positive_stressed_event_rate": 0.5263157894736842,
+          "role": "DISCOVERY",
+          "stop_count": 7,
+          "stressed_edge_to_cost_ratio": 0.3259055829799068,
+          "stressed_net_per_event_usd": -12.51684210526313,
+          "stressed_net_usd": -237.81999999999977,
+          "target_count": 5
+        }
+      }
+    },
+    {
+      "candidate": {
+        "extreme_percentile": 0.9,
+        "market": "ZC",
+        "mechanism": "CROWDING_CONTINUATION",
+        "target_stop_multiple": 2.0
+      },
+      "candidate_id": "cftc_grain_bd53a8e6dd000422b858",
+      "control": "PRIMARY",
+      "event_hash": "f57ceaa87be5cdd9380489d37a1f05effdbc3e6a99c22bfdea1108b9fb7700ef",
+      "roles": {
+        "DISCOVERY": {
+          "event_count": 93,
+          "event_path_hash": "f57ceaa87be5cdd9380489d37a1f05effdbc3e6a99c22bfdea1108b9fb7700ef",
+          "gross_pnl_usd": 2600.0,
+          "lower_quartile_stressed_event_usd": -130.28,
+          "maximum_positive_day_profit_share": 0.09954339699126205,
+          "maximum_single_trade_positive_profit_share": 0.09954339699126205,
+          "median_stressed_event_usd": -67.78,
+          "minimum_open_pnl_stressed_usd": -315.14,
+          "normal_net_usd": 2108.96,
+          "positive_stressed_event_rate": 0.3978494623655914,
+          "role": "DISCOVERY",
+          "stop_count": 37,
+          "stressed_edge_to_cost_ratio": 0.9232823397394924,
+          "stressed_net_per_event_usd": -3.3982795698924617,
+          "stressed_net_usd": -316.03999999999985,
+          "target_count": 13
+        }
+      }
+    }
+  ],
+  "branch_id": "CFTC_GRAIN_POSITIONING_CROWDING_TRIPWIRE_V1",
+  "broker_connections": 0,
+  "cftc_receipt_hash": "be49646c4a0a864b450266fb7d2f98ee14f0e03bab8f5a73a9f5c811447bb538",
+  "combine_pass_count": 0,
+  "context_count_by_market": {
+    "ZC": 1266,
+    "ZS": 1071,
+    "ZW": 1221
+  },
+  "contract_specs": {
+    "ZC": {
+      "point_value_usd": 50.0,
+      "tick_size": 0.25,
+      "tick_value_usd": 12.5
+    },
+    "ZS": {
+      "point_value_usd": 50.0,
+      "tick_size": 0.25,
+      "tick_value_usd": 12.5
+    },
+    "ZW": {
+      "point_value_usd": 50.0,
+      "tick_size": 0.25,
+      "tick_value_usd": 12.5
+    }
+  },
+  "cot_data_receipt": {
+    "availability_rule": "REPORT_DATE_PLUS_8_CALENDAR_DAYS_AT_08_30_AMERICA_CHICAGO",
+    "markets": {
+      "ZC": {
+        "first_feature_ready_at": "2018-07-11T13:30:00+00:00",
+        "first_report_date": "2018-01-02T00:00:00+00:00",
+        "last_report_date": "2024-09-24T00:00:00+00:00",
+        "retained_report_count": 340
+      },
+      "ZS": {
+        "first_feature_ready_at": "2018-07-11T13:30:00+00:00",
+        "first_report_date": "2018-01-02T00:00:00+00:00",
+        "last_report_date": "2024-09-24T00:00:00+00:00",
+        "retained_report_count": 340
+      },
+      "ZW": {
+        "first_feature_ready_at": "2018-07-11T13:30:00+00:00",
+        "first_report_date": "2018-01-02T00:00:00+00:00",
+        "last_report_date": "2024-09-24T00:00:00+00:00",
+        "retained_report_count": 340
+      }
+    },
+    "shutdown_backlog_rows_excluded": 36,
+    "source_row_count": 1056
+  },
+  "discovery_eligible_count": 0,
+  "final_development_candidate_count": 0,
+  "final_development_event_gate_passer_ids": [],
+  "manifest_hash": "aefda2e615ac6cf22c6144b965cb0ccb283d4511007d39389642edd55ba1c8a0",
+  "next_action": "PIVOT_TO_FROZEN_SOYBEAN_CRUSH_STRUCTURAL_VALUE_ROUTER_EVI",
+  "orders": 0,
+  "price_data_receipt": {
+    "ZC": {
+      "mixed_instrument_session_count": 0,
+      "roll_guard_row_count": 18095,
+      "roll_guard_session_count": 102,
+      "rth_bar_count": 388850,
+      "session_count": 1615
+    },
+    "ZS": {
+      "mixed_instrument_session_count": 0,
+      "roll_guard_row_count": 25553,
+      "roll_guard_session_count": 144,
+      "rth_bar_count": 331298,
+      "session_count": 1574
+    },
+    "ZW": {
+      "mixed_instrument_session_count": 0,
+      "roll_guard_row_count": 17778,
+      "roll_guard_session_count": 102,
+      "rth_bar_count": 364783,
+      "session_count": 1575
+    }
+  },
+  "proposal_count": 48,
+  "q4_access_count_delta": 0,
+  "result_hash": "0bd41225a5c339312390347fc576aad13cc5b4152d4a24445d7c6412e30329c1",
+  "runtime_seconds": 231.40810797200538,
+  "schema": "hydra_cftc_grain_positioning_crowding_result_v1",
+  "selected_candidate_ids": [],
+  "selected_results": [],
+  "source_audit_hash": "e8351595feb9f669b82d76dfc414d854cf74aab681ba5aece4a860f213c145fe",
+  "status": "CFTC_GRAIN_POSITIONING_CROWDING_FALSIFIED",
+  "tier_ceiling": "H_DIAGNOSTIC",
+  "validation_access_policy": "DISCOVERY_SELECT_THEN_SELECTED_VALIDATION_ONLY",
+  "validation_candidate_count": 0,
+  "validation_event_gate_passer_ids": [],
+  "xfa_paths_started": 0
+}
