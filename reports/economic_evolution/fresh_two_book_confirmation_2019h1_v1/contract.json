@@ -1,0 +1,574 @@
+{
+  "account_replay_contract": {
+    "account_label": "50K",
+    "cost_scenarios": [
+      "NORMAL",
+      "STRESSED_1_5X"
+    ],
+    "exact_consistency": true,
+    "exact_mll": true,
+    "fill_semantics": "CAUSAL_NEXT_TRADABLE_OPEN_UNCHANGED",
+    "horizons_trading_days": [
+      5,
+      10,
+      20
+    ],
+    "normal_stress_multiplier": 1.5,
+    "retuning_allowed": false,
+    "start_grid": "MAXIMUM_NON_OVERLAPPING_COMPLETE_WINDOWS_FROM_POST_WARMUP_CALENDAR"
+  },
+  "authoritative_database_writes": 0,
+  "books": [
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "3a3d75293d3ab049fc61fff7ee20576e5e6495d926f82d520e388333bb478024",
+      "component_ids": [
+        "hazard_16f0da561bc98f2eb7d2efc4",
+        "hazard_0a569f580a2540474116636c"
+      ],
+      "component_quantity_tiers": {
+        "hazard_0a569f580a2540474116636c": 4,
+        "hazard_16f0da561bc98f2eb7d2efc4": 4
+      },
+      "development_result_hash": "58e2bb9bf21ae87544a4145cc8f4cadef0bff3641907cbe3b9c5a7b22c3fb820",
+      "governor_policy": {
+        "actual_stop_risk_available": false,
+        "aggregate_open_risk_ceiling": 1500.0,
+        "component_priority": [
+          "hazard_16f0da561bc98f2eb7d2efc4",
+          "hazard_0a569f580a2540474116636c"
+        ],
+        "concurrency_scaling": "PROPORTIONAL",
+        "daily_consistency_profit_guard": 750.0,
+        "daily_loss_guard": 500.0,
+        "future_outcome_fields_used": false,
+        "maximum_concurrent_sleeves": 2,
+        "maximum_mini_equivalent": 5.0,
+        "maximum_mll_buffer_fraction": 0.75,
+        "nominal_risk_charge_per_mini": {
+          "hazard_0a569f580a2540474116636c": 865.8809537683067,
+          "hazard_16f0da561bc98f2eb7d2efc4": 795.0525300344694
+        },
+        "outbound_order_capability": false,
+        "policy_id": "autonomous_marginal_book_b09b8e7b30f90b34737eb724",
+        "policy_version": "hydra_active_risk_pool_governor_v1",
+        "preserve_sole_sleeve_nominal_risk": true,
+        "protected_mll_buffer": 0.0,
+        "risk_measure": "DECLARED_NOMINAL_RISK_UTILISATION",
+        "same_instrument_conflict_rule": "PRIORITY",
+        "schema": "hydra_active_risk_pool_policy_v1",
+        "static_risk_tier": 1.0,
+        "structural_fingerprint": "70f9194493e536104a567d73dce31543ed249e8670ab66f9075c48a2ecabc907",
+        "target_protection_distance": 599.9999999999999,
+        "target_protection_mode": "SCALE_50"
+      },
+      "governor_profile_id": "fast_pass_governor_03",
+      "graduation_horizon_trading_days": 5,
+      "policy_id": "autonomous_marginal_book_b09b8e7b30f90b34737eb724",
+      "policy_spec_hash": "9994d48228cc3e0fc6e9fdab91a5419505035a95368456d1e6283c3a3bf7635e",
+      "prior_evidence_tier": "G"
+    },
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "4202306a5c17e712e9c73714880e7f94b9f100b8935f72a55e630e0726e58660",
+      "component_ids": [
+        "hazard_16f0da561bc98f2eb7d2efc4",
+        "hazard_367100adab5fe2a69a4f3257"
+      ],
+      "component_quantity_tiers": {
+        "hazard_16f0da561bc98f2eb7d2efc4": 4,
+        "hazard_367100adab5fe2a69a4f3257": 4
+      },
+      "development_result_hash": "dd7e7daea68bcafc92cd8f238a3701634405e56aaa641e5417b33dd550856cc2",
+      "governor_policy": {
+        "actual_stop_risk_available": false,
+        "aggregate_open_risk_ceiling": 1000.0,
+        "component_priority": [
+          "hazard_16f0da561bc98f2eb7d2efc4",
+          "hazard_367100adab5fe2a69a4f3257"
+        ],
+        "concurrency_scaling": "PROPORTIONAL",
+        "daily_consistency_profit_guard": 1125.0,
+        "daily_loss_guard": 1000.0,
+        "future_outcome_fields_used": false,
+        "maximum_concurrent_sleeves": 2,
+        "maximum_mini_equivalent": 5.0,
+        "maximum_mll_buffer_fraction": 0.5,
+        "nominal_risk_charge_per_mini": {
+          "hazard_16f0da561bc98f2eb7d2efc4": 795.0525300344694,
+          "hazard_367100adab5fe2a69a4f3257": 463.02066092349656
+        },
+        "outbound_order_capability": false,
+        "policy_id": "autonomous_marginal_book_2f3752128ff0fd44a71b2327",
+        "policy_version": "hydra_active_risk_pool_governor_v1",
+        "preserve_sole_sleeve_nominal_risk": true,
+        "protected_mll_buffer": 0.0,
+        "risk_measure": "DECLARED_NOMINAL_RISK_UTILISATION",
+        "same_instrument_conflict_rule": "PRIORITY",
+        "schema": "hydra_active_risk_pool_policy_v1",
+        "static_risk_tier": 1.0,
+        "structural_fingerprint": "7c124c5e852ca4f3f51542db1e5ed158845f2754cf93ec5f2ff54707c224aa66",
+        "target_protection_distance": 299.99999999999994,
+        "target_protection_mode": "SCALE_50"
+      },
+      "governor_profile_id": "fast_pass_governor_02",
+      "graduation_horizon_trading_days": 5,
+      "policy_id": "autonomous_marginal_book_2f3752128ff0fd44a71b2327",
+      "policy_spec_hash": "9ed2dc8291e7f8a8456a8828d2b5db06cd7adefa6703a64990137564bdf4d639",
+      "prior_evidence_tier": "G"
+    }
+  ],
+  "broker_connections": 0,
+  "components": [
+    {
+      "calibration": {
+        "calibration_end_exclusive_ns": 1688342400000000000,
+        "calibration_hash": "cba2f81f293564e2108e00d2e907161a53a36d66099ed06a99d1b89385337d38",
+        "context_threshold": 0.0005459839844697001,
+        "finite_context_observations": 161539,
+        "finite_trigger_observations": 161539,
+        "source_matrix_hash": "514d2d1aadb8a6d00aad2a13b61f51a8f3271eba531031ea9499f31a18ef615e",
+        "trigger_threshold": 0.0009598944116147035
+      },
+      "candidate": {
+        "adverse_r": 1.0,
+        "context_feature": "cross_asset_ctx_15m_return",
+        "context_operator": "SAME_SIGN",
+        "context_quantile": 0.65,
+        "cooldown_minutes": 60,
+        "cross_asset_reference_market": "ES",
+        "direction_rule": "TRIGGER_SIGN_CONTINUATION",
+        "execution_market": "MYM",
+        "favorable_r": 2.0,
+        "horizon": 60,
+        "market": "YM",
+        "mechanism": "CROSS_ASSET_STATE",
+        "risk_level": 0.75,
+        "session_code": 1,
+        "timeframe": "1m",
+        "trigger_feature": "ctx_15m_return",
+        "trigger_operator": "ABS_GT",
+        "trigger_quantile": 0.85,
+        "version": 1
+      },
+      "candidate_fingerprint": "0a569f580a2540474116636c5d85fb129d47c9fefd3f0072be1e5be21d5f6e0b",
+      "candidate_id": "hazard_0a569f580a2540474116636c",
+      "declared_risk_charge_per_mini": 865.8809537683067,
+      "development_component_receipt": {
+        "design_metrics": {
+          "normal": {
+            "episode_count": 4,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_total_usd": 4369.94828577499,
+            "pass_count": 1,
+            "pass_rate": 0.25
+          },
+          "stressed": {
+            "episode_count": 4,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_total_usd": 4135.94828577499,
+            "pass_count": 1,
+            "pass_rate": 0.25
+          }
+        },
+        "quantity_scaling_applied_exactly_once": true,
+        "selected_cell_hash": "9efe99242d9067782ff0beaaf2f90ee210ade03f321467158e4ca156d322dcf0",
+        "selected_cell_identity": {
+          "account_label": "50K",
+          "account_size_usd": 50000,
+          "horizon_trading_days": 20,
+          "integer_quantity_tier": 4,
+          "risk_governor_mode": "CAUSAL_STATIC_STOP_RISK_GOVERNOR"
+        },
+        "selection_outcome_role": "B1_B2_DESIGN_ONLY",
+        "source_candidate_result_hash": "aef1ddbf40aeeb44e326aca0aa255796a3d51bb66b6dd3ecc1eb0b544adf0815",
+        "source_event_content_sha256": "bd4beafaddc0f6d9535e90e305b6a560dba02deb3fa0e303b9c39dbe9338e014",
+        "source_event_file_sha256": "7901bd214b3d48288f359e645d9d1d5d08decb61f0117746cabe3b10dbca29b1",
+        "source_exact_result_hash": "c358fb87b446735d68c4594a292090c3d18d570182f4504be030efcbd4aace81",
+        "source_full_cell_hash": "55143049cf11558948525013357211236c73f0a399ac468258f58f72cb87ee85"
+      },
+      "integer_quantity_tier": 4
+    },
+    {
+      "calibration": {
+        "calibration_end_exclusive_ns": 1688342400000000000,
+        "calibration_hash": "03e3dad5b7a6404b4ca94c4badf75fafec56a464288726a83410d4484232c59a",
+        "context_threshold": 0.0007425283088917656,
+        "finite_context_observations": 162708,
+        "finite_trigger_observations": 162977,
+        "source_matrix_hash": "a8c0184d40ca7931b11072170a1be5a5aa671f16b02ff46c217031b1ee38a792",
+        "trigger_threshold": 0.00105780598593741
+      },
+      "candidate": {
+        "adverse_r": 0.75,
+        "context_feature": "ctx_60m_return",
+        "context_operator": "SAME_SIGN",
+        "context_quantile": 0.5,
+        "cooldown_minutes": 60,
+        "cross_asset_reference_market": null,
+        "direction_rule": "TRIGGER_SIGN_CONTINUATION",
+        "execution_market": "MES",
+        "favorable_r": 2.0,
+        "horizon": 60,
+        "market": "ES",
+        "mechanism": "MULTI_TIMEFRAME_ALIGNMENT",
+        "risk_level": 1.0,
+        "session_code": 1,
+        "timeframe": "1m",
+        "trigger_feature": "ctx_15m_return",
+        "trigger_operator": "ABS_GT",
+        "trigger_quantile": 0.85,
+        "version": 1
+      },
+      "candidate_fingerprint": "16f0da561bc98f2eb7d2efc4e2a5534ed2500651f6e15051185f488505478ea0",
+      "candidate_id": "hazard_16f0da561bc98f2eb7d2efc4",
+      "declared_risk_charge_per_mini": 795.0525300344694,
+      "development_component_receipt": {
+        "design_metrics": {
+          "normal": {
+            "episode_count": 22,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_total_usd": 7366.914209473907,
+            "pass_count": 1,
+            "pass_rate": 0.045454545454545456
+          },
+          "stressed": {
+            "episode_count": 22,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_total_usd": 6241.914209473907,
+            "pass_count": 1,
+            "pass_rate": 0.045454545454545456
+          }
+        },
+        "quantity_scaling_applied_exactly_once": true,
+        "selected_cell_hash": "a178e701795a390eeecb3e55d79e0235ad46b95b8c7dbff9620b57a6bef1c433",
+        "selected_cell_identity": {
+          "account_label": "50K",
+          "account_size_usd": 50000,
+          "horizon_trading_days": 5,
+          "integer_quantity_tier": 4,
+          "risk_governor_mode": "CONTRACT_ONLY_UNIFORM_SCALE"
+        },
+        "selection_outcome_role": "B1_B2_DESIGN_ONLY",
+        "source_candidate_result_hash": "1ad7783b3a5fe302205e23b7fe019ce56b7b5f347c5b7d221d236765206c7851",
+        "source_event_content_sha256": "7dab9f14e69204f59d5ff6a7a9af4f7c12943e6b54140fb1041f3b5bb6ddafb1",
+        "source_event_file_sha256": "247d9fa8d68ecb822238f21014827138e62822a9bce8d9a9a5e5b099a91391f0",
+        "source_exact_result_hash": "37897b6b86492c4a1464bd9b796912465d31c4a693de058c7d1a5a676264b934",
+        "source_full_cell_hash": "fe80f8450c1049b6b1243e710bae83a3085ba1ceda1c01e67760390828ce5073"
+      },
+      "integer_quantity_tier": 4
+    },
+    {
+      "calibration": {
+        "calibration_end_exclusive_ns": 1688342400000000000,
+        "calibration_hash": "7ec6853a258c98870499399217970799b5ddeaf6cd31c2d8472bc6e0c3d29275",
+        "context_threshold": 0.000501152651254344,
+        "finite_context_observations": 130107,
+        "finite_trigger_observations": 146163,
+        "source_matrix_hash": "5315b3ad493d229042ea91c8d5c5e46957ec6332ad4a904c7c55f7033fa34b5d",
+        "trigger_threshold": 0.3
+      },
+      "candidate": {
+        "adverse_r": 1.0,
+        "context_feature": "past_return_60",
+        "context_operator": "ABS_GT",
+        "context_quantile": 0.35,
+        "cooldown_minutes": 390,
+        "cross_asset_reference_market": null,
+        "direction_rule": "PAST_RETURN_REVERSAL",
+        "execution_market": "MYM",
+        "favorable_r": 1.0,
+        "horizon": "SESSION",
+        "market": "YM",
+        "mechanism": "EXHAUSTION_REVERSAL",
+        "risk_level": 1.5,
+        "session_code": 0,
+        "timeframe": "5m",
+        "trigger_feature": "extreme_dwell",
+        "trigger_operator": "GT",
+        "trigger_quantile": 0.75,
+        "version": 1
+      },
+      "candidate_fingerprint": "367100adab5fe2a69a4f325731c7cf4393dee54661ae2a3bcfa5d80f0b6f2b08",
+      "candidate_id": "hazard_367100adab5fe2a69a4f3257",
+      "declared_risk_charge_per_mini": 463.02066092349656,
+      "development_component_receipt": {
+        "design_metrics": {
+          "normal": {
+            "episode_count": 4,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_total_usd": 1190.4051510940699,
+            "pass_count": 1,
+            "pass_rate": 0.25
+          },
+          "stressed": {
+            "episode_count": 4,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_total_usd": 983.4051510940699,
+            "pass_count": 1,
+            "pass_rate": 0.25
+          }
+        },
+        "quantity_scaling_applied_exactly_once": true,
+        "selected_cell_hash": "10d7e9c7d7a0b15afa580bb25d67f721cc7094c8e6ef2aa9af37c743ccf05bf6",
+        "selected_cell_identity": {
+          "account_label": "50K",
+          "account_size_usd": 50000,
+          "horizon_trading_days": 20,
+          "integer_quantity_tier": 4,
+          "risk_governor_mode": "CAUSAL_STATIC_STOP_RISK_GOVERNOR"
+        },
+        "selection_outcome_role": "B1_B2_DESIGN_ONLY",
+        "source_candidate_result_hash": "81e52e97c7a89f43ba96f5b9841b75c5c939d4572a8dd7cf3636c74698293d34",
+        "source_event_content_sha256": "d1025dc785d0ab19fe1ba420c86b3f25f06ecc33caebf010abc20f856e0fe673",
+        "source_event_file_sha256": "fbc78fddccd3284d6578f69b9c662633eae75e0c7bffb3993bc145c22ca98852",
+        "source_exact_result_hash": "cf03957e761adfbf4717dab90d527b2cb9e302c165bcd90726a1613718f51660",
+        "source_full_cell_hash": "4fcdc302535aac9b25f0fd4d0b105a57009cf6e404de26ef54fbe7c4e52e9506"
+      },
+      "integer_quantity_tier": 4
+    }
+  ],
+  "contract_hash": "9389ff104615f83d42c2e3f1636a29813d5cb69adee064c05e18320c4fd29695",
+  "data_partition": {
+    "candidate_modification_allowed": false,
+    "entire_post_warmup_block_consumed_once": true,
+    "recalibration_allowed": false,
+    "role": "CONFIRMATION",
+    "warmup_complete_sessions": 5,
+    "warmup_rule": "FIRST_5_COMMON_COMPLETE_SESSION_DAYS_EXCLUDED"
+  },
+  "data_request": {
+    "additional_authority_usd": 100.0,
+    "broker_or_order_capability": false,
+    "cumulative_hard_cap_usd": 200.720719923081,
+    "data_role": "CONFIRMATION",
+    "dataset": "GLBX.MDP3",
+    "date_interval": "HALF_OPEN",
+    "end": "2019-07-01",
+    "frozen_estimated_cost_usd": 3.689934432507,
+    "prior_cumulative_actual_usd": 157.932536271218,
+    "projected_cumulative_usd": 161.62247070372499,
+    "q4_2024_access_allowed": false,
+    "request_hash": "e4aa22f2f8dbf4341ed6d160cdee14838d8b085053713587e9377fdd031ab251",
+    "schema": "ohlcv-1m",
+    "start": "2019-01-02",
+    "stype_in": "continuous",
+    "stype_out": "instrument_id",
+    "symbols": [
+      "ES.c.0",
+      "MES.c.0",
+      "NQ.c.0",
+      "MNQ.c.0",
+      "YM.c.0",
+      "MYM.c.0",
+      "RTY.c.0",
+      "M2K.c.0",
+      "CL.c.0",
+      "MCL.c.0"
+    ]
+  },
+  "decision_class": "NEW_PRE_DATA_TWO_BOOK_M1_CONFIRMATION_DECISION",
+  "official_cost_matrix": {
+    "instrument_ids": [
+      "736",
+      "1504",
+      "7341",
+      "7449",
+      "7849",
+      "7859",
+      "8078",
+      "8084",
+      "9166",
+      "15657",
+      "18197",
+      "18720",
+      "36315",
+      "36742",
+      "37699",
+      "79323",
+      "97456",
+      "117678",
+      "206109",
+      "303281",
+      "310036",
+      "316302",
+      "398475",
+      "551735",
+      "579836",
+      "694785",
+      "724380"
+    ],
+    "parts": {
+      "definition": {
+        "billable_size_bytes": 1182240,
+        "estimated_cost_usd": 0.001871779561,
+        "record_count": 3284
+      },
+      "ohlcv-1m": {
+        "billable_size_bytes": 56571816,
+        "estimated_cost_usd": 3.688062652946,
+        "record_count": 1010211
+      }
+    },
+    "requests": {
+      "definition": {
+        "dataset": "GLBX.MDP3",
+        "end": "2019-07-01",
+        "schema": "definition",
+        "start": "2019-01-02",
+        "stype_in": "instrument_id",
+        "symbols": [
+          "736",
+          "1504",
+          "7341",
+          "7449",
+          "7849",
+          "7859",
+          "8078",
+          "8084",
+          "9166",
+          "15657",
+          "18197",
+          "18720",
+          "36315",
+          "36742",
+          "37699",
+          "79323",
+          "97456",
+          "117678",
+          "206109",
+          "303281",
+          "310036",
+          "316302",
+          "398475",
+          "551735",
+          "579836",
+          "694785",
+          "724380"
+        ]
+      },
+      "ohlcv-1m": {
+        "dataset": "GLBX.MDP3",
+        "end": "2019-07-01",
+        "schema": "ohlcv-1m",
+        "start": "2019-01-02",
+        "stype_in": "continuous",
+        "symbols": [
+          "ES.c.0",
+          "MES.c.0",
+          "NQ.c.0",
+          "MNQ.c.0",
+          "YM.c.0",
+          "MYM.c.0",
+          "RTY.c.0",
+          "M2K.c.0",
+          "CL.c.0",
+          "MCL.c.0"
+        ]
+      }
+    },
+    "total_billable_size_bytes": 57754056,
+    "total_estimated_cost_usd": 3.689934432507,
+    "total_record_count": 1013495
+  },
+  "official_rule_snapshot": {
+    "file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+    "path": "/root/hydra-bot/config/rulesets/topstep_official_2026-07-19.json",
+    "retrieval_status": "OFFICIAL_CURRENT_SNAPSHOT",
+    "retrieved_at_utc": "2026-07-19T01:04:10Z",
+    "snapshot_id": "topstep_official_2026-07-19T010410Z"
+  },
+  "official_rule_snapshot_payload": {
+    "50K": {
+      "account_label": "50K",
+      "account_size_usd": 50000,
+      "consistency_target_fraction": 0.5,
+      "maximum_loss_limit_usd": 2000,
+      "maximum_micro_contracts": 50,
+      "maximum_mini_contracts": 5,
+      "minimum_trading_days": 2,
+      "no_activation_fee_usd": 0,
+      "no_activation_monthly_price_usd": 95,
+      "optional_daily_loss_limit_usd": 1000,
+      "profit_target_usd": 3000,
+      "special_contract_caps": {
+        "CL_QM_RB_HO": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "GC": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "MCL": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "MGC": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "SIL_MHG": {
+          "100K": 4,
+          "150K": 6,
+          "50K": 2
+        },
+        "SI_HG_PL": {
+          "100K": 0,
+          "150K": 0,
+          "50K": 0
+        }
+      },
+      "standard_activation_fee_usd": 149,
+      "standard_monthly_price_usd": 49
+    }
+  },
+  "orders": 0,
+  "planner_minimum_three_heuristic_applied": false,
+  "q4_access_count_delta": 0,
+  "schema": "hydra_fresh_two_book_confirmation_2019h1_contract_v1",
+  "scientific_reason": "M1 requires one Tier-C candidate; two high-value immutable G hypotheses justify one shared packet",
+  "source_bindings": {
+    "authorization_manifest_hash": "6308849da7fd715e324334da1663e8ec8ce4cd083aa399490b240a9386a64792",
+    "fast_pass_manifest_hash": "3b1f7e4fe881a1de07c86584740bc19c2b79b248b287a146d96bc83bb71b0562",
+    "marginal_result_file_sha256": "01a32ac702a11d3d1070c49da4b4e3529e2a414b95516bb41e1800a7bf30eb97",
+    "marginal_result_hash": "c8eb617d541e5de606cc3df3e4f93f00d9ab5c477a3cab4e961cd162892cae21",
+    "marginal_result_path": "reports/economic_evolution/marginal_book_tier_g_batch_v1/economic_result.json",
+    "observed_pass_bank_hash": "b5a2f90f86eb339b2ec86e52372efd0d06f8caa5ece2d60aff1c60d5decf45f7",
+    "rule_snapshot_file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "rule_snapshot_payload_hash": "df44ca54b9ed3057837e2b7e50ba23dae5193a651f839718517fb4e4d143a303",
+    "semantic_result_hash": "c45ca03fc9536861a2899a6be4b434fcec7cfa00f4ab7786cc2a6f26a11571bc"
+  },
+  "status": "FROZEN_AWAITING_ACQUISITION",
+  "tier_c_gate": {
+    "all_passing_paths_consistency_compliant": true,
+    "matching_horizon_days": 5,
+    "maximum_normal_mll_breach_rate": 0.1,
+    "maximum_positive_day_share": 0.5,
+    "maximum_positive_sleeve_share": 0.65,
+    "maximum_positive_trade_share": 0.5,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "minimum_normal_passes": 1,
+    "minimum_stressed_passes": 1,
+    "no_retuning": true,
+    "positive_stressed_net_required": true
+  },
+  "untouched_audit": {
+    "period": "2019-01-02:2019-07-01",
+    "q4_overlap": false,
+    "relevant_access_ledger_hit_count": 0,
+    "scope": "TWO_FROZEN_BOOK_LINEAGES_AND_FULL_BANK_MARKETS",
+    "status": "UNTOUCHED_BEFORE_CONTRACT_FREEZE"
+  }
+}

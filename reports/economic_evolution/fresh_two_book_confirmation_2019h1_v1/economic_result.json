@@ -1,0 +1,2197 @@
+{
+  "acquisition_receipt_hash": "228d991f5f041e709e1ef77c46b28977a7bab5bb3ab8291f403c988be513424d",
+  "book_results": [
+    {
+      "behavioral_fingerprint": "3a3d75293d3ab049fc61fff7ee20576e5e6495d926f82d520e388333bb478024",
+      "book_or_component_mutated": false,
+      "cells": [
+        {
+          "data_censored_start_count": 3,
+          "episodes": {
+            "NORMAL": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 932.4744276702768,
+                "mll_breached": false,
+                "net_pnl_usd": -976.9005723297232,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1366.9993079535925,
+                "mll_breached": false,
+                "net_pnl_usd": -233.7286544108283,
+                "passed": false,
+                "start_day": 17912,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 755.4307377387668,
+                "mll_breached": false,
+                "net_pnl_usd": -1031.894556119245,
+                "passed": false,
+                "start_day": 17919,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1062.9631336333332,
+                "mll_breached": false,
+                "net_pnl_usd": -537.4186608117379,
+                "passed": false,
+                "start_day": 17926,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1235.1738538124773,
+                "mll_breached": false,
+                "net_pnl_usd": -457.3261461875227,
+                "passed": false,
+                "start_day": 17933,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1457.0771406242566,
+                "mll_breached": false,
+                "net_pnl_usd": 59.21210486131167,
+                "passed": false,
+                "start_day": 17947,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1567.1208877911413,
+                "mll_breached": false,
+                "net_pnl_usd": -416.83486509346403,
+                "passed": false,
+                "start_day": 17954,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1574.9670166400902,
+                "mll_breached": false,
+                "net_pnl_usd": 107.88897222787637,
+                "passed": false,
+                "start_day": 17961,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1213.1610417510892,
+                "mll_breached": false,
+                "net_pnl_usd": 628.1521173626534,
+                "passed": false,
+                "start_day": 17981,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1485.03362540307,
+                "mll_breached": false,
+                "net_pnl_usd": -514.9663745969301,
+                "passed": false,
+                "start_day": 17988,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1709.1638970913264,
+                "mll_breached": false,
+                "net_pnl_usd": -199.33610290867364,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1939.9300000000003,
+                "mll_breached": false,
+                "net_pnl_usd": 304.7916846848457,
+                "passed": false,
+                "start_day": 18002,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1618.9912317926282,
+                "mll_breached": false,
+                "net_pnl_usd": -205.38876820736914,
+                "passed": false,
+                "start_day": 18010,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 794.6974193753267,
+                "mll_breached": false,
+                "net_pnl_usd": -1205.3025806246733,
+                "passed": false,
+                "start_day": 18017,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1152.7895326982325,
+                "mll_breached": false,
+                "net_pnl_usd": 48.520751365838805,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 810.7978930204117,
+                "mll_breached": false,
+                "net_pnl_usd": -1189.2021069795883,
+                "passed": false,
+                "start_day": 18031,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 799.0758990322065,
+                "mll_breached": false,
+                "net_pnl_usd": -1200.9241009677935,
+                "passed": false,
+                "start_day": 18038,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1025.4077112594896,
+                "mll_breached": false,
+                "net_pnl_usd": -278.2110905692243,
+                "passed": false,
+                "start_day": 18045,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1135.631034945989,
+                "mll_breached": false,
+                "net_pnl_usd": -601.5498444386321,
+                "passed": false,
+                "start_day": 18052,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1321.435029441047,
+                "mll_breached": false,
+                "net_pnl_usd": -678.5649705589531,
+                "passed": false,
+                "start_day": 18059,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ],
+            "STRESSED_1_5X": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1014.9542780075426,
+                "mll_breached": false,
+                "net_pnl_usd": -890.5144719924574,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1325.8330579535905,
+                "mll_breached": false,
+                "net_pnl_usd": -328.6913484433244,
+                "passed": false,
+                "start_day": 17912,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 712.339492414998,
+                "mll_breached": false,
+                "net_pnl_usd": -1083.2287597530158,
+                "passed": false,
+                "start_day": 17919,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1023.6406336333312,
+                "mll_breached": false,
+                "net_pnl_usd": -590.05366081174,
+                "passed": false,
+                "start_day": 17926,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1219.0127583009598,
+                "mll_breached": false,
+                "net_pnl_usd": -501.17474169904017,
+                "passed": false,
+                "start_day": 17933,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1441.0458906242566,
+                "mll_breached": false,
+                "net_pnl_usd": 21.149604861311673,
+                "passed": false,
+                "start_day": 17947,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1518.665134906536,
+                "mll_breached": false,
+                "net_pnl_usd": -481.33486509346403,
+                "passed": false,
+                "start_day": 17954,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1563.5295166400902,
+                "mll_breached": false,
+                "net_pnl_usd": 28.763972227876366,
+                "passed": false,
+                "start_day": 17961,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1176.2235417510892,
+                "mll_breached": false,
+                "net_pnl_usd": 528.9646173626534,
+                "passed": false,
+                "start_day": 17981,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1471.53362540307,
+                "mll_breached": false,
+                "net_pnl_usd": -528.4663745969301,
+                "passed": false,
+                "start_day": 17988,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1702.4138970913264,
+                "mll_breached": false,
+                "net_pnl_usd": -208.33610290867364,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1932.0550000000003,
+                "mll_breached": false,
+                "net_pnl_usd": 289.0416846848457,
+                "passed": false,
+                "start_day": 18002,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1594.8829096318877,
+                "mll_breached": false,
+                "net_pnl_usd": -236.24709036810964,
+                "passed": false,
+                "start_day": 18010,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 736.5724193753267,
+                "mll_breached": false,
+                "net_pnl_usd": -1263.4275806246733,
+                "passed": false,
+                "start_day": 18017,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1127.9670326982305,
+                "mll_breached": false,
+                "net_pnl_usd": 560.3163849787234,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 768.6178308447488,
+                "mll_breached": false,
+                "net_pnl_usd": -1231.3821691552512,
+                "passed": false,
+                "start_day": 18031,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 760.4505006759719,
+                "mll_breached": false,
+                "net_pnl_usd": -1239.5494993240281,
+                "passed": false,
+                "start_day": 18038,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 994.5782641236947,
+                "mll_breached": false,
+                "net_pnl_usd": -331.7260946766546,
+                "passed": false,
+                "start_day": 18045,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1093.818534945989,
+                "mll_breached": false,
+                "net_pnl_usd": -662.1123444386321,
+                "passed": false,
+                "start_day": 18052,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1267.622529441047,
+                "mll_breached": false,
+                "net_pnl_usd": -732.3774705589531,
+                "passed": false,
+                "start_day": 18059,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ]
+          },
+          "full_coverage_start_count": 20,
+          "horizon_trading_days": 5,
+          "normal": {
+            "accepted_event_count": 156,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 15.989821904980179,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_0a569f580a2540474116636c": -4819.85650013711,
+              "hazard_16f0da561bc98f2eb7d2efc4": -3759.127264164951
+            },
+            "consistency_rate": 0.75,
+            "data_censored_count": 3,
+            "episode_count": 20,
+            "full_coverage_start_count": 20,
+            "maximum_mini_equivalent_max": 1.8,
+            "maximum_mini_equivalent_mean": 1.6800000000000004,
+            "maximum_net_directional_exposure_max": 1.8,
+            "maximum_net_directional_exposure_mean": 1.6800000000000004,
+            "maximum_positive_session_day_aggregate_share": 0.21226426954594743,
+            "mean_daily_contract_utilization": 0.075,
+            "mean_daily_maximum_mini_equivalent": 1.125,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 755.4307377387668,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -437.08050564049336,
+            "net_total": -8578.983764301833,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 5811.864042169906,
+            "requested_start_count": 23,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 31,
+            "target_progress_median": -0.14569350188016444,
+            "target_progress_p25": -0.25104962366721517,
+            "target_progress_p75": -0.04579062978001518,
+            "terminal_distribution": {
+              "TIMEOUT": 20
+            }
+          },
+          "requested_start_count": 23,
+          "stressed": {
+            "accepted_event_count": 152,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 11.581656765849395,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_0a569f580a2540474116636c": -4738.576871643787,
+              "hazard_16f0da561bc98f2eb7d2efc4": -4141.809438685984
+            },
+            "consistency_rate": 0.75,
+            "data_censored_count": 3,
+            "episode_count": 20,
+            "full_coverage_start_count": 20,
+            "maximum_mini_equivalent_max": 1.8,
+            "maximum_mini_equivalent_mean": 1.6700000000000004,
+            "maximum_net_directional_exposure_max": 1.8,
+            "maximum_net_directional_exposure_mean": 1.6700000000000004,
+            "maximum_positive_session_day_aggregate_share": 0.2003462589413067,
+            "mean_daily_contract_utilization": 0.075,
+            "mean_daily_maximum_mini_equivalent": 1.125,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 712.339492414998,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -491.2548033962521,
+            "net_total": -8880.386310329537,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 6000.366974477591,
+            "requested_start_count": 23,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 35,
+            "target_progress_median": -0.16375160113208403,
+            "target_progress_p25": -0.25730390697244304,
+            "target_progress_p75": -0.05032155865539243,
+            "terminal_distribution": {
+              "TIMEOUT": 20
+            }
+          }
+        },
+        {
+          "data_censored_start_count": 2,
+          "episodes": {
+            "NORMAL": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 683.4174124715864,
+                "mll_breached": false,
+                "net_pnl_usd": -1193.225209213022,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 579.6404459114492,
+                "mll_breached": false,
+                "net_pnl_usd": -1341.0364253605294,
+                "passed": false,
+                "start_day": 17919,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1457.0771406242566,
+                "mll_breached": false,
+                "net_pnl_usd": -357.62276023215236,
+                "passed": false,
+                "start_day": 17947,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 831.9651081380653,
+                "mll_breached": false,
+                "net_pnl_usd": 246.95618374962942,
+                "passed": false,
+                "start_day": 17981,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1709.1638970913264,
+                "mll_breached": false,
+                "net_pnl_usd": 91.43558177617524,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 665.9408383578993,
+                "mll_breached": false,
+                "net_pnl_usd": -1334.0591616421007,
+                "passed": false,
+                "start_day": 18010,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 716.5532104281301,
+                "mll_breached": false,
+                "net_pnl_usd": -1029.977960454169,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 387.00616138223995,
+                "mll_breached": false,
+                "net_pnl_usd": -1401.7936641283231,
+                "passed": false,
+                "start_day": 18038,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 893.5198090202903,
+                "mll_breached": false,
+                "net_pnl_usd": -1106.4801909797097,
+                "passed": false,
+                "start_day": 18052,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ],
+            "STRESSED_1_5X": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 704.3995872666637,
+                "mll_breached": false,
+                "net_pnl_usd": -1136.506590385441,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 551.2028992201303,
+                "mll_breached": false,
+                "net_pnl_usd": -1374.0677220518482,
+                "passed": false,
+                "start_day": 17919,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1441.0458906242566,
+                "mll_breached": false,
+                "net_pnl_usd": -460.18526023215236,
+                "passed": false,
+                "start_day": 17947,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 800.5729154266155,
+                "mll_breached": false,
+                "net_pnl_usd": 153.31399103817967,
+                "passed": false,
+                "start_day": 17981,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1702.4138970913264,
+                "mll_breached": false,
+                "net_pnl_usd": 67.43558177617524,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 647.8038423118269,
+                "mll_breached": false,
+                "net_pnl_usd": -1207.5086576881731,
+                "passed": false,
+                "start_day": 18010,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 672.0048728904367,
+                "mll_breached": false,
+                "net_pnl_usd": -549.043164378978,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 372.20087327247165,
+                "mll_breached": false,
+                "net_pnl_usd": -1430.7552022380914,
+                "passed": false,
+                "start_day": 18038,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 824.2927677617408,
+                "mll_breached": false,
+                "net_pnl_usd": -1175.7072322382592,
+                "passed": false,
+                "start_day": 18052,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ]
+          },
+          "full_coverage_start_count": 9,
+          "horizon_trading_days": 10,
+          "normal": {
+            "accepted_event_count": 128,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 4.995424924699435,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_0a569f580a2540474116636c": -4857.856410105243,
+              "hazard_16f0da561bc98f2eb7d2efc4": -2567.9471963791
+            },
+            "consistency_rate": 0.7777777777777778,
+            "data_censored_count": 2,
+            "episode_count": 9,
+            "full_coverage_start_count": 9,
+            "maximum_mini_equivalent_max": 1.8,
+            "maximum_mini_equivalent_mean": 1.7222222222222223,
+            "maximum_net_directional_exposure_max": 1.8,
+            "maximum_net_directional_exposure_mean": 1.7222222222222223,
+            "maximum_positive_session_day_aggregate_share": 0.29254943976977615,
+            "mean_daily_contract_utilization": 0.06340740740740741,
+            "mean_daily_maximum_mini_equivalent": 0.9511111111111112,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 387.00616138223995,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -1106.4801909797097,
+            "net_total": -7425.803606484202,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 4216.897754384294,
+            "requested_start_count": 11,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 38,
+            "target_progress_median": -0.36882673032656993,
+            "target_progress_p25": -0.44468638721403353,
+            "target_progress_p75": -0.11920758674405078,
+            "terminal_distribution": {
+              "TIMEOUT": 9
+            }
+          },
+          "requested_start_count": 11,
+          "stressed": {
+            "accepted_event_count": 126,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 7.841104829840231,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_0a569f580a2540474116636c": -4455.902911397426,
+              "hazard_16f0da561bc98f2eb7d2efc4": -2657.121345001324
+            },
+            "consistency_rate": 0.7777777777777778,
+            "data_censored_count": 2,
+            "episode_count": 9,
+            "full_coverage_start_count": 9,
+            "maximum_mini_equivalent_max": 1.8,
+            "maximum_mini_equivalent_mean": 1.7111111111111112,
+            "maximum_net_directional_exposure_max": 1.8,
+            "maximum_net_directional_exposure_mean": 1.7111111111111112,
+            "maximum_positive_session_day_aggregate_share": 0.2634677636487712,
+            "mean_daily_contract_utilization": 0.0631111111111111,
+            "mean_daily_maximum_mini_equivalent": 0.9466666666666665,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 372.20087327247165,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -1136.506590385441,
+            "net_total": -7113.0242563985885,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 4562.801380187595,
+            "requested_start_count": 11,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 40,
+            "target_progress_median": -0.37883553012848037,
+            "target_progress_p25": -0.4025028858960577,
+            "target_progress_p75": -0.15339508674405078,
+            "terminal_distribution": {
+              "TIMEOUT": 9
+            }
+          }
+        },
+        {
+          "data_censored_start_count": 2,
+          "episodes": {
+            "NORMAL": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 232.97985269244964,
+                "mll_breached": false,
+                "net_pnl_usd": -1730.150116576784,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 665.9408383578993,
+                "mll_breached": false,
+                "net_pnl_usd": -1242.6235798659254,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 153.7304689641387,
+                "mll_breached": false,
+                "net_pnl_usd": -1532.6199622769636,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ],
+            "STRESSED_1_5X": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 244.42795357710565,
+                "mll_breached": false,
+                "net_pnl_usd": -1720.389515692128,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 647.8038423118269,
+                "mll_breached": false,
+                "net_pnl_usd": -1140.0730759119979,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 154.9230740346684,
+                "mll_breached": false,
+                "net_pnl_usd": -1010.5379735935494,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ]
+          },
+          "full_coverage_start_count": 3,
+          "horizon_trading_days": 20,
+          "normal": {
+            "accepted_event_count": 87,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 0.0,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_0a569f580a2540474116636c": -2469.7391004035917,
+              "hazard_16f0da561bc98f2eb7d2efc4": -2035.6545583161214
+            },
+            "consistency_rate": 1.0,
+            "data_censored_count": 2,
+            "episode_count": 3,
+            "full_coverage_start_count": 3,
+            "maximum_mini_equivalent_max": 1.8,
+            "maximum_mini_equivalent_mean": 1.7666666666666666,
+            "maximum_net_directional_exposure_max": 1.8,
+            "maximum_net_directional_exposure_mean": 1.7666666666666666,
+            "maximum_positive_session_day_aggregate_share": 0.4053814967319858,
+            "mean_daily_contract_utilization": 0.04833333333333334,
+            "mean_daily_maximum_mini_equivalent": 0.7250000000000001,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 153.7304689641387,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -1532.6199622769636,
+            "net_total": -4505.393658719673,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 1913.8470287619575,
+            "requested_start_count": 5,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 31,
+            "target_progress_median": -0.5108733207589878,
+            "target_progress_p25": -0.5437950131422913,
+            "target_progress_p75": -0.4625405903571481,
+            "terminal_distribution": {
+              "TIMEOUT": 3
+            }
+          },
+          "requested_start_count": 5,
+          "stressed": {
+            "accepted_event_count": 85,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 0.0,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_0a569f580a2540474116636c": -2077.7051031482843,
+              "hazard_16f0da561bc98f2eb7d2efc4": -1793.2954620494268
+            },
+            "consistency_rate": 1.0,
+            "data_censored_count": 2,
+            "episode_count": 3,
+            "full_coverage_start_count": 3,
+            "maximum_mini_equivalent_max": 1.8,
+            "maximum_mini_equivalent_mean": 1.7333333333333334,
+            "maximum_net_directional_exposure_max": 1.8,
+            "maximum_net_directional_exposure_mean": 1.7333333333333334,
+            "maximum_positive_session_day_aggregate_share": 0.3506513687680916,
+            "mean_daily_contract_utilization": 0.04911111111111112,
+            "mean_daily_maximum_mini_equivalent": 0.7366666666666668,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 154.9230740346684,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -1140.0730759119979,
+            "net_total": -3871.0005651976753,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 2484.2122621470808,
+            "requested_start_count": 5,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 33,
+            "target_progress_median": -0.38002435863733264,
+            "target_progress_p25": -0.47674376526735435,
+            "target_progress_p75": -0.35843517491759125,
+            "terminal_distribution": {
+              "TIMEOUT": 3
+            }
+          }
+        }
+      ],
+      "component_ids": [
+        "hazard_16f0da561bc98f2eb7d2efc4",
+        "hazard_0a569f580a2540474116636c"
+      ],
+      "concentration": {
+        "NORMAL": {
+          "accepted_event_inventory_hash": "37f2f192d495b370bea625e9dc28e95379ef39b5d57825315f37c9046c9ee463",
+          "cleared": false,
+          "daily_pnl_hash": "1c58155d71bd188032fa19c269e17a43874b34de3ab24cc6a31c8de5f715811b",
+          "denominator": "UNIQUE_NONOVERLAPPING_CONFIRMATION_P5_EPISODES",
+          "episode_count": 20,
+          "maximum_single_day_positive_profit_share": 0.21226426954594743,
+          "maximum_single_sleeve_positive_profit_share": 1.0,
+          "maximum_single_trade_positive_profit_share": 0.07915387309275745,
+          "net_by_sleeve_usd": {
+            "hazard_0a569f580a2540474116636c": -4819.85650013711,
+            "hazard_16f0da561bc98f2eb7d2efc4": -3759.1272641649502
+          },
+          "unique_accepted_trade_count": 156,
+          "unique_day_count": 100
+        },
+        "STRESSED_1_5X": {
+          "accepted_event_inventory_hash": "73768036d6a5ce521dfcfa218d9ddd1e6f664db7398d86c02fa3cd6f5a55ceec",
+          "cleared": false,
+          "daily_pnl_hash": "57dac4f4c0b283236b3f741d37907af9679434dcc36f822ceadaa6c74a005383",
+          "denominator": "UNIQUE_NONOVERLAPPING_CONFIRMATION_P5_EPISODES",
+          "episode_count": 20,
+          "maximum_single_day_positive_profit_share": 0.2003462589413067,
+          "maximum_single_sleeve_positive_profit_share": 1.0,
+          "maximum_single_trade_positive_profit_share": 0.0724824539847702,
+          "net_by_sleeve_usd": {
+            "hazard_0a569f580a2540474116636c": -4738.576871643789,
+            "hazard_16f0da561bc98f2eb7d2efc4": -4141.809438685983
+          },
+          "unique_accepted_trade_count": 152,
+          "unique_day_count": 100
+        }
+      },
+      "evidence_tier": "G_CONFIRMATION_FAILED_BRANCH_CLOSED",
+      "governor_profile_id": "fast_pass_governor_03",
+      "policy_id": "autonomous_marginal_book_b09b8e7b30f90b34737eb724",
+      "policy_spec_hash": "9994d48228cc3e0fc6e9fdab91a5419505035a95368456d1e6283c3a3bf7635e",
+      "recalibration_performed": false,
+      "result_hash": "4491055e0ec44cda2425145c3afca92f7f720749a69b13dcba05c155a8be8e3a",
+      "retuning_performed": false,
+      "tier_c_gate": {
+        "checks": {
+          "full_coverage": true,
+          "matching_horizon_is_frozen_5d": true,
+          "normal_concentration_cleared": false,
+          "normal_mll_controlled": true,
+          "normal_pass_observed": false,
+          "normal_passing_consistency": false,
+          "positive_stressed_economics": false,
+          "stressed_concentration_cleared": false,
+          "stressed_mll_controlled": true,
+          "stressed_pass_observed": false,
+          "stressed_passing_consistency": false
+        },
+        "passed": false,
+        "reason": "TIER_C_GATE_FAILED"
+      },
+      "tier_c_promoted": false
+    },
+    {
+      "behavioral_fingerprint": "4202306a5c17e712e9c73714880e7f94b9f100b8935f72a55e630e0726e58660",
+      "book_or_component_mutated": false,
+      "cells": [
+        {
+          "data_censored_start_count": 2,
+          "episodes": {
+            "NORMAL": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1186.4909684790036,
+                "mll_breached": false,
+                "net_pnl_usd": -652.2527910247809,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1273.0735156299634,
+                "mll_breached": false,
+                "net_pnl_usd": -381.30493211005523,
+                "passed": false,
+                "start_day": 17912,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1101.4825337886577,
+                "mll_breached": false,
+                "net_pnl_usd": -898.5174662113423,
+                "passed": false,
+                "start_day": 17919,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1526.7279658311018,
+                "mll_breached": false,
+                "net_pnl_usd": 430.69065881530696,
+                "passed": false,
+                "start_day": 17926,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1152.8833922556587,
+                "mll_breached": false,
+                "net_pnl_usd": -607.4436812970744,
+                "passed": false,
+                "start_day": 17933,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1388.1569029762468,
+                "mll_breached": false,
+                "net_pnl_usd": 286.352410802996,
+                "passed": false,
+                "start_day": 17940,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1726.135032305734,
+                "mll_breached": false,
+                "net_pnl_usd": 195.1746244602109,
+                "passed": false,
+                "start_day": 17947,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1803.343398626559,
+                "mll_breached": false,
+                "net_pnl_usd": 154.12607212948933,
+                "passed": false,
+                "start_day": 17954,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1523.5967069421677,
+                "mll_breached": false,
+                "net_pnl_usd": -249.53305758029455,
+                "passed": false,
+                "start_day": 17961,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1404.168293050323,
+                "mll_breached": false,
+                "net_pnl_usd": 1127.844579590179,
+                "passed": false,
+                "start_day": 17981,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1452.7302627545869,
+                "mll_breached": false,
+                "net_pnl_usd": -21.668901997712965,
+                "passed": false,
+                "start_day": 17988,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1792.073509190188,
+                "mll_breached": false,
+                "net_pnl_usd": -207.9264908098121,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1437.0118264063494,
+                "mll_breached": false,
+                "net_pnl_usd": -329.6606611946336,
+                "passed": false,
+                "start_day": 18002,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1482.6483183176315,
+                "mll_breached": false,
+                "net_pnl_usd": -329.8362400078331,
+                "passed": false,
+                "start_day": 18010,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1021.7106712042951,
+                "mll_breached": false,
+                "net_pnl_usd": -694.7017276229672,
+                "passed": false,
+                "start_day": 18017,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1130.3895743006433,
+                "mll_breached": false,
+                "net_pnl_usd": -592.3614722741913,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 450.83393634447566,
+                "mll_breached": false,
+                "net_pnl_usd": -1549.1660636555243,
+                "passed": false,
+                "start_day": 18031,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1505.736905836944,
+                "mll_breached": false,
+                "net_pnl_usd": -205.93378216875863,
+                "passed": false,
+                "start_day": 18038,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 977.6874682027919,
+                "mll_breached": false,
+                "net_pnl_usd": -458.615482834306,
+                "passed": false,
+                "start_day": 18045,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1311.7380060594587,
+                "mll_breached": false,
+                "net_pnl_usd": -386.48454895435134,
+                "passed": false,
+                "start_day": 18052,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1043.964928611691,
+                "mll_breached": false,
+                "net_pnl_usd": -789.8553433550042,
+                "passed": false,
+                "start_day": 18059,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ],
+            "STRESSED_1_5X": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1121.1323765510679,
+                "mll_breached": false,
+                "net_pnl_usd": -752.4551329527167,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1245.6432049045907,
+                "mll_breached": false,
+                "net_pnl_usd": -412.4852428354279,
+                "passed": false,
+                "start_day": 17912,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1030.1232372084996,
+                "mll_breached": false,
+                "net_pnl_usd": -969.8767627915004,
+                "passed": false,
+                "start_day": 17919,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1515.4779658311018,
+                "mll_breached": false,
+                "net_pnl_usd": 378.75315881530696,
+                "passed": false,
+                "start_day": 17926,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1113.8833922556587,
+                "mll_breached": false,
+                "net_pnl_usd": -654.3186812970744,
+                "passed": false,
+                "start_day": 17933,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1365.4694029762468,
+                "mll_breached": false,
+                "net_pnl_usd": 237.41491080299602,
+                "passed": false,
+                "start_day": 17940,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1713.103782305734,
+                "mll_breached": false,
+                "net_pnl_usd": 150.9246244602109,
+                "passed": false,
+                "start_day": 17947,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1788.343398626559,
+                "mll_breached": false,
+                "net_pnl_usd": 112.87607212948933,
+                "passed": false,
+                "start_day": 17954,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1474.649206942173,
+                "mll_breached": false,
+                "net_pnl_usd": -329.58042437308904,
+                "passed": false,
+                "start_day": 17961,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1384.8457930503282,
+                "mll_breached": false,
+                "net_pnl_usd": 1026.0083234782796,
+                "passed": false,
+                "start_day": 17981,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1441.6677627545869,
+                "mll_breached": false,
+                "net_pnl_usd": -43.043901997712965,
+                "passed": false,
+                "start_day": 17988,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1784.198509190188,
+                "mll_breached": false,
+                "net_pnl_usd": -215.8014908098121,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1427.1268264063547,
+                "mll_breached": false,
+                "net_pnl_usd": -376.1207268018625,
+                "passed": false,
+                "start_day": 18002,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1457.7802001474556,
+                "mll_breached": false,
+                "net_pnl_usd": -371.03494625951134,
+                "passed": false,
+                "start_day": 18010,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 990.3981712042951,
+                "mll_breached": false,
+                "net_pnl_usd": -753.0142276229672,
+                "passed": false,
+                "start_day": 18017,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1100.8583243006433,
+                "mll_breached": false,
+                "net_pnl_usd": -661.5819387744195,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 407.52143634447566,
+                "mll_breached": false,
+                "net_pnl_usd": -1592.4785636555243,
+                "passed": false,
+                "start_day": 18031,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1484.5356166020283,
+                "mll_breached": false,
+                "net_pnl_usd": -278.529262988508,
+                "passed": false,
+                "start_day": 18038,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 949.8720106957626,
+                "mll_breached": false,
+                "net_pnl_usd": -530.9139555823785,
+                "passed": false,
+                "start_day": 18045,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1306.353006059464,
+                "mll_breached": false,
+                "net_pnl_usd": -459.9320489543461,
+                "passed": false,
+                "start_day": 18052,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1023.7177375654283,
+                "mll_breached": false,
+                "net_pnl_usd": -817.9775344012669,
+                "passed": false,
+                "start_day": 18059,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ]
+          },
+          "full_coverage_start_count": 21,
+          "horizon_trading_days": 5,
+          "normal": {
+            "accepted_event_count": 143,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 3.8604576885689768,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_16f0da561bc98f2eb7d2efc4": -3142.2241033941573,
+              "hazard_367100adab5fe2a69a4f3257": -3018.850193906274
+            },
+            "consistency_rate": 0.7619047619047619,
+            "data_censored_count": 2,
+            "episode_count": 21,
+            "full_coverage_start_count": 21,
+            "maximum_mini_equivalent_max": 2.0999999999999996,
+            "maximum_mini_equivalent_mean": 2.0952380952380953,
+            "maximum_net_directional_exposure_max": 2.0999999999999996,
+            "maximum_net_directional_exposure_mean": 2.0952380952380953,
+            "maximum_positive_session_day_aggregate_share": 0.14185534034443958,
+            "mean_daily_contract_utilization": 0.093015873015873,
+            "mean_daily_maximum_mini_equivalent": 1.395238095238095,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 450.83393634447566,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -329.8362400078331,
+            "net_total": -6161.07429730046,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 7792.80754069982,
+            "requested_start_count": 23,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 0,
+            "target_progress_median": -0.10994541333594438,
+            "target_progress_p25": -0.20248122709902477,
+            "target_progress_p75": -0.007222967332570988,
+            "terminal_distribution": {
+              "TIMEOUT": 21
+            }
+          },
+          "requested_start_count": 23,
+          "stressed": {
+            "accepted_event_count": 143,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 4.57880409553017,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_16f0da561bc98f2eb7d2efc4": -3891.562935064998,
+              "hazard_367100adab5fe2a69a4f3257": -3421.604817346818
+            },
+            "consistency_rate": 0.7619047619047619,
+            "data_censored_count": 2,
+            "episode_count": 21,
+            "full_coverage_start_count": 21,
+            "maximum_mini_equivalent_max": 2.0999999999999996,
+            "maximum_mini_equivalent_mean": 2.085714285714286,
+            "maximum_net_directional_exposure_max": 2.0999999999999996,
+            "maximum_net_directional_exposure_mean": 2.085714285714286,
+            "maximum_positive_session_day_aggregate_share": 0.15169992774429372,
+            "mean_daily_contract_utilization": 0.09206349206349204,
+            "mean_daily_maximum_mini_equivalent": 1.3809523809523807,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 407.52143634447566,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -376.1207268018625,
+            "net_total": -7313.167752411835,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 7165.964955217845,
+            "requested_start_count": 23,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 0,
+            "target_progress_median": -0.12537357560062082,
+            "target_progress_p25": -0.2205273129248065,
+            "target_progress_p75": -0.014347967332570988,
+            "terminal_distribution": {
+              "TIMEOUT": 21
+            }
+          }
+        },
+        {
+          "data_censored_start_count": 1,
+          "episodes": {
+            "NORMAL": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 808.3715821392034,
+                "mll_breached": false,
+                "net_pnl_usd": -886.8587072020964,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 975.5734999496708,
+                "mll_breached": false,
+                "net_pnl_usd": -658.6019518658068,
+                "passed": false,
+                "start_day": 17919,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 807.6864733425537,
+                "mll_breached": false,
+                "net_pnl_usd": -562.2557201987511,
+                "passed": false,
+                "start_day": 17933,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1726.135032305734,
+                "mll_breached": false,
+                "net_pnl_usd": 349.30069658970024,
+                "passed": false,
+                "start_day": 17947,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1249.3002293137179,
+                "mll_breached": false,
+                "net_pnl_usd": 1111.0908818275784,
+                "passed": false,
+                "start_day": 17981,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1287.958673769339,
+                "mll_breached": false,
+                "net_pnl_usd": -506.6821558323354,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 946.5708408937207,
+                "mll_breached": false,
+                "net_pnl_usd": -1036.8597772764551,
+                "passed": false,
+                "start_day": 18010,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 324.6895698790613,
+                "mll_breached": false,
+                "net_pnl_usd": -1675.3104301209387,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 881.02451834557,
+                "mll_breached": false,
+                "net_pnl_usd": -627.9198859286698,
+                "passed": false,
+                "start_day": 18038,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 877.6772161903718,
+                "mll_breached": false,
+                "net_pnl_usd": -1023.9429249772802,
+                "passed": false,
+                "start_day": 18052,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ],
+            "STRESSED_1_5X": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 749.7528268061142,
+                "mll_breached": false,
+                "net_pnl_usd": -1013.0551565676797,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 891.9896511394618,
+                "mll_breached": false,
+                "net_pnl_usd": -791.2551099525226,
+                "passed": false,
+                "start_day": 17919,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 782.9264733425516,
+                "mll_breached": false,
+                "net_pnl_usd": -682.4489879104731,
+                "passed": false,
+                "start_day": 17933,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1713.103782305734,
+                "mll_breached": false,
+                "net_pnl_usd": 263.80069658970024,
+                "passed": false,
+                "start_day": 17947,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": false,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1209.9539732018166,
+                "mll_breached": false,
+                "net_pnl_usd": 981.1963323551463,
+                "passed": false,
+                "start_day": 17981,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 1272.073673769337,
+                "mll_breached": false,
+                "net_pnl_usd": -557.0797214395643,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 917.2761528844349,
+                "mll_breached": false,
+                "net_pnl_usd": -1082.7238471155651,
+                "passed": false,
+                "start_day": 18010,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 305.6342682050672,
+                "mll_breached": false,
+                "net_pnl_usd": -1694.3657317949328,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 817.2335544361849,
+                "mll_breached": false,
+                "net_pnl_usd": -735.331586930799,
+                "passed": false,
+                "start_day": 18038,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 816.7829178927204,
+                "mll_breached": false,
+                "net_pnl_usd": -1103.2122232749316,
+                "passed": false,
+                "start_day": 18052,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ]
+          },
+          "full_coverage_start_count": 10,
+          "horizon_trading_days": 10,
+          "normal": {
+            "accepted_event_count": 136,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 0.9336518110344627,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_16f0da561bc98f2eb7d2efc4": -2838.7691005074666,
+              "hazard_367100adab5fe2a69a4f3257": -2679.2708744775778
+            },
+            "consistency_rate": 0.8,
+            "data_censored_count": 1,
+            "episode_count": 10,
+            "full_coverage_start_count": 10,
+            "maximum_mini_equivalent_max": 2.0999999999999996,
+            "maximum_mini_equivalent_mean": 2.1,
+            "maximum_net_directional_exposure_max": 2.0999999999999996,
+            "maximum_net_directional_exposure_mean": 2.1,
+            "maximum_positive_session_day_aggregate_share": 0.15987434323094163,
+            "mean_daily_contract_utilization": 0.08333333333333331,
+            "mean_daily_maximum_mini_equivalent": 1.2499999999999998,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 324.6895698790613,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -643.2609188972383,
+            "net_total": -5518.039974985055,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 6488.670996719546,
+            "requested_start_count": 11,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 0,
+            "target_progress_median": -0.21442030629907943,
+            "target_progress_p25": -0.3298906235111614,
+            "target_progress_p75": -0.17352518230797978,
+            "terminal_distribution": {
+              "TIMEOUT": 10
+            }
+          },
+          "requested_start_count": 11,
+          "stressed": {
+            "accepted_event_count": 136,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 1.0262951265065592,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_16f0da561bc98f2eb7d2efc4": -3480.3520804737645,
+              "hazard_367100adab5fe2a69a4f3257": -2934.123255567879
+            },
+            "consistency_rate": 0.8,
+            "data_censored_count": 1,
+            "episode_count": 10,
+            "full_coverage_start_count": 10,
+            "maximum_mini_equivalent_max": 2.0999999999999996,
+            "maximum_mini_equivalent_mean": 2.0799999999999996,
+            "maximum_net_directional_exposure_max": 2.0999999999999996,
+            "maximum_net_directional_exposure_mean": 2.0799999999999996,
+            "maximum_positive_session_day_aggregate_share": 0.17475687594322464,
+            "mean_daily_contract_utilization": 0.08093333333333333,
+            "mean_daily_maximum_mini_equivalent": 1.214,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 305.6342682050672,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -763.2933484416608,
+            "net_total": -6414.475336041622,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 5762.274065653084,
+            "requested_start_count": 11,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 0,
+            "target_progress_median": -0.25443111614722025,
+            "target_progress_p25": -0.3551022248261979,
+            "target_progress_p75": -0.1961406793524305,
+            "terminal_distribution": {
+              "TIMEOUT": 10
+            }
+          }
+        },
+        {
+          "data_censored_start_count": 1,
+          "episodes": {
+            "NORMAL": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 507.8351999998704,
+                "mll_breached": false,
+                "net_pnl_usd": -1241.28094004991,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 807.6864733425537,
+                "mll_breached": false,
+                "net_pnl_usd": -368.32005300803576,
+                "passed": false,
+                "start_day": 17933,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 701.0942415985846,
+                "mll_breached": false,
+                "net_pnl_usd": -1298.9057584014154,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 167.07175509224908,
+                "mll_breached": false,
+                "net_pnl_usd": -1760.286791670609,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ],
+            "STRESSED_1_5X": [
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 423.71675180063176,
+                "mll_breached": false,
+                "net_pnl_usd": -1351.6493882491486,
+                "passed": false,
+                "start_day": 17905,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 782.9264733425516,
+                "mll_breached": false,
+                "net_pnl_usd": -563.1689400349278,
+                "passed": false,
+                "start_day": 17933,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 666.5588514721385,
+                "mll_breached": false,
+                "net_pnl_usd": -1333.4411485278615,
+                "passed": false,
+                "start_day": 17995,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              },
+              {
+                "consistency_ok": true,
+                "days_to_target": null,
+                "minimum_mll_buffer_usd": 165.84537702289526,
+                "mll_breached": false,
+                "net_pnl_usd": -1765.263169739963,
+                "passed": false,
+                "start_day": 18024,
+                "terminal_status": "maximum_evaluation_duration_reached"
+              }
+            ]
+          },
+          "full_coverage_start_count": 4,
+          "horizon_trading_days": 20,
+          "normal": {
+            "accepted_event_count": 111,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 0.0,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_16f0da561bc98f2eb7d2efc4": -1624.5148597985133,
+              "hazard_367100adab5fe2a69a4f3257": -3044.278683331496
+            },
+            "consistency_rate": 1.0,
+            "data_censored_count": 1,
+            "episode_count": 4,
+            "full_coverage_start_count": 4,
+            "maximum_mini_equivalent_max": 2.0999999999999996,
+            "maximum_mini_equivalent_mean": 2.0999999999999996,
+            "maximum_net_directional_exposure_max": 2.0999999999999996,
+            "maximum_net_directional_exposure_mean": 2.0999999999999996,
+            "maximum_positive_session_day_aggregate_share": 0.23055482070535965,
+            "mean_daily_contract_utilization": 0.05833333333333332,
+            "mean_daily_maximum_mini_equivalent": 0.8749999999999998,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 167.07175509224908,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -1270.0933492256627,
+            "net_total": -4668.79354312997,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 3017.128344226605,
+            "requested_start_count": 5,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 0,
+            "target_progress_median": -0.4233644497418876,
+            "target_progress_p25": -0.4714170055729046,
+            "target_progress_p75": -0.34101357276314714,
+            "terminal_distribution": {
+              "TIMEOUT": 4
+            }
+          },
+          "requested_start_count": 5,
+          "stressed": {
+            "accepted_event_count": 111,
+            "all_passing_paths_consistency_compliant": false,
+            "best_day_concentration_max": 0.0,
+            "block_pass_counts": {},
+            "blocks_with_passes": [],
+            "component_contribution": {
+              "hazard_16f0da561bc98f2eb7d2efc4": -1860.82925164468,
+              "hazard_367100adab5fe2a69a4f3257": -3152.69339490727
+            },
+            "consistency_rate": 1.0,
+            "data_censored_count": 1,
+            "episode_count": 4,
+            "full_coverage_start_count": 4,
+            "maximum_mini_equivalent_max": 2.0999999999999996,
+            "maximum_mini_equivalent_mean": 2.05,
+            "maximum_net_directional_exposure_max": 2.0999999999999996,
+            "maximum_net_directional_exposure_mean": 2.05,
+            "maximum_positive_session_day_aggregate_share": 0.23945831649129362,
+            "mean_daily_contract_utilization": 0.054749999999999986,
+            "mean_daily_maximum_mini_equivalent": 0.8212499999999998,
+            "median_days_to_target": null,
+            "minimum_mll_buffer": 165.84537702289526,
+            "mll_breach_count": 0,
+            "mll_breach_rate": 0.0,
+            "net_median": -1342.545268388505,
+            "net_total": -5013.522646551901,
+            "pass_count": 0,
+            "pass_rate": 0.0,
+            "passing_best_day_concentration_max": 0.0,
+            "passing_consistency_rate": 0.0,
+            "passing_episode_count": 0,
+            "positive_session_day_aggregate_profit_denominator": 2537.618983895855,
+            "requested_start_count": 5,
+            "single_episode_day_observation_domination": false,
+            "single_trade_domination": false,
+            "single_trade_domination_metric_qualification": "LEGACY_FIELD_IS_EPISODE_DAY_OBSERVATION_CONCENTRATION;NOT_TRADE_LEVEL_EVIDENCE",
+            "skipped_event_count": 0,
+            "target_progress_median": -0.447515089462835,
+            "target_progress_p25": -0.48501761120728404,
+            "target_progress_p75": -0.38029103213487603,
+            "terminal_distribution": {
+              "TIMEOUT": 4
+            }
+          }
+        }
+      ],
+      "component_ids": [
+        "hazard_16f0da561bc98f2eb7d2efc4",
+        "hazard_367100adab5fe2a69a4f3257"
+      ],
+      "concentration": {
+        "NORMAL": {
+          "accepted_event_inventory_hash": "e61cd3357acd6f7f20a238f7d5a5588712b555e61721de7e9834b639e2d7dbaa",
+          "cleared": false,
+          "daily_pnl_hash": "1fcff1b4ee1a5a69918065416f5b2eed38591d483823b19ae5a1490479ff90de",
+          "denominator": "UNIQUE_NONOVERLAPPING_CONFIRMATION_P5_EPISODES",
+          "episode_count": 21,
+          "maximum_single_day_positive_profit_share": 0.14185534034443958,
+          "maximum_single_sleeve_positive_profit_share": 1.0,
+          "maximum_single_trade_positive_profit_share": 0.05224024278387964,
+          "net_by_sleeve_usd": {
+            "hazard_16f0da561bc98f2eb7d2efc4": -3142.224103394158,
+            "hazard_367100adab5fe2a69a4f3257": -3018.850193906273
+          },
+          "unique_accepted_trade_count": 143,
+          "unique_day_count": 105
+        },
+        "STRESSED_1_5X": {
+          "accepted_event_inventory_hash": "38bab7441901c6ba6e28dd563da0569f270c8e5affbd846250403a2b73406a52",
+          "cleared": false,
+          "daily_pnl_hash": "f77c4258f3ddeec3451930fae7859fcb8bb3c257fe2248d26be1d6bfa2bfada5",
+          "denominator": "UNIQUE_NONOVERLAPPING_CONFIRMATION_P5_EPISODES",
+          "episode_count": 21,
+          "maximum_single_day_positive_profit_share": 0.15169992774429372,
+          "maximum_single_sleeve_positive_profit_share": 1.0,
+          "maximum_single_trade_positive_profit_share": 0.05383334921957356,
+          "net_by_sleeve_usd": {
+            "hazard_16f0da561bc98f2eb7d2efc4": -3891.562935064999,
+            "hazard_367100adab5fe2a69a4f3257": -3421.604817346817
+          },
+          "unique_accepted_trade_count": 143,
+          "unique_day_count": 105
+        }
+      },
+      "evidence_tier": "G_CONFIRMATION_FAILED_BRANCH_CLOSED",
+      "governor_profile_id": "fast_pass_governor_02",
+      "policy_id": "autonomous_marginal_book_2f3752128ff0fd44a71b2327",
+      "policy_spec_hash": "9ed2dc8291e7f8a8456a8828d2b5db06cd7adefa6703a64990137564bdf4d639",
+      "recalibration_performed": false,
+      "result_hash": "c9554c27ec09c2fdc5f6aba6165633c3a0c1106f7846e8efb7cdfb2b5ae0d963",
+      "retuning_performed": false,
+      "tier_c_gate": {
+        "checks": {
+          "full_coverage": true,
+          "matching_horizon_is_frozen_5d": true,
+          "normal_concentration_cleared": false,
+          "normal_mll_controlled": true,
+          "normal_pass_observed": false,
+          "normal_passing_consistency": false,
+          "positive_stressed_economics": false,
+          "stressed_concentration_cleared": false,
+          "stressed_mll_controlled": true,
+          "stressed_pass_observed": false,
+          "stressed_passing_consistency": false
+        },
+        "passed": false,
+        "reason": "TIER_C_GATE_FAILED"
+      },
+      "tier_c_promoted": false
+    }
+  ],
+  "broker_connections": 0,
+  "calendar": {
+    "first_session_day": 17905,
+    "last_session_day": 18078,
+    "non_overlapping_start_counts": {
+      "10": 11,
+      "20": 5,
+      "5": 23
+    },
+    "period": "2019-01-02:2019-07-01",
+    "post_warmup_session_count": 115,
+    "warmup_complete_sessions": 5
+  },
+  "component_receipts": [
+    {
+      "batch_stream_equal": true,
+      "calibration_hash": "cba2f81f293564e2108e00d2e907161a53a36d66099ed06a99d1b89385337d38",
+      "candidate_fingerprint": "0a569f580a2540474116636c5d85fb129d47c9fefd3f0072be1e5be21d5f6e0b",
+      "candidate_id": "hazard_0a569f580a2540474116636c",
+      "censored_event_count": 1,
+      "completed_event_count": 125,
+      "coverage": {
+        "data_censored_start_counts": {
+          "10": 2,
+          "20": 2,
+          "5": 3
+        },
+        "full_coverage_start_counts": {
+          "10": 9,
+          "20": 3,
+          "5": 20
+        },
+        "headline_denominator_excludes_censored": true
+      },
+      "emitted_intent_count": 126,
+      "fill_policy_hash": "cb491b8b4767fb300aa818531eb6c61e17f6cfec0336805b7c1ea3b018e35a17",
+      "normal_trajectory_hash": "5dee012c76650f190765a1fe2fa6ea5e349d183fe00e4b633317f94786b21b15",
+      "stressed_trajectory_hash": "a93130334979c7d49b22f46b67f52d996576767463cb1b4142c5e45966996423"
+    },
+    {
+      "batch_stream_equal": true,
+      "calibration_hash": "03e3dad5b7a6404b4ca94c4badf75fafec56a464288726a83410d4484232c59a",
+      "candidate_fingerprint": "16f0da561bc98f2eb7d2efc4e2a5534ed2500651f6e15051185f488505478ea0",
+      "candidate_id": "hazard_16f0da561bc98f2eb7d2efc4",
+      "censored_event_count": 0,
+      "completed_event_count": 82,
+      "coverage": {
+        "data_censored_start_counts": {
+          "10": 1,
+          "20": 1,
+          "5": 2
+        },
+        "full_coverage_start_counts": {
+          "10": 10,
+          "20": 4,
+          "5": 21
+        },
+        "headline_denominator_excludes_censored": true
+      },
+      "emitted_intent_count": 82,
+      "fill_policy_hash": "ca5d7ee7df35f353f74d69ccd2ca6cd43cb630ef0d4bef9ae3538e60ae1fa17b",
+      "normal_trajectory_hash": "1d0022a5879e07e942ab7e0da34dc949324b9e57060487a4ddeb79549b9c9ffe",
+      "stressed_trajectory_hash": "206cfa1952e8c06034b22cf7ef120649b580c82d29c722c913445ab48f00d5f4"
+    },
+    {
+      "batch_stream_equal": true,
+      "calibration_hash": "7ec6853a258c98870499399217970799b5ddeaf6cd31c2d8472bc6e0c3d29275",
+      "candidate_fingerprint": "367100adab5fe2a69a4f325731c7cf4393dee54661ae2a3bcfa5d80f0b6f2b08",
+      "candidate_id": "hazard_367100adab5fe2a69a4f3257",
+      "censored_event_count": 0,
+      "completed_event_count": 71,
+      "coverage": {
+        "data_censored_start_counts": {
+          "10": 1,
+          "20": 1,
+          "5": 2
+        },
+        "full_coverage_start_counts": {
+          "10": 10,
+          "20": 4,
+          "5": 21
+        },
+        "headline_denominator_excludes_censored": true
+      },
+      "emitted_intent_count": 71,
+      "fill_policy_hash": "cb491b8b4767fb300aa818531eb6c61e17f6cfec0336805b7c1ea3b018e35a17",
+      "normal_trajectory_hash": "cddc2c71e111414facdd886e27c70e11c11e1a44c37157d40367f227a4ad8a0a",
+      "stressed_trajectory_hash": "8bf56c7a687818198215f65fd7f03c0477a66e9a03b644de0019f3106658b599"
+    }
+  ],
+  "contract_hash": "9389ff104615f83d42c2e3f1636a29813d5cb69adee064c05e18320c4fd29695",
+  "decision": "BOTH_EXACT_CANDIDATE_CONFIRMATION_BRANCHES_CLOSED",
+  "feature_receipt_hash": "b7f1142a0c35f0dea9b9e311f6b38cc58ad06cf3000bfbf0a55135c526ae012c",
+  "orders": 0,
+  "packet_reuse_allowed": false,
+  "q4_access_count_delta": 0,
+  "recalibration_performed": false,
+  "result_hash": "a045f4739db45a6cc990ff653320c64eb7d9565856da32fde4322dfae36ab0d7",
+  "retuning_performed": false,
+  "schema": "hydra_fresh_two_book_confirmation_2019h1_result_v1",
+  "status": "CONFIRMATION_PACKET_CONSUMED_ONCE",
+  "tier_c_policy_ids": []
+}

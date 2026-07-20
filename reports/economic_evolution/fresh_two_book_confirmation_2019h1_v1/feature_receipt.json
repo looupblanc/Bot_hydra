@@ -1,0 +1,284 @@
+{
+  "acquisition_receipt_hash": "228d991f5f041e709e1ef77c46b28977a7bab5bb3ab8291f403c988be513424d",
+  "bundles": {
+    "ES": {
+      "bundle_hash": "a6cb93c4cfae20de3e51734675d4eb970f62763cf7036bd22d6479738d0297d1",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/492bb715f6057b04f818/feature_matrices/06a9bbd0090ddc5eef65b8dd2f7a9c5c0de442414d713104389328ad2a43a24c",
+      "row_count": 158617
+    },
+    "YM": {
+      "bundle_hash": "d9f952231005d7f2dc44a7884796b846d82a9272d16ae81e8102be10489d7c74",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/492bb715f6057b04f818/feature_matrices/ea060c66e7a1db46f7e6d1683a820704564d9bf07058de019d2d7332ff799f9d",
+      "row_count": 158275
+    }
+  },
+  "contract_hash": "9389ff104615f83d42c2e3f1636a29813d5cb69adee064c05e18320c4fd29695",
+  "contract_map_path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/492bb715f6057b04f818/explicit_contract_map.json",
+  "contract_map_sha256": "fcdfd965102e3325dd34c4ed3c28f5b50c546efa365022f8763742dbca88d25b",
+  "data_role": "CONFIRMATION",
+  "decision_markets": [
+    "ES",
+    "YM"
+  ],
+  "map_guard": {
+    "explicit_contract_count": 19,
+    "unmapped_contract_rows_excluded": 0,
+    "unsafe_roll_rows_excluded": 78397
+  },
+  "micro_execution_aliases_are_accounting_only": true,
+  "micro_proxy_feature_reads": 0,
+  "outright_definition_checks": [
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "CLG9",
+      "instrument_id": "303281",
+      "root": "CL"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "CLH9",
+      "instrument_id": "79323",
+      "root": "CL"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "CLJ9",
+      "instrument_id": "97456",
+      "root": "CL"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "CLK9",
+      "instrument_id": "694785",
+      "root": "CL"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "CLM9",
+      "instrument_id": "551735",
+      "root": "CL"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "CLN9",
+      "instrument_id": "117678",
+      "root": "CL"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "CLQ9",
+      "instrument_id": "310036",
+      "root": "CL"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "ESH9",
+      "instrument_id": "18720",
+      "root": "ES"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "ESM9",
+      "instrument_id": "736",
+      "root": "ES"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "ESU9",
+      "instrument_id": "37699",
+      "root": "ES"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "NQH9",
+      "instrument_id": "15657",
+      "root": "NQ"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "NQM9",
+      "instrument_id": "9166",
+      "root": "NQ"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "NQU9",
+      "instrument_id": "36742",
+      "root": "NQ"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "RTYH9",
+      "instrument_id": "18197",
+      "root": "RTY"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "RTYM9",
+      "instrument_id": "1504",
+      "root": "RTY"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "RTYU9",
+      "instrument_id": "36315",
+      "root": "RTY"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "YMH9",
+      "instrument_id": "724380",
+      "root": "YM"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "YMM9",
+      "instrument_id": "579836",
+      "root": "YM"
+    },
+    {
+      "checks": {
+        "asset_equals_root": true,
+        "instrument_class_f": true,
+        "security_type_fut": true,
+        "valid_outright_future_symbol": true
+      },
+      "contract": "YMU9",
+      "instrument_id": "316302",
+      "root": "YM"
+    }
+  ],
+  "q4_access_count_delta": 0,
+  "raw_requested_symbol_count": 10,
+  "rejected_non_outight_record_count": 175369,
+  "result_hash": "b7f1142a0c35f0dea9b9e311f6b38cc58ad06cf3000bfbf0a55135c526ae012c",
+  "roll_map_hash": "92c72e6e47b74819c377014515f45e5c2c6c0968a27fb217ed42584b392a4746",
+  "schema": "hydra_fresh_two_book_confirmation_feature_receipt_v1",
+  "segment_coverage": {
+    "CL": {
+      "first_active_start": "2019-01-02",
+      "gaps": [],
+      "last_active_end": "2019-07-01",
+      "segment_count": 7
+    },
+    "ES": {
+      "first_active_start": "2019-01-02",
+      "gaps": [],
+      "last_active_end": "2019-07-01",
+      "segment_count": 3
+    },
+    "NQ": {
+      "first_active_start": "2019-01-02",
+      "gaps": [],
+      "last_active_end": "2019-07-01",
+      "segment_count": 3
+    },
+    "RTY": {
+      "first_active_start": "2019-01-02",
+      "gaps": [],
+      "last_active_end": "2019-07-01",
+      "segment_count": 3
+    },
+    "YM": {
+      "first_active_start": "2019-01-02",
+      "gaps": [],
+      "last_active_end": "2019-07-01",
+      "segment_count": 3
+    }
+  },
+  "source_path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/492bb715f6057b04f818/normalized_ohlcv.parquet",
+  "source_sha256": "dcf3a2e257faecf36efe73560f9f53723bee5e090ac67b03c7240059465b36bd",
+  "status": "CAUSAL_FEATURE_BUNDLES_READY"
+}
