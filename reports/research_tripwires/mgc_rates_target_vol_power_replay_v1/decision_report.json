@@ -1,0 +1,43 @@
+{
+  "branch_gate": {
+    "checks": {
+      "power": false
+    },
+    "passed": false,
+    "status": "MGC_POWER_REPLAY_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+  },
+  "candidate_id": "volconv_MGC_rates_target_vol_gap_oco_open_v1",
+  "candidate_result": null,
+  "control_power": {
+    "passed": false,
+    "status": "NOT_RUN_BECAUSE_TRIGGER_POWER_FAILED"
+  },
+  "decision": "MGC_POWER_REPLAY_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
+  "event_counts": {},
+  "next_action": "CLOSE_POWER_EXTENSION_WITHOUT_THRESHOLD_RELAXATION",
+  "power_preflight": {
+    "checks": {
+      "DISCOVERY": false,
+      "FINAL_DEVELOPMENT": true,
+      "VALIDATION": true
+    },
+    "count_semantics": "CAUSAL_INDEPENDENT_TRIGGER_UPPER_BOUND_NO_FUTURE_OUTCOME",
+    "event_counts": {
+      "DISCOVERY": 0,
+      "FINAL_DEVELOPMENT": 20,
+      "VALIDATION": 20
+    },
+    "independent_trigger_count": 40,
+    "outcomes_read": 0,
+    "passed": false,
+    "raw_trigger_count": 175,
+    "thresholds": {
+      "DISCOVERY": 60,
+      "FINAL_DEVELOPMENT": 20,
+      "VALIDATION": 12
+    }
+  },
+  "report_hash": "092193cf3e1eb77d0d5daac8a09d2ec25e48c3ade9cd9c6088e2eb673d9eb4ad",
+  "runtime_seconds": 3476.6566287039313,
+  "schema": "hydra_mgc_rates_target_vol_power_replay_report_v1"
+}

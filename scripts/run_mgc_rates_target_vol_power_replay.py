@@ -39,11 +39,19 @@ def main(argv: Sequence[str] | None = None) -> int:
     artifacts = persist_replay_artifacts(
         args.root, result, output_root=args.output
     )
+    candidate_result = result.get("candidate_result")
     print(
         json.dumps(
             {
                 "decision": result["decision"],
-                "candidate_id": result["candidate_result"]["candidate_id"],
+                # A power preflight can legitimately terminate before outcome
+                # construction.  Preserve that economic verdict instead of
+                # turning the CLI summary into a false runtime failure.
+                "candidate_id": (
+                    candidate_result.get("candidate_id")
+                    if isinstance(candidate_result, dict)
+                    else None
+                ),
                 "power_preflight": result["power_preflight"],
                 "control_power": result["control_power"],
                 "branch_gate": result["branch_gate"],
@@ -58,4 +66,3 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

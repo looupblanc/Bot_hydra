@@ -1,0 +1,19 @@
+{
+  "broker_connections": 0,
+  "candidate_fingerprint": "5a4c4cfa065ce3322f4acf0ef0e286b9b672d4d46d1bd7a0fc55df57a828816f",
+  "candidate_id": "volconv_MGC_rates_target_vol_gap_oco_open_v1",
+  "incremental_data_spend_usd": 0.0,
+  "orders": 0,
+  "promotion_status": null,
+  "q4_access_count_delta": 0,
+  "receipt_hash": "5a6a9067022a35ce46490f415f224e80594e51069e09038204070e3ceac0cafc",
+  "report_hash": "092193cf3e1eb77d0d5daac8a09d2ec25e48c3ade9cd9c6088e2eb673d9eb4ad",
+  "report_path": "reports/research_tripwires/mgc_rates_target_vol_power_replay_v1/decision_report.json",
+  "report_sha256": "c5795583d4bd8725d9f669843c4df50162a42047ab41594f4350d9302fa1d2c4",
+  "result_hash": "c46b445eba27c3b8a4c01eafe4a21a4ff99eadafe1ba302c0abe86929f8f3107",
+  "result_path": "reports/research_tripwires/mgc_rates_target_vol_power_replay_v1/economic_result.json",
+  "result_sha256": "7844b696fc7c3d35d1862c586937250a5592f04287ee2416c9f543b266c09cb0",
+  "schema": "hydra_mgc_rates_target_vol_power_replay_evidence_receipt_v1",
+  "tier_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+  "xfa_status": null
+}
