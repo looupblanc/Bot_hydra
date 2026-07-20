@@ -1,0 +1,161 @@
+{
+  "schema": "hydra_cftc_grain_positioning_crowding_manifest_v1",
+  "branch_id": "CFTC_GRAIN_POSITIONING_CROWDING_TRIPWIRE_V1",
+  "created_at_utc": "2026-07-20T18:10:00Z",
+  "decision_card": {
+    "hypothesis": "Weekly disaggregated CFTC positioning, made available only after publication, identifies crowded grain states in which causal opening-price confirmation or unwind produces executable intraday edge and materially different information from prior price-only and USDA-release branches.",
+    "strongest_argument_against": "The report is delayed, low-frequency and widely observed; any signal may be too stale or too sparse to cover grain transaction costs or contribute meaningful Combine target velocity.",
+    "smallest_decisive_experiment": "Forty-eight frozen COT-conditioned intraday policies across ZC, ZS and ZW, selected on 2018-2021 and replayed unchanged on 2022 validation; 2023 through pre-Q4 2024 remains final-development and is evaluated only after the validation gate.",
+    "expected_runtime_minutes": [10, 30],
+    "expected_data_cost_usd": 0.0,
+    "expected_information_gain": 0.94,
+    "expected_economic_upside": 0.66,
+    "implementation_cost": 0.18,
+    "overfitting_risk": 0.21,
+    "deployment_risk": 0.08,
+    "next_materially_distinct_alternative": "SOYBEAN_CRUSH_STRUCTURAL_VALUE_ROUTER using ZS plus targeted ZM/ZL; frozen official estimate approximately USD 5.8904 before any purchase."
+  },
+  "novelty_audit": {
+    "registry_and_cemetery_query_terms": ["CFTC", "COT", "COMMITMENTS_OF_TRADERS", "MANAGED_MONEY", "PRODUCER_MERCHANT_CROWDING"],
+    "matching_prior_strategy_or_tombstone_count": 0,
+    "distinct_from": [
+      "USDA_GRAIN_INFORMATION_SHOCK",
+      "CBOT_GRAIN_SPLIT_SESSION_INVENTORY_TRANSFER",
+      "OHLCV_GENERIC_GRAMMAR",
+      "MICROSTRUCTURE_ORDER_FLOW",
+      "TERM_STRUCTURE"
+    ]
+  },
+  "cftc_data_contract": {
+    "publisher": "U.S. Commodity Futures Trading Commission",
+    "dataset_id": "rxbv-e226",
+    "dataset_name": "Disaggregated_All",
+    "endpoint": "https://publicreporting.cftc.gov/resource/rxbv-e226.csv",
+    "futonly_or_combined": "FutOnly",
+    "contract_market_codes": {
+      "ZW": "001602",
+      "ZC": "002602",
+      "ZS": "005602"
+    },
+    "start": "2018-01-02",
+    "end_inclusive": "2024-09-24",
+    "selected_fields": [
+      "id",
+      "market_and_exchange_names",
+      "contract_market_name",
+      "report_date_as_yyyy_mm_dd",
+      "cftc_contract_market_code",
+      "futonly_or_combined",
+      "open_interest_all",
+      "prod_merc_positions_long",
+      "prod_merc_positions_short",
+      "swap_positions_long_all",
+      "swap__positions_short_all",
+      "m_money_positions_long_all",
+      "m_money_positions_short_all",
+      "m_money_positions_spread"
+    ],
+    "expected_rows_per_market": 352,
+    "expected_total_rows": 1056,
+    "actual_spend_usd": 0.0,
+    "q4_2024_access": false
+  },
+  "publication_causality": {
+    "official_usual_release": "FRIDAY_15_30_AMERICA_NEW_YORK_FOR_PRIOR_TUESDAY_POSITIONS",
+    "conservative_actionable_time": "REPORT_DATE_PLUS_8_CALENDAR_DAYS_AT_08_30_AMERICA_CHICAGO",
+    "reason": "One-week-plus-one-day delay remains causal under ordinary one/two-day holiday delays.",
+    "excluded_disrupted_report_dates": {
+      "start": "2018-12-18",
+      "end_inclusive": "2019-03-05",
+      "reason": "2018-2019 federal shutdown publication backlog; exact historical release timestamps are unavailable."
+    },
+    "available_at_must_be_lte_decision_time": true,
+    "future_label_eligibility": false
+  },
+  "frozen_price_input": {
+    "receipt_path": "reports/data_access/usda_grain_information_shock_acquisition_receipt.json",
+    "ohlcv_path": "data/cache/databento/usda_grain_information_shock/781c6f4bd33b1a4ea984/raw_ohlcv.dbn.zst",
+    "ohlcv_sha256": "d822920c55888bce1750c60c880e5539f5570c09be3fd998b7b8e4a1da1bb3ca",
+    "definition_path": "data/cache/databento/usda_grain_information_shock/781c6f4bd33b1a4ea984/raw_definition.dbn.zst",
+    "definition_sha256": "5d7a3528a91fa48840a58093c0e7bcade598278bcd523d57c3065e93c1f1e3de",
+    "symbols": ["ZC.c.0", "ZS.c.0", "ZW.c.0"],
+    "schema": "ohlcv-1m",
+    "q4_2024_access": false
+  },
+  "chronological_roles": [
+    {"role": "DISCOVERY", "start": "2018-01-02", "end": "2022-01-01", "candidate_modification_allowed": true},
+    {"role": "VALIDATION", "start": "2022-01-01", "end": "2023-01-01", "candidate_modification_allowed": false},
+    {"role": "FINAL_DEVELOPMENT", "start": "2023-01-01", "end": "2024-10-01", "candidate_modification_allowed": false}
+  ],
+  "candidate_lattice": {
+    "markets": ["ZC", "ZS", "ZW"],
+    "mechanisms": [
+      "CROWDING_CONTINUATION",
+      "CROWDING_UNWIND",
+      "PRODUCER_MANAGED_DIVERGENCE",
+      "POSITION_CHANGE_MOMENTUM"
+    ],
+    "extreme_percentiles": [0.8, 0.9],
+    "target_stop_multiples": [1.5, 2.0],
+    "proposal_count": 48,
+    "position_normalization": "NET_POSITION_DIVIDED_BY_OPEN_INTEREST",
+    "rolling_position_history_reports": 52,
+    "minimum_position_history_reports": 26,
+    "opening_range_local": ["08:30", "08:44"],
+    "decision_time_local": "08:45",
+    "entry": "FIRST_TRADABLE_BAR_OPEN_STRICTLY_AFTER_DECISION",
+    "price_confirmation": "COMPLETED_OPENING_RANGE_DISPLACEMENT_AGREES_WITH_FROZEN_COT_DIRECTION",
+    "stop": "ONE_COMPLETED_OPENING_RANGE_FROM_ENTRY_WITH_MINIMUM_FOUR_TICKS",
+    "exit": "FIRST_CAUSAL_STOP_TARGET_OR_13_20_CHICAGO_SESSION_FLATTEN",
+    "maximum_one_position_per_MARKET_session": true,
+    "contracts": 1
+  },
+  "execution": {
+    "fill_model": "NEXT_TRADABLE_1M_OPEN_AFTER_DECISION_V1",
+    "normal_round_turn_fees_usd": {"ZC": 5.28, "ZS": 5.28, "ZW": 5.28},
+    "normal_extra_slippage_ticks_per_side": 0,
+    "stressed_extra_slippage_ticks_per_side": 1,
+    "same_bar_stop_target": "STOP_FIRST",
+    "session_timezone": "America/Chicago",
+    "mandatory_flatten_local": "13:20",
+    "overnight_positions": false,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "selection_gate": {
+    "selection_on_discovery_only": true,
+    "maximum_selected_specs": 8,
+    "maximum_one_selected_per_market_mechanism": true,
+    "minimum_discovery_events": 80,
+    "minimum_validation_events": 30,
+    "validation_stressed_net_usd_minimum_exclusive": 0,
+    "minimum_validation_stressed_edge_to_cost_ratio": 1.25,
+    "maximum_single_trade_or_day_positive_profit_share": 0.25,
+    "required_controls": ["DIRECTION_FLIP", "ONE_COT_PUBLICATION_LAG", "PRICE_ONLY_OPENING_DISPLACEMENT", "SESSION_TIME_SHIFT"],
+    "final_development_before_validation_gate": false,
+    "account_replay_before_final_event_gate": false
+  },
+  "account_contract": {
+    "account_sizes_after_final_event_gate": ["50K", "100K", "150K"],
+    "account_replay_status": "BLOCKED_UNTIL_FINAL_DEVELOPMENT_EVENT_GATE",
+    "xfa_status": "BLOCKED_UNTIL_CLEAN_COMBINE_SURVIVORS"
+  },
+  "official_sources": [
+    "https://www.cftc.gov/MarketReports/CommitmentsofTraders/HistoricalCompressed/index.htm",
+    "https://www.cftc.gov/MarketReports/CommitmentsofTraders/ReleaseSchedule/index.htm",
+    "https://publicreportinghub.cftc.gov/Commitments-of-Traders/Disaggregated_All/rxbv-e226",
+    "https://help.topstep.com/en/articles/8284206-when-and-what-products-can-i-trade",
+    "https://help.topstep.com/en/articles/8284213-topstepx-commissions-and-fees"
+  ],
+  "governance": {
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "single_authoritative_writer": true,
+    "no_broker": true,
+    "no_orders": true,
+    "no_live_trading": true,
+    "no_q4_access": true,
+    "new_databento_spend_usd": 0.0
+  },
+  "manifest_hash": "aefda2e615ac6cf22c6144b965cb0ccb283d4511007d39389642edd55ba1c8a0"
+}
