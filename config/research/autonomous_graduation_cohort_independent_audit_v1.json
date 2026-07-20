@@ -1,0 +1,80 @@
+{
+  "schema": "hydra_autonomous_graduation_cohort_independent_audit_protocol_v1",
+  "status": "FROZEN_BEFORE_COHORT_REPLAY",
+  "purpose": "Independent fail-closed authorization guard for the bounded 12-candidate graduation adapter.",
+  "source_bank": {
+    "path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/combine_candidate_bank.json",
+    "wrapper_result_hash": "e86d76b4735fd0cbfad6787e4599cace94c17f1275b57a30d533a6972d16a0c0",
+    "inner_result_hash": "4a91943724ccd691ac67e7c7936e41fe78bcaeb3ac8f80263bd4b3a82dd2b9a2"
+  },
+  "mandatory_exclusions": {
+    "confirmation_failed_tier_g": {
+      "source_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/fresh_confirmation_result.json",
+      "source_result_hash": "f4ebea3fbbdf582066bdad12db737e155db1d8abd3847c0df17dbd0f9b4906bc",
+      "candidate_ids": [
+        "hazard_020ae195ccef8e39b1907e38",
+        "hazard_19327ab34a21d623c654a6cc",
+        "hazard_1f49e74c20f7bad315dd5cee",
+        "hazard_367100adab5fe2a69a4f3257"
+      ]
+    },
+    "final_development_failed_tier_q": {
+      "source_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/tier_q_2026_two_stage/final_development_result.json",
+      "source_result_hash": "ef6c8d474faee39a6c42e66a5006a2cf68e49a3e373cf2cd9c9ac1086b05a561",
+      "candidate_ids": [
+        "hazard_0a569f580a2540474116636c",
+        "hazard_10ffb41856432af08259e32b",
+        "hazard_16a744e747cafb88a7e2c83b",
+        "hazard_16f0da561bc98f2eb7d2efc4",
+        "hazard_2641d5adb7bfee8dca07de2a"
+      ]
+    }
+  },
+  "sealed_economic_role": {
+    "declared_source_kind": "SEALED_CONFIRMATION_PARQUET",
+    "path": "data/cache/databento/tier_q_2026_confirmation/97a80942156d15b9801d/confirmation_2026_sealed.parquet",
+    "declared_sha256": "88ea7ef551e30d1d810b8d4607154d528450cb08b0a3f855d79e36bf62df24c3",
+    "start_inclusive": "2026-05-01",
+    "end_exclusive": "2026-07-19",
+    "new_cohort_role": "FINAL_DEVELOPMENT",
+    "maximum_resulting_evidence_tier": "G_DEVELOPMENT_ONLY",
+    "independent_confirmation_claim_allowed": false,
+    "must_not_be_opened_by_preflight_or_audit": true
+  },
+  "cohort_contract": {
+    "exact_candidate_count": 12,
+    "candidate_ids_unique": true,
+    "candidate_fingerprints_unique": true,
+    "behavioral_fingerprints_unique": true,
+    "source_tier_required": "Q_DEVELOPMENT_ONLY",
+    "compact_evidence_bundle_required": true,
+    "no_status_inheritance": true
+  },
+  "evaluation_contract": {
+    "horizons_trading_days": [5, 10, 20],
+    "start_policy": "NON_OVERLAPPING_WITHIN_EACH_HORIZON_AND_TEMPORAL_BLOCK",
+    "cross_horizon_counts_are_not_independent": true,
+    "headline_denominator": "FULL_COVERAGE_ONLY",
+    "data_censored_excluded_from_pass_rate": true,
+    "normal_and_stressed_decision_identity_required": true,
+    "exact_account_runner": "hydra.account_policy.causal_active_pool_replay.run_causal_shared_account_episode",
+    "exact_mll_required": true,
+    "exact_consistency_required": true,
+    "exact_contract_limits_required": true
+  },
+  "safety_contract": {
+    "q4_access_count_delta": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "data_purchase_count": 0,
+    "retuning_performed": false,
+    "recalibration_performed": false,
+    "xfa_before_exact_combine_pass_allowed": false
+  },
+  "authorization": {
+    "pass_status": "AUTONOMOUS_GRADUATION_COHORT_AUDIT_PASS",
+    "fail_status": "AUTONOMOUS_GRADUATION_COHORT_AUDIT_FAIL_CLOSED",
+    "economic_replay_allowed_only_after_pass": true,
+    "audit_receipt_required": true
+  }
+}
