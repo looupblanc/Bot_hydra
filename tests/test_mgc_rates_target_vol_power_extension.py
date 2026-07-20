@@ -174,6 +174,7 @@ def _definition_frame(*, tn_symbol: str = "TNH6") -> pd.DataFrame:
         [
             {
                 "ts_event": "2015-08-31T00:00:00Z",
+                "ts_recv": "2015-08-31T00:00:00Z",
                 "instrument_id": 101,
                 "raw_symbol": "ZNH6",
                 "instrument_class": "F",
@@ -186,6 +187,7 @@ def _definition_frame(*, tn_symbol: str = "TNH6") -> pd.DataFrame:
             },
             {
                 "ts_event": "2015-08-31T00:00:00Z",
+                "ts_recv": "2015-08-31T00:00:00Z",
                 "instrument_id": 102,
                 "raw_symbol": tn_symbol,
                 "instrument_class": "F",
@@ -198,6 +200,7 @@ def _definition_frame(*, tn_symbol: str = "TNH6") -> pd.DataFrame:
             },
             {
                 "ts_event": "2015-08-31T00:00:00Z",
+                "ts_recv": "2015-08-31T00:00:00Z",
                 "instrument_id": 103,
                 "raw_symbol": "MGCZ5",
                 "instrument_class": "F",
@@ -316,6 +319,56 @@ def test_definition_received_after_first_actual_bar_is_rejected() -> None:
         )
 
 
+def test_definition_requires_a_finite_receive_timestamp() -> None:
+    definitions = _definition_frame().drop(columns=["ts_recv"])
+    with pytest.raises(
+        acquisition.MGCPowerExtensionError,
+        match="definition history lacks columns: .*ts_recv",
+    ):
+        acquisition.build_roll_artifacts(
+            _mappings(),
+            definitions,
+            first_tradable_at_by_instrument={
+                "101": "2015-09-01T22:00:00Z",
+                "102": "2015-09-01T22:00:00Z",
+                "103": "2015-09-01T22:00:00Z",
+            },
+        )
+
+    definitions = _definition_frame()
+    definitions.loc[definitions["asset"] == "MGC", "ts_recv"] = None
+    with pytest.raises(
+        acquisition.MGCPowerExtensionError,
+        match="definition availability is incomplete",
+    ):
+        acquisition.build_roll_artifacts(
+            _mappings(),
+            definitions,
+            first_tradable_at_by_instrument={
+                "101": "2015-09-01T22:00:00Z",
+                "102": "2015-09-01T22:00:00Z",
+                "103": "2015-09-01T22:00:00Z",
+            },
+        )
+
+
+def test_equal_availability_with_different_activation_is_rejected() -> None:
+    definitions = _definition_frame()
+    mgc = definitions[definitions["asset"] == "MGC"].iloc[0].copy()
+    mgc["activation"] = "2015-08-31T00:00:00Z"
+    definitions = pd.concat([definitions, mgc.to_frame().T], ignore_index=True)
+    with pytest.raises(acquisition.MGCPowerExtensionError, match="ambiguous definition"):
+        acquisition.build_roll_artifacts(
+            _mappings(),
+            definitions,
+            first_tradable_at_by_instrument={
+                "101": "2015-09-01T22:00:00Z",
+                "102": "2015-09-01T22:00:00Z",
+                "103": "2015-09-01T22:00:00Z",
+            },
+        )
+
+
 def test_first_tradable_header_scan_is_complete_and_interval_bounded() -> None:
     dtype = np.dtype([("instrument_id", "u4"), ("ts_event", "u8")])
     chunks = [
@@ -364,8 +417,9 @@ def test_multi_segment_contract_maps_remain_explicit_and_synchronised() -> None:
     }
     second = pd.DataFrame(
         [
-            {
-                "ts_event": "2017-12-31T00:00:00Z",
+                {
+                    "ts_event": "2017-12-31T00:00:00Z",
+                    "ts_recv": "2017-12-31T00:00:00Z",
                 "instrument_id": 201,
                 "raw_symbol": "ZNH8",
                 "instrument_class": "F",
@@ -376,8 +430,9 @@ def test_multi_segment_contract_maps_remain_explicit_and_synchronised() -> None:
                 "expiration": "2018-03-22T00:00:00Z",
                 "activation": "2017-01-01T00:00:00Z",
             },
-            {
-                "ts_event": "2017-12-31T00:00:00Z",
+                {
+                    "ts_event": "2017-12-31T00:00:00Z",
+                    "ts_recv": "2017-12-31T00:00:00Z",
                 "instrument_id": 202,
                 "raw_symbol": "TNH8",
                 "instrument_class": "F",
@@ -388,8 +443,9 @@ def test_multi_segment_contract_maps_remain_explicit_and_synchronised() -> None:
                 "expiration": "2018-03-22T00:00:00Z",
                 "activation": "2017-01-01T00:00:00Z",
             },
-            {
-                "ts_event": "2017-12-31T00:00:00Z",
+                {
+                    "ts_event": "2017-12-31T00:00:00Z",
+                    "ts_recv": "2017-12-31T00:00:00Z",
                 "instrument_id": 203,
                 "raw_symbol": "MGCZ7",
                 "instrument_class": "F",

@@ -703,6 +703,7 @@ def _resolve_definition(
 ) -> dict[str, Any]:
     required = {
         "ts_event",
+        "ts_recv",
         "instrument_id",
         "raw_symbol",
         "instrument_class",
@@ -711,23 +712,26 @@ def _resolve_definition(
         "min_price_increment",
         "unit_of_measure_qty",
         "expiration",
+        "activation",
     }
     missing = sorted(required - set(frame.columns))
     if missing:
         raise MGCPowerExtensionError(f"definition history lacks columns: {missing}")
     work = frame.copy()
     work["instrument_id_key"] = work["instrument_id"].astype(str)
-    work["ts_event"] = pd.to_datetime(work["ts_event"], utc=True)
-    if "ts_recv" in work.columns:
-        work["ts_recv"] = pd.to_datetime(work["ts_recv"], utc=True)
-    else:
-        work["ts_recv"] = work["ts_event"]
+    work["ts_event"] = pd.to_datetime(work["ts_event"], utc=True, errors="coerce")
+    work["ts_recv"] = pd.to_datetime(work["ts_recv"], utc=True, errors="coerce")
+    instrument_rows = work[work["instrument_id_key"] == str(instrument_id)]
+    if instrument_rows.empty:
+        raise MGCPowerExtensionError(f"definition missing for instrument {instrument_id}")
+    if instrument_rows[["ts_event", "ts_recv"]].isna().any(axis=None):
+        raise MGCPowerExtensionError(
+            f"definition availability is incomplete for instrument {instrument_id}"
+        )
     work["definition_available_at"] = work[["ts_event", "ts_recv"]].max(axis=1)
     rows = work[work["instrument_id_key"] == str(instrument_id)].sort_values(
         "definition_available_at"
     )
-    if rows.empty:
-        raise MGCPowerExtensionError(f"definition missing for instrument {instrument_id}")
     if first_tradable_at is None:
         cutoff = pd.Timestamp(active_start, tz="UTC")
         cutoff_basis = "MAPPING_START_MIDNIGHT"
@@ -754,12 +758,15 @@ def _resolve_definition(
         "min_price_increment",
         "unit_of_measure_qty",
         "expiration",
+        "activation",
     ]
     if len(selected_rows[signature_columns].astype(str).drop_duplicates()) != 1:
         raise MGCPowerExtensionError(
             f"ambiguous definition for instrument {instrument_id} at {selected_available_at}"
         )
-    selected = selected_rows.iloc[-1].to_dict()
+    selected = selected_rows.sort_values(
+        ["ts_event", "ts_recv"], kind="mergesort"
+    ).iloc[-1].to_dict()
     raw_symbol = str(selected.get("raw_symbol") or "").upper()
     if (
         not valid_outright_future_symbol(root, raw_symbol)
@@ -1189,6 +1196,13 @@ def _load_existing_receipt(
         treasury = json.loads(paths["treasury_sync"].read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         raise MGCPowerExtensionError("sealed roll artifact is invalid") from exc
+    rebuilt_mgc_map, rebuilt_treasury = _build_roll_artifacts_from_dbn(
+        paths["raw_definitions"], paths["raw_ohlcv"]
+    )
+    if rebuilt_mgc_map != mgc_map or rebuilt_treasury != treasury:
+        raise MGCPowerExtensionError(
+            "sealed roll artifacts do not reproduce under the causal resolver"
+        )
     mgc_core = dict(mgc_map)
     mgc_hash = str(mgc_core.pop("roll_map_hash", ""))
     treasury_core = dict(treasury)
