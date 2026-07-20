@@ -1,0 +1,70 @@
+{
+  "broker_connections": 0,
+  "bundle_id": "272cb68c78c2111082cb",
+  "completed_at_utc": "2026-07-20T12:51:00.786591+00:00",
+  "cumulative_actual_before_usd": 163.488265362386,
+  "download_status": "DOWNLOADED",
+  "files": [
+    {
+      "kind": "ohlcv-1m",
+      "path": "/root/hydra-bot/data/cache/databento/refinery_products_to_mcl/272cb68c78c2111082cb/raw_ohlcv.dbn.zst",
+      "sha256": "a40db8832fa9ddc8002105ba282c995e176eaabc1dd7188de9c75b0aa4de0f74",
+      "size_bytes": 10981258
+    },
+    {
+      "kind": "definition",
+      "path": "/root/hydra-bot/data/cache/databento/refinery_products_to_mcl/272cb68c78c2111082cb/raw_definition.dbn.zst",
+      "sha256": "91d903428ddd3aede4c4ebe0b04cd69fa727178701af9e9ad93f71e1a01a3c67",
+      "size_bytes": 145733
+    }
+  ],
+  "manifest_hash": "7e770116d790ebb7f00c85f9b0b482c8482895085f42263132d861a638d429c4",
+  "network_requests": {
+    "definition": true,
+    "ohlcv-1m": true
+  },
+  "official_estimates": {
+    "definition": {
+      "billable_size_bytes": 394560,
+      "estimated_cost_usd": 0.00062468648,
+      "record_count": 1096
+    },
+    "ohlcv-1m": {
+      "billable_size_bytes": 37639056,
+      "estimated_cost_usd": 2.453787177801,
+      "record_count": 672126
+    }
+  },
+  "official_total_cost_usd": 2.454411864281,
+  "orders": 0,
+  "projected_actual_usd": 165.942677226667,
+  "q4_access_count_delta": 0,
+  "raw_immutable": true,
+  "receipt_hash": "47bc21e6bd68144a19f0452b94c295f09b9d8036ac010769baf9a4ffa899ec05",
+  "remaining_after_usd": 34.778042696414005,
+  "requests": {
+    "definition": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "definition",
+      "start": "2023-01-03",
+      "stype_in": "continuous",
+      "symbols": [
+        "RB.c.0",
+        "HO.c.0"
+      ]
+    },
+    "ohlcv-1m": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "ohlcv-1m",
+      "start": "2023-01-03",
+      "stype_in": "continuous",
+      "symbols": [
+        "RB.c.0",
+        "HO.c.0"
+      ]
+    }
+  },
+  "schema": "hydra_refinery_products_to_mcl_acquisition_receipt_v1"
+}

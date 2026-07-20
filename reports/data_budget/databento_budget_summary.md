@@ -3,15 +3,13 @@
 - Budget start: 2026-07-10
 - Hard cap USD: 200.72
 - Safety ceiling USD: 200.72
-- Cumulative estimated spend USD: 163.488265
-- Cumulative actual spend USD: 163.488265
-- Remaining hard-cap budget USD: 37.232455
-- Remaining automatic safety budget USD: 37.232455
-- Ledger records: 462
+- Cumulative estimated spend USD: 165.942677
+- Cumulative actual spend USD: 165.942677
+- Remaining hard-cap budget USD: 34.778043
+- Remaining automatic safety budget USD: 34.778043
+- Ledger records: 464
 
 ## Recent Records
-- 2026-07-18T23:23:34.966484+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-07-28T15:29:00Z to 2023-07-28T15:32:00Z estimate=$0.000000 actual=$0.006125 status=DOWNLOADED
-- 2026-07-18T23:23:42.549102+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-07-28T15:43:00Z to 2023-07-28T15:46:00Z estimate=$0.000000 actual=$0.002681 status=DOWNLOADED
 - 2026-07-18T23:23:46.954923+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-07-31T15:58:00Z to 2023-07-31T16:01:00Z estimate=$0.000000 actual=$0.004022 status=DOWNLOADED
 - 2026-07-18T23:23:55.746544+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-07-31T17:13:00Z to 2023-07-31T17:16:00Z estimate=$0.000000 actual=$0.001919 status=DOWNLOADED
 - 2026-07-18T23:24:01.349084+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-08-01T13:43:00Z to 2023-08-01T13:46:00Z estimate=$0.000000 actual=$0.006565 status=DOWNLOADED
@@ -30,3 +28,5 @@
 - 2026-07-20T07:06:13.935043+00:00 GLBX.MDP3 ohlcv-1m+definition ['YM.c.0', 'MYM.c.0', 'ES.c.0'] 2021-01-04 to 2021-07-01 estimate=$1.869054 actual=$1.869054 status=DOWNLOADED
 - 2026-07-20T07:43:18.043803+00:00 GLBX.MDP3 ohlcv-1m+definition ['ES.c.0', 'MES.c.0', 'NQ.c.0', 'MNQ.c.0', 'YM.c.0', 'MYM.c.0', 'RTY.c.0', 'M2K.c.0', 'CL.c.0', 'MCL.c.0'] 2019-01-02 to 2019-07-01 estimate=$3.689934 actual=$3.689934 status=DOWNLOADED
 - 2026-07-20T12:46:34.992387+00:00 GLBX.MDP3 ohlcv-1m+definition ['CL.c.0', 'NQ.c.0', 'ES.c.0'] 2018-01-02 to 2018-07-02 estimate=$1.865795 actual=$1.865795 status=DOWNLOADED
+- 2026-07-20T12:51:00.736646+00:00 GLBX.MDP3 ohlcv-1m ['RB.c.0', 'HO.c.0'] 2023-01-03 to 2024-10-01 estimate=$2.453787 actual=$2.453787 status=DOWNLOADED
+- 2026-07-20T12:51:00.753109+00:00 GLBX.MDP3 definition ['RB.c.0', 'HO.c.0'] 2023-01-03 to 2024-10-01 estimate=$0.000625 actual=$0.000625 status=DOWNLOADED
