@@ -1,0 +1,66 @@
+{
+  "schema": "hydra_risk_corrected_complementarity_graph_manifest_v1",
+  "created_at_utc": "2026-07-20T04:24:00Z",
+  "source_contract": {
+    "candidate_bank_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/combine_candidate_bank.json",
+    "candidate_bank_file_sha256": "3f7c5954397ea0163b6c95b63c8b1529adb69baad2f9661ee2073b84560f3fb3",
+    "candidate_bank_hash": "4a91943724ccd691ac67e7c7936e41fe78bcaeb3ac8f80263bd4b3a82dd2b9a2",
+    "pass_observed_bank_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/combine_pass_observed_bank.json",
+    "pass_observed_bank_file_sha256": "ca30983a912aac98ad0c4d777012f01471436ce3131376cf694725927f68725f",
+    "pass_observed_bank_hash": "b5a2f90f86eb339b2ec86e52372efd0d06f8caa5ece2d60aff1c60d5decf45f7",
+    "marginal_book_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/marginal_books_semantic_reconciliation_composite.json",
+    "marginal_book_file_sha256": "6712c54b995d15630301e82ef202b7c6f2510fba191be1d1b47d51d7bee7bcf4",
+    "tier_g_graduation_path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/tier_g_development_graduation.json",
+    "tier_g_graduation_file_sha256": "a3c7b1b808dea1716bb2077e65072683ffb671f45247d65b9f749dc3c0cafda8",
+    "tier_g_graduation_hash": "d0f879c32f0a60da03b117f98786c01760a2988bcf205b17ae5da0da32982162",
+    "cohort_manifest_path": "config/research/autonomous_graduation_cohort_v1.json",
+    "cohort_manifest_file_sha256": "40434d03cbb3cdabdf929ca3d7d2092bb32215e9e191df17d3409c2651ce0775"
+  },
+  "selection_contract": {
+    "design_blocks": ["B1", "B2"],
+    "held_out_development_blocks": ["B3", "B4"],
+    "minimum_sleeves": 2,
+    "maximum_sleeves": 4,
+    "maximum_components_per_market": 2,
+    "exact_design_proposals_per_size": 6,
+    "held_out_finalist_count": 8,
+    "membership_inputs": [
+      "market",
+      "loss_day_cluster",
+      "account_path_cluster",
+      "B1_B2_design_economics"
+    ],
+    "b3_b4_used_for_membership": false
+  },
+  "governor_contract": {
+    "risk_charge_derivation": "MAX_CAUSAL_DECLARED_STOP_RISK_PER_MINI",
+    "epsilon_charge_forbidden": true,
+    "aggregate_open_risk_fraction": 1.0,
+    "daily_loss_fraction": 0.5,
+    "consistency_guard_fraction": 1.0,
+    "maximum_concurrent_sleeves": 4,
+    "target_protection_distance_fraction": 0.1,
+    "concurrency_scaling": "PROPORTIONAL",
+    "same_instrument_conflict_rule": "PRIORITY",
+    "inactive_sleeves_reserve_risk": false
+  },
+  "development_gate": {
+    "minimum_normal_passes": 3,
+    "minimum_stressed_passes": 2,
+    "minimum_stressed_pass_blocks": 2,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "positive_stressed_net": true,
+    "passing_paths_consistency_compliant": true
+  },
+  "side_effect_contract": {
+    "database_writes": 0,
+    "registry_writes": 0,
+    "service_changes": 0,
+    "q4_access": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "data_purchases": 0,
+    "xfa_paths": 0
+  },
+  "manifest_hash": "d2db03eaf764b4356215c8b960036c214202cfe94021d6eda663f6c455adba89"
+}
