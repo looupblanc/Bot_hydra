@@ -1,0 +1,2442 @@
+{
+  "account_replay_evidence_role": "DIAGNOSTIC_DYNAMIC_RISK_APPROXIMATION_NOT_TIER_Q_ELIGIBLE",
+  "authoritative_mission_writes": 0,
+  "branch_gate": {
+    "passed": false,
+    "status": "V73_RECOVERY_SPEED_FALSIFIED",
+    "tier_e_candidate_ids": [],
+    "tier_g_or_c_claimed": false,
+    "tier_q_candidate_ids": []
+  },
+  "branch_id": "V73_ES_EVENT_EXTREME_RECOVERY_SPEED_REVERSAL",
+  "broker_connections": 0,
+  "candidate_results": [
+    {
+      "candidate_id": "v73_es_event_extreme_recovery_speed_reversal_15m",
+      "complete_causal_evidence_bundle": false,
+      "discovery_frontier_cell_count": 18,
+      "evaluations": {
+        "DISCOVERY": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 2,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 974.3999999999069,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1656.800000000112,
+                "net_total_usd": -3313.600000000224,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.276133333333352,
+                "target_progress_p25": -0.30598333333335115,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 857.2499999999272,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2019.9000000001033,
+                "net_total_usd": -4039.8000000002066,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3366500000000172,
+                "target_progress_p25": -0.3465250000000154,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "total_preregistered_start_count": 2
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 707.5999999998749,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2135.600000000137,
+                "net_total_usd": -2135.600000000137,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.35593333333335614,
+                "target_progress_p25": -0.35593333333335614,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 545.8499999999185,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2349.80000000009,
+                "net_total_usd": -2349.80000000009,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3916333333333484,
+                "target_progress_p25": -0.3916333333333484,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            }
+          },
+          "PRIMARY": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 2,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 994.4999999998836,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1729.9000000001397,
+                "net_total_usd": -3459.8000000002794,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.28831666666669,
+                "target_progress_p25": -0.3003000000000223,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 777.3499999998894,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1972.6000000001368,
+                "net_total_usd": -3945.2000000002736,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.32876666666668947,
+                "target_progress_p25": -0.34018333333335493,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "total_preregistered_start_count": 2
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 737.5999999998166,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2214.300000000192,
+                "net_total_usd": -2214.300000000192,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.369050000000032,
+                "target_progress_p25": -0.369050000000032,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 687.2499999998399,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2270.900000000169,
+                "net_total_usd": -2270.900000000169,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3784833333333615,
+                "target_progress_p25": -0.3784833333333615,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            }
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 2,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1004.799999999901,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1884.3000000001048,
+                "net_total_usd": -3768.6000000002095,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3140500000000175,
+                "target_progress_p25": -0.3172000000000177,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 786.0499999999302,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2102.0000000000946,
+                "net_total_usd": -4204.000000000189,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.35033333333334915,
+                "target_progress_p25": -0.35930000000001444,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "total_preregistered_start_count": 2
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 759.7999999998719,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2045.9000000001397,
+                "net_total_usd": -2045.9000000001397,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3409833333333566,
+                "target_progress_p25": -0.3409833333333566,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 599.6499999999214,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2321.0000000000873,
+                "net_total_usd": -2321.0000000000873,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3868333333333479,
+                "target_progress_p25": -0.3868333333333479,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            }
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "EVENT_REFERENCE": {
+              "comparison_basis": "EXACT_ONE_CONTRACT_EVENT_REFERENCE",
+              "event_count": 29,
+              "normal_expectancy_per_event_usd": 16.45862068965517,
+              "normal_net_total_usd": 477.29999999999995,
+              "stressed_expectancy_per_event_usd": 3.958620689655172,
+              "stressed_net_total_usd": 114.79999999999998
+            }
+          }
+        },
+        "FINAL_DEVELOPMENT": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1026.7999999999302,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1973.2000000000698,
+                "net_total_usd": -1973.2000000000698,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3288666666666783,
+                "target_progress_p25": -0.3288666666666783,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 954.4999999999272,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2045.5000000000728,
+                "net_total_usd": -2045.5000000000728,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3409166666666788,
+                "target_progress_p25": -0.3409166666666788,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "PRIMARY": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1210.7999999998865,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1678.6000000001222,
+                "net_total_usd": -1678.6000000001222,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.27976666666668704,
+                "target_progress_p25": -0.27976666666668704,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1109.9499999998952,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1785.7000000001135,
+                "net_total_usd": -1785.7000000001135,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.29761666666668557,
+                "target_progress_p25": -0.29761666666668557,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 920.4999999999418,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1937.9000000000815,
+                "net_total_usd": -1937.9000000000815,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3229833333333469,
+                "target_progress_p25": -0.3229833333333469,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 871.8499999999476,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2122.70000000007,
+                "net_total_usd": -2122.70000000007,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.353783333333345,
+                "target_progress_p25": -0.353783333333345,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "EVENT_REFERENCE": {
+              "comparison_basis": "EXACT_ONE_CONTRACT_EVENT_REFERENCE",
+              "event_count": 22,
+              "normal_expectancy_per_event_usd": -24.822727272727267,
+              "normal_net_total_usd": -546.0999999999999,
+              "stressed_expectancy_per_event_usd": -37.32272727272727,
+              "stressed_net_total_usd": -821.0999999999999
+            }
+          }
+        },
+        "VALIDATION": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 759.5999999999476,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2167.300000000061,
+                "net_total_usd": -2167.300000000061,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.36121666666667684,
+                "target_progress_p25": -0.36121666666667684,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 735.9499999999534,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2222.2000000000553,
+                "net_total_usd": -2222.2000000000553,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3703666666666759,
+                "target_progress_p25": -0.3703666666666759,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "PRIMARY": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1144.9999999999272,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 80.19999999986612,
+                "net_total_usd": 80.19999999986612,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.013366666666644354,
+                "target_progress_p25": 0.013366666666644354,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 886.5499999999447,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -911.7000000001135,
+                "net_total_usd": -911.7000000001135,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.15195000000001893,
+                "target_progress_p25": -0.15195000000001893,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1218.1999999998225,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1781.8000000001775,
+                "net_total_usd": -1781.8000000001775,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.29696666666669624,
+                "target_progress_p25": -0.29696666666669624,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1158.8999999998632,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1841.1000000001368,
+                "net_total_usd": -1841.1000000001368,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.30685000000002277,
+                "target_progress_p25": -0.30685000000002277,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "EVENT_REFERENCE": {
+              "comparison_basis": "EXACT_ONE_CONTRACT_EVENT_REFERENCE",
+              "event_count": 19,
+              "normal_expectancy_per_event_usd": 202.77894736842106,
+              "normal_net_total_usd": 3852.8,
+              "stressed_expectancy_per_event_usd": 190.27894736842106,
+              "stressed_net_total_usd": 3615.3
+            }
+          }
+        }
+      },
+      "evidence_tier": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+      "frozen_discovery_cell": {
+        "account_label": "100K",
+        "account_size_usd": 100000,
+        "horizon_trading_days": 10,
+        "micro_cap": 10,
+        "risk_fraction": 0.1
+      },
+      "gate": {
+        "checks": {
+          "beats_all_controls": false,
+          "controlled_stressed_mll": true,
+          "full_coverage_denominator_in_each_heldout_role": true,
+          "minimum_combined_normal_passes": false,
+          "minimum_combined_stressed_passes": false,
+          "no_single_trade_domination": true,
+          "nonnegative_stressed_p25": false,
+          "passing_paths_consistency": true,
+          "positive_final_development_context": false,
+          "positive_final_development_stressed_net": false,
+          "positive_validation_context": true,
+          "positive_validation_stressed_net": false
+        },
+        "conservative_unique_normal_pass_lower_bound": 0,
+        "conservative_unique_stressed_pass_lower_bound": 0,
+        "control_beats": {
+          "DIRECTION_FLIP_SAME_EVENTS": true,
+          "SESSION_MATCHED_TIMING_NULL": true,
+          "STATIC_EXTREME_REJECTION_PARENT": false
+        },
+        "control_deltas": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "stressed_net_total_usd": 1570.299999999901,
+            "stressed_pass_count": 0.0,
+            "stressed_target_progress_median": 0.13085833333332508
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "stressed_net_total_usd": 1266.3999999999796,
+            "stressed_pass_count": 0.0,
+            "stressed_target_progress_median": 0.10553333333333165
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "comparison_basis": "EXACT_ONE_CONTRACT_EVENT_EXPECTANCY",
+            "parent_event_count": 41,
+            "primary_event_count": 160,
+            "stressed_expectancy_per_event_usd": -94.29496951219514
+          }
+        },
+        "headline_horizons": {
+          "DISCOVERY": 20,
+          "FINAL_DEVELOPMENT": 10,
+          "VALIDATION": 10
+        },
+        "passed": false,
+        "positive_temporal_contexts": {
+          "FINAL_DEVELOPMENT": 0,
+          "VALIDATION": 1
+        },
+        "single_trade_positive_profit_concentration": {
+          "COMBINED": 0.05469714744381329,
+          "FINAL_DEVELOPMENT": 0.12628365907907815,
+          "VALIDATION": 0.08117426064646187
+        }
+      },
+      "holding_minutes": 15,
+      "independent_confirmation_claimed": false,
+      "tier_g_or_c_claimed": false,
+      "tier_q_claimed": false,
+      "tier_q_eligible": false
+    },
+    {
+      "candidate_id": "v73_es_event_extreme_recovery_speed_reversal_30m",
+      "complete_causal_evidence_bundle": false,
+      "discovery_frontier_cell_count": 18,
+      "evaluations": {
+        "DISCOVERY": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 2,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1357.5249999998923,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1594.8000000001266,
+                "net_total_usd": -3189.600000000253,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.26580000000002113,
+                "target_progress_p25": -0.26967083333335357,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 868.362499999901,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2007.987500000112,
+                "net_total_usd": -4015.975000000224,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.33466458333335203,
+                "target_progress_p25": -0.33854270833335187,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "total_preregistered_start_count": 2
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 731.774999999805,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2174.6000000002095,
+                "net_total_usd": -2174.6000000002095,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.36243333333336825,
+                "target_progress_p25": -0.36243333333336825,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 588.1374999998516,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2259.75000000016,
+                "net_total_usd": -2259.75000000016,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3766250000000267,
+                "target_progress_p25": -0.3766250000000267,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            }
+          },
+          "PRIMARY": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 2,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 828.8749999999127,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1420.775000000096,
+                "net_total_usd": -2841.550000000192,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.23679583333334933,
+                "target_progress_p25": -0.2875604166666829,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 704.3374999999069,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1819.637500000099,
+                "net_total_usd": -3639.275000000198,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.30327291666668316,
+                "target_progress_p25": -0.3323489583333503,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "total_preregistered_start_count": 2
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 648.2249999998894,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1617.75000000016,
+                "net_total_usd": -1617.75000000016,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.2696250000000267,
+                "target_progress_p25": -0.2696250000000267,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 609.437499999869,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2344.0250000001397,
+                "net_total_usd": -2344.0250000001397,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3906708333333566,
+                "target_progress_p25": -0.3906708333333566,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            }
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 2,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 878.8749999999127,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1945.2750000001106,
+                "net_total_usd": -3890.550000000221,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.32421250000001844,
+                "target_progress_p25": -0.3325145833333506,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 2,
+                "full_coverage_episode_count": 2,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 814.1374999999243,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2094.225000000093,
+                "net_total_usd": -4188.450000000186,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.34903750000001554,
+                "target_progress_p25": -0.3533729166666817,
+                "terminal_distribution": {
+                  "TIMEOUT": 2
+                }
+              },
+              "total_preregistered_start_count": 2
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 712.6749999998574,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2133.900000000169,
+                "net_total_usd": -2133.900000000169,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3556500000000281,
+                "target_progress_p25": -0.3556500000000281,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 604.5124999999098,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2311.450000000099,
+                "net_total_usd": -2311.450000000099,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.38524166666668314,
+                "target_progress_p25": -0.38524166666668314,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            }
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "EVENT_REFERENCE": {
+              "comparison_basis": "EXACT_ONE_CONTRACT_EVENT_REFERENCE",
+              "event_count": 29,
+              "normal_expectancy_per_event_usd": 16.45862068965517,
+              "normal_net_total_usd": 477.29999999999995,
+              "stressed_expectancy_per_event_usd": 3.958620689655172,
+              "stressed_net_total_usd": 114.79999999999998
+            }
+          }
+        },
+        "FINAL_DEVELOPMENT": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1263.4249999998865,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1635.3500000001222,
+                "net_total_usd": -1635.3500000001222,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.2725583333333537,
+                "target_progress_p25": -0.2725583333333537,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 812.6124999999302,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2090.8500000000786,
+                "net_total_usd": -2090.8500000000786,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3484750000000131,
+                "target_progress_p25": -0.3484750000000131,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "PRIMARY": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 973.7249999999185,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1910.1000000000931,
+                "net_total_usd": -1910.1000000000931,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3183500000000155,
+                "target_progress_p25": -0.3183500000000155,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 980.6874999999272,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1910.2750000000815,
+                "net_total_usd": -1910.2750000000815,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.31837916666668026,
+                "target_progress_p25": -0.31837916666668026,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 832.324999999968,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1991.7000000000553,
+                "net_total_usd": -1991.7000000000553,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.33195000000000924,
+                "target_progress_p25": -0.33195000000000924,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 691.4874999999593,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2182.750000000058,
+                "net_total_usd": -2182.750000000058,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3637916666666764,
+                "target_progress_p25": -0.3637916666666764,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "EVENT_REFERENCE": {
+              "comparison_basis": "EXACT_ONE_CONTRACT_EVENT_REFERENCE",
+              "event_count": 22,
+              "normal_expectancy_per_event_usd": -24.822727272727267,
+              "normal_net_total_usd": -546.0999999999999,
+              "stressed_expectancy_per_event_usd": -37.32272727272727,
+              "stressed_net_total_usd": -821.0999999999999
+            }
+          }
+        },
+        "VALIDATION": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 670.0749999999534,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2253.7000000000553,
+                "net_total_usd": -2253.7000000000553,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.37561666666667587,
+                "target_progress_p25": -0.37561666666667587,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 656.6874999999563,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -2271.7750000000524,
+                "net_total_usd": -2271.7750000000524,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3786291666666754,
+                "target_progress_p25": -0.3786291666666754,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "PRIMARY": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1269.5749999999534,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 1338.1499999998487,
+                "net_total_usd": 1338.1499999998487,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.22302499999997477,
+                "target_progress_p25": 0.22302499999997477,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1033.3874999999243,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 251.39999999987776,
+                "net_total_usd": 251.39999999987776,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.04189999999997963,
+                "target_progress_p25": 0.04189999999997963,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "10": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 1,
+              "horizon_trading_days": 10,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1720.0249999999069,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1019.2000000001135,
+                "net_total_usd": -1019.2000000001135,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.1698666666666856,
+                "target_progress_p25": -0.1698666666666856,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 1.0,
+                "data_censored_count": 0,
+                "episode_count": 1,
+                "full_coverage_episode_count": 1,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 1179.0999999998749,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": -1820.9000000001251,
+                "net_total_usd": -1820.9000000001251,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": -0.3034833333333542,
+                "target_progress_p25": -0.3034833333333542,
+                "terminal_distribution": {
+                  "TIMEOUT": 1
+                }
+              },
+              "total_preregistered_start_count": 1
+            },
+            "20": {
+              "account_label": "100K",
+              "account_size_usd": 100000,
+              "data_censored_start_count": 0,
+              "full_coverage_start_count": 0,
+              "horizon_trading_days": 20,
+              "market": "ES",
+              "micro_cap": 10,
+              "normal": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "risk_fraction": 0.1,
+              "stressed": {
+                "all_passing_paths_consistency_compliant": false,
+                "consistency_compliance_rate": 0.0,
+                "data_censored_count": 0,
+                "episode_count": 0,
+                "full_coverage_episode_count": 0,
+                "median_days_to_target": null,
+                "minimum_mll_buffer_usd": 0.0,
+                "mll_breach_count": 0,
+                "mll_breach_rate": 0.0,
+                "net_median_usd": 0.0,
+                "net_total_usd": 0.0,
+                "pass_count": 0,
+                "pass_count_by_block": {},
+                "pass_rate": 0.0,
+                "target_progress_median": 0.0,
+                "target_progress_p25": 0.0,
+                "terminal_distribution": {}
+              },
+              "total_preregistered_start_count": 0
+            }
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "EVENT_REFERENCE": {
+              "comparison_basis": "EXACT_ONE_CONTRACT_EVENT_REFERENCE",
+              "event_count": 19,
+              "normal_expectancy_per_event_usd": 202.77894736842106,
+              "normal_net_total_usd": 3852.8,
+              "stressed_expectancy_per_event_usd": 190.27894736842106,
+              "stressed_net_total_usd": 3615.3
+            }
+          }
+        }
+      },
+      "evidence_tier": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+      "frozen_discovery_cell": {
+        "account_label": "100K",
+        "account_size_usd": 100000,
+        "horizon_trading_days": 10,
+        "micro_cap": 10,
+        "risk_fraction": 0.1
+      },
+      "gate": {
+        "checks": {
+          "beats_all_controls": false,
+          "controlled_stressed_mll": true,
+          "full_coverage_denominator_in_each_heldout_role": true,
+          "minimum_combined_normal_passes": false,
+          "minimum_combined_stressed_passes": false,
+          "no_single_trade_domination": true,
+          "nonnegative_stressed_p25": false,
+          "passing_paths_consistency": true,
+          "positive_final_development_context": false,
+          "positive_final_development_stressed_net": false,
+          "positive_validation_context": true,
+          "positive_validation_stressed_net": true
+        },
+        "conservative_unique_normal_pass_lower_bound": 0,
+        "conservative_unique_stressed_pass_lower_bound": 0,
+        "control_beats": {
+          "DIRECTION_FLIP_SAME_EVENTS": true,
+          "SESSION_MATCHED_TIMING_NULL": true,
+          "STATIC_EXTREME_REJECTION_PARENT": false
+        },
+        "control_deltas": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "stressed_net_total_usd": 2703.7499999999272,
+            "stressed_pass_count": 0.0,
+            "stressed_target_progress_median": 0.2253124999999939
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "stressed_net_total_usd": 2344.7749999999796,
+            "stressed_pass_count": 0.0,
+            "stressed_target_progress_median": 0.19539791666666498
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "comparison_basis": "EXACT_ONE_CONTRACT_EVENT_EXPECTANCY",
+            "parent_event_count": 41,
+            "primary_event_count": 151,
+            "stressed_expectancy_per_event_usd": -79.21529235987725
+          }
+        },
+        "headline_horizons": {
+          "DISCOVERY": 20,
+          "FINAL_DEVELOPMENT": 10,
+          "VALIDATION": 10
+        },
+        "passed": false,
+        "positive_temporal_contexts": {
+          "FINAL_DEVELOPMENT": 0,
+          "VALIDATION": 2
+        },
+        "single_trade_positive_profit_concentration": {
+          "COMBINED": 0.05174355029607119,
+          "FINAL_DEVELOPMENT": 0.1224852271189499,
+          "VALIDATION": 0.07603686025980078
+        }
+      },
+      "holding_minutes": 30,
+      "independent_confirmation_claimed": false,
+      "tier_g_or_c_claimed": false,
+      "tier_q_claimed": false,
+      "tier_q_eligible": false
+    }
+  ],
+  "complete_causal_evidence_bundle": false,
+  "coverage": {
+    "DISCOVERY": {
+      "ES": {
+        "data_censored_day_count": 0,
+        "data_censored_days": [],
+        "exact_required_minutes": 400,
+        "full_coverage_day_count": 22,
+        "full_coverage_days": [
+          20230802,
+          20230803,
+          20230804,
+          20230807,
+          20230808,
+          20230809,
+          20230810,
+          20230811,
+          20230814,
+          20230815,
+          20230816,
+          20230817,
+          20230818,
+          20230821,
+          20230822,
+          20230823,
+          20230824,
+          20230825,
+          20230828,
+          20230829,
+          20230830,
+          20230831
+        ],
+        "preregistered_calendar_day_count": 22,
+        "status": "FULL_COVERAGE"
+      }
+    },
+    "FINAL_DEVELOPMENT": {
+      "ES": {
+        "data_censored_day_count": 0,
+        "data_censored_days": [],
+        "exact_required_minutes": 400,
+        "full_coverage_day_count": 11,
+        "full_coverage_days": [
+          20240816,
+          20240819,
+          20240820,
+          20240821,
+          20240822,
+          20240823,
+          20240826,
+          20240827,
+          20240828,
+          20240829,
+          20240830
+        ],
+        "preregistered_calendar_day_count": 11,
+        "status": "FULL_COVERAGE"
+      }
+    },
+    "VALIDATION": {
+      "ES": {
+        "data_censored_day_count": 0,
+        "data_censored_days": [],
+        "exact_required_minutes": 400,
+        "full_coverage_day_count": 10,
+        "full_coverage_days": [
+          20240802,
+          20240805,
+          20240806,
+          20240807,
+          20240808,
+          20240809,
+          20240812,
+          20240813,
+          20240814,
+          20240815
+        ],
+        "preregistered_calendar_day_count": 10,
+        "status": "FULL_COVERAGE"
+      }
+    }
+  },
+  "data_purchase_count": 0,
+  "decision": "V73_RECOVERY_SPEED_FALSIFIED",
+  "event_construction": {
+    "v73_es_event_extreme_recovery_speed_reversal_15m": {
+      "direction_flip_status_counts": {
+        "DIRECTION_FLIP_OVERLAP_SUPPRESSED": 35,
+        "TRADE_CREATED": 290
+      },
+      "event_counts": {
+        "DIRECTION_FLIP_SAME_EVENTS": 255,
+        "PRIMARY": 290,
+        "SESSION_MATCHED_TIMING_NULL": 267,
+        "STATIC_EXTREME_REJECTION_PARENT": 70
+      },
+      "primary_status_counts": {
+        "OVERLAPPING_SIGNAL_SUPPRESSED": 2,
+        "SESSION_FLATTEN_ENTRY_REJECT": 10,
+        "TRADE_CREATED": 290
+      },
+      "signal_count": 302,
+      "static_parent_status_counts": {
+        "TRADE_CREATED": 70
+      },
+      "timing_null_status_counts": {
+        "TIMING_NULL_OVERLAP_SUPPRESSED": 23,
+        "TRADE_CREATED": 290
+      }
+    },
+    "v73_es_event_extreme_recovery_speed_reversal_30m": {
+      "direction_flip_status_counts": {
+        "DIRECTION_FLIP_OVERLAP_SUPPRESSED": 37,
+        "TRADE_CREATED": 277
+      },
+      "event_counts": {
+        "DIRECTION_FLIP_SAME_EVENTS": 240,
+        "PRIMARY": 277,
+        "SESSION_MATCHED_TIMING_NULL": 250,
+        "STATIC_EXTREME_REJECTION_PARENT": 70
+      },
+      "primary_status_counts": {
+        "OVERLAPPING_SIGNAL_SUPPRESSED": 1,
+        "SESSION_FLATTEN_ENTRY_REJECT": 24,
+        "TRADE_CREATED": 277
+      },
+      "signal_count": 302,
+      "static_parent_status_counts": {
+        "TRADE_CREATED": 70
+      },
+      "timing_null_status_counts": {
+        "TIMING_NULL_OVERLAP_SUPPRESSED": 27,
+        "TRADE_CREATED": 277
+      }
+    }
+  },
+  "evidence_role": "VIEWED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
+  "evidence_tier": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+  "incremental_data_spend_usd": 0.0,
+  "independent_confirmation_claimed": false,
+  "next_action": "TOMBSTONE_EXACT_RECOVERY_SPEED_FORMULATION_AND_REALLOCATE_EXPLORATION",
+  "orders": 0,
+  "power_preflight": {
+    "candidates": {
+      "v73_es_event_extreme_recovery_speed_reversal_15m": {
+        "checks": {
+          "DISCOVERY": true,
+          "FINAL_DEVELOPMENT": true,
+          "VALIDATION": true,
+          "role_local_control_power": true
+        },
+        "control_event_counts_by_role": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "DISCOVERY": 114,
+            "FINAL_DEVELOPMENT": 64,
+            "VALIDATION": 77
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "DISCOVERY": 121,
+            "FINAL_DEVELOPMENT": 66,
+            "VALIDATION": 80
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "DISCOVERY": 29,
+            "FINAL_DEVELOPMENT": 22,
+            "VALIDATION": 19
+          }
+        },
+        "control_power": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "DISCOVERY": true,
+            "FINAL_DEVELOPMENT": true,
+            "VALIDATION": true
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "DISCOVERY": true,
+            "FINAL_DEVELOPMENT": true,
+            "VALIDATION": true
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "DISCOVERY": true,
+            "FINAL_DEVELOPMENT": true,
+            "VALIDATION": true
+          }
+        },
+        "primary_event_counts": {
+          "DISCOVERY": 130,
+          "FINAL_DEVELOPMENT": 72,
+          "VALIDATION": 88
+        }
+      },
+      "v73_es_event_extreme_recovery_speed_reversal_30m": {
+        "checks": {
+          "DISCOVERY": true,
+          "FINAL_DEVELOPMENT": true,
+          "VALIDATION": true,
+          "role_local_control_power": true
+        },
+        "control_event_counts_by_role": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "DISCOVERY": 109,
+            "FINAL_DEVELOPMENT": 60,
+            "VALIDATION": 71
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "DISCOVERY": 116,
+            "FINAL_DEVELOPMENT": 61,
+            "VALIDATION": 73
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "DISCOVERY": 29,
+            "FINAL_DEVELOPMENT": 22,
+            "VALIDATION": 19
+          }
+        },
+        "control_power": {
+          "DIRECTION_FLIP_SAME_EVENTS": {
+            "DISCOVERY": true,
+            "FINAL_DEVELOPMENT": true,
+            "VALIDATION": true
+          },
+          "SESSION_MATCHED_TIMING_NULL": {
+            "DISCOVERY": true,
+            "FINAL_DEVELOPMENT": true,
+            "VALIDATION": true
+          },
+          "STATIC_EXTREME_REJECTION_PARENT": {
+            "DISCOVERY": true,
+            "FINAL_DEVELOPMENT": true,
+            "VALIDATION": true
+          }
+        },
+        "primary_event_counts": {
+          "DISCOVERY": 126,
+          "FINAL_DEVELOPMENT": 68,
+          "VALIDATION": 83
+        }
+      }
+    },
+    "passed": true,
+    "thresholds": {
+      "DISCOVERY": 20,
+      "FINAL_DEVELOPMENT": 8,
+      "VALIDATION": 8
+    }
+  },
+  "q4_access_count_delta": 0,
+  "q4_row_count": 0,
+  "result_hash": "29a6ced3bc26af36bce5b013d2f135ecb87e89cf8f454272413b5a0530504bba",
+  "role_calendar_counts": {
+    "DISCOVERY": 22,
+    "FINAL_DEVELOPMENT": 11,
+    "VALIDATION": 10
+  },
+  "schema": "hydra_v73_es_event_extreme_recovery_speed_tripwire_v1",
+  "source_bindings": {
+    "decision_card_hash": "7d1dc6b9f33ac9c121e7780f0105852c5c49adbdbe67d880bd8e82ef96e78375",
+    "decision_card_path": "config/research/v73_es_event_extreme_recovery_speed_reversal_v1.json",
+    "fill_policy_hashes": {
+      "15": "fc693f31a48571e9ff30c80070ccb95c9a7e38c14f500c5aec4f43b117882b08",
+      "30": "5226f5b0ecaa79ddd73c3405ca8e8f1cbe2eefeb0a76c23a83cfc9de4559d123"
+    },
+    "rule_snapshot": {
+      "file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+      "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+      "path": "/root/hydra-bot/config/rulesets/topstep_official_2026-07-19.json",
+      "retrieval_status": "OFFICIAL_CURRENT_SNAPSHOT",
+      "retrieved_at_utc": "2026-07-19T01:04:10Z",
+      "snapshot_id": "topstep_official_2026-07-19T010410Z"
+    },
+    "verified_inputs": {
+      "cost_snapshot": {
+        "byte_count": 9397,
+        "path": "config/v7/phase0_g0_preregistration.json",
+        "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6"
+      },
+      "event_store_integrity_binding": {
+        "byte_count": 41448317,
+        "path": "data/cache/v7_d1/date_matched_event_bars_v1.parquet",
+        "sha256": "ea0208fc3666f912b39e9b21b302a466bd7ee00c802140d6a6beed73098aa4a3"
+      },
+      "feature_manifest": {
+        "byte_count": 3644,
+        "path": "data/manifests/v7_d1_date_matched_event_store_v1.json",
+        "sha256": "5c700f1ec38ab03a1206af7013a28600a681a0b3334781979b37ec356b5421ab"
+      },
+      "minute_print_store": {
+        "byte_count": 2459095,
+        "path": "data/cache/v7_d1/date_matched_minute_print_features_v2.parquet",
+        "sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb"
+      },
+      "rule_snapshot": {
+        "byte_count": 6849,
+        "path": "config/rulesets/topstep_official_2026-07-19.json",
+        "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+      },
+      "static_parent_grammar": {
+        "byte_count": 6080,
+        "path": "WORM/v7-d1-microstructure-grammar-0002-2026-07-12.json",
+        "sha256": "fac0b5166351940d1fde5334bdeaf846d56e56efc8cef9772a9599b8b86feee9"
+      }
+    }
+  },
+  "status": "V73_RECOVERY_SPEED_FALSIFIED",
+  "tier_g_or_c_claimed": false,
+  "tier_q_claimed": false,
+  "tier_q_eligible": false
+}
