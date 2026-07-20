@@ -496,9 +496,9 @@
       "enabled": true,
       "engine": "production_kernel_v1",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "4fa7ae26c259f23880af43b6afd63b16e3d6740a6ec50d37135a1b061bc57409",
+      "manifest_file_sha256": "0754c2ee90bf1d8b80ee684787b2ec934400fc10c037cdeec1bf7fcc9476a5ef",
       "manifest_path": "config/v7/autonomous_economic_discovery_director_0035.json",
-      "manifest_semantic_hash": "7b3502b1028471ef854442c406727aa24c04652ed42717f54f42ad9dce3ed214",
+      "manifest_semantic_hash": "6308849da7fd715e324334da1663e8ec8ce4cd083aa399490b240a9386a64792",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862254,
         "prior_global_N_trials": 762254,
@@ -716,8 +716,8 @@
         "xfa_diagnostic_development_only": true
       },
       "q4_access_allowed": false,
-      "worm_commit": "f7b190b84f0910cc8a0e0d4294772fc0a11d81df",
-      "worm_tag": "worm/autonomous-economic-discovery-director-0035-post-macro-terminal-relay-revision-02-2026-07-19"
+      "worm_commit": "a964e6762da709a6aaad2e2f895ee768ed081efe",
+      "worm_tag": "worm/autonomous-economic-discovery-director-0035-exact-snapshot-resume-revision-03-2026-07-20"
     },
     {
       "broker_or_orders_allowed": false,
@@ -763,7 +763,7 @@
     "q4_access_allowed": false
   },
   "issued_at_utc": "2026-07-19T19:06:58Z",
-  "queue_hash": "d2c279f82e2d2d6f18e814b7264daf91b43087c861f39879b0588cd7f4455232",
+  "queue_hash": "ec2cbfbf5ae6f0763083f4dbda5d8c6bb2089d32287a042e9c1175791902439b",
   "queue_id": "hydra_economic_evolution_production_queue_0052",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
