@@ -1,0 +1,218 @@
+{
+  "schema": "hydra_options_iv_teacher_student_tripwire_manifest_v1",
+  "branch_id": "OPTIONS_IV_TEACHER_STUDENT_TRIPWIRE_V1",
+  "created_at_utc": "2026-07-20T23:21:23Z",
+  "decision_card": {
+    "hypothesis": "Exchange-published option implied-volatility states contain causal regime information that improves the stressed economics of meso-horizon ES/NQ structural opportunities, and at least half of that incremental utility can be distilled into a futures-only L1-deployable student.",
+    "strongest_argument_against": "Twenty sessions may be underpowered, option statistics may be sparse or endogenous to traded contracts, and the useful state may not be reproducible from futures-only deployment inputs.",
+    "smallest_decisive_experiment": "A pre-Q4 twenty-session teacher/student tripwire over twelve frozen ES/NQ overlay specifications, with 12 discovery, 4 validation and 4 final-development sessions, paired ungated controls, and no account promotion.",
+    "expected_runtime_minutes": [30, 90],
+    "expected_information_gain": 0.91,
+    "expected_economic_upside": 0.72,
+    "official_data_cost_usd": 0.517611466349,
+    "implementation_cost": 0.28,
+    "overfitting_risk": 0.43,
+    "deployment_risk": 0.38,
+    "next_materially_distinct_alternative": "A deployable settlement/curve-state branch outside equity-index direction if the teacher has no paired gross increment; do not search neighbouring option thresholds."
+  },
+  "novelty_audit": {
+    "prior_weekly_option_gamma_candidate_count": 2,
+    "prior_weekly_option_gamma_used_actual_option_data": false,
+    "prior_option_surface_or_exchange_iv_branch_count": 0,
+    "representation_status": "MATERIALLY_DISTINCT_TEACHER_REPRESENTATION",
+    "forbidden_resurrection": "weekly_option_gamma_hedge_reversion"
+  },
+  "data_contract": {
+    "dataset": "GLBX.MDP3",
+    "symbols": ["ES.OPT", "NQ.OPT"],
+    "stype_in": "parent",
+    "stype_out": "raw_symbol",
+    "schemas": ["statistics", "definition"],
+    "start": "2024-09-03",
+    "end_exclusive": "2024-10-01",
+    "q4_2024_access": false,
+    "statistics_contract": {
+      "required_stat_type": 14,
+      "meaning": "EXCHANGE_PUBLISHED_IMPLIED_VOLATILITY",
+      "availability_field": "ts_recv",
+      "non_iv_statistics_allowed_in_decision": false
+    },
+    "definition_contract": {
+      "outright_call_put_only": true,
+      "user_defined_instruments_allowed": false,
+      "spreads_allowed": false,
+      "definition_must_be_available_before_observation": true
+    },
+    "official_estimates": {
+      "statistics": {
+        "record_count": 48718,
+        "billable_size_bytes": 3117952,
+        "estimated_cost_usd": 0.435541570187
+      },
+      "definition": {
+        "record_count": 143990,
+        "billable_size_bytes": 51836400,
+        "estimated_cost_usd": 0.082069896162
+      }
+    },
+    "official_total_cost_usd": 0.517611466349,
+    "underlying_cache": {
+      "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-07-01_2024-10-01.dbn.zst",
+      "observed_row_count": 358955,
+      "observed_start": "2024-07-01T00:00:00Z",
+      "observed_end": "2024-09-30T23:59:00Z",
+      "purchase_required": false
+    }
+  },
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "sessions": ["2024-09-03", "2024-09-04", "2024-09-05", "2024-09-06", "2024-09-09", "2024-09-10", "2024-09-11", "2024-09-12", "2024-09-13", "2024-09-16", "2024-09-17", "2024-09-18"],
+      "candidate_modification_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "sessions": ["2024-09-19", "2024-09-20", "2024-09-23", "2024-09-24"],
+      "candidate_modification_allowed": false
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "sessions": ["2024-09-25", "2024-09-26", "2024-09-27", "2024-09-30"],
+      "candidate_modification_allowed": false
+    }
+  ],
+  "causal_contract": {
+    "option_availability": "STATISTIC_TS_RECV_LESS_THAN_OR_EQUAL_TO_DECISION_TIME",
+    "definition_availability": "DEFINITION_TS_RECV_LESS_THAN_OR_EQUAL_TO_OPTION_OBSERVATION",
+    "underlying_features": "ONLY_COMPLETED_FUTURES_1M_BARS_WITH_BAR_END_LESS_THAN_OR_EQUAL_TO_DECISION_TIME",
+    "option_surface_aggregation": "PAST_ONLY_FIVE_MINUTE_SNAPSHOTS_WITH_NO_FORWARD_FILL_ACROSS_SESSION",
+    "entry": "NEXT_TRADABLE_FUTURES_1M_OPEN_STRICTLY_AFTER_DECISION",
+    "exit": "FIRST_CAUSAL_STOP_TARGET_OR_FROZEN_TIME_EXIT_SAME_BAR_STOP_FIRST",
+    "future_label_eligibility": false,
+    "negative_shift_allowed": false,
+    "backfill_allowed": false,
+    "missing_option_state": "ABSTAIN_DATA_UNAVAILABLE",
+    "missing_future_coverage": "CENSORED_FUTURE_COVERAGE"
+  },
+  "teacher_feature_contract": {
+    "status": "TEACHER_ONLY_UNDEPLOYABLE",
+    "features": [
+      "NEAR_TERM_ATM_IV",
+      "ATM_IV_CHANGE_5M",
+      "ATM_IV_CHANGE_15M",
+      "PUT_CALL_IV_SKEW",
+      "PUT_CALL_IV_SKEW_CHANGE_15M",
+      "ES_NQ_ATM_IV_SPREAD",
+      "ES_NQ_ATM_IV_CHANGE_DIVERGENCE"
+    ],
+    "moneyness_absolute_log_maximum": 0.03,
+    "days_to_expiry_minimum": 7,
+    "days_to_expiry_maximum": 45,
+    "minimum_distinct_options_per_snapshot": 4,
+    "maximum_snapshot_age_minutes": 15
+  },
+  "student_contract": {
+    "status": "L1_DEPLOYABLE_ONLY_IF_ECONOMIC_GATE_PASSES",
+    "model": "L2_REGULARIZED_LOGISTIC_REGRESSION",
+    "maximum_feature_count": 8,
+    "features": [
+      "FUTURES_RETURN_5M",
+      "FUTURES_RETURN_15M",
+      "FUTURES_REALIZED_VOL_15M",
+      "FUTURES_REALIZED_VOL_60M",
+      "FUTURES_RANGE_POSITION_30M",
+      "FUTURES_VOLUME_Z_30M",
+      "ES_NQ_RETURN_DIVERGENCE_15M",
+      "SESSION_MINUTE"
+    ],
+    "training_role": "DISCOVERY_ONLY",
+    "threshold_selection_role": "DISCOVERY_ONLY",
+    "validation_and_final_refit_allowed": false,
+    "teacher_feature_at_inference_allowed": false
+  },
+  "candidate_lattice": {
+    "markets": ["ES", "NQ"],
+    "structural_anchors": [
+      "FIFTEEN_MINUTE_DISPLACEMENT_CONTINUATION",
+      "THIRTY_MINUTE_COMPRESSION_BREAKOUT_CONTINUATION"
+    ],
+    "teacher_overlays": [
+      "ATM_IV_EXPANSION_CONFIRMATION",
+      "DIRECTIONAL_IV_SKEW_CONFIRMATION",
+      "CROSS_INDEX_IV_DISLOCATION_ROUTER"
+    ],
+    "proposal_count": 12,
+    "maximum_one_initial_position_per_anchor_episode": true,
+    "minimum_episode_separation_minutes": 15,
+    "holding_minutes_by_anchor": {
+      "FIFTEEN_MINUTE_DISPLACEMENT_CONTINUATION": 30,
+      "THIRTY_MINUTE_COMPRESSION_BREAKOUT_CONTINUATION": 60
+    },
+    "stop_atr_multiple": 1.0,
+    "target_stop_multiple": 1.5,
+    "contracts": 1
+  },
+  "execution": {
+    "instrument": "FRONT_STANDARD_FUTURES_CONTRACT",
+    "fill_model": "NEXT_TRADABLE_1M_OPEN_AFTER_DECISION_V1",
+    "normal_round_turn_fees_usd": {"ES": 5.28, "NQ": 5.28},
+    "normal_extra_slippage_ticks_per_side": 0,
+    "stressed_extra_slippage_ticks_per_side": 1,
+    "same_bar_stop_target": "STOP_FIRST",
+    "mandatory_flatten_local": "15:10",
+    "session_timezone": "America/Chicago",
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "selection_gate": {
+    "minimum_total_independent_opportunities": 40,
+    "minimum_validation_independent_opportunities": 8,
+    "minimum_final_independent_opportunities": 8,
+    "teacher_paired_stressed_uplift_validation_minimum_exclusive": 0,
+    "teacher_paired_stressed_uplift_final_minimum_exclusive": 0,
+    "student_paired_stressed_uplift_validation_minimum_exclusive": 0,
+    "student_paired_stressed_uplift_final_minimum_exclusive": 0,
+    "student_minimum_teacher_uplift_retention_fraction": 0.5,
+    "student_stressed_net_validation_minimum_exclusive": 0,
+    "student_stressed_net_final_minimum_exclusive": 0,
+    "minimum_distinct_anchor_contexts": 2,
+    "maximum_single_trade_or_day_positive_profit_share": 0.25,
+    "required_controls": [
+      "UNGATED_STRUCTURAL_BASELINE",
+      "DIRECTION_FLIP",
+      "DUTY_CYCLE_MATCHED_RANDOM_GATE"
+    ],
+    "teacher_failure_status": "OPTIONS_IV_TEACHER_NO_GROSS_INCREMENT",
+    "student_failure_status": "OPTIONS_IV_DEPLOYMENT_INCOMPATIBLE",
+    "success_status": "OPTIONS_IV_STUDENT_TRIPWIRE_GREEN_TIER_E_ONLY",
+    "tier_q_allowed": false,
+    "combine_replay_allowed": false,
+    "neighbor_threshold_retry_after_failure": false
+  },
+  "official_rule_evidence": {
+    "snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "snapshot_file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f"
+  },
+  "budget": {
+    "authoritative_cumulative_cap_usd": 200.720719923081,
+    "cumulative_actual_before_usd": 191.65788407326198,
+    "remaining_before_usd": 9.062835849819,
+    "official_incremental_estimate_usd": 0.517611466349,
+    "maximum_branch_purchase_usd": 0.7,
+    "projected_remaining_after_usd": 8.54522438347,
+    "purchase_status": "NOT_PURCHASED_AWAITING_FROZEN_MANIFEST"
+  },
+  "governance": {
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "single_authoritative_writer": true,
+    "no_broker": true,
+    "no_orders": true,
+    "no_live_trading": true,
+    "no_q4_access": true,
+    "no_xfa_before_clean_combine_survivors": true,
+    "frozen_manifest_before_purchase": true
+  },
+  "manifest_hash": "723019b5baaca70906a9ec90f87476f200bfc7a406d2be0f8b883f016cca58f4"
+}
