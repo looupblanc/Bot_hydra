@@ -1,0 +1,209 @@
+{
+  "schema": "hydra_soybean_crush_structural_value_router_manifest_v1",
+  "branch_id": "SOYBEAN_CRUSH_STRUCTURAL_VALUE_ROUTER_V1",
+  "created_at_utc": "2026-07-20T18:20:00Z",
+  "decision_card": {
+    "hypothesis": "A causally aligned soybean-crush state can identify which single executable soybean-complex leg is lagging or leading its processing-value relationship, producing more stressed target velocity than that leg's matched price-only baseline.",
+    "strongest_argument_against": "The public crush relationship may already be incorporated synchronously; independently rolling continuous contracts and sparse one-minute prints can create artificial residuals, while the economically hedged 10:11:9 Board Crush is not deployable under the configured Topstep contract caps.",
+    "smallest_decisive_experiment": "Twenty-four frozen single-leg router policies across ZS, ZM and ZL, two relative-value mechanisms, two causal lookbacks and two past-only robust-z thresholds; selection on 2018-2021 discovery, unchanged 2022 validation, and unopened 2023 through pre-Q4-2024 final development only after the validation gate.",
+    "expected_runtime_minutes": [20, 45],
+    "expected_information_gain": 0.8,
+    "expected_economic_upside": 0.6,
+    "data_cost_usd": 5.890399850905,
+    "implementation_cost": 0.24,
+    "overfitting_risk": 0.24,
+    "deployment_risk": 0.45,
+    "next_materially_distinct_alternative": "Options-implied volatility or settlement-curve state after a separate official cost and deployability decision; do not search neighbouring crush thresholds."
+  },
+  "frozen_existing_zs_input": {
+    "receipt_path": "reports/data_access/usda_grain_information_shock_acquisition_receipt.json",
+    "receipt_file_sha256": "3ee18f5d5f8e56b36b2ba99a874afedb4e7e3b85d6f28052ebb260cfae9fc186",
+    "receipt_hash": "81a646377a6307e24abad9fd07035f6a58e19abdb756332b5c547e30dd0071cd",
+    "bundle_id": "781c6f4bd33b1a4ea984",
+    "ohlcv_path": "data/cache/databento/usda_grain_information_shock/781c6f4bd33b1a4ea984/raw_ohlcv.dbn.zst",
+    "ohlcv_sha256": "d822920c55888bce1750c60c880e5539f5570c09be3fd998b7b8e4a1da1bb3ca",
+    "definition_path": "data/cache/databento/usda_grain_information_shock/781c6f4bd33b1a4ea984/raw_definition.dbn.zst",
+    "definition_sha256": "5d7a3528a91fa48840a58093c0e7bcade598278bcd523d57c3065e93c1f1e3de",
+    "filter_symbol": "ZS.c.0",
+    "schema": "ohlcv-1m",
+    "start": "2018-01-02",
+    "end_exclusive": "2024-10-01",
+    "q4_2024_access": false
+  },
+  "new_data_contract": {
+    "dataset": "GLBX.MDP3",
+    "symbols": ["ZM.c.0", "ZL.c.0"],
+    "stype_in": "continuous",
+    "stype_out": "instrument_id",
+    "schemas": ["ohlcv-1m", "definition"],
+    "start": "2018-01-02",
+    "end_exclusive": "2024-10-01",
+    "q4_2024_access": false,
+    "official_estimates": {
+      "ohlcv-1m": {
+        "record_count": 1612801,
+        "billable_size_bytes": 90316856,
+        "estimated_cost_usd": 5.887988880277
+      },
+      "definition": {
+        "record_count": 4230,
+        "billable_size_bytes": 1522800,
+        "estimated_cost_usd": 0.002410970628
+      }
+    },
+    "official_total_cost_usd": 5.890399850905,
+    "symbology_policy": {
+      "resolve_before_download": true,
+      "half_open_complete_coverage_required": true,
+      "gap_or_overlap_allowed": false,
+      "persist_mapping_and_hash": true
+    }
+  },
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "start": "2018-01-02",
+      "end": "2022-01-01",
+      "candidate_modification_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "start": "2022-01-01",
+      "end": "2023-01-01",
+      "candidate_modification_allowed": false
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "start": "2023-01-01",
+      "end": "2024-10-01",
+      "candidate_modification_allowed": false
+    }
+  ],
+  "economic_relationship": {
+    "official_formula": "GROSS_PROCESSING_MARGIN_USD_PER_BUSHEL=0.022*ZM_USD_PER_SHORT_TON+0.11*ZL_CENTS_PER_POUND-ZS_USD_PER_BUSHEL",
+    "dbn_zs_conversion": "ZS_CENTS_PER_BUSHEL_DIVIDED_BY_100",
+    "full_board_crush_ratio": {"ZS": 10, "ZM": 11, "ZL": 9},
+    "full_board_crush_contract_count": 30,
+    "full_board_crush_status": "NON_DEPLOYABLE_DIAGNOSTIC_UPPER_BOUND_ONLY",
+    "one_to_one_to_one_status": "APPROXIMATE_UNWEIGHTED_DIAGNOSTIC_ONLY",
+    "production_policy": "EXECUTE_EXACTLY_ONE_ROUTED_LEG_PER_OPPORTUNITY"
+  },
+  "contract_alignment": {
+    "map_every_bar_to_explicit_raw_contract": true,
+    "valid_processing_month_triplets": [
+      {"processing_month": "JAN", "ZS_month": "JAN", "ZM_month": "JAN", "ZL_month": "JAN"},
+      {"processing_month": "MAR", "ZS_month": "MAR", "ZM_month": "MAR", "ZL_month": "MAR"},
+      {"processing_month": "MAY", "ZS_month": "MAY", "ZM_month": "MAY", "ZL_month": "MAY"},
+      {"processing_month": "JUL", "ZS_month": "JUL", "ZM_month": "JUL", "ZL_month": "JUL"},
+      {"processing_month": "AUG", "ZS_month": "AUG", "ZM_month": "AUG", "ZL_month": "AUG"},
+      {"processing_month": "SEP", "ZS_month": "SEP", "ZM_month": "SEP", "ZL_month": "SEP"},
+      {"processing_month": "OCT", "ZS_month": "NOV", "ZM_month": "OCT", "ZL_month": "OCT"},
+      {"processing_month": "DEC", "ZS_month": "NOV", "ZM_month": "DEC", "ZL_month": "DEC"}
+    ],
+    "unsupported_triplet_action": "EXCLUDE_FAIL_CLOSED",
+    "roll_guard_true_sessions_each_side": 1,
+    "maximum_instruments_per_leg_per_retained_session": 1,
+    "stable_triplet_required_through_feature_and_holding_window": true
+  },
+  "causal_contract": {
+    "feature_input": "COMPLETED_OHLCV_1M_BARS_ONLY",
+    "alignment": "BACKWARD_ASOF_LAST_COMPLETED_BAR",
+    "maximum_leg_staleness_minutes": 2,
+    "backfill_allowed": false,
+    "negative_shift_allowed": false,
+    "future_label_eligibility": false,
+    "decision": "AFTER_ALL_REQUIRED_LEG_BARS_ARE_AVAILABLE",
+    "entry": "NEXT_TRADABLE_OPEN_OF_ROUTED_EXECUTION_LEG_STRICTLY_AFTER_DECISION",
+    "account_flat_until_fill": true,
+    "exit_accounting": "ROUTED_EXECUTION_LEG_ONLY",
+    "missing_or_stale_leg": "DATA_CENSORED",
+    "missing_future_coverage": "CENSORED_FUTURE_COVERAGE"
+  },
+  "candidate_lattice": {
+    "execution_legs": ["ZS", "ZM", "ZL"],
+    "mechanisms": [
+      "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+      "COMPONENT_RESIDUAL_REVERSION_ROUTER"
+    ],
+    "causal_lookback_minutes": [15, 60],
+    "past_only_robust_z_thresholds": [1.5, 2.0],
+    "proposal_count": 24,
+    "normalization": "TRAILING_DISCOVERY_SAFE_MEDIAN_AND_MAD_BY_EXPLICIT_TRIPLET_AND_SESSION",
+    "maximum_initial_positions_per_complex_session": 1,
+    "maximum_holding_minutes_by_lookback": {"15": 30, "60": 120},
+    "stop_risk_units": 1.0,
+    "target_stop_multiple": 1.5,
+    "contracts": 1,
+    "direction_contract": {
+      "CRUSH_EXPANSION_CONTINUATION_ROUTER": "PRODUCT_LEGS_FOLLOW_CRUSH_CHANGE; BEAN_LEG_OPPOSES_CRUSH_CHANGE",
+      "COMPONENT_RESIDUAL_REVERSION_ROUTER": "ROUTED_LEG_TRADES_TOWARD_ITS_CAUSAL_CRUSH_IMPLIED_VALUE"
+    }
+  },
+  "execution": {
+    "fill_model": "NEXT_TRADABLE_1M_OPEN_AFTER_DECISION_V1",
+    "cost_model": "APPLY_FEES_AND_SLIPPAGE_TO_ACTUALLY_EXECUTED_LEG_ONLY",
+    "normal_round_turn_fees_usd": {"ZS": 5.28, "ZM": 5.28, "ZL": 5.28},
+    "normal_extra_slippage_ticks_per_side": 0,
+    "stressed_extra_slippage_ticks_per_side": 1,
+    "same_bar_stop_target": "STOP_FIRST",
+    "session_timezone": "America/Chicago",
+    "mandatory_flatten_local": "13:20",
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "selection_gate": {
+    "selection_on_discovery_only": true,
+    "maximum_selected_specs": 4,
+    "minimum_discovery_independent_events": 80,
+    "minimum_validation_independent_events": 30,
+    "validation_stressed_net_usd_minimum_exclusive": 0,
+    "minimum_validation_stressed_edge_to_cost_ratio": 1.25,
+    "maximum_single_trade_or_day_positive_profit_share": 0.25,
+    "required_controls": [
+      "MATCHED_EXECUTION_LEG_PRICE_ONLY_DISPLACEMENT",
+      "DIRECTION_FLIP",
+      "SESSION_AND_EXPOSURE_MATCHED_RANDOM_ROUTING"
+    ],
+    "empty_or_undercovered_control": "UNRESOLVED_NOT_PASSED",
+    "final_development_before_validation_gate": false,
+    "account_replay_before_final_event_gate": false,
+    "failure_status": "SOYBEAN_CRUSH_STRUCTURAL_VALUE_ROUTER_FALSIFIED",
+    "neighbor_threshold_retry_after_failure": false
+  },
+  "account_contract": {
+    "account_sizes_after_final_event_gate": ["50K", "100K", "150K"],
+    "account_replay_status": "BLOCKED_UNTIL_FINAL_DEVELOPMENT_EVENT_GATE",
+    "xfa_status": "BLOCKED_UNTIL_CLEAN_COMBINE_SURVIVORS",
+    "full_board_crush_execution_allowed": false
+  },
+  "official_rule_evidence": {
+    "snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "snapshot_file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+    "sources": [
+      "https://www.cmegroup.com/trading/agricultural/grain-and-oilseed/soybean-crush-spreads.html",
+      "https://help.topstep.com/en/articles/8284206-when-and-what-products-can-i-trade",
+      "https://help.topstep.com/en/articles/8284213-topstepx-commissions-and-fees"
+    ],
+    "maximum_mini_contracts_by_account": {"50K": 5, "100K": 10, "150K": 15}
+  },
+  "budget": {
+    "authoritative_cumulative_cap_usd": 200.720719923081,
+    "observed_cumulative_actual_at_decision_usd": 185.76748422235698,
+    "official_incremental_estimate_usd": 5.890399850905,
+    "maximum_branch_purchase_usd": 5.890399850905,
+    "projected_remaining_at_decision_usd": 9.062835849819,
+    "purchase_status": "NOT_PURCHASED_AWAITING_EXPLICIT_EXECUTE"
+  },
+  "governance": {
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "single_authoritative_writer": true,
+    "no_broker": true,
+    "no_orders": true,
+    "no_live_trading": true,
+    "no_q4_access": true,
+    "no_xfa_before_clean_combine_survivors": true
+  },
+  "manifest_hash": "67c65399dbe9919c47fce22eced7460a3ece876ebb160b7d82e17850601f5827"
+}
