@@ -266,6 +266,37 @@ def test_generic_full_rejection_is_counted_with_foregone_pnl() -> None:
     assert result["foregone_realized_pnl_full_rejections_usd"] == -25.0
 
 
+def test_rejection_preserves_preexisting_risk_even_just_above_dynamic_maximum() -> None:
+    row = _decision_row(kind="rejected")
+    row.update(
+        {
+            "decision_status": "CONFLICT_REJECTED",
+            "reason": "SAME_INSTRUMENT_CONFLICT",
+            "binding_constraint": "SAME_INSTRUMENT_CONFLICT",
+            "conflict_rejected": True,
+            "risk_before": {
+                "open_declared_nominal_risk": 406.38432255912824,
+                "maximum_admissible_declared_nominal_risk": 406.33767082902705,
+            },
+            "risk_after": {
+                "open_declared_nominal_risk": 406.38432255912824,
+                "maximum_admissible_declared_nominal_risk": 406.33767082902705,
+            },
+        }
+    )
+    result = cohort._governor_allocation_attribution(
+        [_FakeEpisode((row,))], policy=_fake_policy()
+    )
+    assert result["decision_status_counts"] == {"CONFLICT_REJECTED": 1}
+    corrupted = dict(row)
+    corrupted["risk_after"] = dict(row["risk_after"])
+    corrupted["risk_after"]["maximum_admissible_declared_nominal_risk"] = 406.0
+    with pytest.raises(cohort.AutonomousGraduationCohortError):
+        cohort._governor_allocation_attribution(
+            [_FakeEpisode((corrupted,))], policy=_fake_policy()
+        )
+
+
 @pytest.mark.parametrize(
     ("mutation", "value"),
     (
@@ -354,6 +385,18 @@ def test_actual_book_742_reconstructs_frozen_policy_and_attributes_24_to_8() -> 
         "size_reduction_binding_counts"
     ] == {"AGGREGATE_NOMINAL_RISK_LIMIT": 6}
     assert result["contract_utilization_denominator_mini_equivalent"] == 5.0
+    over_dynamic_limit_episode = cohort.run_causal_shared_account_episode(
+        value["trajectories"]["NORMAL"],
+        value["calendar"],
+        policy=value["policy"],
+        start_day=19569,
+        maximum_duration_days=20,
+        config=value["config"],
+    )
+    over_dynamic_limit = cohort._governor_allocation_attribution(
+        [over_dynamic_limit_episode], policy=value["policy"]
+    )
+    assert over_dynamic_limit["decision_status_counts"]["CONFLICT_REJECTED"] > 0
 
 
 def test_xfa_contract_never_counts_alternative_paths_without_combine_pass() -> None:

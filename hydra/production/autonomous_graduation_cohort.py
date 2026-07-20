@@ -1220,8 +1220,6 @@ def _governor_allocation_attribution(
                 rel_tol=1e-10,
                 abs_tol=1e-7,
             )
-            or risk_after["open_declared_nominal_risk"]
-            > risk_after["maximum_admissible_declared_nominal_risk"] + 1e-7
         ):
             raise AutonomousGraduationCohortError(
                 "governor nominal-risk state conservation drift"
@@ -1237,6 +1235,22 @@ def _governor_allocation_attribution(
         ):
             raise AutonomousGraduationCohortError(
                 "governor status-specific rejection flags drift"
+            )
+        if admitted_quantity > 0 and (
+            risk_after["open_declared_nominal_risk"]
+            > risk_after["maximum_admissible_declared_nominal_risk"] + 1e-7
+        ):
+            raise AutonomousGraduationCohortError(
+                "admitted governor risk exceeds the current admissible bound"
+            )
+        if status in rejection_statuses and not math.isclose(
+            risk_after["maximum_admissible_declared_nominal_risk"],
+            risk_before["maximum_admissible_declared_nominal_risk"],
+            rel_tol=1e-10,
+            abs_tol=1e-7,
+        ):
+            raise AutonomousGraduationCohortError(
+                "rejected governor decision changed the admissible risk state"
             )
         requested_total += requested_quantity
         admitted_total += admitted_quantity
