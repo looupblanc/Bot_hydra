@@ -1,0 +1,71 @@
+{
+  "actual_incremental_spend_usd": 6.018208749593,
+  "broker_connections": 0,
+  "bundle_id": "d8b466e0604149038d88",
+  "cumulative_actual_after_usd": 185.76748422235696,
+  "cumulative_actual_before_usd": 179.74927547276397,
+  "download_status": "DOWNLOADED",
+  "files": [
+    {
+      "kind": "tbbo",
+      "path": "/root/hydra-bot/data/cache/databento/cme_cross_crypto_flow_response/d8b466e0604149038d88/raw_tbbo.dbn.zst",
+      "sha256": "8d0326e973c0c01dd6afdd1a2abf72025cd255bf936f29d0778ecdfce2987097",
+      "size_bytes": 82636392
+    },
+    {
+      "kind": "definition",
+      "path": "/root/hydra-bot/data/cache/databento/cme_cross_crypto_flow_response/d8b466e0604149038d88/raw_definition.dbn.zst",
+      "sha256": "88061de38d5639585c1ef3d1df883ce47585e8bcbcdec9c90f6085b696e9c2d9",
+      "size_bytes": 199408
+    }
+  ],
+  "manifest_hash": "b899c1a6d5b3356b92785019f369de6ee3a18abf3dc8bc4e2db123601b50ffa6",
+  "network": {
+    "definition": true,
+    "tbbo": true
+  },
+  "official_estimates": {
+    "definition": {
+      "billable_size_bytes": 450000,
+      "estimated_cost_usd": 0.00071246177,
+      "record_count": 1250
+    },
+    "tbbo": {
+      "billable_size_bytes": 230758480,
+      "estimated_cost_usd": 6.017496287823,
+      "record_count": 2884481
+    }
+  },
+  "official_total_cost_usd": 6.018208749593,
+  "orders": 0,
+  "projected_actual_usd": 185.76748422235696,
+  "q4_access_count_delta": 0,
+  "receipt_hash": "b36c73b7407cfcbc0161e3404a733c69958005a7eb74775cd295693deadc5d3b",
+  "remaining_after_usd": 14.953235700724022,
+  "requests": {
+    "definition": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-01-01",
+      "schema": "definition",
+      "start": "2022-01-01",
+      "stype_in": "continuous",
+      "symbols": [
+        "MBT.c.0",
+        "MET.c.0"
+      ]
+    },
+    "tbbo": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-01-01",
+      "schema": "tbbo",
+      "start": "2022-01-01",
+      "stype_in": "continuous",
+      "symbols": [
+        "MBT.c.0",
+        "MET.c.0"
+      ]
+    }
+  },
+  "schema": "hydra_cme_cross_crypto_flow_response_acquisition_receipt_v1",
+  "tranche": "A"
+}
