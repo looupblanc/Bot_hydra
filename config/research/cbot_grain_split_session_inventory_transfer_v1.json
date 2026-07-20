@@ -1,0 +1,137 @@
+{
+  "schema": "hydra_cbot_grain_split_session_inventory_transfer_manifest_v1",
+  "branch_id": "CBOT_GRAIN_SPLIT_SESSION_INVENTORY_TRANSFER_V1",
+  "hypothesis": "The mandatory 07:45-08:30 America/Chicago grain-market pause separates overnight inventory discovery from the daytime liquidity reopening; agreement or rejection in the first completed reopening bars can identify a causal 30-120 minute continuation or unwind large enough to survive conservative costs.",
+  "strongest_argument_against": "This may be only the already-falsified overnight-equity inventory idea transplanted to grains; the 45-minute pause may add no information and the stressed 55.28 USD round-turn hurdle may absorb the response.",
+  "material_distinction": {
+    "opening_range": "The signal is not a breakout of a newly formed cash-session range. It is a state transfer across the exchange-mandated 45-minute CBOT closure, conditioned on overnight inventory and completed reopening response.",
+    "overnight_equity": "Prior tombstones concern equity overnight inventory. This tripwire uses physical crop markets, their split Globex session, grain-specific contract economics and a causal post-reopen confirmation.",
+    "wasde": "All official WASDE release dates are excluded. No scheduled-report identity or result is used.",
+    "microstructure": "Only one-minute executable bars are used; no order-flow, MBO or selective-veto feature is present."
+  },
+  "decision_card": {
+    "expected_value_of_information_per_compute_minute": 0.94,
+    "expected_economic_upside": 0.76,
+    "data_cost_usd": 0.0,
+    "implementation_cost": 0.15,
+    "overfitting_risk": 0.2,
+    "deployment_risk": 0.13,
+    "smallest_decisive_experiment": "Seventy-two frozen cells, selected only on 2018-2021, then unchanged 2022 validation and 2023-2024Q3 final-development with direction-flip and next-session timing controls.",
+    "next_materially_distinct_alternative": "CME crypto event-time participation and cross-crypto state using MBT/MET, subject to a fresh cost/EVI decision."
+  },
+  "official_sources": {
+    "cme_session_source": "https://www.cmegroup.com/trading/agricultural/files/AC-268_Grains_FC_FINAL_SR.pdf",
+    "cme_session_contract": "19:00-07:45_AND_08:30-13:20_AMERICA_CHICAGO",
+    "topstep_products_url": "https://help.topstep.com/en/articles/8284206-when-and-what-products-can-i-trade",
+    "topstep_fees_url": "https://help.topstep.com/en/articles/8284213-topstepx-commissions-and-fees",
+    "product_status": "ZC_ZS_ZW_PERMITTED",
+    "round_turn_commission_and_fees_usd": 5.28
+  },
+  "frozen_inputs": {
+    "source_acquisition_receipt": {
+      "path": "reports/data_access/usda_grain_information_shock_acquisition_receipt.json",
+      "sha256": "3ee18f5d5f8e56b36b2ba99a874afedb4e7e3b85d6f28052ebb260cfae9fc186"
+    },
+    "source_market_data": {
+      "path": "data/cache/databento/usda_grain_information_shock/781c6f4bd33b1a4ea984/raw_ohlcv.dbn.zst",
+      "sha256": "d822920c55888bce1750c60c880e5539f5570c09be3fd998b7b8e4a1da1bb3ca"
+    },
+    "source_definition_data": {
+      "path": "data/cache/databento/usda_grain_information_shock/781c6f4bd33b1a4ea984/raw_definition.dbn.zst",
+      "sha256": "5d7a3528a91fa48840a58093c0e7bcade598278bcd523d57c3065e93c1f1e3de"
+    },
+    "source_usda_manifest_for_exclusion_only": {
+      "path": "config/research/usda_grain_information_shock_tripwire_v1.json",
+      "sha256": "b42a18504840ccf57c9b26a0f33dacd0c5a8faf9556f70eb20ab2a55cbda5987"
+    },
+    "rule_snapshot": {
+      "path": "config/rulesets/topstep_official_2026-07-19.json",
+      "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+    }
+  },
+  "data_contract": {
+    "dataset": "GLBX.MDP3",
+    "symbols": ["ZC.c.0", "ZS.c.0", "ZW.c.0"],
+    "schema": "ohlcv-1m",
+    "start": "2018-01-02",
+    "end_exclusive": "2024-10-01",
+    "q4_2024_access": false,
+    "incremental_data_spend_usd": 0.0
+  },
+  "chronological_roles": [
+    {"role": "DISCOVERY", "start": "2018-01-02", "end": "2022-01-01", "candidate_modification_allowed": true},
+    {"role": "VALIDATION", "start": "2022-01-01", "end": "2023-01-01", "candidate_modification_allowed": false},
+    {"role": "FINAL_DEVELOPMENT", "start": "2023-01-01", "end": "2024-10-01", "candidate_modification_allowed": false}
+  ],
+  "session_contract": {
+    "timezone": "America/Chicago",
+    "overnight_open": "19:00_PREVIOUS_CALENDAR_DAY",
+    "pause_start": "07:45",
+    "day_reopen": "08:30",
+    "product_close": "13:20",
+    "excluded_days": "OFFICIAL_WASDE_RELEASE_DATES_AND_ROLL_GUARD",
+    "minimum_overnight_bars": 300,
+    "minimum_pre_pause_bars": 25
+  },
+  "causal_contract": {
+    "decision_features": "overnight displacement, strictly pre-pause range, and completed first 1 or 3 reopening bars",
+    "available_at": "BAR_TIMESTAMP_PLUS_ONE_MINUTE",
+    "entry": "NEXT_TRADABLE_BAR_OPEN_STRICTLY_AFTER_DECISION",
+    "exit": "FIRST_CAUSAL_STOP_TARGET_OR_FROZEN_TIME_EXIT; SAME_BAR_STOP_FIRST",
+    "future_label_eligibility": false,
+    "negative_shift_allowed": false,
+    "backfill_allowed": false,
+    "missing_interval": "DATA_CENSORED"
+  },
+  "candidate_lattice": {
+    "mechanisms": ["INVENTORY_CONTINUATION", "INVENTORY_REJECTION"],
+    "decision_bars": [1, 3],
+    "minimum_overnight_displacement_to_pre_pause_range": [0.5, 1.0],
+    "minimum_reopen_response_to_pre_pause_range": 0.25,
+    "holding_minutes": [30, 60, 120],
+    "execution_symbols": ["ZC", "ZS", "ZW"],
+    "stop_pre_pause_range_fraction": 0.5,
+    "target_stop_multiple": 1.5
+  },
+  "execution": {
+    "tick_size": 0.25,
+    "tick_value_usd": 12.5,
+    "point_value_usd": 50.0,
+    "round_turn_commission_and_fees_usd": 5.28,
+    "normal_slippage_ticks_per_side": 1.0,
+    "stressed_slippage_ticks_per_side": 2.0
+  },
+  "selection_gate": {
+    "selection_on_discovery_only": true,
+    "maximum_selected_cells": 8,
+    "minimum_discovery_events": 160,
+    "minimum_validation_events": 40,
+    "minimum_final_development_events": 80,
+    "positive_stressed_validation_required": true,
+    "positive_stressed_final_development_required": true,
+    "minimum_stressed_edge_to_cost_ratio": 1.25,
+    "maximum_single_event_profit_concentration": 0.25,
+    "controls": ["DIRECTION_FLIP", "NEXT_SESSION_SIGNAL_TIMING"]
+  },
+  "account_gate": {
+    "run_only_after_selection_gate": true,
+    "account_sizes": ["50K", "100K", "150K"],
+    "horizons_trading_days": [5, 10, 20],
+    "minimum_normal_p10_passes": 1,
+    "minimum_stressed_p20_passes": 1,
+    "fallback_minimum_stable_target_progress_uplift": 0.25
+  },
+  "governance": {
+    "evidence_role": "VIEWED_DEVELOPMENT_TRIPWIRE_ONLY",
+    "tier_ceiling": "E",
+    "promotion_allowed": false,
+    "q4_2024_access_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "xfa_allowed": false,
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "kill_branch_after_failed_gate": true
+  },
+  "manifest_hash": "40be03552a4869b4e2e928b7d3ff6e523ca3b64e762ada6522cc5cc7f77b6af7"
+}

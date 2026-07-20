@@ -1,0 +1,482 @@
+{
+  "account_matrix_block_reason": "EVENT_ECONOMICS_GATE_NOT_GREEN",
+  "account_matrix_executed": false,
+  "best_diagnostic_by_discovery": [
+    {
+      "candidate_id": "grain_reopen_a68920c8fb47d6d1133b",
+      "cell": {
+        "decision_bars": 1,
+        "execution_symbol": "ZS",
+        "holding_minutes": 60,
+        "mechanism": "INVENTORY_REJECTION",
+        "minimum_overnight_displacement_to_pre_pause_range": 1.0
+      },
+      "event_count": 199,
+      "event_hash": "02cb97b981680ee95ee774935b2337db1f1c0326b27dd387a8da269c07abd735",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 126,
+          "event_path_hash": "af44e5d87c7e99858da05215c9c5f0a2a39affeb482e11ca7df622730b658335",
+          "exit_reasons": {
+            "STOP_FIRST": 78,
+            "TARGET": 48
+          },
+          "gross_pnl_usd": 250.0,
+          "lower_quartile_stressed_event_usd": -105.28,
+          "maximum_single_event_positive_profit_share": 0.15517006167742492,
+          "median_stressed_event_usd": -86.53,
+          "minimum_open_pnl_stressed_usd": -377.64,
+          "normal_net_usd": -3565.28,
+          "positive_stressed_event_rate": 0.3412698412698413,
+          "role": "DISCOVERY",
+          "signal_count": 126,
+          "stressed_edge_to_cost_ratio": 0.035892311579721135,
+          "stressed_net_usd": -6715.28
+        },
+        "FINAL_DEVELOPMENT": {
+          "data_censored_count": 0,
+          "event_count": 43,
+          "event_path_hash": "c62ad5513754a1f108d999f8ece0304fc2146d0c1c6e588e00fe7b25a6c92c10",
+          "exit_reasons": {
+            "STOP_FIRST": 30,
+            "TARGET": 13
+          },
+          "gross_pnl_usd": -387.5,
+          "lower_quartile_stressed_event_usd": -130.28,
+          "maximum_single_event_positive_profit_share": 0.15441163091143986,
+          "median_stressed_event_usd": -105.28,
+          "minimum_open_pnl_stressed_usd": -227.64,
+          "normal_net_usd": -1689.54,
+          "positive_stressed_event_rate": 0.27906976744186046,
+          "role": "FINAL_DEVELOPMENT",
+          "signal_count": 43,
+          "stressed_edge_to_cost_ratio": -0.16301787096557063,
+          "stressed_net_usd": -2764.54
+        },
+        "VALIDATION": {
+          "data_censored_count": 0,
+          "event_count": 30,
+          "event_path_hash": "16f9b8e07a3109df3ed85ff101f86652611b7afefa84014cfe5979f3f462eb2b",
+          "exit_reasons": {
+            "STOP_FIRST": 22,
+            "TARGET": 8
+          },
+          "gross_pnl_usd": -950.0,
+          "lower_quartile_stressed_event_usd": -180.28,
+          "maximum_single_event_positive_profit_share": 0.2655397469634123,
+          "median_stressed_event_usd": -155.28,
+          "minimum_open_pnl_stressed_usd": -365.14,
+          "normal_net_usd": -1858.4,
+          "positive_stressed_event_rate": 0.26666666666666666,
+          "role": "VALIDATION",
+          "signal_count": 30,
+          "stressed_edge_to_cost_ratio": -0.5728412928123492,
+          "stressed_net_usd": -2608.4
+        }
+      }
+    },
+    {
+      "candidate_id": "grain_reopen_6bc33d94633cc7c21015",
+      "cell": {
+        "decision_bars": 1,
+        "execution_symbol": "ZS",
+        "holding_minutes": 120,
+        "mechanism": "INVENTORY_REJECTION",
+        "minimum_overnight_displacement_to_pre_pause_range": 1.0
+      },
+      "event_count": 199,
+      "event_hash": "eee6bfd6f90caf67d406e7594c5ba3b18fdb1217dbb049a89a19fd8243c17a4d",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 126,
+          "event_path_hash": "750d716198dde5d60b00ef0640e5f60f9951df7277e41ac6d486f13e98581bc4",
+          "exit_reasons": {
+            "STOP_FIRST": 78,
+            "TARGET": 48
+          },
+          "gross_pnl_usd": 250.0,
+          "lower_quartile_stressed_event_usd": -105.28,
+          "maximum_single_event_positive_profit_share": 0.15517006167742492,
+          "median_stressed_event_usd": -86.53,
+          "minimum_open_pnl_stressed_usd": -377.64,
+          "normal_net_usd": -3565.28,
+          "positive_stressed_event_rate": 0.3412698412698413,
+          "role": "DISCOVERY",
+          "signal_count": 126,
+          "stressed_edge_to_cost_ratio": 0.035892311579721135,
+          "stressed_net_usd": -6715.28
+        },
+        "FINAL_DEVELOPMENT": {
+          "data_censored_count": 0,
+          "event_count": 43,
+          "event_path_hash": "7c88529938206a3290f2dc213fe8dc637db06491a481153f0ac039becff353b5",
+          "exit_reasons": {
+            "STOP_FIRST": 30,
+            "TARGET": 13
+          },
+          "gross_pnl_usd": -387.5,
+          "lower_quartile_stressed_event_usd": -130.28,
+          "maximum_single_event_positive_profit_share": 0.15441163091143986,
+          "median_stressed_event_usd": -105.28,
+          "minimum_open_pnl_stressed_usd": -227.64,
+          "normal_net_usd": -1689.54,
+          "positive_stressed_event_rate": 0.27906976744186046,
+          "role": "FINAL_DEVELOPMENT",
+          "signal_count": 43,
+          "stressed_edge_to_cost_ratio": -0.16301787096557063,
+          "stressed_net_usd": -2764.54
+        },
+        "VALIDATION": {
+          "data_censored_count": 0,
+          "event_count": 30,
+          "event_path_hash": "99097c1411cee7c1bd6846b93386ccd689f9d14099de59145d2fdaac61762201",
+          "exit_reasons": {
+            "STOP_FIRST": 22,
+            "TARGET": 8
+          },
+          "gross_pnl_usd": -950.0,
+          "lower_quartile_stressed_event_usd": -180.28,
+          "maximum_single_event_positive_profit_share": 0.2655397469634123,
+          "median_stressed_event_usd": -155.28,
+          "minimum_open_pnl_stressed_usd": -365.14,
+          "normal_net_usd": -1858.4,
+          "positive_stressed_event_rate": 0.26666666666666666,
+          "role": "VALIDATION",
+          "signal_count": 30,
+          "stressed_edge_to_cost_ratio": -0.5728412928123492,
+          "stressed_net_usd": -2608.4
+        }
+      }
+    },
+    {
+      "candidate_id": "grain_reopen_c3e39e688e85d2168b65",
+      "cell": {
+        "decision_bars": 1,
+        "execution_symbol": "ZS",
+        "holding_minutes": 30,
+        "mechanism": "INVENTORY_REJECTION",
+        "minimum_overnight_displacement_to_pre_pause_range": 1.0
+      },
+      "event_count": 199,
+      "event_hash": "465fbeb9ac4d7cce8eda3a773e03f77533cdf00b7f7d93756583cf212e410f7f",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 126,
+          "event_path_hash": "1f1e210da1f9723f6b7cc53b9f48f0b418968f1a6269e1c99f7e35f986999b70",
+          "exit_reasons": {
+            "STOP_FIRST": 77,
+            "TARGET": 46,
+            "TIME_EXIT": 3
+          },
+          "gross_pnl_usd": 100.0,
+          "lower_quartile_stressed_event_usd": -105.28,
+          "maximum_single_event_positive_profit_share": 0.1652381352886755,
+          "median_stressed_event_usd": -86.53,
+          "minimum_open_pnl_stressed_usd": -377.64,
+          "normal_net_usd": -3715.28,
+          "positive_stressed_event_rate": 0.3333333333333333,
+          "role": "DISCOVERY",
+          "signal_count": 126,
+          "stressed_edge_to_cost_ratio": 0.014356924631888453,
+          "stressed_net_usd": -6865.28
+        },
+        "FINAL_DEVELOPMENT": {
+          "data_censored_count": 0,
+          "event_count": 43,
+          "event_path_hash": "0af52b44e0c87fc87ad852b7d55ceb87b92a805cdd1b062d6ad81c7338fe3315",
+          "exit_reasons": {
+            "STOP_FIRST": 30,
+            "TARGET": 13
+          },
+          "gross_pnl_usd": -387.5,
+          "lower_quartile_stressed_event_usd": -130.28,
+          "maximum_single_event_positive_profit_share": 0.15441163091143986,
+          "median_stressed_event_usd": -105.28,
+          "minimum_open_pnl_stressed_usd": -227.64,
+          "normal_net_usd": -1689.54,
+          "positive_stressed_event_rate": 0.27906976744186046,
+          "role": "FINAL_DEVELOPMENT",
+          "signal_count": 43,
+          "stressed_edge_to_cost_ratio": -0.16301787096557063,
+          "stressed_net_usd": -2764.54
+        },
+        "VALIDATION": {
+          "data_censored_count": 0,
+          "event_count": 30,
+          "event_path_hash": "c292bd281e32dd0f9b9a9873bada8451992ab4ba9eb4aeee3cef2c3c4ff48127",
+          "exit_reasons": {
+            "STOP_FIRST": 22,
+            "TARGET": 8
+          },
+          "gross_pnl_usd": -950.0,
+          "lower_quartile_stressed_event_usd": -180.28,
+          "maximum_single_event_positive_profit_share": 0.2655397469634123,
+          "median_stressed_event_usd": -155.28,
+          "minimum_open_pnl_stressed_usd": -365.14,
+          "normal_net_usd": -1858.4,
+          "positive_stressed_event_rate": 0.26666666666666666,
+          "role": "VALIDATION",
+          "signal_count": 30,
+          "stressed_edge_to_cost_ratio": -0.5728412928123492,
+          "stressed_net_usd": -2608.4
+        }
+      }
+    },
+    {
+      "candidate_id": "grain_reopen_561d0425b4464c72a90e",
+      "cell": {
+        "decision_bars": 3,
+        "execution_symbol": "ZS",
+        "holding_minutes": 30,
+        "mechanism": "INVENTORY_CONTINUATION",
+        "minimum_overnight_displacement_to_pre_pause_range": 1.0
+      },
+      "event_count": 283,
+      "event_hash": "7c864a7c4d16dd4e405096df6b01e11530af772c29f275bce673a485ff3118c5",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 158,
+          "event_path_hash": "f8e5f4d9e4ae559be4074740357ba1b5b3c98024c32de3e9d1e975048e14488c",
+          "exit_reasons": {
+            "STOP_FIRST": 83,
+            "TARGET": 70,
+            "TIME_EXIT": 5
+          },
+          "gross_pnl_usd": 1712.5,
+          "lower_quartile_stressed_event_usd": -105.28,
+          "maximum_single_event_positive_profit_share": 0.09924384459702754,
+          "median_stressed_event_usd": -80.28,
+          "minimum_open_pnl_stressed_usd": -340.14,
+          "normal_net_usd": -3071.7400000000002,
+          "positive_stressed_event_rate": 0.3037974683544304,
+          "role": "DISCOVERY",
+          "signal_count": 158,
+          "stressed_edge_to_cost_ratio": 0.19606743116745132,
+          "stressed_net_usd": -7021.74
+        },
+        "FINAL_DEVELOPMENT": {
+          "data_censored_count": 0,
+          "event_count": 78,
+          "event_path_hash": "94276cf7572666c2e43d67b8b57dfbbed857af694faf48f6627db52fd2edfc8a",
+          "exit_reasons": {
+            "STOP_FIRST": 36,
+            "TARGET": 41,
+            "TIME_EXIT": 1
+          },
+          "gross_pnl_usd": 1300.0,
+          "lower_quartile_stressed_event_usd": -130.28,
+          "maximum_single_event_positive_profit_share": 0.05977774361849303,
+          "median_stressed_event_usd": -11.530000000000001,
+          "minimum_open_pnl_stressed_usd": -252.64,
+          "normal_net_usd": -1061.8400000000001,
+          "positive_stressed_event_rate": 0.48717948717948717,
+          "role": "FINAL_DEVELOPMENT",
+          "signal_count": 78,
+          "stressed_edge_to_cost_ratio": 0.3014954172696575,
+          "stressed_net_usd": -3011.84
+        },
+        "VALIDATION": {
+          "data_censored_count": 0,
+          "event_count": 47,
+          "event_path_hash": "c0245f1450f85f98ce686123ce8a1f87f33e2a046b52a3822ef6bf2b403099cc",
+          "exit_reasons": {
+            "STOP_FIRST": 23,
+            "TARGET": 24
+          },
+          "gross_pnl_usd": 2300.0,
+          "lower_quartile_stressed_event_usd": -149.03,
+          "maximum_single_event_positive_profit_share": 0.06764195204846873,
+          "median_stressed_event_usd": 19.72,
+          "minimum_open_pnl_stressed_usd": -265.14,
+          "normal_net_usd": 876.8399999999999,
+          "positive_stressed_event_rate": 0.5106382978723404,
+          "role": "VALIDATION",
+          "signal_count": 47,
+          "stressed_edge_to_cost_ratio": 0.8852418634726115,
+          "stressed_net_usd": -298.1600000000001
+        }
+      }
+    },
+    {
+      "candidate_id": "grain_reopen_e4912acb9b4e9992f611",
+      "cell": {
+        "decision_bars": 3,
+        "execution_symbol": "ZS",
+        "holding_minutes": 120,
+        "mechanism": "INVENTORY_CONTINUATION",
+        "minimum_overnight_displacement_to_pre_pause_range": 1.0
+      },
+      "event_count": 283,
+      "event_hash": "e4148875a279462dbde70f00a1aed5a17a785aa2e3c6a36361ca302dde8507b2",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 158,
+          "event_path_hash": "858434cdbced1fc458dbcf2989fbc6bf2d1bb95af061e5302a59aaec7b218e5c",
+          "exit_reasons": {
+            "STOP_FIRST": 85,
+            "TARGET": 71,
+            "TIME_EXIT": 2
+          },
+          "gross_pnl_usd": 1637.5,
+          "lower_quartile_stressed_event_usd": -105.28,
+          "maximum_single_event_positive_profit_share": 0.09979461760795062,
+          "median_stressed_event_usd": -80.28,
+          "minimum_open_pnl_stressed_usd": -340.14,
+          "normal_net_usd": -3146.7400000000002,
+          "positive_stressed_event_rate": 0.310126582278481,
+          "role": "DISCOVERY",
+          "signal_count": 158,
+          "stressed_edge_to_cost_ratio": 0.1874805363717965,
+          "stressed_net_usd": -7096.74
+        },
+        "FINAL_DEVELOPMENT": {
+          "data_censored_count": 0,
+          "event_count": 78,
+          "event_path_hash": "82ac8a1193d0eb7e9a0bd586f523f0aa65459786687f73fd8e74ac0179ca2f39",
+          "exit_reasons": {
+            "STOP_FIRST": 37,
+            "TARGET": 41
+          },
+          "gross_pnl_usd": 1212.5,
+          "lower_quartile_stressed_event_usd": -130.28,
+          "maximum_single_event_positive_profit_share": 0.05977774361849303,
+          "median_stressed_event_usd": -11.530000000000001,
+          "minimum_open_pnl_stressed_usd": -252.64,
+          "normal_net_usd": -1149.3400000000001,
+          "positive_stressed_event_rate": 0.48717948717948717,
+          "role": "FINAL_DEVELOPMENT",
+          "signal_count": 78,
+          "stressed_edge_to_cost_ratio": 0.28120245649189207,
+          "stressed_net_usd": -3099.34
+        },
+        "VALIDATION": {
+          "data_censored_count": 0,
+          "event_count": 47,
+          "event_path_hash": "5d079a7e0fc087d3b226e548b6c76eaaba1da848cc078574b175a11ef2f56afa",
+          "exit_reasons": {
+            "STOP_FIRST": 23,
+            "TARGET": 24
+          },
+          "gross_pnl_usd": 2300.0,
+          "lower_quartile_stressed_event_usd": -149.03,
+          "maximum_single_event_positive_profit_share": 0.06764195204846873,
+          "median_stressed_event_usd": 19.72,
+          "minimum_open_pnl_stressed_usd": -265.14,
+          "normal_net_usd": 876.8399999999999,
+          "positive_stressed_event_rate": 0.5106382978723404,
+          "role": "VALIDATION",
+          "signal_count": 47,
+          "stressed_edge_to_cost_ratio": 0.8852418634726115,
+          "stressed_net_usd": -298.1600000000001
+        }
+      }
+    }
+  ],
+  "branch_id": "CBOT_GRAIN_SPLIT_SESSION_INVENTORY_TRANSFER_V1",
+  "broker_connections": 0,
+  "context_receipt": {
+    "ZC": {
+      "context_count_across_decision_windows": 1914,
+      "reopen_days_observed": 1578,
+      "roll_guard_day_count": 102,
+      "skipped_counts_across_decision_windows": {
+        "OVERNIGHT_BOUNDARY_COVERAGE": 0,
+        "OVERNIGHT_COVERAGE": 674,
+        "PRE_PAUSE_COVERAGE": 66,
+        "REOPEN_COVERAGE": 0,
+        "ROLE": 0,
+        "ROLL_GUARD": 86,
+        "WASDE": 128
+      },
+      "unique_session_count": 1044
+    },
+    "ZS": {
+      "context_count_across_decision_windows": 1753,
+      "reopen_days_observed": 1479,
+      "roll_guard_day_count": 144,
+      "skipped_counts_across_decision_windows": {
+        "OVERNIGHT_BOUNDARY_COVERAGE": 0,
+        "OVERNIGHT_COVERAGE": 830,
+        "PRE_PAUSE_COVERAGE": 72,
+        "REOPEN_COVERAGE": 0,
+        "ROLE": 0,
+        "ROLL_GUARD": 122,
+        "WASDE": 98
+      },
+      "unique_session_count": 904
+    },
+    "ZW": {
+      "context_count_across_decision_windows": 1887,
+      "reopen_days_observed": 1423,
+      "roll_guard_day_count": 102,
+      "skipped_counts_across_decision_windows": {
+        "OVERNIGHT_BOUNDARY_COVERAGE": 0,
+        "OVERNIGHT_COVERAGE": 418,
+        "PRE_PAUSE_COVERAGE": 248,
+        "REOPEN_COVERAGE": 0,
+        "ROLE": 0,
+        "ROLL_GUARD": 70,
+        "WASDE": 98
+      },
+      "unique_session_count": 990
+    }
+  },
+  "data_receipt": {
+    "first_timestamp": "2018-01-02 14:30:00+00:00",
+    "last_timestamp": "2024-09-30 18:19:00+00:00",
+    "q4_2024_row_count": 0,
+    "row_count": 3156358,
+    "rows_by_symbol": {
+      "ZC": 1087145,
+      "ZS": 1021362,
+      "ZW": 1047851
+    }
+  },
+  "discovery_eligible_count": 0,
+  "event_gate_passer_ids": [],
+  "incremental_data_spend_usd": 0.0,
+  "manifest_hash": "40be03552a4869b4e2e928b7d3ff6e523ca3b64e762ada6522cc5cc7f77b6af7",
+  "next_action": "TOMBSTONE_EXACT_SPEC_AND_PIVOT_TO_CME_CRYPTO_EVENT_TIME",
+  "non_deployable_upper_bound": {
+    "DISCOVERY": {
+      "flat_choice_count": 987,
+      "interpretation": "NON_DEPLOYABLE_UPPER_BOUND_NEVER_PROMOTION_ELIGIBLE",
+      "market_session_count": 1392,
+      "non_deployable_hindsight_stressed_net_usd": 23699.1,
+      "positive_event_rate": 0.29094827586206895
+    },
+    "FINAL_DEVELOPMENT": {
+      "flat_choice_count": 361,
+      "interpretation": "NON_DEPLOYABLE_UPPER_BOUND_NEVER_PROMOTION_ELIGIBLE",
+      "market_session_count": 589,
+      "non_deployable_hindsight_stressed_net_usd": 15021.16,
+      "positive_event_rate": 0.3870967741935484
+    },
+    "VALIDATION": {
+      "flat_choice_count": 178,
+      "interpretation": "NON_DEPLOYABLE_UPPER_BOUND_NEVER_PROMOTION_ELIGIBLE",
+      "market_session_count": 341,
+      "non_deployable_hindsight_stressed_net_usd": 19026.86,
+      "positive_event_rate": 0.4780058651026393
+    }
+  },
+  "orders": 0,
+  "positive_both_heldout_without_full_gate_ids": [],
+  "proposal_count": 72,
+  "q4_access_count_delta": 0,
+  "result_hash": "2d948279ac06ba0cf34a47825580a9ca02ee2df0b4c56101b4231aacba083e90",
+  "runtime_seconds": 75.84897204500157,
+  "schema": "hydra_cbot_grain_split_session_inventory_transfer_economic_result_v1",
+  "selected_candidate_ids": [],
+  "selected_results": [],
+  "source_acquisition_receipt_hash": "81a646377a6307e24abad9fd07035f6a58e19abdb756332b5c547e30dd0071cd",
+  "source_audit_hash": "63242888da015911316563201357c3aa257b4c4289ed4c8921e6f84441738c5a",
+  "status": "GRAIN_SPLIT_SESSION_EVENT_ALPHA_FALSIFIED",
+  "tier_ceiling": "H_DIAGNOSTIC",
+  "xfa_paths_started": 0
+}
