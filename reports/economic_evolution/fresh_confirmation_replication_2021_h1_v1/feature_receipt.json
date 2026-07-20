@@ -1,0 +1,40 @@
+{
+  "bundles": {
+    "ES": {
+      "bundle_hash": "ca13a8548455662e32c93bd5b1543fd950f26c8c910e393c38bdaa305396b022",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/254743f74cd49058afdf/feature_matrices/5a80ca195cee41c9ed6437bda12a2efa3300ca068207675919499b6012432e6b",
+      "row_count": 159917
+    },
+    "YM": {
+      "bundle_hash": "f79fc50fce263b106a526394641336a85e84af8bc1b37a8fc127343014b8ebb3",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/254743f74cd49058afdf/feature_matrices/f5654af613acd31fc58470b070199dc2af367eaf4bbd5433ab718f7f3ac11c56",
+      "row_count": 158814
+    }
+  },
+  "contract_hash": "9995cb6a2d8a077bdcb46ce39537cd6c3cd1cfbcf0536b2950c60547489111a8",
+  "contract_map": {
+    "guard_receipt": {
+      "explicit_contract_count": 9,
+      "unmapped_contract_rows_excluded": 0,
+      "unsafe_roll_rows_excluded": 35208
+    },
+    "map_type": "EXPLICIT_DATABENTO_CONTINUOUS_SYMBOLOGY_DATE_AWARE_DEFINITIONS_V2",
+    "path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/254743f74cd49058afdf/explicit_contract_map.json",
+    "roll_map_hash": "b871ecac1bb762f09c7d0e10c1bce2f8e51d03c520ae00c6e46c709f33de19bf",
+    "sha256": "3edeac03e867c566bb2c78fa88c129d632d07fa1ac2658160d0f261791ec66a8"
+  },
+  "data_role": "CONFIRMATION",
+  "q4_access_count_delta": 0,
+  "result_hash": "3e634c2b42643dec12e6f1e7065b3ed2764da30e8cd4f59cc0a56e37df98224c",
+  "source_file_inventory_hash": "2087ab859588ab8700b4586a905ca793edc6300beed718095df768a2c22e9790",
+  "source_files": [
+    {
+      "path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/254743f74cd49058afdf/normalized_ohlcv.parquet",
+      "rows": 511764,
+      "sha256": "c82bf49eab68fbb5d30144f46b52b29db1b6b66876ae504c88b14b9d520355e0"
+    }
+  ],
+  "status": "CONFIRMATION_CAUSAL_FEATURE_BUNDLES_READY"
+}
