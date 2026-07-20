@@ -33,6 +33,7 @@ from hydra.production import (
     PRODUCTION_STATE_SCHEMA,
     load_and_validate_production_manifest,
     load_and_verify_production_result,
+    verify_non_economic_terminal_publication,
 )
 from hydra.production.causal_target_velocity_manifest import (
     CAUSAL_TARGET_VELOCITY_ENGINE,
@@ -569,6 +570,18 @@ class EconomicEvolutionManifestRuntime:
                 raise EconomicEvolutionRuntimeError(
                     "manifest multiplicity reservation drift"
                 )
+            adoption = config.get("completed_scientific_result_adoption")
+            if isinstance(adoption, Mapping):
+                evidence = reservations[0].get("evidence")
+                if (
+                    not isinstance(evidence, Mapping)
+                    or evidence.get("preregistration_hash")
+                    != adoption.get("multiplicity_preregistration_hash")
+                    or adoption.get("economic_replay_allowed") is not False
+                ):
+                    raise EconomicEvolutionRuntimeError(
+                        "manifest adopted multiplicity reservation drift"
+                    )
             return reservations[0]
         if output_dir.exists() and any(output_dir.iterdir()):
             raise EconomicEvolutionRuntimeError(
@@ -1142,9 +1155,18 @@ class EconomicEvolutionManifestRuntime:
     ) -> None:
         receipt = result.get("evidence_bundle")
         if not isinstance(receipt, Mapping):
-            raise EconomicEvolutionRuntimeError(
-                "production COMPLETE forbidden without an EvidenceBundle receipt"
-            )
+            try:
+                verify_non_economic_terminal_publication(
+                    result,
+                    config,
+                    root=self.root,
+                )
+            except Exception as exc:
+                raise EconomicEvolutionRuntimeError(
+                    "production COMPLETE forbidden without EvidenceBundle receipt "
+                    "or explicitly authorised non-economic terminal evidence"
+                ) from exc
+            return
         raw_path = str(receipt.get("bundle_path") or "")
         if not raw_path:
             raise EconomicEvolutionRuntimeError(
@@ -1426,6 +1448,38 @@ class EconomicEvolutionManifestRuntime:
         output_dir: Path,
     ) -> dict[str, Any]:
         if _is_production_like(config):
+            audit = result.get("non_economic_audit")
+            if isinstance(audit, Mapping) and result.get("evidence_bundle") is None:
+                next_action = result.get("autonomous_next_action")
+                if not isinstance(next_action, Mapping):
+                    raise EconomicEvolutionRuntimeError(
+                        "non-economic production result omits autonomous next action"
+                    )
+                handoff = self._record_production_successor_handoff(
+                    config, result, next_action
+                )
+                return {
+                    **dict(action),
+                    "manifest_campaign_terminal_state": (
+                        "PRODUCTION_NON_ECONOMIC_AUDIT_COMPLETE"
+                    ),
+                    "manifest_campaign_evidence_status": audit["classification"],
+                    "manifest_campaign_evidence_bundle_sha256": None,
+                    "manifest_campaign_non_economic_audit": dict(audit),
+                    "manifest_campaign_summary_only_evidence": False,
+                    "manifest_campaign_independently_confirmed": False,
+                    "manifest_campaign_status_inheritance_allowed": False,
+                    "manifest_campaign_successor_handoff_id": handoff["handoff_id"],
+                    "manifest_campaign_successor_handoff_hash": handoff["handoff_hash"],
+                    "manifest_campaign_successor_handoff_state": handoff["handoff_state"],
+                    "next_experiment_id": str(next_action["action"]),
+                    "next_experiment_state": (
+                        "WORM_MANIFEST_REQUIRED"
+                        if next_action.get("manifest_required") is True
+                        else "NON_ECONOMIC_AUDIT_TERMINAL"
+                    ),
+                    "manifest_campaign_autonomous_next_action": dict(next_action),
+                }
             evidence = result["evidence_bundle"]
             next_action = result.get("autonomous_next_action")
             if not isinstance(next_action, Mapping):
@@ -1990,6 +2044,17 @@ class EconomicEvolutionManifestRuntime:
             raise EconomicEvolutionRuntimeError(
                 "production result scientific_status is missing"
             )
+        audit = result.get("non_economic_audit")
+        if isinstance(audit, Mapping) and result.get("evidence_bundle") is None:
+            return self._production_non_economic_complete_action(
+                predecessor,
+                config,
+                result,
+                kpis,
+                summary,
+                audit,
+                scientific_status,
+            )
         counters, production_kpis, frontier = self._production_terminal_views(
             summary, kpis
         )
@@ -2123,6 +2188,130 @@ class EconomicEvolutionManifestRuntime:
             "manifest_campaign_failure_vectors": dict(result["failure_vectors"]),
             "manifest_campaign_matched_controls": dict(result["matched_controls"]),
             "manifest_campaign_evidence_bundle": dict(result["evidence_bundle"]),
+            "raw_global_N_trials": int(
+                config["multiplicity"]["expected_global_N_trials_after_reservation"]
+            ),
+            "economic_independent_confirmation_queue_eligible_count": 0,
+            "economic_pre_holdout_ready_count": 0,
+            "economic_paper_shadow_ready_count": 0,
+            "q4_access_delta": 0,
+            "new_data_purchase_count": 0,
+            "broker_connections": 0,
+            "orders": 0,
+            "new_data_purchase_authorized": False,
+            "protected_holdout_access_authorized": False,
+            "shadow_admission_authorized": False,
+            "progressed": True,
+        }
+
+    def _production_non_economic_complete_action(
+        self,
+        predecessor: Mapping[str, Any],
+        config: Mapping[str, Any],
+        result: Mapping[str, Any],
+        kpis: Mapping[str, Any],
+        summary: Mapping[str, Any],
+        audit: Mapping[str, Any],
+        scientific_status: str,
+    ) -> dict[str, Any]:
+        """Represent a terminal audit without interpreting it as economics."""
+
+        verify_non_economic_terminal_publication(result, config, root=self.root)
+        counters = summary.get("production_counters")
+        if (
+            summary.get("terminal_mode") != "NON_ECONOMIC_AUDIT_ONLY"
+            or summary.get("economic_evidence_materialized") is not False
+            or not isinstance(counters, Mapping)
+            or any(
+                counters.get(field) != 0
+                for field in (
+                    "serious_exact_account_replays",
+                    "predeclared_control_policy_replays",
+                    "combine_episodes_completed",
+                    "normal_episodes_completed",
+                    "stressed_episodes_completed",
+                )
+            )
+            or kpis.get("exact_account_replays") != 0
+            or kpis.get("combine_episodes_completed") != 0
+            or any(
+                kpis.get(field) != 0
+                for field in (
+                    "positive_stressed_net_candidates",
+                    "candidates_with_normal_pass",
+                    "candidates_with_stressed_pass",
+                    "near_pass_count",
+                    "candidates_promoted_96",
+                    "confirmation_ready_candidates",
+                )
+            )
+        ):
+            raise EconomicEvolutionRuntimeError(
+                "non-economic production terminal invented economic counters"
+            )
+        self._verify_zero_safety_fields(result, "production_result")
+        return {
+            **dict(predecessor),
+            "action_type": "MANIFEST_ECONOMIC_PRODUCTION_NON_ECONOMIC_AUDIT_COMPLETE",
+            "manifest_campaign_id": config["campaign_id"],
+            "manifest_campaign_engine": _engine(config),
+            "manifest_campaign_state": "COMPLETE",
+            "manifest_campaign_scientific_status": scientific_status,
+            "manifest_campaign_live_kpis": dict(kpis),
+            "manifest_campaign_production_counters": dict(counters),
+            "manifest_campaign_production_kpis": {},
+            "manifest_campaign_economic_frontier": {
+                "candidate_count": 0,
+                "positive_stressed_net_count": 0,
+                "normal_pass_fraction_best": None,
+                "normal_pass_fraction_median": None,
+                "stressed_pass_fraction_best": None,
+                "stressed_pass_fraction_median": None,
+                "stressed_target_progress_median_best": None,
+                "stressed_target_progress_median_population": None,
+                "stressed_mll_breach_rate_minimum": None,
+                "stressed_mll_breach_rate_maximum": None,
+            },
+            "manifest_campaign_policies_proposed": self._production_nonnegative_int(
+                kpis, "policies_proposed", "production result kpis"
+            ),
+            "manifest_campaign_unique_policies_screened": self._production_nonnegative_int(
+                kpis, "unique_policies_screened", "production result kpis"
+            ),
+            "manifest_campaign_exact_account_replays": 0,
+            "manifest_campaign_predeclared_control_policy_replays": 0,
+            "manifest_campaign_rolling_combine_episode_count": 0,
+            "manifest_campaign_normal_episode_count": 0,
+            "manifest_campaign_stressed_episode_count": 0,
+            "manifest_campaign_stressed_positive_policy_count": 0,
+            "manifest_campaign_policies_with_normal_pass_count": 0,
+            "manifest_campaign_policies_with_stressed_pass_count": 0,
+            "manifest_campaign_best_normal_pass_rate": None,
+            "manifest_campaign_best_stressed_pass_rate": None,
+            "manifest_campaign_median_normal_pass_rate": None,
+            "manifest_campaign_median_stressed_pass_rate": None,
+            "manifest_campaign_target_progress_frontier": {
+                "stressed_target_progress_median_best": None,
+                "stressed_target_progress_median_population": None,
+            },
+            "manifest_campaign_mll_frontier": {
+                "stressed_mll_breach_rate_minimum": None,
+                "stressed_mll_breach_rate_maximum": None,
+            },
+            "manifest_campaign_near_pass_count": 0,
+            "manifest_campaign_promoted_to_96_start_ids": [],
+            "manifest_campaign_development_finalist_ids": [],
+            "manifest_campaign_confirmation_ready_ids": [],
+            "manifest_campaign_successive_halving": dict(result["successive_halving"]),
+            "manifest_campaign_failure_vectors": dict(result["failure_vectors"]),
+            "manifest_campaign_matched_controls": dict(result["matched_controls"]),
+            "manifest_campaign_evidence_bundle": None,
+            "manifest_campaign_non_economic_audit": dict(audit),
+            "manifest_campaign_evidence_reconstruction": False,
+            "manifest_campaign_confirmation_ready_count": 0,
+            "manifest_campaign_tombstone_signature_hash": None,
+            "manifest_campaign_graveyard_class_signature_count": 0,
+            "manifest_campaign_graveyard_indexed_object_count": 0,
             "raw_global_N_trials": int(
                 config["multiplicity"]["expected_global_N_trials_after_reservation"]
             ),

@@ -119,7 +119,12 @@ def load_and_verify_production_result(
         raise ProductionRuntimeError("production result identity/status drift")
     receipt = result.get("evidence_bundle")
     if not isinstance(receipt, Mapping) or not str(receipt.get("bundle_path") or ""):
-        raise ProductionRuntimeError("production result lacks sealed EvidenceBundle receipt")
+        verify_non_economic_terminal_publication(
+            result,
+            manifest,
+            root=target.resolve().parents[3],
+        )
+        return result
     verified = guard_campaign_completion(
         "COMPLETE",
         str(receipt["bundle_path"]),
@@ -133,6 +138,329 @@ def load_and_verify_production_result(
     if verified is None or verified.get("status") != "COMPLETE":
         raise ProductionRuntimeError("EvidenceBundle is not complete")
     return result
+
+
+def verify_non_economic_terminal_publication(
+    result: Mapping[str, Any],
+    manifest: Mapping[str, Any],
+    *,
+    root: str | Path,
+) -> dict[str, Any]:
+    """Verify an explicitly preregistered audit-only terminal publication.
+
+    This path never substitutes for an EvidenceBundle.  It is restricted to a
+    hash-bound completed scientific result with exactly zero materialized
+    economic candidates/events/trades/episodes.
+    """
+
+    project = Path(root).resolve()
+    adoption = manifest.get("completed_scientific_result_adoption")
+    reference = result.get("non_economic_audit")
+    if (
+        not isinstance(adoption, Mapping)
+        or adoption.get("terminal_mode") != "NON_ECONOMIC_AUDIT_ONLY"
+        or adoption.get("economic_outcomes_changed") is not False
+        or adoption.get("scientific_policy_changed") is not False
+        or adoption.get("economic_replay_allowed") is not False
+        or result.get("evidence_bundle") is not None
+        or result.get("evidence_verification_manifest_sha256") is not None
+        or not isinstance(reference, Mapping)
+        or reference.get("schema") != "hydra_non_economic_audit_receipt_v1"
+        or reference.get("terminal_mode") != "NON_ECONOMIC_AUDIT_ONLY"
+        or reference.get("classification")
+        != adoption.get("canonical_evidence_status")
+    ):
+        raise ProductionRuntimeError(
+            "production result lacks an explicitly authorised terminal evidence publication"
+        )
+    expected_path = (project / str(adoption.get("audit_receipt_path") or "")).resolve()
+    allowed = (project / "reports/economic_evolution").resolve()
+    raw_observed = Path(str(reference.get("path") or ""))
+    observed_path = (
+        raw_observed.resolve()
+        if raw_observed.is_absolute()
+        else (project / raw_observed).resolve()
+    )
+    if (
+        expected_path != observed_path
+        or observed_path == allowed
+        or allowed not in observed_path.parents
+        or not observed_path.is_file()
+        or _sha256(observed_path) != reference.get("file_sha256")
+    ):
+        raise ProductionRuntimeError("non-economic audit receipt path/hash drift")
+    try:
+        receipt = json.loads(observed_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ProductionRuntimeError("invalid non-economic audit receipt") from exc
+    if not isinstance(receipt, dict):
+        raise ProductionRuntimeError("invalid non-economic audit receipt")
+    claimed = str(receipt.get("receipt_hash") or "")
+    core = dict(receipt)
+    core.pop("receipt_hash", None)
+    zero_fields = (
+        "q4_access_count_delta",
+        "data_purchase_count",
+        "network_requests",
+        "broker_connections",
+        "orders",
+        "mission_database_writes",
+        "registry_writes",
+        "cemetery_writes",
+    )
+    if (
+        not claimed
+        or stable_hash(core) != claimed
+        or reference.get("receipt_hash") != claimed
+        or receipt.get("schema") != "hydra_non_economic_audit_receipt_v1"
+        or receipt.get("campaign_id") != manifest.get("campaign_id")
+        or receipt.get("manifest_hash") != manifest.get("manifest_hash")
+        or receipt.get("source_commit") != manifest.get("source_commit")
+        or receipt.get("terminal_mode") != "NON_ECONOMIC_AUDIT_ONLY"
+        or receipt.get("classification")
+        != adoption.get("canonical_evidence_status")
+        or receipt.get("scientific_status") != adoption.get("scientific_status")
+        or receipt.get("source_manifest_hash") != adoption.get("source_manifest_hash")
+        or receipt.get("source_manifest_file_sha256")
+        != adoption.get("source_manifest_file_sha256")
+        or receipt.get("source_manifest_worm_commit")
+        != adoption.get("source_manifest_worm_commit")
+        or receipt.get("source_manifest_worm_tag")
+        != adoption.get("source_manifest_worm_tag")
+        or receipt.get("source_commit_adopted") != adoption.get("source_commit")
+        or receipt.get("scientific_result_hash")
+        != adoption.get("scientific_result_hash")
+        or receipt.get("scientific_result_file_sha256")
+        != adoption.get("scientific_result_file_sha256")
+        or receipt.get("replay_lease_attempt_hash")
+        != adoption.get("replay_lease_attempt_hash")
+        or receipt.get("replay_lease_file_sha256")
+        != adoption.get("replay_lease_file_sha256")
+        or receipt.get("scientific_replay_previously_completed") is not True
+        or receipt.get("economic_replay_executed_by_adapter") is not False
+        or receipt.get("economic_outcomes_changed") is not False
+        or receipt.get("scientific_policy_changed") is not False
+        or receipt.get("economic_evidence_bundle_created") is not False
+        or receipt.get("evidence_tier_awarded") is not None
+        or type(receipt.get("diagnostic_candidate_count")) is not int
+        or receipt.get("diagnostic_candidate_count") != 6
+        or receipt.get("materialized_candidate_count") != 0
+        or receipt.get("materialized_event_count") != 0
+        or receipt.get("materialized_trade_count") != 0
+        or receipt.get("materialized_episode_count") != 0
+        or receipt.get("promotion_allowed") is not False
+        or receipt.get("tier_q_allowed") is not False
+        or any(type(receipt.get(field)) is not int or receipt.get(field) != 0 for field in zero_fields)
+    ):
+        raise ProductionRuntimeError("non-economic audit receipt contract drift")
+    scientific_path = Path(str(receipt.get("scientific_result_path") or ""))
+    if not scientific_path.is_absolute():
+        scientific_path = (project / scientific_path).resolve()
+    else:
+        scientific_path = scientific_path.resolve()
+    lease_path = Path(str(receipt.get("replay_lease_path") or ""))
+    if not lease_path.is_absolute():
+        lease_path = (project / lease_path).resolve()
+    else:
+        lease_path = lease_path.resolve()
+    expected_scientific = (project / str(adoption["scientific_result_path"])).resolve()
+    expected_lease = (project / str(adoption["replay_lease_path"])).resolve()
+    if (
+        scientific_path != expected_scientific
+        or lease_path != expected_lease
+        or scientific_path == allowed
+        or lease_path == allowed
+        or allowed not in scientific_path.parents
+        or allowed not in lease_path.parents
+    ):
+        raise ProductionRuntimeError("non-economic audit source artifact path drift")
+    try:
+        scientific_payload = json.loads(scientific_path.read_text(encoding="utf-8"))
+        lease_payload = json.loads(lease_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ProductionRuntimeError("non-economic audit source artifact is invalid") from exc
+    try:
+        from hydra.production.cross_ecology_analog_runtime import (
+            _canonical_material as validate_0036_canonical_material,
+            _validate_scientific_payload as validate_0036_scientific_payload,
+        )
+
+        validate_0036_scientific_payload(scientific_payload, manifest)
+        if validate_0036_canonical_material(scientific_payload, manifest) is not None:
+            raise ProductionRuntimeError(
+                "non-economic audit source unexpectedly contains canonical evidence"
+            )
+    except ProductionRuntimeError:
+        raise
+    except Exception as exc:
+        raise ProductionRuntimeError(
+            "non-economic audit scientific semantics drift"
+        ) from exc
+    lease_core = dict(lease_payload) if isinstance(lease_payload, dict) else {}
+    lease_claimed = str(lease_core.pop("attempt_hash", ""))
+    scientific_core = (
+        dict(scientific_payload) if isinstance(scientific_payload, Mapping) else {}
+    )
+    scientific_claimed = str(scientific_core.pop("result_hash", ""))
+    scientific_decisions = (
+        scientific_payload.get("candidate_decisions")
+        if isinstance(scientific_payload, Mapping)
+        else None
+    )
+    scientific_bundles = (
+        scientific_payload.get("evidence_bundles")
+        if isinstance(scientific_payload, Mapping)
+        else None
+    )
+    if (
+        _sha256(scientific_path) != adoption.get("scientific_result_file_sha256")
+        or not isinstance(scientific_payload, Mapping)
+        or not scientific_claimed
+        or stable_hash(scientific_core) != scientific_claimed
+        or scientific_payload.get("result_hash") != adoption.get("scientific_result_hash")
+        or scientific_payload.get("status") != adoption.get("scientific_status")
+        or scientific_payload.get("canonical_evidence_material") is not None
+        or scientific_payload.get("canonical_evidence_status")
+        != adoption.get("canonical_evidence_status")
+        or not isinstance(scientific_decisions, list)
+        or len(scientific_decisions) != 6
+        or not isinstance(scientific_bundles, Mapping)
+        or len(scientific_bundles) != 6
+        or not isinstance(receipt.get("candidate_fragment_hashes"), Mapping)
+        or receipt.get("candidate_fragment_hashes")
+        != scientific_payload.get("evidence_bundle_hashes")
+        or receipt.get("candidate_fragment_hashes_hash")
+        != stable_hash(dict(sorted(receipt.get("candidate_fragment_hashes", {}).items())))
+        or _sha256(lease_path) != adoption.get("replay_lease_file_sha256")
+        or not isinstance(lease_payload, Mapping)
+        or not lease_claimed
+        or stable_hash(lease_core) != lease_claimed
+        or lease_claimed != adoption.get("replay_lease_attempt_hash")
+        or lease_payload.get("status") != "COMPLETE"
+        or lease_payload.get("result_hash") != adoption.get("scientific_result_hash")
+        or lease_payload.get("result_file_sha256")
+        != adoption.get("scientific_result_file_sha256")
+    ):
+        raise ProductionRuntimeError("non-economic audit source artifact drift")
+    worm_commit = str(adoption.get("source_manifest_worm_commit") or "")
+    worm_tag = str(adoption.get("source_manifest_worm_tag") or "")
+    worm_path = str(adoption.get("source_manifest_path") or "")
+    tagged = subprocess.run(
+        ["git", "rev-parse", f"{worm_tag}^{{commit}}"],
+        cwd=project,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    blob = subprocess.run(
+        ["git", "show", f"{worm_commit}:{worm_path}"],
+        cwd=project,
+        check=False,
+        capture_output=True,
+    )
+    try:
+        frozen_manifest = json.loads(blob.stdout) if blob.returncode == 0 else None
+    except json.JSONDecodeError:
+        frozen_manifest = None
+    if (
+        tagged.returncode != 0
+        or tagged.stdout.strip() != worm_commit
+        or blob.returncode != 0
+        or hashlib.sha256(blob.stdout).hexdigest()
+        != adoption.get("source_manifest_file_sha256")
+        or not isinstance(frozen_manifest, Mapping)
+        or frozen_manifest.get("manifest_hash") != adoption.get("source_manifest_hash")
+        or frozen_manifest.get("source_commit") != adoption.get("source_commit")
+    ):
+        raise ProductionRuntimeError("non-economic audit source manifest WORM drift")
+    economic = result.get("economic_results")
+    counters = economic.get("production_counters") if isinstance(economic, Mapping) else None
+    frontier = economic.get("economic_frontier") if isinstance(economic, Mapping) else None
+    kpis = result.get("kpis")
+    halving = result.get("successive_halving")
+    stages = halving.get("stage_decisions") if isinstance(halving, Mapping) else None
+    controls = result.get("matched_controls")
+    next_action = result.get("autonomous_next_action")
+    if (
+        not isinstance(counters, Mapping)
+        or not isinstance(frontier, Mapping)
+        or not isinstance(kpis, Mapping)
+        or not isinstance(stages, list)
+        or not stages
+        or any(
+            not isinstance(stage, Mapping)
+            or stage.get("output_count") != 0
+            or stage.get("selected_policy_ids") != []
+            for stage in stages
+        )
+        or not isinstance(controls, Mapping)
+        or controls.get("control_policy_count") != 0
+        or not isinstance(next_action, Mapping)
+        or next_action.get("candidate_ids") != []
+        or next_action.get("tier_q_allowed") is not False
+        or next_action.get("manifest_required") is not True
+        or any(
+            next_action.get(field) is not False
+            for field in (
+                "q4_access_authorized",
+                "new_data_purchase_authorized",
+                "network_access_authorized",
+                "broker_or_orders_authorized",
+                "mission_database_write_authorized",
+                "registry_write_authorized",
+                "cemetery_write_authorized",
+            )
+        )
+        or economic.get("economic_evidence_materialized") is not False
+        or economic.get("confirmation_ready_candidate_ids") != []
+        or economic.get("development_finalist_ids") != []
+        or economic.get("development_only") is not True
+        or economic.get("independently_confirmed") is not False
+        or any(
+            counters.get(field) != 0
+            for field in (
+                "serious_exact_account_replays",
+                "predeclared_control_policy_replays",
+                "combine_episodes_completed",
+                "normal_episodes_completed",
+                "stressed_episodes_completed",
+            )
+        )
+        or kpis.get("exact_account_replays") != 0
+        or kpis.get("combine_episodes_completed") != 0
+        or kpis.get("normal_episodes_completed") != 0
+        or kpis.get("stressed_episodes_completed") != 0
+        or kpis.get("positive_stressed_net_candidates") != 0
+        or kpis.get("candidates_with_normal_pass") != 0
+        or kpis.get("candidates_with_stressed_pass") != 0
+        or kpis.get("best_normal_pass_rate") != 0.0
+        or kpis.get("best_stressed_pass_rate") != 0.0
+        or kpis.get("median_normal_pass_rate") != 0.0
+        or kpis.get("median_stressed_pass_rate") != 0.0
+        or kpis.get("near_pass_count") != 0
+        or kpis.get("candidates_promoted_96") != 0
+        or kpis.get("candidates_surviving_96") != 0
+        or kpis.get("confirmation_ready_candidates") != 0
+        or frontier.get("candidate_count") != 0
+        or frontier.get("positive_stressed_net_count") != 0
+        or any(
+            frontier.get(field) is not None
+            for field in (
+                "normal_pass_fraction_best",
+                "stressed_pass_fraction_best",
+                "stressed_target_progress_median_best",
+                "stressed_mll_breach_rate_minimum",
+            )
+        )
+        or result.get("evidence_tier_awarded") is not None
+        or result.get("tier_q_allowed") is not False
+        or result.get("promotion_allowed") is not False
+        or result.get("development_only") is not True
+        or result.get("independently_confirmed") is not False
+        or result.get("status_inheritance") is not False
+    ):
+        raise ProductionRuntimeError("non-economic terminal invented economic evidence")
+    return receipt
 
 
 def read_live_status(manifest_path: str | Path) -> dict[str, Any]:

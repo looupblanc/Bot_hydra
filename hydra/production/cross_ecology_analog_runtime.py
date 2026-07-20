@@ -34,8 +34,13 @@ from hydra.production.cross_ecology_analog_manifest import (
     CAMPAIGN_MODE,
     CAMPAIGN_ORDINAL,
     CLASS_ID,
+    COMPLETED_RESULT_ADOPTION_CLASSIFICATION,
+    COMPLETED_RESULT_ADOPTION_SCHEMA,
     DEFAULT_MANIFEST_PATH,
     EVIDENCE_ROLE,
+    NON_ECONOMIC_AUDIT_RECEIPT_SCHEMA,
+    NON_ECONOMIC_CANONICAL_STATUS,
+    NON_ECONOMIC_TERMINAL_MODE,
     ROOT_AUTHORIZATION,
     RUNTIME_VERSION,
     SCIENTIFIC_RESULT_SCHEMA,
@@ -79,13 +84,18 @@ def read_cross_ecology_analog_status(manifest_path: str | Path) -> dict[str, Any
     result_path = output / "economic_production_result.json"
     if result_path.is_file():
         return _load_terminal_result(result_path, manifest, output)
-    state_path = output / "production_state.json"
-    if state_path.is_file():
-        return _read_snapshot(state_path, "state_hash", manifest)
+    checkpoint = _read_checkpoint_pair(output, manifest)
+    if checkpoint is not None:
+        return checkpoint[0]
+    adoption = _completed_adoption(manifest)
     return {
         "campaign_id": CAMPAIGN_ID,
         "state": "NOT_STARTED",
-        "next_action": "RUN_OR_ADOPT_EXACT_ROOT_AUTHORIZED_0036_REPLAY_ONCE",
+        "next_action": (
+            "ADOPT_COMPLETED_HASH_BOUND_RESULT_WITHOUT_REPLAY"
+            if adoption is not None
+            else "RUN_OR_ADOPT_EXACT_ROOT_AUTHORIZED_0036_REPLAY_ONCE"
+        ),
     }
 
 
@@ -123,13 +133,17 @@ def run_cross_ecology_analog_manifest(
     output.mkdir(parents=True, exist_ok=True)
     started_wall = time.perf_counter()
     started_cpu = time.process_time()
-    sequence = _next_sequence(output)
+    sequence = _next_sequence(output, manifest)
     _publish(
         output,
         manifest,
         state="STARTING",
         stage="SCIENTIFIC_SOURCE_BINDING",
-        next_action="ADOPT_OR_RUN_EXACT_ROOT_AUTHORIZED_READ_ONLY_RESULT_ONCE",
+        next_action=(
+            "ADOPT_COMPLETED_HASH_BOUND_RESULT_WITHOUT_REPLAY"
+            if _completed_adoption(manifest) is not None
+            else "ADOPT_OR_RUN_EXACT_ROOT_AUTHORIZED_READ_ONLY_RESULT_ONCE"
+        ),
         sequence=sequence,
         metrics=None,
         elapsed=0.0,
@@ -153,9 +167,21 @@ def run_cross_ecology_analog_manifest(
     _publish(
         output,
         manifest,
-        state="EXACT_REPLAY_ACTIVE",
+        state=(
+            "EXACT_REPLAY_ACTIVE"
+            if replay_executed
+            else (
+                "NON_ECONOMIC_AUDIT_ACTIVE"
+                if canonical is None
+                else "CANONICAL_ADOPTION_ACTIVE"
+            )
+        ),
         stage="CANONICAL_EVIDENCE_ADOPTION",
-        next_action="SEAL_EMBEDDED_CANONICAL_EVIDENCE_WITHOUT_REPLAY",
+        next_action=(
+            "PUBLISH_NON_ECONOMIC_AUDIT_WITHOUT_REPLAY"
+            if canonical is None
+            else "SEAL_EMBEDDED_CANONICAL_EVIDENCE_WITHOUT_REPLAY"
+        ),
         sequence=sequence,
         metrics=metrics,
         elapsed=elapsed,
@@ -163,7 +189,18 @@ def run_cross_ecology_analog_manifest(
         replay_executed=replay_executed,
     )
 
-    receipt = _seal_evidence(root, output, manifest, scientific, canonical, metrics)
+    receipt = (
+        _publish_non_economic_audit(
+            root,
+            output,
+            manifest,
+            scientific,
+            scientific_path,
+            metrics,
+        )
+        if canonical is None
+        else _seal_evidence(root, output, manifest, scientific, canonical, metrics)
+    )
     decision_report = _decision_report(manifest, scientific, metrics, scientific_path)
     _atomic_json(output / "decision_report.json", decision_report)
 
@@ -188,6 +225,7 @@ def run_cross_ecology_analog_manifest(
         kpis=final_kpis,
         decision_report=decision_report,
         replay_executed=replay_executed,
+        non_economic_audit=receipt if canonical is None else None,
     )
 
     # COMPLETE views are published first.  The atomic terminal result is the
@@ -196,7 +234,11 @@ def run_cross_ecology_analog_manifest(
         output,
         manifest,
         state="COMPLETE",
-        stage="TIER_E_BRANCH_DECISION_SEALED",
+        stage=(
+            "NON_ECONOMIC_BRANCH_DECISION_SEALED"
+            if canonical is None
+            else "TIER_E_BRANCH_DECISION_SEALED"
+        ),
         next_action=str(terminal["autonomous_next_action"]["action"]),
         sequence=sequence,
         metrics=metrics,
@@ -222,6 +264,8 @@ def _obtain_scientific_result(
     source_path = _inside(root, source["result_path"])
     if source["source_mode"] == "PREEXISTING_HASH_BOUND":
         _load_scientific_result(source_path, manifest, require_hash_binding=True)
+        if _completed_adoption(manifest) is not None:
+            _validate_adopted_replay_lease(output, manifest, source_path)
         return source_path, False
 
     lease_path = output / "scientific_replay_attempt.json"
@@ -251,7 +295,9 @@ def _obtain_scientific_result(
             )
             complete["attempt_hash"] = stable_hash(complete)
             _atomic_json(lease_path, complete)
-        return source_path, True
+        # The lease proves that the sole replay happened previously.  Merely
+        # adopting its immutable output in this invocation is not a replay.
+        return source_path, False
 
     if lease_path.is_file():
         lease = _read_hashed(lease_path, "attempt_hash")
@@ -317,6 +363,14 @@ def _load_scientific_result(
 ) -> dict[str, Any]:
     result = _read_json(path)
     _validate_scientific_payload(result, manifest)
+    adoption = _completed_adoption(manifest)
+    if adoption is not None and (
+        _sha256(path) != adoption.get("scientific_result_file_sha256")
+        or result.get("result_hash") != adoption.get("scientific_result_hash")
+    ):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 adopted scientific result hash binding drift"
+        )
     if require_hash_binding:
         source = manifest["research_source"]
         if (
@@ -334,6 +388,18 @@ def _validate_scientific_payload(
     core = dict(result)
     core.pop("result_hash", None)
     source = manifest["research_source"]
+    adoption = _completed_adoption(manifest)
+    expected_source_commit = (
+        adoption["source_commit"] if adoption is not None else manifest.get("source_commit")
+    )
+    expected_manifest_hash = (
+        adoption["source_manifest_hash"]
+        if adoption is not None
+        else manifest.get("manifest_hash")
+    )
+    expected_implementation_files = (
+        None if adoption is not None else dict(sorted(manifest["implementation_files"].items()))
+    )
     audit = result.get("source_audit")
     governance = result.get("governance")
     production = result.get("production_manifest")
@@ -347,7 +413,7 @@ def _validate_scientific_payload(
         result.get("schema") != SCIENTIFIC_RESULT_SCHEMA
         or result.get("campaign_id") != CAMPAIGN_ID
         or result.get("branch_id") != CLASS_ID
-        or result.get("source_commit") != manifest.get("source_commit")
+        or result.get("source_commit") != expected_source_commit
         or result.get("status") not in SCIENTIFIC_STATUSES
         or result.get("evidence_role") != EVIDENCE_ROLE
         or result.get("evidence_tier_ceiling") != "TIER_E_EXECUTABLE_DIAGNOSTIC"
@@ -363,12 +429,14 @@ def _validate_scientific_payload(
         or int(production.get("campaign_ordinal", -1)) != CAMPAIGN_ORDINAL
         or production.get("path") != DEFAULT_MANIFEST_PATH
         or production.get("production_manifest_hash")
-        != manifest.get("manifest_hash")
-        or production.get("source_commit") != manifest.get("source_commit")
+        != expected_manifest_hash
+        or production.get("source_commit") != expected_source_commit
         or production.get("decision_card_hash")
         != source.get("decision_card_hash")
-        or production.get("implementation_files")
-        != dict(sorted(manifest["implementation_files"].items()))
+        or (
+            expected_implementation_files is not None
+            and production.get("implementation_files") != expected_implementation_files
+        )
         or production.get("verified_against_committed_blobs") is not True
         or production.get("source_commit_is_live_head_ancestor") is not True
         or not isinstance(production_reservation, Mapping)
@@ -393,6 +461,16 @@ def _validate_scientific_payload(
         raise CrossEcologyAnalogRuntimeError(
             "0036 scientific production-manifest file hash is invalid"
         )
+    if adoption is not None and (
+        result.get("result_hash") != adoption.get("scientific_result_hash")
+        or manifest_file_sha != adoption.get("source_manifest_file_sha256")
+        or result.get("status") != adoption.get("scientific_status")
+        or result.get("canonical_evidence_status")
+        != adoption.get("canonical_evidence_status")
+    ):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 adopted scientific result identity drift"
+        )
     _require_exact_zero_counters(
         governance, SAFETY_COUNTER_FIELDS, "0036 scientific governance"
     )
@@ -408,12 +486,30 @@ def _validate_scientific_payload(
         )
 
 
+def _completed_adoption(manifest: Mapping[str, Any]) -> dict[str, Any] | None:
+    raw = manifest.get("completed_scientific_result_adoption")
+    if raw is None:
+        return None
+    if (
+        not isinstance(raw, Mapping)
+        or raw.get("schema") != COMPLETED_RESULT_ADOPTION_SCHEMA
+        or raw.get("classification") != COMPLETED_RESULT_ADOPTION_CLASSIFICATION
+        or raw.get("terminal_mode") != NON_ECONOMIC_TERMINAL_MODE
+        or raw.get("economic_outcomes_changed") is not False
+        or raw.get("scientific_policy_changed") is not False
+        or raw.get("economic_replay_allowed") is not False
+    ):
+        raise CrossEcologyAnalogRuntimeError("0036 completed-result adoption drift")
+    return dict(raw)
+
+
 def _canonical_material(
     scientific: Mapping[str, Any], manifest: Mapping[str, Any]
-) -> dict[str, Any]:
+) -> dict[str, Any] | None:
     material = scientific.get("canonical_evidence_material")
     if not isinstance(material, Mapping):
-        raise CrossEcologyAnalogRuntimeError("0036 lacks aggregate canonical evidence material")
+        _validate_nonmaterialized_scientific_result(scientific, manifest)
+        return None
     checked = dict(material)
     claimed = str(checked.pop("canonical_material_hash", ""))
     identity = material.get("identity")
@@ -464,6 +560,356 @@ def _canonical_material(
     if scientific.get("canonical_evidence_material_hash") not in (None, claimed):
         raise CrossEcologyAnalogRuntimeError("0036 top-level canonical hash drift")
     return dict(material)
+
+
+def _validate_nonmaterialized_scientific_result(
+    scientific: Mapping[str, Any], manifest: Mapping[str, Any]
+) -> None:
+    """Accept only the exact zero-material underpowered scientific outcome."""
+
+    decisions = scientific.get("candidate_decisions")
+    bundles = scientific.get("evidence_bundles")
+    bundle_hashes = scientific.get("evidence_bundle_hashes")
+    gate = scientific.get("branch_gate")
+    if (
+        scientific.get("status")
+        != "SESSION_PATH_ANALOG_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+        or scientific.get("canonical_evidence_status") != NON_ECONOMIC_CANONICAL_STATUS
+        or scientific.get("canonical_evidence_material") is not None
+        or scientific.get("canonical_evidence_material_hash") not in (None, "")
+        or not isinstance(decisions, Sequence)
+        or isinstance(decisions, (str, bytes))
+        or len(decisions) != int(manifest["multiplicity"]["prospective_comparisons"])
+        or not isinstance(bundles, Mapping)
+        or not isinstance(bundle_hashes, Mapping)
+        or not isinstance(gate, Mapping)
+        or gate.get("status") != scientific.get("status")
+        or list(gate.get("passed_candidate_ids") or ())
+        or gate.get("threshold_relaxation_allowed") is not False
+    ):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 non-economic scientific result contract drift"
+        )
+    candidate_ids = [str(row.get("candidate_id") or "") for row in decisions]
+    if (
+        not all(candidate_ids)
+        or len(candidate_ids) != len(set(candidate_ids))
+        or set(bundles) != set(candidate_ids)
+        or set(bundle_hashes) != set(candidate_ids)
+    ):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 non-economic candidate inventory drift"
+        )
+    empty_ledger_hash = stable_hash([])
+    for decision in decisions:
+        if not isinstance(decision, Mapping):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 non-economic decision is malformed"
+            )
+        scalar_zero_fields = (
+            "materialized_economic_event_count",
+            "routed_event_count",
+            "future_outcome_censored_signal_count",
+        )
+        if any(
+            type(decision.get(field)) is not int or decision.get(field) != 0
+            for field in scalar_zero_fields
+        ):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 non-economic decision unexpectedly materialized an event"
+            )
+        for field in (
+            "routed_signals_by_role",
+            "routed_events_by_role",
+            "control_event_counts",
+        ):
+            counts = decision.get(field)
+            if not isinstance(counts, Mapping) or any(
+                type(value) is not int or value != 0 for value in counts.values()
+            ):
+                raise CrossEcologyAnalogRuntimeError(
+                    "0036 non-economic decision count drift"
+                )
+        if (
+            decision.get("routed_events_by_market") != {}
+            or decision.get("control_opportunity_identity_equal") is not True
+            or decision.get("event_ledger_hash") != empty_ledger_hash
+            or not _is_exact_zero_number(
+                decision.get("discovery_stressed_net_per_one_micro_usd")
+            )
+            or not _is_exact_zero_number(decision.get("discovery_target_first_rate"))
+        ):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 non-economic decision ledger identity drift"
+            )
+        _validate_zero_decision_account_material(decision)
+        candidate_id = str(decision["candidate_id"])
+        bundle = bundles[candidate_id]
+        if not isinstance(bundle, Mapping):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 non-economic candidate fragment is malformed"
+            )
+        bundle_core = dict(bundle)
+        claimed = str(bundle_core.pop("evidence_bundle_hash", ""))
+        row_counts = bundle.get("row_counts")
+        if (
+            not claimed
+            or stable_hash(bundle_core) != claimed
+            or bundle_hashes[candidate_id] != claimed
+            or decision.get("evidence_bundle_hash") != claimed
+            or bundle.get("schema") != "hydra_compact_complete_evidence_bundle_v1"
+            or bundle.get("campaign_id") != CAMPAIGN_ID
+            or bundle.get("candidate_id") != candidate_id
+            or bundle.get("source_commit") != scientific.get("source_commit")
+            or bundle.get("tier_ceiling") != "E"
+            or bundle.get("tier_q_allowed") is not False
+            or bundle.get("promotion_allowed") is not False
+            or bundle.get("complete") is not False
+            or bundle.get("materialization_status")
+            != "NON_MATERIALIZED_FRAGMENT_EXCLUDED"
+            or bundle.get("canonical_evidence_material") is not None
+            or not isinstance(row_counts, Mapping)
+            or any(
+                type(row_counts.get(field)) is not int
+                or row_counts.get(field) != expected
+                for field, expected in (
+                    ("canonical_rows", 0),
+                    ("controls", 5),
+                    ("routed_event_rows", 0),
+                    ("routed_trade_rows", 0),
+                    ("scenarios", 2),
+                )
+            )
+        ):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 non-economic candidate fragment drift"
+            )
+        _validate_empty_routed_ledgers(bundle, empty_ledger_hash)
+        _validate_zero_account_episode_material(bundle.get("account_episode_material"))
+        ledger_hashes = bundle.get("ledger_hashes")
+        if (
+            not isinstance(ledger_hashes, Mapping)
+            or ledger_hashes.get("account_material")
+            != stable_hash(bundle.get("account_episode_material"))
+        ):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 non-economic account material hash drift"
+            )
+
+    power = scientific.get("power_preflight")
+    if (
+        not isinstance(power, Mapping)
+        or power.get("passed") is not False
+        or power.get("underpowered_status") != scientific.get("status")
+    ):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 non-economic power preflight drift"
+        )
+
+
+def _validate_empty_routed_ledgers(
+    bundle: Mapping[str, Any], empty_ledger_hash: str
+) -> None:
+    expected_controls = {
+        "PRIMARY",
+        "OWN_PATH_ONLY",
+        "SESSION_MARKET_EXPOSURE_MATCHED_RANDOM",
+        "ANALOG_LABEL_PERMUTATION",
+        "DIRECTION_FLIP",
+    }
+    expected_scenarios = {"NORMAL", "STRESSED_1_5X"}
+    events = bundle.get("routed_event_ledgers")
+    trades = bundle.get("routed_trade_ledgers")
+    hashes = bundle.get("ledger_hashes")
+    event_hashes = hashes.get("events") if isinstance(hashes, Mapping) else None
+    trade_hashes = hashes.get("trades") if isinstance(hashes, Mapping) else None
+    if (
+        not isinstance(events, Mapping)
+        or not isinstance(trades, Mapping)
+        or not isinstance(event_hashes, Mapping)
+        or not isinstance(trade_hashes, Mapping)
+        or set(events) != expected_controls
+        or set(event_hashes) != expected_controls
+        or set(trades) != expected_controls
+        or set(trade_hashes) != expected_controls
+    ):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 non-economic routed ledger contract drift"
+        )
+    for control, rows in events.items():
+        if rows != [] or event_hashes.get(control) != empty_ledger_hash:
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 non-economic fragment contains a routed event"
+            )
+    for control, scenarios in trades.items():
+        expected = trade_hashes.get(control)
+        if (
+            not isinstance(scenarios, Mapping)
+            or not isinstance(expected, Mapping)
+            or set(scenarios) != expected_scenarios
+            or set(expected) != expected_scenarios
+        ):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 non-economic routed trade ledger contract drift"
+            )
+        for scenario, rows in scenarios.items():
+            if rows != [] or expected.get(scenario) != empty_ledger_hash:
+                raise CrossEcologyAnalogRuntimeError(
+                    "0036 non-economic fragment contains a routed trade"
+                )
+
+
+def _validate_zero_account_episode_material(value: Any) -> None:
+    if not isinstance(value, Mapping):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 non-economic account material is malformed"
+        )
+    evaluations = value.get("evaluations")
+    if not isinstance(evaluations, Mapping):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 non-economic account evaluations are absent"
+        )
+    _validate_zero_evaluation_tree(evaluations, require_episode_ledger=True)
+
+
+def _validate_zero_decision_account_material(decision: Mapping[str, Any]) -> None:
+    frontier = decision.get("account_frontier")
+    selected = decision.get("discovery_selected_account_cell")
+    if (
+        not isinstance(frontier, Sequence)
+        or isinstance(frontier, (str, bytes))
+        or not frontier
+        or not isinstance(selected, Mapping)
+    ):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 non-economic decision account frontier drift"
+        )
+    for cell in [*frontier, selected]:
+        if not isinstance(cell, Mapping) or not isinstance(cell.get("evaluations"), Mapping):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 non-economic decision account cell drift"
+            )
+        _validate_zero_evaluation_tree(
+            cell["evaluations"], require_episode_ledger=False
+        )
+    context = decision.get("stressed_context_economics_per_one_micro")
+    temporal = context.get("net_by_temporal_subblock_usd") if isinstance(context, Mapping) else None
+    if (
+        not isinstance(context, Mapping)
+        or set(context)
+        != {
+            "future_outcome_censored_signal_count",
+            "net_by_market_usd",
+            "net_by_temporal_subblock_usd",
+            "positive_market_or_temporal_context_count",
+            "positive_markets",
+            "positive_temporal_subblocks",
+        }
+        or type(context.get("future_outcome_censored_signal_count")) is not int
+        or context.get("future_outcome_censored_signal_count") != 0
+        or context.get("net_by_market_usd") != {}
+        or not isinstance(temporal, Mapping)
+        or any(
+            not isinstance(value, (int, float))
+            or isinstance(value, bool)
+            or not math.isfinite(float(value))
+            or float(value) != 0.0
+            for value in temporal.values()
+        )
+        or type(context.get("positive_market_or_temporal_context_count")) is not int
+        or context.get("positive_market_or_temporal_context_count") != 0
+        or context.get("positive_markets") != []
+        or context.get("positive_temporal_subblocks") != []
+    ):
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 non-economic decision context contains economic evidence"
+        )
+
+
+def _validate_zero_evaluation_tree(
+    evaluations: Mapping[str, Any], *, require_episode_ledger: bool
+) -> None:
+    found = 0
+
+    def visit(node: Any) -> None:
+        nonlocal found
+        if isinstance(node, Mapping):
+            if "episode_ledger" in node or "episodes" in node:
+                found += 1
+                exact_zero_ints = ("episodes", "passes", "mll_breaches")
+                ledger = node.get("episode_ledger", [])
+                if (
+                    (require_episode_ledger and "episode_ledger" not in node)
+                    or ledger != []
+                    or node.get("episode_ledger_hash") != stable_hash([])
+                    or any(
+                        type(node.get(field)) is not int or node.get(field) != 0
+                        for field in exact_zero_ints
+                    )
+                    or not _is_exact_zero_number(node.get("net_total_usd"))
+                    or not _is_exact_zero_number(node.get("pass_rate"))
+                    or not _is_exact_zero_number(node.get("mll_breach_rate"))
+                    or not _is_exact_zero_number(node.get("target_progress_median"))
+                    or not _is_exact_zero_number(node.get("target_progress_p25"))
+                ):
+                    raise CrossEcologyAnalogRuntimeError(
+                        "0036 non-economic fragment contains account evidence"
+                    )
+            if "full_coverage_start_count" in node and (
+                type(node.get("full_coverage_start_count")) is not int
+                or node.get("full_coverage_start_count") != 0
+            ):
+                raise CrossEcologyAnalogRuntimeError(
+                    "0036 non-economic fragment contains a full-coverage start"
+                )
+            for child in node.values():
+                visit(child)
+        elif isinstance(node, Sequence) and not isinstance(node, (str, bytes)):
+            for child in node:
+                visit(child)
+
+    visit(evaluations)
+    if found == 0:
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 non-economic account evaluation contract drift"
+        )
+
+
+def _is_exact_zero_number(value: Any) -> bool:
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(float(value))
+        and float(value) == 0.0
+    )
+
+
+def _validate_adopted_replay_lease(
+    output: Path, manifest: Mapping[str, Any], source_path: Path
+) -> dict[str, Any]:
+    adoption = _completed_adoption(manifest)
+    if adoption is None:
+        raise CrossEcologyAnalogRuntimeError("0036 completed-result adoption is absent")
+    root = source_path.parents[3]
+    lease_path = _inside(root, adoption["replay_lease_path"])
+    expected_path = (output / "scientific_replay_attempt.json").resolve()
+    if (
+        lease_path != expected_path
+        or not lease_path.is_file()
+        or _sha256(lease_path) != adoption.get("replay_lease_file_sha256")
+    ):
+        raise CrossEcologyAnalogRuntimeError("0036 adopted replay lease binding drift")
+    lease = _read_hashed(lease_path, "attempt_hash")
+    _validate_replay_lease(lease, manifest)
+    if (
+        lease.get("status") != "COMPLETE"
+        or lease.get("attempt_hash") != adoption.get("replay_lease_attempt_hash")
+        or lease.get("result_hash") != adoption.get("scientific_result_hash")
+        or lease.get("result_file_sha256")
+        != adoption.get("scientific_result_file_sha256")
+    ):
+        raise CrossEcologyAnalogRuntimeError("0036 adopted replay lease/result drift")
+    return lease
 
 
 def _seal_evidence(
@@ -523,6 +969,83 @@ def _seal_evidence(
     return receipt.to_dict()
 
 
+def _publish_non_economic_audit(
+    root: Path,
+    output: Path,
+    manifest: Mapping[str, Any],
+    scientific: Mapping[str, Any],
+    scientific_path: Path,
+    metrics: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Publish an audit receipt without manufacturing economic ledger rows."""
+
+    adoption = _completed_adoption(manifest)
+    if adoption is None:
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 non-economic terminal requires explicit completed-result adoption"
+        )
+    lease = _validate_adopted_replay_lease(output, manifest, scientific_path)
+    receipt_path = _inside(root, adoption["audit_receipt_path"])
+    if receipt_path != (output / "non_economic_audit_receipt.json").resolve():
+        raise CrossEcologyAnalogRuntimeError("0036 non-economic audit path drift")
+    bundle_hashes = dict(sorted(scientific["evidence_bundle_hashes"].items()))
+    core = {
+        "schema": NON_ECONOMIC_AUDIT_RECEIPT_SCHEMA,
+        "campaign_id": CAMPAIGN_ID,
+        "manifest_hash": manifest["manifest_hash"],
+        "source_commit": manifest["source_commit"],
+        "terminal_mode": NON_ECONOMIC_TERMINAL_MODE,
+        "classification": NON_ECONOMIC_CANONICAL_STATUS,
+        "scientific_status": scientific["status"],
+        "scientific_result_path": str(scientific_path),
+        "scientific_result_hash": scientific["result_hash"],
+        "scientific_result_file_sha256": _sha256(scientific_path),
+        "source_manifest_hash": adoption["source_manifest_hash"],
+        "source_manifest_file_sha256": adoption["source_manifest_file_sha256"],
+        "source_manifest_worm_commit": adoption["source_manifest_worm_commit"],
+        "source_manifest_worm_tag": adoption["source_manifest_worm_tag"],
+        "source_commit_adopted": adoption["source_commit"],
+        "replay_lease_path": str((output / "scientific_replay_attempt.json").resolve()),
+        "replay_lease_attempt_hash": lease["attempt_hash"],
+        "replay_lease_file_sha256": _sha256(
+            output / "scientific_replay_attempt.json"
+        ),
+        "scientific_replay_previously_completed": True,
+        "economic_replay_executed_by_adapter": False,
+        "economic_outcomes_changed": False,
+        "scientific_policy_changed": False,
+        "economic_evidence_bundle_created": False,
+        "evidence_tier_awarded": None,
+        "diagnostic_candidate_count": int(metrics["diagnostic_candidate_count"]),
+        "materialized_candidate_count": 0,
+        "materialized_event_count": 0,
+        "materialized_trade_count": 0,
+        "materialized_episode_count": 0,
+        "candidate_fragment_hashes": bundle_hashes,
+        "candidate_fragment_hashes_hash": stable_hash(bundle_hashes),
+        "promotion_allowed": False,
+        "tier_q_allowed": False,
+        "q4_access_count_delta": 0,
+        "data_purchase_count": 0,
+        "network_requests": 0,
+        "broker_connections": 0,
+        "orders": 0,
+        "mission_database_writes": 0,
+        "registry_writes": 0,
+        "cemetery_writes": 0,
+    }
+    receipt = {**core, "receipt_hash": stable_hash(core)}
+    _atomic_json(receipt_path, receipt)
+    return {
+        "schema": NON_ECONOMIC_AUDIT_RECEIPT_SCHEMA,
+        "terminal_mode": NON_ECONOMIC_TERMINAL_MODE,
+        "classification": NON_ECONOMIC_CANONICAL_STATUS,
+        "path": str(receipt_path),
+        "file_sha256": _sha256(receipt_path),
+        "receipt_hash": receipt["receipt_hash"],
+    }
+
+
 def _verify_sealed_matches_canonical(
     bundle_path: str | Path, canonical: Mapping[str, Any]
 ) -> None:
@@ -545,11 +1068,38 @@ def _verify_sealed_matches_canonical(
 
 
 def _economic_metrics(
-    scientific: Mapping[str, Any], canonical: Mapping[str, Any]
+    scientific: Mapping[str, Any], canonical: Mapping[str, Any] | None
 ) -> dict[str, Any]:
     decisions = list(scientific.get("candidate_decisions") or [])
     if not decisions:
         raise CrossEcologyAnalogRuntimeError("0036 has no evaluated candidate decisions")
+    if canonical is None:
+        return {
+            "proposal_count": len(decisions),
+            "diagnostic_candidate_count": len(decisions),
+            "candidate_count": 0,
+            "canonical_policy_count": 0,
+            "control_policy_count": 0,
+            "normal_episode_count": 0,
+            "stressed_episode_count": 0,
+            "combine_episode_count": 0,
+            "normal_pass_candidate_count": 0,
+            "stressed_pass_candidate_count": 0,
+            "positive_stressed_count": 0,
+            "best_normal_pass_rate": 0.0,
+            "median_normal_pass_rate": 0.0,
+            "best_stressed_pass_rate": 0.0,
+            "median_stressed_pass_rate": 0.0,
+            "best_stressed_target_progress": 0.0,
+            "median_stressed_target_progress": 0.0,
+            "minimum_stressed_mll_breach_rate": 0.0,
+            "maximum_stressed_mll_breach_rate": 0.0,
+            "near_pass_count": 0,
+            "tier_e_passed_candidate_ids": [],
+            "headline_by_candidate": [],
+            "economic_evidence_materialized": False,
+            "canonical_evidence_status": NON_ECONOMIC_CANONICAL_STATUS,
+        }
     bundles = scientific.get("evidence_bundles")
     if not isinstance(bundles, Mapping):
         raise CrossEcologyAnalogRuntimeError("0036 candidate EvidenceBundle fragments are absent")
@@ -619,6 +1169,8 @@ def _economic_metrics(
         "near_pass_count": sum(value >= 0.60 for value in stressed_progress),
         "tier_e_passed_candidate_ids": passed_ids,
         "headline_by_candidate": primary_rows,
+        "economic_evidence_materialized": True,
+        "canonical_evidence_status": "AGGREGATE_CANONICAL_EVIDENCE_MATERIALIZED",
     }
 
 
@@ -679,7 +1231,7 @@ def _next_action(status: str, metrics: Mapping[str, Any]) -> dict[str, Any]:
     if status == "SESSION_PATH_ANALOG_TIER_E_DIAGNOSTIC_GREEN":
         action = "FREEZE_TIER_E_DIAGNOSTIC_AND_REQUIRE_SEPARATELY_FROZEN_UNSEEN_CONFIRMATION"
     elif status == "SESSION_PATH_ANALOG_UNDERPOWERED_NO_THRESHOLD_RELAXATION":
-        action = "PRESERVE_UNDERPOWERED_TIER_E_DIAGNOSTIC_AND_PREAPPEND_DISTINCT_SUCCESSOR"
+        action = "PRESERVE_NON_MATERIALIZED_DIAGNOSTIC_AND_PREAPPEND_DISTINCT_SUCCESSOR"
     else:
         action = "QUEUE_MATERIALLY_DISTINCT_MECHANISM_MANIFEST"
     return {
@@ -708,7 +1260,18 @@ def _terminal_result(
     kpis: Mapping[str, Any],
     decision_report: Mapping[str, Any],
     replay_executed: bool,
+    non_economic_audit: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    if non_economic_audit is not None:
+        return _non_economic_terminal_result(
+            manifest=manifest,
+            scientific=scientific,
+            scientific_path=scientific_path,
+            audit=non_economic_audit,
+            metrics=metrics,
+            kpis=kpis,
+            decision_report=decision_report,
+        )
     economic_results = {
         "schema": "hydra_cross_ecology_0036_economics_v1",
         "production_counters": {
@@ -807,6 +1370,11 @@ def _terminal_result(
                 "result_hash": scientific["result_hash"],
                 "source_mode": manifest["research_source"]["source_mode"],
                 "economic_replay_executed_by_adapter": bool(replay_executed),
+                "scientific_replay_previously_completed": bool(
+                    replay_executed
+                    or manifest["research_source"]["source_mode"]
+                    == "GENERATE_READ_ONLY_ONCE"
+                ),
             },
             "canonical_evidence_material_hash": scientific[
                 "canonical_evidence_material"
@@ -821,6 +1389,110 @@ def _terminal_result(
             "cemetery_writes": 0,
         }
     )
+    result["result_hash"] = stable_hash(result)
+    return result
+
+
+def _non_economic_terminal_result(
+    *,
+    manifest: Mapping[str, Any],
+    scientific: Mapping[str, Any],
+    scientific_path: Path,
+    audit: Mapping[str, Any],
+    metrics: Mapping[str, Any],
+    kpis: Mapping[str, Any],
+    decision_report: Mapping[str, Any],
+) -> dict[str, Any]:
+    economic_results = {
+        "schema": "hydra_cross_ecology_0036_non_economic_terminal_v1",
+        "terminal_mode": NON_ECONOMIC_TERMINAL_MODE,
+        "canonical_evidence_status": NON_ECONOMIC_CANONICAL_STATUS,
+        "production_counters": {
+            "diagnostic_candidates_evaluated": int(metrics["diagnostic_candidate_count"]),
+            "serious_exact_account_replays": 0,
+            "predeclared_control_policy_replays": 0,
+            "combine_episodes_completed": 0,
+            "normal_episodes_completed": 0,
+            "stressed_episodes_completed": 0,
+        },
+        "economic_frontier": {
+            "candidate_count": 0,
+            "positive_stressed_net_count": 0,
+            "normal_pass_fraction_best": None,
+            "stressed_pass_fraction_best": None,
+            "stressed_target_progress_median_best": None,
+            "stressed_mll_breach_rate_minimum": None,
+        },
+        "economic_evidence_materialized": False,
+        "matched_controls_status": "NOT_MATERIALIZED_NO_ROUTED_EVENTS",
+        "null_status": "NOT_MATERIALIZED_NO_ROUTED_EVENTS",
+        "confirmation_ready_candidate_ids": [],
+        "development_finalist_ids": [],
+        "development_only": True,
+        "independently_confirmed": False,
+    }
+    economic_results["summary_hash"] = stable_hash(economic_results)
+    result = {
+        "schema": RESULT_SCHEMA,
+        "campaign_id": CAMPAIGN_ID,
+        "manifest_hash": manifest["manifest_hash"],
+        "source_commit": manifest["source_commit"],
+        "status": "COMPLETE",
+        "scientific_status": scientific["status"],
+        "kpis": dict(kpis),
+        "economic_results": economic_results,
+        "successive_halving": {
+            "schema": "hydra_cross_ecology_0036_non_economic_tripwire_v1",
+            "stage_decisions": [
+                {
+                    "stage": "SIX_RULE_CROSS_ECOLOGY_TRIPWIRE",
+                    "input_count": int(metrics["diagnostic_candidate_count"]),
+                    "output_count": 0,
+                    "selected_policy_ids": [],
+                    "economic_materialization_required": True,
+                }
+            ],
+            "thresholds_changed_after_results": False,
+        },
+        "matched_controls": {
+            "schema": "hydra_cross_ecology_0036_non_economic_controls_v1",
+            "status": "NOT_MATERIALIZED_NO_ROUTED_EVENTS",
+            "control_policy_count": 0,
+        },
+        "failure_vectors": _failure_vectors(scientific),
+        "evidence_bundle": None,
+        "evidence_verification_manifest_sha256": None,
+        "non_economic_audit": dict(audit),
+        "autonomous_next_action": _next_action(str(scientific["status"]), metrics),
+        "development_only": True,
+        "independently_confirmed": False,
+        "status_inheritance": False,
+        "q4_access_delta": 0,
+        "new_data_purchase_count": 0,
+        "broker_connections": 0,
+        "orders": 0,
+        "campaign_mode": CAMPAIGN_MODE,
+        "campaign_ordinal": CAMPAIGN_ORDINAL,
+        "runtime_version": RUNTIME_VERSION,
+        "scientific_result": {
+            "path": str(scientific_path),
+            "file_sha256": _sha256(scientific_path),
+            "result_hash": scientific["result_hash"],
+            "source_mode": manifest["research_source"]["source_mode"],
+            "economic_replay_executed_by_adapter": False,
+            "scientific_replay_previously_completed": True,
+        },
+        "canonical_evidence_material_hash": None,
+        "decision_report_hash": decision_report["decision_report_hash"],
+        "evidence_tier_ceiling": "E",
+        "evidence_tier_awarded": None,
+        "tier_q_allowed": False,
+        "promotion_allowed": False,
+        "network_requests": 0,
+        "mission_database_writes": 0,
+        "registry_writes": 0,
+        "cemetery_writes": 0,
+    }
     result["result_hash"] = stable_hash(result)
     return result
 
@@ -905,6 +1577,9 @@ def _write_state(
 ) -> None:
     metrics = metrics or {}
     base = Path(str(manifest["evidence_bundle"]["destination"]))
+    economic_evidence_materialized = bool(
+        metrics.get("economic_evidence_materialized", True)
+    )
     core = {
         "schema": STATE_SCHEMA,
         "campaign_id": CAMPAIGN_ID,
@@ -917,7 +1592,7 @@ def _write_state(
         "checkpoint_sequence": int(sequence),
         "runner_pid": os.getpid(),
         "worker_count": 1,
-        "evidence_writer_count": 1,
+        "evidence_writer_count": 1 if economic_evidence_materialized else 0,
         "policies_proposed": int(metrics.get("proposal_count", 0)),
         "unique_policies_screened": int(metrics.get("proposal_count", 0)),
         "exact_account_replays": int(metrics.get("candidate_count", 0)),
@@ -927,10 +1602,25 @@ def _write_state(
             if metrics.get("headline_by_candidate")
             else ""
         ),
-        "evidence_staging_path": str(
-            base / f".{CAMPAIGN_ID}.evidence-v1.staging"
+        "evidence_staging_path": (
+            str(base / f".{CAMPAIGN_ID}.evidence-v1.staging")
+            if economic_evidence_materialized
+            else ""
         ),
-        "evidence_final_path": str(base / f"{CAMPAIGN_ID}.evidence-v1"),
+        "evidence_final_path": (
+            str(base / f"{CAMPAIGN_ID}.evidence-v1")
+            if economic_evidence_materialized
+            else ""
+        ),
+        "non_economic_audit_path": (
+            str(
+                _completed_adoption(manifest).get("audit_receipt_path")
+                if _completed_adoption(manifest) is not None
+                else ""
+            )
+            if not economic_evidence_materialized
+            else ""
+        ),
         "broker_connections": 0,
         "orders": 0,
         "q4_access_count_delta": 0,
@@ -958,6 +1648,7 @@ def _kpis(
     proposals = int(metrics.get("proposal_count", 0))
     candidates = int(metrics.get("candidate_count", 0))
     episodes = int(metrics.get("combine_episode_count", 0))
+    non_economic = metrics.get("economic_evidence_materialized") is False
     hours = max(float(elapsed) / 3600.0, 1e-12)
     economic_fraction = 1.0 if replay_executed and candidates else 0.0
     cpu_fraction = min(max(float(cpu_seconds) / max(float(elapsed), 1e-9), 0.0), 1.0)
@@ -976,7 +1667,7 @@ def _kpis(
             "exact_account_replays": float(candidates / hours),
             "combine_episodes": float(episodes / hours),
         },
-        "workers": {"compute": 1, "evidence_writer": 1},
+        "workers": {"compute": 1, "evidence_writer": 0 if non_economic else 1},
         "policies_proposed": proposals,
         "unique_policies_screened": proposals,
         "exact_account_replays": candidates,
@@ -1000,11 +1691,17 @@ def _kpis(
         "cpu_utilization_fraction": cpu_fraction,
         "admin_overhead_alert": False,
         "matched_controls_status": (
+            "NOT_MATERIALIZED_NO_ROUTED_EVENTS"
+            if non_economic
+            else
             "COMPLETE_EXPOSURE_MATCHED_FOUR_CONTROL_FAMILIES"
             if candidates
             else "PENDING_BOUNDED_TRIPWIRE_CONTROLS"
         ),
         "null_status": (
+            "NOT_MATERIALIZED_NO_ROUTED_EVENTS"
+            if non_economic
+            else
             "COMPLETE_RANDOM_PERMUTATION_DIRECTION_AND_OWN_PATH_CONTROLS"
             if candidates
             else "PENDING_BOUNDED_TRIPWIRE_NULLS"
@@ -1068,9 +1765,25 @@ def _load_terminal_result(
         scientific,
         source_path,
     )
-    source_result = _load_scientific_result(source_path, manifest)
+    source_result = _load_scientific_result(
+        source_path,
+        manifest,
+        require_hash_binding=(
+            manifest["research_source"]["source_mode"]
+            == "PREEXISTING_HASH_BOUND"
+        ),
+    )
     canonical = _canonical_material(source_result, manifest)
-    if (
+    if canonical is None:
+        if (
+            result.get("canonical_evidence_material_hash") is not None
+            or result.get("evidence_bundle") is not None
+            or not isinstance(result.get("non_economic_audit"), Mapping)
+        ):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 non-economic terminal publication drift"
+            )
+    elif (
         canonical.get("canonical_material_hash")
         != result.get("canonical_evidence_material_hash")
     ):
@@ -1103,11 +1816,23 @@ def _read_snapshot(
 ) -> dict[str, Any]:
     value = _read_hashed(path, hash_field)
     expected_schema = STATE_SCHEMA if hash_field == "state_hash" else KPI_SCHEMA
+    from hydra.production.autonomous_director_manifest import (
+        resumable_snapshot_identity_matches,
+    )
+
+    root = path.resolve().parents[3]
+    try:
+        relative = path.resolve().relative_to(root).as_posix()
+    except ValueError:
+        relative = ""
     if (
-        value.get("schema") != expected_schema
-        or value.get("campaign_id") != CAMPAIGN_ID
-        or value.get("manifest_hash") != manifest.get("manifest_hash")
-        or value.get("source_commit") != manifest.get("source_commit")
+        not resumable_snapshot_identity_matches(
+            value,
+            manifest,
+            path=relative,
+            schema=expected_schema,
+            hash_field=hash_field,
+        )
     ):
         raise CrossEcologyAnalogRuntimeError(f"0036 {path.name} identity drift")
     _require_zero_fields(
@@ -1236,7 +1961,13 @@ def _validate_terminal_semantics(
         or result.get("autonomous_next_action") != expected_action
         or report.get("autonomous_next_action") != expected_action
         or state.get("next_action") != expected_action["action"]
-        or state.get("stage") != "TIER_E_BRANCH_DECISION_SEALED"
+        or state.get("stage")
+        != (
+            "NON_ECONOMIC_BRANCH_DECISION_SEALED"
+            if scientific.get("canonical_evidence_status")
+            == NON_ECONOMIC_CANONICAL_STATUS
+            else "TIER_E_BRANCH_DECISION_SEALED"
+        )
         or type(state_sequence) is not int
         or type(kpi_sequence) is not int
         or type(embedded_sequence) is not int
@@ -1256,13 +1987,25 @@ def _validate_terminal_scientific_replay(
 
     source_mode = manifest["research_source"]["source_mode"]
     generated = source_mode == "GENERATE_READ_ONLY_ONCE"
+    adoption = _completed_adoption(manifest)
+    executed_now = scientific.get("economic_replay_executed_by_adapter")
+    previously_completed = scientific.get("scientific_replay_previously_completed")
     if (
         scientific.get("source_mode") != source_mode
-        or scientific.get("economic_replay_executed_by_adapter") is not generated
+        or not isinstance(executed_now, bool)
+        or not isinstance(previously_completed, bool)
+        or (adoption is not None and executed_now is not False)
+        or (adoption is not None and previously_completed is not True)
+        or (adoption is None and generated and previously_completed is not True)
+        or (adoption is None and not generated and previously_completed is not False)
+        or (not generated and executed_now is not False)
     ):
         raise CrossEcologyAnalogRuntimeError("0036 terminal scientific source-mode drift")
     lease_path = output / "scientific_replay_attempt.json"
     if not generated:
+        if adoption is not None:
+            _validate_adopted_replay_lease(output, manifest, source_path)
+            return
         if lease_path.is_file():
             raise CrossEcologyAnalogRuntimeError(
                 "0036 preexisting terminal source unexpectedly has a replay lease"
@@ -1340,11 +2083,22 @@ def _validate_replay_lease(
     maximum = lease.get("maximum_generations")
     runner_pid = lease.get("runner_pid")
     status = lease.get("status")
+    adoption = _completed_adoption(manifest)
+    expected_manifest_hash = (
+        adoption["source_manifest_hash"]
+        if adoption is not None
+        else manifest.get("manifest_hash")
+    )
+    expected_source_commit = (
+        adoption["source_commit"]
+        if adoption is not None
+        else manifest.get("source_commit")
+    )
     if (
         lease.get("schema") != REPLAY_LEASE_SCHEMA
         or lease.get("campaign_id") != CAMPAIGN_ID
-        or lease.get("manifest_hash") != manifest.get("manifest_hash")
-        or lease.get("source_commit") != manifest.get("source_commit")
+        or lease.get("manifest_hash") != expected_manifest_hash
+        or lease.get("source_commit") != expected_source_commit
         or not isinstance(generation, int)
         or isinstance(generation, bool)
         or generation != 0
@@ -1417,12 +2171,18 @@ def _verify_multiplicity_reservation(
     entry = matches[0]
     evidence = entry.get("evidence")
     reservation = entry.get("multiplicity")
+    adoption = _completed_adoption(manifest)
+    expected_preregistration_hash = (
+        adoption["multiplicity_preregistration_hash"]
+        if adoption is not None
+        else manifest.get("manifest_hash")
+    )
     if (
         not isinstance(evidence, Mapping)
         or not isinstance(reservation, Mapping)
         or evidence.get("campaign_id") != CAMPAIGN_ID
         or evidence.get("class_id") != CLASS_ID
-        or evidence.get("preregistration_hash") != manifest.get("manifest_hash")
+        or evidence.get("preregistration_hash") != expected_preregistration_hash
         or reservation.get("previous_N_trials")
         != multiplicity.get("prior_global_N_trials")
         or reservation.get("delta_trials") != multiplicity.get("reserved_delta_trials")
@@ -1462,13 +2222,39 @@ def _set_single_thread_libraries() -> None:
         os.environ[field] = "1"
 
 
-def _next_sequence(output: Path) -> int:
-    path = output / "production_state.json"
-    if not path.is_file():
+def _next_sequence(output: Path, manifest: Mapping[str, Any]) -> int:
+    checkpoint = _read_checkpoint_pair(output, manifest)
+    if checkpoint is None:
         return 1
+    state, _kpis = checkpoint
+    return max(int(state["checkpoint_sequence"]) + 1, 1)
+
+
+def _read_checkpoint_pair(
+    output: Path, manifest: Mapping[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any]] | None:
+    state_path = output / "production_state.json"
+    kpi_path = output / "production_kpis.json"
+    if not state_path.is_file() and not kpi_path.is_file():
+        return None
+    if state_path.is_file() != kpi_path.is_file():
+        raise CrossEcologyAnalogRuntimeError(
+            "0036 prior checkpoint pair is incomplete"
+        )
     try:
-        value = _read_hashed(path, "state_hash")
-        return max(int(value.get("checkpoint_sequence", 0)) + 1, 1)
+        state = _read_snapshot(state_path, "state_hash", manifest)
+        kpis = _read_snapshot(kpi_path, "kpi_hash", manifest)
+        state_sequence = state.get("checkpoint_sequence")
+        kpi_sequence = kpis.get("checkpoint_sequence")
+        if (
+            type(state_sequence) is not int
+            or type(kpi_sequence) is not int
+            or state_sequence != kpi_sequence
+        ):
+            raise CrossEcologyAnalogRuntimeError(
+                "0036 prior checkpoint pair sequence drift"
+            )
+        return state, kpis
     except Exception as exc:
         raise CrossEcologyAnalogRuntimeError("0036 prior checkpoint is corrupt") from exc
 

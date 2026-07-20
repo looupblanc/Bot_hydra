@@ -26,6 +26,15 @@ CAMPAIGN_ID = "hydra_cross_ecology_session_path_analog_router_0036"
 CAMPAIGN_ORDINAL = 36
 CLASS_ID = "CAUSAL_CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER_V1"
 RUNTIME_VERSION = "hydra_cross_ecology_session_path_analog_runtime_v1"
+COMPLETED_RESULT_ADOPTION_SCHEMA = (
+    "hydra_cross_ecology_0036_completed_scientific_result_adoption_v1"
+)
+COMPLETED_RESULT_ADOPTION_CLASSIFICATION = (
+    "COMPLETED_SCIENTIFIC_RESULT_ADOPTION_WITHOUT_ECONOMIC_REPLAY"
+)
+NON_ECONOMIC_TERMINAL_MODE = "NON_ECONOMIC_AUDIT_ONLY"
+NON_ECONOMIC_CANONICAL_STATUS = "NO_GENUINELY_MATERIALIZED_POLICY_FRAGMENT"
+NON_ECONOMIC_AUDIT_RECEIPT_SCHEMA = "hydra_non_economic_audit_receipt_v1"
 SCIENTIFIC_RESULT_SCHEMA = "hydra_cross_ecology_session_path_analog_router_v1"
 DECISION_CARD_SCHEMA = "hydra_autonomous_branch_decision_card_v1"
 ROOT_AUTHORIZATION = "ROOT_AUTHORIZED_CROSS_ECOLOGY_SESSION_ANALOG_REPLAY_V1"
@@ -49,8 +58,11 @@ _REQUIRED_IMPLEMENTATION_FILES = frozenset(
         "tests/test_cross_ecology_session_path_analog_router.py",
         "hydra/production/cross_ecology_analog_manifest.py",
         "hydra/production/cross_ecology_analog_runtime.py",
+        "hydra/production/autonomous_director_manifest.py",
         "hydra/production/manifest.py",
         "hydra/production/runtime.py",
+        "hydra/production/__init__.py",
+        "hydra/mission/economic_evolution_manifest_runtime.py",
         "scripts/run_economic_production_manifest.py",
     }
 )
@@ -107,6 +119,7 @@ def validate_cross_ecology_analog_manifest(
     _multiplicity(manifest)
     _evidence(manifest)
     _governance(manifest)
+    _completed_result_adoption(manifest, root)
 
 
 def _identity(manifest: Mapping[str, Any]) -> None:
@@ -342,6 +355,225 @@ def _governance(manifest: Mapping[str, Any]) -> None:
         for field in _GOVERNANCE_ZERO_COUNTER_FIELDS
     ):
         raise CrossEcologyAnalogManifestError("0036 governance counters drift")
+
+
+def _completed_result_adoption(manifest: Mapping[str, Any], root: Path) -> None:
+    """Validate an exact technical adoption without authorising another replay.
+
+    This optional contract exists only for a scientific result that was already
+    completed under the original preregistration but contains no materialized
+    economic policy fragment.  It binds every old mutable/immutable artifact
+    independently; a broad compatibility hash can never authorize adoption.
+    """
+
+    raw = manifest.get("completed_scientific_result_adoption")
+    if raw is None:
+        if manifest.get("compatible_artifact_manifest_hashes") not in (None, [], ()):
+            raise CrossEcologyAnalogManifestError("0036 adoption compatibility drift")
+        if manifest.get("resumable_snapshot_compatibility") is not None:
+            raise CrossEcologyAnalogManifestError("0036 snapshot compatibility drift")
+        return
+    if not isinstance(raw, Mapping):
+        raise CrossEcologyAnalogManifestError("0036 completed-result adoption drift")
+    adoption = dict(raw)
+    required = {
+        "schema",
+        "classification",
+        "terminal_mode",
+        "economic_outcomes_changed",
+        "scientific_policy_changed",
+        "economic_replay_allowed",
+        "source_manifest_hash",
+        "source_manifest_file_sha256",
+        "source_manifest_path",
+        "source_manifest_worm_commit",
+        "source_manifest_worm_tag",
+        "source_commit",
+        "scientific_status",
+        "canonical_evidence_status",
+        "scientific_result_path",
+        "scientific_result_hash",
+        "scientific_result_file_sha256",
+        "replay_lease_path",
+        "replay_lease_attempt_hash",
+        "replay_lease_file_sha256",
+        "multiplicity_preregistration_hash",
+        "audit_receipt_path",
+    }
+    source = _mapping(manifest, "research_source")
+    runtime = _mapping(manifest, "runtime")
+    old_manifest_hash = str(adoption.get("source_manifest_hash") or "")
+    old_source_commit = str(adoption.get("source_commit") or "")
+    result_path = str(source.get("result_path") or "")
+    output = Path(str(runtime.get("output_dir") or ""))
+    if (
+        set(adoption) != required
+        or adoption.get("schema") != COMPLETED_RESULT_ADOPTION_SCHEMA
+        or adoption.get("classification")
+        != COMPLETED_RESULT_ADOPTION_CLASSIFICATION
+        or adoption.get("terminal_mode") != NON_ECONOMIC_TERMINAL_MODE
+        or adoption.get("economic_outcomes_changed") is not False
+        or adoption.get("scientific_policy_changed") is not False
+        or adoption.get("economic_replay_allowed") is not False
+        or adoption.get("scientific_status")
+        != "SESSION_PATH_ANALOG_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+        or adoption.get("canonical_evidence_status")
+        != NON_ECONOMIC_CANONICAL_STATUS
+        or not _SHA256.fullmatch(old_manifest_hash)
+        or old_manifest_hash == str(manifest.get("manifest_hash") or "")
+        or not _SHA256.fullmatch(
+            str(adoption.get("source_manifest_file_sha256") or "")
+        )
+        or adoption.get("source_manifest_path") != DEFAULT_MANIFEST_PATH
+        or not _GIT_SHA.fullmatch(
+            str(adoption.get("source_manifest_worm_commit") or "")
+        )
+        or not re.fullmatch(
+            r"worm/[A-Za-z0-9][A-Za-z0-9._/-]+",
+            str(adoption.get("source_manifest_worm_tag") or ""),
+        )
+        or not _GIT_SHA.fullmatch(old_source_commit)
+        or old_source_commit == str(manifest.get("source_commit") or "")
+        or adoption.get("scientific_result_path") != result_path
+        or source.get("source_mode") != "PREEXISTING_HASH_BOUND"
+        or source.get("result_hash") != adoption.get("scientific_result_hash")
+        or source.get("result_file_sha256")
+        != adoption.get("scientific_result_file_sha256")
+        or not _SHA256.fullmatch(str(adoption.get("scientific_result_hash") or ""))
+        or not _SHA256.fullmatch(
+            str(adoption.get("scientific_result_file_sha256") or "")
+        )
+        or adoption.get("replay_lease_path")
+        != (output / "scientific_replay_attempt.json").as_posix()
+        or not _SHA256.fullmatch(
+            str(adoption.get("replay_lease_attempt_hash") or "")
+        )
+        or not _SHA256.fullmatch(
+            str(adoption.get("replay_lease_file_sha256") or "")
+        )
+        or adoption.get("multiplicity_preregistration_hash") != old_manifest_hash
+        or adoption.get("audit_receipt_path")
+        != (output / "non_economic_audit_receipt.json").as_posix()
+    ):
+        raise CrossEcologyAnalogManifestError("0036 completed-result adoption drift")
+
+    compatible = manifest.get("compatible_artifact_manifest_hashes")
+    if not isinstance(compatible, (list, tuple)) or tuple(compatible) != (
+        old_manifest_hash,
+    ):
+        raise CrossEcologyAnalogManifestError("0036 adoption compatibility drift")
+    _resumable_snapshot_adoption(
+        manifest,
+        old_manifest_hash=old_manifest_hash,
+        old_source_commit=old_source_commit,
+    )
+    _verify_adopted_source_manifest_blob(root, adoption)
+
+
+def _verify_adopted_source_manifest_blob(
+    root: Path, adoption: Mapping[str, Any]
+) -> None:
+    commit = str(adoption["source_manifest_worm_commit"])
+    tag = str(adoption["source_manifest_worm_tag"])
+    tagged = subprocess.run(
+        ["git", "rev-parse", f"{tag}^{{commit}}"],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    blob = subprocess.run(
+        ["git", "show", f"{commit}:{adoption['source_manifest_path']}"],
+        cwd=root,
+        check=False,
+        capture_output=True,
+    )
+    if (
+        tagged.returncode != 0
+        or tagged.stdout.strip() != commit
+        or blob.returncode != 0
+        or hashlib.sha256(blob.stdout).hexdigest()
+        != adoption.get("source_manifest_file_sha256")
+    ):
+        raise CrossEcologyAnalogManifestError("0036 adopted source-manifest WORM drift")
+    try:
+        frozen = json.loads(blob.stdout)
+    except json.JSONDecodeError as exc:
+        raise CrossEcologyAnalogManifestError(
+            "0036 adopted source-manifest WORM drift"
+        ) from exc
+    if (
+        not isinstance(frozen, Mapping)
+        or frozen.get("manifest_hash") != adoption.get("source_manifest_hash")
+        or frozen.get("source_commit") != adoption.get("source_commit")
+        or frozen.get("campaign_id") != CAMPAIGN_ID
+    ):
+        raise CrossEcologyAnalogManifestError("0036 adopted source-manifest WORM drift")
+
+
+def _resumable_snapshot_adoption(
+    manifest: Mapping[str, Any], *, old_manifest_hash: str, old_source_commit: str
+) -> None:
+    section = manifest.get("resumable_snapshot_compatibility")
+    if not isinstance(section, Mapping):
+        raise CrossEcologyAnalogManifestError("0036 snapshot compatibility drift")
+    expected_top = {
+        "schema",
+        "classification",
+        "economic_outcomes_changed",
+        "scientific_policy_changed",
+        "bindings",
+    }
+    if (
+        set(section) != expected_top
+        or section.get("schema") != "hydra_resumable_snapshot_compatibility_v1"
+        or section.get("classification")
+        != "HASH_BOUND_TECHNICAL_REVISION_RESUME_ONLY"
+        or section.get("economic_outcomes_changed") is not False
+        or section.get("scientific_policy_changed") is not False
+    ):
+        raise CrossEcologyAnalogManifestError("0036 snapshot compatibility drift")
+    output = Path(str(_mapping(manifest, "runtime").get("output_dir") or ""))
+    specs = {
+        (output / "production_state.json").as_posix(): (
+            "hydra_economic_production_state_v1",
+            "state_hash",
+        ),
+        (output / "production_kpis.json").as_posix(): (
+            "hydra_economic_production_kpis_v1",
+            "kpi_hash",
+        ),
+    }
+    bindings = section.get("bindings")
+    if not isinstance(bindings, (list, tuple)) or len(bindings) != len(specs):
+        raise CrossEcologyAnalogManifestError("0036 snapshot compatibility drift")
+    observed: set[str] = set()
+    required_fields = {
+        "path",
+        "schema",
+        "hash_field",
+        "manifest_hash",
+        "source_commit",
+        "snapshot_hash",
+    }
+    for raw_binding in bindings:
+        if not isinstance(raw_binding, Mapping) or set(raw_binding) != required_fields:
+            raise CrossEcologyAnalogManifestError("0036 snapshot compatibility drift")
+        path = str(raw_binding.get("path") or "")
+        expected = specs.get(path)
+        if (
+            expected is None
+            or path in observed
+            or raw_binding.get("schema") != expected[0]
+            or raw_binding.get("hash_field") != expected[1]
+            or raw_binding.get("manifest_hash") != old_manifest_hash
+            or raw_binding.get("source_commit") != old_source_commit
+            or not _SHA256.fullmatch(str(raw_binding.get("snapshot_hash") or ""))
+        ):
+            raise CrossEcologyAnalogManifestError("0036 snapshot compatibility drift")
+        observed.add(path)
+    if observed != set(specs):
+        raise CrossEcologyAnalogManifestError("0036 snapshot compatibility drift")
 
 
 def _project_root(path: Path) -> Path:

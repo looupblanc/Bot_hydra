@@ -12,6 +12,7 @@ from hydra.production.runtime import (
     load_and_verify_production_result,
     read_live_status,
     run_production_manifest,
+    verify_non_economic_terminal_publication,
 )
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "load_and_verify_production_result",
     "read_live_status",
     "run_production_manifest",
+    "verify_non_economic_terminal_publication",
 ]
