@@ -11,8 +11,9 @@ from __future__ import annotations
 
 import hashlib
 import json
-import statistics
-from collections import defaultdict
+import math
+import subprocess
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -28,8 +29,8 @@ from hydra.production.autonomous_exact_replay import (
     _load_frozen_grid,
     _load_rule_snapshot,
     _load_self_hashed_manifest,
-    _summarize_exact_episodes,
 )
+from hydra.production.fast_pass_runtime_helpers import _summarize_sprint_episodes
 from hydra.propfirm.account_size_xfa import (
     freeze_account_size_xfa_handoff,
     load_account_size_xfa_rules,
@@ -264,6 +265,10 @@ def build_autonomous_graduation_preflight(
                 "account_label": value["account_label"],
                 "component_ids": list(value["component_ids"]),
                 "frozen_policy_hash": value["frozen_policy_hash"],
+                "executable_spec_hash": value.get("executable_spec_hash"),
+                "source_governor_policy_hash": value.get(
+                    "source_governor_policy_hash"
+                ),
                 "source_evidence_hash": value["source_evidence_hash"],
                 "coverage": coverage,
                 "coverage_hash": stable_hash(coverage),
@@ -294,6 +299,7 @@ def build_autonomous_graduation_preflight(
         "candidate_count": len(frozen),
         "frozen_candidates": frozen,
         "frozen_candidate_inventory_hash": stable_hash(frozen),
+        "runtime_provenance": _runtime_provenance(project, project / manifest_path),
         "independence_contract": {
             "within_horizon_grid_non_overlapping": True,
             "cross_horizon_observations_independent": False,
@@ -308,6 +314,9 @@ def build_autonomous_graduation_preflight(
         "broker_connections": 0,
         "orders": 0,
     }
+    core["runtime_provenance_hash"] = core["runtime_provenance"][
+        "runtime_provenance_hash"
+    ]
     return {**core, "preflight_hash": stable_hash(core)}
 
 
@@ -325,6 +334,13 @@ def execute_autonomous_graduation_cohort(
     manifest = _load_cohort_manifest(project / manifest_path)
     if str(frozen_preflight["manifest_hash"]) != str(manifest["manifest_hash"]):
         raise AutonomousGraduationCohortError("preflight/manifest binding drift")
+    runtime_provenance = _runtime_provenance(project, project / manifest_path)
+    if runtime_provenance != frozen_preflight.get("runtime_provenance") or str(
+        frozen_preflight.get("runtime_provenance_hash")
+    ) != str(runtime_provenance["runtime_provenance_hash"]):
+        raise AutonomousGraduationCohortError(
+            "runtime code differs from the reviewed frozen preflight"
+        )
     artifacts = _load_replay_artifacts(project, manifest)
     prepared = _prepare_all(project, manifest, artifacts)
     by_id = {str(row["candidate_id"]): row for row in prepared}
@@ -347,6 +363,10 @@ def execute_autonomous_graduation_cohort(
             or str(value["frozen_policy_hash"]) != str(frozen["frozen_policy_hash"])
             or str(value["source_evidence_hash"])
             != str(frozen["source_evidence_hash"])
+            or value.get("executable_spec_hash")
+            != frozen.get("executable_spec_hash")
+            or value.get("source_governor_policy_hash")
+            != frozen.get("source_governor_policy_hash")
         ):
             raise AutonomousGraduationCohortError(
                 f"runtime/preflight policy or coverage drift: {candidate_id}"
@@ -399,7 +419,17 @@ def execute_autonomous_graduation_cohort(
                     )
                     if episode.passed:
                         passed_runtime.append((episode, scenario, block, horizon))
-                summaries[scenario][str(horizon)] = _summarize_exact_episodes(values)
+                coverage_row = runtime_coverage[str(horizon)]
+                summaries[scenario][str(horizon)] = _summarize_cohort_episodes(
+                    values,
+                    requested_start_count=int(
+                        coverage_row["requested_start_count"]
+                    ),
+                    data_censored_count=int(
+                        coverage_row["data_censored_start_count"]
+                    ),
+                    policy=value["policy"],
+                )
 
         concentration = _unique_trajectory_concentration(value)
         gates = _development_gates(
@@ -416,6 +446,9 @@ def execute_autonomous_graduation_cohort(
             "frozen_policy_hash": value["frozen_policy_hash"],
             "source_evidence_hash": value["source_evidence_hash"],
             "preflight_hash": frozen_preflight["preflight_hash"],
+            "runtime_provenance_hash": runtime_provenance[
+                "runtime_provenance_hash"
+            ],
             "coverage_hash": frozen["coverage_hash"],
             "episode_receipt_hash": stable_hash(receipts),
             "concentration_hash": concentration["concentration_hash"],
@@ -483,6 +516,10 @@ def execute_autonomous_graduation_cohort(
         "status": "COMPLETE_READ_ONLY_GRADUATION_COHORT_REPLAY",
         "manifest_hash": str(manifest["manifest_hash"]),
         "preflight_hash": str(frozen_preflight["preflight_hash"]),
+        "runtime_provenance": runtime_provenance,
+        "runtime_provenance_hash": runtime_provenance[
+            "runtime_provenance_hash"
+        ],
         "candidate_results": candidate_results,
         "candidate_result_hashes": {
             row["candidate_id"]: row["result_hash"] for row in candidate_results
@@ -535,6 +572,24 @@ def verify_autonomous_graduation_preflight(value: Mapping[str, Any]) -> dict[str
         )
     ):
         raise AutonomousGraduationCohortError("preflight side-effect drift")
+    provenance = row.get("runtime_provenance")
+    if not isinstance(provenance, Mapping):
+        raise AutonomousGraduationCohortError("preflight runtime provenance missing")
+    provenance_core = dict(provenance)
+    provenance_claimed = provenance_core.pop("runtime_provenance_hash", None)
+    required = {
+        "source_commit",
+        "manifest_file_sha256",
+        "adapter_module_sha256",
+        "runner_script_sha256",
+        "audit_protocol_tests_sha256",
+    }
+    if (
+        not required.issubset(provenance_core)
+        or provenance_claimed != stable_hash(provenance_core)
+        or row.get("runtime_provenance_hash") != provenance_claimed
+    ):
+        raise AutonomousGraduationCohortError("preflight runtime provenance drift")
     return {**row, "preflight_hash": claimed}
 
 
@@ -674,6 +729,20 @@ def _prepare_all(
                 raise AutonomousGraduationCohortError(
                     f"book executable specification drift: {candidate_id}"
                 )
+            policy = books._active_policy(spec, context)
+            reconstructed_policy = policy.to_dict()
+            source_governor = dict(source_book["governor_policy"])
+            if reconstructed_policy != source_governor:
+                raise AutonomousGraduationCohortError(
+                    f"book frozen governor mapping drift: {candidate_id}"
+                )
+            if (
+                str(reconstructed_policy["structural_fingerprint"])
+                != str(source_governor["structural_fingerprint"])
+            ):
+                raise AutonomousGraduationCohortError(
+                    f"book governor structural fingerprint drift: {candidate_id}"
+                )
             components = tuple(str(value) for value in frozen["component_ids"])
             eligible = set(context.calendar)
             censored: set[int] = set()
@@ -696,7 +765,9 @@ def _prepare_all(
                     "qd_cell": str(frozen["qd_cell"]),
                     "account_label": str(frozen["account_label"]),
                     "component_ids": components,
-                    "frozen_policy_hash": str(spec["policy_spec_hash"]),
+                    "frozen_policy_hash": stable_hash(reconstructed_policy),
+                    "executable_spec_hash": str(spec["policy_spec_hash"]),
+                    "source_governor_policy_hash": stable_hash(source_governor),
                     "source_evidence_hash": stable_hash(receipts),
                     "calendar": context.calendar,
                     "eligible_session_days": frozenset(eligible),
@@ -705,7 +776,7 @@ def _prepare_all(
                         "NORMAL": normal,
                         "STRESSED_1_5X": stressed,
                     },
-                    "policy": books._active_policy(spec, context),
+                    "policy": policy,
                     "config": _account_config(context.rules[str(frozen["account_label"])]),
                 }
             )
@@ -758,11 +829,7 @@ def _development_gates(
     for horizon in HORIZONS:
         normal = dict(summaries["NORMAL"][str(horizon)])
         stressed = dict(summaries["STRESSED_1_5X"][str(horizon)])
-        pass_blocks = {
-            block
-            for block, row in dict(stressed.get("by_block") or {}).items()
-            if int(row.get("pass_count", 0)) > 0
-        }
+        pass_blocks = set(stressed.get("blocks_with_passes") or ())
         output[str(horizon)] = {
             "minimum_normal_passes": int(normal["pass_count"])
             >= int(gate["minimum_normal_passes_same_horizon"]),
@@ -771,8 +838,8 @@ def _development_gates(
             "positive_stressed_net": float(stressed["net_total_usd"]) > 0.0,
             "stressed_mll_within_tolerance": float(stressed["mll_breach_rate"])
             <= float(gate["maximum_stressed_mll_breach_rate"]),
-            "passing_consistency_compliant": _passing_consistency_from_summary(
-                stressed
+            "passing_consistency_compliant": bool(
+                stressed.get("all_passing_paths_consistency_compliant")
             ),
             "multiple_stressed_pass_blocks": len(pass_blocks)
             >= int(gate["minimum_blocks_with_stressed_passes"]),
@@ -781,10 +848,687 @@ def _development_gates(
     return output
 
 
-def _passing_consistency_from_summary(summary: Mapping[str, Any]) -> bool:
-    # Exact account replay cannot pass with a failed consistency gate.  The
-    # terminal engine therefore makes every TARGET_REACHED path compliant.
-    return int(summary.get("pass_count", 0)) > 0
+def _summarize_cohort_episodes(
+    values: Sequence[tuple[Any, str]],
+    *,
+    requested_start_count: int,
+    data_censored_count: int,
+    policy: Any,
+) -> dict[str, Any]:
+    """Summarize exact outcomes while preserving legitimate governor scaling.
+
+    The standalone exact-frontier summarizer intentionally raises whenever a
+    requested quantity is reduced.  Active-pool books, however, have a frozen
+    proportional concurrency governor for which reduction/rejection is an
+    explicit policy action.  This wrapper uses the book-aware exact account
+    summary and adds a complete allocation attribution rather than hiding the
+    reduction or changing the governor.
+    """
+
+    summary = _policy_aware_sprint_summary(
+        values,
+        requested_start_count=int(requested_start_count),
+        data_censored_count=int(data_censored_count),
+        policy=policy,
+    )
+    attribution = _governor_allocation_attribution(
+        [episode for episode, _block in values], policy=policy
+    )
+    by_block = {
+        block: _policy_aware_sprint_summary(
+            [
+                (episode, observed_block)
+                for episode, observed_block in values
+                if observed_block == block
+            ],
+            requested_start_count=sum(
+                observed_block == block for _episode, observed_block in values
+            ),
+            data_censored_count=0,
+            policy=policy,
+        )
+        for block in BLOCKS
+    }
+    return {
+        **summary,
+        "net_total_usd": float(summary["net_total"]),
+        "net_median_usd": float(summary["net_median"]),
+        "minimum_mll_buffer_usd": float(summary["minimum_mll_buffer"]),
+        "governor_allocation_attribution": attribution,
+        "requested_quantity_total": attribution["requested_quantity_total"],
+        "admitted_quantity_total": attribution["admitted_quantity_total"],
+        "size_reduced_count": attribution["size_reduced_count"],
+        "risk_or_contract_rejection_count": attribution[
+            "risk_or_contract_rejection_count"
+        ],
+        "by_block": by_block,
+        "by_block_hash": stable_hash(by_block),
+        "episode_path_hash": stable_hash(
+            [episode.to_dict(include_paths=True) for episode, _block in values]
+        ),
+    }
+
+
+def _policy_aware_sprint_summary(
+    values: Sequence[tuple[Any, str]],
+    *,
+    requested_start_count: int,
+    data_censored_count: int,
+    policy: Any,
+) -> dict[str, Any]:
+    """Use the immutable account contract as the utilization denominator."""
+
+    summary = _summarize_sprint_episodes(
+        values,
+        requested_start_count=int(requested_start_count),
+        data_censored_count=int(data_censored_count),
+    )
+    limit = _strict_positive_number(
+        getattr(policy, "maximum_mini_equivalent", None),
+        "maximum_mini_equivalent",
+    )
+    daily_maximums = [
+        _strict_nonnegative_number(
+            dict(daily_row.get("exposure") or {}).get(
+                "maximum_mini_equivalent", 0.0
+            ),
+            "daily maximum_mini_equivalent",
+        )
+        for episode, _block in values
+        for daily_row in episode.daily_path
+    ]
+    episode_maximums = [
+        _strict_nonnegative_number(
+            episode.maximum_mini_equivalent,
+            "episode maximum_mini_equivalent",
+        )
+        for episode, _block in values
+    ]
+    if any(value > limit + 1e-9 for value in (*daily_maximums, *episode_maximums)):
+        raise AutonomousGraduationCohortError(
+            "observed account exposure exceeds frozen maximum mini-equivalent"
+        )
+    daily_mean = (
+        sum(daily_maximums) / len(daily_maximums) if daily_maximums else 0.0
+    )
+    summary["mean_daily_maximum_mini_equivalent"] = float(daily_mean)
+    summary["mean_daily_contract_utilization"] = float(daily_mean / limit)
+    summary["contract_utilization_denominator_mini_equivalent"] = float(limit)
+    summary["contract_utilization_denominator_source"] = (
+        "FROZEN_ACTIVE_RISK_POOL_POLICY_MAXIMUM_MINI_EQUIVALENT"
+    )
+    return summary
+
+
+def _allocation_contract_contexts(
+    episodes: Sequence[Any], *, policy: Any
+) -> list[tuple[dict[str, Any], float, float]]:
+    """Reconstruct the causal mini-equivalent headroom at every decision."""
+
+    limit = _strict_positive_number(
+        getattr(policy, "maximum_mini_equivalent", None),
+        "maximum_mini_equivalent",
+    )
+    contexts: list[tuple[dict[str, Any], float, float]] = []
+    for episode in episodes:
+        live: list[tuple[str, int, float]] = []
+        previous_decision_ns: int | None = None
+        seen_event_ids: set[str] = set()
+        for raw in episode.risk_allocation_path:
+            if not isinstance(raw, Mapping):
+                raise AutonomousGraduationCohortError(
+                    "governor allocation row is not a mapping"
+                )
+            row = dict(raw)
+            for field in ("event_id", "decision_ns", "exit_ns", "mini_equivalent", "allow"):
+                if field not in row:
+                    raise AutonomousGraduationCohortError(
+                        f"governor allocation attribution is incomplete: {field}"
+                    )
+            event_id = str(row["event_id"])
+            if not event_id or event_id in seen_event_ids:
+                raise AutonomousGraduationCohortError(
+                    "governor allocation event identity is empty or duplicated"
+                )
+            seen_event_ids.add(event_id)
+            decision_ns = _strict_nonnegative_int(row["decision_ns"], "decision_ns")
+            exit_ns = _strict_nonnegative_int(row["exit_ns"], "exit_ns")
+            if exit_ns <= decision_ns or (
+                previous_decision_ns is not None
+                and decision_ns < previous_decision_ns
+            ):
+                raise AutonomousGraduationCohortError(
+                    "governor allocation timestamps are noncausal or out of order"
+                )
+            previous_decision_ns = decision_ns
+            live = [value for value in live if value[1] > decision_ns]
+            open_mini = sum(value[2] for value in live)
+            if open_mini > limit + 1e-9:
+                raise AutonomousGraduationCohortError(
+                    "chronological open exposure exceeds frozen contract limit"
+                )
+            available_mini = max(0.0, limit - open_mini)
+            contexts.append((row, float(open_mini), float(available_mini)))
+            admitted_mini = _strict_nonnegative_number(
+                row["mini_equivalent"], "mini_equivalent"
+            )
+            if not isinstance(row["allow"], bool):
+                raise AutonomousGraduationCohortError("governor allow is not boolean")
+            if row["allow"] and admitted_mini > 0.0:
+                live.append((event_id, exit_ns, admitted_mini))
+    return contexts
+
+
+def _governor_allocation_attribution(
+    episodes: Sequence[Any],
+    *,
+    policy: Any,
+) -> dict[str, Any]:
+    contract_contexts = _allocation_contract_contexts(episodes, policy=policy)
+    decisions = [row for row, _open_mini, _available_mini in contract_contexts]
+    statuses: Counter[str] = Counter()
+    reduction_reasons: Counter[str] = Counter()
+    reduction_bindings: Counter[str] = Counter()
+    rejection_reasons: Counter[str] = Counter()
+    rejection_bindings: Counter[str] = Counter()
+    foregone_realized: list[float] = []
+    foregone_realized_reductions: list[float] = []
+    foregone_realized_rejections: list[float] = []
+    foregone_censored = 0
+    explicit_reductions = 0
+    explicit_rejections = 0
+    requested_total = 0
+    admitted_total = 0
+    concurrency_scaling = str(
+        getattr(getattr(policy, "concurrency_scaling", None), "value", "")
+    )
+    target_protection_mode = str(
+        getattr(getattr(policy, "target_protection_mode", None), "value", "")
+    )
+    valid_statuses = {
+        "ACCEPTED",
+        "SIZE_REDUCED",
+        "REJECTED",
+        "CONFLICT_REJECTED",
+        "CONTRACT_LIMIT_REJECTED",
+        "MLL_RISK_REJECTED",
+    }
+    rejection_statuses = valid_statuses.difference({"ACCEPTED", "SIZE_REDUCED"})
+    for row, open_mini_before, available_mini in contract_contexts:
+        required_fields = {
+            "policy_id",
+            "component_id",
+            "event_id",
+            "decision_ns",
+            "exit_ns",
+            "base_quantity",
+            "base_mini_equivalent",
+            "requested_quantity",
+            "requested_mini_equivalent",
+            "requested_declared_nominal_risk",
+            "quantity",
+            "mini_equivalent",
+            "admitted_declared_nominal_risk",
+            "decision_status",
+            "size_reduced",
+            "conflict_rejected",
+            "contract_limit_rejected",
+            "mll_risk_rejected",
+            "reason",
+            "binding_constraint",
+            "emitted",
+            "allow",
+            "accepted",
+            "rejected",
+            "admission_fraction",
+            "scaling_factor",
+            "foregone_expected_pnl",
+            "foregone_expected_pnl_status",
+            "foregone_realized_pnl_ex_post",
+            "foregone_realized_pnl_status",
+            "foregone_realized_pnl_used_for_routing",
+            "foregone_realized_pnl_available_at_decision",
+            "risk_before",
+            "risk_after",
+        }
+        if not required_fields.issubset(row):
+            missing = sorted(required_fields.difference(row))
+            raise AutonomousGraduationCohortError(
+                "governor allocation attribution is incomplete: " + ",".join(missing)
+            )
+        requested_quantity = _strict_nonnegative_int(
+            row["requested_quantity"], "requested_quantity"
+        )
+        admitted_quantity = _strict_nonnegative_int(row["quantity"], "quantity")
+        base_quantity = _strict_nonnegative_int(row["base_quantity"], "base_quantity")
+        if str(row["policy_id"]) != str(getattr(policy, "policy_id", "")):
+            raise AutonomousGraduationCohortError(
+                "governor decision policy ID differs from frozen policy"
+            )
+        base_mini = _strict_positive_number(
+            row["base_mini_equivalent"], "base_mini_equivalent"
+        )
+        requested_mini = _strict_positive_number(
+            row["requested_mini_equivalent"], "requested_mini_equivalent"
+        )
+        admitted_mini = _strict_nonnegative_number(
+            row["mini_equivalent"], "mini_equivalent"
+        )
+        requested_risk = _strict_positive_number(
+            row["requested_declared_nominal_risk"],
+            "requested_declared_nominal_risk",
+        )
+        admitted_risk = _strict_nonnegative_number(
+            row["admitted_declared_nominal_risk"],
+            "admitted_declared_nominal_risk",
+        )
+        component_id = str(row["component_id"])
+        charges = getattr(policy, "nominal_risk_charge_map", None)
+        if not isinstance(charges, Mapping) or component_id not in charges:
+            raise AutonomousGraduationCohortError(
+                "governor component is absent from frozen nominal-risk charges"
+            )
+        component_charge = _strict_positive_number(
+            charges[component_id], "component nominal risk charge"
+        )
+        status = str(row["decision_status"])
+        if status not in valid_statuses:
+            raise AutonomousGraduationCohortError("unknown governor decision status")
+        for field in (
+            "emitted",
+            "size_reduced",
+            "allow",
+            "accepted",
+            "rejected",
+            "conflict_rejected",
+            "contract_limit_rejected",
+            "mll_risk_rejected",
+            "foregone_realized_pnl_available_at_decision",
+        ):
+            if not isinstance(row[field], bool):
+                raise AutonomousGraduationCohortError(
+                    f"governor {field} is not boolean"
+                )
+        if row["emitted"] is not True or requested_quantity <= 0:
+            raise AutonomousGraduationCohortError(
+                "governor decision is not bound to a positive emitted intent"
+            )
+        marked_reduced = row["size_reduced"]
+        if requested_quantity < admitted_quantity or base_quantity != requested_quantity:
+            raise AutonomousGraduationCohortError(
+                "requested quantity differs from immutable sleeve intent"
+            )
+        if marked_reduced != (status == "SIZE_REDUCED"):
+            raise AutonomousGraduationCohortError(
+                "quantity reduction lacks exact SIZE_REDUCED attribution"
+            )
+        if not isinstance(row["reason"], str) or not row["reason"]:
+            raise AutonomousGraduationCohortError(
+                "governor decision reason must be a nonempty string"
+            )
+        if row["binding_constraint"] is not None and not isinstance(
+            row["binding_constraint"], str
+        ):
+            raise AutonomousGraduationCohortError(
+                "governor binding constraint has an invalid type"
+            )
+        admission_fraction = _strict_fraction(row["admission_fraction"], "admission_fraction")
+        scaling_factor = _strict_fraction(row["scaling_factor"], "scaling_factor")
+        expected_fraction = admitted_quantity / requested_quantity
+        if (
+            abs(admission_fraction - expected_fraction) > 1e-12
+            or abs(scaling_factor - expected_fraction) > 1e-12
+        ):
+            raise AutonomousGraduationCohortError(
+                "governor scaling/admission fraction drift"
+            )
+        if (
+            abs(base_mini - requested_mini) > 1e-9
+            or abs(admitted_mini - requested_mini * expected_fraction) > 1e-9
+            or abs(admitted_risk - requested_risk * expected_fraction) > 1e-7
+            or admitted_mini > available_mini + 1e-9
+            or open_mini_before + admitted_mini
+            > float(getattr(policy, "maximum_mini_equivalent", 0.0)) + 1e-9
+        ):
+            raise AutonomousGraduationCohortError(
+                "governor quantity/mini/risk conservation drift"
+            )
+        if not isinstance(row["risk_before"], Mapping) or not isinstance(
+            row["risk_after"], Mapping
+        ):
+            raise AutonomousGraduationCohortError(
+                "governor risk attribution must contain mappings"
+            )
+        risk_before = _validated_risk_state(row["risk_before"], "risk_before")
+        risk_after = _validated_risk_state(row["risk_after"], "risk_after")
+        if (
+            not math.isclose(
+                requested_risk,
+                requested_mini * component_charge,
+                rel_tol=1e-10,
+                abs_tol=1e-7,
+            )
+            or not math.isclose(
+                admitted_risk,
+                admitted_mini * component_charge,
+                rel_tol=1e-10,
+                abs_tol=1e-7,
+            )
+            or not math.isclose(
+                risk_after["open_declared_nominal_risk"],
+                risk_before["open_declared_nominal_risk"] + admitted_risk,
+                rel_tol=1e-10,
+                abs_tol=1e-7,
+            )
+            or risk_after["open_declared_nominal_risk"]
+            > risk_after["maximum_admissible_declared_nominal_risk"] + 1e-7
+        ):
+            raise AutonomousGraduationCohortError(
+                "governor nominal-risk state conservation drift"
+            )
+        expected_flags = {
+            "conflict_rejected": status == "CONFLICT_REJECTED",
+            "contract_limit_rejected": status == "CONTRACT_LIMIT_REJECTED",
+            "mll_risk_rejected": status == "MLL_RISK_REJECTED",
+        }
+        if any(
+            row[field] is not expected
+            for field, expected in expected_flags.items()
+        ):
+            raise AutonomousGraduationCohortError(
+                "governor status-specific rejection flags drift"
+            )
+        requested_total += requested_quantity
+        admitted_total += admitted_quantity
+        statuses[status] += 1
+        reason = str(row["reason"])
+        binding = row["binding_constraint"]
+
+        if status == "ACCEPTED":
+            if (
+                admitted_quantity != requested_quantity
+                or row["allow"] is not True
+                or row["accepted"] is not True
+                or row["rejected"] is not False
+                or reason != "ACTIVE_POOL_NOMINAL_RISK_PRESERVED"
+                or row["binding_constraint"] is not None
+            ):
+                raise AutonomousGraduationCohortError(
+                    "accepted governor allocation is inconsistent"
+                )
+        elif status in rejection_statuses:
+            binding = str(binding)
+            if (
+                admitted_quantity != 0
+                or row["allow"] is not False
+                or row["accepted"] is not False
+                or row["rejected"] is not True
+                or not reason
+                or binding != reason
+                or not _valid_rejection_status_reason(status, reason)
+            ):
+                raise AutonomousGraduationCohortError(
+                    "governor rejection is not completely attributed"
+                )
+            explicit_rejections += 1
+            rejection_reasons[reason] += 1
+            rejection_bindings[binding] += 1
+        else:
+            binding = str(binding)
+            if (
+                row["allow"] is not True
+                or row["accepted"] is not True
+                or row["rejected"] is not False
+                or not 0 < admitted_quantity < requested_quantity
+                or reason
+                not in {
+                    "ACTIVE_POOL_PROPORTIONAL_SIZE_REDUCTION",
+                    "TARGET_PROTECTION_SIZE_REDUCTION",
+                }
+                or binding
+                not in {
+                    "AGGREGATE_NOMINAL_RISK_LIMIT",
+                    "SHARED_CONTRACT_LIMIT",
+                    "TARGET_PROTECTION",
+                }
+            ):
+                raise AutonomousGraduationCohortError(
+                    "size reduction is not an admitted frozen-governor action"
+                )
+            if (
+                reason == "ACTIVE_POOL_PROPORTIONAL_SIZE_REDUCTION"
+                and (
+                    concurrency_scaling != "PROPORTIONAL"
+                    or binding
+                    not in {
+                        "AGGREGATE_NOMINAL_RISK_LIMIT",
+                        "SHARED_CONTRACT_LIMIT",
+                    }
+                )
+            ) or (
+                reason == "TARGET_PROTECTION_SIZE_REDUCTION"
+                and (
+                    target_protection_mode == "NONE"
+                    or binding != "TARGET_PROTECTION"
+                )
+            ):
+                raise AutonomousGraduationCohortError(
+                    "size reduction is not enabled by the frozen policy"
+                )
+            explicit_reductions += 1
+            reduction_reasons[reason] += 1
+            reduction_bindings[binding] += 1
+
+        if binding == "AGGREGATE_NOMINAL_RISK_LIMIT":
+            available_risk = max(
+                0.0,
+                risk_before["maximum_admissible_declared_nominal_risk"]
+                - risk_before["open_declared_nominal_risk"],
+            )
+            if (
+                requested_risk <= available_risk + 1e-7
+                or admitted_risk > available_risk + 1e-7
+            ):
+                raise AutonomousGraduationCohortError(
+                    "aggregate-risk suppression is not proven by risk state"
+                )
+        if binding == "SHARED_CONTRACT_LIMIT" and (
+            requested_mini <= available_mini + 1e-9
+            or admitted_mini > available_mini + 1e-9
+        ):
+            raise AutonomousGraduationCohortError(
+                "contract-limit suppression is not proven by chronological exposure"
+            )
+
+        suppressed = requested_quantity - admitted_quantity
+        if (
+            row["foregone_realized_pnl_used_for_routing"] is not False
+            or row["foregone_realized_pnl_available_at_decision"] is not False
+        ):
+            raise AutonomousGraduationCohortError(
+                "ex-post foregone PnL entered routing"
+            )
+        if (
+            row["foregone_expected_pnl"] is not None
+            or row["foregone_expected_pnl_status"]
+            != "UNAVAILABLE_NO_FROZEN_PRE_OUTCOME_ESTIMATE"
+        ):
+            raise AutonomousGraduationCohortError(
+                "unfrozen expected foregone PnL entered attribution"
+            )
+        observed = row["foregone_realized_pnl_ex_post"]
+        observed_status = str(row["foregone_realized_pnl_status"])
+        if observed is None:
+            if observed_status != "CENSORED_FUTURE_COVERAGE":
+                raise AutonomousGraduationCohortError(
+                    "missing foregone PnL lacks censor attribution"
+                )
+            if suppressed:
+                foregone_censored += 1
+        else:
+            if (
+                observed_status != "OBSERVED_COMPLETE_PATH"
+                or isinstance(observed, bool)
+                or not isinstance(observed, (int, float))
+            ):
+                raise AutonomousGraduationCohortError(
+                    "foregone realized PnL status drift"
+                )
+            if suppressed:
+                foregone_realized.append(float(observed))
+                if status == "SIZE_REDUCED":
+                    foregone_realized_reductions.append(float(observed))
+                elif status in rejection_statuses:
+                    foregone_realized_rejections.append(float(observed))
+            elif abs(float(observed)) > 1e-12:
+                raise AutonomousGraduationCohortError(
+                    "unsuppressed decision has nonzero foregone realized PnL"
+                )
+    reduced = sum(row["size_reduced"] is True for row in decisions)
+    core = {
+        "decision_count": len(decisions),
+        "requested_quantity_total": requested_total,
+        "admitted_quantity_total": admitted_total,
+        "size_reduced_count": reduced,
+        "explicitly_attributed_size_reduced_count": explicit_reductions,
+        "quantity_suppressed_total": requested_total - admitted_total,
+        "risk_or_contract_rejection_count": sum(
+            count
+            for status, count in statuses.items()
+            if status in {"MLL_RISK_REJECTED", "CONTRACT_LIMIT_REJECTED"}
+        ),
+        "all_governor_rejection_count": explicit_rejections,
+        "decision_status_counts": dict(sorted(statuses.items())),
+        "size_reduction_reason_counts": dict(sorted(reduction_reasons.items())),
+        "size_reduction_binding_counts": dict(sorted(reduction_bindings.items())),
+        "rejection_reason_counts": dict(sorted(rejection_reasons.items())),
+        "rejection_binding_counts": dict(sorted(rejection_bindings.items())),
+        "foregone_realized_pnl_ex_post_total_usd": sum(foregone_realized),
+        "foregone_realized_pnl_size_reductions_usd": sum(
+            foregone_realized_reductions
+        ),
+        "foregone_realized_pnl_full_rejections_usd": sum(
+            foregone_realized_rejections
+        ),
+        "foregone_realized_pnl_observed_count": len(foregone_realized),
+        "foregone_realized_pnl_censored_count": foregone_censored,
+        "foregone_realized_pnl_used_for_routing": False,
+        "size_reduction_is_frozen_governor_semantics": (
+            explicit_reductions == reduced
+        ),
+        "all_rejections_explicitly_attributed": explicit_rejections
+        == sum(statuses[status] for status in rejection_statuses),
+        "requested_quantity_matches_immutable_base_quantity": True,
+    }
+    return {**core, "allocation_attribution_hash": stable_hash(core)}
+
+
+def _strict_nonnegative_int(value: Any, field: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise AutonomousGraduationCohortError(
+            f"governor {field} must be an explicit nonnegative integer"
+        )
+    return value
+
+
+def _strict_fraction(value: Any, field: str) -> float:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not 0.0 <= float(value) <= 1.0
+    ):
+        raise AutonomousGraduationCohortError(
+            f"governor {field} must be an explicit fraction"
+        )
+    return float(value)
+
+
+def _strict_nonnegative_number(value: Any, field: str) -> float:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(float(value))
+        or float(value) < 0.0
+    ):
+        raise AutonomousGraduationCohortError(
+            f"governor {field} must be a finite nonnegative number"
+        )
+    return float(value)
+
+
+def _strict_positive_number(value: Any, field: str) -> float:
+    number = _strict_nonnegative_number(value, field)
+    if number <= 0.0:
+        raise AutonomousGraduationCohortError(
+            f"governor {field} must be a finite positive number"
+        )
+    return number
+
+
+def _validated_risk_state(value: Mapping[str, Any], field: str) -> dict[str, float]:
+    required = {
+        "open_declared_nominal_risk",
+        "maximum_admissible_declared_nominal_risk",
+    }
+    if not required.issubset(value):
+        raise AutonomousGraduationCohortError(
+            f"governor {field} is missing nominal-risk state"
+        )
+    open_risk = _strict_nonnegative_number(
+        value["open_declared_nominal_risk"], f"{field}.open_declared_nominal_risk"
+    )
+    maximum = _strict_nonnegative_number(
+        value["maximum_admissible_declared_nominal_risk"],
+        f"{field}.maximum_admissible_declared_nominal_risk",
+    )
+    return {
+        "open_declared_nominal_risk": open_risk,
+        "maximum_admissible_declared_nominal_risk": maximum,
+    }
+
+
+def _valid_rejection_status_reason(status: str, reason: str) -> bool:
+    allowed = {
+        "REJECTED": {
+            "COMPONENT_NOT_IN_FROZEN_MEMBERSHIP",
+            "INVALID_NOMINAL_ENTRY_SIZE",
+            "DAILY_LOSS_GUARD",
+            "DAILY_CONSISTENCY_GUARD",
+            "MAXIMUM_CONCURRENT_SLEEVES",
+            "TARGET_PROTECTION_LOCK",
+        },
+        "CONFLICT_REJECTED": {"SAME_INSTRUMENT_CONFLICT"},
+        "CONTRACT_LIMIT_REJECTED": {"SHARED_CONTRACT_LIMIT"},
+        "MLL_RISK_REJECTED": {
+            "PROTECTED_MLL_BUFFER_REACHED",
+            "AGGREGATE_NOMINAL_RISK_LIMIT",
+        },
+    }
+    return reason in allowed.get(status, set())
+
+
+def _runtime_provenance(project: Path, manifest_path: Path) -> dict[str, Any]:
+    module_path = Path(__file__).resolve()
+    script_path = (project / "scripts/run_autonomous_graduation_cohort.py").resolve()
+    tests_path = (project / "tests/test_autonomous_graduation_cohort.py").resolve()
+    try:
+        source_commit = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=project,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise AutonomousGraduationCohortError("cannot bind source commit") from exc
+    core = {
+        "source_commit": source_commit,
+        "manifest_file_sha256": _sha256(manifest_path.resolve()),
+        "adapter_module_sha256": _sha256(module_path),
+        "runner_script_sha256": _sha256(script_path),
+        "audit_protocol_tests_sha256": _sha256(tests_path),
+    }
+    return {**core, "runtime_provenance_hash": stable_hash(core)}
 
 
 def _unique_trajectory_concentration(value: Mapping[str, Any]) -> dict[str, Any]:
