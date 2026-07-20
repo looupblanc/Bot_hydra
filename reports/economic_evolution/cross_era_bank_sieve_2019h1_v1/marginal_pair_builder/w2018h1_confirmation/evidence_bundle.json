@@ -1,0 +1,38 @@
+{
+  "accounting": "EXACT_CHRONOLOGICAL_PNL_MLL_CONSISTENCY",
+  "broker_connections": 0,
+  "candidate_freeze_hashes": {
+    "hazard_0c503c8ed692e7a3b49684f2": "ec696bd62d8cd99ab760dea50dad1df395d81584cbde4e975cf227c347730498",
+    "hazard_0df449d78eadc5bce054eb2c": "0f52cd550bf1c534d427c318b3407c28101b3da554403f78b8ab2529b0c06f22",
+    "hazard_10ffb41856432af08259e32b": "2e40aa2121c72544ae697a1e975faa89e703c4832e12db4a83ede312d85a6608",
+    "hazard_207180dadb3a6283f951dce7": "b3763847a948967675ccb6824807d33429f719ec56915fbf75cdc09c9cd8dda2",
+    "w2019_pair_40da198691f99a0f3d09eb1f": "7722c58e462cc7f6d12536420564a4fb5e877d8ebd2b4acd8866db893fe0f459",
+    "w2019_pair_9dabd048a7eb7318091b6e2b": "8cd631218d9db9cb00232be20d5337da1aac232831501622246a47a5966fd5c6",
+    "w2019_pair_d802eee6d824a0d718560451": "f48436d6e47f216119867fdef5175257180f048a4473e92ef5ed29925208c4e2",
+    "w2019_pair_f5059f81e516c64891094ec1": "f93c4d3a16a97d4fa819201bc2d472c4e9ab03913d5eb5e6ff8f6919ac30b076"
+  },
+  "candidate_result_hashes": {
+    "hazard_0c503c8ed692e7a3b49684f2": "ed271453a0050f81231008d9781f0b69e23b534984271b90f2a863bf2065e93a",
+    "hazard_0df449d78eadc5bce054eb2c": "9813fa09d5c860064c0f2d0808f2675adbfe74b586339738fb84e5de53b8e5d3",
+    "hazard_10ffb41856432af08259e32b": "fdb6315d78695a309da9074f3ea4c30a6f2a4b30c839e23973e57666218b2fae",
+    "hazard_207180dadb3a6283f951dce7": "159d26613fa23b1b342ffb3df793f7fc6e7626529ed6126ed0625f20045bdd49",
+    "w2019_pair_40da198691f99a0f3d09eb1f": "885db4ebc30177d4e2fecb565871d2660e8e2813bc2d7987d896b1cc3efb4883",
+    "w2019_pair_9dabd048a7eb7318091b6e2b": "95c795167e48ce32f7209be26f589495340f512d765971e56f82b9c82f83a7d9",
+    "w2019_pair_d802eee6d824a0d718560451": "a0d9c8145fcf564d884e696610de191a4a9aab38666bef4b8e0979d31bdf3bbf",
+    "w2019_pair_f5059f81e516c64891094ec1": "c132d6a943655209bf617647a6c8f30972ab8a161dc286f18df91bb81988f979"
+  },
+  "data_role": "CONFIRMATION_CONSUMED_ONCE",
+  "decision_engine": "SHARED_CAUSAL_BATCH_STREAMING_PATH",
+  "economic_result_hash": "a2a0ab78264a3cc62131b72ffe4eafcc6620e645085c0f7913ca15e05e85d1f1",
+  "evidence_bundle_hash": "09c7268ed28b82546d8d7af18879debb15e2bfd1746cff5f5973fc68cc62d68a",
+  "feature_receipt_hash": "972d2c274716abdcade3569412a897f7cfd5a52c08a8b0830e66849f32e196d7",
+  "fill_policy": "CAUSAL_NEXT_TRADABLE_OPEN_UNCHANGED",
+  "orders": 0,
+  "parent_contract_hash": "cf0eb8e7dbdd66fbbbe8b111bd749846cc704d970f6d0c06cd07e2f0762b8ab7",
+  "promotion_status": null,
+  "q4_access_count_delta": 0,
+  "raw_data_sha256": "85eea3633a1d5dda6d8aa431c0843a91eacba7dae97b9efc6ea90f9fc2751363",
+  "schema": "hydra_w2018h1_cohort_confirmation_evidence_bundle_v1",
+  "status": "COMPLETE_CAUSAL_CONFIRMATION_EVIDENCE_BUNDLE",
+  "xfa_paths_started": 0
+}

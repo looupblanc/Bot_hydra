@@ -1,0 +1,13 @@
+{
+  "broker_connections": 0,
+  "decision": "NO_TIER_C_CANDIDATE_CONFIRMED",
+  "exact_account_episode_count": 378,
+  "next_action": "CLOSE_FAILED_EXACT_BRANCHES_AND_REALLOCATE_TO_MATERIALLY_DISTINCT_EVI_BRANCH",
+  "numeric_threads_per_worker": 1,
+  "orders": 0,
+  "q4_access_count_delta": 0,
+  "schema": "hydra_w2018h1_cohort_confirmation_state_v1",
+  "status": "W2018H1_CONFIRMATION_PACKET_CONSUMED_ONCE",
+  "tier_c_candidate_count": 0,
+  "worker_processes": 1
+}

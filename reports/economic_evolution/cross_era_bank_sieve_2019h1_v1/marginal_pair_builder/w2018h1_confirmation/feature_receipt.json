@@ -1,0 +1,48 @@
+{
+  "acquisition_contract_hash": "2fd66b8389d72f435d7ddf27ed8154ff0367cbee6de3f8416abdc68846dd6d93",
+  "acquisition_receipt_hash": "7992351dc544410914f583bd6c9fe00ae343fb9345956652f11eb5807298abef",
+  "bundles": {
+    "CL": {
+      "bundle_hash": "56c02f11f3830b81b4876529bcb8e4b9e2a022e3d2a5053dfd6067ed3ccdc5f3",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/298c5e0566cfff9e404b/feature_matrices/d94a0c9c568bf97c3076f48a6b6ef946223d5603cf4a0f8c52c0b4f15e934c96",
+      "row_count": 134376
+    },
+    "ES": {
+      "bundle_hash": "a568eeac9185d5a18063a38840812954d685460d7238a3a2dc16dc369cf26f4e",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/298c5e0566cfff9e404b/feature_matrices/cabf263f008e7c1116ae982d92b2e25072f9721a64eee21ad399251f29870520",
+      "row_count": 159980
+    },
+    "NQ": {
+      "bundle_hash": "4e853e8484614bee8e2f68e2ec92b306727a9cc5f0f7a9864785e4c5d8499af9",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/298c5e0566cfff9e404b/feature_matrices/5bb11bc11926badc5867d9df120b61913efd6e44558089db9016ada378d67751",
+      "row_count": 159611
+    }
+  },
+  "candidate_logic_mutated": false,
+  "causal_feature_markets": [
+    "CL",
+    "NQ",
+    "ES"
+  ],
+  "contract_map_path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/298c5e0566cfff9e404b/explicit_contract_map.json",
+  "contract_map_sha256": "a299b7d06323ffcfc312dcf733bab096ff96a44ecc74dc3b05028a0a57f4937a",
+  "cross_asset_dependency_market": "ES",
+  "data_role": "CONFIRMATION",
+  "future_outcome_arrays_in_decision_bundle": false,
+  "map_guard": {
+    "explicit_contract_count": 13,
+    "unmapped_contract_rows_excluded": 0,
+    "unsafe_roll_rows_excluded": 56825
+  },
+  "parent_economic_contract_hash": "cf0eb8e7dbdd66fbbbe8b111bd749846cc704d970f6d0c06cd07e2f0762b8ab7",
+  "q4_access_count_delta": 0,
+  "result_hash": "972d2c274716abdcade3569412a897f7cfd5a52c08a8b0830e66849f32e196d7",
+  "roll_map_hash": "346a254da11ce56a66c9e7069d1d30deedc48e521e3292669bc9e94f90e03521",
+  "schema": "hydra_w2018h1_cohort_feature_receipt_v1",
+  "source_path": "/root/hydra-bot/data/cache/databento/fresh_confirmation_0035/298c5e0566cfff9e404b/normalized_ohlcv.parquet",
+  "source_sha256": "4e181690c6d05e7569befbf7bf7990e5fd67a552f64f40b1c52a848471d1145a",
+  "status": "W2018H1_CAUSAL_FEATURE_BUNDLES_READY"
+}

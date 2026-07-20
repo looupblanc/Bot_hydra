@@ -1,0 +1,171 @@
+{
+  "broker_connections": 0,
+  "candidate_count": 8,
+  "causal_feature_dependency_audit": {
+    "complete_causal_feature_markets": [
+      "CL",
+      "ES",
+      "NQ"
+    ],
+    "component_ids": [
+      "hazard_09ee35bc24190bb213469e6a",
+      "hazard_0c503c8ed692e7a3b49684f2",
+      "hazard_0df449d78eadc5bce054eb2c",
+      "hazard_0e4181808737ad6e9c8593ed",
+      "hazard_10ffb41856432af08259e32b",
+      "hazard_207180dadb3a6283f951dce7",
+      "hazard_2a34338b0805cd6e21bd2a00"
+    ],
+    "cross_asset_feature_dependencies_derived_from_frozen_candidates": [
+      "ES"
+    ],
+    "dependency_expansion_changes_candidate_logic": false,
+    "signal_markets_declared_by_parent": [
+      "CL",
+      "NQ"
+    ]
+  },
+  "contract_hash": "2fd66b8389d72f435d7ddf27ed8154ff0367cbee6de3f8416abdc68846dd6d93",
+  "data_partition": {
+    "candidate_modification_allowed": false,
+    "entire_post_warmup_block_consumed_once": true,
+    "recalibration_allowed": false,
+    "role": "CONFIRMATION",
+    "warmup_rule": "FIRST_5_COMMON_COMPLETE_SESSION_DAYS_EXCLUDED"
+  },
+  "data_request": {
+    "additional_authority_usd": 100.0,
+    "broker_or_order_capability": false,
+    "cumulative_hard_cap_usd": 200.720719923081,
+    "data_role": "CONFIRMATION",
+    "dataset": "GLBX.MDP3",
+    "date_interval": "HALF_OPEN",
+    "end": "2018-07-02",
+    "frozen_estimated_cost_usd": 1.865794658661,
+    "prior_cumulative_actual_usd": 161.62247070372499,
+    "projected_cumulative_usd": 163.488265362386,
+    "q4_2024_access_allowed": false,
+    "request_hash": "ce3f7ba7359ac7f9bc9a5b107df07393cb2fea7e3fe3d909ddc0d7669e0c75a5",
+    "schema": "ohlcv-1m",
+    "start": "2018-01-02",
+    "stype_in": "continuous",
+    "stype_out": "instrument_id",
+    "symbols": [
+      "CL.c.0",
+      "NQ.c.0",
+      "ES.c.0"
+    ]
+  },
+  "numeric_threads_per_worker": 1,
+  "official_cost_matrix": {
+    "instrument_ids": [
+      "16210",
+      "21168",
+      "23252",
+      "23520",
+      "45928",
+      "47511",
+      "57287",
+      "253894",
+      "253896",
+      "353594",
+      "477338",
+      "545967",
+      "669714"
+    ],
+    "parts": {
+      "definition": {
+        "billable_size_bytes": 633600,
+        "estimated_cost_usd": 0.001003146172,
+        "record_count": 1760
+      },
+      "ohlcv-1m": {
+        "billable_size_bytes": 28604352,
+        "estimated_cost_usd": 1.864791512489,
+        "record_count": 510792
+      }
+    },
+    "requests": {
+      "definition": {
+        "dataset": "GLBX.MDP3",
+        "end": "2018-07-02",
+        "schema": "definition",
+        "start": "2018-01-02",
+        "stype_in": "instrument_id",
+        "symbols": [
+          "16210",
+          "21168",
+          "23252",
+          "23520",
+          "45928",
+          "47511",
+          "57287",
+          "253894",
+          "253896",
+          "353594",
+          "477338",
+          "545967",
+          "669714"
+        ]
+      },
+      "ohlcv-1m": {
+        "dataset": "GLBX.MDP3",
+        "end": "2018-07-02",
+        "schema": "ohlcv-1m",
+        "start": "2018-01-02",
+        "stype_in": "continuous",
+        "symbols": [
+          "CL.c.0",
+          "NQ.c.0",
+          "ES.c.0"
+        ]
+      }
+    },
+    "symbology_hash": "85d0aa7a2f1a467e1ab61bf1cdc86765dd15cc2a6c12a890cf35ae2dc2cb81a6",
+    "total_billable_size_bytes": 29237952,
+    "total_estimated_cost_usd": 1.865794658661,
+    "total_record_count": 512552
+  },
+  "orders": 0,
+  "parent_economic_contract_hash": "cf0eb8e7dbdd66fbbbe8b111bd749846cc704d970f6d0c06cd07e2f0762b8ab7",
+  "q4_access_count_delta": 0,
+  "recalibration_allowed": false,
+  "retuning_allowed": false,
+  "schema": "hydra_w2018h1_cohort_acquisition_contract_v1",
+  "source_bindings": {
+    "authorization_manifest_hash": "6308849da7fd715e324334da1663e8ec8ce4cd083aa399490b240a9386a64792",
+    "official_rule_snapshot_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+    "pair_contract_hash": "e7e9fb2560509e0c9733b469dc7d582a5473df946e0a06cc51a7401e36ecf262",
+    "parent_contract_file_sha256": "c03cebc2c143cc3da901d68013ebaa574f001148d9375f9bb0bedb58525ff8aa",
+    "source_sieve_contract_hash": "e8f4b05f1b9bff54be1248c83efabc3d544da7b367ea7f5570ddd1730f1674c5"
+  },
+  "status": "FROZEN_AWAITING_ACQUISITION",
+  "tier_g_candidates": [
+    {
+      "candidate_id": "hazard_10ffb41856432af08259e32b"
+    },
+    {
+      "candidate_id": "hazard_207180dadb3a6283f951dce7"
+    },
+    {
+      "candidate_id": "hazard_0df449d78eadc5bce054eb2c"
+    },
+    {
+      "candidate_id": "hazard_0c503c8ed692e7a3b49684f2"
+    },
+    {
+      "candidate_id": "w2019_pair_d802eee6d824a0d718560451"
+    },
+    {
+      "candidate_id": "w2019_pair_40da198691f99a0f3d09eb1f"
+    },
+    {
+      "candidate_id": "w2019_pair_f5059f81e516c64891094ec1"
+    },
+    {
+      "candidate_id": "w2019_pair_9dabd048a7eb7318091b6e2b"
+    }
+  ],
+  "worker_processes": 1,
+  "xfa_paths_started": 0
+}
