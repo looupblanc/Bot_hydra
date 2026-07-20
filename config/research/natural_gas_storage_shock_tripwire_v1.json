@@ -1,0 +1,170 @@
+{
+  "schema": "hydra_natural_gas_storage_shock_tripwire_manifest_v1",
+  "branch_id": "EIA_NATURAL_GAS_STORAGE_SHOCK_NG_MNG_V1",
+  "hypothesis": "The scheduled EIA Weekly Natural Gas Storage Report creates a market-specific information shock whose completed first response bars contain enough causal continuation or rejection information to produce a low-turnover executable NG/MNG edge after conservative costs.",
+  "strongest_argument_against": "The release may be incorporated inside the first minute, leaving only whipsaw and adverse selection at the next executable open; weekly frequency may also be too low for Combine target velocity.",
+  "material_distinction": {
+    "broad_ohlcv": "Only preregistered EIA natural-gas storage release timestamps are eligible; this is not an unrestricted bar grammar.",
+    "scheduled_macro_release": "The prior terminal branch tested equity/rates CPI and FOMC reactions. This branch tests a commodity-specific physical-storage information shock in a previously unused market ecology.",
+    "weekly_energy_inventory": "No prior reachable artifact contains NG or MNG. The exact CL petroleum-inventory grammar is not reused.",
+    "microstructure": "No order-flow or MBO feature is used. The decision is made from completed one-minute NG response bars and strictly prior range state."
+  },
+  "decision_card": {
+    "expected_value_of_information_per_compute_minute": 0.91,
+    "expected_economic_upside": 0.86,
+    "data_cost_risk": 0.08,
+    "implementation_cost": 0.18,
+    "overfitting_risk": 0.31,
+    "deployment_risk": 0.12,
+    "smallest_decisive_experiment": "Discovery-only selection followed by unchanged validation and final-development event economics; exact account replay opens only after the held-out stressed gate.",
+    "next_materially_distinct_alternative": "USDA grain-report reaction in ZC/ZS/ZW with market-specific session rules and no shared threshold lineage."
+  },
+  "official_sources": {
+    "release_schedule_url": "https://ir.eia.gov/ngs/schedule.html",
+    "release_schedule_retrieved_at_utc": "2026-07-20T13:55:00Z",
+    "release_schedule_contract": "STANDARD_THURSDAY_10_30_AM_AMERICA_NEW_YORK; holiday-shift weeks excluded rather than inferred",
+    "topstep_products_url": "https://help.topstep.com/en/articles/8284206-when-and-what-products-can-i-trade",
+    "topstep_fees_url": "https://help.topstep.com/en/articles/8284213-topstepx-commissions-and-fees",
+    "topstep_product_status": "NG_AND_MNG_PERMITTED",
+    "ng_round_turn_commission_and_fees_usd": 4.18,
+    "mng_round_turn_commission_and_fees_usd": 1.72
+  },
+  "data_contract": {
+    "dataset": "GLBX.MDP3",
+    "symbols": ["NG.c.0", "MNG.c.0"],
+    "stype_in": "continuous",
+    "schemas": ["ohlcv-1m", "definition"],
+    "start": "2023-01-03",
+    "end_exclusive": "2024-10-01",
+    "q4_access": false,
+    "official_estimates": {
+      "ohlcv-1m": {
+        "record_count": 624336,
+        "billable_size_bytes": 34962816,
+        "estimated_cost_usd": 2.279316186905
+      },
+      "definition": {
+        "record_count": 847,
+        "billable_size_bytes": 304920,
+        "estimated_cost_usd": 0.000482764095
+      },
+      "total_record_count": 625183,
+      "total_billable_size_bytes": 35267736,
+      "total_estimated_cost_usd": 2.279798951
+    }
+  },
+  "frozen_inputs": {
+    "rule_snapshot": {
+      "path": "config/rulesets/topstep_official_2026-07-19.json",
+      "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+    }
+  },
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "start": "2023-01-03",
+      "end": "2024-01-01",
+      "candidate_modification_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "start": "2024-01-01",
+      "end": "2024-07-01",
+      "candidate_modification_allowed": false
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "start": "2024-07-01",
+      "end": "2024-10-01",
+      "candidate_modification_allowed": false
+    }
+  ],
+  "release_contract": {
+    "timezone": "America/New_York",
+    "standard_weekday": "THURSDAY",
+    "standard_release_time": "10:30",
+    "excluded_holiday_shift_dates": [
+      "2023-11-23",
+      "2024-07-04"
+    ],
+    "calendar_labels_in_decision_features": false,
+    "release_timestamp_is_known_before_decision": true
+  },
+  "causal_contract": {
+    "decision_features": "completed NG bars at or after the known release plus strictly prior 30-minute range",
+    "available_at": "BAR_TIMESTAMP_PLUS_ONE_MINUTE",
+    "decision_time": "COMPLETION_OF_FROZEN_1_3_OR_5_BAR_RESPONSE_WINDOW",
+    "entry": "NEXT_TRADABLE_BAR_OPEN_STRICTLY_AFTER_DECISION",
+    "exit": "FIRST_CAUSAL_STOP_TARGET_OR_FROZEN_TIME_EXIT; SAME_BAR_STOP_FIRST",
+    "future_label_eligibility": false,
+    "backfill_allowed": false,
+    "roll_guard_sessions_each_side": 1,
+    "missing_interval": "DATA_CENSORED"
+  },
+  "candidate_lattice": {
+    "mechanisms": [
+      "RELEASE_RESPONSE_CONTINUATION",
+      "RELEASE_REJECTION_REVERSAL"
+    ],
+    "decision_bars": [1, 3, 5],
+    "minimum_response_to_prior_range": [0.5, 1.0, 1.5],
+    "holding_minutes": [5, 15, 30, 60],
+    "stop_prior_range_fraction": [0.5, 1.0],
+    "target_stop_multiple": [1.5, 3.0]
+  },
+  "execution": {
+    "instruments": {
+      "NG": {
+        "tick_size": 0.001,
+        "tick_value_usd": 10.0,
+        "point_value_usd": 10000.0,
+        "round_turn_commission_and_fees_usd": 4.18
+      },
+      "MNG": {
+        "tick_size": 0.001,
+        "tick_value_usd": 1.0,
+        "point_value_usd": 1000.0,
+        "round_turn_commission_and_fees_usd": 1.72
+      }
+    },
+    "normal_slippage_ticks_per_side": 1.0,
+    "stressed_slippage_ticks_per_side": 2.0,
+    "latency": "ONE_COMPLETE_MINUTE_RESPONSE_THEN_NEXT_TRADABLE_OPEN"
+  },
+  "selection_gate": {
+    "selection_on_discovery_only": true,
+    "maximum_selected_cells": 12,
+    "minimum_discovery_events": 20,
+    "minimum_validation_events": 8,
+    "minimum_final_development_events": 5,
+    "positive_stressed_validation_required": true,
+    "positive_stressed_final_development_required": true,
+    "minimum_stressed_edge_to_cost_ratio": 1.25,
+    "maximum_single_event_profit_concentration": 0.35,
+    "controls": ["DIRECTION_FLIP", "NON_RELEASE_WEEKDAY_MATCH"]
+  },
+  "account_gate": {
+    "run_only_after_selection_gate": true,
+    "account_sizes": ["50K", "100K", "150K"],
+    "horizons_trading_days": [5, 10, 20],
+    "instruments": ["NG", "MNG"],
+    "quantity_frontiers": {
+      "NG": [1, 2, 3, 5],
+      "MNG": [5, 10, 20, 30, 50]
+    },
+    "exact_mll_consistency_and_contract_limits": true
+  },
+  "governance": {
+    "evidence_role": "VIEWED_DEVELOPMENT_TRIPWIRE_ONLY",
+    "tier_ceiling": "E",
+    "promotion_allowed": false,
+    "q4_access_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "xfa_allowed": false,
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "kill_branch_after_failed_gate": true
+  },
+  "manifest_hash": "d10bf20df0d504ad58f1c82448966096c4e7a688f7fe7ef06c547f3b27e5ecfb"
+}

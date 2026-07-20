@@ -3,15 +3,13 @@
 - Budget start: 2026-07-10
 - Hard cap USD: 200.72
 - Safety ceiling USD: 200.72
-- Cumulative estimated spend USD: 165.942677
-- Cumulative actual spend USD: 165.942677
-- Remaining hard-cap budget USD: 34.778043
-- Remaining automatic safety budget USD: 34.778043
-- Ledger records: 464
+- Cumulative estimated spend USD: 168.222476
+- Cumulative actual spend USD: 168.222476
+- Remaining hard-cap budget USD: 32.498244
+- Remaining automatic safety budget USD: 32.498244
+- Ledger records: 466
 
 ## Recent Records
-- 2026-07-18T23:23:46.954923+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-07-31T15:58:00Z to 2023-07-31T16:01:00Z estimate=$0.000000 actual=$0.004022 status=DOWNLOADED
-- 2026-07-18T23:23:55.746544+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-07-31T17:13:00Z to 2023-07-31T17:16:00Z estimate=$0.000000 actual=$0.001919 status=DOWNLOADED
 - 2026-07-18T23:24:01.349084+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-08-01T13:43:00Z to 2023-08-01T13:46:00Z estimate=$0.000000 actual=$0.006565 status=DOWNLOADED
 - 2026-07-18T23:24:04.870197+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-08-01T13:58:00Z to 2023-08-01T14:01:00Z estimate=$0.000000 actual=$0.012027 status=DOWNLOADED
 - 2026-07-18T23:24:08.798841+00:00 GLBX.MDP3 tbbo ['YMU3'] 2023-08-01T15:43:00Z to 2023-08-01T15:46:00Z estimate=$0.000000 actual=$0.001696 status=DOWNLOADED
@@ -30,3 +28,5 @@
 - 2026-07-20T12:46:34.992387+00:00 GLBX.MDP3 ohlcv-1m+definition ['CL.c.0', 'NQ.c.0', 'ES.c.0'] 2018-01-02 to 2018-07-02 estimate=$1.865795 actual=$1.865795 status=DOWNLOADED
 - 2026-07-20T12:51:00.736646+00:00 GLBX.MDP3 ohlcv-1m ['RB.c.0', 'HO.c.0'] 2023-01-03 to 2024-10-01 estimate=$2.453787 actual=$2.453787 status=DOWNLOADED
 - 2026-07-20T12:51:00.753109+00:00 GLBX.MDP3 definition ['RB.c.0', 'HO.c.0'] 2023-01-03 to 2024-10-01 estimate=$0.000625 actual=$0.000625 status=DOWNLOADED
+- 2026-07-20T15:23:10.445106+00:00 GLBX.MDP3 ohlcv-1m ['NG.c.0', 'MNG.c.0'] 2023-01-03 to 2024-10-01 estimate=$2.279316 actual=$2.279316 status=DOWNLOADED
+- 2026-07-20T15:23:10.458212+00:00 GLBX.MDP3 definition ['NG.c.0', 'MNG.c.0'] 2023-01-03 to 2024-10-01 estimate=$0.000483 actual=$0.000483 status=DOWNLOADED

@@ -1,0 +1,1211 @@
+{
+  "account_matrix_block_reason": "EVENT_ECONOMICS_GATE_NOT_GREEN",
+  "account_matrix_executed": false,
+  "acquisition_receipt_hash": "7a4b6b6ed1262787f09f827bf3a952c39d524307050fb2ac9cfc5b04ce5a2f4f",
+  "actual_incremental_spend_usd": 2.279798951,
+  "audit_hash": "5f197b3143458e7859a45b5326d2dab2ea71d049ab2f5f7f60ad0ef3b4a9afc1",
+  "branch_id": "EIA_NATURAL_GAS_STORAGE_SHOCK_NG_MNG_V1",
+  "broker_connections": 0,
+  "data_receipt": {
+    "first_timestamp": "2023-01-03 00:00:00+00:00",
+    "last_timestamp": "2024-09-30 23:58:00+00:00",
+    "q4_row_count": 0,
+    "row_count": 624336,
+    "rows_by_symbol": {
+      "MNG": 110962,
+      "NG": 513374
+    }
+  },
+  "discovery_eligible_count": 9,
+  "event_gate_passer_ids": [],
+  "evidence_role": "VIEWED_DEVELOPMENT_TRIPWIRE_ONLY",
+  "manifest_hash": "d10bf20df0d504ad58f1c82448966096c4e7a688f7fe7ef06c547f3b27e5ecfb",
+  "next_action": "TOMBSTONE_EXACT_NG_STORAGE_SHOCK_SPEC_AND_START_DISTINCT_USDA_GRAIN_TRIPWIRE",
+  "non_deployable_upper_bound": {
+    "DISCOVERY": {
+      "event_count": 43,
+      "interpretation": "NON_DEPLOYABLE_UPPER_BOUND_NEVER_PROMOTION_ELIGIBLE",
+      "non_deployable_hindsight_stressed_net_usd": 11940.260000000007,
+      "positive_event_rate": 0.9069767441860465
+    },
+    "FINAL_DEVELOPMENT": {
+      "event_count": 10,
+      "interpretation": "NON_DEPLOYABLE_UPPER_BOUND_NEVER_PROMOTION_ELIGIBLE",
+      "non_deployable_hindsight_stressed_net_usd": 2687.12,
+      "positive_event_rate": 0.8
+    },
+    "VALIDATION": {
+      "event_count": 22,
+      "interpretation": "NON_DEPLOYABLE_UPPER_BOUND_NEVER_PROMOTION_ELIGIBLE",
+      "non_deployable_hindsight_stressed_net_usd": 5698.959999999993,
+      "positive_event_rate": 0.9090909090909091
+    }
+  },
+  "orders": 0,
+  "positive_both_heldout_without_full_gate_ids": [],
+  "proposal_count": 576,
+  "q4_access_count_delta": 0,
+  "release_event_count_by_role": {
+    "DISCOVERY": 45,
+    "FINAL_DEVELOPMENT": 10,
+    "VALIDATION": 23
+  },
+  "result_hash": "2dcebca8b9d24f14770c92078f08665f98b7c4f57c1e2117245b1538c6a79fdc",
+  "roll_guard_day_count": 76,
+  "runtime_seconds": 161.52513547509443,
+  "schema": "hydra_natural_gas_storage_shock_tripwire_economic_result_v1",
+  "selected_candidate_ids": [
+    "ng_storage_a992d0dc360d0708501b",
+    "ng_storage_750a6a6f175cd401cb1b",
+    "ng_storage_1576b71fc4d375db9b88",
+    "ng_storage_a2d566ddb79690a74fde",
+    "ng_storage_500d4c37618d7b7f176e"
+  ],
+  "selected_results": [
+    {
+      "candidate_id": "ng_storage_a992d0dc360d0708501b",
+      "cell": {
+        "decision_bars": 3,
+        "execution_symbol": "NG",
+        "holding_minutes": 60,
+        "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+        "minimum_response_to_prior_range": 0.5,
+        "stop_prior_range_fraction": 1.0,
+        "target_stop_multiple": 3.0
+      },
+      "control_gate": false,
+      "controls": {
+        "direction_flip": {
+          "candidate_id": "ng_storage_a992d0dc360d0708501b",
+          "cell": {
+            "decision_bars": 3,
+            "execution_symbol": "NG",
+            "holding_minutes": 60,
+            "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+            "minimum_response_to_prior_range": 0.5,
+            "stop_prior_range_fraction": 1.0,
+            "target_stop_multiple": 3.0
+          },
+          "event_count": 47,
+          "event_hash": "8dedbd61f7affe35032d15ccc9a160e51109efcbd021b7be18e57c5c7a994da1",
+          "roles": {
+            "DISCOVERY": {
+              "event_count": 26,
+              "event_path_hash": "dd356d772451dcbbee4b01ffd5575a275d4d43b94ed1df80cb96d702bf4f6fe6",
+              "exit_reasons": {
+                "STOP_FIRST": 14,
+                "TIME_EXIT": 12
+              },
+              "gross_pnl_usd": -2030.0000000000073,
+              "lower_quartile_stressed_event_usd": -311.68000000000166,
+              "maximum_single_event_positive_profit_share": 0.24281807561597243,
+              "median_stressed_event_usd": -244.1800000000024,
+              "minimum_open_pnl_stressed_usd": -452.09000000000145,
+              "normal_net_usd": -2658.6800000000076,
+              "positive_stressed_event_rate": 0.3076923076923077,
+              "role": "DISCOVERY",
+              "stressed_edge_to_cost_ratio": -1.767245882230044,
+              "stressed_net_usd": -3178.6800000000076
+            },
+            "FINAL_DEVELOPMENT": {
+              "event_count": 7,
+              "event_path_hash": "b41ac92c3ba9fe2be8dad6e2b8f13154bbaa65f18f769635d429811995307b10",
+              "exit_reasons": {
+                "STOP_FIRST": 4,
+                "TIME_EXIT": 3
+              },
+              "gross_pnl_usd": -1160.0000000000055,
+              "lower_quartile_stressed_event_usd": -284.18000000000245,
+              "maximum_single_event_positive_profit_share": 1.0,
+              "median_stressed_event_usd": -254.1799999999991,
+              "minimum_open_pnl_stressed_usd": -342.09000000000026,
+              "normal_net_usd": -1329.2600000000054,
+              "positive_stressed_event_rate": 0.14285714285714285,
+              "role": "FINAL_DEVELOPMENT",
+              "stressed_edge_to_cost_ratio": -3.750889219427037,
+              "stressed_net_usd": -1469.2600000000054
+            },
+            "VALIDATION": {
+              "event_count": 14,
+              "event_path_hash": "99056d0114400c843e101180259c0dfcbac41f99cb4081f58df140d20fadeb6c",
+              "exit_reasons": {
+                "STOP_FIRST": 4,
+                "TIME_EXIT": 10
+              },
+              "gross_pnl_usd": 409.9999999999926,
+              "lower_quartile_stressed_event_usd": -144.1800000000001,
+              "maximum_single_event_positive_profit_share": 0.3846240575012326,
+              "median_stressed_event_usd": -94.18000000000116,
+              "minimum_open_pnl_stressed_usd": -392.0899999999992,
+              "normal_net_usd": 71.47999999999257,
+              "positive_stressed_event_rate": 0.35714285714285715,
+              "role": "VALIDATION",
+              "stressed_edge_to_cost_ratio": 0.6628726637780389,
+              "stressed_net_usd": -208.52000000000743
+            }
+          }
+        },
+        "non_release_weekday_matched": {
+          "candidate_id": "ng_storage_a992d0dc360d0708501b",
+          "cell": {
+            "decision_bars": 3,
+            "execution_symbol": "NG",
+            "holding_minutes": 60,
+            "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+            "minimum_response_to_prior_range": 0.5,
+            "stop_prior_range_fraction": 1.0,
+            "target_stop_multiple": 3.0
+          },
+          "event_count": 4,
+          "event_hash": "cde5cee4d8c86b93492ff89266ba9500c5f1beb3e3e0534298b5b7e1e6981f37",
+          "roles": {
+            "DISCOVERY": {
+              "event_count": 2,
+              "event_path_hash": "239af16dc39d8a6ebad5f97066a33168f7214433ebc7f39f8a94757c33ba234f",
+              "exit_reasons": {
+                "STOP_FIRST": 1,
+                "TIME_EXIT": 1
+              },
+              "gross_pnl_usd": -320.0000000000003,
+              "lower_quartile_stressed_event_usd": -264.1800000000002,
+              "maximum_single_event_positive_profit_share": null,
+              "median_stressed_event_usd": -204.18000000000012,
+              "minimum_open_pnl_stressed_usd": -312.0899999999991,
+              "normal_net_usd": -368.36000000000024,
+              "positive_stressed_event_rate": 0.0,
+              "role": "DISCOVERY",
+              "stressed_edge_to_cost_ratio": -3.6215482118605737,
+              "stressed_net_usd": -408.36000000000024
+            },
+            "FINAL_DEVELOPMENT": {
+              "event_count": 0,
+              "event_path_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "exit_reasons": {},
+              "gross_pnl_usd": 0.0,
+              "lower_quartile_stressed_event_usd": null,
+              "maximum_single_event_positive_profit_share": null,
+              "median_stressed_event_usd": null,
+              "minimum_open_pnl_stressed_usd": null,
+              "normal_net_usd": 0.0,
+              "positive_stressed_event_rate": null,
+              "role": "FINAL_DEVELOPMENT",
+              "stressed_edge_to_cost_ratio": null,
+              "stressed_net_usd": 0.0
+            },
+            "VALIDATION": {
+              "event_count": 2,
+              "event_path_hash": "b6cd7f7888a068924388c04feef4b5fc17fc57fb2838031588b2fc1c79ff98f6",
+              "exit_reasons": {
+                "STOP_FIRST": 1,
+                "TIME_EXIT": 1
+              },
+              "gross_pnl_usd": -179.99999999999793,
+              "lower_quartile_stressed_event_usd": -174.179999999999,
+              "maximum_single_event_positive_profit_share": null,
+              "median_stressed_event_usd": -134.17999999999898,
+              "minimum_open_pnl_stressed_usd": -222.09000000000017,
+              "normal_net_usd": -228.35999999999794,
+              "positive_stressed_event_rate": 0.0,
+              "role": "VALIDATION",
+              "stressed_edge_to_cost_ratio": -2.0371208691715474,
+              "stressed_net_usd": -268.35999999999797
+            }
+          }
+        }
+      },
+      "event_gate_passed": false,
+      "primary": {
+        "candidate_id": "ng_storage_a992d0dc360d0708501b",
+        "cell": {
+          "decision_bars": 3,
+          "execution_symbol": "NG",
+          "holding_minutes": 60,
+          "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+          "minimum_response_to_prior_range": 0.5,
+          "stop_prior_range_fraction": 1.0,
+          "target_stop_multiple": 3.0
+        },
+        "event_count": 47,
+        "event_hash": "603319436e81c864749940746cedd6bf35ca46bc21e9788b59196bd8036223bf",
+        "roles": {
+          "DISCOVERY": {
+            "event_count": 26,
+            "event_path_hash": "9e8ecb51da13bed0b4bef94d0cd9a6255561e15f9d08163455d1e9053c42cc5f",
+            "exit_reasons": {
+              "STOP_FIRST": 6,
+              "TIME_EXIT": 20
+            },
+            "gross_pnl_usd": 2399.999999999993,
+            "lower_quartile_stressed_event_usd": -234.18000000000018,
+            "maximum_single_event_positive_profit_share": 0.14101809472583937,
+            "median_stressed_event_usd": 45.819999999998956,
+            "minimum_open_pnl_stressed_usd": -422.0900000000003,
+            "normal_net_usd": 1771.3199999999933,
+            "positive_stressed_event_rate": 0.5384615384615384,
+            "role": "DISCOVERY",
+            "stressed_edge_to_cost_ratio": 2.0893547376118615,
+            "stressed_net_usd": 1251.3199999999933
+          },
+          "FINAL_DEVELOPMENT": {
+            "event_count": 7,
+            "event_path_hash": "fc7ff52bd98e61278225213cdb1b426ac75da272b77c8af503b9f4384ee69ec7",
+            "exit_reasons": {
+              "STOP_FIRST": 2,
+              "TARGET": 1,
+              "TIME_EXIT": 4
+            },
+            "gross_pnl_usd": 1200.0000000000011,
+            "lower_quartile_stressed_event_usd": -109.1799999999973,
+            "maximum_single_event_positive_profit_share": 0.4247842796026384,
+            "median_stressed_event_usd": 225.82000000000136,
+            "minimum_open_pnl_stressed_usd": -222.09000000000017,
+            "normal_net_usd": 1030.7400000000011,
+            "positive_stressed_event_rate": 0.7142857142857143,
+            "role": "FINAL_DEVELOPMENT",
+            "stressed_edge_to_cost_ratio": 3.880230226993472,
+            "stressed_net_usd": 890.7400000000011
+          },
+          "VALIDATION": {
+            "event_count": 14,
+            "event_path_hash": "3f57e1058e9f9ede116d15590993f02222c507c64662b84a85668c516ca8d1b9",
+            "exit_reasons": {
+              "STOP_FIRST": 4,
+              "TARGET": 1,
+              "TIME_EXIT": 9
+            },
+            "gross_pnl_usd": -909.999999999993,
+            "lower_quartile_stressed_event_usd": -289.1800000000019,
+            "maximum_single_event_positive_profit_share": 0.39252984212552794,
+            "median_stressed_event_usd": -69.17999999999947,
+            "minimum_open_pnl_stressed_usd": -822.0900000000007,
+            "normal_net_usd": -1248.519999999993,
+            "positive_stressed_event_rate": 0.35714285714285715,
+            "role": "VALIDATION",
+            "stressed_edge_to_cost_ratio": -1.4712539610683453,
+            "stressed_net_usd": -1528.519999999993
+          }
+        }
+      },
+      "role_gate": {
+        "FINAL_DEVELOPMENT": false,
+        "VALIDATION": false
+      }
+    },
+    {
+      "candidate_id": "ng_storage_750a6a6f175cd401cb1b",
+      "cell": {
+        "decision_bars": 5,
+        "execution_symbol": "NG",
+        "holding_minutes": 30,
+        "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+        "minimum_response_to_prior_range": 0.5,
+        "stop_prior_range_fraction": 1.0,
+        "target_stop_multiple": 3.0
+      },
+      "control_gate": false,
+      "controls": {
+        "direction_flip": {
+          "candidate_id": "ng_storage_750a6a6f175cd401cb1b",
+          "cell": {
+            "decision_bars": 5,
+            "execution_symbol": "NG",
+            "holding_minutes": 30,
+            "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+            "minimum_response_to_prior_range": 0.5,
+            "stop_prior_range_fraction": 1.0,
+            "target_stop_multiple": 3.0
+          },
+          "event_count": 53,
+          "event_hash": "913e4b5e62619ad962f955a5a4ab82e408213b525649c646e40017d99299860f",
+          "roles": {
+            "DISCOVERY": {
+              "event_count": 31,
+              "event_path_hash": "0ea7f412c65d6a17417c5eb9c2d27a37f7c9fefd64b814cd6fbee21347cfede3",
+              "exit_reasons": {
+                "STOP_FIRST": 11,
+                "TIME_EXIT": 20
+              },
+              "gross_pnl_usd": -2320.0000000000064,
+              "lower_quartile_stressed_event_usd": -294.17999999999915,
+              "maximum_single_event_positive_profit_share": 0.21225938688212947,
+              "median_stressed_event_usd": -194.18000000000126,
+              "minimum_open_pnl_stressed_usd": -412.09000000000145,
+              "normal_net_usd": -3069.5800000000067,
+              "positive_stressed_event_rate": 0.25806451612903225,
+              "role": "DISCOVERY",
+              "stressed_edge_to_cost_ratio": -1.6939499700638199,
+              "stressed_net_usd": -3689.5800000000067
+            },
+            "FINAL_DEVELOPMENT": {
+              "event_count": 8,
+              "event_path_hash": "320ae1d362eee25d809f5c0815e8cbf119d33321cdae27f6bf637040c3c6825a",
+              "exit_reasons": {
+                "STOP_FIRST": 2,
+                "TIME_EXIT": 6
+              },
+              "gross_pnl_usd": -770.000000000004,
+              "lower_quartile_stressed_event_usd": -206.68000000000097,
+              "maximum_single_event_positive_profit_share": 1.0,
+              "median_stressed_event_usd": -139.18000000000063,
+              "minimum_open_pnl_stressed_usd": -302.0900000000002,
+              "normal_net_usd": -963.440000000004,
+              "positive_stressed_event_rate": 0.125,
+              "role": "FINAL_DEVELOPMENT",
+              "stressed_edge_to_cost_ratio": -2.1785875961973855,
+              "stressed_net_usd": -1123.4400000000041
+            },
+            "VALIDATION": {
+              "event_count": 14,
+              "event_path_hash": "fc769953a338cd5ac336b67edccc018179bfcfc3734ba10f0bb69773811ce1cc",
+              "exit_reasons": {
+                "STOP_FIRST": 4,
+                "TIME_EXIT": 10
+              },
+              "gross_pnl_usd": -19.999999999997787,
+              "lower_quartile_stressed_event_usd": -144.17999999999955,
+              "maximum_single_event_positive_profit_share": 0.41509962798756467,
+              "median_stressed_event_usd": -29.18000000000054,
+              "minimum_open_pnl_stressed_usd": -472.0899999999993,
+              "normal_net_usd": -358.5199999999978,
+              "positive_stressed_event_rate": 0.42857142857142855,
+              "role": "VALIDATION",
+              "stressed_edge_to_cost_ratio": -0.03233525189160866,
+              "stressed_net_usd": -638.5199999999978
+            }
+          }
+        },
+        "non_release_weekday_matched": {
+          "candidate_id": "ng_storage_750a6a6f175cd401cb1b",
+          "cell": {
+            "decision_bars": 5,
+            "execution_symbol": "NG",
+            "holding_minutes": 30,
+            "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+            "minimum_response_to_prior_range": 0.5,
+            "stop_prior_range_fraction": 1.0,
+            "target_stop_multiple": 3.0
+          },
+          "event_count": 8,
+          "event_hash": "3e792e316d2d12e9377be33068da71dbc161c6a82a9a6059f57af12fe8d1b1c6",
+          "roles": {
+            "DISCOVERY": {
+              "event_count": 4,
+              "event_path_hash": "775374c973062536da60017700c8009255952219e164dd1384ce994a9a7d806d",
+              "exit_reasons": {
+                "TIME_EXIT": 4
+              },
+              "gross_pnl_usd": 369.9999999999992,
+              "lower_quartile_stressed_event_usd": -11.67999999999914,
+              "maximum_single_event_positive_profit_share": 0.7743337743337734,
+              "median_stressed_event_usd": 35.82000000000007,
+              "minimum_open_pnl_stressed_usd": -312.0899999999991,
+              "normal_net_usd": 273.27999999999923,
+              "positive_stressed_event_rate": 0.75,
+              "role": "DISCOVERY",
+              "stressed_edge_to_cost_ratio": 2.0937075599818877,
+              "stressed_net_usd": 193.27999999999923
+            },
+            "FINAL_DEVELOPMENT": {
+              "event_count": 0,
+              "event_path_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "exit_reasons": {},
+              "gross_pnl_usd": 0.0,
+              "lower_quartile_stressed_event_usd": null,
+              "maximum_single_event_positive_profit_share": null,
+              "median_stressed_event_usd": null,
+              "minimum_open_pnl_stressed_usd": null,
+              "normal_net_usd": 0.0,
+              "positive_stressed_event_rate": null,
+              "role": "FINAL_DEVELOPMENT",
+              "stressed_edge_to_cost_ratio": null,
+              "stressed_net_usd": 0.0
+            },
+            "VALIDATION": {
+              "event_count": 4,
+              "event_path_hash": "cbb677dc4b7b5724558885ec775218b9c8e122ea24559e2aa24af0020d322682",
+              "exit_reasons": {
+                "TIME_EXIT": 4
+              },
+              "gross_pnl_usd": 109.99999999999899,
+              "lower_quartile_stressed_event_usd": -54.17999999999945,
+              "maximum_single_event_positive_profit_share": 1.0,
+              "median_stressed_event_usd": -49.17999999999945,
+              "minimum_open_pnl_stressed_usd": -132.0900000000012,
+              "normal_net_usd": 13.279999999998985,
+              "positive_stressed_event_rate": 0.25,
+              "role": "VALIDATION",
+              "stressed_edge_to_cost_ratio": 0.6224535989135298,
+              "stressed_net_usd": -66.72000000000102
+            }
+          }
+        }
+      },
+      "event_gate_passed": false,
+      "primary": {
+        "candidate_id": "ng_storage_750a6a6f175cd401cb1b",
+        "cell": {
+          "decision_bars": 5,
+          "execution_symbol": "NG",
+          "holding_minutes": 30,
+          "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+          "minimum_response_to_prior_range": 0.5,
+          "stop_prior_range_fraction": 1.0,
+          "target_stop_multiple": 3.0
+        },
+        "event_count": 53,
+        "event_hash": "71c4d0e18dcb507b0eba1cb6e9473ee98f26def65818e3f5d7ab815d35403358",
+        "roles": {
+          "DISCOVERY": {
+            "event_count": 31,
+            "event_path_hash": "88838f172ae9a6a69b41e5c1e410eef9c60fbad96b2821a78e4ada4784e0c051",
+            "exit_reasons": {
+              "STOP_FIRST": 8,
+              "TARGET": 1,
+              "TIME_EXIT": 22
+            },
+            "gross_pnl_usd": 2579.999999999987,
+            "lower_quartile_stressed_event_usd": -174.18000000000123,
+            "maximum_single_event_positive_profit_share": 0.1804851147268974,
+            "median_stressed_event_usd": 15.819999999997833,
+            "minimum_open_pnl_stressed_usd": -552.0899999999993,
+            "normal_net_usd": 1830.4199999999867,
+            "positive_stressed_event_rate": 0.5161290322580645,
+            "role": "DISCOVERY",
+            "stressed_edge_to_cost_ratio": 1.8837891908468194,
+            "stressed_net_usd": 1210.4199999999867
+          },
+          "FINAL_DEVELOPMENT": {
+            "event_count": 8,
+            "event_path_hash": "924732f26e7f867426eed00c7886645c3fdaff1126091e97f2c98a7b14c58a7e",
+            "exit_reasons": {
+              "STOP_FIRST": 2,
+              "TIME_EXIT": 6
+            },
+            "gross_pnl_usd": 350.0000000000015,
+            "lower_quartile_stressed_event_usd": -41.68000000000139,
+            "maximum_single_event_positive_profit_share": 0.4656850614534318,
+            "median_stressed_event_usd": 25.820000000001166,
+            "minimum_open_pnl_stressed_usd": -242.08999999999799,
+            "normal_net_usd": 156.56000000000142,
+            "positive_stressed_event_rate": 0.75,
+            "role": "FINAL_DEVELOPMENT",
+            "stressed_edge_to_cost_ratio": 0.9902670891806289,
+            "stressed_net_usd": -3.4399999999985837
+          },
+          "VALIDATION": {
+            "event_count": 14,
+            "event_path_hash": "424f63767f570e74c7f990121661f7241006fb481240d66a5b4dec297afe4d3a",
+            "exit_reasons": {
+              "STOP_FIRST": 2,
+              "TARGET": 1,
+              "TIME_EXIT": 11
+            },
+            "gross_pnl_usd": 509.9999999999927,
+            "lower_quartile_stressed_event_usd": -201.67999999999932,
+            "maximum_single_event_positive_profit_share": 0.5817126774815792,
+            "median_stressed_event_usd": -59.17999999999946,
+            "minimum_open_pnl_stressed_usd": -372.0900000000014,
+            "normal_net_usd": 171.47999999999274,
+            "positive_stressed_event_rate": 0.42857142857142855,
+            "role": "VALIDATION",
+            "stressed_edge_to_cost_ratio": 0.8245489232361003,
+            "stressed_net_usd": -108.52000000000724
+          }
+        }
+      },
+      "role_gate": {
+        "FINAL_DEVELOPMENT": false,
+        "VALIDATION": false
+      }
+    },
+    {
+      "candidate_id": "ng_storage_1576b71fc4d375db9b88",
+      "cell": {
+        "decision_bars": 3,
+        "execution_symbol": "NG",
+        "holding_minutes": 30,
+        "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+        "minimum_response_to_prior_range": 0.5,
+        "stop_prior_range_fraction": 1.0,
+        "target_stop_multiple": 3.0
+      },
+      "control_gate": false,
+      "controls": {
+        "direction_flip": {
+          "candidate_id": "ng_storage_1576b71fc4d375db9b88",
+          "cell": {
+            "decision_bars": 3,
+            "execution_symbol": "NG",
+            "holding_minutes": 30,
+            "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+            "minimum_response_to_prior_range": 0.5,
+            "stop_prior_range_fraction": 1.0,
+            "target_stop_multiple": 3.0
+          },
+          "event_count": 47,
+          "event_hash": "73ef7b40f023a6854ab143f3ba8e46956cda5abbace6b82a0b442b94106c8f2d",
+          "roles": {
+            "DISCOVERY": {
+              "event_count": 26,
+              "event_path_hash": "7681b2593667dab1ae847fdb9a3b17505aae7c4d3eefc55db52c92378569aca6",
+              "exit_reasons": {
+                "STOP_FIRST": 11,
+                "TIME_EXIT": 15
+              },
+              "gross_pnl_usd": -1440.0000000000057,
+              "lower_quartile_stressed_event_usd": -299.1799999999986,
+              "maximum_single_event_positive_profit_share": 0.20221106253838583,
+              "median_stressed_event_usd": -194.17999999999904,
+              "minimum_open_pnl_stressed_usd": -452.09000000000145,
+              "normal_net_usd": -2068.6800000000057,
+              "positive_stressed_event_rate": 0.2692307692307692,
+              "role": "DISCOVERY",
+              "stressed_edge_to_cost_ratio": -1.2536128425671254,
+              "stressed_net_usd": -2588.6800000000057
+            },
+            "FINAL_DEVELOPMENT": {
+              "event_count": 7,
+              "event_path_hash": "dfa46b5fc34a4cf6da62898e8da40659fbc474986c08a28b2caf976938746308",
+              "exit_reasons": {
+                "STOP_FIRST": 2,
+                "TIME_EXIT": 5
+              },
+              "gross_pnl_usd": -529.9999999999949,
+              "lower_quartile_stressed_event_usd": -214.17999999999904,
+              "maximum_single_event_positive_profit_share": 0.5811161583387305,
+              "median_stressed_event_usd": -124.18000000000006,
+              "minimum_open_pnl_stressed_usd": -262.0900000000002,
+              "normal_net_usd": -699.259999999995,
+              "positive_stressed_event_rate": 0.2857142857142857,
+              "role": "FINAL_DEVELOPMENT",
+              "stressed_edge_to_cost_ratio": -1.713768350255432,
+              "stressed_net_usd": -839.259999999995
+            },
+            "VALIDATION": {
+              "event_count": 14,
+              "event_path_hash": "9621d6b6fe21ddc42de9f99f043f48e7e382f2d6d7e1eaad5b7f33d4ce24057c",
+              "exit_reasons": {
+                "STOP_FIRST": 4,
+                "TIME_EXIT": 10
+              },
+              "gross_pnl_usd": -40.00000000000006,
+              "lower_quartile_stressed_event_usd": -144.18000000000177,
+              "maximum_single_event_positive_profit_share": 0.4006246311233515,
+              "median_stressed_event_usd": -44.18,
+              "minimum_open_pnl_stressed_usd": -392.0899999999992,
+              "normal_net_usd": -378.5200000000001,
+              "positive_stressed_event_rate": 0.2857142857142857,
+              "role": "VALIDATION",
+              "stressed_edge_to_cost_ratio": -0.06467050378322456,
+              "stressed_net_usd": -658.5200000000001
+            }
+          }
+        },
+        "non_release_weekday_matched": {
+          "candidate_id": "ng_storage_1576b71fc4d375db9b88",
+          "cell": {
+            "decision_bars": 3,
+            "execution_symbol": "NG",
+            "holding_minutes": 30,
+            "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+            "minimum_response_to_prior_range": 0.5,
+            "stop_prior_range_fraction": 1.0,
+            "target_stop_multiple": 3.0
+          },
+          "event_count": 4,
+          "event_hash": "0871add2346e398f27cb0ce206b1f1f883ff64a9e9bfd7c31438fafb0631c41f",
+          "roles": {
+            "DISCOVERY": {
+              "event_count": 2,
+              "event_path_hash": "b0c2f23cdba029fd1138524618f1951002f1359ac7dda69a8be115042b7e816f",
+              "exit_reasons": {
+                "STOP_FIRST": 1,
+                "TIME_EXIT": 1
+              },
+              "gross_pnl_usd": -70.00000000000114,
+              "lower_quartile_stressed_event_usd": -201.6800000000004,
+              "maximum_single_event_positive_profit_share": 1.0,
+              "median_stressed_event_usd": -79.18000000000058,
+              "minimum_open_pnl_stressed_usd": -312.0899999999991,
+              "normal_net_usd": -118.36000000000115,
+              "positive_stressed_event_rate": 0.5,
+              "role": "DISCOVERY",
+              "stressed_edge_to_cost_ratio": -0.7922136713445126,
+              "stressed_net_usd": -158.36000000000115
+            },
+            "FINAL_DEVELOPMENT": {
+              "event_count": 0,
+              "event_path_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "exit_reasons": {},
+              "gross_pnl_usd": 0.0,
+              "lower_quartile_stressed_event_usd": null,
+              "maximum_single_event_positive_profit_share": null,
+              "median_stressed_event_usd": null,
+              "minimum_open_pnl_stressed_usd": null,
+              "normal_net_usd": 0.0,
+              "positive_stressed_event_rate": null,
+              "role": "FINAL_DEVELOPMENT",
+              "stressed_edge_to_cost_ratio": null,
+              "stressed_net_usd": 0.0
+            },
+            "VALIDATION": {
+              "event_count": 2,
+              "event_path_hash": "394475a3a02c27345b299470579ca696fdc3eff0cd28631f0f98729de7e6b55b",
+              "exit_reasons": {
+                "TIME_EXIT": 2
+              },
+              "gross_pnl_usd": 10.000000000001119,
+              "lower_quartile_stressed_event_usd": -51.67999999999973,
+              "maximum_single_event_positive_profit_share": null,
+              "median_stressed_event_usd": -39.17999999999944,
+              "minimum_open_pnl_stressed_usd": -132.0900000000012,
+              "normal_net_usd": -38.359999999998884,
+              "positive_stressed_event_rate": 0.0,
+              "role": "VALIDATION",
+              "stressed_edge_to_cost_ratio": 0.11317338162065549,
+              "stressed_net_usd": -78.35999999999888
+            }
+          }
+        }
+      },
+      "event_gate_passed": false,
+      "primary": {
+        "candidate_id": "ng_storage_1576b71fc4d375db9b88",
+        "cell": {
+          "decision_bars": 3,
+          "execution_symbol": "NG",
+          "holding_minutes": 30,
+          "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+          "minimum_response_to_prior_range": 0.5,
+          "stop_prior_range_fraction": 1.0,
+          "target_stop_multiple": 3.0
+        },
+        "event_count": 47,
+        "event_hash": "cfb9cd6b6453b708c088cd343a2f8ee89906ef70fccbc31247cd62897b717a89",
+        "roles": {
+          "DISCOVERY": {
+            "event_count": 26,
+            "event_path_hash": "bc173fb78eebb1a4d65bfdcceab77b434c28789fe5db3eb6565cfca0170c4c3e",
+            "exit_reasons": {
+              "STOP_FIRST": 6,
+              "TIME_EXIT": 20
+            },
+            "gross_pnl_usd": 2069.999999999994,
+            "lower_quartile_stressed_event_usd": -174.18000000000123,
+            "maximum_single_event_positive_profit_share": 0.165598363239648,
+            "median_stressed_event_usd": 0.8199999999994851,
+            "minimum_open_pnl_stressed_usd": -422.0900000000003,
+            "normal_net_usd": 1441.319999999994,
+            "positive_stressed_event_rate": 0.5,
+            "role": "DISCOVERY",
+            "stressed_edge_to_cost_ratio": 1.8020684611902305,
+            "stressed_net_usd": 921.319999999994
+          },
+          "FINAL_DEVELOPMENT": {
+            "event_count": 7,
+            "event_path_hash": "9af074cf2b3a388ba97b89344664163b64e1142e149fa2a7fc467c4088b2aa48",
+            "exit_reasons": {
+              "STOP_FIRST": 2,
+              "TIME_EXIT": 5
+            },
+            "gross_pnl_usd": 169.99999999999906,
+            "lower_quartile_stressed_event_usd": -129.1799999999973,
+            "maximum_single_event_positive_profit_share": 0.6216141818982623,
+            "median_stressed_event_usd": 5.8199999999989345,
+            "minimum_open_pnl_stressed_usd": -222.09000000000017,
+            "normal_net_usd": 0.7399999999990357,
+            "positive_stressed_event_rate": 0.5714285714285714,
+            "role": "FINAL_DEVELOPMENT",
+            "stressed_edge_to_cost_ratio": 0.549699282157405,
+            "stressed_net_usd": -139.26000000000096
+          },
+          "VALIDATION": {
+            "event_count": 14,
+            "event_path_hash": "3a2e86ea0a87284b933f355b4d25235421a738be656bb9682a2c63174883b936",
+            "exit_reasons": {
+              "STOP_FIRST": 3,
+              "TIME_EXIT": 11
+            },
+            "gross_pnl_usd": -320.0000000000003,
+            "lower_quartile_stressed_event_usd": -244.18000000000018,
+            "maximum_single_event_positive_profit_share": 0.33934841420594847,
+            "median_stressed_event_usd": -44.18,
+            "minimum_open_pnl_stressed_usd": -452.089999999997,
+            "normal_net_usd": -658.5200000000003,
+            "positive_stressed_event_rate": 0.42857142857142855,
+            "role": "VALIDATION",
+            "stressed_edge_to_cost_ratio": -0.5173640302657962,
+            "stressed_net_usd": -938.5200000000003
+          }
+        }
+      },
+      "role_gate": {
+        "FINAL_DEVELOPMENT": false,
+        "VALIDATION": false
+      }
+    },
+    {
+      "candidate_id": "ng_storage_a2d566ddb79690a74fde",
+      "cell": {
+        "decision_bars": 5,
+        "execution_symbol": "NG",
+        "holding_minutes": 60,
+        "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+        "minimum_response_to_prior_range": 0.5,
+        "stop_prior_range_fraction": 1.0,
+        "target_stop_multiple": 3.0
+      },
+      "control_gate": false,
+      "controls": {
+        "direction_flip": {
+          "candidate_id": "ng_storage_a2d566ddb79690a74fde",
+          "cell": {
+            "decision_bars": 5,
+            "execution_symbol": "NG",
+            "holding_minutes": 60,
+            "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+            "minimum_response_to_prior_range": 0.5,
+            "stop_prior_range_fraction": 1.0,
+            "target_stop_multiple": 3.0
+          },
+          "event_count": 53,
+          "event_hash": "4d826c2300c77e3633d4df9d4d4049464b8db568a54bcd842687519c1b2f59f1",
+          "roles": {
+            "DISCOVERY": {
+              "event_count": 31,
+              "event_path_hash": "a5ad0f76189ffc1822643e0cece039ad4f58ba1523718bfcde6dcd9aa0c95a66",
+              "exit_reasons": {
+                "STOP_FIRST": 15,
+                "TIME_EXIT": 16
+              },
+              "gross_pnl_usd": -2820.0000000000005,
+              "lower_quartile_stressed_event_usd": -314.17999999999915,
+              "maximum_single_event_positive_profit_share": 0.33091933532819606,
+              "median_stressed_event_usd": -204.18000000000015,
+              "minimum_open_pnl_stressed_usd": -452.089999999997,
+              "normal_net_usd": -3569.5800000000004,
+              "positive_stressed_event_rate": 0.25806451612903225,
+              "role": "DISCOVERY",
+              "stressed_edge_to_cost_ratio": -2.0590253946465342,
+              "stressed_net_usd": -4189.58
+            },
+            "FINAL_DEVELOPMENT": {
+              "event_count": 8,
+              "event_path_hash": "fa44ca4f9f63651b1bbd7c03966dd7f3eedf3591f66b5b0ae4470f0201e96b83",
+              "exit_reasons": {
+                "STOP_FIRST": 4,
+                "TIME_EXIT": 4
+              },
+              "gross_pnl_usd": -1530.000000000009,
+              "lower_quartile_stressed_event_usd": -266.68000000000325,
+              "maximum_single_event_positive_profit_share": 1.0,
+              "median_stressed_event_usd": -249.17999999999964,
+              "minimum_open_pnl_stressed_usd": -352.0899999999992,
+              "normal_net_usd": -1723.4400000000091,
+              "positive_stressed_event_rate": 0.125,
+              "role": "FINAL_DEVELOPMENT",
+              "stressed_edge_to_cost_ratio": -4.3288818469896135,
+              "stressed_net_usd": -1883.4400000000091
+            },
+            "VALIDATION": {
+              "event_count": 14,
+              "event_path_hash": "4af78ed2a435bdd03b0120dd0bfc13405799ad4ca28b249859d03a2df6df564b",
+              "exit_reasons": {
+                "STOP_FIRST": 4,
+                "TIME_EXIT": 10
+              },
+              "gross_pnl_usd": 299.99999999999807,
+              "lower_quartile_stressed_event_usd": -166.68000000000094,
+              "maximum_single_event_positive_profit_share": 0.3444608824297286,
+              "median_stressed_event_usd": -44.17999999999999,
+              "minimum_open_pnl_stressed_usd": -472.0899999999993,
+              "normal_net_usd": -38.520000000002014,
+              "positive_stressed_event_rate": 0.35714285714285715,
+              "role": "VALIDATION",
+              "stressed_edge_to_cost_ratio": 0.4850287783741804,
+              "stressed_net_usd": -318.52000000000197
+            }
+          }
+        },
+        "non_release_weekday_matched": {
+          "candidate_id": "ng_storage_a2d566ddb79690a74fde",
+          "cell": {
+            "decision_bars": 5,
+            "execution_symbol": "NG",
+            "holding_minutes": 60,
+            "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+            "minimum_response_to_prior_range": 0.5,
+            "stop_prior_range_fraction": 1.0,
+            "target_stop_multiple": 3.0
+          },
+          "event_count": 8,
+          "event_hash": "b80f162d9c8bc6fa0c96711311b1219486fa35e97016e749a8cbaba25791d54b",
+          "roles": {
+            "DISCOVERY": {
+              "event_count": 4,
+              "event_path_hash": "244149fe3d39122b4e7d4106c6196fc28378adbf956841c67ec256df41bc0e4a",
+              "exit_reasons": {
+                "TARGET": 1,
+                "TIME_EXIT": 3
+              },
+              "gross_pnl_usd": 569.9999999999994,
+              "lower_quartile_stressed_event_usd": -19.180000000000533,
+              "maximum_single_event_positive_profit_share": 0.5818541565107714,
+              "median_stressed_event_usd": 145.81999999999906,
+              "minimum_open_pnl_stressed_usd": -342.09000000000026,
+              "normal_net_usd": 473.2799999999994,
+              "positive_stressed_event_rate": 0.75,
+              "role": "DISCOVERY",
+              "stressed_edge_to_cost_ratio": 3.2254413761883174,
+              "stressed_net_usd": 393.2799999999994
+            },
+            "FINAL_DEVELOPMENT": {
+              "event_count": 0,
+              "event_path_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "exit_reasons": {},
+              "gross_pnl_usd": 0.0,
+              "lower_quartile_stressed_event_usd": null,
+              "maximum_single_event_positive_profit_share": null,
+              "median_stressed_event_usd": null,
+              "minimum_open_pnl_stressed_usd": null,
+              "normal_net_usd": 0.0,
+              "positive_stressed_event_rate": null,
+              "role": "FINAL_DEVELOPMENT",
+              "stressed_edge_to_cost_ratio": null,
+              "stressed_net_usd": 0.0
+            },
+            "VALIDATION": {
+              "event_count": 4,
+              "event_path_hash": "ec6c2c15a1c7fd7bb57a534da546fc892161454dcfd0b3d78c1bea63fccfeb7e",
+              "exit_reasons": {
+                "STOP_FIRST": 1,
+                "TIME_EXIT": 3
+              },
+              "gross_pnl_usd": 190.00000000000352,
+              "lower_quartile_stressed_event_usd": -124.17999999999896,
+              "maximum_single_event_positive_profit_share": 0.9819052356672021,
+              "median_stressed_event_usd": -44.179999999998884,
+              "minimum_open_pnl_stressed_usd": -222.09000000000017,
+              "normal_net_usd": 93.28000000000353,
+              "positive_stressed_event_rate": 0.5,
+              "role": "VALIDATION",
+              "stressed_edge_to_cost_ratio": 1.075147125396127,
+              "stressed_net_usd": 13.280000000003518
+            }
+          }
+        }
+      },
+      "event_gate_passed": false,
+      "primary": {
+        "candidate_id": "ng_storage_a2d566ddb79690a74fde",
+        "cell": {
+          "decision_bars": 5,
+          "execution_symbol": "NG",
+          "holding_minutes": 60,
+          "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+          "minimum_response_to_prior_range": 0.5,
+          "stop_prior_range_fraction": 1.0,
+          "target_stop_multiple": 3.0
+        },
+        "event_count": 53,
+        "event_hash": "c185cda3a39d6bc50656e6c3d17c0512d045556de925810d1061a087fc1b95fb",
+        "roles": {
+          "DISCOVERY": {
+            "event_count": 31,
+            "event_path_hash": "770d1737c2e9ba9dce746118a93b1fcee63294b2e14e96e96d35a0e0ab3675a5",
+            "exit_reasons": {
+              "STOP_FIRST": 10,
+              "TARGET": 1,
+              "TIME_EXIT": 20
+            },
+            "gross_pnl_usd": 2129.999999999974,
+            "lower_quartile_stressed_event_usd": -264.18000000000245,
+            "maximum_single_event_positive_profit_share": 0.17236086353733285,
+            "median_stressed_event_usd": 5.8199999999989345,
+            "minimum_open_pnl_stressed_usd": -552.0899999999993,
+            "normal_net_usd": 1380.4199999999742,
+            "positive_stressed_event_rate": 0.5161290322580645,
+            "role": "DISCOVERY",
+            "stressed_edge_to_cost_ratio": 1.5552213087223632,
+            "stressed_net_usd": 760.4199999999742
+          },
+          "FINAL_DEVELOPMENT": {
+            "event_count": 8,
+            "event_path_hash": "d0608650a6176ca5b89f224e3f149eb93f128b0acbaad57e1cc2bc2df492ae19",
+            "exit_reasons": {
+              "STOP_FIRST": 2,
+              "TARGET": 1,
+              "TIME_EXIT": 5
+            },
+            "gross_pnl_usd": 1530.000000000009,
+            "lower_quartile_stressed_event_usd": 25.82000000000116,
+            "maximum_single_event_positive_profit_share": 0.35186075006606654,
+            "median_stressed_event_usd": 180.82000000000187,
+            "minimum_open_pnl_stressed_usd": -242.08999999999799,
+            "normal_net_usd": 1336.560000000009,
+            "positive_stressed_event_rate": 0.75,
+            "role": "FINAL_DEVELOPMENT",
+            "stressed_edge_to_cost_ratio": 4.3288818469896135,
+            "stressed_net_usd": 1176.560000000009
+          },
+          "VALIDATION": {
+            "event_count": 14,
+            "event_path_hash": "1c0edeb74e609f0765784af33584b446c9177fc49f36dec7190b750a220a94fd",
+            "exit_reasons": {
+              "STOP_FIRST": 2,
+              "TARGET": 2,
+              "TIME_EXIT": 10
+            },
+            "gross_pnl_usd": -440.0000000000047,
+            "lower_quartile_stressed_event_usd": -234.18000000000018,
+            "maximum_single_event_positive_profit_share": 0.6829209437009235,
+            "median_stressed_event_usd": -134.17999999999898,
+            "minimum_open_pnl_stressed_usd": -642.0900000000028,
+            "normal_net_usd": -778.5200000000048,
+            "positive_stressed_event_rate": 0.21428571428571427,
+            "role": "VALIDATION",
+            "stressed_edge_to_cost_ratio": -0.7113755416154768,
+            "stressed_net_usd": -1058.5200000000048
+          }
+        }
+      },
+      "role_gate": {
+        "FINAL_DEVELOPMENT": false,
+        "VALIDATION": false
+      }
+    },
+    {
+      "candidate_id": "ng_storage_500d4c37618d7b7f176e",
+      "cell": {
+        "decision_bars": 3,
+        "execution_symbol": "NG",
+        "holding_minutes": 15,
+        "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+        "minimum_response_to_prior_range": 0.5,
+        "stop_prior_range_fraction": 1.0,
+        "target_stop_multiple": 1.5
+      },
+      "control_gate": false,
+      "controls": {
+        "direction_flip": {
+          "candidate_id": "ng_storage_500d4c37618d7b7f176e",
+          "cell": {
+            "decision_bars": 3,
+            "execution_symbol": "NG",
+            "holding_minutes": 15,
+            "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+            "minimum_response_to_prior_range": 0.5,
+            "stop_prior_range_fraction": 1.0,
+            "target_stop_multiple": 1.5
+          },
+          "event_count": 47,
+          "event_hash": "33ec3a448c21ea9a876753be7670bb9e3d7d4d542d1d373abce1572aae2e9f80",
+          "roles": {
+            "DISCOVERY": {
+              "event_count": 26,
+              "event_path_hash": "d2bf0db2b53b31531f9566010f1e16bf69f571018dee50b7b8ce88b8590958c0",
+              "exit_reasons": {
+                "STOP_FIRST": 9,
+                "TARGET": 2,
+                "TIME_EXIT": 15
+              },
+              "gross_pnl_usd": -1450.0000000000002,
+              "lower_quartile_stressed_event_usd": -261.6800000000027,
+              "maximum_single_event_positive_profit_share": 0.26640827890139157,
+              "median_stressed_event_usd": -134.17999999999898,
+              "minimum_open_pnl_stressed_usd": -402.09000000000253,
+              "normal_net_usd": -2078.6800000000003,
+              "positive_stressed_event_rate": 0.3076923076923077,
+              "role": "DISCOVERY",
+              "stressed_edge_to_cost_ratio": -1.26231848730717,
+              "stressed_net_usd": -2598.6800000000003
+            },
+            "FINAL_DEVELOPMENT": {
+              "event_count": 7,
+              "event_path_hash": "c74ccddf860470c46fdb0123cdeaa9c775cd32e5c650dfc89913680e14e97650",
+              "exit_reasons": {
+                "STOP_FIRST": 2,
+                "TARGET": 1,
+                "TIME_EXIT": 4
+              },
+              "gross_pnl_usd": -320.00000000000915,
+              "lower_quartile_stressed_event_usd": -209.18000000000183,
+              "maximum_single_event_positive_profit_share": 0.6703175767739192,
+              "median_stressed_event_usd": -174.179999999999,
+              "minimum_open_pnl_stressed_usd": -262.0900000000002,
+              "normal_net_usd": -489.2600000000092,
+              "positive_stressed_event_rate": 0.2857142857142857,
+              "role": "FINAL_DEVELOPMENT",
+              "stressed_edge_to_cost_ratio": -1.0347280605316211,
+              "stressed_net_usd": -629.2600000000092
+            },
+            "VALIDATION": {
+              "event_count": 14,
+              "event_path_hash": "cb66741f4ca2c9beaa7bf2ffa49985d79dd4d25524f6c91de350222edb71cd27",
+              "exit_reasons": {
+                "STOP_FIRST": 3,
+                "TARGET": 2,
+                "TIME_EXIT": 9
+              },
+              "gross_pnl_usd": -200.00000000000009,
+              "lower_quartile_stressed_event_usd": -166.67999999999927,
+              "maximum_single_event_positive_profit_share": 0.28452897341786226,
+              "median_stressed_event_usd": -79.18000000000059,
+              "minimum_open_pnl_stressed_usd": -392.0899999999992,
+              "normal_net_usd": -538.5200000000001,
+              "positive_stressed_event_rate": 0.35714285714285715,
+              "role": "VALIDATION",
+              "stressed_edge_to_cost_ratio": -0.3233525189161225,
+              "stressed_net_usd": -818.5200000000001
+            }
+          }
+        },
+        "non_release_weekday_matched": {
+          "candidate_id": "ng_storage_500d4c37618d7b7f176e",
+          "cell": {
+            "decision_bars": 3,
+            "execution_symbol": "NG",
+            "holding_minutes": 15,
+            "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+            "minimum_response_to_prior_range": 0.5,
+            "stop_prior_range_fraction": 1.0,
+            "target_stop_multiple": 1.5
+          },
+          "event_count": 4,
+          "event_hash": "d4e2218c0e9df293f9a2a5641dd25279ea31fed6dfc5fac15586cccbda21c7f0",
+          "roles": {
+            "DISCOVERY": {
+              "event_count": 2,
+              "event_path_hash": "fb8120dcc5524d1e0a82cae8cc84cf11f7d60a44a6683e7e5fd89c823dd07acc",
+              "exit_reasons": {
+                "STOP_FIRST": 1,
+                "TIME_EXIT": 1
+              },
+              "gross_pnl_usd": -19.999999999997783,
+              "lower_quartile_stressed_event_usd": -189.17999999999955,
+              "maximum_single_event_positive_profit_share": 1.0,
+              "median_stressed_event_usd": -54.1799999999989,
+              "minimum_open_pnl_stressed_usd": -312.0899999999991,
+              "normal_net_usd": -68.3599999999978,
+              "positive_stressed_event_rate": 0.5,
+              "role": "DISCOVERY",
+              "stressed_edge_to_cost_ratio": -0.22634676324126057,
+              "stressed_net_usd": -108.3599999999978
+            },
+            "FINAL_DEVELOPMENT": {
+              "event_count": 0,
+              "event_path_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+              "exit_reasons": {},
+              "gross_pnl_usd": 0.0,
+              "lower_quartile_stressed_event_usd": null,
+              "maximum_single_event_positive_profit_share": null,
+              "median_stressed_event_usd": null,
+              "minimum_open_pnl_stressed_usd": null,
+              "normal_net_usd": 0.0,
+              "positive_stressed_event_rate": null,
+              "role": "FINAL_DEVELOPMENT",
+              "stressed_edge_to_cost_ratio": null,
+              "stressed_net_usd": 0.0
+            },
+            "VALIDATION": {
+              "event_count": 2,
+              "event_path_hash": "0e0251e08bdb4cb116def7aa0730565a26357ed74db38ff13456d8499ea1ddb9",
+              "exit_reasons": {
+                "TIME_EXIT": 2
+              },
+              "gross_pnl_usd": 110.00000000000121,
+              "lower_quartile_stressed_event_usd": -16.679999999999694,
+              "maximum_single_event_positive_profit_share": 1.0,
+              "median_stressed_event_usd": 10.820000000000608,
+              "minimum_open_pnl_stressed_usd": -132.0900000000012,
+              "normal_net_usd": 61.640000000001216,
+              "positive_stressed_event_rate": 0.5,
+              "role": "VALIDATION",
+              "stressed_edge_to_cost_ratio": 1.2449071978270847,
+              "stressed_net_usd": 21.640000000001216
+            }
+          }
+        }
+      },
+      "event_gate_passed": false,
+      "primary": {
+        "candidate_id": "ng_storage_500d4c37618d7b7f176e",
+        "cell": {
+          "decision_bars": 3,
+          "execution_symbol": "NG",
+          "holding_minutes": 15,
+          "mechanism": "RELEASE_RESPONSE_CONTINUATION",
+          "minimum_response_to_prior_range": 0.5,
+          "stop_prior_range_fraction": 1.0,
+          "target_stop_multiple": 1.5
+        },
+        "event_count": 47,
+        "event_hash": "f8271186ca1e428c9ff37d5d99c41a6d9a1c60971f17d924eec6c01b5a2ad8df",
+        "roles": {
+          "DISCOVERY": {
+            "event_count": 26,
+            "event_path_hash": "6756561a7f27116ef749592492c730f40087a010f077597168a347eb844c9e90",
+            "exit_reasons": {
+              "STOP_FIRST": 4,
+              "TARGET": 4,
+              "TIME_EXIT": 18
+            },
+            "gross_pnl_usd": 1555.0000000000086,
+            "lower_quartile_stressed_event_usd": -121.68000000000035,
+            "maximum_single_event_positive_profit_share": 0.16223753280839925,
+            "median_stressed_event_usd": 35.82000000000007,
+            "minimum_open_pnl_stressed_usd": -402.0899999999981,
+            "normal_net_usd": 926.3200000000086,
+            "positive_stressed_event_rate": 0.5384615384615384,
+            "role": "DISCOVERY",
+            "stressed_edge_to_cost_ratio": 1.3537277570776967,
+            "stressed_net_usd": 406.3200000000086
+          },
+          "FINAL_DEVELOPMENT": {
+            "event_count": 7,
+            "event_path_hash": "acd4f3b321d09995ff322eaf487d87c035d0b26865e16b1d26d2eb0735018846",
+            "exit_reasons": {
+              "STOP_FIRST": 2,
+              "TIME_EXIT": 5
+            },
+            "gross_pnl_usd": 330.00000000000364,
+            "lower_quartile_stressed_event_usd": -84.17999999999782,
+            "maximum_single_event_positive_profit_share": 0.3453545472402242,
+            "median_stressed_event_usd": 85.819999999999,
+            "minimum_open_pnl_stressed_usd": -222.09000000000017,
+            "normal_net_usd": 160.7400000000036,
+            "positive_stressed_event_rate": 0.7142857142857143,
+            "role": "FINAL_DEVELOPMENT",
+            "stressed_edge_to_cost_ratio": 1.0670633124232156,
+            "stressed_net_usd": 20.74000000000359
+          },
+          "VALIDATION": {
+            "event_count": 14,
+            "event_path_hash": "13c21ac0e3a73b6334598e2e7f350a0bb22a28644064268ac44ac6e37d16e9e5",
+            "exit_reasons": {
+              "STOP_FIRST": 3,
+              "TIME_EXIT": 11
+            },
+            "gross_pnl_usd": 190.00000000000128,
+            "lower_quartile_stressed_event_usd": -219.1799999999996,
+            "maximum_single_event_positive_profit_share": 0.31460966718742767,
+            "median_stressed_event_usd": -9.179999999999414,
+            "minimum_open_pnl_stressed_usd": -372.08999999999696,
+            "normal_net_usd": -148.5199999999988,
+            "positive_stressed_event_rate": 0.42857142857142855,
+            "role": "VALIDATION",
+            "stressed_edge_to_cost_ratio": 0.3071848929703183,
+            "stressed_net_usd": -428.5199999999988
+          }
+        }
+      },
+      "role_gate": {
+        "FINAL_DEVELOPMENT": false,
+        "VALIDATION": false
+      }
+    }
+  ],
+  "status": "NATURAL_GAS_STORAGE_SHOCK_FALSIFIED",
+  "tier_ceiling": "H_DIAGNOSTIC",
+  "xfa_paths_started": 0
+}

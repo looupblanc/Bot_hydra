@@ -1,0 +1,70 @@
+{
+  "actual_incremental_spend_usd": 2.279798951,
+  "broker_connections": 0,
+  "bundle_id": "2ab79abae975e646b247",
+  "cumulative_actual_after_usd": 168.22247617766698,
+  "cumulative_actual_before_usd": 165.94267722666697,
+  "download_status": "DOWNLOADED",
+  "files": [
+    {
+      "kind": "ohlcv-1m",
+      "path": "/root/hydra-bot/data/cache/databento/natural_gas_storage_shock/2ab79abae975e646b247/raw_ohlcv.dbn.zst",
+      "sha256": "3a89a81f1bfa7854e40ce98b8d4ad16be36f44a47a873ecff016126bc4eed402",
+      "size_bytes": 8071824
+    },
+    {
+      "kind": "definition",
+      "path": "/root/hydra-bot/data/cache/databento/natural_gas_storage_shock/2ab79abae975e646b247/raw_definition.dbn.zst",
+      "sha256": "ca3449a98237d18b2a7431f29c6ea04c90cf36a27f5e4cbfa7a9b578d337720c",
+      "size_bytes": 145808
+    }
+  ],
+  "manifest_hash": "d10bf20df0d504ad58f1c82448966096c4e7a688f7fe7ef06c547f3b27e5ecfb",
+  "network": {
+    "definition": true,
+    "ohlcv-1m": true
+  },
+  "official_estimates": {
+    "definition": {
+      "billable_size_bytes": 304920,
+      "estimated_cost_usd": 0.000482764095,
+      "record_count": 847
+    },
+    "ohlcv-1m": {
+      "billable_size_bytes": 34962816,
+      "estimated_cost_usd": 2.279316186905,
+      "record_count": 624336
+    }
+  },
+  "official_total_cost_usd": 2.279798951,
+  "orders": 0,
+  "projected_actual_usd": 168.22247617766698,
+  "q4_access_count_delta": 0,
+  "receipt_hash": "7a4b6b6ed1262787f09f827bf3a952c39d524307050fb2ac9cfc5b04ce5a2f4f",
+  "remaining_after_usd": 32.498243745414015,
+  "requests": {
+    "definition": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "definition",
+      "start": "2023-01-03",
+      "stype_in": "continuous",
+      "symbols": [
+        "NG.c.0",
+        "MNG.c.0"
+      ]
+    },
+    "ohlcv-1m": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "ohlcv-1m",
+      "start": "2023-01-03",
+      "stype_in": "continuous",
+      "symbols": [
+        "NG.c.0",
+        "MNG.c.0"
+      ]
+    }
+  },
+  "schema": "hydra_natural_gas_storage_shock_acquisition_receipt_v1"
+}

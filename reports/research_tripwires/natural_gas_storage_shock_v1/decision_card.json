@@ -1,0 +1,58 @@
+{
+  "schema": "hydra_autonomous_branch_decision_card_v1",
+  "branch_id": "EIA_NATURAL_GAS_STORAGE_SHOCK_NG_MNG_V1",
+  "selected_at_utc": "2026-07-20T13:55:00Z",
+  "hypothesis": "A physical-storage information shock in NG has sufficiently large post-release continuation or rejection to survive next-minute execution costs while remaining a low-turnover Topstep-compatible policy.",
+  "strongest_argument_against": "The first minute may absorb all information and the weekly opportunity rate may make Combine passage too slow even if per-event expectancy is positive.",
+  "terminal_representation_audit": {
+    "already_tested_and_not_repeated": [
+      "BROAD_OHLCV_GRAMMARS",
+      "EQUITY_AND_RATES_CPI_FOMC_RELEASE_BRACKETS",
+      "CROSS_INDEX_DISPERSION",
+      "TREASURY_CURVE_RELATIVE_VALUE",
+      "CL_FRONT_SECOND_TERM_STRUCTURE",
+      "RB_HO_TO_MCL_DIRECTION_TRANSFER",
+      "FX_CAUSAL_ECOLOGY",
+      "DENSE_AND_SPARSE_MICROSTRUCTURE",
+      "SELECTIVE_ORDER_FLOW_VETO",
+      "MGC_RATES_TARGET_VOL",
+      "CROSS_ASSET_VOLATILITY_CONVEXITY"
+    ],
+    "repository_ng_mng_reachable_artifact_count": 0,
+    "graveyard_exact_ng_mng_tombstone_count": 0,
+    "materially_distinct": true
+  },
+  "smallest_decisive_falsification": {
+    "selection": "DISCOVERY_ONLY",
+    "unchanged_heldout_roles": ["VALIDATION", "FINAL_DEVELOPMENT"],
+    "cheap_gate": "POSITIVE_STRESSED_EVENT_ECONOMICS_IN_BOTH_HELDOUT_ROLES_WITH_EDGE_TO_COST_AND_CONCENTRATION_GATES",
+    "account_replay": "CLOSED_UNLESS_CHEAP_GATE_PASSES",
+    "maximum_cpu_workers": 1
+  },
+  "official_cost_estimate": {
+    "dataset": "GLBX.MDP3",
+    "symbols": ["NG.c.0", "MNG.c.0"],
+    "schema": ["ohlcv-1m", "definition"],
+    "start": "2023-01-03",
+    "end_exclusive": "2024-10-01",
+    "estimated_usd": 2.279798951,
+    "cumulative_before_usd": 165.94267722666697,
+    "projected_after_usd": 168.22247617766698,
+    "authorised_cap_usd": 200.720719923081,
+    "remaining_after_usd": 32.498243745414015
+  },
+  "evi_score": {
+    "expected_value_of_information_per_compute_minute": 0.91,
+    "expected_economic_upside": 0.86,
+    "data_cost_risk": 0.08,
+    "implementation_cost": 0.18,
+    "overfitting_risk": 0.31,
+    "deployment_risk": 0.12
+  },
+  "purchase_gate": "NECESSARY_AND_WITHIN_AUTHORITY",
+  "purchase_reason": "No NG/MNG bars exist locally, so no causal gross-edge or legal target-velocity ceiling can be measured without this minimal two-symbol input.",
+  "manifest_hash": "d10bf20df0d504ad58f1c82448966096c4e7a688f7fe7ef06c547f3b27e5ecfb",
+  "q4_access": false,
+  "broker_connections": 0,
+  "orders": 0
+}
