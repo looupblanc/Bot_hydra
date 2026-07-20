@@ -1,0 +1,15 @@
+{
+  "decision_hash": "3ae243222c92aea41c23749710ef5d4d9c70e2534ad89e2b8a94b72183d2cd99",
+  "deployment_risk": "LOW_EXISTING_CAUSAL_COMPONENTS_ONLY",
+  "expected_data_cost_usd": 0.0,
+  "expected_economic_upside": "MEDIUM_HIGH",
+  "expected_information_gain": "HIGH",
+  "expected_runtime_minutes": 20,
+  "hypothesis": "A metadata-diverse shared-risk book selected by worst-era economics can avoid the regime-specific false positives of mono-era selection.",
+  "materially_distinct_next_alternative": "CAUSAL_EVENT_TIME_VOLATILITY_BURST_DIRECT_ACCOUNT_POLICY_WITH_MULTI_ASSET_SURVIVAL_ROUTING",
+  "overfitting_risk": "MEDIUM_CONTROLLED_BY_WORST_ERA_AND_LOEO",
+  "schema": "hydra_distributionally_robust_account_policy_v1_decision_card",
+  "smallest_decisive_experiment": "120 novel book/account cells, exact P5/P10/P20 normal/stress on three already-viewed eras with leave-one-era-out ranking.",
+  "status": "FROZEN_BEFORE_DRO_OUTCOMES",
+  "strongest_argument_against": "The immutable components may contain no invariant target velocity; combination can only redistribute, not manufacture, alpha."
+}
