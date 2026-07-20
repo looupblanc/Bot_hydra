@@ -1,0 +1,1036 @@
+{
+  "account_replay_executed": false,
+  "account_replay_status": "BLOCKED_UNTIL_FINAL_DEVELOPMENT_EVENT_GATE",
+  "acquisition_receipt_hash": "4ed2423ef7f5f994858ef4d270247c925c6da07a25801cc1eef23782fac0bbcf",
+  "actual_incremental_spend_usd": 5.890399850905,
+  "all_candidate_discovery_results": [
+    {
+      "candidate": {
+        "execution_leg": "ZS",
+        "lookback_minutes": 15,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_50dd3a0eb18dbab76b71",
+      "discovery": {
+        "censored_future_coverage_count": 51,
+        "event_count": 448,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "a41ec986d100154fc3f06e8bdb89cff81894f7205f7962f3f58ce2befd721802",
+        "gross_pnl_usd": 1850.0,
+        "independent_session_count": 448,
+        "maximum_positive_day_profit_share": 0.0440633455022937,
+        "maximum_single_trade_positive_profit_share": 0.0440633455022937,
+        "minimum_event_equity_stressed_usd": -615.14,
+        "minimum_open_pnl_stressed_usd": -615.14,
+        "normal_net_usd": -515.44,
+        "opportunity_count": 499,
+        "positive_stressed_event_rate": 0.3549107142857143,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 133,
+        "stressed_edge_to_cost_ratio": 0.13637596716361577,
+        "stressed_net_per_event_usd": -23.527767857142855,
+        "stressed_net_usd": -10540.44,
+        "target_count": 55
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZS",
+        "lookback_minutes": 15,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_6f66842610bbe9987e2b",
+      "discovery": {
+        "censored_future_coverage_count": 46,
+        "event_count": 445,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "5ec9c4705ba66b4e2f2e53f30f153fa79573b47ef1657927c2f4531083dfe848",
+        "gross_pnl_usd": 375.0,
+        "independent_session_count": 445,
+        "maximum_positive_day_profit_share": 0.035776661981647306,
+        "maximum_single_trade_positive_profit_share": 0.035776661981647306,
+        "minimum_event_equity_stressed_usd": -615.14,
+        "minimum_open_pnl_stressed_usd": -615.14,
+        "normal_net_usd": -1974.6000000000001,
+        "opportunity_count": 491,
+        "positive_stressed_event_rate": 0.3325842696629214,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 129,
+        "stressed_edge_to_cost_ratio": 0.02783013967019429,
+        "stressed_net_per_event_usd": -27.864269662921345,
+        "stressed_net_usd": -12399.6,
+        "target_count": 52
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZS",
+        "lookback_minutes": 60,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_7e29bdd231fc9e36b211",
+      "discovery": {
+        "censored_future_coverage_count": 12,
+        "event_count": 392,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "d093bc7234dc28ad8990cf87fddc2feab6314a192512c12b9afa5203a01a27ba",
+        "gross_pnl_usd": -2037.5,
+        "independent_session_count": 392,
+        "maximum_positive_day_profit_share": 0.03352954008853436,
+        "maximum_single_trade_positive_profit_share": 0.03352954008853436,
+        "minimum_event_equity_stressed_usd": -855.28,
+        "minimum_open_pnl_stressed_usd": -852.64,
+        "normal_net_usd": -4107.259999999999,
+        "opportunity_count": 404,
+        "positive_stressed_event_rate": 0.413265306122449,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 85,
+        "stressed_edge_to_cost_ratio": -0.17165469225999513,
+        "stressed_net_per_event_usd": -34.999387755102035,
+        "stressed_net_usd": -13719.759999999998,
+        "target_count": 44
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZS",
+        "lookback_minutes": 60,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_87bc07bd6ff7e01cf66e",
+      "discovery": {
+        "censored_future_coverage_count": 9,
+        "event_count": 323,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "33167b21dbe7872ce193cf04a6f33e6015125429943e527506ca5db45c6ea8dd",
+        "gross_pnl_usd": 850.0,
+        "independent_session_count": 323,
+        "maximum_positive_day_profit_share": 0.03696034764177745,
+        "maximum_single_trade_positive_profit_share": 0.03696034764177745,
+        "minimum_event_equity_stressed_usd": -830.28,
+        "minimum_open_pnl_stressed_usd": -827.64,
+        "normal_net_usd": -855.4399999999993,
+        "opportunity_count": 332,
+        "positive_stressed_event_rate": 0.42724458204334365,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 73,
+        "stressed_edge_to_cost_ratio": 0.08690815546130848,
+        "stressed_net_per_event_usd": -25.752136222910206,
+        "stressed_net_usd": -8317.939999999999,
+        "target_count": 31
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZS",
+        "lookback_minutes": 15,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_c015f1a1ff0b999a3119",
+      "discovery": {
+        "censored_future_coverage_count": 34,
+        "event_count": 451,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "6c28afb6031f108d650bea19c8a5ba834c181f26aae86e90c70e5038a5f64bc2",
+        "gross_pnl_usd": -1925.0,
+        "independent_session_count": 451,
+        "maximum_positive_day_profit_share": 0.035048214380849214,
+        "maximum_single_trade_positive_profit_share": 0.035048214380849214,
+        "minimum_event_equity_stressed_usd": -517.78,
+        "minimum_open_pnl_stressed_usd": -515.14,
+        "normal_net_usd": -4306.28,
+        "opportunity_count": 485,
+        "positive_stressed_event_rate": 0.29933481152993346,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 157,
+        "stressed_edge_to_cost_ratio": -0.14096078873602474,
+        "stressed_net_per_event_usd": -36.682439024390234,
+        "stressed_net_usd": -16543.78,
+        "target_count": 35
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZS",
+        "lookback_minutes": 15,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_a9a916d9911e2f75fa44",
+      "discovery": {
+        "censored_future_coverage_count": 33,
+        "event_count": 434,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "be381127715eff6d15b998d1aacf34edd0a64b1984e46fad08b762b2db7efd57",
+        "gross_pnl_usd": 500.0,
+        "independent_session_count": 434,
+        "maximum_positive_day_profit_share": 0.03877490602768483,
+        "maximum_single_trade_positive_profit_share": 0.03877490602768483,
+        "minimum_event_equity_stressed_usd": -555.28,
+        "minimum_open_pnl_stressed_usd": -552.64,
+        "normal_net_usd": -1791.5200000000002,
+        "opportunity_count": 467,
+        "positive_stressed_event_rate": 0.33410138248847926,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 147,
+        "stressed_edge_to_cost_ratio": 0.03804734916508897,
+        "stressed_net_per_event_usd": -30.827235023041467,
+        "stressed_net_usd": -13379.02,
+        "target_count": 34
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZS",
+        "lookback_minutes": 60,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_c2b04d8d420db62e8d6b",
+      "discovery": {
+        "censored_future_coverage_count": 6,
+        "event_count": 395,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "427f37d8c943bc12fe9f96f2e9a3869f782696abe4b8e9ff31b9d5caebd7b04a",
+        "gross_pnl_usd": 675.0,
+        "independent_session_count": 395,
+        "maximum_positive_day_profit_share": 0.026666340483218285,
+        "maximum_single_trade_positive_profit_share": 0.026666340483218285,
+        "minimum_event_equity_stressed_usd": -815.14,
+        "minimum_open_pnl_stressed_usd": -815.14,
+        "normal_net_usd": -1410.5999999999988,
+        "opportunity_count": 401,
+        "positive_stressed_event_rate": 0.39746835443037976,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 108,
+        "stressed_edge_to_cost_ratio": 0.05643529588816614,
+        "stressed_net_per_event_usd": -28.223037974683532,
+        "stressed_net_usd": -11148.099999999999,
+        "target_count": 43
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZS",
+        "lookback_minutes": 60,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_ae9be02cfdf62bf7f9d5",
+      "discovery": {
+        "censored_future_coverage_count": 7,
+        "event_count": 352,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "ffeee07fe458d707cecaf516087dfa3eaa768010e78b37d09f44cec85f829c82",
+        "gross_pnl_usd": 1300.0,
+        "independent_session_count": 352,
+        "maximum_positive_day_profit_share": 0.038176600403325364,
+        "maximum_single_trade_positive_profit_share": 0.038176600403325364,
+        "minimum_event_equity_stressed_usd": -815.14,
+        "minimum_open_pnl_stressed_usd": -815.14,
+        "normal_net_usd": -558.559999999999,
+        "opportunity_count": 359,
+        "positive_stressed_event_rate": 0.36079545454545453,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 91,
+        "stressed_edge_to_cost_ratio": 0.12196769544854087,
+        "stressed_net_per_event_usd": -26.05414772727272,
+        "stressed_net_usd": -9171.06,
+        "target_count": 36
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZM",
+        "lookback_minutes": 15,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_d2d71d2ddd28c0820f46",
+      "discovery": {
+        "censored_future_coverage_count": 84,
+        "event_count": 415,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "08c977df644247367d569444c52ba10e0651b13ea8deb6df78f93797631a39bc",
+        "gross_pnl_usd": -2679.9999999999445,
+        "independent_session_count": 415,
+        "maximum_positive_day_profit_share": 0.047231426787689365,
+        "maximum_single_trade_positive_profit_share": 0.047231426787689365,
+        "minimum_event_equity_stressed_usd": -332.6400000000011,
+        "minimum_open_pnl_stressed_usd": -332.6400000000011,
+        "normal_net_usd": -4871.199999999944,
+        "opportunity_count": 499,
+        "positive_stressed_event_rate": 0.27228915662650605,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 171,
+        "stressed_edge_to_cost_ratio": -0.2554521885008335,
+        "stressed_net_per_event_usd": -31.207710843378024,
+        "stressed_net_usd": -12951.200000001883,
+        "target_count": 29
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZM",
+        "lookback_minutes": 15,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_4fabdc5e6f052b02b507",
+      "discovery": {
+        "censored_future_coverage_count": 89,
+        "event_count": 402,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "7a2a5cc430a4ecf5bafa8115d781f44a641fede8ea80c0cedf39732e7b0929c5",
+        "gross_pnl_usd": -1289.9999999999977,
+        "independent_session_count": 402,
+        "maximum_positive_day_profit_share": 0.08797452853294785,
+        "maximum_single_trade_positive_profit_share": 0.08797452853294785,
+        "minimum_event_equity_stressed_usd": -332.6400000000011,
+        "minimum_open_pnl_stressed_usd": -332.6400000000011,
+        "normal_net_usd": -3412.559999999998,
+        "opportunity_count": 491,
+        "positive_stressed_event_rate": 0.2860696517412935,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 135,
+        "stressed_edge_to_cost_ratio": -0.1269365199319854,
+        "stressed_net_per_event_usd": -28.314825870651337,
+        "stressed_net_usd": -11382.560000001838,
+        "target_count": 32
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZM",
+        "lookback_minutes": 60,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_5887a1e51722115333c8",
+      "discovery": {
+        "censored_future_coverage_count": 21,
+        "event_count": 383,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "02a1a68ace072f0036c55ca332aa55fbefbe26a391e78e49492792df9ba630e1",
+        "gross_pnl_usd": -2080.0000000001205,
+        "independent_session_count": 383,
+        "maximum_positive_day_profit_share": 0.04123580288562747,
+        "maximum_single_trade_positive_profit_share": 0.04123580288562747,
+        "minimum_event_equity_stressed_usd": -625.2800000000045,
+        "minimum_open_pnl_stressed_usd": -622.6400000000045,
+        "normal_net_usd": -4102.24000000012,
+        "opportunity_count": 404,
+        "positive_stressed_event_rate": 0.34986945169712796,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 126,
+        "stressed_edge_to_cost_ratio": -0.2148263211818877,
+        "stressed_net_per_event_usd": -31.44187989556611,
+        "stressed_net_usd": -12042.240000001822,
+        "target_count": 35
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZM",
+        "lookback_minutes": 60,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_a51728adefe2885f84c8",
+      "discovery": {
+        "censored_future_coverage_count": 17,
+        "event_count": 315,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "03c6f2b441ffe70364055f0945696ae1a72bcdfac1779fba469c7e0f897655af",
+        "gross_pnl_usd": -3870.0000000000387,
+        "independent_session_count": 315,
+        "maximum_positive_day_profit_share": 0.05271375514082169,
+        "maximum_single_trade_positive_profit_share": 0.05271375514082169,
+        "minimum_event_equity_stressed_usd": -785.2800000000068,
+        "minimum_open_pnl_stressed_usd": -782.6400000000068,
+        "normal_net_usd": -5533.200000000038,
+        "opportunity_count": 332,
+        "positive_stressed_event_rate": 0.33015873015873015,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 95,
+        "stressed_edge_to_cost_ratio": -0.48598553345389267,
+        "stressed_net_per_event_usd": -38.58158730159191,
+        "stressed_net_usd": -12153.200000001452,
+        "target_count": 22
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZM",
+        "lookback_minutes": 15,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_1d1dcdbc0536c00ae83e",
+      "discovery": {
+        "censored_future_coverage_count": 74,
+        "event_count": 414,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "2ee66bdff5020af33b601df8e9054d934bbe97503630c92bc323b75e4836ab80",
+        "gross_pnl_usd": 1660.0000000000136,
+        "independent_session_count": 414,
+        "maximum_positive_day_profit_share": 0.039469078179698636,
+        "maximum_single_trade_positive_profit_share": 0.039469078179698636,
+        "minimum_event_equity_stressed_usd": -302.64,
+        "minimum_open_pnl_stressed_usd": -302.64,
+        "normal_net_usd": -525.9199999999867,
+        "opportunity_count": 488,
+        "positive_stressed_event_rate": 0.32608695652173914,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 132,
+        "stressed_edge_to_cost_ratio": 0.15861004097107695,
+        "stressed_net_per_event_usd": -21.608502415463512,
+        "stressed_net_usd": -8945.920000001895,
+        "target_count": 43
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZM",
+        "lookback_minutes": 15,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_ba3cf23e15234b34e484",
+      "discovery": {
+        "censored_future_coverage_count": 64,
+        "event_count": 410,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "33b171730a1b22e737fcbb1039a38877ca766bd964ea949b861b3b3460d0cc09",
+        "gross_pnl_usd": -739.9999999999693,
+        "independent_session_count": 410,
+        "maximum_positive_day_profit_share": 0.03683679818068918,
+        "maximum_single_trade_positive_profit_share": 0.03683679818068918,
+        "minimum_event_equity_stressed_usd": -345.2800000000034,
+        "minimum_open_pnl_stressed_usd": -342.6400000000034,
+        "normal_net_usd": -2904.7999999999697,
+        "opportunity_count": 474,
+        "positive_stressed_event_rate": 0.32439024390243903,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 138,
+        "stressed_edge_to_cost_ratio": -0.07139549243593404,
+        "stressed_net_per_event_usd": -26.719024390248478,
+        "stressed_net_usd": -10954.80000000188,
+        "target_count": 39
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZM",
+        "lookback_minutes": 60,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_398d00a49310d5b62b72",
+      "discovery": {
+        "censored_future_coverage_count": 15,
+        "event_count": 386,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "6d792b720515034ef9f1d91beb1e7d79c6ec44be718e6f0361cf5b909b52c66e",
+        "gross_pnl_usd": -9.094947017729282e-11,
+        "independent_session_count": 386,
+        "maximum_positive_day_profit_share": 0.03391863116793718,
+        "maximum_single_trade_positive_profit_share": 0.03391863116793718,
+        "minimum_event_equity_stressed_usd": -575.2800000000045,
+        "minimum_open_pnl_stressed_usd": -572.6400000000045,
+        "normal_net_usd": -2038.0800000000906,
+        "opportunity_count": 401,
+        "positive_stressed_event_rate": 0.42487046632124353,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 110,
+        "stressed_edge_to_cost_ratio": -9.32042678245032e-15,
+        "stressed_net_per_event_usd": -23.54424870466777,
+        "stressed_net_usd": -9088.080000001763,
+        "target_count": 48
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZM",
+        "lookback_minutes": 60,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_fd8f8092a01037a9813c",
+      "discovery": {
+        "censored_future_coverage_count": 11,
+        "event_count": 343,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "0081082fe56299dc7240ef5e20b570c18df1d1381dd131242a465a5f1f70aa1c",
+        "gross_pnl_usd": -989.9999999999636,
+        "independent_session_count": 343,
+        "maximum_positive_day_profit_share": 0.03113991595948183,
+        "maximum_single_trade_positive_profit_share": 0.03113991595948183,
+        "minimum_event_equity_stressed_usd": -562.6400000000023,
+        "minimum_open_pnl_stressed_usd": -562.6400000000023,
+        "normal_net_usd": -2801.039999999963,
+        "opportunity_count": 354,
+        "positive_stressed_event_rate": 0.39067055393586003,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 104,
+        "stressed_edge_to_cost_ratio": -0.11417315569988877,
+        "stressed_net_per_event_usd": -29.449096209916803,
+        "stressed_net_usd": -10101.040000001463,
+        "target_count": 40
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 15,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_3db00369833c618dd7da",
+      "discovery": {
+        "censored_future_coverage_count": 81,
+        "event_count": 418,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "027434655d7d4c37eaef2f2c4f0622c468a056f4aa9728a4e0a8c164181ad7a0",
+        "gross_pnl_usd": -1979.9999999999707,
+        "independent_session_count": 418,
+        "maximum_positive_day_profit_share": 0.08095745100359038,
+        "maximum_single_trade_positive_profit_share": 0.08095745100359038,
+        "minimum_event_equity_stressed_usd": -752.6399999999957,
+        "minimum_open_pnl_stressed_usd": -752.6399999999957,
+        "normal_net_usd": -4187.039999999971,
+        "opportunity_count": 499,
+        "positive_stressed_event_rate": 0.3062200956937799,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 156,
+        "stressed_edge_to_cost_ratio": -0.27412280701753977,
+        "stressed_net_per_event_usd": -21.41397129186663,
+        "stressed_net_usd": -8951.040000000254,
+        "target_count": 37
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 15,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_966f37fed52c0359c0b5",
+      "discovery": {
+        "censored_future_coverage_count": 66,
+        "event_count": 425,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "759ddf4f296cf88014e1ab0ba9ac3dafd41d5ee77f2113835f7b55d12f9fd9b4",
+        "gross_pnl_usd": -1745.9999999999682,
+        "independent_session_count": 425,
+        "maximum_positive_day_profit_share": 0.07712825907280985,
+        "maximum_single_trade_positive_profit_share": 0.07712825907280985,
+        "minimum_event_equity_stressed_usd": -752.6399999999957,
+        "minimum_open_pnl_stressed_usd": -752.6399999999957,
+        "normal_net_usd": -3989.999999999968,
+        "opportunity_count": 491,
+        "positive_stressed_event_rate": 0.30823529411764705,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 155,
+        "stressed_edge_to_cost_ratio": -0.23774509803921132,
+        "stressed_net_per_event_usd": -21.1058823529418,
+        "stressed_net_usd": -8970.000000000267,
+        "target_count": 40
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 60,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_767059a1b8472e04e0c3",
+      "discovery": {
+        "censored_future_coverage_count": 20,
+        "event_count": 384,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "a6861dbced9d48082975d9bdecd842790fefb150512ad63c141ef51f38646be7",
+        "gross_pnl_usd": 690.000000000012,
+        "independent_session_count": 384,
+        "maximum_positive_day_profit_share": 0.0579767538562071,
+        "maximum_single_trade_positive_profit_share": 0.0579767538562071,
+        "minimum_event_equity_stressed_usd": -686.6400000000003,
+        "minimum_open_pnl_stressed_usd": -686.6400000000003,
+        "normal_net_usd": -1337.519999999988,
+        "opportunity_count": 404,
+        "positive_stressed_event_rate": 0.3932291666666667,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 105,
+        "stressed_edge_to_cost_ratio": 0.10398582175926106,
+        "stressed_net_per_event_usd": -14.498750000000763,
+        "stressed_net_usd": -5567.520000000293,
+        "target_count": 48
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 60,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_5310e830f4156bbce913",
+      "discovery": {
+        "censored_future_coverage_count": 14,
+        "event_count": 318,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "6b2e0cf927cb7a6b81bf7af6069c74510e81a6c9696dde6af85d8190951e5cca",
+        "gross_pnl_usd": -1385.9999999999652,
+        "independent_session_count": 318,
+        "maximum_positive_day_profit_share": 0.07644502962475415,
+        "maximum_single_trade_positive_profit_share": 0.07644502962475415,
+        "minimum_event_equity_stressed_usd": -686.6400000000003,
+        "minimum_open_pnl_stressed_usd": -686.6400000000003,
+        "normal_net_usd": -3065.0399999999654,
+        "opportunity_count": 332,
+        "positive_stressed_event_rate": 0.39308176100628933,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 83,
+        "stressed_edge_to_cost_ratio": -0.2522274633123626,
+        "stressed_net_per_event_usd": -20.48754716981194,
+        "stressed_net_usd": -6515.040000000197,
+        "target_count": 31
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 15,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_2b2d62b22a527fb9f02d",
+      "discovery": {
+        "censored_future_coverage_count": 61,
+        "event_count": 425,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "83d4657a4edf0bd928450e3c52165e3d1d18c7654aa3ff5113c0781f84f20f24",
+        "gross_pnl_usd": -426.0000000000048,
+        "independent_session_count": 425,
+        "maximum_positive_day_profit_share": 0.06099891341002004,
+        "maximum_single_trade_positive_profit_share": 0.06099891341002004,
+        "minimum_event_equity_stressed_usd": -530.6399999999973,
+        "minimum_open_pnl_stressed_usd": -530.6399999999973,
+        "normal_net_usd": -2670.000000000005,
+        "opportunity_count": 486,
+        "positive_stressed_event_rate": 0.3247058823529412,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 139,
+        "stressed_edge_to_cost_ratio": -0.05800653594771306,
+        "stressed_net_per_event_usd": -19.53882352941258,
+        "stressed_net_usd": -8304.000000000346,
+        "target_count": 43
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 15,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_a5a44aa0087c97447d3b",
+      "discovery": {
+        "censored_future_coverage_count": 50,
+        "event_count": 418,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "9ffc91be3e38d00bed768d4e6fbb1be71563e48059043de993d5593f29ef9719",
+        "gross_pnl_usd": -174.0000000000336,
+        "independent_session_count": 418,
+        "maximum_positive_day_profit_share": 0.027019755553847433,
+        "maximum_single_trade_positive_profit_share": 0.027019755553847433,
+        "minimum_event_equity_stressed_usd": -299.28000000000117,
+        "minimum_open_pnl_stressed_usd": -296.6400000000012,
+        "normal_net_usd": -2381.040000000034,
+        "opportunity_count": 468,
+        "positive_stressed_event_rate": 0.3133971291866029,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 150,
+        "stressed_edge_to_cost_ratio": -0.02408958001063729,
+        "stressed_net_per_event_usd": -19.088612440192307,
+        "stressed_net_usd": -7979.040000000385,
+        "target_count": 43
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 60,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_34f7567f9a7b6f8c35b2",
+      "discovery": {
+        "censored_future_coverage_count": 11,
+        "event_count": 392,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "33cb2d226e1db59336d2b0c580a21a376c01c611216910279b1fab12969c224e",
+        "gross_pnl_usd": 1943.9999999999627,
+        "independent_session_count": 392,
+        "maximum_positive_day_profit_share": 0.041397556610380824,
+        "maximum_single_trade_positive_profit_share": 0.041397556610380824,
+        "minimum_event_equity_stressed_usd": -638.6400000000014,
+        "minimum_open_pnl_stressed_usd": -638.6400000000014,
+        "normal_net_usd": -125.76000000003728,
+        "opportunity_count": 403,
+        "positive_stressed_event_rate": 0.42857142857142855,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 106,
+        "stressed_edge_to_cost_ratio": 0.2869897959183618,
+        "stressed_net_per_event_usd": -12.642244897959982,
+        "stressed_net_usd": -4955.760000000313,
+        "target_count": 43
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 60,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_5b9e79f15d87a6136075",
+      "discovery": {
+        "censored_future_coverage_count": 7,
+        "event_count": 361,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "f44b0a784eee52ef3a9005501db79a42fb38756b4e48a26663495dc0d61dc18e",
+        "gross_pnl_usd": -768.0000000000241,
+        "independent_session_count": 361,
+        "maximum_positive_day_profit_share": 0.03634874195435981,
+        "maximum_single_trade_positive_profit_share": 0.03634874195435981,
+        "minimum_event_equity_stressed_usd": -638.6400000000014,
+        "minimum_open_pnl_stressed_usd": -638.6400000000014,
+        "normal_net_usd": -2674.080000000024,
+        "opportunity_count": 368,
+        "positive_stressed_event_rate": 0.4155124653739612,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 106,
+        "stressed_edge_to_cost_ratio": -0.12311480455525162,
+        "stressed_net_per_event_usd": -19.507146814405115,
+        "stressed_net_usd": -7042.080000000246,
+        "target_count": 37
+      }
+    }
+  ],
+  "best_discovery_diagnostics": [
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 60,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_34f7567f9a7b6f8c35b2",
+      "discovery": {
+        "censored_future_coverage_count": 11,
+        "event_count": 392,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "33cb2d226e1db59336d2b0c580a21a376c01c611216910279b1fab12969c224e",
+        "gross_pnl_usd": 1943.9999999999627,
+        "independent_session_count": 392,
+        "maximum_positive_day_profit_share": 0.041397556610380824,
+        "maximum_single_trade_positive_profit_share": 0.041397556610380824,
+        "minimum_event_equity_stressed_usd": -638.6400000000014,
+        "minimum_open_pnl_stressed_usd": -638.6400000000014,
+        "normal_net_usd": -125.76000000003728,
+        "opportunity_count": 403,
+        "positive_stressed_event_rate": 0.42857142857142855,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 106,
+        "stressed_edge_to_cost_ratio": 0.2869897959183618,
+        "stressed_net_per_event_usd": -12.642244897959982,
+        "stressed_net_usd": -4955.760000000313,
+        "target_count": 43
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 60,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_767059a1b8472e04e0c3",
+      "discovery": {
+        "censored_future_coverage_count": 20,
+        "event_count": 384,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "a6861dbced9d48082975d9bdecd842790fefb150512ad63c141ef51f38646be7",
+        "gross_pnl_usd": 690.000000000012,
+        "independent_session_count": 384,
+        "maximum_positive_day_profit_share": 0.0579767538562071,
+        "maximum_single_trade_positive_profit_share": 0.0579767538562071,
+        "minimum_event_equity_stressed_usd": -686.6400000000003,
+        "minimum_open_pnl_stressed_usd": -686.6400000000003,
+        "normal_net_usd": -1337.519999999988,
+        "opportunity_count": 404,
+        "positive_stressed_event_rate": 0.3932291666666667,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 105,
+        "stressed_edge_to_cost_ratio": 0.10398582175926106,
+        "stressed_net_per_event_usd": -14.498750000000763,
+        "stressed_net_usd": -5567.520000000293,
+        "target_count": 48
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 60,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_5310e830f4156bbce913",
+      "discovery": {
+        "censored_future_coverage_count": 14,
+        "event_count": 318,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "6b2e0cf927cb7a6b81bf7af6069c74510e81a6c9696dde6af85d8190951e5cca",
+        "gross_pnl_usd": -1385.9999999999652,
+        "independent_session_count": 318,
+        "maximum_positive_day_profit_share": 0.07644502962475415,
+        "maximum_single_trade_positive_profit_share": 0.07644502962475415,
+        "minimum_event_equity_stressed_usd": -686.6400000000003,
+        "minimum_open_pnl_stressed_usd": -686.6400000000003,
+        "normal_net_usd": -3065.0399999999654,
+        "opportunity_count": 332,
+        "positive_stressed_event_rate": 0.39308176100628933,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 83,
+        "stressed_edge_to_cost_ratio": -0.2522274633123626,
+        "stressed_net_per_event_usd": -20.48754716981194,
+        "stressed_net_usd": -6515.040000000197,
+        "target_count": 31
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 60,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_5b9e79f15d87a6136075",
+      "discovery": {
+        "censored_future_coverage_count": 7,
+        "event_count": 361,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "f44b0a784eee52ef3a9005501db79a42fb38756b4e48a26663495dc0d61dc18e",
+        "gross_pnl_usd": -768.0000000000241,
+        "independent_session_count": 361,
+        "maximum_positive_day_profit_share": 0.03634874195435981,
+        "maximum_single_trade_positive_profit_share": 0.03634874195435981,
+        "minimum_event_equity_stressed_usd": -638.6400000000014,
+        "minimum_open_pnl_stressed_usd": -638.6400000000014,
+        "normal_net_usd": -2674.080000000024,
+        "opportunity_count": 368,
+        "positive_stressed_event_rate": 0.4155124653739612,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 106,
+        "stressed_edge_to_cost_ratio": -0.12311480455525162,
+        "stressed_net_per_event_usd": -19.507146814405115,
+        "stressed_net_usd": -7042.080000000246,
+        "target_count": 37
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 15,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_a5a44aa0087c97447d3b",
+      "discovery": {
+        "censored_future_coverage_count": 50,
+        "event_count": 418,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "9ffc91be3e38d00bed768d4e6fbb1be71563e48059043de993d5593f29ef9719",
+        "gross_pnl_usd": -174.0000000000336,
+        "independent_session_count": 418,
+        "maximum_positive_day_profit_share": 0.027019755553847433,
+        "maximum_single_trade_positive_profit_share": 0.027019755553847433,
+        "minimum_event_equity_stressed_usd": -299.28000000000117,
+        "minimum_open_pnl_stressed_usd": -296.6400000000012,
+        "normal_net_usd": -2381.040000000034,
+        "opportunity_count": 468,
+        "positive_stressed_event_rate": 0.3133971291866029,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 150,
+        "stressed_edge_to_cost_ratio": -0.02408958001063729,
+        "stressed_net_per_event_usd": -19.088612440192307,
+        "stressed_net_usd": -7979.040000000385,
+        "target_count": 43
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZL",
+        "lookback_minutes": 15,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_2b2d62b22a527fb9f02d",
+      "discovery": {
+        "censored_future_coverage_count": 61,
+        "event_count": 425,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "83d4657a4edf0bd928450e3c52165e3d1d18c7654aa3ff5113c0781f84f20f24",
+        "gross_pnl_usd": -426.0000000000048,
+        "independent_session_count": 425,
+        "maximum_positive_day_profit_share": 0.06099891341002004,
+        "maximum_single_trade_positive_profit_share": 0.06099891341002004,
+        "minimum_event_equity_stressed_usd": -530.6399999999973,
+        "minimum_open_pnl_stressed_usd": -530.6399999999973,
+        "normal_net_usd": -2670.000000000005,
+        "opportunity_count": 486,
+        "positive_stressed_event_rate": 0.3247058823529412,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 139,
+        "stressed_edge_to_cost_ratio": -0.05800653594771306,
+        "stressed_net_per_event_usd": -19.53882352941258,
+        "stressed_net_usd": -8304.000000000346,
+        "target_count": 43
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZS",
+        "lookback_minutes": 60,
+        "mechanism": "CRUSH_EXPANSION_CONTINUATION_ROUTER",
+        "robust_z_threshold": 2.0
+      },
+      "candidate_id": "soy_crush_87bc07bd6ff7e01cf66e",
+      "discovery": {
+        "censored_future_coverage_count": 9,
+        "event_count": 323,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "33167b21dbe7872ce193cf04a6f33e6015125429943e527506ca5db45c6ea8dd",
+        "gross_pnl_usd": 850.0,
+        "independent_session_count": 323,
+        "maximum_positive_day_profit_share": 0.03696034764177745,
+        "maximum_single_trade_positive_profit_share": 0.03696034764177745,
+        "minimum_event_equity_stressed_usd": -830.28,
+        "minimum_open_pnl_stressed_usd": -827.64,
+        "normal_net_usd": -855.4399999999993,
+        "opportunity_count": 332,
+        "positive_stressed_event_rate": 0.42724458204334365,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 73,
+        "stressed_edge_to_cost_ratio": 0.08690815546130848,
+        "stressed_net_per_event_usd": -25.752136222910206,
+        "stressed_net_usd": -8317.939999999999,
+        "target_count": 31
+      }
+    },
+    {
+      "candidate": {
+        "execution_leg": "ZM",
+        "lookback_minutes": 15,
+        "mechanism": "COMPONENT_RESIDUAL_REVERSION_ROUTER",
+        "robust_z_threshold": 1.5
+      },
+      "candidate_id": "soy_crush_1d1dcdbc0536c00ae83e",
+      "discovery": {
+        "censored_future_coverage_count": 74,
+        "event_count": 414,
+        "event_level_50k_mll_breach_count": 0,
+        "event_path_hash": "2ee66bdff5020af33b601df8e9054d934bbe97503630c92bc323b75e4836ab80",
+        "gross_pnl_usd": 1660.0000000000136,
+        "independent_session_count": 414,
+        "maximum_positive_day_profit_share": 0.039469078179698636,
+        "maximum_single_trade_positive_profit_share": 0.039469078179698636,
+        "minimum_event_equity_stressed_usd": -302.64,
+        "minimum_open_pnl_stressed_usd": -302.64,
+        "normal_net_usd": -525.9199999999867,
+        "opportunity_count": 488,
+        "positive_stressed_event_rate": 0.32608695652173914,
+        "reference_50k_mll_usd": 2000.0,
+        "stop_count": 132,
+        "stressed_edge_to_cost_ratio": 0.15861004097107695,
+        "stressed_net_per_event_usd": -21.608502415463512,
+        "stressed_net_usd": -8945.920000001895,
+        "target_count": 43
+      }
+    }
+  ],
+  "branch_id": "SOYBEAN_CRUSH_STRUCTURAL_VALUE_ROUTER_V1",
+  "broker_connections": 0,
+  "combine_pass_count": 0,
+  "contract_specs": {
+    "ZL": {
+      "point_value_usd": 600.0,
+      "tick_size": 0.01,
+      "tick_value_usd": 6.0
+    },
+    "ZM": {
+      "point_value_usd": 100.0,
+      "tick_size": 0.1,
+      "tick_value_usd": 10.0
+    },
+    "ZS": {
+      "point_value_usd": 50.0,
+      "tick_size": 0.25,
+      "tick_value_usd": 12.5
+    }
+  },
+  "discovery_candidate_count": 24,
+  "discovery_eligible_count": 0,
+  "final_access_policy": "VALIDATION_PASS_THEN_FINAL_DEVELOPMENT_ONLY",
+  "final_development_candidate_count": 0,
+  "final_development_event_gate_passer_ids": [],
+  "manifest_hash": "67c65399dbe9919c47fce22eced7460a3ece876ebb160b7d82e17850601f5827",
+  "next_action": "Options-implied volatility or settlement-curve state after a separate official cost and deployability decision; do not search neighbouring crush thresholds.",
+  "official_rule_snapshot_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+  "orders": 0,
+  "proposal_count": 24,
+  "q4_access_count_delta": 0,
+  "reconstruction": {
+    "aligned_rows": 691577,
+    "aligned_session_count": 1216,
+    "incomplete_triplet_session_count": 37,
+    "q4_2024_rows": 0,
+    "retained_triplet_session_count": 1374,
+    "roll_diagnostics": {
+      "ZL": {
+        "mixed_instrument_session_count": 0,
+        "roll_boundary_count": 54
+      },
+      "ZM": {
+        "mixed_instrument_session_count": 0,
+        "roll_boundary_count": 54
+      },
+      "ZS": {
+        "mixed_instrument_session_count": 0,
+        "roll_boundary_count": 48
+      }
+    },
+    "roll_guard_session_count": 180,
+    "unsupported_triplet_session_count": 102
+  },
+  "reference_50k_mll_usd": 2000.0,
+  "result_hash": "8cec34b7272619e953562a8c2bb304a8baf7b8e9f11e47d78bc80c1ca1e63c42",
+  "runtime_seconds": 6828.508617611951,
+  "schema": "hydra_soybean_crush_structural_value_router_result_v1",
+  "selected_candidate_ids": [],
+  "selected_results": [],
+  "source_audit_hash": "4f2971e2a5f34f6da6f71813a902cd9e5b221f1109047412a26d2977ff86d4e6",
+  "status": "SOYBEAN_CRUSH_STRUCTURAL_VALUE_ROUTER_FALSIFIED",
+  "validation_access_policy": "DISCOVERY_SELECT_THEN_SELECTED_VALIDATION_ONLY",
+  "validation_candidate_count": 0,
+  "validation_event_gate_passer_ids": [],
+  "xfa_paths_started": 0
+}
