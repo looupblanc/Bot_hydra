@@ -1,0 +1,11 @@
+{
+  "completed_at_utc": "2026-07-20T08:06:57.144914+00:00",
+  "configuration_completed": 46,
+  "configuration_total": 46,
+  "development_requalified_count": 4,
+  "exact_account_episode_count": 7566,
+  "pid": 4058076,
+  "result_hash": "870d6ac0662b281ee3597cd6f5fad8be3d631ec99502095d6acd33c1f86e5528",
+  "schema": "hydra_cross_era_bank_sieve_2019h1_v1_state",
+  "status": "COMPLETE"
+}

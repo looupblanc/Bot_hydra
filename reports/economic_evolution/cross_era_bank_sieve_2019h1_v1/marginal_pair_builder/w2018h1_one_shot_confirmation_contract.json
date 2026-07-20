@@ -1,0 +1,654 @@
+{
+  "broker_connections": 0,
+  "candidate_count": 8,
+  "candidates": [
+    {
+      "account_label": "50K",
+      "behavior_cluster_id": "w2019_exact_fb88b7e77bc21269",
+      "behavior_hash": "fb88b7e77bc21269e209a2cf5c69a4fa36cd9eb614336a1dd5d137048f0f37ed",
+      "candidate_freeze_hash": "2e40aa2121c72544ae697a1e975faa89e703c4832e12db4a83ede312d85a6608",
+      "candidate_id": "hazard_10ffb41856432af08259e32b",
+      "component_ids": [
+        "hazard_10ffb41856432af08259e32b"
+      ],
+      "confirmation_rank": 0,
+      "development_result_hash": "f7a2ba169ca094834fceb996effc2e229c5aec61c1000e675883c273c6cde086",
+      "development_selected_cell_hash": "06b565e5cd8842e679dea6152b171cce8e63c62b9ca214ba75523e2feead9265",
+      "executable_spec": {
+        "component_ids": [
+          "hazard_10ffb41856432af08259e32b"
+        ],
+        "component_priority": [
+          "hazard_10ffb41856432af08259e32b"
+        ],
+        "component_quantity_tiers": {
+          "hazard_10ffb41856432af08259e32b": 3
+        },
+        "configuration_id": "hazard_10ffb41856432af08259e32b",
+        "frozen_account_policy": {
+          "actual_stop_risk_available": false,
+          "aggregate_open_risk_ceiling": 2000.0,
+          "component_priority": [
+            "hazard_10ffb41856432af08259e32b"
+          ],
+          "concurrency_scaling": "PRIORITY",
+          "daily_consistency_profit_guard": 3000.0,
+          "daily_loss_guard": 2000.0,
+          "future_outcome_fields_used": false,
+          "maximum_concurrent_sleeves": 1,
+          "maximum_mini_equivalent": 3.0,
+          "maximum_mll_buffer_fraction": 1.0,
+          "nominal_risk_charge_per_mini": {
+            "hazard_10ffb41856432af08259e32b": 488.2390480695824
+          },
+          "outbound_order_capability": false,
+          "policy_id": "exact-0029:hazard_10ffb41856432af08259e32b:50000:3:CAUSAL_STATIC_STOP_RISK_GOVERNOR",
+          "policy_version": "hydra_active_risk_pool_governor_v1",
+          "preserve_sole_sleeve_nominal_risk": true,
+          "protected_mll_buffer": 0.0,
+          "risk_measure": "DECLARED_NOMINAL_RISK_UTILISATION",
+          "same_instrument_conflict_rule": "PRIORITY",
+          "schema": "hydra_active_risk_pool_policy_v1",
+          "static_risk_tier": 1.0,
+          "structural_fingerprint": "3c99040db6cae93981fa2dfa6ea13669350bea91608e6d695d50c41dfa261a18",
+          "target_protection_distance": 0.0,
+          "target_protection_mode": "NONE"
+        },
+        "pnl_state_profile": {
+          "base_multiplier": 1.0,
+          "consistency_headroom_fraction": 0.0,
+          "consistency_multiplier": 1.0,
+          "intraday_loss_fraction_of_mll": 0.0,
+          "loss_multiplier": 1.0,
+          "low_buffer_fraction": 0.0,
+          "profile_id": "pnl_state_identity",
+          "progress_step_1": 1.0,
+          "progress_step_1_multiplier": 1.0,
+          "progress_step_2": 1.0,
+          "progress_step_2_multiplier": 1.0,
+          "schema": "hydra_pnl_state_sizing_profile_v1",
+          "target_protection_fraction": 0.0,
+          "target_protection_multiplier": 1.0
+        },
+        "signal_or_trade_logic_mutated": false
+      },
+      "executable_spec_hash": "4e0ae157e12082f2b055fe3e7cd4232941d69748f2978e192cd796340cc33277",
+      "headline_horizon_trading_days": 10,
+      "promotion_status": null,
+      "signal_entry_exit_stop_target_mutated": false,
+      "source_kind": "EXACT_STANDALONE",
+      "status_before_confirmation": "DEVELOPMENT_REQUALIFIED"
+    },
+    {
+      "account_label": "50K",
+      "behavior_cluster_id": "w2019_exact_462995b9c0b6d343",
+      "behavior_hash": "462995b9c0b6d343232b475723a3b71fa0f50331f23d331039f71b87c6ad3d7c",
+      "candidate_freeze_hash": "b3763847a948967675ccb6824807d33429f719ec56915fbf75cdc09c9cd8dda2",
+      "candidate_id": "hazard_207180dadb3a6283f951dce7",
+      "component_ids": [
+        "hazard_207180dadb3a6283f951dce7"
+      ],
+      "confirmation_rank": 1,
+      "development_result_hash": "6cc06e0d6d645b035d190d1bac92301dde74c888d9c300d7060046f026a3ec67",
+      "development_selected_cell_hash": "c6cb2d3e6bb14757994ada9e1ddcdfbff79cbba5cffa54a2e1b56b94f19afa05",
+      "executable_spec": {
+        "component_ids": [
+          "hazard_207180dadb3a6283f951dce7"
+        ],
+        "component_priority": [
+          "hazard_207180dadb3a6283f951dce7"
+        ],
+        "component_quantity_tiers": {
+          "hazard_207180dadb3a6283f951dce7": 4
+        },
+        "configuration_id": "hazard_207180dadb3a6283f951dce7",
+        "frozen_account_policy": {
+          "actual_stop_risk_available": false,
+          "aggregate_open_risk_ceiling": 2000.0,
+          "component_priority": [
+            "hazard_207180dadb3a6283f951dce7"
+          ],
+          "concurrency_scaling": "PRIORITY",
+          "daily_consistency_profit_guard": 3000.0,
+          "daily_loss_guard": 2000.0,
+          "future_outcome_fields_used": false,
+          "maximum_concurrent_sleeves": 1,
+          "maximum_mini_equivalent": 5.0,
+          "maximum_mll_buffer_fraction": 1.0,
+          "nominal_risk_charge_per_mini": {
+            "hazard_207180dadb3a6283f951dce7": 1e-06
+          },
+          "outbound_order_capability": false,
+          "policy_id": "exact-0029:hazard_207180dadb3a6283f951dce7:50000:4:CONTRACT_ONLY_UNIFORM_SCALE",
+          "policy_version": "hydra_active_risk_pool_governor_v1",
+          "preserve_sole_sleeve_nominal_risk": true,
+          "protected_mll_buffer": 0.0,
+          "risk_measure": "DECLARED_NOMINAL_RISK_UTILISATION",
+          "same_instrument_conflict_rule": "PRIORITY",
+          "schema": "hydra_active_risk_pool_policy_v1",
+          "static_risk_tier": 1.0,
+          "structural_fingerprint": "81c60364f6dbb79e8bc6fac6f0164c7108f91719b6c7cd07f1553dd9989ca3e9",
+          "target_protection_distance": 0.0,
+          "target_protection_mode": "NONE"
+        },
+        "pnl_state_profile": {
+          "base_multiplier": 1.0,
+          "consistency_headroom_fraction": 0.0,
+          "consistency_multiplier": 1.0,
+          "intraday_loss_fraction_of_mll": 0.0,
+          "loss_multiplier": 1.0,
+          "low_buffer_fraction": 0.0,
+          "profile_id": "pnl_state_identity",
+          "progress_step_1": 1.0,
+          "progress_step_1_multiplier": 1.0,
+          "progress_step_2": 1.0,
+          "progress_step_2_multiplier": 1.0,
+          "schema": "hydra_pnl_state_sizing_profile_v1",
+          "target_protection_fraction": 0.0,
+          "target_protection_multiplier": 1.0
+        },
+        "signal_or_trade_logic_mutated": false
+      },
+      "executable_spec_hash": "d30bfbf73dad643f3bf7ff558a9409263c453c9597b2323bc9379ff0afe7d6db",
+      "headline_horizon_trading_days": 20,
+      "promotion_status": null,
+      "signal_entry_exit_stop_target_mutated": false,
+      "source_kind": "EXACT_STANDALONE",
+      "status_before_confirmation": "DEVELOPMENT_REQUALIFIED"
+    },
+    {
+      "account_label": "50K",
+      "behavior_cluster_id": "w2019_exact_a3e09b7282d1d1d2",
+      "behavior_hash": "a3e09b7282d1d1d233e95fa4f3bd6edcb3038a46c6b81fb6d7a927d7d2bd2463",
+      "candidate_freeze_hash": "0f52cd550bf1c534d427c318b3407c28101b3da554403f78b8ab2529b0c06f22",
+      "candidate_id": "hazard_0df449d78eadc5bce054eb2c",
+      "component_ids": [
+        "hazard_0df449d78eadc5bce054eb2c"
+      ],
+      "confirmation_rank": 2,
+      "development_result_hash": "a6db20823fcf6027c36e7f4de78d144fb45b8f393abda71786f041f6ea392cdc",
+      "development_selected_cell_hash": "92cf564e44ee64fc6bad1e3e17493754e93b74c173c7033b1430190d1c3855df",
+      "executable_spec": {
+        "component_ids": [
+          "hazard_0df449d78eadc5bce054eb2c"
+        ],
+        "component_priority": [
+          "hazard_0df449d78eadc5bce054eb2c"
+        ],
+        "component_quantity_tiers": {
+          "hazard_0df449d78eadc5bce054eb2c": 2
+        },
+        "configuration_id": "hazard_0df449d78eadc5bce054eb2c",
+        "frozen_account_policy": {
+          "actual_stop_risk_available": false,
+          "aggregate_open_risk_ceiling": 4500.0,
+          "component_priority": [
+            "hazard_0df449d78eadc5bce054eb2c"
+          ],
+          "concurrency_scaling": "PRIORITY",
+          "daily_consistency_profit_guard": 9000.0,
+          "daily_loss_guard": 4500.0,
+          "future_outcome_fields_used": false,
+          "maximum_concurrent_sleeves": 1,
+          "maximum_mini_equivalent": 15.0,
+          "maximum_mll_buffer_fraction": 1.0,
+          "nominal_risk_charge_per_mini": {
+            "hazard_0df449d78eadc5bce054eb2c": 1463.0035335891102
+          },
+          "outbound_order_capability": false,
+          "policy_id": "exact-0029:hazard_0df449d78eadc5bce054eb2c:150000:2:CAUSAL_STATIC_STOP_RISK_GOVERNOR",
+          "policy_version": "hydra_active_risk_pool_governor_v1",
+          "preserve_sole_sleeve_nominal_risk": true,
+          "protected_mll_buffer": 0.0,
+          "risk_measure": "DECLARED_NOMINAL_RISK_UTILISATION",
+          "same_instrument_conflict_rule": "PRIORITY",
+          "schema": "hydra_active_risk_pool_policy_v1",
+          "static_risk_tier": 1.0,
+          "structural_fingerprint": "7b0377ad55fb9cc7b82d63d9f9ab69fe12fb5cce71337a0d7a117bb4c3de4e88",
+          "target_protection_distance": 0.0,
+          "target_protection_mode": "NONE"
+        },
+        "pnl_state_profile": {
+          "base_multiplier": 1.0,
+          "consistency_headroom_fraction": 0.0,
+          "consistency_multiplier": 1.0,
+          "intraday_loss_fraction_of_mll": 0.0,
+          "loss_multiplier": 1.0,
+          "low_buffer_fraction": 0.0,
+          "profile_id": "pnl_state_identity",
+          "progress_step_1": 1.0,
+          "progress_step_1_multiplier": 1.0,
+          "progress_step_2": 1.0,
+          "progress_step_2_multiplier": 1.0,
+          "schema": "hydra_pnl_state_sizing_profile_v1",
+          "target_protection_fraction": 0.0,
+          "target_protection_multiplier": 1.0
+        },
+        "signal_or_trade_logic_mutated": false
+      },
+      "executable_spec_hash": "a72d4ff337929255d7cf8d0a1d5964e3d95b0267ad42a7eefd8cffd0ecc4499e",
+      "headline_horizon_trading_days": 10,
+      "promotion_status": null,
+      "signal_entry_exit_stop_target_mutated": false,
+      "source_kind": "EXACT_STANDALONE",
+      "status_before_confirmation": "DEVELOPMENT_REQUALIFIED"
+    },
+    {
+      "account_label": "50K",
+      "behavior_cluster_id": "w2019_exact_8b04b86a7b5b9704",
+      "behavior_hash": "8b04b86a7b5b97049cab40dd9c04979800a362d6cd39e379210c8743d2788d5a",
+      "candidate_freeze_hash": "ec696bd62d8cd99ab760dea50dad1df395d81584cbde4e975cf227c347730498",
+      "candidate_id": "hazard_0c503c8ed692e7a3b49684f2",
+      "component_ids": [
+        "hazard_0c503c8ed692e7a3b49684f2"
+      ],
+      "confirmation_rank": 3,
+      "development_result_hash": "0f1e0cd09622e1460aeddc9afb75318278d4c5849c0833b52294a32cbfc6a6aa",
+      "development_selected_cell_hash": "37b26ea67491f1bd3186d155796b722f703bed00a116a8fcab4898f8a30be778",
+      "executable_spec": {
+        "component_ids": [
+          "hazard_0c503c8ed692e7a3b49684f2"
+        ],
+        "component_priority": [
+          "hazard_0c503c8ed692e7a3b49684f2"
+        ],
+        "component_quantity_tiers": {
+          "hazard_0c503c8ed692e7a3b49684f2": 3
+        },
+        "configuration_id": "hazard_0c503c8ed692e7a3b49684f2",
+        "frozen_account_policy": {
+          "actual_stop_risk_available": false,
+          "aggregate_open_risk_ceiling": 2000.0,
+          "component_priority": [
+            "hazard_0c503c8ed692e7a3b49684f2"
+          ],
+          "concurrency_scaling": "PRIORITY",
+          "daily_consistency_profit_guard": 3000.0,
+          "daily_loss_guard": 2000.0,
+          "future_outcome_fields_used": false,
+          "maximum_concurrent_sleeves": 1,
+          "maximum_mini_equivalent": 5.0,
+          "maximum_mll_buffer_fraction": 1.0,
+          "nominal_risk_charge_per_mini": {
+            "hazard_0c503c8ed692e7a3b49684f2": 1624.4240077799213
+          },
+          "outbound_order_capability": false,
+          "policy_id": "exact-0029:hazard_0c503c8ed692e7a3b49684f2:50000:3:CAUSAL_STATIC_STOP_RISK_GOVERNOR",
+          "policy_version": "hydra_active_risk_pool_governor_v1",
+          "preserve_sole_sleeve_nominal_risk": true,
+          "protected_mll_buffer": 0.0,
+          "risk_measure": "DECLARED_NOMINAL_RISK_UTILISATION",
+          "same_instrument_conflict_rule": "PRIORITY",
+          "schema": "hydra_active_risk_pool_policy_v1",
+          "static_risk_tier": 1.0,
+          "structural_fingerprint": "c8e34259685b704b7889fdd86da30a078cba6f805a0cd61848d734c465051dee",
+          "target_protection_distance": 0.0,
+          "target_protection_mode": "NONE"
+        },
+        "pnl_state_profile": {
+          "base_multiplier": 1.0,
+          "consistency_headroom_fraction": 0.0,
+          "consistency_multiplier": 1.0,
+          "intraday_loss_fraction_of_mll": 0.0,
+          "loss_multiplier": 1.0,
+          "low_buffer_fraction": 0.0,
+          "profile_id": "pnl_state_identity",
+          "progress_step_1": 1.0,
+          "progress_step_1_multiplier": 1.0,
+          "progress_step_2": 1.0,
+          "progress_step_2_multiplier": 1.0,
+          "schema": "hydra_pnl_state_sizing_profile_v1",
+          "target_protection_fraction": 0.0,
+          "target_protection_multiplier": 1.0
+        },
+        "signal_or_trade_logic_mutated": false
+      },
+      "executable_spec_hash": "a29e8b7415519c97093052566c95169dda318d2cb30508306378c81b7bd3ebd5",
+      "headline_horizon_trading_days": 20,
+      "promotion_status": null,
+      "signal_entry_exit_stop_target_mutated": false,
+      "source_kind": "EXACT_STANDALONE",
+      "status_before_confirmation": "DEVELOPMENT_REQUALIFIED"
+    },
+    {
+      "account_label": "150K",
+      "behavior_cluster_id": "w2019_pair_fb2f389eca543987",
+      "behavior_hash": "fb2f389eca54398717534a17da82292aa0a012575c10477a3e7a9223948a201a",
+      "candidate_freeze_hash": "f48436d6e47f216119867fdef5175257180f048a4473e92ef5ed29925208c4e2",
+      "candidate_id": "w2019_pair_d802eee6d824a0d718560451",
+      "component_ids": [
+        "hazard_0df449d78eadc5bce054eb2c",
+        "hazard_2a34338b0805cd6e21bd2a00"
+      ],
+      "confirmation_rank": 4,
+      "development_result_hash": "063da64fa5e8644089c1461c8b14c4890fbdf55fa1eee6ad951f8e4e49bfd274",
+      "development_selected_cell_hash": "e74d2bad336e1dd8e9f3540951b6386f388081b09988f6e7dd708b74828eec18",
+      "executable_spec": {
+        "account_label": "150K",
+        "availability_component_ids": [
+          "hazard_0df449d78eadc5bce054eb2c",
+          "hazard_2a34338b0805cd6e21bd2a00"
+        ],
+        "book_static_risk_tier": 1.0,
+        "comparison_pair_context_hash": "bc0bf472536cd4382a3e77864e45f6c6986f2dbe9f9fe2ea3a957f7441d060fb",
+        "comparison_pair_members": [
+          "hazard_0df449d78eadc5bce054eb2c",
+          "hazard_2a34338b0805cd6e21bd2a00"
+        ],
+        "component_ids": [
+          "hazard_0df449d78eadc5bce054eb2c",
+          "hazard_2a34338b0805cd6e21bd2a00"
+        ],
+        "component_nominal_risk_charges": {
+          "hazard_0df449d78eadc5bce054eb2c": 1463.0035335891102,
+          "hazard_2a34338b0805cd6e21bd2a00": 2110.2210689825665
+        },
+        "component_priority": [
+          "hazard_0df449d78eadc5bce054eb2c",
+          "hazard_2a34338b0805cd6e21bd2a00"
+        ],
+        "component_quantity_tiers": {
+          "hazard_0df449d78eadc5bce054eb2c": 2,
+          "hazard_2a34338b0805cd6e21bd2a00": 3
+        },
+        "governor_profile": {
+          "daily_loss_budget_fraction": 0.25,
+          "daily_profit_lock_fraction": 0.5,
+          "maximum_concurrent_sleeves": 3,
+          "open_risk_ceiling_fraction": 0.75,
+          "profile_id": "fast_pass_governor_03",
+          "same_instrument_conflict_policy": "priority",
+          "signal_quality_tiers": [
+            0.0,
+            0.5,
+            1.0,
+            1.5,
+            2.0
+          ],
+          "target_protection_fraction": 0.8
+        },
+        "maximum_mini_equivalent": 15.0,
+        "pnl_state_profile_id": "pnl_state_identity",
+        "policy_id": "w2019_pair_d802eee6d824a0d718560451",
+        "policy_role": "PAIR",
+        "policy_spec_hash": "d802eee6d824a0d71856045159f8a8f49bd71a347a5c5e4e0f8b0ccb7a792d37",
+        "signal_or_trade_logic_mutated": false
+      },
+      "executable_spec_hash": "d802eee6d824a0d71856045159f8a8f49bd71a347a5c5e4e0f8b0ccb7a792d37",
+      "headline_horizon_trading_days": 20,
+      "promotion_status": null,
+      "signal_entry_exit_stop_target_mutated": false,
+      "source_kind": "MARGINALLY_ACCEPTED_PAIR",
+      "status_before_confirmation": "DEVELOPMENT_REQUALIFIED"
+    },
+    {
+      "account_label": "50K",
+      "behavior_cluster_id": "w2019_pair_85d16dfd44fe3ad5",
+      "behavior_hash": "85d16dfd44fe3ad51ee4306b5ae2adc413214c30be0a065bffa5f9ad02c7fd93",
+      "candidate_freeze_hash": "7722c58e462cc7f6d12536420564a4fb5e877d8ebd2b4acd8866db893fe0f459",
+      "candidate_id": "w2019_pair_40da198691f99a0f3d09eb1f",
+      "component_ids": [
+        "hazard_207180dadb3a6283f951dce7",
+        "hazard_0e4181808737ad6e9c8593ed"
+      ],
+      "confirmation_rank": 5,
+      "development_result_hash": "e2f70568f7dac944252ca4021720ef60fefd6107ba426c9f46f83a6cfd1c5f68",
+      "development_selected_cell_hash": "42e3092292e17371a5726f90522fc33b0ba2bbc9ca72adf2aa48723490b6cbe6",
+      "executable_spec": {
+        "account_label": "50K",
+        "availability_component_ids": [
+          "hazard_207180dadb3a6283f951dce7",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "book_static_risk_tier": 1.0,
+        "comparison_pair_context_hash": "2f8a161902c87ba8505e744bec62500bc69f52fa45a332fecd7370a70dea6dd3",
+        "comparison_pair_members": [
+          "hazard_207180dadb3a6283f951dce7",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "component_ids": [
+          "hazard_207180dadb3a6283f951dce7",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "component_nominal_risk_charges": {
+          "hazard_0e4181808737ad6e9c8593ed": 865.2298242249161,
+          "hazard_207180dadb3a6283f951dce7": 1e-06
+        },
+        "component_priority": [
+          "hazard_207180dadb3a6283f951dce7",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "component_quantity_tiers": {
+          "hazard_0e4181808737ad6e9c8593ed": 3,
+          "hazard_207180dadb3a6283f951dce7": 4
+        },
+        "governor_profile": {
+          "daily_loss_budget_fraction": 0.25,
+          "daily_profit_lock_fraction": 0.5,
+          "maximum_concurrent_sleeves": 3,
+          "open_risk_ceiling_fraction": 0.75,
+          "profile_id": "fast_pass_governor_03",
+          "same_instrument_conflict_policy": "priority",
+          "signal_quality_tiers": [
+            0.0,
+            0.5,
+            1.0,
+            1.5,
+            2.0
+          ],
+          "target_protection_fraction": 0.8
+        },
+        "maximum_mini_equivalent": 5.0,
+        "pnl_state_profile_id": "pnl_state_identity",
+        "policy_id": "w2019_pair_40da198691f99a0f3d09eb1f",
+        "policy_role": "PAIR",
+        "policy_spec_hash": "40da198691f99a0f3d09eb1f51ca41490eb3dd1b811150ae7a8c3a6448427e42",
+        "signal_or_trade_logic_mutated": false
+      },
+      "executable_spec_hash": "40da198691f99a0f3d09eb1f51ca41490eb3dd1b811150ae7a8c3a6448427e42",
+      "headline_horizon_trading_days": 20,
+      "promotion_status": null,
+      "signal_entry_exit_stop_target_mutated": false,
+      "source_kind": "MARGINALLY_ACCEPTED_PAIR",
+      "status_before_confirmation": "DEVELOPMENT_REQUALIFIED"
+    },
+    {
+      "account_label": "150K",
+      "behavior_cluster_id": "w2019_pair_930b66ce1bc33332",
+      "behavior_hash": "930b66ce1bc3333252a2c28670ce54b2ce96c520ca66ad45c0fbad988b06af4b",
+      "candidate_freeze_hash": "f93c4d3a16a97d4fa819201bc2d472c4e9ab03913d5eb5e6ff8f6919ac30b076",
+      "candidate_id": "w2019_pair_f5059f81e516c64891094ec1",
+      "component_ids": [
+        "hazard_09ee35bc24190bb213469e6a",
+        "hazard_0e4181808737ad6e9c8593ed"
+      ],
+      "confirmation_rank": 6,
+      "development_result_hash": "b67e21b08fd6111b15bdeca04bb79d2653f3c8d0d0e5c79814c81d3a45e54811",
+      "development_selected_cell_hash": "6082ef70ba940810571d6d791d230ce93272a288bf44c0cde0f71e6bb91d4a18",
+      "executable_spec": {
+        "account_label": "150K",
+        "availability_component_ids": [
+          "hazard_09ee35bc24190bb213469e6a",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "book_static_risk_tier": 1.0,
+        "comparison_pair_context_hash": "f6ab0e0af3ac2207e81f8a753217576f591b81ed7e54dd492e5c69c4743599a9",
+        "comparison_pair_members": [
+          "hazard_09ee35bc24190bb213469e6a",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "component_ids": [
+          "hazard_09ee35bc24190bb213469e6a",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "component_nominal_risk_charges": {
+          "hazard_09ee35bc24190bb213469e6a": 1624.4240077799213,
+          "hazard_0e4181808737ad6e9c8593ed": 865.2298242249161
+        },
+        "component_priority": [
+          "hazard_09ee35bc24190bb213469e6a",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "component_quantity_tiers": {
+          "hazard_09ee35bc24190bb213469e6a": 3,
+          "hazard_0e4181808737ad6e9c8593ed": 3
+        },
+        "governor_profile": {
+          "daily_loss_budget_fraction": 0.25,
+          "daily_profit_lock_fraction": 0.5,
+          "maximum_concurrent_sleeves": 3,
+          "open_risk_ceiling_fraction": 0.75,
+          "profile_id": "fast_pass_governor_03",
+          "same_instrument_conflict_policy": "priority",
+          "signal_quality_tiers": [
+            0.0,
+            0.5,
+            1.0,
+            1.5,
+            2.0
+          ],
+          "target_protection_fraction": 0.8
+        },
+        "maximum_mini_equivalent": 15.0,
+        "pnl_state_profile_id": "pnl_state_identity",
+        "policy_id": "w2019_pair_f5059f81e516c64891094ec1",
+        "policy_role": "PAIR",
+        "policy_spec_hash": "f5059f81e516c64891094ec1754b037b1326f7b1a348a879dca07333bc966519",
+        "signal_or_trade_logic_mutated": false
+      },
+      "executable_spec_hash": "f5059f81e516c64891094ec1754b037b1326f7b1a348a879dca07333bc966519",
+      "headline_horizon_trading_days": 20,
+      "promotion_status": null,
+      "signal_entry_exit_stop_target_mutated": false,
+      "source_kind": "MARGINALLY_ACCEPTED_PAIR",
+      "status_before_confirmation": "DEVELOPMENT_REQUALIFIED"
+    },
+    {
+      "account_label": "100K",
+      "behavior_cluster_id": "w2019_pair_c82dbcc904dc95e8",
+      "behavior_hash": "c82dbcc904dc95e8354a8c9e2444bec7a6450dfb6beb388679638e3b6f552d20",
+      "candidate_freeze_hash": "8cd631218d9db9cb00232be20d5337da1aac232831501622246a47a5966fd5c6",
+      "candidate_id": "w2019_pair_9dabd048a7eb7318091b6e2b",
+      "component_ids": [
+        "hazard_0df449d78eadc5bce054eb2c",
+        "hazard_0e4181808737ad6e9c8593ed"
+      ],
+      "confirmation_rank": 7,
+      "development_result_hash": "ee89e4f3446656058ce16c26af148e6146b75674e23be90c4116ee9126def92f",
+      "development_selected_cell_hash": "048a31ce4cea60f30e6efc1acd7b915eab3d4c776d036f2c6a3de5c56427fc67",
+      "executable_spec": {
+        "account_label": "100K",
+        "availability_component_ids": [
+          "hazard_0df449d78eadc5bce054eb2c",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "book_static_risk_tier": 1.0,
+        "comparison_pair_context_hash": "8bb4a5bafd585fab59821792ad43798bd6eca87f7cb23e46b4f8062abd589d65",
+        "comparison_pair_members": [
+          "hazard_0df449d78eadc5bce054eb2c",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "component_ids": [
+          "hazard_0df449d78eadc5bce054eb2c",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "component_nominal_risk_charges": {
+          "hazard_0df449d78eadc5bce054eb2c": 1463.0035335891102,
+          "hazard_0e4181808737ad6e9c8593ed": 865.2298242249161
+        },
+        "component_priority": [
+          "hazard_0df449d78eadc5bce054eb2c",
+          "hazard_0e4181808737ad6e9c8593ed"
+        ],
+        "component_quantity_tiers": {
+          "hazard_0df449d78eadc5bce054eb2c": 2,
+          "hazard_0e4181808737ad6e9c8593ed": 3
+        },
+        "governor_profile": {
+          "daily_loss_budget_fraction": 0.25,
+          "daily_profit_lock_fraction": 0.5,
+          "maximum_concurrent_sleeves": 3,
+          "open_risk_ceiling_fraction": 0.75,
+          "profile_id": "fast_pass_governor_03",
+          "same_instrument_conflict_policy": "priority",
+          "signal_quality_tiers": [
+            0.0,
+            0.5,
+            1.0,
+            1.5,
+            2.0
+          ],
+          "target_protection_fraction": 0.8
+        },
+        "maximum_mini_equivalent": 10.0,
+        "pnl_state_profile_id": "pnl_state_identity",
+        "policy_id": "w2019_pair_9dabd048a7eb7318091b6e2b",
+        "policy_role": "PAIR",
+        "policy_spec_hash": "9dabd048a7eb7318091b6e2bfba4fd9164888084307314dfaf5697388885d3e0",
+        "signal_or_trade_logic_mutated": false
+      },
+      "executable_spec_hash": "9dabd048a7eb7318091b6e2bfba4fd9164888084307314dfaf5697388885d3e0",
+      "headline_horizon_trading_days": 20,
+      "promotion_status": null,
+      "signal_entry_exit_stop_target_mutated": false,
+      "source_kind": "MARGINALLY_ACCEPTED_PAIR",
+      "status_before_confirmation": "DEVELOPMENT_REQUALIFIED"
+    }
+  ],
+  "contract_hash": "cf0eb8e7dbdd66fbbbe8b111bd749846cc704d970f6d0c06cd07e2f0762b8ab7",
+  "data_purchase_count_at_freeze": 0,
+  "data_role": "CONFIRMATION",
+  "decision_rule": {
+    "confirmed_pass_requirements": [
+      "AT_LEAST_ONE_NORMAL_PASS",
+      "AT_LEAST_ONE_STRESSED_PASS",
+      "POSITIVE_STRESSED_NET",
+      "ZERO_MLL_BREACH_NORMAL_AND_STRESSED",
+      "ALL_PASSING_PATHS_CONSISTENCY_COMPLIANT"
+    ],
+    "failure": "CANDIDATE_CONFIRMATION_FAILED_NO_RETUNING_ON_W2018",
+    "positive_replication_without_pass": "REMAINS_DEVELOPMENT_REQUALIFIED_NO_TIER_C_CLAIM",
+    "stress_does_not_erase_a_valid_normal_pass_but_controls_PROMOTION": true
+  },
+  "evaluation": {
+    "candidate_logic_and_risk_immutable": true,
+    "complete_non_overlapping_starts_only": true,
+    "headline_horizon_is_candidate_specific_and_frozen": true,
+    "horizons_trading_days": [
+      5,
+      10,
+      20
+    ],
+    "scenarios": [
+      "NORMAL",
+      "STRESSED_1_5X"
+    ],
+    "single_evaluation_no_retuning": true
+  },
+  "next_action": "ACQUIRE_OR_BIND_W2018H1_ONCE_WITHIN_AUTHORITY_THEN_RUN_EXACT_CONFIRMATION_WITHOUT_RETUNING",
+  "orders": 0,
+  "promotion_status": null,
+  "q4_access_count_delta": 0,
+  "required_execution_markets": [
+    "MCL",
+    "MNQ"
+  ],
+  "required_markets": [
+    "CL",
+    "NQ"
+  ],
+  "schema": "hydra_cross_era_marginal_pair_builder_2019h1_v1_w2018h1_confirmation_contract",
+  "source_combined_cohort_hash": "6d06535d8ba7e226ad901b6e0d9f78ea53522b914679b29a8b6364ede0feb049",
+  "source_pair_result_hash": "1558c4c42d0b794666485b06a00984d1ff84f46e88ea945d85cec32ccca24afd",
+  "status": "W2018H1_ONE_SHOT_CONFIRMATION_CONTRACT_FROZEN_DATA_UNOPENED",
+  "w2018_bar_access_count_at_freeze": 0,
+  "window": {
+    "end_exclusive": "2018-07-02",
+    "previous_candidate_outcome_access_count": 0,
+    "q4_overlap": false,
+    "role_frozen_before_bar_access": true,
+    "start_inclusive": "2018-01-02",
+    "window_id": "W2018H1"
+  },
+  "xfa_paths_started": 0
+}

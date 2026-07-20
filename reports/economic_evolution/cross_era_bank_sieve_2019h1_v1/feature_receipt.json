@@ -1,0 +1,48 @@
+{
+  "bundles": {
+    "CL": {
+      "bundle_hash": "69df4ea9ec5188c036f6a5022fa7d569b21ba6f770e6d226be21af8a639f2d6d",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/reports/economic_evolution/cross_era_bank_sieve_2019h1_v1/feature_matrices/916cae6d2da47012635a4686c2d5dce3ae06409d57002e610c0bbd5b6d668047",
+      "row_count": 133310
+    },
+    "ES": {
+      "bundle_hash": "bdfa2956ba9ec223c9725c07abf984fb7be75b101ade3171748b4d599052150e",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/reports/economic_evolution/cross_era_bank_sieve_2019h1_v1/feature_matrices/07397cf6427d55971308fc1fc2788910de7b759520cf4e7c0bd9500e86f03741",
+      "row_count": 158617
+    },
+    "NQ": {
+      "bundle_hash": "77b89a9e1da31f5c85f71a394b88e3e3b7b004a6de4237e1898d238081a06c66",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/reports/economic_evolution/cross_era_bank_sieve_2019h1_v1/feature_matrices/852befcae284ed8b7205370ff70f27c7ca9656991212e5dda5dbb4ceff5fd71b",
+      "row_count": 158743
+    },
+    "RTY": {
+      "bundle_hash": "11417edfaf02cfe813ea042bfdecd304ab54b971de3cf1f1c782e93a5a573d82",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/reports/economic_evolution/cross_era_bank_sieve_2019h1_v1/feature_matrices/df3b4ae5658d9b9536405c2ecb299bc48b03e1212c16711db1e64b51f80f7766",
+      "row_count": 147500
+    },
+    "YM": {
+      "bundle_hash": "01d283eb912cb49e8896ca49a55ab3579fce4dd9123e3652dc6723afc19e316c",
+      "cache_hit": false,
+      "path": "/root/hydra-bot/reports/economic_evolution/cross_era_bank_sieve_2019h1_v1/feature_matrices/1cb8b227a0c3ab501b70147b050b2303b24a9e789066ebca1c901fa647da1d5c",
+      "row_count": 158275
+    }
+  },
+  "contract_hash": "e8f4b05f1b9bff54be1248c83efabc3d544da7b367ea7f5570ddd1730f1674c5",
+  "data_role": "VIEWED_DEVELOPMENT",
+  "future_outcome_arrays_in_decision_bundle": false,
+  "map_guard": {
+    "explicit_contract_count": 19,
+    "unmapped_contract_rows_excluded": 0,
+    "unsafe_roll_rows_excluded": 78397
+  },
+  "market_count": 5,
+  "new_purchase": false,
+  "q4_access_count_delta": 0,
+  "result_hash": "6b034b8c6c040d6d535d61627da61032634cb05b524c3e93ded69c95f869d28c",
+  "schema": "hydra_cross_era_bank_sieve_2019h1_v1_feature_receipt",
+  "status": "W2019H1_CAUSAL_FEATURE_BUNDLES_READY"
+}
