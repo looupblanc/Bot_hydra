@@ -5,6 +5,7 @@ from copy import deepcopy
 import pytest
 
 from hydra.economic_evolution.schema import stable_hash
+from hydra.production import autonomous_combine_candidate_bank as candidate_bank
 from hydra.production.autonomous_combine_candidate_bank import (
     CONCENTRATION_RECEIPT_SCHEMA,
     AutonomousCombineCandidateBankError,
@@ -159,6 +160,10 @@ def _cell(
         "account_size_usd": 50_000,
         "integer_quantity_tier": 3,
         "risk_governor_mode": "CAUSAL_STATIC_STOP_RISK_GOVERNOR",
+        "declared_stop_risk_charge_per_mini_usd": 463.02,
+        "account_policy": {
+            "nominal_risk_charge_per_mini": {"candidate": 463.02},
+        },
         "horizon_trading_days": 10,
         "full_coverage_start_count": 20,
         "data_censored_start_count": 0,
@@ -168,6 +173,21 @@ def _cell(
         "normal": _scenario("normal", normal_passes, block_passes),
         "stressed": _scenario("stressed", stressed_passes, block_passes),
     }
+
+
+def test_epsilon_risk_cell_cannot_enter_tier_q() -> None:
+    candidate_id = "epsilon-risk"
+    cell = _cell(
+        normal_passes=3,
+        stressed_passes=3,
+        block_passes={"B1": 1, "B2": 1},
+    )
+    cell["risk_governor_mode"] = "CONTRACT_ONLY_UNIFORM_SCALE"
+    cell["declared_stop_risk_charge_per_mini_usd"] = 1e-6
+    cell["account_policy"] = {
+        "nominal_risk_charge_per_mini": {candidate_id: 1e-6},
+    }
+    assert candidate_bank._cell_causal_risk_charge_valid(cell) is False
 
 
 def _scenario(

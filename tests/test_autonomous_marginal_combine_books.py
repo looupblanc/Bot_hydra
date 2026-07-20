@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
@@ -93,6 +94,30 @@ def test_g_ready_reads_heldout_not_design() -> None:
     assert books._g_ready_gates(compact)[
         "stressed_5d_pass_rate_at_least_2pct"
     ] is False
+
+
+def test_identity_profile_never_substitutes_epsilon_stop_risk() -> None:
+    component = _component("contract-only", account="50K")
+    component = replace(
+        component,
+        source_governor_mode="CONTRACT_ONLY_UNIFORM_SCALE",
+        declared_risk_charge_per_mini=463.02,
+    )
+    context = _context({"contract-only": component})
+    spec = books._policy_spec(
+        account_label="50K",
+        members=("contract-only",),
+        components=context.components,
+        profile=books._identity_profile(),
+        policy_role="STANDALONE",
+        predecessor_policy_id=None,
+    )
+
+    policy = books._active_policy(spec, context)
+
+    assert dict(policy.nominal_risk_charge_per_mini)["contract-only"] == pytest.approx(
+        463.02
+    )
 
 
 def test_g_gate_uses_passing_path_consistency_not_timeout_ratio() -> None:

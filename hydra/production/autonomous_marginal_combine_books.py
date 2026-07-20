@@ -66,6 +66,10 @@ from hydra.production.autonomous_exact_replay import (
     _require_scenario_identity,
 )
 from hydra.production.causal_risk_preflight import scale_causal_trajectory
+from hydra.production.causal_risk_charge import (
+    RISK_CHARGE_CONTRACT,
+    require_causal_stop_risk_charge,
+)
 from hydra.production.fast_pass_runtime_helpers import (
     _book_component_key,
     _governor_profiles,
@@ -1251,6 +1255,7 @@ def _policy_spec(
             value: str(components[value].source_governor_mode)
             for value in component_ids
         },
+        "risk_charge_contract": RISK_CHARGE_CONTRACT,
         "governor_profile": asdict(profile),
         "quantity_tiers_materialized_before_book_replay": True,
         "book_static_risk_tier": 1.0,
@@ -1282,13 +1287,10 @@ def _active_policy(
     charges = []
     for value in members:
         component = context.components[value]
-        charge = float(component.declared_risk_charge_per_mini)
-        if (
-            identity
-            and component.source_governor_mode
-            == "CONTRACT_ONLY_UNIFORM_SCALE"
-        ):
-            charge = 1e-6
+        charge = require_causal_stop_risk_charge(
+            component.declared_risk_charge_per_mini,
+            governor_mode=component.source_governor_mode,
+        )
         charges.append((value, charge))
     return ActiveRiskPoolPolicy(
         policy_id=str(spec["policy_id"]),

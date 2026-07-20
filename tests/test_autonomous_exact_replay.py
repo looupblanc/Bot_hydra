@@ -343,6 +343,11 @@ def test_exact_race_replays_both_scenarios_without_writing(
         and cell["stressed"]["size_reduced_count"] == 0
         for cell in result["results"][0]["frontier"]
     )
+    assert all(
+        min(cell["account_policy"]["nominal_risk_charge_per_mini"].values())
+        >= 1.0
+        for cell in result["results"][0]["frontier"]
+    )
 
 
 def _trajectory(candidate_id: str, *, scenario: str, net: float) -> CausalTradeTrajectory:

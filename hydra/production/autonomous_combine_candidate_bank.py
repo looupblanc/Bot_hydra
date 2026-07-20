@@ -232,6 +232,7 @@ def _classify_candidate(
         and value.get("legally_executable") is True
         and value.get("account_rule_compliant") is True
         and int(value.get("hard_compliance_failure_count", 0)) == 0
+        and _cell_causal_risk_charge_valid(value)
         and isinstance(value.get("normal"), Mapping)
         and isinstance(value.get("stressed"), Mapping)
     ]
@@ -365,6 +366,26 @@ def _cell_account_paths_complete(cell: Mapping[str, Any]) -> bool:
         and bool(dict(cell.get(scenario) or {}).get("episode_path_hash"))
         for scenario in ("normal", "stressed")
     )
+
+
+def _cell_causal_risk_charge_valid(cell: Mapping[str, Any]) -> bool:
+    """Reject legacy account cells whose governor used an epsilon identity risk."""
+
+    try:
+        declared = float(cell.get("declared_stop_risk_charge_per_mini_usd"))
+        policy = dict(cell.get("account_policy") or {})
+        charges = dict(policy.get("nominal_risk_charge_per_mini") or {})
+        return bool(
+            math.isfinite(declared)
+            and declared >= 1.0
+            and charges
+            and all(
+                math.isfinite(float(value)) and float(value) >= 1.0
+                for value in charges.values()
+            )
+        )
+    except (TypeError, ValueError):
+        return False
 
 
 def _cell_rank(cell: Mapping[str, Any] | None) -> tuple[Any, ...]:

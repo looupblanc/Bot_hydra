@@ -43,6 +43,10 @@ from hydra.evidence.causal_target_velocity_adapter import (
 )
 from hydra.markets.instruments import instrument_spec
 from hydra.production.causal_risk_preflight import scale_causal_trajectory
+from hydra.production.causal_risk_charge import (
+    RISK_CHARGE_CONTRACT,
+    require_causal_stop_risk_charge,
+)
 from hydra.propfirm.combine_episode import CombineTerminal
 from hydra.propfirm.scaling_plan import mini_equivalent
 from hydra.propfirm.topstep_150k import Topstep150KConfig
@@ -237,10 +241,9 @@ def run_exact_0029_account_size_race(
                                 )
                             )
                         continue
-                    policy_charge = (
-                        1e-6
-                        if governor_mode == "CONTRACT_ONLY_UNIFORM_SCALE"
-                        else declared_risk_charge
+                    policy_charge = require_causal_stop_risk_charge(
+                        declared_risk_charge,
+                        governor_mode=governor_mode,
                     )
                     policy = _standalone_policy(
                         candidate_id,
@@ -333,6 +336,7 @@ def run_exact_0029_account_size_race(
         },
         "integer_risk_frontier": list(tiers),
         "risk_governor_modes": list(RISK_GOVERNOR_MODES),
+        "risk_charge_contract": RISK_CHARGE_CONTRACT,
         "results": results,
         "best_exact_frontier_point": best,
         "counters": {
@@ -716,6 +720,7 @@ def _exact_cell(
         "maximum_scaled_mini_equivalent": maximum_mini,
         "maximum_mini_contracts": float(account_contract_limit),
         "declared_stop_risk_charge_per_mini_usd": float(declared_risk_charge),
+        "risk_charge_contract": RISK_CHARGE_CONTRACT,
         "risk_governor_mode": governor_mode,
         "account_policy": policy.to_dict(),
         "legally_executable": True,

@@ -49,6 +49,7 @@ from hydra.production.autonomous_exact_replay import (
     _summarize_exact_episodes,
 )
 from hydra.production.causal_risk_preflight import scale_causal_trajectory
+from hydra.production.causal_risk_charge import require_causal_stop_risk_charge
 from hydra.research.causal_sleeve_replay import (
     CausalTradeMark,
     CausalTradeTrajectory,
@@ -483,10 +484,9 @@ def _prepare_candidate(
     )
     _require_scenario_identity(scaled_normal, scaled_stressed)
     declared_risk = _declared_stop_risk_charge_per_mini(events, entry["candidate"])
-    risk_charge = (
-        1e-6
-        if str(cell["risk_governor_mode"]) == "CONTRACT_ONLY_UNIFORM_SCALE"
-        else declared_risk
+    risk_charge = require_causal_stop_risk_charge(
+        declared_risk,
+        governor_mode=str(cell["risk_governor_mode"]),
     )
     rule = dict(rules[account_label])
     policy = _standalone_policy(
