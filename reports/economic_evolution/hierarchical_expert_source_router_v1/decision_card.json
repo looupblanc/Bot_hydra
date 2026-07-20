@@ -1,0 +1,32 @@
+{
+  "B4_access": false,
+  "advancement_gate": {
+    "maximum_B3_normal_mll_breach_rate": 0.1,
+    "minimum_B3_normal_passes": 1,
+    "minimum_B3_stressed_passes_advisory": 1,
+    "must_beat_at_least_one_matched_control": true,
+    "positive_B3_stressed_net": true
+  },
+  "data_purchase": false,
+  "decision_card_hash": "a7f9d4b05bb681bd00197ece3ff03b43f383e530822660d3d2d41f293a3fde5e",
+  "final_development_role": "B3_OPENED_ONCE",
+  "hypothesis": "A small behaviorally diverse source ecology selected with B1-only hierarchical economic shrinkage can route simultaneous causal signals into faster legal account paths than one expert, equal-risk pooling, or exposure-matched random priority.",
+  "missing_outcome_rule": "ACCEPTED_SIGNAL_MAKES_WINDOW_DATA_CENSORED",
+  "profile_selection_role": "B2_ONLY",
+  "promotion_eligible": false,
+  "q4_access": false,
+  "risk_tiers": [
+    0.5,
+    1.0,
+    1.5
+  ],
+  "schema": "hydra_hierarchical_expert_router_decision_card_v1",
+  "source_fit_role": "B1_ONLY",
+  "source_universe": "ALL_5000_STAGE2_CANDIDATES",
+  "top_k": 15,
+  "trade_budgets_per_session": [
+    2,
+    4,
+    8
+  ]
+}
