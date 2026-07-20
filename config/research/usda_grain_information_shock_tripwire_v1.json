@@ -1,0 +1,166 @@
+{
+  "schema": "hydra_usda_grain_information_shock_tripwire_manifest_v1",
+  "branch_id": "USDA_WASDE_GRAIN_INFORMATION_SHOCK_ZC_ZS_ZW_V1",
+  "hypothesis": "A scheduled USDA WASDE supply-and-demand information shock creates sufficiently large and persistent causal repricing in grain futures that a low-turnover response or rejection policy can remain positive after conservative costs across chronological eras.",
+  "strongest_argument_against": "The report surprise may be fully incorporated before a next-minute executable fill, while monthly frequency and the two-day consistency requirement may make the mechanism economically useful only as a component rather than a complete fast-Combine policy.",
+  "material_distinction": {
+    "broad_ohlcv": "Only official preregistered USDA WASDE timestamps are eligible; this is not another unrestricted bar grammar.",
+    "prior_macro_release": "Prior macro work targeted equity and rates reactions to CPI/FOMC. This branch tests physical crop supply-and-demand information in a previously unused CBOT grain ecology.",
+    "energy_inventory": "The EIA NG and petroleum inventory branches are tombstoned. This branch uses different products, information production, session structure and cross-grain response.",
+    "microstructure": "No MBO, order-flow or veto feature is used. Decisions use completed one-minute response bars and strictly prior ranges only."
+  },
+  "decision_card": {
+    "expected_value_of_information_per_compute_minute": 0.88,
+    "expected_economic_upside": 0.9,
+    "data_cost_risk": 0.23,
+    "implementation_cost": 0.2,
+    "overfitting_risk": 0.27,
+    "deployment_risk": 0.14,
+    "smallest_decisive_experiment": "Discovery-only cell selection across 47 official releases followed by unchanged 12-release validation and 21-release final-development; exact account replay opens only after both held-out roles and matched controls pass.",
+    "next_materially_distinct_alternative": "Volatility-event account policy with cross-asset survival routing, using no scheduled-release identity."
+  },
+  "official_sources": {
+    "usda_archive_url": "https://esmis.nal.usda.gov/publication/world-agricultural-supply-and-demand-estimates",
+    "archive_retrieved_at_utc": "2026-07-20T15:25:00Z",
+    "release_time_url": "https://www.usda.gov/about-usda/general-information/staff-offices/office-chief-economist/commodity-markets/wasde-report",
+    "release_time_contract": "12:00_PM_AMERICA_NEW_YORK",
+    "topstep_products_url": "https://help.topstep.com/en/articles/8284206-when-and-what-products-can-i-trade",
+    "topstep_fees_url": "https://help.topstep.com/en/articles/8284213-topstepx-commissions-and-fees",
+    "topstep_economic_releases_url": "https://help.topstep.com/en/articles/8284211-economic-releases",
+    "product_status": "ZC_ZS_ZW_PERMITTED",
+    "round_turn_commission_and_fees_usd": 5.28
+  },
+  "data_contract": {
+    "dataset": "GLBX.MDP3",
+    "symbols": ["ZC.c.0", "ZS.c.0", "ZW.c.0"],
+    "stype_in": "continuous",
+    "schemas": ["ohlcv-1m", "definition"],
+    "start": "2018-01-02",
+    "end_exclusive": "2024-10-01",
+    "q4_2024_access": false,
+    "official_estimates": {
+      "ohlcv-1m": {
+        "record_count": 3156358,
+        "billable_size_bytes": 176756048,
+        "estimated_cost_usd": 11.523182839155
+      },
+      "definition": {
+        "record_count": 6345,
+        "billable_size_bytes": 2284200,
+        "estimated_cost_usd": 0.003616455942
+      },
+      "total_record_count": 3162703,
+      "total_billable_size_bytes": 179040248,
+      "total_estimated_cost_usd": 11.526799295097
+    }
+  },
+  "frozen_inputs": {
+    "rule_snapshot": {
+      "path": "config/rulesets/topstep_official_2026-07-19.json",
+      "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+    }
+  },
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "start": "2018-01-02",
+      "end": "2022-01-01",
+      "candidate_modification_allowed": true,
+      "scheduled_release_count": 47
+    },
+    {
+      "role": "VALIDATION",
+      "start": "2022-01-01",
+      "end": "2023-01-01",
+      "candidate_modification_allowed": false,
+      "scheduled_release_count": 12
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "start": "2023-01-01",
+      "end": "2024-10-01",
+      "candidate_modification_allowed": false,
+      "scheduled_release_count": 21
+    }
+  ],
+  "release_contract": {
+    "timezone": "America/New_York",
+    "release_time": "12:00",
+    "calendar_labels_in_decision_features": false,
+    "release_timestamp_is_known_before_decision": true,
+    "archive_rule": "EARLIEST_OFFICIAL_RELEASE_PER_CALENDAR_MONTH; duplicate reposts excluded",
+    "release_dates": [
+      "2018-01-12", "2018-02-08", "2018-03-08", "2018-04-10", "2018-05-10", "2018-06-12", "2018-07-12", "2018-08-10", "2018-09-12", "2018-10-11", "2018-11-08", "2018-12-11",
+      "2019-02-08", "2019-03-08", "2019-04-09", "2019-05-10", "2019-06-11", "2019-07-11", "2019-08-12", "2019-09-12", "2019-10-10", "2019-11-08", "2019-12-10",
+      "2020-01-10", "2020-02-11", "2020-03-10", "2020-04-09", "2020-05-12", "2020-06-11", "2020-07-10", "2020-08-12", "2020-09-11", "2020-10-09", "2020-11-10", "2020-12-10",
+      "2021-01-12", "2021-02-09", "2021-03-09", "2021-04-09", "2021-05-12", "2021-06-10", "2021-07-12", "2021-08-12", "2021-09-10", "2021-10-12", "2021-11-09", "2021-12-09",
+      "2022-01-12", "2022-02-09", "2022-03-09", "2022-04-08", "2022-05-12", "2022-06-10", "2022-07-12", "2022-08-12", "2022-09-12", "2022-10-12", "2022-11-09", "2022-12-09",
+      "2023-01-12", "2023-02-08", "2023-03-08", "2023-04-11", "2023-05-12", "2023-06-09", "2023-07-12", "2023-08-11", "2023-09-12", "2023-10-12", "2023-11-09", "2023-12-08",
+      "2024-01-12", "2024-02-08", "2024-03-08", "2024-04-11", "2024-05-10", "2024-06-12", "2024-07-12", "2024-08-12", "2024-09-12"
+    ]
+  },
+  "causal_contract": {
+    "decision_features": "completed grain response bars after the known report plus strictly prior 30-minute market ranges and contemporaneously completed cross-grain response",
+    "available_at": "BAR_TIMESTAMP_PLUS_ONE_MINUTE",
+    "decision_time": "COMPLETION_OF_FROZEN_1_3_OR_5_BAR_RESPONSE_WINDOW",
+    "entry": "NEXT_TRADABLE_BAR_OPEN_STRICTLY_AFTER_DECISION",
+    "exit": "FIRST_CAUSAL_STOP_TARGET_OR_FROZEN_TIME_EXIT; SAME_BAR_STOP_FIRST",
+    "future_label_eligibility": false,
+    "backfill_allowed": false,
+    "roll_guard_sessions_each_side": 1,
+    "missing_interval": "DATA_CENSORED"
+  },
+  "candidate_lattice": {
+    "mechanisms": ["RESPONSE_CONTINUATION", "REJECTION_REVERSAL"],
+    "signal_modes": ["OWN_MARKET", "CROSS_GRAIN_BREADTH"],
+    "decision_bars": [1, 3, 5],
+    "minimum_response_to_prior_range": [0.5, 1.0, 1.5],
+    "holding_minutes": [5, 15, 30, 60],
+    "stop_prior_range_fraction": [0.5, 1.0],
+    "target_stop_multiple": [1.5, 3.0],
+    "execution_symbols": ["ZC", "ZS", "ZW"]
+  },
+  "execution": {
+    "instruments": {
+      "ZC": {"tick_size": 0.25, "tick_value_usd": 12.5, "point_value_usd": 50.0, "round_turn_commission_and_fees_usd": 5.28},
+      "ZS": {"tick_size": 0.25, "tick_value_usd": 12.5, "point_value_usd": 50.0, "round_turn_commission_and_fees_usd": 5.28},
+      "ZW": {"tick_size": 0.25, "tick_value_usd": 12.5, "point_value_usd": 50.0, "round_turn_commission_and_fees_usd": 5.28}
+    },
+    "normal_slippage_ticks_per_side": 1.0,
+    "stressed_slippage_ticks_per_side": 2.0,
+    "latency": "ONE_TO_FIVE_COMPLETE_MINUTE_RESPONSE_THEN_NEXT_TRADABLE_OPEN",
+    "session_flatten": "BEFORE_EARLIER_OF_PRODUCT_CLOSE_OR_15_10_AMERICA_CHICAGO"
+  },
+  "selection_gate": {
+    "selection_on_discovery_only": true,
+    "maximum_selected_cells": 16,
+    "minimum_discovery_events": 20,
+    "minimum_validation_events": 7,
+    "minimum_final_development_events": 12,
+    "positive_stressed_validation_required": true,
+    "positive_stressed_final_development_required": true,
+    "minimum_stressed_edge_to_cost_ratio": 1.25,
+    "maximum_single_event_profit_concentration": 0.35,
+    "controls": ["DIRECTION_FLIP", "NON_RELEASE_MONTH_MATCH"]
+  },
+  "account_gate": {
+    "run_only_after_selection_gate": true,
+    "account_sizes": ["50K", "100K", "150K"],
+    "horizons_trading_days": [5, 10, 20],
+    "quantity_frontier": [1, 2, 3, 5, 8, 10, 15],
+    "exact_mll_consistency_contract_limits_and_minimum_days": true
+  },
+  "governance": {
+    "evidence_role": "VIEWED_DEVELOPMENT_TRIPWIRE_ONLY",
+    "tier_ceiling": "E",
+    "promotion_allowed": false,
+    "q4_2024_access_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "xfa_allowed": false,
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "kill_branch_after_failed_gate": true
+  },
+  "manifest_hash": "b97792862a529849496b48bd5d6b26d28d2b31a3d7c956a36f10fb303e708f03"
+}

@@ -1,0 +1,72 @@
+{
+  "actual_incremental_spend_usd": 11.526799295097,
+  "broker_connections": 0,
+  "bundle_id": "781c6f4bd33b1a4ea984",
+  "cumulative_actual_after_usd": 179.74927547276397,
+  "cumulative_actual_before_usd": 168.22247617766698,
+  "download_status": "DOWNLOADED",
+  "files": [
+    {
+      "kind": "ohlcv-1m",
+      "path": "/root/hydra-bot/data/cache/databento/usda_grain_information_shock/781c6f4bd33b1a4ea984/raw_ohlcv.dbn.zst",
+      "sha256": "d822920c55888bce1750c60c880e5539f5570c09be3fd998b7b8e4a1da1bb3ca",
+      "size_bytes": 35984568
+    },
+    {
+      "kind": "definition",
+      "path": "/root/hydra-bot/data/cache/databento/usda_grain_information_shock/781c6f4bd33b1a4ea984/raw_definition.dbn.zst",
+      "sha256": "5d7a3528a91fa48840a58093c0e7bcade598278bcd523d57c3065e93c1f1e3de",
+      "size_bytes": 738009
+    }
+  ],
+  "manifest_hash": "b97792862a529849496b48bd5d6b26d28d2b31a3d7c956a36f10fb303e708f03",
+  "network": {
+    "definition": true,
+    "ohlcv-1m": true
+  },
+  "official_estimates": {
+    "definition": {
+      "billable_size_bytes": 2284200,
+      "estimated_cost_usd": 0.003616455942,
+      "record_count": 6345
+    },
+    "ohlcv-1m": {
+      "billable_size_bytes": 176756048,
+      "estimated_cost_usd": 11.523182839155,
+      "record_count": 3156358
+    }
+  },
+  "official_total_cost_usd": 11.526799295097,
+  "orders": 0,
+  "projected_actual_usd": 179.74927547276397,
+  "q4_access_count_delta": 0,
+  "receipt_hash": "81a646377a6307e24abad9fd07035f6a58e19abdb756332b5c547e30dd0071cd",
+  "remaining_after_usd": 20.971444450317016,
+  "requests": {
+    "definition": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "definition",
+      "start": "2018-01-02",
+      "stype_in": "continuous",
+      "symbols": [
+        "ZC.c.0",
+        "ZS.c.0",
+        "ZW.c.0"
+      ]
+    },
+    "ohlcv-1m": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "ohlcv-1m",
+      "start": "2018-01-02",
+      "stype_in": "continuous",
+      "symbols": [
+        "ZC.c.0",
+        "ZS.c.0",
+        "ZW.c.0"
+      ]
+    }
+  },
+  "schema": "hydra_usda_grain_information_shock_acquisition_receipt_v1"
+}
