@@ -1,0 +1,193 @@
+{
+  "schema": "hydra_autonomous_branch_decision_card_v1",
+  "decision_id": "V73_ES_EVENT_EXTREME_RECOVERY_SPEED_REVERSAL_20260720_V1",
+  "selected_branch": "V73_ES_EVENT_EXTREME_RECOVERY_SPEED_REVERSAL",
+  "evidence_role": "PREREGISTERED_PRE_Q4_DEVELOPMENT_TRIPWIRE",
+  "hypothesis": "An ES minute that breaches a causal 60-minute price extreme under unusually strong same-direction executed flow, but then recovers inside that extreme within one or two complete minutes while signed-flow magnitude decelerates, identifies rapid exhaustion. Entering the reversal only after recovery is observable can improve 10/20-day Combine trajectories relative to the earlier static five-minute extreme-rejection parent and matched nulls.",
+  "strongest_argument_against": "The apparent recovery may be ordinary high-frequency mean reversion, too sparse after strict causality, or too small after ES execution costs; the 2023/2024 behavior may also remain temporally unstable.",
+  "why_materially_distinct": {
+    "static_parent": "The terminal parent decided on a five-minute static rejection. This branch requires a separate breach state followed by an explicitly observed one-or-two-minute recovery-speed transition with decelerating flow.",
+    "mgc_rates_target_vol": "No rates source, cross-asset volatility trigger, OCO direction ambiguity, or MGC execution is used.",
+    "terminal_branch_resurrection": false,
+    "prior_execution_count": 0,
+    "prior_recommendation_source": "reports/v7_1/forensics/v71_mechanism_forensics_result.json"
+  },
+  "smallest_decisive_falsification_experiment": {
+    "mechanism_count": 1,
+    "holding_variants_minutes": [15, 30],
+    "direction_count": 2,
+    "account_size_count": 3,
+    "risk_fraction_count": 3,
+    "maximum_cpu_workers": 1,
+    "expected_implementation_minutes": [20, 30],
+    "expected_economic_runtime_minutes": [3, 8],
+    "data_cost_usd": 0.0
+  },
+  "frozen_inputs": {
+    "feature_manifest": {
+      "path": "data/manifests/v7_d1_date_matched_event_store_v1.json",
+      "sha256": "5c700f1ec38ab03a1206af7013a28600a681a0b3334781979b37ec356b5421ab"
+    },
+    "minute_print_store": {
+      "path": "data/cache/v7_d1/date_matched_minute_print_features_v2.parquet",
+      "sha256": "2bf13b332118392673247f5c564a3d1533d84c61177398e28a9832b3ca116cbb"
+    },
+    "event_store_integrity_binding": {
+      "path": "data/cache/v7_d1/date_matched_event_bars_v1.parquet",
+      "sha256": "ea0208fc3666f912b39e9b21b302a466bd7ee00c802140d6a6beed73098aa4a3",
+      "economic_decode_required": false
+    },
+    "rule_snapshot": {
+      "path": "config/rulesets/topstep_official_2026-07-19.json",
+      "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+    },
+    "cost_snapshot": {
+      "path": "config/v7/phase0_g0_preregistration.json",
+      "sha256": "0ef08acfa423f398b78eb944cd533efada48e7f605afa475006ddc845b5d33c6"
+    },
+    "static_parent_grammar": {
+      "path": "WORM/v7-d1-microstructure-grammar-0002-2026-07-12.json",
+      "sha256": "fac0b5166351940d1fde5334bdeaf846d56e56efc8cef9772a9599b8b86feee9"
+    }
+  },
+  "chronological_roles": {
+    "DISCOVERY": ["2023-08-02", "2023-09-01"],
+    "VALIDATION": ["2024-08-02", "2024-08-16"],
+    "FINAL_DEVELOPMENT": ["2024-08-16", "2024-09-01"]
+  },
+  "causal_contract": {
+    "execution_market": "ES",
+    "source_representation": "ONE_MINUTE_EXECUTED_PRINT_FEATURES",
+    "required_prior_complete_minutes": 60,
+    "prior_extreme_window_minutes": 60,
+    "flow_threshold": "ABS_SIGNED_AGGRESSOR_FRACTION_AT_OR_ABOVE_CAUSAL_PRIOR_60_MINUTE_Q75",
+    "upside_breach": "HIGH_ABOVE_PRIOR_HIGH_AND_POSITIVE_SIGNED_FLOW",
+    "downside_breach": "LOW_BELOW_PRIOR_LOW_AND_NEGATIVE_SIGNED_FLOW",
+    "recovery_deadlines_minutes": [1, 2],
+    "upside_recovery": "COMPLETED_RECOVERY_CLOSE_AT_OR_BELOW_FROZEN_PRIOR_HIGH",
+    "downside_recovery": "COMPLETED_RECOVERY_CLOSE_AT_OR_ABOVE_FROZEN_PRIOR_LOW",
+    "recovery_speed_filter": "ABS_RECOVERY_SIGNED_FLOW_FRACTION_STRICTLY_BELOW_ABS_BREACH_SIGNED_FLOW_FRACTION",
+    "decision_time": "MAX_SOURCE_CLOSE_AND_AVAILABILITY_OVER_PRIOR_60_MINUTES_PLUS_BREACH_PLUS_RECOVERY",
+    "entry": "FIRST_EXECUTED_TRADE_STRICTLY_AFTER_DECISION_IN_THE_NEXT_CONSECUTIVE_TRADABLE_MINUTE_USING_THAT_MINUTES_OPEN_PRICE",
+    "stop": "ONE_ES_TICK_BEYOND_FROZEN_BREACH_EXTREME",
+    "target_r_multiple": 2.0,
+    "holding_variants_minutes": [15, 30],
+    "time_exit": "NEXT_CONSECUTIVE_MINUTE_OPEN_AFTER_FROZEN_HOLDING_MINUTES",
+    "same_bar_stop_target_policy": "STOP_FIRST_CONSERVATIVE",
+    "session_timezone": "America/Chicago",
+    "evaluation_session_window_chicago": ["08:30", "15:10"],
+    "exact_observed_minutes_for_complete_session": 400,
+    "mandatory_flatten_local": "15:10",
+    "entry_deadline_policy": "DECISION_PLUS_MAXIMUM_HOLDING_MUST_NOT_EXCEED_MANDATORY_FLATTEN",
+    "same_contract_required": true,
+    "consecutive_minute_required": true,
+    "maximum_open_positions": 1,
+    "overlapping_signal_policy": "SUPPRESS_UNTIL_PRIOR_EXIT",
+    "missing_interval": "DATA_CENSORED",
+    "missing_future_coverage": "CENSORED_FUTURE_COVERAGE_NO_RETROACTIVE_SIGNAL_SUPPRESSION",
+    "future_outcomes_in_decision": false,
+    "future_label_availability_in_eligibility": false,
+    "q4_end_exclusive": "2024-10-01"
+  },
+  "fill_and_cost_contract": {
+    "fill_policy_id": "CAUSAL_NEXT_TRADABLE_OPEN_V1",
+    "cost_policy": "FROZEN_V7_HOLDING_HORIZON_SCHEDULE",
+    "normal_costs": "COMMISSION_PLUS_TWO_SIDED_FROZEN_SLIPPAGE",
+    "stressed_costs": "COMMISSION_PLUS_1_5X_TWO_SIDED_FROZEN_SLIPPAGE",
+    "price_touch_fill_fabrication_allowed": false
+  },
+  "candidate_lattice": [
+    {
+      "candidate_id": "v73_es_event_extreme_recovery_speed_reversal_15m",
+      "holding_minutes": 15
+    },
+    {
+      "candidate_id": "v73_es_event_extreme_recovery_speed_reversal_30m",
+      "holding_minutes": 30
+    }
+  ],
+  "controls": [
+    {
+      "id": "STATIC_EXTREME_REJECTION_PARENT",
+      "contract": "Exact original causal five-minute ES delta-extreme rejection signal and fixed open-to-open holding geometry; evaluated as an independent one-contract event reference, not as a falsely exposure-matched account control.",
+      "authoritative_holding_minutes": 15,
+      "authoritative_alignment": "INNER_ONE_TO_ONE_ES_MES_FIVE_MINUTE_BLOCK_TIMESTAMPS"
+    },
+    {
+      "id": "DIRECTION_FLIP_SAME_EVENTS",
+      "contract": "Same recovery events, entry timestamps, absolute stop risk, holding horizon and costs; direction inverted."
+    },
+    {
+      "id": "SESSION_MATCHED_TIMING_NULL",
+      "contract": "Role-local deterministic cyclic permutation of event timestamps preserving side, Chicago session minute, opportunity count target, holding horizon and exposure."
+    }
+  ],
+  "account_frontier": {
+    "account_sizes": ["50K", "100K", "150K"],
+    "horizons_trading_days": [10, 20],
+    "risk_fraction_of_current_mll_buffer": [0.1, 0.2, 0.3],
+    "risk_selection_role": "DISCOVERY_ONLY",
+    "maximum_concurrent_positions": 1,
+    "daily_loss_guard_fraction_of_mll": 1.0,
+    "daily_profit_guard_fraction_of_base_target": 0.5,
+    "exact_contract_limits_required": true,
+    "account_replay_evidence_role": "DIAGNOSTIC_DYNAMIC_RISK_APPROXIMATION_NOT_TIER_Q_ELIGIBLE",
+    "diagnostic_mll_and_consistency_tracked": true,
+    "tier_q_requires_separate_exact_chronological_mll_and_consistency_replay": true,
+    "censored_windows_excluded_from_pass_denominators": true
+  },
+  "power_preflight": {
+    "minimum_independent_primary_events": {
+      "DISCOVERY": 20,
+      "VALIDATION": 8,
+      "FINAL_DEVELOPMENT": 8
+    },
+    "when_underpowered": "V73_EVENT_EXTREME_RECOVERY_SPEED_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+  },
+  "frozen_gate": {
+    "positive_stressed_validation_net_required": true,
+    "positive_stressed_final_development_net_required": true,
+    "minimum_combined_normal_passes": 2,
+    "minimum_combined_stressed_passes": 1,
+    "qualifying_horizons_trading_days": [10, 20],
+    "pass_counting": "CONSERVATIVE_PER_ROLE_MAX_ACROSS_P10_P20_TO_AVOID_CROSS_HORIZON_DOUBLE_COUNTING",
+    "role_headline_horizon": "LONGEST_HORIZON_WITH_AT_LEAST_ONE_FULL_COVERAGE_EPISODE",
+    "positive_temporal_context_required_in_validation": true,
+    "positive_temporal_context_required_in_final_development": true,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "passing_paths_consistency_required": true,
+    "minimum_stressed_target_progress_p25": 0.0,
+    "maximum_single_trade_positive_profit_concentration": 0.5,
+    "must_beat_static_parent": true,
+    "must_beat_direction_flip": true,
+    "must_beat_session_timing_null": true,
+    "control_comparison": "DIRECTION_AND_TIMING_USE_ONE_HEADLINE_ACCOUNT_CELL_PER_ROLE;_STATIC_PARENT_USES_EXACT_ONE_CONTRACT_STRESSED_EXPECTANCY_WITHOUT_ACCOUNT_MATCHING_CLAIM",
+    "development_status_when_passed": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+    "tier_q_requires_separate_exact_chronological_account_replay_and_complete_evidence_bundle": true,
+    "independent_confirmation_required_for_tier_g_or_higher": true
+  },
+  "governance": {
+    "audit_only_must_not_decode_parquet": true,
+    "audit_only_outcomes_read": 0,
+    "tier_q_allowed": false,
+    "evidence_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+    "tier_g_allowed": false,
+    "tier_c_allowed": false,
+    "promotion_status_inherited": false,
+    "q4_access_allowed": false,
+    "data_purchase_allowed": false,
+    "network_access_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "mission_or_service_change_allowed": false,
+    "authoritative_writer_change_allowed": false,
+    "economic_replay_requires_explicit_run_flag": true
+  },
+  "branch_rule": {
+    "when_green": "FREEZE_TIER_E_DIAGNOSTIC_AND_REQUIRE_EXACT_CHRONOLOGICAL_ACCOUNT_REPLAY_PLUS_COMPLETE_EVIDENCE_BUNDLE_BEFORE_ANY_TIER_Q_DECISION",
+    "when_weak": "PRESERVE_DIAGNOSTIC_ONLY_WITHOUT_NEIGHBORING_THRESHOLD_TUNING",
+    "when_falsified": "TOMBSTONE_EXACT_RECOVERY_SPEED_FORMULATION_AND_REALLOCATE_EXPLORATION",
+    "when_underpowered": "TERMINALIZE_EXACT_V73_FORMULATION_AS_UNDERPOWERED_AND_REALLOCATE_EXPLORATION_WITHOUT_THRESHOLD_RELAXATION"
+  },
+  "card_hash": "7d1dc6b9f33ac9c121e7780f0105852c5c49adbdbe67d880bd8e82ef96e78375"
+}
