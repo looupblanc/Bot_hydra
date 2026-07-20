@@ -7,6 +7,7 @@ import pytest
 
 from hydra.economic_evolution.schema import stable_hash
 from hydra.production import autonomous_graduation_cohort as cohort
+from hydra.production import autonomous_tier_g_controls as controls
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -354,49 +355,14 @@ def test_policy_aware_summary_rejects_exposure_above_frozen_limit() -> None:
         )
 
 
-def test_actual_book_742_reconstructs_frozen_policy_and_attributes_24_to_8() -> None:
+def test_actual_book_742_is_quarantined_after_causal_stop_risk_reconstruction() -> None:
     manifest = cohort._load_cohort_manifest(ROOT / cohort.DEFAULT_MANIFEST)
     artifacts = cohort._load_replay_artifacts(ROOT, manifest)
-    prepared = cohort._prepare_all(ROOT, manifest, artifacts)
-    value = next(
-        row
-        for row in prepared
-        if row["candidate_id"]
-        == "autonomous_marginal_book_74271a65d77ce0c7fe144170"
-    )
-    assert value["policy"].maximum_mini_equivalent == 5.0
-    assert value["frozen_policy_hash"] == value["source_governor_policy_hash"]
-    episode = cohort.run_causal_shared_account_episode(
-        value["trajectories"]["NORMAL"],
-        value["calendar"],
-        policy=value["policy"],
-        start_day=19541,
-        maximum_duration_days=5,
-        config=value["config"],
-    )
-    result = cohort._summarize_cohort_episodes(
-        [(episode, "B1")],
-        requested_start_count=1,
-        data_censored_count=0,
-        policy=value["policy"],
-    )
-    assert result["size_reduced_count"] == 6
-    assert result["governor_allocation_attribution"][
-        "size_reduction_binding_counts"
-    ] == {"AGGREGATE_NOMINAL_RISK_LIMIT": 6}
-    assert result["contract_utilization_denominator_mini_equivalent"] == 5.0
-    over_dynamic_limit_episode = cohort.run_causal_shared_account_episode(
-        value["trajectories"]["NORMAL"],
-        value["calendar"],
-        policy=value["policy"],
-        start_day=19569,
-        maximum_duration_days=20,
-        config=value["config"],
-    )
-    over_dynamic_limit = cohort._governor_allocation_attribution(
-        [over_dynamic_limit_episode], policy=value["policy"]
-    )
-    assert over_dynamic_limit["decision_status_counts"]["CONFLICT_REJECTED"] > 0
+    with pytest.raises(
+        controls.AutonomousTierGControlsError,
+        match="selected account policy drift",
+    ):
+        cohort._prepare_all(ROOT, manifest, artifacts)
 
 
 def test_xfa_contract_never_counts_alternative_paths_without_combine_pass() -> None:

@@ -200,7 +200,7 @@ def audit_inputs(
         )
     roll = _audit_binding(project, card["frozen_inputs"]["roll_map"])
     rules = _audit_binding(project, card["frozen_inputs"]["rule_snapshot"])
-    access_ledger = _audit_binding(
+    access_ledger = _audit_append_only_binding(
         project, card["frozen_inputs"]["data_access_ledger"]
     )
     parsed_rules, rule_receipt = exact._load_rule_snapshot(project / rules["path"])
@@ -476,13 +476,13 @@ def run_economic_tripwire(
 
     if authorization != RUN_AUTHORIZATION:
         raise SessionPathAnalogError("exact root economic authorization is absent")
-    project = Path(root).resolve()
-    audit = audit_inputs(project, card_path=card_path)
-    card = load_decision_card(_inside(project, card_path))
     if production_manifest_path is None:
         raise SessionPathAnalogError(
             "economic replay requires a validated production manifest"
         )
+    project = Path(root).resolve()
+    audit = audit_inputs(project, card_path=card_path)
+    card = load_decision_card(_inside(project, card_path))
     production_manifest = _validate_production_manifest(
         project,
         production_manifest_path,
@@ -2802,6 +2802,40 @@ def _audit_binding(project: Path, row: Mapping[str, Any]) -> dict[str, Any]:
         "path": str(path.relative_to(project)),
         "sha256": actual_sha,
         "size_bytes": actual_size,
+    }
+
+
+def _audit_append_only_binding(
+    project: Path, row: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Verify a frozen ledger prefix while permitting later governed appends."""
+
+    path = _inside(project, str(row["path"]))
+    frozen_size = int(row["size_bytes"])
+    current_size = path.stat().st_size
+    if current_size < frozen_size:
+        raise SessionPathAnalogError(f"append-only input truncated: {row['path']}")
+    digest = hashlib.sha256()
+    remaining = frozen_size
+    with path.open("rb") as handle:
+        while remaining:
+            chunk = handle.read(min(1024 * 1024, remaining))
+            if not chunk:
+                raise SessionPathAnalogError(
+                    f"append-only input truncated: {row['path']}"
+                )
+            digest.update(chunk)
+            remaining -= len(chunk)
+    frozen_sha = digest.hexdigest()
+    if frozen_sha != str(row["sha256"]):
+        raise SessionPathAnalogError(f"append-only prefix SHA drift: {row['path']}")
+    return {
+        "path": str(path.relative_to(project)),
+        "sha256": frozen_sha,
+        "size_bytes": frozen_size,
+        "current_size_bytes": current_size,
+        "append_only_suffix_bytes": current_size - frozen_size,
+        "binding_mode": "FROZEN_PREFIX_APPEND_ONLY_SUFFIX_ALLOWED",
     }
 
 

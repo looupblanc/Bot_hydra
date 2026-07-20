@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -657,3 +658,25 @@ def test_audit_is_metadata_only_and_governance_closed(monkeypatch: pytest.Monkey
         field: governance[field]
         for field in router.ZERO_SIDE_EFFECT_COUNTER_FIELDS
     } == router._zero_side_effect_counters()
+
+
+def test_append_only_binding_accepts_suffix_and_rejects_prefix_drift(
+    tmp_path: Path,
+) -> None:
+    ledger = tmp_path / "ledger.jsonl"
+    frozen = b'{"entry":1}\n'
+    ledger.write_bytes(frozen)
+    binding = {
+        "path": "ledger.jsonl",
+        "sha256": hashlib.sha256(frozen).hexdigest(),
+        "size_bytes": len(frozen),
+    }
+    ledger.write_bytes(frozen + b'{"entry":2}\n')
+    audited = router._audit_append_only_binding(tmp_path, binding)
+    assert audited["size_bytes"] == len(frozen)
+    assert audited["append_only_suffix_bytes"] > 0
+    assert audited["binding_mode"] == "FROZEN_PREFIX_APPEND_ONLY_SUFFIX_ALLOWED"
+
+    ledger.write_bytes(b'{"entry":9}\n' + b'{"entry":2}\n')
+    with pytest.raises(router.SessionPathAnalogError, match="prefix SHA drift"):
+        router._audit_append_only_binding(tmp_path, binding)
