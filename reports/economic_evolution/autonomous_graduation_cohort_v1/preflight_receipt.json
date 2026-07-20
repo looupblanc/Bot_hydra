@@ -1,0 +1,4225 @@
+{
+  "audit_hash": "7cdade1d77c6a061ad7821093b185701dae539a9bd06060a6fdd3b07c8f65bbd",
+  "broker_connections": 0,
+  "candidate_count": 12,
+  "confirmation_partition_reads": 0,
+  "database_writes": 0,
+  "frozen_candidate_inventory_hash": "1305e28dbbf9b059eeb53977ac2e278d2a7d2ced6a20ebba3e80b4ee5e0a8ba6",
+  "frozen_candidates": [
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "c5ac0c9b925c557385dc9893bd5c529d0a331d0c680fb6043dc92a313aae89c1",
+      "candidate_fingerprint": "e06ce0c3fe4d4de3bd8e3c370510815ac7cd3aa418b494080ce1468f35940e60",
+      "candidate_id": "autonomous_marginal_book_74271a65d77ce0c7fe144170",
+      "component_ids": [
+        "hazard_187b1bace916c254bb483d6d",
+        "hazard_0df449d78eadc5bce054eb2c"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": "e06ce0c3fe4d4de3bd8e3c370510815ac7cd3aa418b494080ce1468f35940e60",
+      "frozen_policy_hash": "4083231fe293dc46b4e1cf9c4a60fdec7255569ca478a3a80acef18b164030a4",
+      "kind": "MARGINAL_BOOK",
+      "qd_cell": "book_qd_74271a65d77ce0c7fe144170",
+      "source_evidence_hash": "ce6a1abe07e813aaf926e258074aaeab5115598d9b388703bb5704f3428b4b3e",
+      "source_governor_policy_hash": "4083231fe293dc46b4e1cf9c4a60fdec7255569ca478a3a80acef18b164030a4"
+    },
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "68388fa519bcb0947787f77a5b3d45279197cb9cc15224ac5b6dc04191bff1c2",
+      "candidate_fingerprint": "01340d634a288f435a06760c31fa06419af2e4ff3cb15e28d9a5f328f843f21d",
+      "candidate_id": "hazard_01340d634a288f435a06760c",
+      "component_ids": [
+        "hazard_01340d634a288f435a06760c"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "586e1c8744bfb8322a4ced8126591d3373639e29f5c06988b42dc5c9160167b3",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_1b3cd4ec54507253807685f4",
+      "source_evidence_hash": "b0b1603a2c6bb4afd5d21f208316951a2c0aaf1f2cdec7ddbaaf039ed6060f73",
+      "source_governor_policy_hash": null
+    },
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "f4af78a789a76cd271811a80c9b6612272f50b502cc65cfae92d2a3bdb7bf236",
+      "candidate_fingerprint": "03bc777e62c6335af87800286c6d876ba2b7ba01d873f8f03974d9787893747d",
+      "candidate_id": "hazard_03bc777e62c6335af8780028",
+      "component_ids": [
+        "hazard_03bc777e62c6335af8780028"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "e18c24150cb8e1b10d959c2d47a1a9e8601c968856419faec747a0d11032e93f",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_4485123c17501f3856b94a41",
+      "source_evidence_hash": "d2bd2f15e70abbe43ddde69e7198b56e770e0c07c7a0e7d540f40be50a28a139",
+      "source_governor_policy_hash": null
+    },
+    {
+      "account_label": "100K",
+      "behavioral_fingerprint": "569b9780b5158a54bb3fcb42adfb45264464516da6e4b67eec1f8f62bd2b3f33",
+      "candidate_fingerprint": "09ee35bc24190bb213469e6a400ad209e4726a63de5d48bb5023759f78667f96",
+      "candidate_id": "hazard_09ee35bc24190bb213469e6a",
+      "component_ids": [
+        "hazard_09ee35bc24190bb213469e6a"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "ff2640db3996bb1d0e85925dd8f556b51afe6d5ea2b7da5021f1f66d49f4fdfd",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_06074d30fd01f469bd3902b8",
+      "source_evidence_hash": "a7785e66301c01311b3a72f1586d97721e8955d469b730b5e4d4f9c6b4d3dc59",
+      "source_governor_policy_hash": null
+    },
+    {
+      "account_label": "150K",
+      "behavioral_fingerprint": "27b5e11fd9eb443febc826850a3ab81fbf1b93be9fb460b59901975981d3ffe6",
+      "candidate_fingerprint": "0df449d78eadc5bce054eb2c5b64304d95c7385f52006d3e412e419cab9f22fa",
+      "candidate_id": "hazard_0df449d78eadc5bce054eb2c",
+      "component_ids": [
+        "hazard_0df449d78eadc5bce054eb2c"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "19644f9d93d0f86c169efef7db3af2fd908a3d21708548f119782f7ae271eb53",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_7a6aa5b9fe4e6de001806def",
+      "source_evidence_hash": "73e753674756bf51246c06bb70695b8fe408d5b4fea1b365bc1155c17a46d35d",
+      "source_governor_policy_hash": null
+    },
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "0dfd94c77ff023f05212fd52e1463d9f3f8a9683a7190935169aba0d1bfa6458",
+      "candidate_fingerprint": "11d0fa817a785d264adb2e96eca519f26de217ea9d73a2834fdd5029acf6dda4",
+      "candidate_id": "hazard_11d0fa817a785d264adb2e96",
+      "component_ids": [
+        "hazard_11d0fa817a785d264adb2e96"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 6,
+          "full_coverage_by_block": {
+            "B1": 3,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 18,
+          "full_coverage_starts": [
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 5,
+          "full_coverage_by_block": {
+            "B1": 1,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 7,
+          "full_coverage_starts": [
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 11,
+          "full_coverage_by_block": {
+            "B1": 8,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 41,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "588eb678f7e020c89d55264dd3513acb27a78191f46ba24f9a3ef3e2bbec290a",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "185918bb3ff2aea1ff83fca7e15a3679abf1861b74dc5586e46f52427e3d7cea",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_ad44343e6e07abb769d4eb29",
+      "source_evidence_hash": "6a60de83d1db205357b09497dc116b0c90bdf036bd214d0bbc591a272419a331",
+      "source_governor_policy_hash": null
+    },
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "ac21a589ef87f92c51cd85ddd0eb6b0996f6a5c299596e260d4fe0c68ab884af",
+      "candidate_fingerprint": "142801996c93954cbd7e75b982d23f9eda374d430eca04db0e255d5a1cde91e7",
+      "candidate_id": "hazard_142801996c93954cbd7e75b9",
+      "component_ids": [
+        "hazard_142801996c93954cbd7e75b9"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "d4ef62e19a4c0fb1c4a86fe067751024dc5469993791234142d26af95e720072",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_6b7b5181f43f8a38deacc190",
+      "source_evidence_hash": "852790972281094996d56c7bf148d57879d6ec8df8982e59bb5de963a2139b49",
+      "source_governor_policy_hash": null
+    },
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "09db56901f737157976b61a628c92e2311e0107ca377afc693ed59415748c91a",
+      "candidate_fingerprint": "1f3ff3e1f6d2b9d5e8eec1b341ce4ad3412a69073b364c33bf42ca6f256122f1",
+      "candidate_id": "hazard_1f3ff3e1f6d2b9d5e8eec1b3",
+      "component_ids": [
+        "hazard_1f3ff3e1f6d2b9d5e8eec1b3"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "bf065f4d9321dcaac772bb63c3ef364f4ddad7e3211d5a4018372730405bb9da",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_4f17797715bc7b8e287bb58b",
+      "source_evidence_hash": "2c29598350f12a1451d034dc1c2c436febc89e573944208369a3f8fd843018fe",
+      "source_governor_policy_hash": null
+    },
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "906bfa4ae58a26eaac43c06c672adc60c68ff57dd4fd8b3bc571fb1857f6c998",
+      "candidate_fingerprint": "23cf467f9b8d33256da1ed749cb5ba7b20c8f779bf633e543cd7f954cdd2d3ff",
+      "candidate_id": "hazard_23cf467f9b8d33256da1ed74",
+      "component_ids": [
+        "hazard_23cf467f9b8d33256da1ed74"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "13a0d6e6fddc64db11aa77d107c53926f3a82dc2d614b2a15b7146c53342b7cc",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_7977f0465cdaaf6b0b65a7f4",
+      "source_evidence_hash": "4b02fe3bab0f7c4f0d28af073cfd8fcf8537933f6e042381a4af9fc7c2e16d73",
+      "source_governor_policy_hash": null
+    },
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "e5f0e89de7b630b752f511ced54b30c621d07772758a9b5bb039335751561f01",
+      "candidate_fingerprint": "294627b596f6b477df6de5ac65c7d8d1f74900ae42d0267f18e129204ccdddfc",
+      "candidate_id": "hazard_294627b596f6b477df6de5ac",
+      "component_ids": [
+        "hazard_294627b596f6b477df6de5ac"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "6ee6ebd12d886942db3b63e2ee83ee13297baf2f1693863017fa303b9944095c",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_6e758fd1773b902997851253",
+      "source_evidence_hash": "b35853041ae438c7cf830a25f5412a4a2c730d6c9c7457862ca86b290e9c7af4",
+      "source_governor_policy_hash": null
+    },
+    {
+      "account_label": "100K",
+      "behavioral_fingerprint": "c2392a551c5e8ef427aab9672b28b4edefdaf30d3de3331065b018a25f996659",
+      "candidate_fingerprint": "2a34338b0805cd6e21bd2a000e13cc3816109925f9bfdeec54084f1244e13bb9",
+      "candidate_id": "hazard_2a34338b0805cd6e21bd2a00",
+      "component_ids": [
+        "hazard_2a34338b0805cd6e21bd2a00"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "af05d259bc219e1104cbecbc67d99eb600ba88bb313b91a7d2db6bd7120b9bfb",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_8c81a2867cd5bb3621376b40",
+      "source_evidence_hash": "53b8e2ba37e5f49b3a76c802cd756647e867b22eb444e98013392936f935e80b",
+      "source_governor_policy_hash": null
+    },
+    {
+      "account_label": "50K",
+      "behavioral_fingerprint": "d41385e68682888b672f9cb1a8140874765d99d054e0db2a9bea48fbd131392f",
+      "candidate_fingerprint": "324b4ea1349b603c4651a7fb2002991d09780d6e40ba0f88f1eab17639c9fb45",
+      "candidate_id": "hazard_324b4ea1349b603c4651a7fb",
+      "component_ids": [
+        "hazard_324b4ea1349b603c4651a7fb"
+      ],
+      "coverage": {
+        "10": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 5,
+            "B2": 5,
+            "B3": 5,
+            "B4": 5
+          },
+          "full_coverage_start_count": 20,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 24,
+          "within_horizon_non_overlapping": true
+        },
+        "20": {
+          "data_censored_start_count": 4,
+          "full_coverage_by_block": {
+            "B1": 2,
+            "B2": 2,
+            "B3": 2,
+            "B4": 2
+          },
+          "full_coverage_start_count": 8,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 12,
+          "within_horizon_non_overlapping": true
+        },
+        "5": {
+          "data_censored_start_count": 8,
+          "full_coverage_by_block": {
+            "B1": 11,
+            "B2": 11,
+            "B3": 11,
+            "B4": 11
+          },
+          "full_coverage_start_count": 44,
+          "full_coverage_starts": [
+            {
+              "session_day": 19541,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19548,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19555,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19562,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19569,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19576,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19583,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19590,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19597,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19604,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19627,
+              "temporal_block": "B1"
+            },
+            {
+              "session_day": 19657,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19664,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19671,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19678,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19685,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19692,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19719,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19727,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19734,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19741,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19748,
+              "temporal_block": "B2"
+            },
+            {
+              "session_day": 19779,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19786,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19809,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19817,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19824,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19831,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19838,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19845,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19852,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19859,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19866,
+              "temporal_block": "B3"
+            },
+            {
+              "session_day": 19907,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19914,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19921,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19928,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19935,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19942,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19949,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19956,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19963,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19970,
+              "temporal_block": "B4"
+            },
+            {
+              "session_day": 19977,
+              "temporal_block": "B4"
+            }
+          ],
+          "headline_denominator_excludes_censored": true,
+          "requested_start_count": 52,
+          "within_horizon_non_overlapping": true
+        }
+      },
+      "coverage_hash": "bcf320e21f4e98e450f5b5b99e35235cdc4f758183d5835efc1875035f2988f0",
+      "executable_spec_hash": null,
+      "frozen_policy_hash": "ad5a5d47b758ac980aa9ced13b0aa1928aeddc6be4487823fffe6d4c27e0d4b2",
+      "kind": "STANDALONE",
+      "qd_cell": "realized_qd_ca6c56d9e2c603ab313a2840",
+      "source_evidence_hash": "3879b554e6614e3d3566dcafe58b744c7f789db0a385d0901bf97496f3125261",
+      "source_governor_policy_hash": null
+    }
+  ],
+  "frozen_grid_hash": "32d94dddf0c183400118557302b0f7094e7ed9ab1d2b04cbf60ac8b4e16900b5",
+  "independence_contract": {
+    "cross_horizon_observations_independent": false,
+    "full_coverage_only": true,
+    "stage_48_independent_claimed": false,
+    "stage_96_independent_claimed": false,
+    "within_horizon_grid_non_overlapping": true
+  },
+  "manifest_hash": "32c32b69e4a743eadbd1c005d613744db3ab02e6bba5a7939498995e62c3f016",
+  "official_rule_snapshot_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f",
+  "orders": 0,
+  "preflight_hash": "ac83242533b55a7fc4027d3fff38841ab2caf5caa6de8b306253f0dd74d41b15",
+  "q4_access_count_delta": 0,
+  "registry_writes": 0,
+  "runtime_provenance": {
+    "adapter_module_sha256": "2b51a057d479af87764e815761b7d0ca18305bb55149bf1afed8e6c3746a784c",
+    "audit_protocol_tests_sha256": "1b5bfe1eabb3ecc196f1891ce578f907f5b2e62e9776d954595a0e8ef40c1ee0",
+    "manifest_file_sha256": "40434d03cbb3cdabdf929ca3d7d2092bb32215e9e191df17d3409c2651ce0775",
+    "runner_script_sha256": "db1214e07a6ca57fb27ab17432ea5098abe9988390627f7808d9b9d0eda91243",
+    "runtime_provenance_hash": "468d3b21191a36b7803f6972d9c5ffb2ea7c8a33990871a70e48a90df91d73bf",
+    "source_commit": "930a19f5844ac7f0205c77de342828e1e821d4e2"
+  },
+  "runtime_provenance_hash": "468d3b21191a36b7803f6972d9c5ffb2ea7c8a33990871a70e48a90df91d73bf",
+  "schema": "hydra_autonomous_graduation_cohort_preflight_v1",
+  "source_exact_composite_hash": "000862a49ccaf0cfe69d3837c053d639c91cca7c5c993185d2ad4d6fda876841",
+  "status": "PASS_FROZEN_FULL_COVERAGE_PREFLIGHT"
+}
