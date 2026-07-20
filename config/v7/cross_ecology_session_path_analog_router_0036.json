@@ -3,6 +3,33 @@
   "campaign_mode": "CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER",
   "campaign_ordinal": 36,
   "class_id": "CAUSAL_CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER_V1",
+  "compatible_artifact_manifest_hashes": [
+    "f39c81d988bbe842395c39736df447979e1ca9fee996ee5dc18b1ec61ae92d23"
+  ],
+  "completed_scientific_result_adoption": {
+    "audit_receipt_path": "reports/economic_evolution/cross_ecology_session_path_analog_router_0036/non_economic_audit_receipt.json",
+    "canonical_evidence_status": "NO_GENUINELY_MATERIALIZED_POLICY_FRAGMENT",
+    "classification": "COMPLETED_SCIENTIFIC_RESULT_ADOPTION_WITHOUT_ECONOMIC_REPLAY",
+    "economic_outcomes_changed": false,
+    "economic_replay_allowed": false,
+    "multiplicity_preregistration_hash": "f39c81d988bbe842395c39736df447979e1ca9fee996ee5dc18b1ec61ae92d23",
+    "replay_lease_attempt_hash": "a51c5ddcf8685acde88806a9c6400273b72bdaac73d394a7339d1d91398d5805",
+    "replay_lease_file_sha256": "cc781c74024b0abf1d4048edf6799bc5cf4072e410f0f246066d196c83f29a31",
+    "replay_lease_path": "reports/economic_evolution/cross_ecology_session_path_analog_router_0036/scientific_replay_attempt.json",
+    "schema": "hydra_cross_ecology_0036_completed_scientific_result_adoption_v1",
+    "scientific_policy_changed": false,
+    "scientific_result_file_sha256": "3bdc5ae9fc5a3664e883f7df42badfde4a7450fb391e05e75761f4062f28aaea",
+    "scientific_result_hash": "e123659d0de62669c49b7f4a8b50b3e8c48d17861ff5b5e4e8d441239731cbb8",
+    "scientific_result_path": "reports/economic_evolution/cross_ecology_session_path_analog_router_0036/scientific_result.json",
+    "scientific_status": "SESSION_PATH_ANALOG_UNDERPOWERED_NO_THRESHOLD_RELAXATION",
+    "source_commit": "8d12d7ec0a5bafc987d392bfe446dbb536c0908f",
+    "source_manifest_file_sha256": "8d23aaff470af49973b78b339df049ba0ea0ec9c955c9a788926319b80ec8e65",
+    "source_manifest_hash": "f39c81d988bbe842395c39736df447979e1ca9fee996ee5dc18b1ec61ae92d23",
+    "source_manifest_path": "config/v7/cross_ecology_session_path_analog_router_0036.json",
+    "source_manifest_worm_commit": "9dbbd33bdcb20cbb165497bcfeda4d3880b410e4",
+    "source_manifest_worm_tag": "worm/cross-ecology-session-path-analog-router-0036-revision-01-2026-07-19",
+    "terminal_mode": "NON_ECONOMIC_AUDIT_ONLY"
+  },
   "created_at_utc": "2026-07-19T19:31:17Z",
   "development_only": true,
   "economic_hypothesis": "A causal cross-ecology session-path analog router can transfer Discovery-only analog evidence into executable 5/10/20-day account trajectories across chronologically frozen Validation and Final-Development roles while beating preregistered matched controls without Q4, new data, broker, or order access.",
@@ -51,16 +78,19 @@
   },
   "implementation_files": {
     "config/research/cross_ecology_session_path_analog_router_v1.json": "6674bbebd6f907793e377cdf234422a4b7a1ff60d264d008a8142431aed5c1eb",
-    "hydra/production/cross_ecology_analog_manifest.py": "d681dec2abfc622dcec45e6bfcbfb01407759eb890e35b83f12ea46450df2674",
-    "hydra/production/cross_ecology_analog_runtime.py": "1b75a74cd49d47583ec11cbea446d65cc2ff63e69707eb0122f7703363efdcbc",
+    "hydra/mission/economic_evolution_manifest_runtime.py": "1019df8316b268e2ef494863dd0f9d430751b5fc30d314f91b965837b38624a1",
+    "hydra/production/__init__.py": "7a4180002ba0cdc64a614a8fec63d78c3cd8bbdb10cd43464ad6572484e83996",
+    "hydra/production/autonomous_director_manifest.py": "79fade842cbe32e20e36efa4d0b50cd44030fd4eb52d045b0ab39792765acf62",
+    "hydra/production/cross_ecology_analog_manifest.py": "e84e5e745dc8274a8dd78817eae4105718707f119fcac6beaeb64bc4b86416d8",
+    "hydra/production/cross_ecology_analog_runtime.py": "a95cf536310575109ee2e7c1f223edea63dd75da470014d694b05312199118ef",
     "hydra/production/manifest.py": "82f8574f7e764e85411e7e8a40123e161163e0ad7f6d7d17b2538b8530f122ea",
-    "hydra/production/runtime.py": "64f46c52b73ab854f8d89d68ae3823a435327f560f4a19898efb416089e3a7e0",
+    "hydra/production/runtime.py": "871cbb99ca257949cb262451e3ed9f780e2253b1cb2d7e900e87766d3de9b941",
     "hydra/research/cross_ecology_session_path_analog_router.py": "31ad8bca40043892024f468811a9099b10cc740eb4bee8083fd9e2af7f243434",
     "scripts/run_cross_ecology_session_path_analog_router.py": "9c9c43cdd63a7157b3c63a2797108a7208a9d569174b3e2ef94062cefb3eb3c1",
     "scripts/run_economic_production_manifest.py": "45e610a35ae5a260e628bc73fcd23634362c6cef0298707b2e6e97ff8762cc6f",
     "tests/test_cross_ecology_session_path_analog_router.py": "191f32e4988bb6969f2bc61b93ad8dc218758fb4ca5756694a9a866b3953bb31"
   },
-  "manifest_hash": "f39c81d988bbe842395c39736df447979e1ca9fee996ee5dc18b1ec61ae92d23",
+  "manifest_hash": "1eacef72b3b296ca5d5f79c17d745821bd7fea89f42cce02376cd1ee82e835e8",
   "multiplicity": {
     "campaign_specific_inflation": 1.0,
     "expected_global_N_trials_after_reservation": 862260,
@@ -81,13 +111,37 @@
     "maximum_economic_replays": 1,
     "module_file_sha256": "31ad8bca40043892024f468811a9099b10cc740eb4bee8083fd9e2af7f243434",
     "module_path": "hydra/research/cross_ecology_session_path_analog_router.py",
-    "result_file_sha256": null,
-    "result_hash": null,
+    "result_file_sha256": "3bdc5ae9fc5a3664e883f7df42badfde4a7450fb391e05e75761f4062f28aaea",
+    "result_hash": "e123659d0de62669c49b7f4a8b50b3e8c48d17861ff5b5e4e8d441239731cbb8",
     "result_path": "reports/economic_evolution/cross_ecology_session_path_analog_router_0036/scientific_result.json",
     "root_authorization": "ROOT_AUTHORIZED_CROSS_ECOLOGY_SESSION_ANALOG_REPLAY_V1",
     "runner_file_sha256": "9c9c43cdd63a7157b3c63a2797108a7208a9d569174b3e2ef94062cefb3eb3c1",
     "runner_path": "scripts/run_cross_ecology_session_path_analog_router.py",
-    "source_mode": "GENERATE_READ_ONLY_ONCE"
+    "source_mode": "PREEXISTING_HASH_BOUND"
+  },
+  "resumable_snapshot_compatibility": {
+    "bindings": [
+      {
+        "hash_field": "state_hash",
+        "manifest_hash": "f39c81d988bbe842395c39736df447979e1ca9fee996ee5dc18b1ec61ae92d23",
+        "path": "reports/economic_evolution/cross_ecology_session_path_analog_router_0036/production_state.json",
+        "schema": "hydra_economic_production_state_v1",
+        "snapshot_hash": "5318623225c46d780941fb26c1c874516823f6ce5caf34367d333edf33b4e66f",
+        "source_commit": "8d12d7ec0a5bafc987d392bfe446dbb536c0908f"
+      },
+      {
+        "hash_field": "kpi_hash",
+        "manifest_hash": "f39c81d988bbe842395c39736df447979e1ca9fee996ee5dc18b1ec61ae92d23",
+        "path": "reports/economic_evolution/cross_ecology_session_path_analog_router_0036/production_kpis.json",
+        "schema": "hydra_economic_production_kpis_v1",
+        "snapshot_hash": "e6c39cc2f1b78618e2a09bd85b1dca56561b4b3aaf5dc0515820bdda2ec31d8f",
+        "source_commit": "8d12d7ec0a5bafc987d392bfe446dbb536c0908f"
+      }
+    ],
+    "classification": "HASH_BOUND_TECHNICAL_REVISION_RESUME_ONLY",
+    "economic_outcomes_changed": false,
+    "schema": "hydra_resumable_snapshot_compatibility_v1",
+    "scientific_policy_changed": false
   },
   "runtime": {
     "asynchronous_evidence_writer_count": 1,
@@ -102,5 +156,5 @@
     "worker_count": 1
   },
   "schema": "hydra_economic_production_manifest_v1",
-  "source_commit": "8d12d7ec0a5bafc987d392bfe446dbb536c0908f"
+  "source_commit": "fa461d2fa7db617d3f29bf89e0b44af380003f66"
 }
