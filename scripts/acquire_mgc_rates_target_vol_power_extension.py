@@ -379,8 +379,77 @@ def _build_roll_artifacts_from_dbn(
         raise MGCPowerExtensionError(
             "OHLCV and definition continuous mappings do not reconcile"
         )
+    first_tradable = _first_tradable_at_by_instrument(ohlcv_store, mappings)
     definitions = store.to_df(pretty_ts=True, map_symbols=False).reset_index()
-    return build_roll_artifacts(mappings, definitions)
+    return build_roll_artifacts(
+        mappings,
+        definitions,
+        first_tradable_at_by_instrument=first_tradable,
+    )
+
+
+def _first_tradable_at_by_instrument(
+    ohlcv_store: Any,
+    mappings: Mapping[str, list[dict[str, str]]],
+) -> dict[str, str]:
+    """Return the first actual OHLCV event for every mapped instrument.
+
+    Only the DBN record headers (``instrument_id`` and ``ts_event``) are used.
+    No price, volume, label, or economic outcome is inspected.  This makes the
+    definition-availability cutoff exact even when a mapping date starts at
+    midnight but its first tradable event occurs later in the session.
+    """
+
+    expected = {
+        str(row["s"]): (str(row["d0"]), str(row["d1"]), symbol)
+        for symbol, intervals in mappings.items()
+        for row in intervals
+    }
+    if len(expected) != sum(len(intervals) for intervals in mappings.values()):
+        raise MGCPowerExtensionError(
+            "instrument ID reuse prevents an unambiguous first-tradable cutoff"
+        )
+    first_ns: dict[str, int] = {}
+    for chunk in ohlcv_store.to_ndarray(schema="ohlcv-1m", count=250_000):
+        names = set(chunk.dtype.names or ())
+        if not {"instrument_id", "ts_event"}.issubset(names):
+            raise MGCPowerExtensionError("OHLCV DBN lacks causal record headers")
+        frame = pd.DataFrame(
+            {
+                "instrument_id": chunk["instrument_id"].astype(str),
+                "ts_event": chunk["ts_event"].astype("uint64"),
+            }
+        )
+        for instrument_id, timestamp in frame.groupby(
+            "instrument_id", sort=False
+        )["ts_event"].min().items():
+            if instrument_id not in expected:
+                continue
+            observed = int(timestamp)
+            first_ns[instrument_id] = min(
+                observed, first_ns.get(instrument_id, observed)
+            )
+
+    if set(first_ns) != set(expected):
+        missing = sorted(set(expected) - set(first_ns))
+        raise MGCPowerExtensionError(
+            f"mapped instruments lack an OHLCV event: {missing}"
+        )
+    output: dict[str, str] = {}
+    for instrument_id, timestamp in first_ns.items():
+        start, end, symbol = expected[instrument_id]
+        first = pd.Timestamp(timestamp, unit="ns", tz="UTC")
+        if not (
+            pd.Timestamp(start, tz="UTC")
+            <= first
+            < pd.Timestamp(end, tz="UTC")
+        ):
+            raise MGCPowerExtensionError(
+                "first OHLCV event is outside its mapping interval: "
+                f"{symbol}/{instrument_id}/{first.isoformat()}"
+            )
+        output[instrument_id] = first.isoformat()
+    return output
 
 
 def _normalize_mappings(raw: Mapping[str, Any]) -> dict[str, list[dict[str, str]]]:
@@ -405,23 +474,51 @@ def _normalize_mappings(raw: Mapping[str, Any]) -> dict[str, list[dict[str, str]
 
 
 def build_roll_artifacts(
-    mappings: Mapping[str, list[dict[str, str]]], definitions: pd.DataFrame
+    mappings: Mapping[str, list[dict[str, str]]],
+    definitions: pd.DataFrame,
+    *,
+    first_tradable_at_by_instrument: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Build both roll artifacts solely from DBN mappings and definitions."""
 
     contracts: dict[str, list[ContractInfo]] = {root: [] for root in ROOTS}
+    definition_audit: dict[str, list[dict[str, Any]]] = {
+        root: [] for root in ROOTS
+    }
     for symbol in SYMBOLS:
         root = symbol.split(".", 1)[0]
         intervals = list(mappings.get(symbol) or ())
         _verify_coverage(intervals, label=symbol)
         for index, interval in enumerate(intervals):
             instrument_id = str(interval["s"])
+            first_tradable_at: Any | None = None
+            if first_tradable_at_by_instrument is not None:
+                if instrument_id not in first_tradable_at_by_instrument:
+                    raise MGCPowerExtensionError(
+                        f"first tradable event missing for instrument {instrument_id}"
+                    )
+                first_tradable_at = first_tradable_at_by_instrument[instrument_id]
+                first = pd.Timestamp(first_tradable_at)
+                if first.tzinfo is None:
+                    first = first.tz_localize("UTC")
+                else:
+                    first = first.tz_convert("UTC")
+                if not (
+                    pd.Timestamp(str(interval["d0"]), tz="UTC")
+                    <= first
+                    < pd.Timestamp(str(interval["d1"]), tz="UTC")
+                ):
+                    raise MGCPowerExtensionError(
+                        "first tradable event is outside the mapping interval for "
+                        f"{symbol}/{instrument_id}"
+                    )
             try:
                 definition = _resolve_definition(
                     definitions,
                     instrument_id=instrument_id,
                     active_start=str(interval["d0"]),
                     root=root,
+                    first_tradable_at=first_tradable_at,
                 )
             except (ValueError, KeyError, TypeError) as exc:
                 raise MGCPowerExtensionError(
@@ -462,6 +559,26 @@ def build_roll_artifacts(
                     f"tick_value={tick_size * point_value}"
                 )
             activation = definition.get("activation")
+            definition_audit[root].append(
+                {
+                    "instrument_id": instrument_id,
+                    "contract": raw_symbol,
+                    "mapping_start": str(interval["d0"]),
+                    "mapping_end": str(interval["d1"]),
+                    "definition_available_at": str(
+                        definition["definition_available_at"]
+                    ),
+                    "first_tradable_at": (
+                        str(definition.get("first_tradable_at"))
+                        if definition.get("first_tradable_at") is not None
+                        else None
+                    ),
+                    "availability_precedes_first_tradable": bool(
+                        definition["availability_precedes_cutoff"]
+                    ),
+                    "cutoff_basis": str(definition["cutoff_basis"]),
+                }
+            )
             contracts[root].append(
                 ContractInfo(
                     root=root,
@@ -513,6 +630,12 @@ def build_roll_artifacts(
             "period_end": END,
             "continuous_symbol": "MGC.v.0",
             "definition_sourced": True,
+            "definition_resolution": (
+                "available_at_not_after_first_actual_ohlcv_event"
+                if first_tradable_at_by_instrument is not None
+                else "available_at_not_after_mapping_start_midnight"
+            ),
+            "definition_availability_audit": definition_audit["MGC"],
             "q4_2024_excluded": True,
         },
     ).to_dict()
@@ -527,6 +650,15 @@ def build_roll_artifacts(
         "continuous_symbols": ["ZN.c.0", "TN.c.0"],
         "policy": "EXPLICIT_CONTRACT_DELIVERY_SYNC_NO_FORWARD_FILL",
         "definition_sourced": True,
+        "definition_resolution": (
+            "available_at_not_after_first_actual_ohlcv_event"
+            if first_tradable_at_by_instrument is not None
+            else "available_at_not_after_mapping_start_midnight"
+        ),
+        "definition_availability_audit": [
+            *definition_audit["ZN"],
+            *definition_audit["TN"],
+        ],
         "root_rolls": {
             root: {
                 "contract_count": len(contracts[root]),
@@ -562,7 +694,12 @@ def _verify_coverage(rows: list[Mapping[str, Any]], *, label: str) -> None:
 
 
 def _resolve_definition(
-    frame: pd.DataFrame, *, instrument_id: str, active_start: str, root: str
+    frame: pd.DataFrame,
+    *,
+    instrument_id: str,
+    active_start: str,
+    root: str,
+    first_tradable_at: Any | None = None,
 ) -> dict[str, Any]:
     required = {
         "ts_event",
@@ -581,17 +718,34 @@ def _resolve_definition(
     work = frame.copy()
     work["instrument_id_key"] = work["instrument_id"].astype(str)
     work["ts_event"] = pd.to_datetime(work["ts_event"], utc=True)
-    rows = work[work["instrument_id_key"] == str(instrument_id)].sort_values("ts_event")
+    if "ts_recv" in work.columns:
+        work["ts_recv"] = pd.to_datetime(work["ts_recv"], utc=True)
+    else:
+        work["ts_recv"] = work["ts_event"]
+    work["definition_available_at"] = work[["ts_event", "ts_recv"]].max(axis=1)
+    rows = work[work["instrument_id_key"] == str(instrument_id)].sort_values(
+        "definition_available_at"
+    )
     if rows.empty:
         raise MGCPowerExtensionError(f"definition missing for instrument {instrument_id}")
-    cutoff = pd.Timestamp(active_start, tz="UTC")
-    available = rows[rows["ts_event"] <= cutoff]
+    if first_tradable_at is None:
+        cutoff = pd.Timestamp(active_start, tz="UTC")
+        cutoff_basis = "MAPPING_START_MIDNIGHT"
+    else:
+        cutoff = pd.Timestamp(first_tradable_at)
+        if cutoff.tzinfo is None:
+            cutoff = cutoff.tz_localize("UTC")
+        else:
+            cutoff = cutoff.tz_convert("UTC")
+        cutoff_basis = "FIRST_ACTUAL_OHLCV_EVENT"
+    available = rows[rows["definition_available_at"] <= cutoff]
     if available.empty:
         raise MGCPowerExtensionError(
-            f"future-only definition for instrument {instrument_id} at {active_start}"
+            "future-only definition for instrument "
+            f"{instrument_id} at causal cutoff {cutoff.isoformat()}"
         )
-    selected_time = available.iloc[-1]["ts_event"]
-    selected_rows = rows[rows["ts_event"] == selected_time]
+    selected_available_at = available.iloc[-1]["definition_available_at"]
+    selected_rows = rows[rows["definition_available_at"] == selected_available_at]
     signature_columns = [
         "raw_symbol",
         "instrument_class",
@@ -603,7 +757,7 @@ def _resolve_definition(
     ]
     if len(selected_rows[signature_columns].astype(str).drop_duplicates()) != 1:
         raise MGCPowerExtensionError(
-            f"ambiguous definition for instrument {instrument_id} at {selected_time}"
+            f"ambiguous definition for instrument {instrument_id} at {selected_available_at}"
         )
     selected = selected_rows.iloc[-1].to_dict()
     raw_symbol = str(selected.get("raw_symbol") or "").upper()
@@ -617,7 +771,18 @@ def _resolve_definition(
             f"definition identity mismatch for {root}/{instrument_id}/{raw_symbol}"
         )
     selected["raw_symbol"] = raw_symbol
-    selected["ts_event"] = pd.Timestamp(selected_time).isoformat()
+    selected["ts_event"] = pd.Timestamp(selected["ts_event"]).isoformat()
+    selected["ts_recv"] = pd.Timestamp(selected["ts_recv"]).isoformat()
+    selected["definition_available_at"] = pd.Timestamp(
+        selected_available_at
+    ).isoformat()
+    selected["first_tradable_at"] = (
+        cutoff.isoformat() if first_tradable_at is not None else None
+    )
+    selected["availability_precedes_cutoff"] = bool(
+        pd.Timestamp(selected_available_at) <= cutoff
+    )
+    selected["cutoff_basis"] = cutoff_basis
     return selected
 
 

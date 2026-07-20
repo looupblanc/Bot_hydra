@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -270,6 +271,79 @@ def test_future_only_definition_is_rejected() -> None:
     )
     with pytest.raises(acquisition.MGCPowerExtensionError, match="future-only"):
         acquisition.build_roll_artifacts(_mappings(), definitions)
+
+
+def test_same_day_definition_is_accepted_only_before_first_actual_bar() -> None:
+    definitions = _definition_frame()
+    definitions["ts_event"] = "2015-09-01T16:05:00Z"
+    definitions["ts_recv"] = "2015-09-01T16:05:01Z"
+    first = {
+        str(instrument_id): "2015-09-01T22:00:00Z"
+        for instrument_id in (101, 102, 103)
+    }
+
+    mgc, treasury = acquisition.build_roll_artifacts(
+        _mappings(),
+        definitions,
+        first_tradable_at_by_instrument=first,
+    )
+
+    mgc_audit = mgc["source_metadata"]["definition_availability_audit"]
+    treasury_audit = treasury["definition_availability_audit"]
+    assert len(mgc_audit) == 1
+    assert len(treasury_audit) == 2
+    assert all(
+        row["cutoff_basis"] == "FIRST_ACTUAL_OHLCV_EVENT"
+        and row["availability_precedes_first_tradable"] is True
+        for row in [*mgc_audit, *treasury_audit]
+    )
+
+
+def test_definition_received_after_first_actual_bar_is_rejected() -> None:
+    definitions = _definition_frame()
+    definitions.loc[definitions["asset"] == "MGC", "ts_recv"] = (
+        "2015-09-01T22:00:01Z"
+    )
+    with pytest.raises(acquisition.MGCPowerExtensionError, match="future-only"):
+        acquisition.build_roll_artifacts(
+            _mappings(),
+            definitions,
+            first_tradable_at_by_instrument={
+                "101": "2015-09-01T22:00:00Z",
+                "102": "2015-09-01T22:00:00Z",
+                "103": "2015-09-01T22:00:00Z",
+            },
+        )
+
+
+def test_first_tradable_header_scan_is_complete_and_interval_bounded() -> None:
+    dtype = np.dtype([("instrument_id", "u4"), ("ts_event", "u8")])
+    chunks = [
+        np.array(
+            [
+                (101, 1_441_065_660_000_000_000),
+                (102, 1_441_065_720_000_000_000),
+                (103, 1_441_065_600_000_000_000),
+                (101, 1_441_065_600_000_000_000),
+            ],
+            dtype=dtype,
+        )
+    ]
+
+    class _HeaderStore:
+        def to_ndarray(self, *, schema: str, count: int):
+            assert schema == "ohlcv-1m"
+            assert count == 250_000
+            return iter(chunks)
+
+    observed = acquisition._first_tradable_at_by_instrument(
+        _HeaderStore(), _mappings()
+    )
+    assert observed == {
+        "101": "2015-09-01T00:00:00+00:00",
+        "102": "2015-09-01T00:02:00+00:00",
+        "103": "2015-09-01T00:00:00+00:00",
+    }
 
 
 def test_multi_segment_contract_maps_remain_explicit_and_synchronised() -> None:
