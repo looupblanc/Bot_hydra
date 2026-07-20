@@ -1,0 +1,194 @@
+{
+  "schema": "hydra_cme_cross_crypto_flow_response_residual_manifest_v1",
+  "branch_id": "CME_CROSS_CRYPTO_FLOW_RESPONSE_RESIDUAL_MBT_MET_V1",
+  "created_at_utc": "2026-07-20T17:15:00Z",
+  "decision_card": {
+    "hypothesis": "Causal signed-flow shocks in one CME micro-crypto contract can identify a short-lived response residual in the other contract, after controlling for the target contract's own flow, with enough executable edge to survive the spread and official TopstepX fees.",
+    "strongest_argument_against": "MBT and MET may incorporate common information too synchronously at a personal-device horizon; the apparent lead-lag may be latency-only, unstable, or fully consumed by the spread.",
+    "smallest_decisive_experiment": "Twenty-four frozen target/mechanism/event-window/holding-horizon specifications on 2022 discovery and unchanged 2023 validation using TBBO, with own-flow, direction-flip, time-shift, and market-permutation controls.",
+    "expected_runtime_minutes": [45, 90],
+    "expected_information_gain": 0.93,
+    "expected_economic_upside": 0.82,
+    "data_cost_usd_tranche_a": 6.018208749593,
+    "implementation_cost": 0.34,
+    "overfitting_risk": 0.25,
+    "deployment_risk": 0.18,
+    "next_materially_distinct_alternative": "Cross-asset term-structure or options-implied state, subject to a new EVI and budget decision."
+  },
+  "novelty_audit": {
+    "registry_candidates_scanned": 75312,
+    "matching_mbt_met_bitcoin_ether_crypto_candidates": 0,
+    "matching_crypto_tombstones": 0,
+    "cached_mbt_met_datasets_before_manifest": 0,
+    "excluded_repetition": [
+      "SINGLE_INSTRUMENT_GENERIC_EVENT_TIME_CLOCK",
+      "EQUITY_MINI_MICRO_PARTICIPATION",
+      "CROSS_CLOCK_SPEED"
+    ]
+  },
+  "data_contract": {
+    "dataset": "GLBX.MDP3",
+    "symbols": ["MBT.c.0", "MET.c.0"],
+    "stype_in": "continuous",
+    "primary_schema": "tbbo",
+    "definition_schema": "definition",
+    "q4_2024_access": false,
+    "tranche_a": {
+      "start": "2022-01-01",
+      "end_exclusive": "2024-01-01",
+      "roles": ["DISCOVERY", "VALIDATION"],
+      "official_estimates": {
+        "tbbo": {
+          "record_count": 2884481,
+          "billable_size_bytes": 230758480,
+          "estimated_cost_usd": 6.017496287823
+        },
+        "definition": {
+          "record_count": 1250,
+          "billable_size_bytes": 450000,
+          "estimated_cost_usd": 0.00071246177
+        }
+      },
+      "official_total_cost_usd": 6.018208749593
+    },
+    "tranche_b_conditional": {
+      "start": "2024-01-01",
+      "end_exclusive": "2024-10-01",
+      "role": "FINAL_DEVELOPMENT",
+      "acquire_only_after_validation_gate": true,
+      "official_estimates": {
+        "tbbo": {
+          "record_count": 3344147,
+          "billable_size_bytes": 267531760,
+          "estimated_cost_usd": 6.976434290409
+        },
+        "definition": {
+          "record_count": 474,
+          "billable_size_bytes": 170640,
+          "estimated_cost_usd": 0.000270165503
+        }
+      },
+      "official_total_cost_usd": 6.976704455912
+    }
+  },
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "start": "2022-01-01",
+      "end": "2023-01-01",
+      "candidate_modification_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "start": "2023-01-01",
+      "end": "2024-01-01",
+      "candidate_modification_allowed": false
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "start": "2024-01-01",
+      "end": "2024-10-01",
+      "candidate_modification_allowed": false
+    }
+  ],
+  "causal_contract": {
+    "state_engine": "ONE_SHARED_TBBO_EVENT_ENGINE_BATCH_EQUALS_STREAMING",
+    "available_at": "TS_RECV_WHEN_PRESENT_ELSE_TS_EVENT_PLUS_ZERO_WITH_EXCHANGE_ORDERING",
+    "decision_features": "ONLY_CURRENT_AND_PRIOR_TBBO_EVENTS",
+    "entry": "FIRST_TARGET_TBBO_STRICTLY_AFTER_DECISION_AT_EXECUTABLE_ASK_FOR_BUY_OR_BID_FOR_SELL",
+    "exit": "FIRST_CAUSAL_STOP_TARGET_OR_FROZEN_TIME_EXIT; SAME_EVENT_STOP_FIRST",
+    "future_label_eligibility": false,
+    "negative_shift_allowed": false,
+    "backfill_allowed": false,
+    "missing_future_coverage": "DATA_CENSORED"
+  },
+  "candidate_lattice": {
+    "targets": ["MBT", "MET"],
+    "mechanisms": [
+      "CROSS_FLOW_CONFIRMATION_CONTINUATION",
+      "CROSS_CRYPTO_RESPONSE_LAG_CATCHUP",
+      "OWN_FLOW_REJECTION_REVERSAL"
+    ],
+    "event_windows_trade_count": [50, 200],
+    "holding_minutes": [5, 15],
+    "proposal_count": 24,
+    "discovery_flow_shock_quantile": 0.9,
+    "normalization": "CAUSAL_TRAILING_MEDIAN_AND_MAD_BY_CONTRACT_SESSION",
+    "minimum_episode_separation_seconds": 60,
+    "stop_risk_units": 1.0,
+    "target_stop_multiple": 1.5,
+    "minimum_stop_ticks": 4,
+    "maximum_one_initial_position_per_opportunity_episode": true
+  },
+  "execution": {
+    "fill_model": "TBBO_EXECUTABLE_TOP_OF_BOOK_NEXT_TARGET_EVENT_V1",
+    "normal_round_turn_fees_usd": {"MBT": 2.82, "MET": 0.82},
+    "normal_extra_slippage_ticks_per_side": 0,
+    "stressed_extra_slippage_ticks_per_side": 1,
+    "partial_fill": "CAP_BY_DISPLAYED_TOP_SIZE_AND_PERSIST_REMAINDER_UNFILLED",
+    "no_touch_fill_assumption": true,
+    "session_timezone": "America/Chicago",
+    "mandatory_flatten_local": "15:10"
+  },
+  "selection_gate": {
+    "selection_on_discovery_only": true,
+    "maximum_selected_specs": 6,
+    "minimum_discovery_independent_episodes": 200,
+    "minimum_validation_independent_episodes": 100,
+    "validation_stressed_net_usd_minimum_exclusive": 0,
+    "minimum_validation_stressed_edge_to_cost_ratio": 1.25,
+    "maximum_single_trade_or_day_positive_profit_share": 0.25,
+    "required_controls": [
+      "DIRECTION_FLIP",
+      "SESSION_TIME_SHIFT",
+      "OWN_FLOW_ONLY",
+      "MBT_MET_MARKET_PERMUTATION"
+    ],
+    "account_replay_before_event_gate": false,
+    "tranche_b_before_validation_gate": false
+  },
+  "account_contract": {
+    "primary_diagnostic_size": "50K",
+    "all_sizes_after_event_gate": ["50K", "100K", "150K"],
+    "mbt_met_contract_cap_class": "MINI_EQUIVALENT_NOT_STANDARD_MICRO",
+    "maximum_contracts_by_account": {"50K": 5, "100K": 10, "150K": 15},
+    "account_replay_status": "BLOCKED_UNTIL_VALIDATION_EVENT_GATE"
+  },
+  "official_rule_evidence": {
+    "base_snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "base_snapshot_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "retrieved_at_utc": "2026-07-20T17:10:00Z",
+    "sources": [
+      "https://help.topstep.com/en/articles/8284197-trading-combine-parameters",
+      "https://help.topstep.com/en/articles/8284206-when-and-what-products-can-i-trade",
+      "https://help.topstep.com/en/articles/8284223-what-is-the-scaling-plan",
+      "https://help.topstep.com/en/articles/8284213-topstepx-commissions-and-fees"
+    ],
+    "verified_facts": {
+      "mbt_met_permitted": true,
+      "mbt_met_count_at_mini_equivalent_caps": true,
+      "mandatory_flatten_local": "15:10",
+      "mbt_round_turn_cost_usd": 2.82,
+      "met_round_turn_cost_usd": 0.82
+    }
+  },
+  "budget": {
+    "authoritative_cumulative_cap_usd": 200.720719923081,
+    "cumulative_actual_before_usd": 179.74927547276397,
+    "remaining_before_usd": 20.971444450317016,
+    "maximum_branch_purchase_usd": 12.994913205505,
+    "sequential_stop_after_tranche_a_failure": true,
+    "projected_remaining_after_both_tranches_usd": 7.976531244812015
+  },
+  "governance": {
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "single_authoritative_writer": true,
+    "no_broker": true,
+    "no_orders": true,
+    "no_live_trading": true,
+    "no_q4_access": true,
+    "no_xfa_before_clean_combine_survivors": true
+  },
+  "manifest_hash": "b899c1a6d5b3356b92785019f369de6ee3a18abf3dc8bc4e2db123601b50ffa6"
+}
