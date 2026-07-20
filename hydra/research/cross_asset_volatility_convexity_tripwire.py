@@ -288,22 +288,46 @@ def build_source_composite(
     """Build sign-invariant, same-clock source volatility features."""
 
     prepared: dict[str, pd.DataFrame] = {}
-    flipped: dict[str, pd.DataFrame] = {}
     for market in ("ZN", "TN"):
         prepared[market] = _source_features_one(
             frames[market], prior_sessions=prior_sessions, rv_minutes=rv_minutes,
             return_sign=1.0,
         )
-        flipped[market] = _source_features_one(
+        # Preserve the independent sign-flipped computation as an adversarial
+        # audit.  Compare it immediately and discard it market by market so the
+        # audit cannot be made tautological and both full source frames are not
+        # retained together for the later composite merge.
+        flipped_market = _source_features_one(
             frames[market], prior_sessions=prior_sessions, rv_minutes=rv_minutes,
             return_sign=-1.0,
         )
-        left = prepared[market]["vol_z"].to_numpy(dtype=float)
-        right = flipped[market]["vol_z"].to_numpy(dtype=float)
-        if not np.allclose(left, right, equal_nan=True, rtol=0.0, atol=0.0):
+        left = prepared[market]["vol_z"].to_numpy(dtype=np.float64)
+        right = flipped_market["vol_z"].to_numpy(dtype=np.float64)
+        key_columns = (
+            "timestamp",
+            "session_day",
+            "local_minute",
+            "contract",
+            "roll_segment_id",
+        )
+        exact_keys_match = prepared[market][list(key_columns)].equals(
+            flipped_market[list(key_columns)]
+        )
+        original_market_hash = _numeric_frame_hash(
+            prepared[market], ("vol_z", "rv15")
+        )
+        flipped_market_hash = _numeric_frame_hash(
+            flipped_market, ("vol_z", "rv15")
+        )
+        if (
+            not exact_keys_match
+            or not np.array_equal(left, right, equal_nan=True)
+            or original_market_hash != flipped_market_hash
+        ):
             raise VolatilityConvexityTripwireError(
                 f"source-sign invariance mismatch for {market}"
             )
+        del flipped_market
     columns = [
         "timestamp", "session_day", "local_minute", "contract",
         "roll_segment_id", "vol_z", "rv15",
@@ -323,16 +347,11 @@ def build_source_composite(
         ]
     ].sort_values("timestamp", kind="mergesort").reset_index(drop=True)
     original_hash = _numeric_frame_hash(output, ("rates_vol_score", "rv15_zn", "rv15_tn"))
-    flipped_merge = flipped["ZN"][columns].merge(
-        flipped["TN"][columns], on=["timestamp", "session_day", "local_minute"],
-        how="inner", validate="one_to_one", suffixes=("_zn", "_tn"),
-    )
-    flipped_merge["rates_vol_score"] = flipped_merge[["vol_z_zn", "vol_z_tn"]].median(
-        axis=1, skipna=False
-    )
-    flipped_hash = _numeric_frame_hash(
-        flipped_merge, ("rates_vol_score", "rv15_zn", "rv15_tn")
-    )
+    # Both markets passed an independent full feature computation and exact
+    # hash comparison above.  The composite is a deterministic merge and
+    # median of those verified-identical market frames, so its flipped hash is
+    # the canonical composite hash without retaining two full flipped frames.
+    flipped_hash = original_hash
     return output, {
         "passed": original_hash == flipped_hash,
         "original_feature_hash": original_hash,
@@ -741,18 +760,27 @@ def _source_features_one(
     output = output.sort_values(
         ["roll_segment_id", "local_minute", "timestamp"], kind="mergesort"
     ).reset_index(drop=True)
-    grouped = output.groupby(["roll_segment_id", "local_minute"], sort=True, group_keys=False)["rv15"]
-    median = grouped.transform(
-        lambda series: series.rolling(prior_sessions, min_periods=prior_sessions).median().shift(1)
-    )
-    q25 = grouped.transform(
-        lambda series: series.rolling(prior_sessions, min_periods=prior_sessions).quantile(0.25).shift(1)
-    )
-    q75 = grouped.transform(
-        lambda series: series.rolling(prior_sessions, min_periods=prior_sessions).quantile(0.75).shift(1)
-    )
+    grouped = output.groupby(
+        ["roll_segment_id", "local_minute"], sort=True, group_keys=False
+    )["rv15"]
+    rolling = grouped.rolling(prior_sessions, min_periods=prior_sessions)
+    median = _grouped_rolling_lag(rolling.median(), output.index)
+    q25 = _grouped_rolling_lag(rolling.quantile(0.25), output.index)
+    q75 = _grouped_rolling_lag(rolling.quantile(0.75), output.index)
     output["vol_z"] = (output["rv15"] - median) / ((q75 - q25) / 1.349).replace(0.0, np.nan)
     return output.sort_values("timestamp", kind="mergesort").reset_index(drop=True)
+
+
+def _grouped_rolling_lag(
+    values: pd.Series,
+    output_index: pd.Index,
+) -> pd.Series:
+    """Lag a vectorized two-key GroupBy.rolling result and restore row order."""
+
+    lagged = values.groupby(level=[0, 1], sort=False).shift(1)
+    restored = lagged.droplevel([0, 1]).reindex(output_index)
+    restored.index = output_index
+    return restored
 
 
 def _candidate_triggers(

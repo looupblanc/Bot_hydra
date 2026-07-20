@@ -4,7 +4,9 @@ from types import SimpleNamespace
 
 import numpy as np
 import pandas as pd
+import pytest
 
+import hydra.research.cross_asset_volatility_convexity_tripwire as tripwire
 from hydra.research.cross_asset_volatility_convexity_tripwire import (
     _match_control_events,
     build_source_composite,
@@ -208,6 +210,274 @@ def test_source_volatility_is_exactly_sign_flip_invariant() -> None:
     assert audit["passed"] is True
     assert audit["original_feature_hash"] == audit["source_sign_flipped_feature_hash"]
     assert audit["decision_source_direction_fields"] == []
+
+
+def _multi_segment_source_frames() -> dict[str, pd.DataFrame]:
+    sessions = pd.bdate_range("2022-01-03", periods=48)
+    frames: dict[str, pd.DataFrame] = {}
+    for market, base in (("ZN", 110.0), ("TN", 112.0)):
+        rows: list[dict[str, object]] = []
+        for session_number, day in enumerate(sessions):
+            segment_number = session_number // 24
+            segment_session = session_number % 24
+            start = pd.Timestamp(day).tz_localize("UTC") + pd.Timedelta(hours=15)
+            for minute in range(24):
+                # Vary both session scale and intraday curvature so the
+                # same-clock rolling quantiles contain non-degenerate values.
+                log_move = (
+                    (segment_session + 1)
+                    * (minute + 1) ** 2
+                    * (1.0 + 0.1 * segment_number)
+                    * 1e-7
+                )
+                rows.append(
+                    {
+                        "timestamp": start + pd.Timedelta(minutes=minute),
+                        "contract": f"{market}{'H' if segment_number == 0 else 'M'}2",
+                        "roll_segment_id": f"{market}:segment-{segment_number}",
+                        "close": base * np.exp(log_move),
+                    }
+                )
+        frames[market] = pd.DataFrame(rows)
+    return frames
+
+
+def _legacy_source_composite(
+    frames: dict[str, pd.DataFrame],
+    *,
+    prior_sessions: int,
+    rv_minutes: int,
+) -> tuple[pd.DataFrame, str, str]:
+    prepared = {
+        market: _legacy_source_features_one(
+            frames[market],
+            prior_sessions=prior_sessions,
+            rv_minutes=rv_minutes,
+            return_sign=1.0,
+        )
+        for market in ("ZN", "TN")
+    }
+    flipped = {
+        market: _legacy_source_features_one(
+            frames[market],
+            prior_sessions=prior_sessions,
+            rv_minutes=rv_minutes,
+            return_sign=-1.0,
+        )
+        for market in ("ZN", "TN")
+    }
+    columns = [
+        "timestamp",
+        "session_day",
+        "local_minute",
+        "contract",
+        "roll_segment_id",
+        "vol_z",
+        "rv15",
+    ]
+
+    def merged(values: dict[str, pd.DataFrame]) -> pd.DataFrame:
+        output = values["ZN"][columns].merge(
+            values["TN"][columns],
+            on=["timestamp", "session_day", "local_minute"],
+            how="inner",
+            validate="one_to_one",
+            suffixes=("_zn", "_tn"),
+        )
+        output["rates_vol_score"] = output[["vol_z_zn", "vol_z_tn"]].median(
+            axis=1,
+            skipna=False,
+        )
+        return output
+
+    original_merge = merged(prepared)
+    expected = original_merge[
+        [
+            "timestamp",
+            "session_day",
+            "local_minute",
+            "rates_vol_score",
+            "rv15_zn",
+            "rv15_tn",
+            "contract_zn",
+            "contract_tn",
+            "roll_segment_id_zn",
+            "roll_segment_id_tn",
+        ]
+    ].sort_values("timestamp", kind="mergesort").reset_index(drop=True)
+    hash_columns = ("rates_vol_score", "rv15_zn", "rv15_tn")
+    return (
+        expected,
+        tripwire._numeric_frame_hash(expected, hash_columns),
+        tripwire._numeric_frame_hash(merged(flipped), hash_columns),
+    )
+
+
+def _legacy_source_features_one(
+    frame: pd.DataFrame,
+    *,
+    prior_sessions: int,
+    rv_minutes: int,
+    return_sign: float,
+) -> pd.DataFrame:
+    """Reference implementation from before vectorized GroupBy.rolling."""
+
+    pieces: list[pd.DataFrame] = []
+    for segment_id, group in frame.groupby("roll_segment_id", sort=True):
+        ordered = group.sort_values("timestamp", kind="mergesort").copy()
+        ordered["gap_segment"] = ordered["timestamp"].diff().ne(
+            pd.Timedelta(minutes=1)
+        ).cumsum()
+        for _gap, segment in ordered.groupby("gap_segment", sort=True):
+            segment = segment.copy()
+            returns = return_sign * np.log(segment["close"].astype(float)).diff()
+            segment["rv15"] = np.sqrt(
+                returns.pow(2).rolling(rv_minutes, min_periods=rv_minutes).sum()
+            )
+            segment["roll_segment_id"] = segment_id
+            pieces.append(segment)
+    output = pd.concat(pieces, ignore_index=True)
+    local = output["timestamp"].dt.tz_convert("America/Chicago")
+    output["session_day"] = local.dt.strftime("%Y%m%d").astype(int)
+    output["local_minute"] = local.dt.hour * 60 + local.dt.minute
+    output = output.sort_values(
+        ["roll_segment_id", "local_minute", "timestamp"], kind="mergesort"
+    ).reset_index(drop=True)
+    grouped = output.groupby(
+        ["roll_segment_id", "local_minute"], sort=True, group_keys=False
+    )["rv15"]
+    median = grouped.transform(
+        lambda series: series.rolling(
+            prior_sessions, min_periods=prior_sessions
+        ).median().shift(1)
+    )
+    q25 = grouped.transform(
+        lambda series: series.rolling(
+            prior_sessions, min_periods=prior_sessions
+        ).quantile(0.25).shift(1)
+    )
+    q75 = grouped.transform(
+        lambda series: series.rolling(
+            prior_sessions, min_periods=prior_sessions
+        ).quantile(0.75).shift(1)
+    )
+    output["vol_z"] = (output["rv15"] - median) / (
+        (q75 - q25) / 1.349
+    ).replace(0.0, np.nan)
+    return output.sort_values("timestamp", kind="mergesort").reset_index(drop=True)
+
+
+def test_optimized_source_composite_is_exactly_legacy_equivalent(
+    monkeypatch,
+) -> None:
+    frames = _multi_segment_source_frames()
+    expected, legacy_original_hash, legacy_flipped_hash = _legacy_source_composite(
+        frames,
+        prior_sessions=20,
+        rv_minutes=15,
+    )
+    original_transform = tripwire._source_features_one
+    calls: list[tuple[str, float]] = []
+
+    def counted_transform(
+        frame: pd.DataFrame,
+        *,
+        prior_sessions: int,
+        rv_minutes: int,
+        return_sign: float,
+    ) -> pd.DataFrame:
+        calls.append((str(frame.iloc[0]["roll_segment_id"])[:2], return_sign))
+        return original_transform(
+            frame,
+            prior_sessions=prior_sessions,
+            rv_minutes=rv_minutes,
+            return_sign=return_sign,
+        )
+
+    monkeypatch.setattr(tripwire, "_source_features_one", counted_transform)
+    actual, audit = build_source_composite(
+        frames,
+        prior_sessions=20,
+        rv_minutes=15,
+    )
+
+    pd.testing.assert_frame_equal(actual, expected, check_exact=True)
+    assert calls == [("ZN", 1.0), ("ZN", -1.0), ("TN", 1.0), ("TN", -1.0)]
+    assert legacy_original_hash == legacy_flipped_hash
+    assert audit["original_feature_hash"] == legacy_original_hash
+    assert audit["source_sign_flipped_feature_hash"] == legacy_flipped_hash
+    assert audit["passed"] is True
+
+
+def test_independent_negative_source_corruption_is_detected(monkeypatch) -> None:
+    frames = _multi_segment_source_frames()
+    original_transform = tripwire._source_features_one
+
+    def corrupt_negative_transform(
+        frame: pd.DataFrame,
+        *,
+        prior_sessions: int,
+        rv_minutes: int,
+        return_sign: float,
+    ) -> pd.DataFrame:
+        output = original_transform(
+            frame,
+            prior_sessions=prior_sessions,
+            rv_minutes=rv_minutes,
+            return_sign=return_sign,
+        )
+        if return_sign < 0.0:
+            finite = np.flatnonzero(np.isfinite(output["vol_z"].to_numpy(dtype=float)))
+            assert len(finite) > 0
+            row = int(finite[0])
+            output.loc[row, "vol_z"] = float(output.loc[row, "vol_z"]) + 1.0
+        return output
+
+    monkeypatch.setattr(
+        tripwire,
+        "_source_features_one",
+        corrupt_negative_transform,
+    )
+    with pytest.raises(
+        tripwire.VolatilityConvexityTripwireError,
+        match="source-sign invariance mismatch for ZN",
+    ):
+        build_source_composite(frames, prior_sessions=20, rv_minutes=15)
+
+
+def test_independent_negative_source_timestamp_corruption_is_detected(
+    monkeypatch,
+) -> None:
+    frames = _multi_segment_source_frames()
+    original_transform = tripwire._source_features_one
+
+    def corrupt_negative_timestamp(
+        frame: pd.DataFrame,
+        *,
+        prior_sessions: int,
+        rv_minutes: int,
+        return_sign: float,
+    ) -> pd.DataFrame:
+        output = original_transform(
+            frame,
+            prior_sessions=prior_sessions,
+            rv_minutes=rv_minutes,
+            return_sign=return_sign,
+        )
+        if return_sign < 0.0:
+            output.loc[0, "timestamp"] += pd.Timedelta(microseconds=1)
+        return output
+
+    monkeypatch.setattr(
+        tripwire,
+        "_source_features_one",
+        corrupt_negative_timestamp,
+    )
+    with pytest.raises(
+        tripwire.VolatilityConvexityTripwireError,
+        match="source-sign invariance mismatch for ZN",
+    ):
+        build_source_composite(frames, prior_sessions=20, rv_minutes=15)
 
 
 def test_true_session_calendar_retains_roll_and_censors_gaps() -> None:
