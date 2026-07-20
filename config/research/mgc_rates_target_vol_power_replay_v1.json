@@ -1,0 +1,154 @@
+{
+  "schema": "hydra_mgc_rates_target_vol_power_replay_card_v1",
+  "decision_id": "MGC_RATES_TARGET_VOL_POWER_REPLAY_20260720_V1",
+  "evidence_role": "BOUNDED_PRE_Q4_DEVELOPMENT_POWER_REPLAY",
+  "hypothesis": "The one frozen rates-target volatility-gap MGC OCO candidate can be decided on the preregistered longer pre-Q4 sample without changing its causal signal, OCO, risk, account, control, power, or economic gates.",
+  "frozen_candidate": {
+    "candidate_id": "volconv_MGC_rates_target_vol_gap_oco_open_v1",
+    "structural_fingerprint": "5a4c4cfa065ce3322f4acf0ef0e286b9b672d4d46d1bd7a0fc55df57a828816f",
+    "parent_branch": "CROSS_ASSET_VOLATILITY_CONVEXITY_WITHOUT_DIRECTION_TRANSFER_V1",
+    "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+    "source_markets": ["ZN", "TN"],
+    "execution_market": "MGC",
+    "session_role": "OPEN",
+    "parameter_mutation_allowed": false,
+    "discovery_reselection_allowed": false,
+    "status_inheritance_allowed": false
+  },
+  "frozen_inputs": {
+    "acquisition_card_path": "config/research/mgc_rates_target_vol_power_extension_v1.json",
+    "acquisition_card_hash": "dc8b4c275107f5c0b6e3b7c404cecf75ba11b9e586bfc2aa837b9f487d3c52b5",
+    "acquisition_receipt_path": "reports/data_access/mgc_rates_target_vol_power_extension_acquisition_receipt.json",
+    "rule_snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "rule_snapshot_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "data_start_inclusive": "2015-09-01T00:00:00Z",
+    "data_end_exclusive": "2021-11-04T00:00:00Z"
+  },
+  "chronological_roles": {
+    "WARMUP_ONLY": ["2015-09-01", "2015-10-01"],
+    "DISCOVERY": ["2015-10-01", "2019-09-10"],
+    "VALIDATION": ["2019-09-10", "2020-06-24"],
+    "FINAL_DEVELOPMENT": ["2020-06-24", "2021-11-04"]
+  },
+  "power_preflight": {
+    "minimum_independent_events_per_target": {
+      "DISCOVERY": 60,
+      "VALIDATION": 12,
+      "FINAL_DEVELOPMENT": 20
+    },
+    "threshold_relaxation_allowed": false,
+    "when_underpowered": "MGC_POWER_REPLAY_UNDERPOWERED_NO_THRESHOLD_RELAXATION"
+  },
+  "causal_contract": {
+    "source_markets": ["ZN", "TN"],
+    "execution_markets": ["MGC"],
+    "data_start_inclusive": "2015-09-01T00:00:00Z",
+    "data_end_exclusive": "2021-11-04T00:00:00Z",
+    "source_rv_minutes": 15,
+    "normalization_prior_true_sessions": 20,
+    "normalization": "SAME_LOCAL_MINUTE_PRIOR_20_TRUE_SESSIONS_ROLLING_MEDIAN_IQR",
+    "session_roles_chicago": {
+      "OPEN": ["07:00", "10:00"]
+    },
+    "minimum_observed_minutes_for_complete_session": 400,
+    "calendar_inventory_window_chicago": ["07:00", "14:00"],
+    "maximum_events_per_session": 3,
+    "event_reset_minutes": 60,
+    "source_roll_guard_true_sessions_each_side": 1,
+    "roll_unsafe_policy": "TRUE_SESSION_RETAINED_ZERO_TRADE",
+    "unexpected_gap_policy": "DATA_CENSORED",
+    "decision_rule": "Source features contain only absolute or squared returns. A completed source state may arm the frozen MGC OCO but cannot select direction.",
+    "entry_rule": "All OCO entry, stop and target levels are frozen at decision_time. No fill is allowed on the completed decision bar; the earliest executable bar is the next tradable MGC bar.",
+    "entry_double_touch_policy": "AMBIGUOUS_BOTH_TOUCH_ABSTAIN",
+    "exit_double_touch_policy": "STOP_FIRST_CONSERVATIVE",
+    "source_sign_flip_invariance_required": true,
+    "same_session_flatten_required": true,
+    "future_outcomes_in_decision": false,
+    "mechanism": {
+      "mechanism": "RATES_TARGET_VOL_GAP_OCO",
+      "source_score_minimum": 1.5,
+      "source_target_score_gap_minimum": 1.5,
+      "target_range_quantile": null,
+      "target_vol_quantile": 0.5,
+      "oco_lookback_minutes": 30,
+      "oco_valid_minutes": 30,
+      "stop_range_fraction": 0.5,
+      "minimum_stop_ticks": 4,
+      "target_r_multiple": 3.0,
+      "maximum_holding_minutes": 60
+    },
+    "normal_all_in_cost_per_micro_usd": {"MGC": 4.0},
+    "stressed_all_in_cost_per_micro_usd": {"MGC": 6.0}
+  },
+  "account_frontier": {
+    "account_sizes": ["50K", "100K", "150K"],
+    "risk_fraction_of_current_mll_buffer": [0.1, 0.2, 0.3],
+    "horizons_trading_days": [5, 10, 20],
+    "maximum_concurrent_positions": 1,
+    "daily_loss_guard_fraction_of_mll": 0.35,
+    "daily_profit_guard_fraction_of_base_target": 0.45,
+    "special_micro_caps": {
+      "MGC": {"50K": 30, "100K": 60, "150K": 90}
+    }
+  },
+  "controls": [
+    "TARGET_ONLY_DUTY_MATCHED_OCO",
+    "SOURCE_SHIFT_5_TRUE_SESSIONS",
+    "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO",
+    "SOURCE_MAGNITUDE_PERMUTATION"
+  ],
+  "control_implementation_contract": {
+    "TARGET_ONLY_DUTY_MATCHED_OCO": "TARGET_ONLY_POOL_ROLE_LOCAL_ONE_TO_ONE_MATCH",
+    "SOURCE_SHIFT_5_TRUE_SESSIONS": "CAUSAL_SAME_CLOCK_LAG_5_TRUE_OBSERVATIONS",
+    "SESSION_TIME_DIRECTION_EXPOSURE_MATCHED_PLACEBO": "ROLE_LOCAL_PLUS_45_MINUTE_CYCLIC_TARGET_ONLY_PLACEBO_WITH_15_MINUTE_TOLERANCE",
+    "SOURCE_MAGNITUDE_PERMUTATION": "NONDEPLOYABLE_ROLE_LOCAL_SHA256_MAGNITUDE_PERMUTATION_NULL",
+    "target_only_and_session_placebo_may_share_decision_timestamp": false,
+    "all_control_event_timestamps_disjoint": true,
+    "cross_role_matching_allowed": false
+  },
+  "control_power_contract": {
+    "exact_role_local_primary_cardinality_required": true,
+    "roles": ["VALIDATION", "FINAL_DEVELOPMENT"],
+    "when_unmatched": "MGC_POWER_REPLAY_CONTROL_UNDERPOWERED"
+  },
+  "frozen_gate": {
+    "minimum_distinct_positive_targets": 1,
+    "positive_stressed_validation_net_required": true,
+    "positive_stressed_final_development_net_required": true,
+    "minimum_combined_final_normal_passes": 2,
+    "minimum_combined_final_stressed_passes": 1,
+    "minimum_positive_quarter_or_market_contexts": 2,
+    "maximum_stressed_mll_breach_rate": 0.1,
+    "passing_consistency_required": true,
+    "minimum_final_stressed_target_progress_p25": 0.0,
+    "minimum_median_target_progress_uplift_over_each_control": 0.1,
+    "one_extra_pass_can_replace_progress_uplift": true,
+    "maximum_single_trade_profit_concentration": 0.5,
+    "evidence_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC"
+  },
+  "governance": {
+    "status_ceiling": "TIER_E_EXECUTABLE_DIAGNOSTIC",
+    "promotion_allowed": false,
+    "tier_q_allowed": false,
+    "xfa_allowed": false,
+    "independent_confirmation_claimed": false,
+    "q4_access_allowed": false,
+    "protected_holdout_access_allowed": false,
+    "network_access_allowed": false,
+    "data_purchase_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "maximum_cpu_workers": 1,
+    "mission_state_writes_allowed": false,
+    "service_or_controller_changes_allowed": false,
+    "queue_changes_allowed": false
+  },
+  "next_branch_rule": {
+    "when_green": "FREEZE_TIER_E_DIAGNOSTIC_ONLY_NO_PROMOTION_OR_XFA",
+    "when_weak": "PRESERVE_DIAGNOSTIC_ONLY_NO_NEIGHBOR_THRESHOLD_TUNING",
+    "when_falsified": "TOMBSTONE_EXACT_RATES_TARGET_VOL_GAP_MGC_OCO",
+    "when_underpowered": "CLOSE_POWER_EXTENSION_WITHOUT_THRESHOLD_RELAXATION",
+    "when_control_underpowered": "CLOSE_AS_NONDECISIVE_WITHOUT_ARTIFICIAL_CONTROL_WIN"
+  },
+  "card_hash": "a42aa4e6d7cc30448d13f0ffb3c6b9c1560e89c0e46d2279300893405e9cf9cc"
+}
