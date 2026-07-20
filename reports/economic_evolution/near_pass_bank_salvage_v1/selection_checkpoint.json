@@ -1,0 +1,667 @@
+{
+  "broker_connections": 0,
+  "eligible_near_pass_count": 77,
+  "exclusions": {
+    "confirmation_failed_ids": [
+      "hazard_19327ab34a21d623c654a6cc",
+      "hazard_1f49e74c20f7bad315dd5cee",
+      "hazard_367100adab5fe2a69a4f3257"
+    ],
+    "operational_summary_hash": "28cd7305d4e2d3b46b5a678c746e650fe2cb367ed5dd51cf8ee580fddb7758bc",
+    "pass_bank_hash": "b5a2f90f86eb339b2ec86e52372efd0d06f8caa5ece2d60aff1c60d5decf45f7",
+    "quarantined_ids": [
+      "hazard_01340d634a288f435a06760c",
+      "hazard_020ae195ccef8e39b1907e38",
+      "hazard_0a569f580a2540474116636c",
+      "hazard_16a744e747cafb88a7e2c83b",
+      "hazard_1f3ff3e1f6d2b9d5e8eec1b3",
+      "hazard_2afe13b4c912d4aa7f238626"
+    ],
+    "tombstone_contract": "SOURCE_0029_BANK_ALREADY_CEMETERY_SCREENED"
+  },
+  "maximum_candidate_count": 24,
+  "no_data_purchase": true,
+  "no_new_strategy_grammar": true,
+  "orders": 0,
+  "q4_access_count_delta": 0,
+  "rejection_counts": {
+    "ALREADY_BANKED_QUARANTINED_OR_CONFIRMATION_FAILED": 46,
+    "NO_CAUSAL_MLL_SAFE_STATIC_CELL": 39,
+    "NO_POSITIVE_STRESSED_REFERENCE_CELL": 14
+  },
+  "schema": "hydra_near_pass_bank_salvage_selection_v1",
+  "selected": [
+    {
+      "account_base_cells": {
+        "100K": "f6d5f3cd23629bed3edc38f915a9881770bedb2b83e3698103da4acc54d2a0ce",
+        "150K": "c3746f947b1761f6f5d32926969e3802342331f9be85ede96f1b5906cc3e7cdc",
+        "50K": "e2399829e45fc8aa48862b4a2014c83a98e9794ac28dbe91a536a36d3f8eee8d"
+      },
+      "candidate_fingerprint": "1478619b60a10a3b9bccef4fc0e5fbbdbc80d8ec492fa07d61b00d4e824b9499",
+      "candidate_id": "hazard_1478619b60a10a3b9bccef4f",
+      "execution_market": "M2K",
+      "holding_horizon": 15,
+      "market": "RTY",
+      "mechanism": "EXHAUSTION_REVERSAL",
+      "realized_behavioral_fingerprint": "2f46a99d2369221f7c75644afc35b40ea3304f0a3e07045b99a428b53dab3731",
+      "selection_rank": [
+        1,
+        0.042012768648305304,
+        266.9844251425093,
+        0,
+        5,
+        115
+      ],
+      "session_code": 0,
+      "source_completed_event_count": 115,
+      "timeframe": "60m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "362f00d5a5a423a8e9f71b45ffeeecf9aac4ebbebfebce941fa0f1e4966dfb65",
+        "150K": "2b91d674d29ce36c03ac2e0eaeda1bcd0198ccbb5d9a1e31020fe9da766775e7",
+        "50K": "0d131406bd0790ed5b36c09540f8db7091fd026e70c868f921ee7a7dd26ddf3c"
+      },
+      "candidate_fingerprint": "190bc1bc8fe3f4a3e33f054d3222b17a27298c67048cbe9b9e22b7b9961f9e64",
+      "candidate_id": "hazard_190bc1bc8fe3f4a3e33f054d",
+      "execution_market": "M2K",
+      "holding_horizon": 30,
+      "market": "RTY",
+      "mechanism": "FAILED_CONTINUATION_REVERSAL",
+      "realized_behavioral_fingerprint": "6cdd73c337a2fe4fcf1331c0c4ddf444e4d3952d7526505e738640074c637826",
+      "selection_rank": [
+        1,
+        0.031502581113130874,
+        1471.6205688147238,
+        0,
+        5,
+        33
+      ],
+      "session_code": 0,
+      "source_completed_event_count": 33,
+      "timeframe": "60m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "8b31708bbde24c0a6b21849c4d2cb1c75c045ccda50e70d27da9758287412c4e",
+        "150K": "0156943cf67cc4a1869bcf73946fa63ca969c83e410e21769b0ffbc3590be986",
+        "50K": "5297457a74840793d41f73e1d8e214941887b43ddb09d94f6beb51e1a621e36d"
+      },
+      "candidate_fingerprint": "0e70f18dbc8de50ba5e91dcc488f53ce51eb6ef72f8073d286619f880b956b95",
+      "candidate_id": "hazard_0e70f18dbc8de50ba5e91dcc",
+      "execution_market": "M2K",
+      "holding_horizon": 30,
+      "market": "RTY",
+      "mechanism": "COMPRESSION_TO_EXPANSION",
+      "realized_behavioral_fingerprint": "3d88b61cb93684a1450d986bfbc7ced00001246a7f458c26963b52283085bd81",
+      "selection_rank": [
+        1,
+        0.005315667174846264,
+        669.1438501645462,
+        2,
+        5,
+        38
+      ],
+      "session_code": 2,
+      "source_completed_event_count": 38,
+      "timeframe": "15m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "179c2ad31657dc7b383bbf1a6338d35afb4157885c6cc30ebba2adbfd25b2650",
+        "150K": "62d8f96cfc5944cdcdc01e22f391b041c30d1a00851ea9616add58636be1e7ad",
+        "50K": "0a86e6482767895d7898970e9022e11a1b6b7974bde7504bdbd22631bdaefe78"
+      },
+      "candidate_fingerprint": "001ce8b9666b8ed7db62c37aef975aa884477dd1f7b5eb441d11376b94bfbebe",
+      "candidate_id": "hazard_001ce8b9666b8ed7db62c37a",
+      "execution_market": "M2K",
+      "holding_horizon": 5,
+      "market": "RTY",
+      "mechanism": "PARTICIPATION_DENSITY",
+      "realized_behavioral_fingerprint": "7722c80744aec67fdec58c1b15c961133263a6d1c8f7380ff37b0d974e220dc4",
+      "selection_rank": [
+        1,
+        0.0,
+        379.12206284217245,
+        0,
+        5,
+        5
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 5,
+      "timeframe": "15m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "10ebb7f8a17dcdb839ba2f608329e8b67a6323b3255d0729bcb936b7ba09085a",
+        "150K": "16b7a29576b838d3e41092ebf4a8fb8a4e4caca616aba97d214c79f7b1a81d9e",
+        "50K": "e54ef052733d96ba68c867ccc2f49324245bcbe0a1fb7dd92d0216050ddbde43"
+      },
+      "candidate_fingerprint": "210623be47e9d0d0416d313d2d998c748b768db9cfb0c40adf1ef0cd2eb32afd",
+      "candidate_id": "hazard_210623be47e9d0d0416d313d",
+      "execution_market": "MCL",
+      "holding_horizon": "SESSION",
+      "market": "CL",
+      "mechanism": "INDEPENDENT_SOURCE_DENSITY",
+      "realized_behavioral_fingerprint": "93f0704883f70c8477ff4da69a4d18965e20853be769701a7c0efe7f5aa34d25",
+      "selection_rank": [
+        1,
+        0.2541662895670015,
+        5544.792952160962,
+        0,
+        4,
+        50
+      ],
+      "session_code": 0,
+      "source_completed_event_count": 50,
+      "timeframe": "60m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "f624511920998ca16b4d010c1665ef2fb4eb4647400da7d65ec126946d50b729",
+        "150K": "b99c437749d38edb3c7fe733f26698e3fa4da62e82588eb70a12befe03996aef",
+        "50K": "1c4b182c4e0ad53b5f14488b135f86b3f1eb7420f8396408e94ff5b98f09ca22"
+      },
+      "candidate_fingerprint": "13e7f1761b1956a1f1ec18b9667f73069a72e6ec0f7b37864e4d3029fb0374fc",
+      "candidate_id": "hazard_13e7f1761b1956a1f1ec18b9",
+      "execution_market": "MCL",
+      "holding_horizon": "SESSION",
+      "market": "CL",
+      "mechanism": "PARTICIPATION_DENSITY",
+      "realized_behavioral_fingerprint": "6c085714163822544e56491dd6e4100547badcd8ea2048993f4b9e3144186d76",
+      "selection_rank": [
+        1,
+        0.16148602500200893,
+        6284.014290740626,
+        0,
+        4,
+        125
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 125,
+      "timeframe": "1m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "552bb5a97e9e5bbea7410c0908d95819170ebbaecfbe231d936f5ca77df3be87",
+        "150K": "996dc0fd2eabf738dba3d87192fbf91b09cfbfd8074ac40ca154aa297f2cb78e",
+        "50K": "8e196ab239c5e039c6ae9061301ceffbd5d891e34a3c89630172453c915bbaa4"
+      },
+      "candidate_fingerprint": "19e56592ceb0d6369ba5d9b9ecfc3f1fb6a7b618f6cbc8e4ee43fb57919f2abf",
+      "candidate_id": "hazard_19e56592ceb0d6369ba5d9b9",
+      "execution_market": "MCL",
+      "holding_horizon": "SESSION",
+      "market": "CL",
+      "mechanism": "INDEPENDENT_SOURCE_DENSITY",
+      "realized_behavioral_fingerprint": "fb04e5261a5cb20774b9b47bde976e7b356cdef4f9f99aeafccc0c30706915f2",
+      "selection_rank": [
+        1,
+        0.06805865515724387,
+        1280.8246973931964,
+        0,
+        4,
+        79
+      ],
+      "session_code": 0,
+      "source_completed_event_count": 79,
+      "timeframe": "30m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "bc9a6723ac3d12e5ef3fc7e41f7cd7bf0ddd7d0784a0f07065d68d107e918b53",
+        "150K": "62a03ad57fa3a0c23a7f6f9a9be96d522e622832701dfd2a46b8e5d064537364",
+        "50K": "1b3d11db29f4a1decf5231b46ab0c31efa45f131181d728a2d3fdb2ed63b8ab4"
+      },
+      "candidate_fingerprint": "2baacb06e08311a5a8fb49b684379c1394bc2c912835d79d8eb33f88331fc828",
+      "candidate_id": "hazard_2baacb06e08311a5a8fb49b6",
+      "execution_market": "MCL",
+      "holding_horizon": 60,
+      "market": "CL",
+      "mechanism": "PARTICIPATION_DENSITY",
+      "realized_behavioral_fingerprint": "b40fe6ed2d4ab13050a2078689f4612e31549597945c804f966f1f078530fa9f",
+      "selection_rank": [
+        1,
+        0.047115096714513735,
+        4412.929420410888,
+        0,
+        4,
+        74
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 74,
+      "timeframe": "5m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "740f71dfca07fa6ab1588fc2402a8692201c782e27f08c9474866adf1870cd5e",
+        "150K": "0dd167d14c7555d7c5d856569f0d37a707134ca2a8abc50d9960475425109498",
+        "50K": "71c06b71928991d0552c9bffb97b7fcadcf5eaafb46fad79b92eb2a25071a12b"
+      },
+      "candidate_fingerprint": "1d25ad29b60cef80fe9544fe57a136aae1891f9faf4785e103813b1ab7dd9d07",
+      "candidate_id": "hazard_1d25ad29b60cef80fe9544fe",
+      "execution_market": "MCL",
+      "holding_horizon": "SESSION",
+      "market": "CL",
+      "mechanism": "DIRECTIONAL_PRESSURE_RELEASE",
+      "realized_behavioral_fingerprint": "e81e28067f4ac34c694568fe8ca4ec130678a14b6aee047965a041be95d14d39",
+      "selection_rank": [
+        1,
+        0.03035782607467263,
+        106.10470337713923,
+        2,
+        4,
+        41
+      ],
+      "session_code": 2,
+      "source_completed_event_count": 41,
+      "timeframe": "30m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "e37f8e71707d9bdd4a49def63ff3dae8c3215bb479fccbea3dc608ad0f2100ff",
+        "150K": "6ef06d3d2c9623ec779236dcb324b5424d00abd5647e341bd33b93199ef29e5c",
+        "50K": "e77c42a25e61adaf5831920e88e674db2985f8614913ce0b1a02d1160c17ae6f"
+      },
+      "candidate_fingerprint": "0a1b96c14502b6e4135456e6ebfd4f4902e442fef3aa7cd1cccc071fe04f1105",
+      "candidate_id": "hazard_0a1b96c14502b6e4135456e6",
+      "execution_market": "MCL",
+      "holding_horizon": 60,
+      "market": "CL",
+      "mechanism": "PARTICIPATION_DENSITY",
+      "realized_behavioral_fingerprint": "8755274a33f05fa49fbb7977a8ade1743ef9507b0ea5b10bbd76da30f3c674b5",
+      "selection_rank": [
+        1,
+        0.023723127671151208,
+        450.21489824925084,
+        0,
+        4,
+        48
+      ],
+      "session_code": 0,
+      "source_completed_event_count": 48,
+      "timeframe": "60m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "f340acddfe42a2b3a991b981579d0cf26b0848a77e61f7e197d370d57db8c004",
+        "150K": "2f5812c9332d2d7c731d48eda9d24559ef8d50a7519d57bda5a91d4730250884",
+        "50K": "81cecef7940752308af04592b3e69e74d8973637eda24d0afc17844cc33aa0cc"
+      },
+      "candidate_fingerprint": "0878260486258ce3bfdbb6661a4183be012584e71249a0a3c3079bcaf226a5de",
+      "candidate_id": "hazard_0878260486258ce3bfdbb666",
+      "execution_market": "MES",
+      "holding_horizon": "SESSION",
+      "market": "ES",
+      "mechanism": "DIRECTIONAL_PRESSURE_RELEASE",
+      "realized_behavioral_fingerprint": "336cabec8b9e4ae07f88338c4948e28bd21eaf0fd3e812adc3ef0924fee2943a",
+      "selection_rank": [
+        1,
+        0.1611169839697856,
+        3409.371572299904,
+        0,
+        4,
+        70
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 70,
+      "timeframe": "60m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "3e13a014752b453115a9c6e253ba79e94182fb4f0980ce5cc14d9ef8fcced729",
+        "150K": "d5f0c39f943923cb56a09872e856852a5246f86a753dfc0abef222e91a9294a5",
+        "50K": "96cb0623d008acb3318ac81d5a1d718095e82dfa44818088f63b527a4b070f71"
+      },
+      "candidate_fingerprint": "0c7f407e65efaa690f3c5dbed59eb0a429851f01f894774132849c5cb2e57841",
+      "candidate_id": "hazard_0c7f407e65efaa690f3c5dbe",
+      "execution_market": "MES",
+      "holding_horizon": "SESSION",
+      "market": "ES",
+      "mechanism": "COMPRESSION_TO_EXPANSION",
+      "realized_behavioral_fingerprint": "3fcae99b65815965310a27224fa016034d0713c4dff94ad72c2c0f0392668471",
+      "selection_rank": [
+        1,
+        0.081413895005604,
+        1944.890932509894,
+        0,
+        4,
+        63
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 63,
+      "timeframe": "15m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "129b4853bda5e53ab6ee4dc8377ecbc5d26c3f3eac6a0e9df31b42172c847d6f",
+        "150K": "d5ca7f4e49e31f821f238b0d9bd6d9cbbb48d7c511bc744acb96e6e1c2499ae0",
+        "50K": "3251506ebc60a4dd82fff3c4c8d03563a3b7d79463157a88a9fd33efbfa07933"
+      },
+      "candidate_fingerprint": "1aae498cb94aa4c28c4d3563811d5891a01b5c3a7040c9d83d4751211cb1fb06",
+      "candidate_id": "hazard_1aae498cb94aa4c28c4d3563",
+      "execution_market": "MES",
+      "holding_horizon": 60,
+      "market": "ES",
+      "mechanism": "COMPRESSION_TO_EXPANSION",
+      "realized_behavioral_fingerprint": "b1209b1dc0f412da6daee8fa49fe7ac5244446045c4c57662f03e0cefd3b732c",
+      "selection_rank": [
+        1,
+        0.0445569271797843,
+        547.5843020486427,
+        0,
+        4,
+        19
+      ],
+      "session_code": 0,
+      "source_completed_event_count": 19,
+      "timeframe": "5m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "f4af5b093a90b69781b14d4ead306e07009aa05c4a975f26afcbda9441047647",
+        "150K": "7fc26ea8e4175f097b2c26509392c42dc479ec04cc93f5c5a22cf654e3208adc",
+        "50K": "40af7d426e0e749cca528b6f29ebde0678e5f9499e7e0f25fe76d64da59e6a92"
+      },
+      "candidate_fingerprint": "1f5e792e93a8e00b5a6c03fc924083ce235009710a164663b8d8cc676e6a45e7",
+      "candidate_id": "hazard_1f5e792e93a8e00b5a6c03fc",
+      "execution_market": "MES",
+      "holding_horizon": "SESSION",
+      "market": "ES",
+      "mechanism": "COMPRESSION_TO_EXPANSION",
+      "realized_behavioral_fingerprint": "c770ca149d3c3d5817b9637c9e5c6ddb6f36c9f35fcfca8a27d5097f53cc801c",
+      "selection_rank": [
+        1,
+        0.0445569271797843,
+        478.1463521265541,
+        0,
+        4,
+        26
+      ],
+      "session_code": 0,
+      "source_completed_event_count": 26,
+      "timeframe": "1m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "9c4541c89861b90a255860b5748ad272a9d998a59e7fe2155f41169f106c2223",
+        "150K": "a065e890e47fee584fc4621dd3b6836ec51b78c669b70c81451796d9ad03f591",
+        "50K": "767de48efd8b95b23ab2721dc8060d0b2e7e058d956b460637da1a39d64c3712"
+      },
+      "candidate_fingerprint": "2fa9f404b68061d53b9ab7f5206a6ef195ebea6dd1b8c1927fa0ffc1b9b94ff6",
+      "candidate_id": "hazard_2fa9f404b68061d53b9ab7f5",
+      "execution_market": "MES",
+      "holding_horizon": "SESSION",
+      "market": "ES",
+      "mechanism": "INDEPENDENT_SOURCE_DENSITY",
+      "realized_behavioral_fingerprint": "401f1b0235ba6f0edb93eb7b862e9cb4f2114e1f014cce8d8f949148f0ef7338",
+      "selection_rank": [
+        1,
+        0.028115542589401837,
+        283.1691696438065,
+        0,
+        4,
+        23
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 23,
+      "timeframe": "30m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "74215fb5ef6151d826a60a3b2d05c7607edf3e1bdc486b7179ef33600ba24faf",
+        "150K": "cb260b061462cc816bb4d8095d5f7e0fc1b5682802b1039fd6ff8935746ecf82",
+        "50K": "69141414402540a36d638ade3140954f83db83eacc300816642a19f37113958d"
+      },
+      "candidate_fingerprint": "1132e3f96d0dda83b7b21bed0504f04b492b5127d7eb2a1e23076111f8fb9270",
+      "candidate_id": "hazard_1132e3f96d0dda83b7b21bed",
+      "execution_market": "MES",
+      "holding_horizon": 30,
+      "market": "ES",
+      "mechanism": "PARTICIPATION_DENSITY",
+      "realized_behavioral_fingerprint": "54876f01cad5874edea3f7dd03b1e8b06f5b668eb68abbdcb3734736715a3f2c",
+      "selection_rank": [
+        1,
+        0.01447561534049843,
+        321.45728735422017,
+        0,
+        4,
+        13
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 13,
+      "timeframe": "15m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "6e87a88f525be1bdd8fdeffc7a0e51a2ad03fe2955676efbc83e8a0f3d94bc6b",
+        "150K": "e6b129e66b3520ebf7ae4246799152131143042ba11b024cea240eb166798d1c",
+        "50K": "6bdf62fc38e84cca705f01452a29caac67f036a7854effa7bca77eb3c2dc79ac"
+      },
+      "candidate_fingerprint": "29d58c0e78274ba58d52bef99f0b06fe88621cc41359ed745e3fd16a69995b27",
+      "candidate_id": "hazard_29d58c0e78274ba58d52bef9",
+      "execution_market": "MYM",
+      "holding_horizon": "SESSION",
+      "market": "YM",
+      "mechanism": "RANGE_BREAKOUT_WITH_ROOM",
+      "realized_behavioral_fingerprint": "2f42ba739282a39f450946fc8fc2b3d92a7243b88ca08ade925d9593256d967a",
+      "selection_rank": [
+        1,
+        0.18322082786237298,
+        2204.8636776594212,
+        2,
+        2,
+        269
+      ],
+      "session_code": -1,
+      "source_completed_event_count": 269,
+      "timeframe": "1m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "558738f421c1a5d4bb3a3a1928c7a348dd11a85b0de3faa6047340440500ed1c",
+        "150K": "7d7df27ce7ec23e485aac77f39f2fa47c66f4d54d23ec3222f655938222a2383",
+        "50K": "4b1740ba2efbffd23e16108763788b210ca46188e5f847b6e2307cbc77a6db17"
+      },
+      "candidate_fingerprint": "2571fc4c3e3ee07b258da89f7801d05826451ae00596c6bc2e7c7274458ef439",
+      "candidate_id": "hazard_2571fc4c3e3ee07b258da89f",
+      "execution_market": "MYM",
+      "holding_horizon": "SESSION",
+      "market": "YM",
+      "mechanism": "RANGE_BREAKOUT_WITH_ROOM",
+      "realized_behavioral_fingerprint": "449527928072d08cb484a6d28e381fc0a4525dafd6a92b89c0ab6a22db90b456",
+      "selection_rank": [
+        1,
+        0.14714494376563136,
+        3218.8151289243397,
+        2,
+        2,
+        159
+      ],
+      "session_code": 2,
+      "source_completed_event_count": 159,
+      "timeframe": "1m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "ed8b5d6b30ecf6802dd3e1ea7b739664471ef5d0dbf180dc62e66b0cfe0cbe5f",
+        "150K": "d285c17d3e94cba7dda8a18aae87b22e0086e3946cba62dfa4b1317a4f1dfe54",
+        "50K": "d5d067c0cdc42ef1eaa4307181ade2229f866ef9c0cf000ab84df4b4f3cf30b5"
+      },
+      "candidate_fingerprint": "32593bbbd942554e40e75e9f80bb6dfb97032a43ea4a20c3b65aa2a7432e7dde",
+      "candidate_id": "hazard_32593bbbd942554e40e75e9f",
+      "execution_market": "MYM",
+      "holding_horizon": "SESSION",
+      "market": "YM",
+      "mechanism": "CROSS_ASSET_STATE",
+      "realized_behavioral_fingerprint": "796f565803bade33d987e1ca8bfc3a1b0d54db5ad2791a0c7981e1c4f4311dcc",
+      "selection_rank": [
+        1,
+        0.12504042780482633,
+        1664.5972788939616,
+        0,
+        2,
+        228
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 228,
+      "timeframe": "5m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "4dbb767d62f1d58329e712820aca81d8a009f7218d217a47a9c7689d95fb9f8d",
+        "150K": "50d075176cfbd748cf210c6b578f073d21c34862db5d12fa10cf067f9c9a06df",
+        "50K": "b58c589a1b109b1314b8e1d0211fc9171f6d6c1c8243282ee98fbc5f51656c37"
+      },
+      "candidate_fingerprint": "21a565329d4036480effad80b5d176f552e46a01caee982052c66a8df004eac5",
+      "candidate_id": "hazard_21a565329d4036480effad80",
+      "execution_market": "MYM",
+      "holding_horizon": 30,
+      "market": "YM",
+      "mechanism": "PARTICIPATION_DENSITY",
+      "realized_behavioral_fingerprint": "aba043f7248956e7f3c1b4215ec15f45067d793e449489025da9c0bb4908a361",
+      "selection_rank": [
+        1,
+        0.1147323832069645,
+        4058.6155618714693,
+        0,
+        2,
+        20
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 20,
+      "timeframe": "15m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "856240624592bba66a757949d13eedc5e024b78ce47503149adfd8c55805cc68",
+        "150K": "bbaf0616d77f9d1afd31c0845ff35024272a229e56e2ec4f7c2dd9efb2430df1",
+        "50K": "97471e6dad7b5e31b784ba25de0d21dd3a6c28bcfb1df32f8075f51e11397ec8"
+      },
+      "candidate_fingerprint": "083d1c2c8c21ea52bcf4a15286a222ceaa1f2e51c0cd352f62a48eaf38ba7929",
+      "candidate_id": "hazard_083d1c2c8c21ea52bcf4a152",
+      "execution_market": "MYM",
+      "holding_horizon": "SESSION",
+      "market": "YM",
+      "mechanism": "COMPRESSION_TO_EXPANSION",
+      "realized_behavioral_fingerprint": "cd0a591421343693b11233fd833b797ab787d59876596cfef9d4de2e90e7b0f3",
+      "selection_rank": [
+        1,
+        0.0805504106794348,
+        1614.5521270958416,
+        0,
+        2,
+        10
+      ],
+      "session_code": 0,
+      "source_completed_event_count": 10,
+      "timeframe": "1m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "725816c7ef8b11565e0a3c537a394cb44086b79e01990f9752eab8f750967466",
+        "150K": "28f9154991519e409db61ab1e048366779243dad733b026b6d9f658bccc12353",
+        "50K": "9a434116cb630bea30b5a7618dd067fd89cf3044e1fbaa3d6e28020ec5a05224"
+      },
+      "candidate_fingerprint": "26e1f21fec9d63c61da8264f9a3bd7e1153f5827387f698787e5f044ae41d743",
+      "candidate_id": "hazard_26e1f21fec9d63c61da8264f",
+      "execution_market": "MNQ",
+      "holding_horizon": "SESSION",
+      "market": "NQ",
+      "mechanism": "CROSS_ASSET_STATE",
+      "realized_behavioral_fingerprint": "31da1bbf606eda01334fb62266370d54fb22f62bc20e7ee33a366420073b5b5a",
+      "selection_rank": [
+        1,
+        0.2588950834388549,
+        6425.551228797223,
+        0,
+        1,
+        285
+      ],
+      "session_code": 0,
+      "source_completed_event_count": 285,
+      "timeframe": "5m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "9a6a1bbf4aa82cb99c624939c2ee3845bed5ffe16905bc89e4143b8bb1f43b87",
+        "150K": "f4a97ba3ef205fd0b06b10f3e32cd2a2757885ac6308b44950b8cf76641ed98a",
+        "50K": "41f0add3f3009020196b45bb870107155ee32807bf47c82dc9fac084ca596151"
+      },
+      "candidate_fingerprint": "13cc904579455181282c6efd29301383d3a36c88c5101c8c481825bc9408fb56",
+      "candidate_id": "hazard_13cc904579455181282c6efd",
+      "execution_market": "MNQ",
+      "holding_horizon": "SESSION",
+      "market": "NQ",
+      "mechanism": "DIRECTIONAL_PRESSURE_RELEASE",
+      "realized_behavioral_fingerprint": "b12bf9d5e3a70d6adf785717b1610172717952243a64a422126f06356e12c817",
+      "selection_rank": [
+        1,
+        0.15534197744399716,
+        4684.710273116158,
+        0,
+        1,
+        39
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 39,
+      "timeframe": "60m"
+    },
+    {
+      "account_base_cells": {
+        "100K": "1c71128b944d691381f0c444d1cff1967afccee5fdab5096b0a51cf0041d8ccd",
+        "150K": "1283d3b1775cd4bc20296b7df9f0ee806fb4a0613a4c63475fe2b999bfea11ba",
+        "50K": "0f27de110dc296bfaf04e15f325ef0d6f9a46fbd13b62c5d0074806fe0582c01"
+      },
+      "candidate_fingerprint": "19f608feeb39fe4442b29770fc8050fc79288d6e356c88dbf7e802704549b32b",
+      "candidate_id": "hazard_19f608feeb39fe4442b29770",
+      "execution_market": "MNQ",
+      "holding_horizon": 30,
+      "market": "NQ",
+      "mechanism": "INDEPENDENT_SOURCE_DENSITY",
+      "realized_behavioral_fingerprint": "8464b703b972e752f8815c7cedc2c3f9a4aabad8338aa947d5c8569b716c883c",
+      "selection_rank": [
+        1,
+        0.09750517394034977,
+        2807.3157624713276,
+        0,
+        1,
+        36
+      ],
+      "session_code": 1,
+      "source_completed_event_count": 36,
+      "timeframe": "30m"
+    }
+  ],
+  "selected_candidate_count": 24,
+  "selected_candidate_ids": [
+    "hazard_1478619b60a10a3b9bccef4f",
+    "hazard_190bc1bc8fe3f4a3e33f054d",
+    "hazard_0e70f18dbc8de50ba5e91dcc",
+    "hazard_001ce8b9666b8ed7db62c37a",
+    "hazard_210623be47e9d0d0416d313d",
+    "hazard_13e7f1761b1956a1f1ec18b9",
+    "hazard_19e56592ceb0d6369ba5d9b9",
+    "hazard_2baacb06e08311a5a8fb49b6",
+    "hazard_1d25ad29b60cef80fe9544fe",
+    "hazard_0a1b96c14502b6e4135456e6",
+    "hazard_0878260486258ce3bfdbb666",
+    "hazard_0c7f407e65efaa690f3c5dbe",
+    "hazard_1aae498cb94aa4c28c4d3563",
+    "hazard_1f5e792e93a8e00b5a6c03fc",
+    "hazard_2fa9f404b68061d53b9ab7f5",
+    "hazard_1132e3f96d0dda83b7b21bed",
+    "hazard_29d58c0e78274ba58d52bef9",
+    "hazard_2571fc4c3e3ee07b258da89f",
+    "hazard_32593bbbd942554e40e75e9f",
+    "hazard_21a565329d4036480effad80",
+    "hazard_083d1c2c8c21ea52bcf4a152",
+    "hazard_26e1f21fec9d63c61da8264f",
+    "hazard_13cc904579455181282c6efd",
+    "hazard_19f608feeb39fe4442b29770"
+  ],
+  "selection_hash": "03ac3a96690ede5a1ba8f799e17b8475b6c5457df94dfbade9b82c0c4458472c",
+  "selection_role": "VIEWED_DEVELOPMENT_B1_B2_ONLY",
+  "source_exact_candidate_count": 176,
+  "status": "FROZEN_BEFORE_DYNAMIC_REPLAY",
+  "stress_is_robustness_metric_not_normal_pass_veto": true
+}

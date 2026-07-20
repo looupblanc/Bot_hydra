@@ -1,0 +1,10 @@
+{
+  "completed_at_utc": "2026-07-20T07:41:49.502669+00:00",
+  "exact_account_episode_count": 30786,
+  "pid": 4014551,
+  "recovered_count": 1,
+  "result_hash": "89934c0d20840d91af3c2ae0202bab8a05eac7f77e12eff774292e28fc568f9a",
+  "schema": "hydra_near_pass_bank_salvage_state_v1",
+  "selected_candidate_count": 24,
+  "status": "COMPLETE"
+}
