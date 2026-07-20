@@ -1,0 +1,107 @@
+{
+  "actual_incremental_spend_usd": 0.517611466349,
+  "broker_connections": 0,
+  "bundle_id": "a6e5a0c4933d34880b9a",
+  "campaign_id": "OPTIONS_IV_TEACHER_STUDENT_TRIPWIRE_V1",
+  "chronological_roles": [
+    {
+      "candidate_modification_allowed": true,
+      "role": "DISCOVERY",
+      "sessions": [
+        "2024-09-03",
+        "2024-09-04",
+        "2024-09-05",
+        "2024-09-06",
+        "2024-09-09",
+        "2024-09-10",
+        "2024-09-11",
+        "2024-09-12",
+        "2024-09-13",
+        "2024-09-16",
+        "2024-09-17",
+        "2024-09-18"
+      ]
+    },
+    {
+      "candidate_modification_allowed": false,
+      "role": "VALIDATION",
+      "sessions": [
+        "2024-09-19",
+        "2024-09-20",
+        "2024-09-23",
+        "2024-09-24"
+      ]
+    },
+    {
+      "candidate_modification_allowed": false,
+      "role": "FINAL_DEVELOPMENT",
+      "sessions": [
+        "2024-09-25",
+        "2024-09-26",
+        "2024-09-27",
+        "2024-09-30"
+      ]
+    }
+  ],
+  "created_at_utc": "2026-07-20T23:37:25.091071+00:00",
+  "deployment_requires_futures_only_student": true,
+  "download_status": "DOWNLOADED",
+  "files": [
+    {
+      "kind": "RAW_DBN_STATISTICS",
+      "path": "/root/hydra-bot/data/cache/databento/options_iv_teacher_pilot/a6e5a0c4933d34880b9a/raw_statistics.dbn.zst",
+      "sha256": "280598e561dfeb7461c3abbdd896cddca14df0569ab684ae39ea45fbcbf35f9a",
+      "size_bytes": 142548723
+    },
+    {
+      "kind": "RAW_DBN_DEFINITION",
+      "path": "/root/hydra-bot/data/cache/databento/options_iv_teacher_pilot/a6e5a0c4933d34880b9a/raw_definition.dbn.zst",
+      "sha256": "923c9c54d44a2fc56a322e032b9ed6eb0d9df16c9e4c62993a4ef21ec0f612db",
+      "size_bytes": 5433551
+    }
+  ],
+  "inventory_hash": "e1bc0e016ccd78fdfffdac761a180d8bbf68dec0b0cd386c46644fc9bf39563f",
+  "manifest_hash": "5b245d49b37c4dad88423c6bb55c51a5983ee2f09a93d7a3ca19ed66da8372bf",
+  "network_data_request_made": true,
+  "official_estimates": {
+    "definition": {
+      "estimated_bytes": 51836400,
+      "estimated_cost_usd": 0.082069896162,
+      "estimated_records": 143990
+    },
+    "statistics": {
+      "estimated_bytes": 467659200,
+      "estimated_cost_usd": 0.435541570187,
+      "estimated_records": 7307175
+    }
+  },
+  "orders": 0,
+  "q4_access_count_delta": 0,
+  "receipt_hash": "66f7d13ef8673996c53972a43791dc686cbe54c18d7a7a0dcc7cdf50419a6876",
+  "requests": {
+    "definition": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "definition",
+      "start": "2024-09-03",
+      "stype_in": "parent",
+      "symbols": [
+        "ES.OPT",
+        "NQ.OPT"
+      ]
+    },
+    "statistics": {
+      "dataset": "GLBX.MDP3",
+      "end": "2024-10-01",
+      "schema": "statistics",
+      "start": "2024-09-03",
+      "stype_in": "parent",
+      "symbols": [
+        "ES.OPT",
+        "NQ.OPT"
+      ]
+    }
+  },
+  "schema": "hydra_options_iv_teacher_acquisition_receipt_v1",
+  "teacher_only": true
+}
