@@ -1,5 +1,5 @@
 {
-  "CONTRE": "Queue 0052 preserves all 20 prior campaigns unchanged and appends exactly one bounded development-only cross-ecology session-path analog router as ordinal 36. The existing controller alone must reserve six prospective comparisons before the single root-authorized read-only replay. No Q4, protected holdout, new data purchase, network, broker, order, mission-writer duplication, Tier-Q claim, promotion, or inherited status is authorized.",
+  "CONTRE": "Queue 0052 preserves all 20 prior campaigns unchanged and binds ordinal 36 to the completed hash-bound cross-ecology scientific result without another economic replay. The existing controller may publish only a NON_ECONOMIC_AUDIT_ONLY terminal because no genuinely materialized policy fragment exists. No Q4, protected holdout, new data purchase, network, broker, order, mission-writer duplication, EvidenceBundle fabrication, Tier-E award, Tier-Q claim, promotion, or inherited status is authorized.",
   "entries": [
     {
       "campaign_id": "hydra_economic_evolution_opportunity_density_0013",
@@ -730,11 +730,11 @@
       },
       "enabled": true,
       "engine": "production_kernel_v1",
-      "implementation_commit": "8d12d7ec0a5bafc987d392bfe446dbb536c0908f",
+      "implementation_commit": "fa461d2fa7db617d3f29bf89e0b44af380003f66",
       "initial_data_purchase_allowed": false,
-      "manifest_file_sha256": "8d23aaff470af49973b78b339df049ba0ea0ec9c955c9a788926319b80ec8e65",
+      "manifest_file_sha256": "035f0e504d4e0a662ed379fdc56757ca486dc90432fe9c5095df4612465e882e",
       "manifest_path": "config/v7/cross_ecology_session_path_analog_router_0036.json",
-      "manifest_semantic_hash": "f39c81d988bbe842395c39736df447979e1ca9fee996ee5dc18b1ec61ae92d23",
+      "manifest_semantic_hash": "1eacef72b3b296ca5d5f79c17d745821bd7fea89f42cce02376cd1ee82e835e8",
       "multiplicity": {
         "expected_global_N_trials_after_reservation": 862260,
         "prior_global_N_trials": 862254,
@@ -743,17 +743,20 @@
       "ordinal": 36,
       "q4_access_allowed": false,
       "scientific_contract": {
+        "canonical_evidence_status": "NO_GENUINELY_MATERIALIZED_POLICY_FRAGMENT",
         "class_id": "CAUSAL_CROSS_ECOLOGY_SESSION_PATH_ANALOG_ROUTER_V1",
         "embedded_canonical_evidence_requires_replay": false,
+        "economic_replay_allowed": false,
         "evidence_role": "VIEWED_PRE_Q4_DEVELOPMENT_TRIPWIRE_ONLY",
-        "maximum_economic_replays": 1,
+        "maximum_economic_replays": 0,
         "promotion_allowed": false,
-        "source_mode": "GENERATE_READ_ONLY_ONCE",
+        "source_mode": "PREEXISTING_HASH_BOUND",
+        "terminal_mode": "NON_ECONOMIC_AUDIT_ONLY",
         "tier_ceiling": "E",
         "tier_q_allowed": false
       },
-      "worm_commit": "9dbbd33bdcb20cbb165497bcfeda4d3880b410e4",
-      "worm_tag": "worm/cross-ecology-session-path-analog-router-0036-revision-01-2026-07-19"
+      "worm_commit": "4d719d93efea1ad35e36d5b692bcdde0dae43db5",
+      "worm_tag": "worm/cross-ecology-session-path-analog-router-0036-revision-02-2026-07-20"
     }
   ],
   "governance": {
@@ -762,8 +765,8 @@
     "proof_window_consumption_allowed": false,
     "q4_access_allowed": false
   },
-  "issued_at_utc": "2026-07-19T19:06:58Z",
-  "queue_hash": "ec2cbfbf5ae6f0763083f4dbda5d8c6bb2089d32287a042e9c1175791902439b",
+  "issued_at_utc": "2026-07-20T01:18:17Z",
+  "queue_hash": "be3e2dbb0284ef30bb23f417b137552dd662379dd0c5ccac5e302620d06f5968",
   "queue_id": "hydra_economic_evolution_production_queue_0052",
   "runtime_policy": {
     "auto_tombstone_failed_exact_class": true,
