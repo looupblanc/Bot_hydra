@@ -1,0 +1,113 @@
+{
+  "freeze_hash": "9bea583c6c78211d627399f448bf84dbce7272c47001c751b0b30be776c8ba75",
+  "manifest_hash": "2b8d2ad301342b91c2bb4e8c92ccde618738a427ac6db84e983bb848056671fa",
+  "schema": "hydra_fx_london_fix_flow_v1_selection_freeze",
+  "selected": [
+    {
+      "policy": {
+        "amplitude_atr": 0.5,
+        "exit_parameter": "16:01",
+        "mechanism": "PRE_FIX_CONTINUATION",
+        "root": "6E",
+        "session_scope": "MONTH_END",
+        "signal_mode": "CONSENSUS_3_OF_4",
+        "stop_atr": 1.0,
+        "target_atr": 2.0
+      },
+      "policy_id": "fxfix_5699762d585a150b86ffebe1"
+    },
+    {
+      "policy": {
+        "amplitude_atr": 0.5,
+        "exit_parameter": "16:05",
+        "mechanism": "PRE_FIX_CONTINUATION",
+        "root": "6E",
+        "session_scope": "MONTH_END",
+        "signal_mode": "CONSENSUS_3_OF_4",
+        "stop_atr": 1.0,
+        "target_atr": 2.0
+      },
+      "policy_id": "fxfix_23b46a222b7df93e364717c3"
+    },
+    {
+      "policy": {
+        "amplitude_atr": 0.5,
+        "exit_parameter": "16:15",
+        "mechanism": "PRE_FIX_CONTINUATION",
+        "root": "6E",
+        "session_scope": "MONTH_END",
+        "signal_mode": "CONSENSUS_3_OF_4",
+        "stop_atr": 1.0,
+        "target_atr": 2.0
+      },
+      "policy_id": "fxfix_b9a866bb4d017c20465e7bad"
+    },
+    {
+      "policy": {
+        "amplitude_atr": 1.0,
+        "exit_parameter": "16:01",
+        "mechanism": "PRE_FIX_CONTINUATION",
+        "root": "6E",
+        "session_scope": "MONTH_END",
+        "signal_mode": "CONSENSUS_3_OF_4",
+        "stop_atr": 1.0,
+        "target_atr": 2.0
+      },
+      "policy_id": "fxfix_e59672c4503ea043e51cfd6b"
+    },
+    {
+      "policy": {
+        "amplitude_atr": 1.0,
+        "exit_parameter": "16:05",
+        "mechanism": "PRE_FIX_CONTINUATION",
+        "root": "6E",
+        "session_scope": "MONTH_END",
+        "signal_mode": "CONSENSUS_3_OF_4",
+        "stop_atr": 1.0,
+        "target_atr": 2.0
+      },
+      "policy_id": "fxfix_77d02475f9281f45e88af82e"
+    },
+    {
+      "policy": {
+        "amplitude_atr": 1.0,
+        "exit_parameter": "16:15",
+        "mechanism": "PRE_FIX_CONTINUATION",
+        "root": "6E",
+        "session_scope": "MONTH_END",
+        "signal_mode": "CONSENSUS_3_OF_4",
+        "stop_atr": 1.0,
+        "target_atr": 2.0
+      },
+      "policy_id": "fxfix_f9c083426a141ca5cb4eb288"
+    },
+    {
+      "policy": {
+        "amplitude_atr": 1.0,
+        "exit_parameter": "16:01",
+        "mechanism": "PRE_FIX_CONTINUATION",
+        "root": "6E",
+        "session_scope": "MONTH_END",
+        "signal_mode": "OWN",
+        "stop_atr": 1.0,
+        "target_atr": 2.0
+      },
+      "policy_id": "fxfix_cd2ddb7467d9a3692c8525d8"
+    },
+    {
+      "policy": {
+        "amplitude_atr": 1.0,
+        "exit_parameter": "16:05",
+        "mechanism": "PRE_FIX_CONTINUATION",
+        "root": "6E",
+        "session_scope": "MONTH_END",
+        "signal_mode": "OWN",
+        "stop_atr": 1.0,
+        "target_atr": 2.0
+      },
+      "policy_id": "fxfix_c53eb510ba539ed30935591f"
+    }
+  ],
+  "selection_role": "DISCOVERY",
+  "status": "FROZEN_AFTER_DISCOVERY_BEFORE_HELD_ROLES"
+}

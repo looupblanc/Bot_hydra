@@ -1,0 +1,10 @@
+{
+  "decision_hash": "8efe988e96093a6aeca014a9e0be10641b9cd0baebc784874a50bf651d078a0d",
+  "expected_cost_usd": 0.0,
+  "hypothesis": "Benchmark-fix hedging creates continuation into 16:00 London and causal inventory unwind after the fix, distinct from generic FX residual ecology.",
+  "next_materially_distinct_alternative": "CROSS_ASSET_VOLATILITY_RISK_PREMIUM_CARRY_SHOCK",
+  "schema": "hydra_fx_london_fix_flow_v1_decision_card",
+  "smallest_decisive_experiment": "128 frozen policies, discovery-only selection, three held chronological development roles, controls and exact 50/100/150K P5/P10/P20.",
+  "status": "FROZEN_BEFORE_OUTCOMES",
+  "strongest_argument_against": "One-minute aggressive execution may consume the clock-conditioned edge and month-end flow may be too sparse."
+}

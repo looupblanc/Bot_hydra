@@ -1,0 +1,16 @@
+{
+  "counts": {
+    "account_cells": 108,
+    "deployable_p20_passes": 0,
+    "discovery_evaluated": 128,
+    "held_gate_passers": 0,
+    "held_policies": 8,
+    "oracle_p20_passes": 0,
+    "policies_frozen": 128
+  },
+  "next_action": "TOMBSTONE_FIX_FLOW_AND_START_CROSS_ASSET_VOLATILITY_RISK_PREMIUM",
+  "result_hash": "707a6bd69a01c0827de5bdec92a0e8516fbbbd988adfebe50495f113e05396fa",
+  "runtime_seconds": 108.95967653300613,
+  "status": "COMPLETE",
+  "verdict": "FX_LONDON_FIX_FLOW_FALSIFIED"
+}

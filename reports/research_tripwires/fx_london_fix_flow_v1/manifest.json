@@ -1,0 +1,1331 @@
+{
+  "broker_connections": 0,
+  "causal_contract": {
+    "costs": "FX_FROZEN_NORMAL_AND_1_5X_STRESSED",
+    "post_fix": "15:50_TO_COMPLETED_16:00; DECIDE_16:01; FILL_16:02; OPPOSITE_DIRECTION; HOLD_15/30/60",
+    "pre_fix": "15:30_TO_COMPLETED_15:55_EUROPE_LONDON; DECIDE_15:56; NEXT_OBSERVED_OPEN; EXIT_16:01/05/15",
+    "roll_exclusion": "PLUS_MINUS_ONE_SESSION"
+  },
+  "cemetery_audit": {
+    "classification": "MATERIALLY_DISTINCT_BENCHMARK_CLOCK_CONDITIONING",
+    "exact_fix_clock_hit_count": 0,
+    "prior_fx_result_sha256": "ef6debcc689b86c1147253c385141dad53240b65fe61efbd2dbf733a386dfa6d"
+  },
+  "decision_hash": "8efe988e96093a6aeca014a9e0be10641b9cd0baebc784874a50bf651d078a0d",
+  "inputs": {
+    "definition_path": "data/cache/databento/fx_causal_ecology/9a2ae71aabd3a11c8b7f/raw_definition.dbn.zst",
+    "definition_sha256": "4accf4d291799914091ffec1d4e6d2c808a3e98ad11bd4aacddceea14470c2dd",
+    "raw_path": "data/cache/databento/fx_causal_ecology/9a2ae71aabd3a11c8b7f/raw_ohlcv.dbn.zst",
+    "raw_sha256": "ea055647b648d7c49e8efb85ba9bd6a30b17ec1aaa5ba0a0ab663dd15fd7cbe8"
+  },
+  "manifest_hash": "2b8d2ad301342b91c2bb4e8c92ccde618738a427ac6db84e983bb848056671fa",
+  "new_data_purchase": false,
+  "numeric_threads_per_worker": 1,
+  "orders": 0,
+  "policies": [
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6E",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6B",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6J",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:01",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:05",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "16:15",
+      "mechanism": "PRE_FIX_CONTINUATION",
+      "root": "6A",
+      "session_scope": "MONTH_END",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_15M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_60M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_15M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_60M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6E",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_15M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_60M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_15M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_60M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6B",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_15M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_60M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_15M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_60M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6J",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_15M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 0.5,
+      "exit_parameter": "HOLD_60M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_15M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "OWN",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_30M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    },
+    {
+      "amplitude_atr": 1.0,
+      "exit_parameter": "HOLD_60M",
+      "mechanism": "POST_FIX_INVENTORY_UNWIND",
+      "root": "6A",
+      "session_scope": "DAILY",
+      "signal_mode": "CONSENSUS_3_OF_4",
+      "stop_atr": 1.0,
+      "target_atr": 2.0
+    }
+  ],
+  "policy_count": 128,
+  "q4_access": 0,
+  "roles": {
+    "DISCOVERY": [
+      "2018-01-02",
+      "2022-01-01"
+    ],
+    "FINAL_DEVELOPMENT": [
+      "2023-01-01",
+      "2024-01-01"
+    ],
+    "REPLICATION_DEVELOPMENT": [
+      "2024-01-01",
+      "2024-10-01"
+    ],
+    "VALIDATION": [
+      "2022-01-01",
+      "2023-01-01"
+    ]
+  },
+  "schema": "hydra_fx_london_fix_flow_v1_manifest",
+  "selection_uses_only": "DISCOVERY",
+  "status": "FROZEN_BEFORE_OUTCOMES",
+  "worker_processes": 1
+}
