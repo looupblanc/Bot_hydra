@@ -1,0 +1,233 @@
+{
+  "schema": "hydra_cross_asset_option_implied_vrp_regime_switch_manifest_v1",
+  "branch_id": "CROSS_ASSET_OPTION_IMPLIED_VRP_REGIME_SWITCH_V1",
+  "created_at_utc": "2026-07-21T03:37:52Z",
+  "decision_card": {
+    "path": "config/research/cross_asset_option_implied_vrp_regime_switch_decision_card_v1.json",
+    "file_sha256": "494430693570fe919ce26301d825e98731891343f591f20b910401fb084da5e7",
+    "decision_card_hash": "8c8cc298c113d3d6a7b228ab3834e6e5ff244be1c8d0b071a2a02f502733b437"
+  },
+  "predecessor": {
+    "branch_id": "OPTION_SETTLEMENT_SURFACE_TEACHER_STUDENT_TRIPWIRE_V1",
+    "terminal_status": "OPTION_SETTLEMENT_TEACHER_NO_INCREMENT",
+    "terminal_result_hash": "ec2f140a2ab641ff6e5a62b1e3b95354af2469ee5d49b8ba2f42d81583fdb128",
+    "reuse_boundary": "Reuse only immutable raw option settlements, definitions, reconstructed surfaces and underlying bars. No predecessor action, model, trade, economic or promotion status is inherited."
+  },
+  "frozen_inputs": {
+    "acquisition_receipt_path": "reports/data_access/options_iv_teacher_pilot_acquisition_receipt.json",
+    "acquisition_receipt_file_sha256": "36e43a3657fda3bfcf16ec226efe911bb421fb180efe072bf7a1d5c1a6de466e",
+    "acquisition_receipt_hash": "66f7d13ef8673996c53972a43791dc686cbe54c18d7a7a0dcc7cdf50419a6876",
+    "statistics_path": "data/cache/databento/options_iv_teacher_pilot/a6e5a0c4933d34880b9a/raw_statistics.dbn.zst",
+    "statistics_sha256": "280598e561dfeb7461c3abbdd896cddca14df0569ab684ae39ea45fbcbf35f9a",
+    "definition_path": "data/cache/databento/options_iv_teacher_pilot/a6e5a0c4933d34880b9a/raw_definition.dbn.zst",
+    "definition_sha256": "923c9c54d44a2fc56a322e032b9ed6eb0d9df16c9e4c62993a4ef21ec0f612db",
+    "underlying_ohlcv_path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_ES_MES_NQ_MNQ_2024-07-01_2024-10-01.dbn.zst",
+    "underlying_ohlcv_sha256": "d609fccf70bf533102cf8c8e5406a60643decc77f4573505edeab47db5e3e889",
+    "predecessor_surface_snapshot_hash": "df0aedee22ff44b2b3ac585b08f2367a8feb272a5cb122c844c21327c67675da",
+    "start": "2024-09-03",
+    "end_exclusive": "2024-10-01",
+    "q4_2024_access": false,
+    "incremental_purchase_usd": 0.0
+  },
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "sessions": [
+        "2024-09-03",
+        "2024-09-04",
+        "2024-09-05",
+        "2024-09-06",
+        "2024-09-09",
+        "2024-09-10",
+        "2024-09-11",
+        "2024-09-12",
+        "2024-09-13",
+        "2024-09-16",
+        "2024-09-17",
+        "2024-09-18"
+      ],
+      "candidate_modification_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "sessions": [
+        "2024-09-19",
+        "2024-09-20",
+        "2024-09-23",
+        "2024-09-24"
+      ],
+      "candidate_modification_allowed": false
+    },
+    {
+      "role": "FINAL_DEVELOPMENT",
+      "sessions": [
+        "2024-09-25",
+        "2024-09-26",
+        "2024-09-27",
+        "2024-09-30"
+      ],
+      "candidate_modification_allowed": false
+    }
+  ],
+  "evidence_role": {
+    "status": "VIEWED_DEVELOPMENT_ONLY",
+    "reason": "All sessions and predecessor structural outcomes have already been viewed by the mission.",
+    "maximum_tier": "E_DIAGNOSTIC",
+    "independent_confirmation_claim_allowed": false
+  },
+  "surface_contract": {
+    "markets": [
+      "ES",
+      "NQ"
+    ],
+    "use": "IMMEDIATELY_PRIOR_LISTED_SESSION_SETTLEMENT_ONLY",
+    "availability": "SURFACE_AVAILABLE_AT_MUST_BE_LESS_THAN_OR_EQUAL_TO_DECISION_TIME",
+    "required_status": "COMPLETE_FRONT_NEXT",
+    "minimum_complete_surface_count": 40
+  },
+  "vrp_feature_contract": {
+    "trailing_realized_session_count": 5,
+    "realized_measure": "MEAN_SQRT_SUM_ONE_MINUTE_LOG_RETURN_SQUARES_OVER_PRIOR_COMPLETE_RTH_SESSIONS",
+    "features": [
+      "ATM_STRADDLE_VOL_PROXY",
+      "LOG_IMPLIED_TO_REALIZED_RATIO",
+      "FRONT_NEXT_TERM_SLOPE",
+      "DOWNSIDE_UPSIDE_WING_PREMIUM_SKEW",
+      "ES_NQ_LOG_VRP_DIFFERENCE"
+    ],
+    "future_outcome_fields_allowed": false,
+    "negative_shift_allowed": false,
+    "centered_window_allowed": false,
+    "backfill_allowed": false
+  },
+  "opportunity_contract": {
+    "families": {
+      "OPENING_15_RANGE": {
+        "range_start_chicago": "08:30",
+        "range_end_exclusive_chicago": "08:45",
+        "decision_chicago": "08:45"
+      },
+      "MORNING_30_RANGE": {
+        "range_start_chicago": "09:30",
+        "range_end_exclusive_chicago": "10:00",
+        "decision_chicago": "10:00"
+      }
+    },
+    "trigger_offset_ticks": 1,
+    "entry_window_minutes": 30,
+    "maximum_one_initial_position_per_opportunity": 1,
+    "same_trigger_bar_high_and_low": "ABSTAIN_AMBIGUOUS",
+    "trigger_decision": "FIRST_COMPLETED_BAR_AFTER_DECISION_TOUCHING_EXACTLY_ONE_RANGE_EXTENSION",
+    "fill": "NEXT_TRADABLE_ONE_MINUTE_OPEN_STRICTLY_AFTER_TRIGGER_BAR"
+  },
+  "action_lattice": [
+    "BREAKOUT_OCO",
+    "FADE_EXTENSION",
+    "ABSTAIN"
+  ],
+  "action_semantics": {
+    "BREAKOUT_OCO": "Trade in the direction of the first unambiguous range extension.",
+    "FADE_EXTENSION": "Trade opposite the direction of the first unambiguous range extension.",
+    "ABSTAIN": "No trade and zero account change."
+  },
+  "execution_contract": {
+    "contracts": 1,
+    "market_parameters": {
+      "ES": {
+        "tick_size": 0.25,
+        "point_value_usd": 50.0,
+        "stop_ticks": 8,
+        "target_ticks": 12,
+        "normal_round_turn_fee_usd": 5.28
+      },
+      "NQ": {
+        "tick_size": 0.25,
+        "point_value_usd": 20.0,
+        "stop_ticks": 16,
+        "target_ticks": 24,
+        "normal_round_turn_fee_usd": 5.28
+      }
+    },
+    "maximum_holding_minutes": 60,
+    "mandatory_flatten_chicago": "15:10",
+    "normal_extra_slippage_ticks_per_side": 0,
+    "stressed_extra_slippage_ticks_per_side": 1,
+    "same_bar_stop_and_target": "STOP_FIRST",
+    "time_exit": "FIRST_TRADABLE_ONE_MINUTE_OPEN_AT_OR_AFTER_HOLDING_DEADLINE",
+    "intratrade_contract_roll": "HARD_FAILURE",
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "teacher_policy_contract": {
+    "status": "OPTIONS_TEACHER_ONLY_NOT_DEPLOYMENT_READY",
+    "model": "L2_REGULARIZED_MULTINOMIAL_LOGISTIC_REGRESSION",
+    "regularization_c": 0.25,
+    "random_state": 1701,
+    "maximum_iterations": 2000,
+    "training_role": "DISCOVERY_ONLY",
+    "training_label": "MAXIMUM_STRESSED_NET_ACTION_WITH_ABSTAIN_ZERO_FLOOR",
+    "class_order": [
+      "ABSTAIN",
+      "BREAKOUT_OCO",
+      "FADE_EXTENSION"
+    ],
+    "heldout_outcomes_may_be_opened_only_after_model_freeze": true
+  },
+  "controls": {
+    "static_actions": [
+      "STATIC_BREAKOUT_OCO",
+      "STATIC_FADE_EXTENSION",
+      "STATIC_ABSTAIN"
+    ],
+    "best_static_control": "DISCOVERY_STRESSED_NET_ARGMAX_FROZEN_BEFORE_HELDOUT",
+    "action_flip": "SWAP_BREAKOUT_AND_FADE_PRESERVE_ABSTAIN",
+    "random_action": "DETERMINISTIC_ROLE_MATCHED_ACTION_COUNTS_SEED_73032"
+  },
+  "selection_gate": {
+    "minimum_total_independent_opportunities": 40,
+    "minimum_validation_independent_opportunities": 8,
+    "minimum_final_development_independent_opportunities": 8,
+    "minimum_validation_trade_count": 2,
+    "minimum_final_development_trade_count": 2,
+    "minimum_trade_coverage_fraction": 0.25,
+    "validation_stressed_net_minimum_exclusive_usd": 0.0,
+    "final_development_stressed_net_minimum_exclusive_usd": 0.0,
+    "validation_paired_stressed_uplift_vs_best_static_minimum_exclusive_usd": 0.0,
+    "final_development_paired_stressed_uplift_vs_best_static_minimum_exclusive_usd": 0.0,
+    "validation_delta_vs_action_flip_minimum_exclusive_usd": 0.0,
+    "final_development_delta_vs_action_flip_minimum_exclusive_usd": 0.0,
+    "validation_delta_vs_random_action_minimum_exclusive_usd": 0.0,
+    "final_development_delta_vs_random_action_minimum_exclusive_usd": 0.0,
+    "maximum_event_level_50k_mll_breach_count": 0,
+    "maximum_single_day_positive_profit_share": 0.5,
+    "success_status": "OPTION_IMPLIED_VRP_REGIME_SWITCH_GREEN_TIER_E_DIAGNOSTIC",
+    "failure_status": "OPTION_IMPLIED_VRP_REGIME_SWITCH_FALSIFIED",
+    "coverage_failure_status": "OPTION_IMPLIED_VRP_REGIME_SWITCH_COVERAGE_UNDERPOWERED",
+    "tier_q_allowed": false,
+    "combine_replay_allowed": false,
+    "xfa_allowed": false,
+    "neighbor_threshold_retry_after_failure": false
+  },
+  "official_rule_evidence": {
+    "snapshot_path": "config/rulesets/topstep_official_2026-07-19.json",
+    "snapshot_file_sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b",
+    "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f"
+  },
+  "budget": {
+    "authoritative_cumulative_cap_usd": 200.720719923081,
+    "cumulative_actual_before_usd": 192.17549553961098,
+    "incremental_purchase_usd": 0.0,
+    "remaining_actual_usd": 8.54522438347002
+  },
+  "governance": {
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "single_authoritative_writer": true,
+    "no_broker": true,
+    "no_orders": true,
+    "no_live_trading": true,
+    "no_q4_access": true,
+    "no_full_regression": true
+  },
+  "manifest_hash": "f8119b6601a97341d30ab251ff484048442576c8254733ff6e6ec78409b2f327"
+}

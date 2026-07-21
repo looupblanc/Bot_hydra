@@ -1,0 +1,30 @@
+{
+  "schema": "hydra_research_branch_decision_card_v1",
+  "branch_id": "CROSS_ASSET_OPTION_IMPLIED_VRP_REGIME_SWITCH_V1",
+  "created_at_utc": "2026-07-21T03:37:52Z",
+  "hypothesis": "A causally available prior-session option-implied variance-risk-premium state can select among a symmetric futures breakout, a symmetric extension fade, and abstention for the next ES/NQ session, producing positive executable stressed utility without transferring a future direction.",
+  "why_target_velocity_can_improve": "The option surface measures a forward-looking volatility price. Conditioning a finite direction-neutral execution lattice on implied-versus-realized volatility may avoid paying breakout costs in overpriced-volatility states and avoid fading genuinely expanding states.",
+  "strongest_argument_against": "Only twenty listed sessions are available, the preceding settlement-surface directional veto added no information, option inputs are not directly available in the Topstep deployment plane, and a futures strategy may not capture an option variance-risk premium after costs.",
+  "smallest_decisive_experiment": "Use the existing sealed forty ES/NQ surfaces and underlying one-minute bars. Fit one discovery-only regularized action classifier over BREAKOUT_OCO, FADE_EXTENSION and ABSTAIN; freeze it before opening four validation and four final-development sessions; require positive held-role stressed utility and uplift versus the best frozen static action, action flip and deterministic random control.",
+  "expected_runtime_minutes": [
+    25,
+    45
+  ],
+  "expected_information_gain": 0.75,
+  "expected_economic_upside": 0.55,
+  "incremental_data_cost_usd": 0.0,
+  "implementation_cost": 0.25,
+  "overfitting_risk": 0.52,
+  "deployment_risk": 0.45,
+  "materially_distinct_from": [
+    "EVENT_TIME_VOLATILITY_BURST_DIRECT_ACCOUNT_V1",
+    "FX_LONDON_FIX_FLOW_V1",
+    "CROSS_ASSET_VOLATILITY_CONVEXITY_WITHOUT_DIRECTION_TRANSFER_V1",
+    "CURVE_RELATIVE_VALUE_TRIPWIRE_V1",
+    "OPTION_SETTLEMENT_SURFACE_TEACHER_STUDENT_TRIPWIRE_V1"
+  ],
+  "distinctness_reason": "The state is exogenous prior-session option-implied volatility relative to trailing realized volatility and it selects a direction-neutral execution geometry. It is not an endogenous variance clock, a directional transfer, a futures-curve spread, or a veto over the prior structural anchors.",
+  "next_materially_distinct_alternative": "Close the option-implied representation after failure and move to a non-option role-conditioned session-path analogue or another existing-data representation; do not tune neighbouring VRP thresholds.",
+  "evidence_ceiling": "TIER_E_DIAGNOSTIC_VIEWED_DEVELOPMENT_ONLY",
+  "decision_card_hash": "8c8cc298c113d3d6a7b228ab3834e6e5ff244be1c8d0b071a2a02f502733b437"
+}
