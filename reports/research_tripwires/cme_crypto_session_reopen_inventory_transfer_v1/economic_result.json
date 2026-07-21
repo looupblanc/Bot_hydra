@@ -1,0 +1,1713 @@
+{
+  "account_matrix": [],
+  "account_replay_executed": false,
+  "all_candidate_results": [
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "f81f036e6cd7146920c87903696f004cf3a5277cf83127ebecd5bd25737944a5",
+      "opportunity_count": 285,
+      "policy_id": "crypto_reopen_20e01c1c0d6d3dddbb72",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 133,
+          "event_path_hash": "3988c5e765429ee2304e0d1c8f615bfe69f60338538f0c562777187c4c522eae",
+          "gross_pnl_usd": -66.54249999999998,
+          "lower_quartile_stressed_event_usd": -9.32,
+          "market_event_counts": {
+            "MBT": 76,
+            "MET": 57
+          },
+          "maximum_positive_day_profit_share": 0.1339033015398556,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.1339033015398556,
+          "median_stressed_event_usd": -1.77,
+          "minimum_open_gross_pnl_usd": -71.0,
+          "normal_net_usd": -327.60249999999996,
+          "positive_stressed_event_rate": 0.21804511278195488,
+          "role": "DISCOVERY",
+          "session_count": 133,
+          "signal_count": 134,
+          "stop_count": 40,
+          "stressed_edge_to_cost_ratio": -0.1941372972342163,
+          "stressed_net_by_half_year": {
+            "H1": -169.68749999999991,
+            "H2": -239.61499999999984
+          },
+          "stressed_net_by_market": {
+            "MBT": -334.6199999999996,
+            "MET": -74.68249999999996
+          },
+          "stressed_net_per_event_usd": -3.077462406015037,
+          "stressed_net_usd": -409.30249999999995,
+          "target_count": 11
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 150,
+          "event_path_hash": "be358853dbb36e72809d52e47adae2089165133392ae9036d035438d6bdb2cbd",
+          "gross_pnl_usd": -61.218750000000014,
+          "lower_quartile_stressed_event_usd": -6.32,
+          "market_event_counts": {
+            "MBT": 83,
+            "MET": 67
+          },
+          "maximum_positive_day_profit_share": 0.13064556554119375,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.13064556554119375,
+          "median_stressed_event_usd": -1.395,
+          "minimum_open_gross_pnl_usd": -28.0,
+          "normal_net_usd": -350.21875,
+          "positive_stressed_event_rate": 0.21333333333333335,
+          "role": "VALIDATION",
+          "session_count": 150,
+          "signal_count": 151,
+          "stop_count": 36,
+          "stressed_edge_to_cost_ratio": -0.16165500396091897,
+          "stressed_net_by_half_year": {
+            "H1": -265.12374999999986,
+            "H2": -174.79499999999985
+          },
+          "stressed_net_by_market": {
+            "MBT": -374.7474999999996,
+            "MET": -65.17125000000001
+          },
+          "stressed_net_per_event_usd": -2.9327916666666667,
+          "stressed_net_usd": -439.91875000000005,
+          "target_count": 22
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 1,
+        "holding_minutes": 30,
+        "mechanism": "OWN_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "a8f4f47c992003aa114dafcdca7b45026d83a0371a5dda18ffd130d54d3d6268",
+      "opportunity_count": 285,
+      "policy_id": "crypto_reopen_a97e1efe29abd6e801bc",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 133,
+          "event_path_hash": "fd79225c1e5ed06fe48183d3fa8adeb308372896f49445da2f467ae70cd64f1a",
+          "gross_pnl_usd": -41.63375000000003,
+          "lower_quartile_stressed_event_usd": -10.32,
+          "market_event_counts": {
+            "MBT": 76,
+            "MET": 57
+          },
+          "maximum_positive_day_profit_share": 0.11140022140296357,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.11140022140296357,
+          "median_stressed_event_usd": -2.12,
+          "minimum_open_gross_pnl_usd": -71.0,
+          "normal_net_usd": -302.69375,
+          "positive_stressed_event_rate": 0.3233082706766917,
+          "role": "DISCOVERY",
+          "session_count": 133,
+          "signal_count": 134,
+          "stop_count": 70,
+          "stressed_edge_to_cost_ratio": -0.1214661862527717,
+          "stressed_net_by_half_year": {
+            "H1": -144.05874999999995,
+            "H2": -240.3349999999998
+          },
+          "stressed_net_by_market": {
+            "MBT": -303.45749999999964,
+            "MET": -80.93625000000006
+          },
+          "stressed_net_per_event_usd": -2.8901785714285713,
+          "stressed_net_usd": -384.39375,
+          "target_count": 33
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 150,
+          "event_path_hash": "ec16fd5582cc2bf81030dc972ac0db4f98b9ef04c8d75d094d21b5e49cec68fd",
+          "gross_pnl_usd": -113.09750000000003,
+          "lower_quartile_stressed_event_usd": -8.695,
+          "market_event_counts": {
+            "MBT": 83,
+            "MET": 67
+          },
+          "maximum_positive_day_profit_share": 0.10389098036253143,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.10389098036253143,
+          "median_stressed_event_usd": -1.4449999999999998,
+          "minimum_open_gross_pnl_usd": -28.0,
+          "normal_net_usd": -402.0975,
+          "positive_stressed_event_rate": 0.2866666666666667,
+          "role": "VALIDATION",
+          "session_count": 150,
+          "signal_count": 151,
+          "stop_count": 66,
+          "stressed_edge_to_cost_ratio": -0.2986466860311593,
+          "stressed_net_by_half_year": {
+            "H1": -302.92499999999984,
+            "H2": -188.87249999999992
+          },
+          "stressed_net_by_market": {
+            "MBT": -432.0099999999997,
+            "MET": -59.78750000000004
+          },
+          "stressed_net_per_event_usd": -3.2786500000000003,
+          "stressed_net_usd": -491.7975,
+          "target_count": 43
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 1,
+        "holding_minutes": 120,
+        "mechanism": "OWN_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "953fcf1c61c07b461f284d25974deb32c49f4d025c3ae0d2c38f094b4c8f5223",
+      "opportunity_count": 285,
+      "policy_id": "crypto_reopen_90808a1be7704c7baff7",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 133,
+          "event_path_hash": "c258e13931ae2ba569a2dbc89a9910ea9aa48cc2619ef0b2296e8641df33a21f",
+          "gross_pnl_usd": -127.70499999999998,
+          "lower_quartile_stressed_event_usd": -7.82,
+          "market_event_counts": {
+            "MBT": 76,
+            "MET": 57
+          },
+          "maximum_positive_day_profit_share": 0.17627147526761788,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.17627147526761788,
+          "median_stressed_event_usd": -2.32,
+          "minimum_open_gross_pnl_usd": -37.5,
+          "normal_net_usd": -388.765,
+          "positive_stressed_event_rate": 0.20300751879699247,
+          "role": "DISCOVERY",
+          "session_count": 133,
+          "signal_count": 134,
+          "stop_count": 44,
+          "stressed_edge_to_cost_ratio": -0.37257848056949466,
+          "stressed_net_by_half_year": {
+            "H1": -184.03749999999985,
+            "H2": -286.4274999999999
+          },
+          "stressed_net_by_market": {
+            "MBT": -387.98249999999956,
+            "MET": -82.48249999999997
+          },
+          "stressed_net_per_event_usd": -3.537330827067669,
+          "stressed_net_usd": -470.465,
+          "target_count": 8
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 150,
+          "event_path_hash": "4cc33cbaaf43e7f16d229a5f5a76bc2ac3cb7601c845783626a41caa39540583",
+          "gross_pnl_usd": -83.18125000000002,
+          "lower_quartile_stressed_event_usd": -6.695,
+          "market_event_counts": {
+            "MBT": 83,
+            "MET": 67
+          },
+          "maximum_positive_day_profit_share": 0.13955587513099618,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.13955587513099618,
+          "median_stressed_event_usd": -1.3699999999999999,
+          "minimum_open_gross_pnl_usd": -33.0,
+          "normal_net_usd": -372.18125000000003,
+          "positive_stressed_event_rate": 0.22,
+          "role": "VALIDATION",
+          "session_count": 150,
+          "signal_count": 151,
+          "stop_count": 33,
+          "stressed_edge_to_cost_ratio": -0.21964945867441252,
+          "stressed_net_by_half_year": {
+            "H1": -335.5099999999998,
+            "H2": -126.37124999999996
+          },
+          "stressed_net_by_market": {
+            "MBT": -396.22249999999957,
+            "MET": -65.65875000000001
+          },
+          "stressed_net_per_event_usd": -3.0792083333333333,
+          "stressed_net_usd": -461.88125,
+          "target_count": 22
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 5,
+        "holding_minutes": 30,
+        "mechanism": "OWN_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "db386c8d0b452bd175afe19293b8d7e582e705ec1b8826102a2ee28d85c4b3ad",
+      "opportunity_count": 285,
+      "policy_id": "crypto_reopen_9826ced39bd5ab8c43c2",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 133,
+          "event_path_hash": "bc3ab5040c8b9619173d7bd0b2c6f894b5fc332b8f33e6cce96c01e61f3d4d07",
+          "gross_pnl_usd": -37.34625000000003,
+          "lower_quartile_stressed_event_usd": -10.82,
+          "market_event_counts": {
+            "MBT": 76,
+            "MET": 57
+          },
+          "maximum_positive_day_profit_share": 0.1211216406324191,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.1211216406324191,
+          "median_stressed_event_usd": -2.42,
+          "minimum_open_gross_pnl_usd": -37.5,
+          "normal_net_usd": -298.40625000000006,
+          "positive_stressed_event_rate": 0.3157894736842105,
+          "role": "DISCOVERY",
+          "session_count": 133,
+          "signal_count": 134,
+          "stop_count": 72,
+          "stressed_edge_to_cost_ratio": -0.10895743377290243,
+          "stressed_net_by_half_year": {
+            "H1": -129.50874999999996,
+            "H2": -250.59749999999985
+          },
+          "stressed_net_by_market": {
+            "MBT": -295.56999999999977,
+            "MET": -84.53625000000002
+          },
+          "stressed_net_per_event_usd": -2.8579417293233083,
+          "stressed_net_usd": -380.10625000000005,
+          "target_count": 31
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 150,
+          "event_path_hash": "f54c2f98d22da5923a369a228a07e137820ca3eac032894e3761b109ad2aace7",
+          "gross_pnl_usd": -201.98,
+          "lower_quartile_stressed_event_usd": -9.695,
+          "market_event_counts": {
+            "MBT": 83,
+            "MET": 67
+          },
+          "maximum_positive_day_profit_share": 0.1131192564124827,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.1131192564124827,
+          "median_stressed_event_usd": -1.545,
+          "minimum_open_gross_pnl_usd": -33.0,
+          "normal_net_usd": -490.98,
+          "positive_stressed_event_rate": 0.2866666666666667,
+          "role": "VALIDATION",
+          "session_count": 150,
+          "signal_count": 151,
+          "stop_count": 64,
+          "stressed_edge_to_cost_ratio": -0.5333509374174809,
+          "stressed_net_by_half_year": {
+            "H1": -389.89374999999995,
+            "H2": -190.7862499999999
+          },
+          "stressed_net_by_market": {
+            "MBT": -521.5349999999997,
+            "MET": -59.14500000000002
+          },
+          "stressed_net_per_event_usd": -3.8712000000000004,
+          "stressed_net_usd": -580.6800000000001,
+          "target_count": 42
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 5,
+        "holding_minutes": 120,
+        "mechanism": "OWN_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "f83d73124023b28e54043a541ffb1b373c565c0122e9a6eee5cceb3a77bd131b",
+      "opportunity_count": 285,
+      "policy_id": "crypto_reopen_5924ce7d1d774e381613",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 133,
+          "event_path_hash": "b4b51b9fd3b30c5d8fccd8e3f1d07d9a5a1309f78d297bd3d16851a42d8fd996",
+          "gross_pnl_usd": -478.59875,
+          "lower_quartile_stressed_event_usd": -8.82,
+          "market_event_counts": {
+            "MBT": 76,
+            "MET": 57
+          },
+          "maximum_positive_day_profit_share": 0.28497210444097293,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.28497210444097293,
+          "median_stressed_event_usd": -1.97,
+          "minimum_open_gross_pnl_usd": -45.5,
+          "normal_net_usd": -739.6587499999999,
+          "positive_stressed_event_rate": 0.19548872180451127,
+          "role": "DISCOVERY",
+          "session_count": 133,
+          "signal_count": 134,
+          "stop_count": 43,
+          "stressed_edge_to_cost_ratio": -1.3963086416151242,
+          "stressed_net_by_half_year": {
+            "H1": -562.44,
+            "H2": -258.9187499999999
+          },
+          "stressed_net_by_market": {
+            "MBT": -737.1700000000014,
+            "MET": -84.18874999999998
+          },
+          "stressed_net_per_event_usd": -6.1756296992481206,
+          "stressed_net_usd": -821.35875,
+          "target_count": 7
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 150,
+          "event_path_hash": "3940d03a9decc3b9403eaf3803d4991399643b4ce3ef3a7ab5797c8d47f99af1",
+          "gross_pnl_usd": -205.3075,
+          "lower_quartile_stressed_event_usd": -8.32,
+          "market_event_counts": {
+            "MBT": 83,
+            "MET": 67
+          },
+          "maximum_positive_day_profit_share": 0.2632774889274022,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.2632774889274022,
+          "median_stressed_event_usd": -1.595,
+          "minimum_open_gross_pnl_usd": -30.5,
+          "normal_net_usd": -494.3075,
+          "positive_stressed_event_rate": 0.13333333333333333,
+          "role": "VALIDATION",
+          "session_count": 150,
+          "signal_count": 151,
+          "stop_count": 51,
+          "stressed_edge_to_cost_ratio": -0.5421375759176129,
+          "stressed_net_by_half_year": {
+            "H1": -304.9049999999998,
+            "H2": -279.10249999999985
+          },
+          "stressed_net_by_market": {
+            "MBT": -505.73499999999956,
+            "MET": -78.27250000000001
+          },
+          "stressed_net_per_event_usd": -3.893383333333333,
+          "stressed_net_usd": -584.0075,
+          "target_count": 9
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 1,
+        "holding_minutes": 30,
+        "mechanism": "OWN_REOPEN_GAP_FADE"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "d07185d7402e4f61a15275da1d79cfc53589c14c8b521321be4e1d2f910dfabf",
+      "opportunity_count": 285,
+      "policy_id": "crypto_reopen_3d522ec14b5afb32b8a8",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 133,
+          "event_path_hash": "d368f0b6090e1d3bc9c17e37e7d46d6ff50a02d14b117d0d78575986a49b94b5",
+          "gross_pnl_usd": -351.85999999999996,
+          "lower_quartile_stressed_event_usd": -14.32,
+          "market_event_counts": {
+            "MBT": 76,
+            "MET": 57
+          },
+          "maximum_positive_day_profit_share": 0.09782435496721209,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.09782435496721209,
+          "median_stressed_event_usd": -1.92,
+          "minimum_open_gross_pnl_usd": -50.0,
+          "normal_net_usd": -612.92,
+          "positive_stressed_event_rate": 0.3233082706766917,
+          "role": "DISCOVERY",
+          "session_count": 133,
+          "signal_count": 134,
+          "stop_count": 69,
+          "stressed_edge_to_cost_ratio": -1.0265491889368654,
+          "stressed_net_by_half_year": {
+            "H1": -460.3987499999998,
+            "H2": -234.22124999999988
+          },
+          "stressed_net_by_market": {
+            "MBT": -621.1200000000005,
+            "MET": -73.49999999999999
+          },
+          "stressed_net_per_event_usd": -5.222706766917293,
+          "stressed_net_usd": -694.62,
+          "target_count": 31
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 150,
+          "event_path_hash": "51cc3c21ebd3117c6f91d8a5fa88225f615bf3633db307a796b9118c12768f61",
+          "gross_pnl_usd": -105.81499999999997,
+          "lower_quartile_stressed_event_usd": -9.32,
+          "market_event_counts": {
+            "MBT": 83,
+            "MET": 67
+          },
+          "maximum_positive_day_profit_share": 0.13189493189146026,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.13189493189146026,
+          "median_stressed_event_usd": -1.67,
+          "minimum_open_gross_pnl_usd": -30.5,
+          "normal_net_usd": -394.815,
+          "positive_stressed_event_rate": 0.22666666666666666,
+          "role": "VALIDATION",
+          "session_count": 150,
+          "signal_count": 151,
+          "stop_count": 71,
+          "stressed_edge_to_cost_ratio": -0.2794164246105096,
+          "stressed_net_by_half_year": {
+            "H1": -263.12999999999977,
+            "H2": -221.38499999999982
+          },
+          "stressed_net_by_market": {
+            "MBT": -405.8724999999996,
+            "MET": -78.6425
+          },
+          "stressed_net_per_event_usd": -3.2301,
+          "stressed_net_usd": -484.515,
+          "target_count": 27
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 1,
+        "holding_minutes": 120,
+        "mechanism": "OWN_REOPEN_GAP_FADE"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "82c0ba4cee89ff5e00a4ab815f9329526eddde73faaf60d94af4b94bd6d5fb43",
+      "opportunity_count": 285,
+      "policy_id": "crypto_reopen_845fb9f947f58e7846be",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 133,
+          "event_path_hash": "2e4f5b2ce8874b049f4a92dc2b6223a5a7fa94d4be6c80821d50307d92683925",
+          "gross_pnl_usd": -333.54625,
+          "lower_quartile_stressed_event_usd": -8.82,
+          "market_event_counts": {
+            "MBT": 76,
+            "MET": 57
+          },
+          "maximum_positive_day_profit_share": 0.2118170056066085,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.2118170056066085,
+          "median_stressed_event_usd": -2.27,
+          "minimum_open_gross_pnl_usd": -40.5,
+          "normal_net_usd": -594.60625,
+          "positive_stressed_event_rate": 0.21052631578947367,
+          "role": "DISCOVERY",
+          "session_count": 133,
+          "signal_count": 134,
+          "stop_count": 37,
+          "stressed_edge_to_cost_ratio": -0.9731189462014237,
+          "stressed_net_by_half_year": {
+            "H1": -434.80374999999975,
+            "H2": -241.50249999999983
+          },
+          "stressed_net_by_market": {
+            "MBT": -607.8325000000003,
+            "MET": -68.47375000000002
+          },
+          "stressed_net_per_event_usd": -5.085009398496241,
+          "stressed_net_usd": -676.30625,
+          "target_count": 9
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 150,
+          "event_path_hash": "48f069d608bad4007c72851973c670c68297ae310774b13bc365e041a57dcee9",
+          "gross_pnl_usd": -201.8325,
+          "lower_quartile_stressed_event_usd": -8.32,
+          "market_event_counts": {
+            "MBT": 83,
+            "MET": 67
+          },
+          "maximum_positive_day_profit_share": 0.20020290835306054,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.20020290835306054,
+          "median_stressed_event_usd": -1.595,
+          "minimum_open_gross_pnl_usd": -23.5,
+          "normal_net_usd": -490.83250000000004,
+          "positive_stressed_event_rate": 0.14,
+          "role": "VALIDATION",
+          "session_count": 150,
+          "signal_count": 151,
+          "stop_count": 49,
+          "stressed_edge_to_cost_ratio": -0.532961447055717,
+          "stressed_net_by_half_year": {
+            "H1": -225.77999999999977,
+            "H2": -354.7525
+          },
+          "stressed_net_by_market": {
+            "MBT": -504.4099999999996,
+            "MET": -76.12250000000003
+          },
+          "stressed_net_per_event_usd": -3.870216666666667,
+          "stressed_net_usd": -580.5325,
+          "target_count": 10
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 5,
+        "holding_minutes": 30,
+        "mechanism": "OWN_REOPEN_GAP_FADE"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "ab2a5104a0d30a4cf7744e0a1d39436c8ed3bb76e4aa7c23670f45e080e1f890",
+      "opportunity_count": 285,
+      "policy_id": "crypto_reopen_e846620bbd006cfabac1",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 133,
+          "event_path_hash": "fb98cd3bfe4e3e9684c05f7990bc85276ebb09b1722389ba20b99b4aa26f4706",
+          "gross_pnl_usd": -304.50249999999994,
+          "lower_quartile_stressed_event_usd": -13.32,
+          "market_event_counts": {
+            "MBT": 76,
+            "MET": 57
+          },
+          "maximum_positive_day_profit_share": 0.09750151251040785,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.09750151251040785,
+          "median_stressed_event_usd": -2.27,
+          "minimum_open_gross_pnl_usd": -50.0,
+          "normal_net_usd": -565.5625,
+          "positive_stressed_event_rate": 0.3533834586466165,
+          "role": "DISCOVERY",
+          "session_count": 133,
+          "signal_count": 134,
+          "stop_count": 68,
+          "stressed_edge_to_cost_ratio": -0.8883840004667988,
+          "stressed_net_by_half_year": {
+            "H1": -428.2974999999998,
+            "H2": -218.9649999999998
+          },
+          "stressed_net_by_market": {
+            "MBT": -596.9200000000008,
+            "MET": -50.342499999999966
+          },
+          "stressed_net_per_event_usd": -4.866635338345864,
+          "stressed_net_usd": -647.2624999999999,
+          "target_count": 35
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 150,
+          "event_path_hash": "cac5a6489031daf74e46511f3c7158e251584cdb4ebae06dd8bf5245cb91c5a4",
+          "gross_pnl_usd": -197.65249999999997,
+          "lower_quartile_stressed_event_usd": -8.82,
+          "market_event_counts": {
+            "MBT": 83,
+            "MET": 67
+          },
+          "maximum_positive_day_profit_share": 0.1260068036664874,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.1260068036664874,
+          "median_stressed_event_usd": -1.67,
+          "minimum_open_gross_pnl_usd": -27.0,
+          "normal_net_usd": -486.6525,
+          "positive_stressed_event_rate": 0.24,
+          "role": "VALIDATION",
+          "session_count": 150,
+          "signal_count": 151,
+          "stop_count": 71,
+          "stressed_edge_to_cost_ratio": -0.5219236862952205,
+          "stressed_net_by_half_year": {
+            "H1": -263.6299999999998,
+            "H2": -312.7224999999999
+          },
+          "stressed_net_by_market": {
+            "MBT": -499.1099999999996,
+            "MET": -77.2425
+          },
+          "stressed_net_per_event_usd": -3.8423499999999997,
+          "stressed_net_usd": -576.3525,
+          "target_count": 22
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 5,
+        "holding_minutes": 120,
+        "mechanism": "OWN_REOPEN_GAP_FADE"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "03263d4ba1054f940c6e9e1186fec9df3f75e380dffff28bca3038f1993cec40",
+      "opportunity_count": 141,
+      "policy_id": "crypto_reopen_86842e425265744003ce",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 59,
+          "event_path_hash": "953efd9c4aeaccfd2d3bb6603cfcc3260d3a4e483bcc5d2ee2da800589b6fa5f",
+          "gross_pnl_usd": 10.925000000000015,
+          "lower_quartile_stressed_event_usd": -10.32,
+          "market_event_counts": {
+            "MBT": 37,
+            "MET": 22
+          },
+          "maximum_positive_day_profit_share": 0.24138187063790068,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.24138187063790068,
+          "median_stressed_event_usd": -1.72,
+          "minimum_open_gross_pnl_usd": -37.5,
+          "normal_net_usd": -111.455,
+          "positive_stressed_event_rate": 0.23728813559322035,
+          "role": "DISCOVERY",
+          "session_count": 59,
+          "signal_count": 59,
+          "stop_count": 16,
+          "stressed_edge_to_cost_ratio": 0.06761356603540052,
+          "stressed_net_by_half_year": {
+            "H1": -42.29749999999999,
+            "H2": -108.3574999999999
+          },
+          "stressed_net_by_market": {
+            "MBT": -121.66499999999994,
+            "MET": -28.99
+          },
+          "stressed_net_per_event_usd": -2.553474576271186,
+          "stressed_net_usd": -150.655,
+          "target_count": 6
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 81,
+          "event_path_hash": "6317f95ea0f0305fc341085e15bae6e273c3d53155f917ef17c2a02cc215649b",
+          "gross_pnl_usd": -149.54875,
+          "lower_quartile_stressed_event_usd": -8.32,
+          "market_event_counts": {
+            "MBT": 47,
+            "MET": 34
+          },
+          "maximum_positive_day_profit_share": 0.2654823932580341,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.2654823932580341,
+          "median_stressed_event_usd": -1.5699999999999998,
+          "minimum_open_gross_pnl_usd": -28.0,
+          "normal_net_usd": -309.96875,
+          "positive_stressed_event_rate": 0.18518518518518517,
+          "role": "VALIDATION",
+          "session_count": 81,
+          "signal_count": 82,
+          "stop_count": 22,
+          "stressed_edge_to_cost_ratio": -0.7093669955412201,
+          "stressed_net_by_half_year": {
+            "H1": -192.73374999999993,
+            "H2": -167.63499999999993
+          },
+          "stressed_net_by_market": {
+            "MBT": -326.6649999999998,
+            "MET": -33.70375000000002
+          },
+          "stressed_net_per_event_usd": -4.448996913580247,
+          "stressed_net_usd": -360.36875000000003,
+          "target_count": 10
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 1,
+        "holding_minutes": 30,
+        "mechanism": "COMMON_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "52bfddeaa32815447401b4ce8e0a35a1d2fe775b40d31979edaabd17fd13d42f",
+      "opportunity_count": 141,
+      "policy_id": "crypto_reopen_3e3dbad3fbda67609b62",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 59,
+          "event_path_hash": "c600db4dd3008703c2847a92c4ff1824d7032e3380f171333b3e050a1d4ba2a8",
+          "gross_pnl_usd": -58.46375000000003,
+          "lower_quartile_stressed_event_usd": -12.82,
+          "market_event_counts": {
+            "MBT": 37,
+            "MET": 22
+          },
+          "maximum_positive_day_profit_share": 0.19628679245283023,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.19628679245283023,
+          "median_stressed_event_usd": -2.2199999999999998,
+          "minimum_open_gross_pnl_usd": -37.5,
+          "normal_net_usd": -180.84375000000006,
+          "positive_stressed_event_rate": 0.3220338983050847,
+          "role": "DISCOVERY",
+          "session_count": 59,
+          "signal_count": 59,
+          "stop_count": 34,
+          "stressed_edge_to_cost_ratio": -0.361825411560837,
+          "stressed_net_by_half_year": {
+            "H1": -81.27250000000004,
+            "H2": -138.7712499999999
+          },
+          "stressed_net_by_market": {
+            "MBT": -187.86499999999992,
+            "MET": -32.17875000000005
+          },
+          "stressed_net_per_event_usd": -3.7295550847457637,
+          "stressed_net_usd": -220.04375000000005,
+          "target_count": 17
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 81,
+          "event_path_hash": "cb8d6b61ce13d09472ddcd886b8c566a287236989d23e9ae3801dbf11ca276dd",
+          "gross_pnl_usd": -168.655,
+          "lower_quartile_stressed_event_usd": -11.82,
+          "market_event_counts": {
+            "MBT": 47,
+            "MET": 34
+          },
+          "maximum_positive_day_profit_share": 0.20335238970425806,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.20335238970425806,
+          "median_stressed_event_usd": -1.72,
+          "minimum_open_gross_pnl_usd": -28.0,
+          "normal_net_usd": -329.07500000000005,
+          "positive_stressed_event_rate": 0.25925925925925924,
+          "role": "VALIDATION",
+          "session_count": 81,
+          "signal_count": 82,
+          "stop_count": 37,
+          "stressed_edge_to_cost_ratio": -0.7999952566170193,
+          "stressed_net_by_half_year": {
+            "H1": -195.91749999999996,
+            "H2": -183.55749999999995
+          },
+          "stressed_net_by_market": {
+            "MBT": -350.2524999999998,
+            "MET": -29.222500000000018
+          },
+          "stressed_net_per_event_usd": -4.684876543209876,
+          "stressed_net_usd": -379.475,
+          "target_count": 22
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 1,
+        "holding_minutes": 120,
+        "mechanism": "COMMON_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "f9cbd9fde6c6fb826d86ae688cc85372c105cde342b80236076a3114378369e4",
+      "opportunity_count": 141,
+      "policy_id": "crypto_reopen_78cbb0b2e66dd56d0acc",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 59,
+          "event_path_hash": "500dc774ff0b80461a52b3508b25d73e1ff145cfc722cd99c443f7f7158180ba",
+          "gross_pnl_usd": -62.687499999999986,
+          "lower_quartile_stressed_event_usd": -8.07,
+          "market_event_counts": {
+            "MBT": 37,
+            "MET": 22
+          },
+          "maximum_positive_day_profit_share": 0.34388080450911945,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.34388080450911945,
+          "median_stressed_event_usd": -2.42,
+          "minimum_open_gross_pnl_usd": -37.5,
+          "normal_net_usd": -185.0675,
+          "positive_stressed_event_rate": 0.1864406779661017,
+          "role": "DISCOVERY",
+          "session_count": 59,
+          "signal_count": 59,
+          "stop_count": 18,
+          "stressed_edge_to_cost_ratio": -0.38796571357841314,
+          "stressed_net_by_half_year": {
+            "H1": -66.30999999999997,
+            "H2": -157.95749999999995
+          },
+          "stressed_net_by_market": {
+            "MBT": -192.3274999999999,
+            "MET": -31.94
+          },
+          "stressed_net_per_event_usd": -3.8011440677966095,
+          "stressed_net_usd": -224.26749999999998,
+          "target_count": 4
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 81,
+          "event_path_hash": "98587394d3ac9a88538bc0056beadf248329404a8b1531922751c002016ceb40",
+          "gross_pnl_usd": -133.735,
+          "lower_quartile_stressed_event_usd": -8.32,
+          "market_event_counts": {
+            "MBT": 47,
+            "MET": 34
+          },
+          "maximum_positive_day_profit_share": 0.24757650347950283,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.24757650347950283,
+          "median_stressed_event_usd": -1.52,
+          "minimum_open_gross_pnl_usd": -33.0,
+          "normal_net_usd": -294.15500000000003,
+          "positive_stressed_event_rate": 0.18518518518518517,
+          "role": "VALIDATION",
+          "session_count": 81,
+          "signal_count": 82,
+          "stop_count": 20,
+          "stressed_edge_to_cost_ratio": -0.6343563229295134,
+          "stressed_net_by_half_year": {
+            "H1": -230.9699999999999,
+            "H2": -113.58499999999998
+          },
+          "stressed_net_by_market": {
+            "MBT": -312.38999999999976,
+            "MET": -32.16500000000001
+          },
+          "stressed_net_per_event_usd": -4.253765432098765,
+          "stressed_net_usd": -344.555,
+          "target_count": 11
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 5,
+        "holding_minutes": 30,
+        "mechanism": "COMMON_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "4e336517cac5fd1c601439916eb96be605466e3c1f03f859c17fe2299c07167d",
+      "opportunity_count": 141,
+      "policy_id": "crypto_reopen_fda894bdc6925afa165f",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 59,
+          "event_path_hash": "a2a2d10d49bbb05a6b859d7f0ce27d23f50edff5a5c04071f43ec0cb06da8fe6",
+          "gross_pnl_usd": -69.22625000000004,
+          "lower_quartile_stressed_event_usd": -14.32,
+          "market_event_counts": {
+            "MBT": 37,
+            "MET": 22
+          },
+          "maximum_positive_day_profit_share": 0.2051057885131025,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.2051057885131025,
+          "median_stressed_event_usd": -2.67,
+          "minimum_open_gross_pnl_usd": -37.5,
+          "normal_net_usd": -191.60625000000005,
+          "positive_stressed_event_rate": 0.3220338983050847,
+          "role": "DISCOVERY",
+          "session_count": 59,
+          "signal_count": 59,
+          "stop_count": 33,
+          "stressed_edge_to_cost_ratio": -0.4284332838222555,
+          "stressed_net_by_half_year": {
+            "H1": -103.59750000000003,
+            "H2": -127.20874999999992
+          },
+          "stressed_net_by_market": {
+            "MBT": -199.82749999999987,
+            "MET": -30.978750000000055
+          },
+          "stressed_net_per_event_usd": -3.911970338983051,
+          "stressed_net_usd": -230.80625000000003,
+          "target_count": 17
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 81,
+          "event_path_hash": "ee9d704ed5e646645c84b7693c5a90103be3713665c737f3f3590e3d5a2c9027",
+          "gross_pnl_usd": -212.83875,
+          "lower_quartile_stressed_event_usd": -11.82,
+          "market_event_counts": {
+            "MBT": 47,
+            "MET": 34
+          },
+          "maximum_positive_day_profit_share": 0.1678962197465229,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.1678962197465229,
+          "median_stressed_event_usd": -1.67,
+          "minimum_open_gross_pnl_usd": -33.0,
+          "normal_net_usd": -373.25875,
+          "positive_stressed_event_rate": 0.2839506172839506,
+          "role": "VALIDATION",
+          "session_count": 81,
+          "signal_count": 82,
+          "stop_count": 35,
+          "stressed_edge_to_cost_ratio": -1.0095757043923728,
+          "stressed_net_by_half_year": {
+            "H1": -261.46374999999995,
+            "H2": -162.19499999999996
+          },
+          "stressed_net_by_market": {
+            "MBT": -396.7524999999998,
+            "MET": -26.90625
+          },
+          "stressed_net_per_event_usd": -5.230354938271605,
+          "stressed_net_usd": -423.65875,
+          "target_count": 22
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 5,
+        "holding_minutes": 120,
+        "mechanism": "COMMON_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "9980e2bd4cfd32af94594d6a304b25e4347b80c63aef2a1aa25b31b0e932414a",
+      "opportunity_count": 185,
+      "policy_id": "crypto_reopen_958b7c255e500326968a",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 83,
+          "event_path_hash": "9a25a7e30819747fccdcb8d72d0283099c20925d8f6177bc466014a4c96b2693",
+          "gross_pnl_usd": -421.86625,
+          "lower_quartile_stressed_event_usd": -13.82,
+          "market_event_counts": {
+            "MBT": 50,
+            "MET": 33
+          },
+          "maximum_positive_day_profit_share": 0.542159876364995,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.542159876364995,
+          "median_stressed_event_usd": -2.92,
+          "minimum_open_gross_pnl_usd": -45.5,
+          "normal_net_usd": -589.92625,
+          "positive_stressed_event_rate": 0.1686746987951807,
+          "role": "DISCOVERY",
+          "session_count": 83,
+          "signal_count": 84,
+          "stop_count": 32,
+          "stressed_edge_to_cost_ratio": -1.905792600289122,
+          "stressed_net_by_half_year": {
+            "H1": -436.65499999999986,
+            "H2": -206.57124999999994
+          },
+          "stressed_net_by_market": {
+            "MBT": -588.2750000000003,
+            "MET": -54.951249999999995
+          },
+          "stressed_net_per_event_usd": -7.749713855421689,
+          "stressed_net_usd": -643.22625,
+          "target_count": 4
+        },
+        "VALIDATION": {
+          "data_censored_count": 0,
+          "event_count": 101,
+          "event_path_hash": "f0a1374754d8490a526d07b9ba0e6cb17631bd100ce4ef40a49b06619a16adbd",
+          "gross_pnl_usd": -181.32999999999998,
+          "lower_quartile_stressed_event_usd": -8.82,
+          "market_event_counts": {
+            "MBT": 56,
+            "MET": 45
+          },
+          "maximum_positive_day_profit_share": 0.3712695179904955,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.3712695179904955,
+          "median_stressed_event_usd": -2.0700000000000003,
+          "minimum_open_gross_pnl_usd": -30.5,
+          "normal_net_usd": -376.15,
+          "positive_stressed_event_rate": 0.1188118811881188,
+          "role": "VALIDATION",
+          "session_count": 101,
+          "signal_count": 101,
+          "stop_count": 40,
+          "stressed_edge_to_cost_ratio": -0.7102067993106689,
+          "stressed_net_by_half_year": {
+            "H1": -213.56749999999988,
+            "H2": -223.08249999999992
+          },
+          "stressed_net_by_market": {
+            "MBT": -380.09499999999974,
+            "MET": -56.555
+          },
+          "stressed_net_per_event_usd": -4.323267326732673,
+          "stressed_net_usd": -436.65,
+          "target_count": 6
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 1,
+        "holding_minutes": 30,
+        "mechanism": "RELATIVE_REOPEN_GAP_MEAN_REVERSION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "9758d0ec0c6fd6824991dceffa640e38864ca0d5436650651fae0833bf363479",
+      "opportunity_count": 185,
+      "policy_id": "crypto_reopen_851456a910fa1edd94dd",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 83,
+          "event_path_hash": "82dff7becb4940f3bc0b18fe1035b1f9522f09bd780d0dbfc6453f24350146b0",
+          "gross_pnl_usd": -357.43999999999994,
+          "lower_quartile_stressed_event_usd": -18.32,
+          "market_event_counts": {
+            "MBT": 50,
+            "MET": 33
+          },
+          "maximum_positive_day_profit_share": 0.17144268774703555,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.17144268774703555,
+          "median_stressed_event_usd": -2.92,
+          "minimum_open_gross_pnl_usd": -45.5,
+          "normal_net_usd": -525.5,
+          "positive_stressed_event_rate": 0.30120481927710846,
+          "role": "DISCOVERY",
+          "session_count": 83,
+          "signal_count": 84,
+          "stop_count": 48,
+          "stressed_edge_to_cost_ratio": -1.6147452114203107,
+          "stressed_net_by_half_year": {
+            "H1": -399.9562499999999,
+            "H2": -178.84374999999991
+          },
+          "stressed_net_by_market": {
+            "MBT": -531.0375000000001,
+            "MET": -47.762499999999974
+          },
+          "stressed_net_per_event_usd": -6.973493975903614,
+          "stressed_net_usd": -578.8,
+          "target_count": 17
+        },
+        "VALIDATION": {
+          "data_censored_count": 0,
+          "event_count": 101,
+          "event_path_hash": "d1f275b679c6643a47cf03463a49ab0cbcc244f1f0bc117b71d3b9fee8011b25",
+          "gross_pnl_usd": -168.49999999999997,
+          "lower_quartile_stressed_event_usd": -9.82,
+          "market_event_counts": {
+            "MBT": 56,
+            "MET": 45
+          },
+          "maximum_positive_day_profit_share": 0.21209900838096032,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.21209900838096032,
+          "median_stressed_event_usd": -2.0700000000000003,
+          "minimum_open_gross_pnl_usd": -30.5,
+          "normal_net_usd": -363.32,
+          "positive_stressed_event_rate": 0.2079207920792079,
+          "role": "VALIDATION",
+          "session_count": 101,
+          "signal_count": 101,
+          "stop_count": 52,
+          "stressed_edge_to_cost_ratio": -0.659956133479555,
+          "stressed_net_by_half_year": {
+            "H1": -213.01749999999996,
+            "H2": -210.80249999999992
+          },
+          "stressed_net_by_market": {
+            "MBT": -369.4949999999998,
+            "MET": -54.32499999999999
+          },
+          "stressed_net_per_event_usd": -4.196237623762375,
+          "stressed_net_usd": -423.82,
+          "target_count": 19
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 1,
+        "holding_minutes": 120,
+        "mechanism": "RELATIVE_REOPEN_GAP_MEAN_REVERSION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "7c74dc6ef025e002f1b5aad4ef4e8ce1d847adb1d1a9e2b2ba25fd2dc92d80a3",
+      "opportunity_count": 185,
+      "policy_id": "crypto_reopen_c328c3e4581bb796af6e",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 83,
+          "event_path_hash": "c815ae7073f535ca377dd800f5455a265d7426af431ab94e883044ed5c58c08d",
+          "gross_pnl_usd": -265.1125,
+          "lower_quartile_stressed_event_usd": -9.32,
+          "market_event_counts": {
+            "MBT": 50,
+            "MET": 33
+          },
+          "maximum_positive_day_profit_share": 0.3336050327084248,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.3336050327084248,
+          "median_stressed_event_usd": -2.82,
+          "minimum_open_gross_pnl_usd": -40.5,
+          "normal_net_usd": -433.1725,
+          "positive_stressed_event_rate": 0.1927710843373494,
+          "role": "DISCOVERY",
+          "session_count": 83,
+          "signal_count": 84,
+          "stop_count": 25,
+          "stressed_edge_to_cost_ratio": -1.1976531441994942,
+          "stressed_net_by_half_year": {
+            "H1": -319.6924999999999,
+            "H2": -166.77999999999992
+          },
+          "stressed_net_by_market": {
+            "MBT": -444.96249999999975,
+            "MET": -41.51000000000001
+          },
+          "stressed_net_per_event_usd": -5.861114457831325,
+          "stressed_net_usd": -486.4725,
+          "target_count": 5
+        },
+        "VALIDATION": {
+          "data_censored_count": 0,
+          "event_count": 101,
+          "event_path_hash": "113924310ffed5c979cb52bf9bf994c2c7c5ddd288600ab13e1791df2ca52bb2",
+          "gross_pnl_usd": -209.43,
+          "lower_quartile_stressed_event_usd": -8.82,
+          "market_event_counts": {
+            "MBT": 56,
+            "MET": 45
+          },
+          "maximum_positive_day_profit_share": 0.375560049165378,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.375560049165378,
+          "median_stressed_event_usd": -1.8199999999999998,
+          "minimum_open_gross_pnl_usd": -23.5,
+          "normal_net_usd": -404.25,
+          "positive_stressed_event_rate": 0.09900990099009901,
+          "role": "VALIDATION",
+          "session_count": 101,
+          "signal_count": 101,
+          "stop_count": 39,
+          "stressed_edge_to_cost_ratio": -0.8202647657841141,
+          "stressed_net_by_half_year": {
+            "H1": -190.01749999999987,
+            "H2": -274.73249999999985
+          },
+          "stressed_net_by_market": {
+            "MBT": -412.19499999999977,
+            "MET": -52.55499999999999
+          },
+          "stressed_net_per_event_usd": -4.601485148514852,
+          "stressed_net_usd": -464.75,
+          "target_count": 5
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 5,
+        "holding_minutes": 30,
+        "mechanism": "RELATIVE_REOPEN_GAP_MEAN_REVERSION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "d69ee5652d6d3c8542893373b7e028c083a9508cb7eceea7c8d8251ee23832c9",
+      "opportunity_count": 185,
+      "policy_id": "crypto_reopen_23ba2988da02212a8868",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 1,
+          "event_count": 83,
+          "event_path_hash": "a4e17d1c2b498a2b06d5c6fdfca326865c28ad3479782f3e9cf5e29bba114403",
+          "gross_pnl_usd": -208.09624999999994,
+          "lower_quartile_stressed_event_usd": -16.32,
+          "market_event_counts": {
+            "MBT": 50,
+            "MET": 33
+          },
+          "maximum_positive_day_profit_share": 0.1465003982701126,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.1465003982701126,
+          "median_stressed_event_usd": -2.02,
+          "minimum_open_gross_pnl_usd": -40.5,
+          "normal_net_usd": -376.15624999999994,
+          "positive_stressed_event_rate": 0.3855421686746988,
+          "role": "DISCOVERY",
+          "session_count": 83,
+          "signal_count": 84,
+          "stop_count": 44,
+          "stressed_edge_to_cost_ratio": -0.9400806378749547,
+          "stressed_net_by_half_year": {
+            "H1": -335.72499999999985,
+            "H2": -93.73124999999992
+          },
+          "stressed_net_by_market": {
+            "MBT": -400.8749999999998,
+            "MET": -28.581249999999955
+          },
+          "stressed_net_per_event_usd": -5.174171686746987,
+          "stressed_net_usd": -429.45624999999995,
+          "target_count": 21
+        },
+        "VALIDATION": {
+          "data_censored_count": 0,
+          "event_count": 101,
+          "event_path_hash": "df7572a5f6a7ffc5470b0dadb637be1953ba41a203a5dad9e07362ea571e6a3f",
+          "gross_pnl_usd": -291.65,
+          "lower_quartile_stressed_event_usd": -10.82,
+          "market_event_counts": {
+            "MBT": 56,
+            "MET": 45
+          },
+          "maximum_positive_day_profit_share": 0.16800904135849268,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.16800904135849268,
+          "median_stressed_event_usd": -1.97,
+          "minimum_open_gross_pnl_usd": -27.0,
+          "normal_net_usd": -486.46999999999997,
+          "positive_stressed_event_rate": 0.2079207920792079,
+          "role": "VALIDATION",
+          "session_count": 101,
+          "signal_count": 101,
+          "stop_count": 55,
+          "stressed_edge_to_cost_ratio": -1.1422920256932476,
+          "stressed_net_by_half_year": {
+            "H1": -286.3924999999999,
+            "H2": -260.5774999999999
+          },
+          "stressed_net_by_market": {
+            "MBT": -494.44499999999977,
+            "MET": -52.52499999999998
+          },
+          "stressed_net_per_event_usd": -5.415544554455446,
+          "stressed_net_usd": -546.97,
+          "target_count": 13
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 5,
+        "holding_minutes": 120,
+        "mechanism": "RELATIVE_REOPEN_GAP_MEAN_REVERSION"
+      }
+    }
+  ],
+  "best_diagnostics_by_discovery": [
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "03263d4ba1054f940c6e9e1186fec9df3f75e380dffff28bca3038f1993cec40",
+      "opportunity_count": 141,
+      "policy_id": "crypto_reopen_86842e425265744003ce",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 59,
+          "event_path_hash": "953efd9c4aeaccfd2d3bb6603cfcc3260d3a4e483bcc5d2ee2da800589b6fa5f",
+          "gross_pnl_usd": 10.925000000000015,
+          "lower_quartile_stressed_event_usd": -10.32,
+          "market_event_counts": {
+            "MBT": 37,
+            "MET": 22
+          },
+          "maximum_positive_day_profit_share": 0.24138187063790068,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.24138187063790068,
+          "median_stressed_event_usd": -1.72,
+          "minimum_open_gross_pnl_usd": -37.5,
+          "normal_net_usd": -111.455,
+          "positive_stressed_event_rate": 0.23728813559322035,
+          "role": "DISCOVERY",
+          "session_count": 59,
+          "signal_count": 59,
+          "stop_count": 16,
+          "stressed_edge_to_cost_ratio": 0.06761356603540052,
+          "stressed_net_by_half_year": {
+            "H1": -42.29749999999999,
+            "H2": -108.3574999999999
+          },
+          "stressed_net_by_market": {
+            "MBT": -121.66499999999994,
+            "MET": -28.99
+          },
+          "stressed_net_per_event_usd": -2.553474576271186,
+          "stressed_net_usd": -150.655,
+          "target_count": 6
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 81,
+          "event_path_hash": "6317f95ea0f0305fc341085e15bae6e273c3d53155f917ef17c2a02cc215649b",
+          "gross_pnl_usd": -149.54875,
+          "lower_quartile_stressed_event_usd": -8.32,
+          "market_event_counts": {
+            "MBT": 47,
+            "MET": 34
+          },
+          "maximum_positive_day_profit_share": 0.2654823932580341,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.2654823932580341,
+          "median_stressed_event_usd": -1.5699999999999998,
+          "minimum_open_gross_pnl_usd": -28.0,
+          "normal_net_usd": -309.96875,
+          "positive_stressed_event_rate": 0.18518518518518517,
+          "role": "VALIDATION",
+          "session_count": 81,
+          "signal_count": 82,
+          "stop_count": 22,
+          "stressed_edge_to_cost_ratio": -0.7093669955412201,
+          "stressed_net_by_half_year": {
+            "H1": -192.73374999999993,
+            "H2": -167.63499999999993
+          },
+          "stressed_net_by_market": {
+            "MBT": -326.6649999999998,
+            "MET": -33.70375000000002
+          },
+          "stressed_net_per_event_usd": -4.448996913580247,
+          "stressed_net_usd": -360.36875000000003,
+          "target_count": 10
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 1,
+        "holding_minutes": 30,
+        "mechanism": "COMMON_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "52bfddeaa32815447401b4ce8e0a35a1d2fe775b40d31979edaabd17fd13d42f",
+      "opportunity_count": 141,
+      "policy_id": "crypto_reopen_3e3dbad3fbda67609b62",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 59,
+          "event_path_hash": "c600db4dd3008703c2847a92c4ff1824d7032e3380f171333b3e050a1d4ba2a8",
+          "gross_pnl_usd": -58.46375000000003,
+          "lower_quartile_stressed_event_usd": -12.82,
+          "market_event_counts": {
+            "MBT": 37,
+            "MET": 22
+          },
+          "maximum_positive_day_profit_share": 0.19628679245283023,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.19628679245283023,
+          "median_stressed_event_usd": -2.2199999999999998,
+          "minimum_open_gross_pnl_usd": -37.5,
+          "normal_net_usd": -180.84375000000006,
+          "positive_stressed_event_rate": 0.3220338983050847,
+          "role": "DISCOVERY",
+          "session_count": 59,
+          "signal_count": 59,
+          "stop_count": 34,
+          "stressed_edge_to_cost_ratio": -0.361825411560837,
+          "stressed_net_by_half_year": {
+            "H1": -81.27250000000004,
+            "H2": -138.7712499999999
+          },
+          "stressed_net_by_market": {
+            "MBT": -187.86499999999992,
+            "MET": -32.17875000000005
+          },
+          "stressed_net_per_event_usd": -3.7295550847457637,
+          "stressed_net_usd": -220.04375000000005,
+          "target_count": 17
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 81,
+          "event_path_hash": "cb8d6b61ce13d09472ddcd886b8c566a287236989d23e9ae3801dbf11ca276dd",
+          "gross_pnl_usd": -168.655,
+          "lower_quartile_stressed_event_usd": -11.82,
+          "market_event_counts": {
+            "MBT": 47,
+            "MET": 34
+          },
+          "maximum_positive_day_profit_share": 0.20335238970425806,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.20335238970425806,
+          "median_stressed_event_usd": -1.72,
+          "minimum_open_gross_pnl_usd": -28.0,
+          "normal_net_usd": -329.07500000000005,
+          "positive_stressed_event_rate": 0.25925925925925924,
+          "role": "VALIDATION",
+          "session_count": 81,
+          "signal_count": 82,
+          "stop_count": 37,
+          "stressed_edge_to_cost_ratio": -0.7999952566170193,
+          "stressed_net_by_half_year": {
+            "H1": -195.91749999999996,
+            "H2": -183.55749999999995
+          },
+          "stressed_net_by_market": {
+            "MBT": -350.2524999999998,
+            "MET": -29.222500000000018
+          },
+          "stressed_net_per_event_usd": -4.684876543209876,
+          "stressed_net_usd": -379.475,
+          "target_count": 22
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 1,
+        "holding_minutes": 120,
+        "mechanism": "COMMON_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "f9cbd9fde6c6fb826d86ae688cc85372c105cde342b80236076a3114378369e4",
+      "opportunity_count": 141,
+      "policy_id": "crypto_reopen_78cbb0b2e66dd56d0acc",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 59,
+          "event_path_hash": "500dc774ff0b80461a52b3508b25d73e1ff145cfc722cd99c443f7f7158180ba",
+          "gross_pnl_usd": -62.687499999999986,
+          "lower_quartile_stressed_event_usd": -8.07,
+          "market_event_counts": {
+            "MBT": 37,
+            "MET": 22
+          },
+          "maximum_positive_day_profit_share": 0.34388080450911945,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.34388080450911945,
+          "median_stressed_event_usd": -2.42,
+          "minimum_open_gross_pnl_usd": -37.5,
+          "normal_net_usd": -185.0675,
+          "positive_stressed_event_rate": 0.1864406779661017,
+          "role": "DISCOVERY",
+          "session_count": 59,
+          "signal_count": 59,
+          "stop_count": 18,
+          "stressed_edge_to_cost_ratio": -0.38796571357841314,
+          "stressed_net_by_half_year": {
+            "H1": -66.30999999999997,
+            "H2": -157.95749999999995
+          },
+          "stressed_net_by_market": {
+            "MBT": -192.3274999999999,
+            "MET": -31.94
+          },
+          "stressed_net_per_event_usd": -3.8011440677966095,
+          "stressed_net_usd": -224.26749999999998,
+          "target_count": 4
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 81,
+          "event_path_hash": "98587394d3ac9a88538bc0056beadf248329404a8b1531922751c002016ceb40",
+          "gross_pnl_usd": -133.735,
+          "lower_quartile_stressed_event_usd": -8.32,
+          "market_event_counts": {
+            "MBT": 47,
+            "MET": 34
+          },
+          "maximum_positive_day_profit_share": 0.24757650347950283,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.24757650347950283,
+          "median_stressed_event_usd": -1.52,
+          "minimum_open_gross_pnl_usd": -33.0,
+          "normal_net_usd": -294.15500000000003,
+          "positive_stressed_event_rate": 0.18518518518518517,
+          "role": "VALIDATION",
+          "session_count": 81,
+          "signal_count": 82,
+          "stop_count": 20,
+          "stressed_edge_to_cost_ratio": -0.6343563229295134,
+          "stressed_net_by_half_year": {
+            "H1": -230.9699999999999,
+            "H2": -113.58499999999998
+          },
+          "stressed_net_by_market": {
+            "MBT": -312.38999999999976,
+            "MET": -32.16500000000001
+          },
+          "stressed_net_per_event_usd": -4.253765432098765,
+          "stressed_net_usd": -344.555,
+          "target_count": 11
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 5,
+        "holding_minutes": 30,
+        "mechanism": "COMMON_REOPEN_GAP_CONTINUATION"
+      }
+    },
+    {
+      "control": "PRIMARY",
+      "event_path_hash": "4e336517cac5fd1c601439916eb96be605466e3c1f03f859c17fe2299c07167d",
+      "opportunity_count": 141,
+      "policy_id": "crypto_reopen_fda894bdc6925afa165f",
+      "roles": {
+        "DISCOVERY": {
+          "data_censored_count": 0,
+          "event_count": 59,
+          "event_path_hash": "a2a2d10d49bbb05a6b859d7f0ce27d23f50edff5a5c04071f43ec0cb06da8fe6",
+          "gross_pnl_usd": -69.22625000000004,
+          "lower_quartile_stressed_event_usd": -14.32,
+          "market_event_counts": {
+            "MBT": 37,
+            "MET": 22
+          },
+          "maximum_positive_day_profit_share": 0.2051057885131025,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.2051057885131025,
+          "median_stressed_event_usd": -2.67,
+          "minimum_open_gross_pnl_usd": -37.5,
+          "normal_net_usd": -191.60625000000005,
+          "positive_stressed_event_rate": 0.3220338983050847,
+          "role": "DISCOVERY",
+          "session_count": 59,
+          "signal_count": 59,
+          "stop_count": 33,
+          "stressed_edge_to_cost_ratio": -0.4284332838222555,
+          "stressed_net_by_half_year": {
+            "H1": -103.59750000000003,
+            "H2": -127.20874999999992
+          },
+          "stressed_net_by_market": {
+            "MBT": -199.82749999999987,
+            "MET": -30.978750000000055
+          },
+          "stressed_net_per_event_usd": -3.911970338983051,
+          "stressed_net_usd": -230.80625000000003,
+          "target_count": 17
+        },
+        "VALIDATION": {
+          "data_censored_count": 1,
+          "event_count": 81,
+          "event_path_hash": "ee9d704ed5e646645c84b7693c5a90103be3713665c737f3f3590e3d5a2c9027",
+          "gross_pnl_usd": -212.83875,
+          "lower_quartile_stressed_event_usd": -11.82,
+          "market_event_counts": {
+            "MBT": 47,
+            "MET": 34
+          },
+          "maximum_positive_day_profit_share": 0.1678962197465229,
+          "maximum_single_market_positive_profit_share": null,
+          "maximum_single_trade_positive_profit_share": 0.1678962197465229,
+          "median_stressed_event_usd": -1.67,
+          "minimum_open_gross_pnl_usd": -33.0,
+          "normal_net_usd": -373.25875,
+          "positive_stressed_event_rate": 0.2839506172839506,
+          "role": "VALIDATION",
+          "session_count": 81,
+          "signal_count": 82,
+          "stop_count": 35,
+          "stressed_edge_to_cost_ratio": -1.0095757043923728,
+          "stressed_net_by_half_year": {
+            "H1": -261.46374999999995,
+            "H2": -162.19499999999996
+          },
+          "stressed_net_by_market": {
+            "MBT": -396.7524999999998,
+            "MET": -26.90625
+          },
+          "stressed_net_per_event_usd": -5.230354938271605,
+          "stressed_net_usd": -423.65875,
+          "target_count": 22
+        }
+      },
+      "spec": {
+        "decision_delay_minutes": 5,
+        "holding_minutes": 120,
+        "mechanism": "COMMON_REOPEN_GAP_CONTINUATION"
+      }
+    }
+  ],
+  "branch_id": "CME_CRYPTO_SESSION_REOPEN_INVENTORY_TRANSFER_V1",
+  "broker_connections": 0,
+  "contract_specs": {
+    "MBT": {
+      "point_value_usd": 0.1,
+      "tick_size": 5.0,
+      "tick_value_usd": 0.5
+    },
+    "MET": {
+      "point_value_usd": 0.1,
+      "tick_size": 0.5,
+      "tick_value_usd": 0.05
+    }
+  },
+  "data_purchase_count": 0,
+  "data_reconstruction": {
+    "availability_ordering": "TS_RECV_CAPTURE_ORDER; NEGATIVE_CLOCK_DELTAS_REPORTED_NOT_BACKFILLED",
+    "degraded_record_count": 278,
+    "degraded_utc_days_excluded": [
+      "2022-01-02"
+    ],
+    "exact_duplicate_record_count_deduplicated": 2642,
+    "invalid_quote_record_count": 410,
+    "minimum_exchange_to_receive_clock_delta_us": -124827.751,
+    "negative_exchange_to_receive_clock_delta_count": 2754,
+    "source_record_count": 2884481,
+    "symbols": {
+      "MBT": {
+        "first_ts_recv": "2022-01-03T00:01:46.470473586+00:00",
+        "last_ts_recv": "2023-12-29T15:58:59.858439348+00:00",
+        "retained_event_count": 1881413,
+        "roll_guard_event_count": 168155,
+        "roll_guard_session_count": 69
+      },
+      "MET": {
+        "first_ts_recv": "2022-01-03T00:04:39.372961130+00:00",
+        "last_ts_recv": "2023-12-29T15:58:56.591036767+00:00",
+        "retained_event_count": 690129,
+        "roll_guard_event_count": 64777,
+        "roll_guard_session_count": 69
+      }
+    }
+  },
+  "decision_card": {
+    "deployment_risk": 0.1,
+    "expected_data_cost_usd": 0.0,
+    "expected_economic_upside": 0.62,
+    "expected_information_gain": 0.78,
+    "expected_runtime_minutes": [
+      10,
+      35
+    ],
+    "hypothesis": "The scheduled CME close-to-reopen interval accumulates information and inventory in micro Bitcoin and Ether.  A causal policy that observes only the first quotes after the 17:00 Chicago reopen can distinguish continuation, fade, common-gap and relative-gap states with executable edge after costs.",
+    "implementation_cost": 0.18,
+    "next_materially_distinct_alternative": "A new external fundamental or alternative-data representation, because the remaining cached directional and relative-value families are already terminal.",
+    "overfitting_risk": 0.16,
+    "smallest_decisive_experiment": "Sixteen pooled one-trade-per-session policies on the already acquired 2022 discovery and unchanged 2023 chronological validation TBBO data; exact 50K replay opens only after positive held stressed economics, at least 100 events, two positive half-years and two positive market contributions.",
+    "strongest_argument_against": "The reopen gap may already be fully incorporated in the first executable quote, while MBT/MET contract economics and spreads may make any remaining response too small for a Trading Combine."
+  },
+  "discovery_eligible_count": 0,
+  "evidence_role": "VIEWED_DEVELOPMENT_TRIPWIRE_ONLY",
+  "exact_account_cell_count": 0,
+  "exact_normal_and_stressed_pass_count": 0,
+  "incremental_data_spend_usd": 0.0,
+  "manifest_hash": "d08a8bcd59bb5ac36b66f406664fdfda681eb9df4b5d1a4d2b6298d687d770bc",
+  "next_action": "TOMBSTONE_EXACT_REOPEN_SPEC_AND_REQUIRE_NEW_EXTERNAL_INFORMATION_REPRESENTATION",
+  "orders": 0,
+  "paired_session_count": 451,
+  "paired_sessions_by_role": {
+    "DISCOVERY": 216,
+    "VALIDATION": 235
+  },
+  "proposal_count": 16,
+  "q4_access_count_delta": 0,
+  "result_hash": "ab7a9aa29c07c7706d1d5936080bde40d8ffbd97dde5216ee6ba92b8b048ecd2",
+  "runtime_seconds": 121.3910721730208,
+  "schema": "hydra_cme_crypto_session_reopen_inventory_transfer_result_v1",
+  "selected_candidate_ids": [],
+  "selected_results": [],
+  "source_audit_hash": "4f6cb2ba5a17787a5795d63441f06636c5de871af6763ea140e0486c3fbc70f4",
+  "source_receipt_hash": "b36c73b7407cfcbc0161e3404a733c69958005a7eb74775cd295693deadc5d3b",
+  "status": "CME_CRYPTO_SESSION_REOPEN_TRANSFER_FALSIFIED",
+  "tier_ceiling": "H_DIAGNOSTIC",
+  "validation_event_gate_passer_ids": [],
+  "xfa_paths_started": 0
+}

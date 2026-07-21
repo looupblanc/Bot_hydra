@@ -1,0 +1,147 @@
+{
+  "schema": "hydra_cme_crypto_session_reopen_inventory_transfer_manifest_v1",
+  "branch_id": "CME_CRYPTO_SESSION_REOPEN_INVENTORY_TRANSFER_V1",
+  "created_at_utc": "2026-07-21T09:00:00Z",
+  "decision_card": {
+    "hypothesis": "The scheduled CME close-to-reopen interval accumulates information and inventory in micro Bitcoin and Ether.  A causal policy that observes only the first quotes after the 17:00 Chicago reopen can distinguish continuation, fade, common-gap and relative-gap states with executable edge after costs.",
+    "strongest_argument_against": "The reopen gap may already be fully incorporated in the first executable quote, while MBT/MET contract economics and spreads may make any remaining response too small for a Trading Combine.",
+    "smallest_decisive_experiment": "Sixteen pooled one-trade-per-session policies on the already acquired 2022 discovery and unchanged 2023 chronological validation TBBO data; exact 50K replay opens only after positive held stressed economics, at least 100 events, two positive half-years and two positive market contributions.",
+    "expected_runtime_minutes": [
+      10,
+      35
+    ],
+    "expected_data_cost_usd": 0.0,
+    "expected_information_gain": 0.78,
+    "expected_economic_upside": 0.62,
+    "implementation_cost": 0.18,
+    "overfitting_risk": 0.16,
+    "deployment_risk": 0.1,
+    "next_materially_distinct_alternative": "A new external fundamental or alternative-data representation, because the remaining cached directional and relative-value families are already terminal."
+  },
+  "novelty_audit": {
+    "prior_cross_crypto_branch": "CROSS_CRYPTO_FLOW_RESPONSE_FALSIFIED_INTRADAY_SIGNED_FLOW_SHOCK_ONLY",
+    "generic_weekend_inventory_tombstone_excluded": true,
+    "current_mechanism": "DAILY_SCHEDULED_CME_CLOSE_TO_REOPEN_INFORMATION_AND_INVENTORY_TRANSFER",
+    "matching_mbt_met_reopen_tombstones": 0,
+    "not_a_neighbor_of": [
+      "CROSS_CRYPTO_SIGNED_FLOW_RESPONSE",
+      "GENERIC_EQUITY_WEEKEND_RESET",
+      "EVENT_TIME_VOLATILITY_BURST",
+      "FX_LONDON_FIX",
+      "SCHEDULED_INFORMATION_SHOCK_ROUTER"
+    ]
+  },
+  "frozen_inputs": {
+    "source_manifest": "config/research/cme_cross_crypto_flow_response_residual_v1.json",
+    "acquisition_receipt": "reports/data_access/cme_cross_crypto_flow_response_tranche_a_receipt.json",
+    "tbbo_sha256": "8d0326e973c0c01dd6afdd1a2abf72025cd255bf936f29d0778ecdfce2987097",
+    "definition_sha256": "88061de38d5639585c1ef3d1df883ce47585e8bcbcdec9c90f6085b696e9c2d9",
+    "rule_snapshot": "config/rulesets/topstep_official_2026-07-19.json"
+  },
+  "chronological_roles": [
+    {
+      "role": "DISCOVERY",
+      "start": "2022-01-01",
+      "end": "2023-01-01",
+      "candidate_modification_allowed": true
+    },
+    {
+      "role": "VALIDATION",
+      "start": "2023-01-01",
+      "end": "2024-01-01",
+      "candidate_modification_allowed": false
+    }
+  ],
+  "causal_contract": {
+    "session_timezone": "America/Chicago",
+    "scheduled_reopen_local": "17:00",
+    "mandatory_flatten_local": "15:10",
+    "reopen_gap": "FIRST_CURRENT_SESSION_MID_MINUS_LAST_PRIOR_SESSION_MID",
+    "features": "ONLY_PRIOR_COMPLETE_SESSION_AND_CURRENT_QUOTES_AVAILABLE_BY_DECISION_TIME",
+    "entry": "FIRST_TARGET_TBBO_STRICTLY_AFTER_DECISION_AT_EXECUTABLE_ASK_OR_BID",
+    "exit": "FIRST_CAUSAL_STOP_TARGET_OR_FROZEN_TIME_EXIT_STOP_FIRST_ON_SAME_EVENT",
+    "one_initial_position_per_session": true,
+    "future_label_eligibility": false,
+    "negative_shift_allowed": false,
+    "backfill_allowed": false,
+    "missing_future_coverage": "DATA_CENSORED"
+  },
+  "candidate_lattice": {
+    "mechanisms": [
+      "OWN_REOPEN_GAP_CONTINUATION",
+      "OWN_REOPEN_GAP_FADE",
+      "COMMON_REOPEN_GAP_CONTINUATION",
+      "RELATIVE_REOPEN_GAP_MEAN_REVERSION"
+    ],
+    "decision_delay_minutes": [
+      1,
+      5
+    ],
+    "holding_minutes": [
+      30,
+      120
+    ],
+    "proposal_count": 16,
+    "market_selection": "ONE_MARKET_PER_SESSION_MAXIMUM_ABSOLUTE_CAUSAL_SCORE",
+    "minimum_abs_gap_over_trailing_median": 1.0,
+    "trailing_gap_sessions": 40,
+    "trailing_minimum_sessions": 20,
+    "minimum_stop_ticks": 6,
+    "stop_fraction_of_prior_session_range": 0.1,
+    "target_stop_multiple": 1.5
+  },
+  "execution": {
+    "fill_model": "TBBO_EXECUTABLE_TOP_OF_BOOK_NEXT_TARGET_EVENT_V1",
+    "normal_round_turn_fees_usd": {
+      "MBT": 2.82,
+      "MET": 0.82
+    },
+    "normal_extra_slippage_ticks_per_side": 0,
+    "stressed_extra_slippage_ticks_per_side": 1,
+    "partial_fill": "ONE_CONTRACT_ONLY_AND_REQUIRE_DISPLAYED_TOP_SIZE_AT_LEAST_ONE",
+    "no_touch_fill_assumption": true
+  },
+  "selection_gate": {
+    "selection_on_discovery_only": true,
+    "maximum_selected_specs": 4,
+    "minimum_discovery_events": 100,
+    "minimum_validation_events": 100,
+    "validation_stressed_net_usd_minimum_exclusive": 0.0,
+    "positive_validation_half_years_required": 2,
+    "positive_validation_markets_required": 2,
+    "maximum_single_trade_or_day_positive_profit_share": 0.25,
+    "maximum_single_market_positive_profit_share": 0.75,
+    "required_controls": [
+      "DIRECTION_FLIP",
+      "DETERMINISTIC_RANDOM_DIRECTION"
+    ],
+    "account_replay_before_event_gate": false
+  },
+  "account_contract": {
+    "account_label": "50K",
+    "quantity_tiers": [
+      1,
+      3,
+      5
+    ],
+    "horizons_trading_days": [
+      5,
+      10,
+      20
+    ],
+    "nonoverlapping_windows": true,
+    "exact_replay_status": "BLOCKED_UNTIL_VALIDATION_EVENT_GATE"
+  },
+  "governance": {
+    "evidence_role": "VIEWED_DEVELOPMENT_TRIPWIRE_ONLY",
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "single_authoritative_writer_untouched": true,
+    "data_purchase": false,
+    "q4_access": false,
+    "broker_connections": 0,
+    "orders": 0,
+    "xfa_before_clean_combine_survivor": false
+  },
+  "manifest_hash": "d08a8bcd59bb5ac36b66f406664fdfda681eb9df4b5d1a4d2b6298d687d770bc"
+}
