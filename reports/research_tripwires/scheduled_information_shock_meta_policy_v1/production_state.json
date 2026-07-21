@@ -1,0 +1,13 @@
+{
+  "counts": {
+    "account_replay_executed": false,
+    "feature_ready_events": 152,
+    "loeo_ecologies": 3,
+    "policy_specs": 24,
+    "pooled_events": 170
+  },
+  "next_action": "TOMBSTONE_POOLED_SCHEDULED_SHOCK_ROUTER_AND_START_CROSS_ASSET_VOLATILITY_RISK_PREMIUM",
+  "result_hash": "e4366df934eaaa1189d9527fc6b43112fa69f9f5c7e808cb20d80db1995de4b8",
+  "status": "COMPLETE",
+  "verdict": "SCHEDULED_INFORMATION_SHOCK_META_POLICY_FALSIFIED"
+}

@@ -1,0 +1,283 @@
+{
+  "account_replay_block_reason": "POOLED_HELD_ECOLOGY_GATE_NOT_MET",
+  "broker_connections": 0,
+  "chronological_roles": {
+    "DISCOVERY": {
+      "action_counts": {
+        "ABSTAIN": 71,
+        "CONTINUATION": 7,
+        "FADE": 0
+      },
+      "decision_hash": "27f4d1cac8a79b7d2f2d8f1663d5aeacc01d2111a6210e180bcfb5e75b68e68d",
+      "event_count": 78,
+      "maximum_positive_ecology_share": 0.7082087639873568,
+      "maximum_single_trade_positive_profit_share": 0.5438781930288166,
+      "minimum_open_pnl_stressed_usd": -585.21,
+      "normal_net_usd": 606.2099999999987,
+      "positive_trade_rate": 0.7142857142857143,
+      "stressed_net_by_ecology": {
+        "EIA_NG_STORAGE": 248.72999999999863,
+        "TREASURY_AUCTION": 0.0,
+        "USDA_WASDE": 102.48000000000005
+      },
+      "stressed_net_usd": 351.2099999999987,
+      "trade_count": 7,
+      "trade_coverage": 0.08974358974358974
+    },
+    "FINAL_DEVELOPMENT": {
+      "action_counts": {
+        "ABSTAIN": 41,
+        "CONTINUATION": 2,
+        "FADE": 0
+      },
+      "decision_hash": "16248d9e3b4af0456528ebebe2f6c45d95d24363b14a02a105a37da619feffcc",
+      "event_count": 43,
+      "maximum_positive_ecology_share": 1.0,
+      "maximum_single_trade_positive_profit_share": 1.0,
+      "minimum_open_pnl_stressed_usd": -153.96,
+      "normal_net_usd": -53.34000000000002,
+      "positive_trade_rate": 0.5,
+      "stressed_net_by_ecology": {
+        "EIA_NG_STORAGE": 0.0,
+        "TREASURY_AUCTION": 0.0,
+        "USDA_WASDE": -128.34000000000003
+      },
+      "stressed_net_usd": -128.34000000000003,
+      "trade_count": 2,
+      "trade_coverage": 0.046511627906976744
+    },
+    "VALIDATION": {
+      "action_counts": {
+        "ABSTAIN": 28,
+        "CONTINUATION": 3,
+        "FADE": 0
+      },
+      "decision_hash": "ce210bda44e72f06b673525ac66dd2e5a427ea738a996997f955f41dc45070fb",
+      "event_count": 31,
+      "maximum_positive_ecology_share": 1.0,
+      "maximum_single_trade_positive_profit_share": 1.0,
+      "minimum_open_pnl_stressed_usd": -1233.1350000000011,
+      "normal_net_usd": -1471.7099999999953,
+      "positive_trade_rate": 0.3333333333333333,
+      "stressed_net_by_ecology": {
+        "EIA_NG_STORAGE": -567.5399999999952,
+        "TREASURY_AUCTION": 0.0,
+        "USDA_WASDE": -1001.67
+      },
+      "stressed_net_usd": -1569.2099999999953,
+      "trade_count": 3,
+      "trade_coverage": 0.0967741935483871
+    }
+  },
+  "controls": {
+    "always_continuation": {
+      "action_counts": {
+        "ABSTAIN": 0,
+        "CONTINUATION": 74,
+        "FADE": 0
+      },
+      "decision_hash": "6cd4692c2cbbf0b239b136656437b0d28f359fbb9f95836123e93663ae1d9add",
+      "event_count": 74,
+      "maximum_positive_ecology_share": 1.0,
+      "maximum_single_trade_positive_profit_share": 0.11255271525596272,
+      "minimum_open_pnl_stressed_usd": -946.32,
+      "normal_net_usd": -5080.2349999999915,
+      "positive_trade_rate": 0.3918918918918919,
+      "stressed_net_by_ecology": {
+        "EIA_NG_STORAGE": -637.7799999999918,
+        "TREASURY_AUCTION": -3369.035,
+        "USDA_WASDE": -3843.4199999999996
+      },
+      "stressed_net_usd": -7850.2349999999915,
+      "trade_count": 74,
+      "trade_coverage": 1.0
+    },
+    "always_fade": {
+      "action_counts": {
+        "ABSTAIN": 0,
+        "CONTINUATION": 0,
+        "FADE": 74
+      },
+      "decision_hash": "69bf4755f5b69b5be9af458c4db0ebf59ec9af72e17d1a03fc576b10e7688b13",
+      "event_count": 74,
+      "maximum_positive_ecology_share": 1.0,
+      "maximum_single_trade_positive_profit_share": 0.11060144591183381,
+      "minimum_open_pnl_stressed_usd": -852.57,
+      "normal_net_usd": 756.3274999999874,
+      "positive_trade_rate": 0.3783783783783784,
+      "stressed_net_by_ecology": {
+        "EIA_NG_STORAGE": -1677.780000000013,
+        "TREASURY_AUCTION": -392.47249999999997,
+        "USDA_WASDE": 56.58000000000027
+      },
+      "stressed_net_usd": -2013.6725000000126,
+      "trade_count": 74,
+      "trade_coverage": 1.0
+    }
+  },
+  "counts": {
+    "account_replay_executed": false,
+    "feature_ready_events": 152,
+    "loeo_ecologies": 3,
+    "policy_specs": 24,
+    "pooled_events": 170
+  },
+  "gate_checks": {
+    "loeo_positive_each_ecology": false,
+    "minimum_100_total_events": true,
+    "no_single_ecology_domination": false,
+    "nontrivial_trade_coverage": false,
+    "positive_each_held_ecology": false,
+    "positive_stressed_final": false,
+    "positive_stressed_validation": false
+  },
+  "held_gate_passed": false,
+  "held_summary": {
+    "action_counts": {
+      "ABSTAIN": 69,
+      "CONTINUATION": 5,
+      "FADE": 0
+    },
+    "decision_hash": "49b7593096e7ea24f5cbf46650dd56e6e4928781530f885ac36a4401aec49a35",
+    "event_count": 74,
+    "maximum_positive_ecology_share": 1.0,
+    "maximum_single_trade_positive_profit_share": 0.8512011712251283,
+    "minimum_open_pnl_stressed_usd": -1233.1350000000011,
+    "normal_net_usd": -1525.0499999999952,
+    "positive_trade_rate": 0.4,
+    "stressed_net_by_ecology": {
+      "EIA_NG_STORAGE": -567.5399999999952,
+      "TREASURY_AUCTION": 0.0,
+      "USDA_WASDE": -1130.01
+    },
+    "stressed_net_usd": -1697.5499999999952,
+    "trade_count": 5,
+    "trade_coverage": 0.06756756756756757
+  },
+  "loeo_discovery": {
+    "aggregate": {
+      "action_counts": {
+        "ABSTAIN": 61,
+        "CONTINUATION": 16,
+        "FADE": 1
+      },
+      "decision_hash": "d4a555842e2c4b312e74709e44db1b7c1c9f44a71067c6bb1ce8cc1bd7fa3194",
+      "event_count": 78,
+      "maximum_positive_ecology_share": 1.0,
+      "maximum_single_trade_positive_profit_share": 0.25383201992568716,
+      "minimum_open_pnl_stressed_usd": -476.55,
+      "normal_net_usd": -517.460000000003,
+      "positive_trade_rate": 0.4117647058823529,
+      "stressed_net_by_ecology": {
+        "EIA_NG_STORAGE": -125.45000000000283,
+        "TREASURY_AUCTION": -476.55,
+        "USDA_WASDE": -546.7100000000002
+      },
+      "stressed_net_usd": -1148.710000000003,
+      "trade_count": 17,
+      "trade_coverage": 0.21794871794871795
+    },
+    "by_ecology": {
+      "EIA_NG_STORAGE": {
+        "action_counts": {
+          "ABSTAIN": 18,
+          "CONTINUATION": 2,
+          "FADE": 0
+        },
+        "decision_hash": "f2daa38d06942016489cc1e60ff581f01a3c4299255980bd658d0a35e80b5f8c",
+        "event_count": 20,
+        "maximum_positive_ecology_share": 1.0,
+        "maximum_single_trade_positive_profit_share": 1.0,
+        "minimum_open_pnl_stressed_usd": -318.1350000000019,
+        "normal_net_usd": -75.45000000000283,
+        "positive_trade_rate": 0.5,
+        "stressed_net_by_ecology": {
+          "EIA_NG_STORAGE": -125.45000000000283
+        },
+        "stressed_net_usd": -125.45000000000283,
+        "trade_count": 2,
+        "trade_coverage": 0.1
+      },
+      "TREASURY_AUCTION": {
+        "action_counts": {
+          "ABSTAIN": 6,
+          "CONTINUATION": 0,
+          "FADE": 1
+        },
+        "decision_hash": "f36cb48c4aebd275381df425dadc6467a284ca0d26887218503216ce06c722d9",
+        "event_count": 7,
+        "maximum_positive_ecology_share": 1.0,
+        "maximum_single_trade_positive_profit_share": null,
+        "minimum_open_pnl_stressed_usd": -476.55,
+        "normal_net_usd": -382.8,
+        "positive_trade_rate": 0.0,
+        "stressed_net_by_ecology": {
+          "TREASURY_AUCTION": -476.55
+        },
+        "stressed_net_usd": -476.55,
+        "trade_count": 1,
+        "trade_coverage": 0.14285714285714285
+      },
+      "USDA_WASDE": {
+        "action_counts": {
+          "ABSTAIN": 37,
+          "CONTINUATION": 14,
+          "FADE": 0
+        },
+        "decision_hash": "0ecd55494600bddc9975a831f7a42b40867854a0c6c5ed8e059fb92dcb5d1e44",
+        "event_count": 51,
+        "maximum_positive_ecology_share": 1.0,
+        "maximum_single_trade_positive_profit_share": 0.293587600238021,
+        "minimum_open_pnl_stressed_usd": -341.46,
+        "normal_net_usd": -59.210000000000136,
+        "positive_trade_rate": 0.42857142857142855,
+        "stressed_net_by_ecology": {
+          "USDA_WASDE": -546.7100000000002
+        },
+        "stressed_net_usd": -546.7100000000002,
+        "trade_count": 14,
+        "trade_coverage": 0.27450980392156865
+      }
+    }
+  },
+  "manifest_hash": "fddeb8c8a826a357f2c8dcf5560ad7a75f7d115184fe0f2609d549d09f42759a",
+  "new_data_purchase": false,
+  "next_action": "TOMBSTONE_POOLED_SCHEDULED_SHOCK_ROUTER_AND_START_CROSS_ASSET_VOLATILITY_RISK_PREMIUM",
+  "non_deployable_upper_bound": {
+    "action_counts": {
+      "ABSTAIN": 17,
+      "CONTINUATION": 29,
+      "FADE": 28
+    },
+    "classification": "NON_DEPLOYABLE_FULL_OUTCOME_UPPER_BOUND",
+    "decision_hash": "5150c9a0ae22be7f39ec0d6fc03a7c92bf63f3b0685edbe731ffe96c6fff2e98",
+    "event_count": 74,
+    "maximum_positive_ecology_share": 0.5537265464785287,
+    "maximum_single_trade_positive_profit_share": 0.0665513758378991,
+    "minimum_open_pnl_stressed_usd": -481.75,
+    "normal_net_usd": 15085.274999999992,
+    "positive_trade_rate": 1.0,
+    "stressed_net_by_ecology": {
+      "EIA_NG_STORAGE": 3743.1199999999917,
+      "TREASURY_AUCTION": 2088.96,
+      "USDA_WASDE": 7236.320000000001
+    },
+    "stressed_net_usd": 13068.399999999992,
+    "trade_count": 57,
+    "trade_coverage": 0.7702702702702703
+  },
+  "orders": 0,
+  "q4_access_count_delta": 0,
+  "result_hash": "e4366df934eaaa1189d9527fc6b43112fa69f9f5c7e808cb20d80db1995de4b8",
+  "schema": "hydra_scheduled_information_shock_meta_policy_result_v1",
+  "selected_policy": {
+    "high_risk_threshold": 1.25,
+    "minimum_predicted_edge_to_cost": 1.0,
+    "ridge": 16.0
+  },
+  "selected_policy_id": "shockmeta_e3351b5e1d70179f200c",
+  "selection_hash": "8ba481b17ac43e013883fd822c080be9fe2acb27abfd7a5e5ad7ffd1bcaa435c",
+  "status": "COMPLETE",
+  "verdict": "SCHEDULED_INFORMATION_SHOCK_META_POLICY_FALSIFIED",
+  "xfa_paths": 0
+}

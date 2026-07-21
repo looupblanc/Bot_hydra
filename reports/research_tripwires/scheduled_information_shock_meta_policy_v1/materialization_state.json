@@ -1,0 +1,11 @@
+{
+  "event_count": 170,
+  "event_count_by_ecology": {
+    "EIA_NG_STORAGE": 47,
+    "TREASURY_AUCTION": 27,
+    "USDA_WASDE": 96
+  },
+  "feature_ready_count": 152,
+  "ledger_sha256": "0343ef2ebdb7181541305592853a6e4ad9a582601b31fa0837bb3b46b27ace30",
+  "status": "POOLED_EVENTS_READY"
+}

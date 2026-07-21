@@ -1,0 +1,183 @@
+{
+  "account_replay_gate": "HELD_GATE_ONLY",
+  "actions": [
+    "CONTINUATION",
+    "FADE",
+    "ABSTAIN"
+  ],
+  "broker_connections": 0,
+  "cheap_gate": {
+    "maximum_positive_ecology_share": 0.5,
+    "minimum_total_events": 100,
+    "positive_stressed_each_held_role": true
+  },
+  "decision_hash": "d8575f72d7158242c58bdd91919d85090f4b581257de327fe4993804642d75cb",
+  "excluded_ecologies": {
+    "CFTC_POSITIONING": "NO_COMPATIBLE_PER_EVENT_LEDGER_FAIL_CLOSED"
+  },
+  "feature_contract": [
+    "surprise",
+    "liquidity",
+    "volatility",
+    "response"
+  ],
+  "included_ecologies": [
+    "EIA_NG_STORAGE",
+    "USDA_WASDE",
+    "TREASURY_AUCTION"
+  ],
+  "inputs": {
+    "cftc_result": {
+      "path": "reports/research_tripwires/cftc_grain_positioning_crowding_v1/economic_result.json",
+      "sha256": "4bc6eff18fc9dbfcfb287512f4b29fa99a7acb6be339ac1da4a5905785c29d5e"
+    },
+    "ng_result": {
+      "path": "reports/research_tripwires/natural_gas_storage_shock_v1/economic_result.json",
+      "sha256": "be716a420e0f1e01de44a1a5e2fd131ea6b5da353eddf12c1d68af2ece08e46d"
+    },
+    "treasury_ledger": {
+      "path": "reports/research_tripwires/treasury_auction_demand_shock_causal_v1/causal_event_ledger.jsonl",
+      "sha256": "a3a9b0edaa0e1b44e780534bdc3f38f7acafad55ccb7353a39a055bd379f6a6a"
+    },
+    "usda_result": {
+      "path": "reports/research_tripwires/usda_grain_information_shock_v1/economic_result.json",
+      "sha256": "6913d32de0b922510da97bc13f6f048f4fd9904d795e415595340957b9f10775"
+    }
+  },
+  "manifest_hash": "fddeb8c8a826a357f2c8dcf5560ad7a75f7d115184fe0f2609d549d09f42759a",
+  "new_data_purchase": false,
+  "numeric_threads": 1,
+  "orders": 0,
+  "policy_count": 24,
+  "policy_specs": [
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 0.0,
+      "ridge": 1.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 0.0,
+      "ridge": 1.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 0.25,
+      "ridge": 1.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 0.25,
+      "ridge": 1.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 0.5,
+      "ridge": 1.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 0.5,
+      "ridge": 1.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 1.0,
+      "ridge": 1.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 1.0,
+      "ridge": 1.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 0.0,
+      "ridge": 4.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 0.0,
+      "ridge": 4.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 0.25,
+      "ridge": 4.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 0.25,
+      "ridge": 4.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 0.5,
+      "ridge": 4.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 0.5,
+      "ridge": 4.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 1.0,
+      "ridge": 4.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 1.0,
+      "ridge": 4.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 0.0,
+      "ridge": 16.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 0.0,
+      "ridge": 16.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 0.25,
+      "ridge": 16.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 0.25,
+      "ridge": 16.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 0.5,
+      "ridge": 16.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 0.5,
+      "ridge": 16.0
+    },
+    {
+      "high_risk_threshold": 0.75,
+      "minimum_predicted_edge_to_cost": 1.0,
+      "ridge": 16.0
+    },
+    {
+      "high_risk_threshold": 1.25,
+      "minimum_predicted_edge_to_cost": 1.0,
+      "ridge": 16.0
+    }
+  ],
+  "q4_access": 0,
+  "roles": [
+    "DISCOVERY",
+    "VALIDATION",
+    "FINAL_DEVELOPMENT"
+  ],
+  "schema": "hydra_scheduled_information_shock_meta_policy_manifest_v1",
+  "status": "FROZEN_BEFORE_POOLED_OUTCOMES",
+  "worker_processes": 1
+}

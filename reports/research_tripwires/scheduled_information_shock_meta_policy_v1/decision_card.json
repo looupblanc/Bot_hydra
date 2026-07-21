@@ -1,0 +1,10 @@
+{
+  "decision_hash": "d8575f72d7158242c58bdd91919d85090f4b581257de327fe4993804642d75cb",
+  "expected_data_cost_usd": 0.0,
+  "hypothesis": "A regularized pooled TRADE_CONTINUATION/TRADE_FADE/ABSTAIN router can share information across scheduled shocks after causal within-ecology normalization.",
+  "next_distinct_alternative": "CROSS_ASSET_VOLATILITY_RISK_PREMIUM_CARRY_SHOCK",
+  "schema": "hydra_scheduled_information_shock_meta_policy_decision_v1",
+  "smallest_decisive_test": "24 frozen ridge/edge/risk specs; leave-one-ecology-out discovery; chronological validation and final-development.",
+  "status": "FROZEN_BEFORE_POOLED_OUTCOMES",
+  "strongest_argument_against": "Release responses are economically heterogeneous and source-specific costs may overwhelm any common state."
+}
