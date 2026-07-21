@@ -1,0 +1,1969 @@
+{
+  "active_policy_validity_audit": {
+    "active_policy_count": 15,
+    "all_active_discovery_stressed_negative": true,
+    "best_active_policy": {
+      "aggregate": {
+        "gross_usd": -85.9375,
+        "median_stressed_usd": -67.18,
+        "normal_net_usd": -163.03750000000002,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -194.28750000000002,
+        "trade_count": 3
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -46.875,
+          "median_stressed_usd": -98.99000000000001,
+          "normal_net_usd": -83.36500000000001,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -98.99000000000001,
+          "trade_count": 1
+        },
+        "FRONT": {
+          "gross_usd": -39.0625,
+          "median_stressed_usd": -47.64875000000001,
+          "normal_net_usd": -79.6725,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -95.29750000000001,
+          "trade_count": 2
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -85.9375,
+          "median_stressed_usd": -83.08500000000001,
+          "normal_net_usd": -142.73250000000002,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -166.17000000000002,
+          "trade_count": 2
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": -28.1175,
+          "normal_net_usd": -20.305,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -28.1175,
+          "trade_count": 1
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "candidate_hash": "f05d403d9d56df0d6ab4e6f1722c1751118965372fa26dc54e144613bd123436",
+      "policy_id": "auction_concession_7a6e4092e90f00eadc41",
+      "spec": {
+        "concession_threshold": 0.5,
+        "holding_minutes": 60,
+        "lookback_minutes": 60
+      },
+      "trade_count": 3
+    },
+    "held_stress_positive_active_policy_count": 0,
+    "inactive_policy_count": 9,
+    "promotion_allowed": false,
+    "selection_changed": false
+  },
+  "broker_connections": 0,
+  "candidate_results": [
+    {
+      "aggregate": {
+        "gross_usd": -109.375,
+        "median_stressed_usd": -40.09625,
+        "normal_net_usd": -1834.5425,
+        "positive_stressed_rate": 0.16666666666666666,
+        "stressed_net_usd": -2580.63625,
+        "trade_count": 42
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -187.5,
+          "median_stressed_usd": -54.155,
+          "normal_net_usd": -769.395,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -1011.5825000000001,
+          "trade_count": 16
+        },
+        "FRONT": {
+          "gross_usd": 46.875,
+          "median_stressed_usd": -32.02375,
+          "normal_net_usd": -277.7575,
+          "positive_stressed_rate": 0.14285714285714285,
+          "stressed_net_usd": -406.66375,
+          "trade_count": 14
+        },
+        "LONG": {
+          "gross_usd": 31.25,
+          "median_stressed_usd": -68.22,
+          "normal_net_usd": -787.39,
+          "positive_stressed_rate": 0.4166666666666667,
+          "stressed_net_usd": -1162.39,
+          "trade_count": 12
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -382.8125,
+          "median_stressed_usd": -54.155,
+          "normal_net_usd": -1120.045,
+          "positive_stressed_rate": 0.21052631578947367,
+          "stressed_net_usd": -1436.45125,
+          "trade_count": 19
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": -195.3125,
+          "median_stressed_usd": -38.53,
+          "normal_net_usd": -623.12,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -806.71375,
+          "trade_count": 11
+        },
+        "VALIDATION": {
+          "gross_usd": 468.75,
+          "median_stressed_usd": -36.730000000000004,
+          "normal_net_usd": -91.3775,
+          "positive_stressed_rate": 0.25,
+          "stressed_net_usd": -337.47125,
+          "trade_count": 12
+        }
+      },
+      "candidate_hash": "a5d28391e40baaf8c88723207c75a3689209e00dbd5d9df6bae2f729ad831873",
+      "policy_id": "auction_concession_95686a1cd5ba7a44f030",
+      "spec": {
+        "concession_threshold": 0.0,
+        "holding_minutes": 15,
+        "lookback_minutes": 30
+      },
+      "trade_count": 42
+    },
+    {
+      "aggregate": {
+        "gross_usd": 7.8125,
+        "median_stressed_usd": -47.92875,
+        "normal_net_usd": -1717.355,
+        "positive_stressed_rate": 0.11904761904761904,
+        "stressed_net_usd": -2463.44875,
+        "trade_count": 42
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -218.75,
+          "median_stressed_usd": -60.947500000000005,
+          "normal_net_usd": -800.6450000000001,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -1042.8325,
+          "trade_count": 16
+        },
+        "FRONT": {
+          "gross_usd": -23.4375,
+          "median_stressed_usd": -34.106875,
+          "normal_net_usd": -348.07,
+          "positive_stressed_rate": 0.07142857142857142,
+          "stressed_net_usd": -476.97625,
+          "trade_count": 14
+        },
+        "LONG": {
+          "gross_usd": 250.0,
+          "median_stressed_usd": -68.22,
+          "normal_net_usd": -568.64,
+          "positive_stressed_rate": 0.3333333333333333,
+          "stressed_net_usd": -943.64,
+          "trade_count": 12
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -492.1875,
+          "median_stressed_usd": -63.53375,
+          "normal_net_usd": -1229.42,
+          "positive_stressed_rate": 0.10526315789473684,
+          "stressed_net_usd": -1545.82625,
+          "trade_count": 19
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": -78.125,
+          "median_stressed_usd": -35.93,
+          "normal_net_usd": -505.9325,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -689.52625,
+          "trade_count": 11
+        },
+        "VALIDATION": {
+          "gross_usd": 578.125,
+          "median_stressed_usd": -35.406875,
+          "normal_net_usd": 17.99749999999999,
+          "positive_stressed_rate": 0.25,
+          "stressed_net_usd": -228.09625,
+          "trade_count": 12
+        }
+      },
+      "candidate_hash": "db3ce33d1555f0c37d7fb1f9c1f5dc336e2d74e4cb00df0a3affb70feb6c6759",
+      "policy_id": "auction_concession_6af78c444ca93ca08fa6",
+      "spec": {
+        "concession_threshold": 0.0,
+        "holding_minutes": 30,
+        "lookback_minutes": 30
+      },
+      "trade_count": 42
+    },
+    {
+      "aggregate": {
+        "gross_usd": 140.625,
+        "median_stressed_usd": -34.386875,
+        "normal_net_usd": -1584.5425,
+        "positive_stressed_rate": 0.16666666666666666,
+        "stressed_net_usd": -2330.63625,
+        "trade_count": 42
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -54.6875,
+          "median_stressed_usd": -45.322500000000005,
+          "normal_net_usd": -636.5825000000001,
+          "positive_stressed_rate": 0.0625,
+          "stressed_net_usd": -878.77,
+          "trade_count": 16
+        },
+        "FRONT": {
+          "gross_usd": 70.3125,
+          "median_stressed_usd": -28.1175,
+          "normal_net_usd": -254.32,
+          "positive_stressed_rate": 0.14285714285714285,
+          "stressed_net_usd": -383.22625,
+          "trade_count": 14
+        },
+        "LONG": {
+          "gross_usd": 125.0,
+          "median_stressed_usd": -68.22,
+          "normal_net_usd": -693.64,
+          "positive_stressed_rate": 0.3333333333333333,
+          "stressed_net_usd": -1068.64,
+          "trade_count": 12
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -445.3125,
+          "median_stressed_usd": -55.72125,
+          "normal_net_usd": -1182.545,
+          "positive_stressed_rate": 0.10526315789473684,
+          "stressed_net_usd": -1498.95125,
+          "trade_count": 19
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": -195.3125,
+          "median_stressed_usd": -28.1175,
+          "normal_net_usd": -623.12,
+          "positive_stressed_rate": 0.18181818181818182,
+          "stressed_net_usd": -806.71375,
+          "trade_count": 11
+        },
+        "VALIDATION": {
+          "gross_usd": 781.25,
+          "median_stressed_usd": -10.669374999999999,
+          "normal_net_usd": 221.1225,
+          "positive_stressed_rate": 0.25,
+          "stressed_net_usd": -24.971250000000005,
+          "trade_count": 12
+        }
+      },
+      "candidate_hash": "1664074a3a99dac5b4c4c978e2a9d02362812c5a651d0c8890a2a0cd70f7e161",
+      "policy_id": "auction_concession_9f0636fe592394d7ea8c",
+      "spec": {
+        "concession_threshold": 0.0,
+        "holding_minutes": 60,
+        "lookback_minutes": 30
+      },
+      "trade_count": 42
+    },
+    {
+      "aggregate": {
+        "gross_usd": -132.8125,
+        "median_stressed_usd": -61.9675,
+        "normal_net_usd": -382.2575,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -483.82,
+        "trade_count": 8
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -109.375,
+          "median_stressed_usd": -69.78,
+          "normal_net_usd": -289.8325,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -364.05125,
+          "trade_count": 5
+        },
+        "FRONT": {
+          "gross_usd": -23.4375,
+          "median_stressed_usd": -20.305,
+          "normal_net_usd": -92.425,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -119.76875,
+          "trade_count": 3
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -148.4375,
+          "median_stressed_usd": -71.34625,
+          "normal_net_usd": -318.7425,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -389.055,
+          "trade_count": 5
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 7.8125,
+          "median_stressed_usd": -20.305,
+          "normal_net_usd": -12.4925,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -20.305,
+          "trade_count": 1
+        },
+        "VALIDATION": {
+          "gross_usd": 7.8125,
+          "median_stressed_usd": -37.230000000000004,
+          "normal_net_usd": -51.0225,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -74.46000000000001,
+          "trade_count": 2
+        }
+      },
+      "candidate_hash": "6d464fddc93b39279ff77a5b7a00b286ecc3a54ecdd80dd541aa79b37b2e23e6",
+      "policy_id": "auction_concession_8b6e069f8daadebb9056",
+      "spec": {
+        "concession_threshold": 0.25,
+        "holding_minutes": 15,
+        "lookback_minutes": 30
+      },
+      "trade_count": 8
+    },
+    {
+      "aggregate": {
+        "gross_usd": -156.25,
+        "median_stressed_usd": -67.44,
+        "normal_net_usd": -405.695,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -507.2575,
+        "trade_count": 8
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -156.25,
+          "median_stressed_usd": -85.405,
+          "normal_net_usd": -336.7075,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -410.92625,
+          "trade_count": 5
+        },
+        "FRONT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": -20.305,
+          "normal_net_usd": -68.9875,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -96.33125,
+          "trade_count": 3
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -195.3125,
+          "median_stressed_usd": -85.405,
+          "normal_net_usd": -365.6175,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -435.93,
+          "trade_count": 5
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 15.625,
+          "median_stressed_usd": -12.4925,
+          "normal_net_usd": -4.68,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -12.4925,
+          "trade_count": 1
+        },
+        "VALIDATION": {
+          "gross_usd": 23.4375,
+          "median_stressed_usd": -29.4175,
+          "normal_net_usd": -35.3975,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -58.835,
+          "trade_count": 2
+        }
+      },
+      "candidate_hash": "1efcae5c7e65e128ad0b8447279243dcf4a82469213db6997c7754a759c0cf5d",
+      "policy_id": "auction_concession_0a54591740b26f67eb55",
+      "spec": {
+        "concession_threshold": 0.25,
+        "holding_minutes": 30,
+        "lookback_minutes": 30
+      },
+      "trade_count": 8
+    },
+    {
+      "aggregate": {
+        "gross_usd": -85.9375,
+        "median_stressed_usd": -44.0025,
+        "normal_net_usd": -335.3825,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -436.945,
+        "trade_count": 8
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -101.5625,
+          "median_stressed_usd": -69.78,
+          "normal_net_usd": -282.02000000000004,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -356.23875,
+          "trade_count": 5
+        },
+        "FRONT": {
+          "gross_usd": 15.625,
+          "median_stressed_usd": -12.4925,
+          "normal_net_usd": -53.3625,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -80.70625,
+          "trade_count": 3
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -148.4375,
+          "median_stressed_usd": -69.78,
+          "normal_net_usd": -318.7425,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -389.055,
+          "trade_count": 5
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 15.625,
+          "median_stressed_usd": -12.4925,
+          "normal_net_usd": -4.68,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -12.4925,
+          "trade_count": 1
+        },
+        "VALIDATION": {
+          "gross_usd": 46.875,
+          "median_stressed_usd": -17.69875,
+          "normal_net_usd": -11.96,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -35.3975,
+          "trade_count": 2
+        }
+      },
+      "candidate_hash": "5d1907b129e9fa8b8a876e9cb9462e45b2fae098a81e4b3d79fbc4d3ce4ed87a",
+      "policy_id": "auction_concession_aae02f06cbb11a6e06ed",
+      "spec": {
+        "concession_threshold": 0.25,
+        "holding_minutes": 60,
+        "lookback_minutes": 30
+      },
+      "trade_count": 8
+    },
+    {
+      "aggregate": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": -54.155,
+        "normal_net_usd": -38.53,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -54.155,
+        "trade_count": 1
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": -54.155,
+          "normal_net_usd": -38.53,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -54.155,
+          "trade_count": 1
+        },
+        "FRONT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": -54.155,
+          "normal_net_usd": -38.53,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -54.155,
+          "trade_count": 1
+        }
+      },
+      "candidate_hash": "59bcc0c8da30c503a7a4fe557b43a06f38125c5fd03af3b0a24e986831c8c4a8",
+      "policy_id": "auction_concession_a876e0ee740cf8f09e51",
+      "spec": {
+        "concession_threshold": 0.5,
+        "holding_minutes": 15,
+        "lookback_minutes": 30
+      },
+      "trade_count": 1
+    },
+    {
+      "aggregate": {
+        "gross_usd": 15.625,
+        "median_stressed_usd": -38.53,
+        "normal_net_usd": -22.905,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -38.53,
+        "trade_count": 1
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": 15.625,
+          "median_stressed_usd": -38.53,
+          "normal_net_usd": -22.905,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -38.53,
+          "trade_count": 1
+        },
+        "FRONT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "VALIDATION": {
+          "gross_usd": 15.625,
+          "median_stressed_usd": -38.53,
+          "normal_net_usd": -22.905,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -38.53,
+          "trade_count": 1
+        }
+      },
+      "candidate_hash": "161db739bc389df3efa520150226f18651d8f2e4ab81e09c52541bfd39622eb7",
+      "policy_id": "auction_concession_a9c632abed7039c96c43",
+      "spec": {
+        "concession_threshold": 0.5,
+        "holding_minutes": 30,
+        "lookback_minutes": 30
+      },
+      "trade_count": 1
+    },
+    {
+      "aggregate": {
+        "gross_usd": 31.25,
+        "median_stressed_usd": -22.905,
+        "normal_net_usd": -7.280000000000001,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -22.905,
+        "trade_count": 1
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": 31.25,
+          "median_stressed_usd": -22.905,
+          "normal_net_usd": -7.280000000000001,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -22.905,
+          "trade_count": 1
+        },
+        "FRONT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "VALIDATION": {
+          "gross_usd": 31.25,
+          "median_stressed_usd": -22.905,
+          "normal_net_usd": -7.280000000000001,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -22.905,
+          "trade_count": 1
+        }
+      },
+      "candidate_hash": "09fc539188380ac9f18fa78adb995346739f3d565f4831cd882d3653cf83da2a",
+      "policy_id": "auction_concession_7499ff947da15889d69c",
+      "spec": {
+        "concession_threshold": 0.5,
+        "holding_minutes": 60,
+        "lookback_minutes": 30
+      },
+      "trade_count": 1
+    },
+    {
+      "aggregate": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FRONT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "candidate_hash": "a77177a35bece99f46bac3c84901b30ff96bed67da4a83d48a8a09d29bfb396d",
+      "policy_id": "auction_concession_e7436401639134aa060c",
+      "spec": {
+        "concession_threshold": 0.75,
+        "holding_minutes": 15,
+        "lookback_minutes": 30
+      },
+      "trade_count": 0
+    },
+    {
+      "aggregate": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FRONT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "candidate_hash": "95cf860d461ef2ce6e43c6029d7d96153cfb44e2a33a62ffca0df0c98ee97816",
+      "policy_id": "auction_concession_c16d3fe562ab23374633",
+      "spec": {
+        "concession_threshold": 0.75,
+        "holding_minutes": 30,
+        "lookback_minutes": 30
+      },
+      "trade_count": 0
+    },
+    {
+      "aggregate": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FRONT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "candidate_hash": "c12d8a5e8aa734fcd7cc97c8217a4d6179d133b25ade9b4d06c8b97a7d4dd583",
+      "policy_id": "auction_concession_b5c646d04d2e050c60e5",
+      "spec": {
+        "concession_threshold": 0.75,
+        "holding_minutes": 60,
+        "lookback_minutes": 30
+      },
+      "trade_count": 0
+    },
+    {
+      "aggregate": {
+        "gross_usd": -703.125,
+        "median_stressed_usd": -45.825625,
+        "normal_net_usd": -2456.67,
+        "positive_stressed_rate": 0.1590909090909091,
+        "stressed_net_usd": -3214.4825,
+        "trade_count": 44
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -218.75,
+          "median_stressed_usd": -68.76,
+          "normal_net_usd": -723.585,
+          "positive_stressed_rate": 0.07142857142857142,
+          "stressed_net_usd": -934.5225,
+          "trade_count": 14
+        },
+        "FRONT": {
+          "gross_usd": 46.875,
+          "median_stressed_usd": -34.106875,
+          "normal_net_usd": -383.195,
+          "positive_stressed_rate": 0.1111111111111111,
+          "stressed_net_usd": -555.0699999999999,
+          "trade_count": 18
+        },
+        "LONG": {
+          "gross_usd": -531.25,
+          "median_stressed_usd": -130.72,
+          "normal_net_usd": -1349.89,
+          "positive_stressed_rate": 0.3333333333333333,
+          "stressed_net_usd": -1724.89,
+          "trade_count": 12
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -945.3125,
+          "median_stressed_usd": -61.450625,
+          "normal_net_usd": -1896.045,
+          "positive_stressed_rate": 0.16666666666666666,
+          "stressed_net_usd": -2306.20125,
+          "trade_count": 24
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": -125.0,
+          "median_stressed_usd": -43.7425,
+          "normal_net_usd": -595.33,
+          "positive_stressed_rate": 0.08333333333333333,
+          "stressed_net_usd": -798.455,
+          "trade_count": 12
+        },
+        "VALIDATION": {
+          "gross_usd": 367.1875,
+          "median_stressed_usd": -34.106875,
+          "normal_net_usd": 34.705,
+          "positive_stressed_rate": 0.25,
+          "stressed_net_usd": -109.82624999999999,
+          "trade_count": 8
+        }
+      },
+      "candidate_hash": "6c6fa1f8e4225fcd858e426a0afb32196e6a66862d2ba01460670ca1df9b19c0",
+      "policy_id": "auction_concession_6c701f717089ab4a2581",
+      "spec": {
+        "concession_threshold": 0.0,
+        "holding_minutes": 15,
+        "lookback_minutes": 60
+      },
+      "trade_count": 44
+    },
+    {
+      "aggregate": {
+        "gross_usd": -601.5625,
+        "median_stressed_usd": -47.90875,
+        "normal_net_usd": -2355.1075,
+        "positive_stressed_rate": 0.13636363636363635,
+        "stressed_net_usd": -3112.92,
+        "trade_count": 44
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -179.6875,
+          "median_stressed_usd": -67.74000000000001,
+          "normal_net_usd": -684.5225,
+          "positive_stressed_rate": 0.07142857142857142,
+          "stressed_net_usd": -895.46,
+          "trade_count": 14
+        },
+        "FRONT": {
+          "gross_usd": -46.875,
+          "median_stressed_usd": -38.013125,
+          "normal_net_usd": -476.945,
+          "positive_stressed_rate": 0.1111111111111111,
+          "stressed_net_usd": -648.8199999999999,
+          "trade_count": 18
+        },
+        "LONG": {
+          "gross_usd": -375.0,
+          "median_stressed_usd": -83.845,
+          "normal_net_usd": -1193.64,
+          "positive_stressed_rate": 0.25,
+          "stressed_net_usd": -1568.64,
+          "trade_count": 12
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -1054.6875,
+          "median_stressed_usd": -65.636875,
+          "normal_net_usd": -2005.42,
+          "positive_stressed_rate": 0.125,
+          "stressed_net_usd": -2415.57625,
+          "trade_count": 24
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": -15.625,
+          "median_stressed_usd": -47.125625,
+          "normal_net_usd": -485.95500000000004,
+          "positive_stressed_rate": 0.08333333333333333,
+          "stressed_net_usd": -689.08,
+          "trade_count": 12
+        },
+        "VALIDATION": {
+          "gross_usd": 468.75,
+          "median_stressed_usd": -28.1175,
+          "normal_net_usd": 136.2675,
+          "positive_stressed_rate": 0.25,
+          "stressed_net_usd": -8.263749999999995,
+          "trade_count": 8
+        }
+      },
+      "candidate_hash": "a82eb5cee2983646fa920e3329151776acb3d5d3eb6de34e2515264b62c3838b",
+      "policy_id": "auction_concession_36ccfc3b1d218f5ae902",
+      "spec": {
+        "concession_threshold": 0.0,
+        "holding_minutes": 30,
+        "lookback_minutes": 60
+      },
+      "trade_count": 44
+    },
+    {
+      "aggregate": {
+        "gross_usd": -601.5625,
+        "median_stressed_usd": -45.825625,
+        "normal_net_usd": -2355.1075,
+        "positive_stressed_rate": 0.1590909090909091,
+        "stressed_net_usd": -3112.92,
+        "trade_count": 44
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -132.8125,
+          "median_stressed_usd": -61.9675,
+          "normal_net_usd": -637.6475,
+          "positive_stressed_rate": 0.07142857142857142,
+          "stressed_net_usd": -848.585,
+          "trade_count": 14
+        },
+        "FRONT": {
+          "gross_usd": 31.25,
+          "median_stressed_usd": -38.013125,
+          "normal_net_usd": -398.82,
+          "positive_stressed_rate": 0.16666666666666666,
+          "stressed_net_usd": -570.695,
+          "trade_count": 18
+        },
+        "LONG": {
+          "gross_usd": -500.0,
+          "median_stressed_usd": -99.47,
+          "normal_net_usd": -1318.64,
+          "positive_stressed_rate": 0.25,
+          "stressed_net_usd": -1693.64,
+          "trade_count": 12
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -1054.6875,
+          "median_stressed_usd": -68.48,
+          "normal_net_usd": -2005.42,
+          "positive_stressed_rate": 0.125,
+          "stressed_net_usd": -2415.57625,
+          "trade_count": 24
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 7.8125,
+          "median_stressed_usd": -38.533125,
+          "normal_net_usd": -462.51750000000004,
+          "positive_stressed_rate": 0.16666666666666666,
+          "stressed_net_usd": -665.6425,
+          "trade_count": 12
+        },
+        "VALIDATION": {
+          "gross_usd": 445.3125,
+          "median_stressed_usd": -25.51125,
+          "normal_net_usd": 112.83000000000001,
+          "positive_stressed_rate": 0.25,
+          "stressed_net_usd": -31.701249999999995,
+          "trade_count": 8
+        }
+      },
+      "candidate_hash": "4889e8e225bfd1bbbe223cf9c2312b77674086573e05a2b53922b60505e5919a",
+      "policy_id": "auction_concession_771b1d7fc7f4e5ca0659",
+      "spec": {
+        "concession_threshold": 0.0,
+        "holding_minutes": 60,
+        "lookback_minutes": 60
+      },
+      "trade_count": 44
+    },
+    {
+      "aggregate": {
+        "gross_usd": -289.0625,
+        "median_stressed_usd": -69.78,
+        "normal_net_usd": -661.4425,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -817.6925,
+        "trade_count": 11
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -187.5,
+          "median_stressed_usd": -71.34625,
+          "normal_net_usd": -365.9175,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -440.13625,
+          "trade_count": 5
+        },
+        "FRONT": {
+          "gross_usd": -39.0625,
+          "median_stressed_usd": -35.93,
+          "normal_net_usd": -164.805,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -215.58625,
+          "trade_count": 5
+        },
+        "LONG": {
+          "gross_usd": -62.5,
+          "median_stressed_usd": -161.97,
+          "normal_net_usd": -130.72,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -161.97,
+          "trade_count": 1
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -210.9375,
+          "median_stressed_usd": -71.34625,
+          "normal_net_usd": -363.0175,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -425.5175,
+          "trade_count": 5
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": -85.9375,
+          "median_stressed_usd": -67.46000000000001,
+          "normal_net_usd": -239.33,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -305.73625,
+          "trade_count": 4
+        },
+        "VALIDATION": {
+          "gross_usd": 7.8125,
+          "median_stressed_usd": -43.219375,
+          "normal_net_usd": -59.095,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -86.43875,
+          "trade_count": 2
+        }
+      },
+      "candidate_hash": "1f9ce8dca1acfc8f2fbd24aebddaa4bb24b9464ff8459e2e1b4aee0379c757e6",
+      "policy_id": "auction_concession_d7aa74044a1defdad47f",
+      "spec": {
+        "concession_threshold": 0.25,
+        "holding_minutes": 15,
+        "lookback_minutes": 60
+      },
+      "trade_count": 11
+    },
+    {
+      "aggregate": {
+        "gross_usd": -203.125,
+        "median_stressed_usd": -67.74000000000001,
+        "normal_net_usd": -575.505,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -731.755,
+        "trade_count": 11
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -140.625,
+          "median_stressed_usd": -71.34625,
+          "normal_net_usd": -319.0425,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -393.26125,
+          "trade_count": 5
+        },
+        "FRONT": {
+          "gross_usd": -62.5,
+          "median_stressed_usd": -59.3675,
+          "normal_net_usd": -188.2425,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -239.02375,
+          "trade_count": 5
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": -99.47,
+          "normal_net_usd": -68.22,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -99.47,
+          "trade_count": 1
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -195.3125,
+          "median_stressed_usd": -71.34625,
+          "normal_net_usd": -347.3925,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -409.8925,
+          "trade_count": 5
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 7.8125,
+          "median_stressed_usd": -51.83500000000001,
+          "normal_net_usd": -145.58,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -211.98625,
+          "trade_count": 4
+        },
+        "VALIDATION": {
+          "gross_usd": -15.625,
+          "median_stressed_usd": -54.938125,
+          "normal_net_usd": -82.5325,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -109.87625,
+          "trade_count": 2
+        }
+      },
+      "candidate_hash": "53fdff8d6850c7cbe007bd83656e6d71f38d8bb0be5ae6dab84d615d27150aea",
+      "policy_id": "auction_concession_779bf7f04212d6a3d6df",
+      "spec": {
+        "concession_threshold": 0.25,
+        "holding_minutes": 30,
+        "lookback_minutes": 60
+      },
+      "trade_count": 11
+    },
+    {
+      "aggregate": {
+        "gross_usd": -70.3125,
+        "median_stressed_usd": -63.53375,
+        "normal_net_usd": -442.6925,
+        "positive_stressed_rate": 0.09090909090909091,
+        "stressed_net_usd": -598.9425,
+        "trade_count": 11
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -54.6875,
+          "median_stressed_usd": -69.78,
+          "normal_net_usd": -233.10500000000002,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -307.32375,
+          "trade_count": 5
+        },
+        "FRONT": {
+          "gross_usd": -15.625,
+          "median_stressed_usd": -55.72125,
+          "normal_net_usd": -141.3675,
+          "positive_stressed_rate": 0.2,
+          "stressed_net_usd": -192.14875,
+          "trade_count": 5
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": -99.47,
+          "normal_net_usd": -68.22,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -99.47,
+          "trade_count": 1
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -109.375,
+          "median_stressed_usd": -67.18,
+          "normal_net_usd": -261.455,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -323.95500000000004,
+          "trade_count": 5
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 31.25,
+          "median_stressed_usd": -55.74125000000001,
+          "normal_net_usd": -122.14250000000001,
+          "positive_stressed_rate": 0.25,
+          "stressed_net_usd": -188.54875,
+          "trade_count": 4
+        },
+        "VALIDATION": {
+          "gross_usd": 7.8125,
+          "median_stressed_usd": -43.219375,
+          "normal_net_usd": -59.095,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -86.43875,
+          "trade_count": 2
+        }
+      },
+      "candidate_hash": "776ae6085d87d9ef25d28a15c541d04fbf48b1de87ff64b1b306cd8aed7d96aa",
+      "policy_id": "auction_concession_6fac61315ae9e8f0a36c",
+      "spec": {
+        "concession_threshold": 0.25,
+        "holding_minutes": 60,
+        "lookback_minutes": 60
+      },
+      "trade_count": 11
+    },
+    {
+      "aggregate": {
+        "gross_usd": -132.8125,
+        "median_stressed_usd": -59.3675,
+        "normal_net_usd": -209.91250000000002,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -241.16250000000002,
+        "trade_count": 3
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -93.75,
+          "median_stressed_usd": -145.865,
+          "normal_net_usd": -130.24,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -145.865,
+          "trade_count": 1
+        },
+        "FRONT": {
+          "gross_usd": -39.0625,
+          "median_stressed_usd": -47.64875,
+          "normal_net_usd": -79.6725,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -95.2975,
+          "trade_count": 2
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -125.0,
+          "median_stressed_usd": -102.61625000000001,
+          "normal_net_usd": -181.79500000000002,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -205.23250000000002,
+          "trade_count": 2
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": -7.8125,
+          "median_stressed_usd": -35.93,
+          "normal_net_usd": -28.1175,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -35.93,
+          "trade_count": 1
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "candidate_hash": "56fbebf322a441ec032c9e8704636c100b63843d20edf290a0fdf50e72b4fe4d",
+      "policy_id": "auction_concession_6e06f586129a03a6d983",
+      "spec": {
+        "concession_threshold": 0.5,
+        "holding_minutes": 15,
+        "lookback_minutes": 60
+      },
+      "trade_count": 3
+    },
+    {
+      "aggregate": {
+        "gross_usd": -117.1875,
+        "median_stressed_usd": -59.3675,
+        "normal_net_usd": -194.28750000000002,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -225.53750000000002,
+        "trade_count": 3
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -78.125,
+          "median_stressed_usd": -130.24,
+          "normal_net_usd": -114.61500000000001,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -130.24,
+          "trade_count": 1
+        },
+        "FRONT": {
+          "gross_usd": -39.0625,
+          "median_stressed_usd": -47.64875,
+          "normal_net_usd": -79.6725,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -95.2975,
+          "trade_count": 2
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -109.375,
+          "median_stressed_usd": -94.80375000000001,
+          "normal_net_usd": -166.17000000000002,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -189.60750000000002,
+          "trade_count": 2
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": -7.8125,
+          "median_stressed_usd": -35.93,
+          "normal_net_usd": -28.1175,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -35.93,
+          "trade_count": 1
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "candidate_hash": "aae95b491576eec78de9f09ae0f91a5713634404a2b60610ad628e5c546575a3",
+      "policy_id": "auction_concession_2db28fc4999f99820aaa",
+      "spec": {
+        "concession_threshold": 0.5,
+        "holding_minutes": 30,
+        "lookback_minutes": 60
+      },
+      "trade_count": 3
+    },
+    {
+      "aggregate": {
+        "gross_usd": -85.9375,
+        "median_stressed_usd": -67.18,
+        "normal_net_usd": -163.03750000000002,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": -194.28750000000002,
+        "trade_count": 3
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": -46.875,
+          "median_stressed_usd": -98.99000000000001,
+          "normal_net_usd": -83.36500000000001,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -98.99000000000001,
+          "trade_count": 1
+        },
+        "FRONT": {
+          "gross_usd": -39.0625,
+          "median_stressed_usd": -47.64875000000001,
+          "normal_net_usd": -79.6725,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -95.29750000000001,
+          "trade_count": 2
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": -85.9375,
+          "median_stressed_usd": -83.08500000000001,
+          "normal_net_usd": -142.73250000000002,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -166.17000000000002,
+          "trade_count": 2
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": -28.1175,
+          "normal_net_usd": -20.305,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": -28.1175,
+          "trade_count": 1
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "candidate_hash": "f05d403d9d56df0d6ab4e6f1722c1751118965372fa26dc54e144613bd123436",
+      "policy_id": "auction_concession_7a6e4092e90f00eadc41",
+      "spec": {
+        "concession_threshold": 0.5,
+        "holding_minutes": 60,
+        "lookback_minutes": 60
+      },
+      "trade_count": 3
+    },
+    {
+      "aggregate": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FRONT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "candidate_hash": "7885de177593847be7060e573794ba22add3c2a971d23531f41c61e51cf14ab3",
+      "policy_id": "auction_concession_92150531668661d0b4eb",
+      "spec": {
+        "concession_threshold": 0.75,
+        "holding_minutes": 15,
+        "lookback_minutes": 60
+      },
+      "trade_count": 0
+    },
+    {
+      "aggregate": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FRONT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "candidate_hash": "d3e1cdd9b75b916907f0c3e9f484f9d24e0d543b5e47db0518edc5e1027376f4",
+      "policy_id": "auction_concession_77889459b1cb5aa37197",
+      "spec": {
+        "concession_threshold": 0.75,
+        "holding_minutes": 30,
+        "lookback_minutes": 60
+      },
+      "trade_count": 0
+    },
+    {
+      "aggregate": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      },
+      "by_ecology": {
+        "BELLY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FRONT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "LONG": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "by_role": {
+        "DISCOVERY": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "FINAL_DEVELOPMENT": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        },
+        "VALIDATION": {
+          "gross_usd": 0.0,
+          "median_stressed_usd": 0.0,
+          "normal_net_usd": 0.0,
+          "positive_stressed_rate": 0.0,
+          "stressed_net_usd": 0.0,
+          "trade_count": 0
+        }
+      },
+      "candidate_hash": "0d2df92d45682562c3015ad7fa60439a337aa64c0168f59b946bd2cc5563a5b8",
+      "policy_id": "auction_concession_3552cf17274d9c471d7e",
+      "spec": {
+        "concession_threshold": 0.75,
+        "holding_minutes": 60,
+        "lookback_minutes": 60
+      },
+      "trade_count": 0
+    }
+  ],
+  "causal_audit": {
+    "by_ecology": {
+      "BELLY": 28,
+      "FRONT": 42,
+      "LONG": 29
+    },
+    "by_role": {
+      "DISCOVERY": 57,
+      "FINAL_DEVELOPMENT": 21,
+      "VALIDATION": 21
+    },
+    "by_term": {
+      "10-Year": 14,
+      "2-Year": 14,
+      "20-Year": 15,
+      "3-Year": 14,
+      "30-Year": 14,
+      "5-Year": 14,
+      "7-Year": 14
+    },
+    "entry_after_decision_count": 99,
+    "entry_before_auction_count": 99,
+    "failures": {
+      "ENTRY_NOT_PRE_AUCTION": 45,
+      "NO_NEXT_OPEN": 3
+    },
+    "future_result_fields_consumed": 0,
+    "materialized_events": 99,
+    "scheduled_events": 147
+  },
+  "event_ledger": {
+    "event_count": 99,
+    "path": "reports/research_tripwires/treasury_auction_concession_curve_relative_value_v1/causal_event_ledger_revision_01.jsonl",
+    "sha256": "7ee6eb8936810e8ab30fd8a4c14d1017f299e1729b046386abf8be83d45a1795"
+  },
+  "evidence_role": "VIEWED_DEVELOPMENT_TRIPWIRE_ONLY",
+  "exact_account": {
+    "exact_account_replays": 0,
+    "status": "BLOCKED_BY_HELD_ECONOMIC_GATE"
+  },
+  "held_gate": {
+    "checks": {
+      "minimum_100_materialized_events": false,
+      "no_single_ecology_domination": false,
+      "selected_final_positive": false,
+      "selected_validation_positive": false,
+      "two_positive_held_ecologies": false,
+      "upper_bound_final_positive": true,
+      "upper_bound_validation_positive": true
+    },
+    "held_ecology_stressed_net_usd": {
+      "BELLY": 0.0,
+      "FRONT": 0.0,
+      "LONG": 0.0
+    },
+    "held_trade_count": 0,
+    "maximum_positive_ecology_share": 1.0,
+    "pass": false
+  },
+  "incremental_data_spend_usd": 0.0,
+  "manifest_hash": "aab301d654e7f5ffcd8deb485582a26bad8f3d239ff2d9a96ac96f0130fb6ae2",
+  "next_action": "TOMBSTONE_PRE_AUCTION_ADJACENT_TENOR_CONCESSION_NO_NEIGHBOR_RETRY",
+  "non_deployable_upper_bound": {
+    "aggregate": {
+      "gross_usd": 8109.375,
+      "median_stressed_usd": -5.240000000000002,
+      "normal_net_usd": 4111.3175,
+      "positive_stressed_rate": 0.45454545454545453,
+      "stressed_net_usd": 2380.84875,
+      "trade_count": 99
+    },
+    "by_ecology": {
+      "BELLY": {
+        "gross_usd": 1328.125,
+        "median_stressed_usd": -8.063125,
+        "normal_net_usd": 308.30249999999995,
+        "positive_stressed_rate": 0.2857142857142857,
+        "stressed_net_usd": -117.47875000000005,
+        "trade_count": 28
+      },
+      "FRONT": {
+        "gross_usd": 1468.75,
+        "median_stressed_usd": -4.68,
+        "normal_net_usd": 502.925,
+        "positive_stressed_rate": 0.42857142857142855,
+        "stressed_net_usd": 120.11250000000003,
+        "trade_count": 42
+      },
+      "LONG": {
+        "gross_usd": 5312.5,
+        "median_stressed_usd": 56.78,
+        "normal_net_usd": 3300.0899999999997,
+        "positive_stressed_rate": 0.6551724137931034,
+        "stressed_net_usd": 2378.215,
+        "trade_count": 29
+      }
+    },
+    "by_role": {
+      "DISCOVERY": {
+        "gross_usd": 5257.8125,
+        "median_stressed_usd": -1.0337499999999977,
+        "normal_net_usd": 2942.4399999999996,
+        "positive_stressed_rate": 0.49122807017543857,
+        "stressed_net_usd": 1938.5337499999998,
+        "trade_count": 57
+      },
+      "FINAL_DEVELOPMENT": {
+        "gross_usd": 1328.125,
+        "median_stressed_usd": -5.240000000000002,
+        "normal_net_usd": 486.7825,
+        "positive_stressed_rate": 0.42857142857142855,
+        "stressed_net_usd": 123.50125,
+        "trade_count": 21
+      },
+      "VALIDATION": {
+        "gross_usd": 1523.4375,
+        "median_stressed_usd": -5.719999999999999,
+        "normal_net_usd": 682.095,
+        "positive_stressed_rate": 0.38095238095238093,
+        "stressed_net_usd": 318.81375,
+        "trade_count": 21
+      }
+    },
+    "event_count": 99,
+    "promotion_allowed": false,
+    "status": "NON_DEPLOYABLE_FULL_OUTCOME_DIRECTION_AND_HORIZON_UPPER_BOUND"
+  },
+  "orders": 0,
+  "policy_count": 24,
+  "q4_access": 0,
+  "result_hash": "4259fbde95e45a4c2ced509a55e231d871240084a57d267153fae4acb153240f",
+  "schema": "hydra_treasury_auction_concession_curve_rv_result_v1",
+  "selected_policy": {
+    "aggregate": {
+      "gross_usd": 0.0,
+      "median_stressed_usd": 0.0,
+      "normal_net_usd": 0.0,
+      "positive_stressed_rate": 0.0,
+      "stressed_net_usd": 0.0,
+      "trade_count": 0
+    },
+    "by_ecology": {
+      "BELLY": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      },
+      "FRONT": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      },
+      "LONG": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      }
+    },
+    "by_role": {
+      "DISCOVERY": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      },
+      "FINAL_DEVELOPMENT": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      },
+      "VALIDATION": {
+        "gross_usd": 0.0,
+        "median_stressed_usd": 0.0,
+        "normal_net_usd": 0.0,
+        "positive_stressed_rate": 0.0,
+        "stressed_net_usd": 0.0,
+        "trade_count": 0
+      }
+    },
+    "candidate_hash": "a77177a35bece99f46bac3c84901b30ff96bed67da4a83d48a8a09d29bfb396d",
+    "policy_id": "auction_concession_e7436401639134aa060c",
+    "spec": {
+      "concession_threshold": 0.75,
+      "holding_minutes": 15,
+      "lookback_minutes": 30
+    },
+    "trade_count": 0
+  },
+  "selection_rule": "MAX_DISCOVERY_STRESSED_NET_THEN_TRADE_COUNT_THEN_POLICY_ID",
+  "status": "TREASURY_AUCTION_CONCESSION_CURVE_RV_FALSIFIED",
+  "tier_q_allowed": false,
+  "xfa_paths": 0
+}

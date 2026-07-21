@@ -1,0 +1,15 @@
+{
+  "decision_hash": "e34b11a0ed98cf45a2e0e8860aa527f9ac4ec027057a91fb3c994a92a88c14af",
+  "distinctness": {
+    "generic_two_leg_curve": "is event-conditioned on announced auction supply rather than an all-session z-score crossing",
+    "post_result_demand": "uses no auction-result demand fields and enters before the result",
+    "three_tenor_curvature": "uses one target and one adjacent hedge, never a three-leg curvature residual"
+  },
+  "expected_data_cost_usd": 0.0,
+  "hypothesis": "A scheduled Treasury auction creates a pre-close relative concession in its maturity proxy that mean-reverts versus one adjacent-tenor hedge after a causal next-open entry.",
+  "next_materially_distinct_alternative": "CROSS_ASSET_MONTH_END_REBALANCING_FLOW",
+  "schema": "hydra_treasury_auction_concession_curve_rv_decision_v1",
+  "smallest_decisive_test": "105 scheduled pre-Q4 auctions; 24 frozen lookback/threshold/horizon specs; discovery-only selection; chronological validation and final-development.",
+  "status": "FROZEN_BEFORE_ECONOMIC_OUTCOMES",
+  "strongest_argument_against": "The concession may be an efficient supply-risk premium rather than a temporary dislocation, and two-leg costs may consume the unwind."
+}

@@ -1,0 +1,9 @@
+{
+  "authoritative_result_path": "reports/research_tripwires/treasury_auction_concession_curve_relative_value_v1/economic_result_revision_01.json",
+  "exact_account_replays": 0,
+  "materialized_events": 99,
+  "policy_count": 24,
+  "result_hash": "4259fbde95e45a4c2ced509a55e231d871240084a57d267153fae4acb153240f",
+  "status": "COMPLETE",
+  "verdict": "TREASURY_AUCTION_CONCESSION_CURVE_RV_FALSIFIED"
+}

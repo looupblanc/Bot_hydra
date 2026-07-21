@@ -1,0 +1,254 @@
+{
+  "broker_connections": 0,
+  "causal_contract": {
+    "action": "LONG_CHEAPENED_AUCTION_TARGET_SHORT_ADJACENT_HEDGE_OR_ABSTAIN",
+    "decision": "COMPLETED_1M_BAR_ENDING_FIVE_MINUTES_BEFORE_COMPETITIVE_CLOSE",
+    "entry": "FIRST_TRADABLE_1M_OPEN_AT_OR_AFTER_DECISION_TIME_AND_BEFORE_CLOSE",
+    "exit": "FROZEN_TIME_EXIT_AT_NEXT_AVAILABLE_OPEN",
+    "feature": "AUCTION_TARGET_MINUS_ADJACENT_HEDGE_PRE_CLOSE_STANDARDIZED_DISPLACEMENT",
+    "result_fields_in_decision": false,
+    "schedule_availability": "ANNOUNCEMENT_DATE_STRICTLY_PRECEDES_AUCTION_DECISION"
+  },
+  "cemetery_statuses": {
+    "generic_two_leg_curve": "CURVE_RELATIVE_VALUE_TRIPWIRE_FALSIFIED",
+    "post_result_demand": "TREASURY_AUCTION_CAUSAL_FALSIFIED",
+    "three_tenor_curvature": "TREASURY_CURVATURE_RISK_GRANULARITY_BLOCKED_AND_COVERAGE_UNDERPOWERED"
+  },
+  "cheap_gate": {
+    "maximum_positive_ecology_share": 0.75,
+    "minimum_materialized_events": 100,
+    "minimum_positive_held_ecologies": 2,
+    "positive_non_deployable_upper_bound_held_roles": true,
+    "positive_selected_stressed_final_development": true,
+    "positive_selected_stressed_validation": true
+  },
+  "decision_hash": "e34b11a0ed98cf45a2e0e8860aa527f9ac4ec027057a91fb3c994a92a88c14af",
+  "exact_account_replay": "ONLY_AFTER_COMPLETE_HELD_GATE",
+  "incremental_data_spend_usd": 0.0,
+  "inputs": {
+    "bond_schedule": {
+      "path": "data/cache/official/treasury_auction_demand_shock_v1/bond.json",
+      "sha256": "86f7015385d55f8632d3d698da4d6727a8ea1424101a9f0a4b98608835591bd4"
+    },
+    "cemetery_generic_two_leg_curve": {
+      "path": "reports/research_tripwires/curve_relative_value_tripwire_v1/economic_result.json",
+      "sha256": "c1208fb5587dcb63a4f0de7a16d8001dd2454db656b2420860f83587a587c2bb"
+    },
+    "cemetery_post_result_demand": {
+      "path": "reports/research_tripwires/treasury_auction_demand_shock_causal_v1/causal_result.json",
+      "sha256": "c86af76003ae050d27c41b6eacaa864bd9b513185a5a29ade5ea969c17cda4f7"
+    },
+    "cemetery_three_tenor_curvature": {
+      "path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_macro_branch_portfolio/treasury_three_tenor_curvature.json",
+      "sha256": "515b0329ab9cf864a398e6bba5c4416fe670f28c3ce7e20516991bd17c154f4c"
+    },
+    "note_schedule": {
+      "path": "data/cache/official/treasury_auction_demand_shock_v1/note.json",
+      "sha256": "93bc58847f74b2099565ace088fe597274dae1d371af15312e88e3ca92be18be"
+    },
+    "official_rule_snapshot": {
+      "path": "config/rulesets/topstep_official_2026-07-19.json",
+      "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+    },
+    "price_TN": {
+      "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/tn_explicit_contract_ohlcv.parquet",
+      "sha256": "aebd664d23a81d5d356c740570bc69e15e8f6556824e78d38360b7427d5003f1"
+    },
+    "price_UB": {
+      "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/ub_explicit_contract_ohlcv.parquet",
+      "sha256": "03e09d13f560ff398f1c6936fd2ff8b7dd900ce8877b588a8dad2aab8907defb"
+    },
+    "price_ZB": {
+      "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zb_explicit_contract_ohlcv.parquet",
+      "sha256": "92e4763c678d6b45607824983f6a5cd7cca3d05c8afba40db324d6eb87d77d6e"
+    },
+    "price_ZF": {
+      "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zf_explicit_contract_ohlcv.parquet",
+      "sha256": "0c22d67bca3d5ac8d354a82e1007c84c9e9fd331192c60464738bd056caec050"
+    },
+    "price_ZN": {
+      "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zn_explicit_contract_ohlcv.parquet",
+      "sha256": "8347100a5ad0fbd7b5281278764300028ac94dd60823dbbc39fd4056b4926d45"
+    },
+    "price_ZT": {
+      "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zt_explicit_contract_ohlcv.parquet",
+      "sha256": "28b99c104fdfe745fae3312e35a11fc7cd2e45cdd166393331ac94c7b5d8c761"
+    }
+  },
+  "manifest_hash": "aab301d654e7f5ffcd8deb485582a26bad8f3d239ff2d9a96ac96f0130fb6ae2",
+  "numeric_threads": 1,
+  "orders": 0,
+  "policy_count": 24,
+  "policy_specs": [
+    {
+      "concession_threshold": 0.0,
+      "holding_minutes": 15,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.0,
+      "holding_minutes": 30,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.0,
+      "holding_minutes": 60,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.25,
+      "holding_minutes": 15,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.25,
+      "holding_minutes": 30,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.25,
+      "holding_minutes": 60,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.5,
+      "holding_minutes": 15,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.5,
+      "holding_minutes": 30,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.5,
+      "holding_minutes": 60,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.75,
+      "holding_minutes": 15,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.75,
+      "holding_minutes": 30,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.75,
+      "holding_minutes": 60,
+      "lookback_minutes": 30
+    },
+    {
+      "concession_threshold": 0.0,
+      "holding_minutes": 15,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.0,
+      "holding_minutes": 30,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.0,
+      "holding_minutes": 60,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.25,
+      "holding_minutes": 15,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.25,
+      "holding_minutes": 30,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.25,
+      "holding_minutes": 60,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.5,
+      "holding_minutes": 15,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.5,
+      "holding_minutes": 30,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.5,
+      "holding_minutes": 60,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.75,
+      "holding_minutes": 15,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.75,
+      "holding_minutes": 30,
+      "lookback_minutes": 60
+    },
+    {
+      "concession_threshold": 0.75,
+      "holding_minutes": 60,
+      "lookback_minutes": 60
+    }
+  ],
+  "q4_access": 0,
+  "role_bounds": {
+    "DISCOVERY": [
+      "2023-01-01",
+      "2024-01-01"
+    ],
+    "FINAL_DEVELOPMENT": [
+      "2024-05-01",
+      "2024-10-01"
+    ],
+    "VALIDATION": [
+      "2024-01-01",
+      "2024-05-01"
+    ]
+  },
+  "schema": "hydra_treasury_auction_concession_curve_rv_manifest_v1",
+  "selection": "MAX_DISCOVERY_STRESSED_NET_THEN_TRADE_COUNT_THEN_POLICY_ID",
+  "status": "FROZEN_BEFORE_ECONOMIC_OUTCOMES",
+  "term_pairs": {
+    "10-Year": [
+      "ZN",
+      "TN"
+    ],
+    "2-Year": [
+      "ZT",
+      "ZF"
+    ],
+    "20-Year": [
+      "ZB",
+      "UB"
+    ],
+    "3-Year": [
+      "ZF",
+      "ZT"
+    ],
+    "30-Year": [
+      "UB",
+      "ZB"
+    ],
+    "5-Year": [
+      "ZF",
+      "ZN"
+    ],
+    "7-Year": [
+      "ZN",
+      "ZF"
+    ]
+  },
+  "worker_processes": 1,
+  "xfa": false
+}
