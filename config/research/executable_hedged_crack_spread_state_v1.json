@@ -1,0 +1,108 @@
+{
+  "schema": "hydra_executable_hedged_crack_spread_state_manifest_v1",
+  "branch_id": "EXECUTABLE_HEDGED_CRACK_SPREAD_STATE_V1",
+  "hypothesis": "A causally observed refinery-margin displacement can be traded as a synchronized RB/HO/CL hedge rather than as an outright crude forecast, preserving the structural relative-value payoff after executable multi-leg costs.",
+  "strongest_argument_against": "The one-minute crack displacement may already be fully incorporated across all three legs, while six-leg transaction and legging costs overwhelm any subsequent continuation or reversion.",
+  "frozen_inputs": {
+    "rb_ho_ohlcv": {
+      "path": "data/cache/databento/refinery_products_to_mcl/272cb68c78c2111082cb/raw_ohlcv.dbn.zst",
+      "sha256": "a40db8832fa9ddc8002105ba282c995e176eaabc1dd7188de9c75b0aa4de0f74"
+    },
+    "rb_ho_definition": {
+      "path": "data/cache/databento/refinery_products_to_mcl/272cb68c78c2111082cb/raw_definition.dbn.zst",
+      "sha256": "91d903428ddd3aede4c4ebe0b04cd69fa727178701af9e9ad93f71e1a01a3c67"
+    },
+    "cl_ohlcv": {
+      "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_2023-01-01_2024-10-01.parquet",
+      "sha256": "07b3093ed8ef5888898abc3e531e0b522273a6c2047489b60eb36b33afeaf374"
+    },
+    "front_roll_map": {
+      "path": "data/cache/contract_maps/roll_map_GLBX-MDP3_ohlcv-1m_705ce6fe27bac7de.json",
+      "sha256": "401ca56ebab606c3eb2cbcf6ed244204f264ed2894c2ee0eb2310998f9244fda"
+    },
+    "rule_snapshot": {
+      "path": "config/rulesets/topstep_official_2026-07-19.json",
+      "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b"
+    },
+    "source_receipt": {
+      "path": "reports/data_access/refinery_products_to_mcl_acquisition_receipt.json",
+      "sha256": "8d5f541b07372c5e7503171950d6efc1a3f1aaea1d45adae453a09decc12027d"
+    }
+  },
+  "chronological_roles": [
+    {"role": "DISCOVERY", "start": "2023-01-03", "end": "2024-01-22", "candidate_modification_allowed": true},
+    {"role": "VALIDATION", "start": "2024-01-22", "end": "2024-05-28", "candidate_modification_allowed": false},
+    {"role": "FINAL_DEVELOPMENT", "start": "2024-05-28", "end": "2024-10-01", "candidate_modification_allowed": false}
+  ],
+  "physical_contract_ratios": {
+    "BALANCED_211": {"RB": 1, "HO": 1, "CL": -2, "gross_mini_contracts": 4},
+    "STANDARD_321": {"RB": 2, "HO": 1, "CL": -3, "gross_mini_contracts": 6}
+  },
+  "contract_specs": {
+    "RB": {"price_multiplier": 42000.0, "minimum_tick": 0.0001, "tick_value_usd": 4.2},
+    "HO": {"price_multiplier": 42000.0, "minimum_tick": 0.0001, "tick_value_usd": 4.2},
+    "CL": {"price_multiplier": 1000.0, "minimum_tick": 0.01, "tick_value_usd": 10.0}
+  },
+  "candidate_lattice": {
+    "mechanisms": ["SPREAD_DISPLACEMENT_CONTINUATION", "SPREAD_DISPLACEMENT_MEAN_REVERSION"],
+    "ratio_ids": ["BALANCED_211", "STANDARD_321"],
+    "lookback_minutes": [15, 60],
+    "holding_minutes": [15, 60, 180],
+    "prior_session_robust_z_threshold": 2.0,
+    "proposal_count": 24
+  },
+  "causal_execution": {
+    "feature": "COMPLETED_SYNCHRONIZED_RB_HO_CL_BAR_ONLY",
+    "available_at": "BAR_TIMESTAMP_PLUS_ONE_MINUTE",
+    "decision_time": "MAX_LEG_AVAILABLE_AT",
+    "entry": "EACH_LEG_FIRST_TRADABLE_BAR_OPEN_STRICTLY_AFTER_DECISION_TIME",
+    "exit": "EACH_LEG_FIRST_TRADABLE_BAR_OPEN_STRICTLY_AFTER_EXIT_INTENT",
+    "maximum_entry_completion_minutes": 2,
+    "maximum_exit_wait_minutes": 5,
+    "partial_entry_failure": "LIQUIDATE_EACH_FILLED_LEG_AT_ITS_FIRST_TRADABLE_OPEN_AFTER_ENTRY_DEADLINE_AND_BOOK_ALL_COSTS",
+    "bar_clock_alignment_seconds": null,
+    "trade_level_simultaneity_claimed": false,
+    "ohlcv_open_semantics": "FIRST_REPORTED_TRADE_IN_COMMON_MINUTE_NOT_A_SIMULTANEOUS_ATOMIC_SPREAD_FILL",
+    "missing_leg_or_interval": "DATA_CENSORED",
+    "roll_guard_sessions_each_side": 1,
+    "session_flatten_chicago": "15:10",
+    "future_fields_in_decision": false
+  },
+  "cost_model": {
+    "normal": {"commission_round_turn_per_contract_usd": 4.0, "slippage_ticks_per_side": 1.0, "legging_ticks_per_non_anchor_contract": 0.25},
+    "stressed": {"commission_round_turn_per_contract_usd": 6.0, "slippage_ticks_per_side": 1.5, "legging_ticks_per_non_anchor_contract": 1.0}
+  },
+  "selection_and_gate": {
+    "selection_on_discovery_only": true,
+    "maximum_selected_cells": 4,
+    "minimum_discovery_complete_events": 100,
+    "minimum_validation_complete_events": 30,
+    "minimum_final_development_complete_events": 30,
+    "minimum_combined_held_complete_events": 100,
+    "positive_discovery_stressed_required": true,
+    "positive_validation_stressed_required": true,
+    "positive_final_development_stressed_required": true,
+    "maximum_single_event_positive_profit_share": 0.25,
+    "maximum_single_day_positive_profit_share": 0.4
+  },
+  "account_gate": {
+    "run_only_after_held_event_gate": true,
+    "account_sizes": ["50K", "100K", "150K"],
+    "horizons_trading_days": [5, 10, 20],
+    "maximum_risk_tiers": 1,
+    "shared_CL_QM_RB_HO_mini_caps": {"50K": 3, "100K": 6, "150K": 9},
+    "fifty_k_policy": "INELIGIBLE_CONTRACT_CAP_FOR_ALL_FROZEN_RATIOS",
+    "exact_mll_consistency_and_contract_limits": true
+  },
+  "governance": {
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "new_data_purchase_allowed": false,
+    "q4_access_allowed": false,
+    "broker_connection_allowed": false,
+    "orders_allowed": false,
+    "xfa_allowed": false,
+    "promotion_allowed": false
+  },
+  "manifest_hash": "694527349cde889731097b97f45226118730bf5248b35b13af0d400652d302af"
+}
