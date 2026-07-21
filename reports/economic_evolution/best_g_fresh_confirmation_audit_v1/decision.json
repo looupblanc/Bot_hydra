@@ -1,0 +1,111 @@
+{
+  "schema": "hydra_best_g_fresh_confirmation_audit_v1",
+  "audited_at_utc": "2026-07-21T03:28:58Z",
+  "source_commit": "210b21e1cb68490ec92a944540df9d58c3befacb",
+  "candidate": {
+    "candidate_id": "hazard_020ae195ccef8e39b1907e38",
+    "candidate_fingerprint": "020ae195ccef8e39b1907e388acd87272e2cdc7683f82754d8cde5add353cbf4",
+    "combine_book_hash": "187fd498cadc6153774b426a1881c64626a3188d63f182ac244250f1ec19397b",
+    "frozen_account_policy_hash": "1deea9d882eaddb93966209274ba42cca25f591f0ff12a901ac5e748918a579e",
+    "policy_id": "exact-0029:hazard_020ae195ccef8e39b1907e38:50000:3:CONTRACT_ONLY_UNIFORM_SCALE"
+  },
+  "lineage_audit": {
+    "fresh_confirmation_was_already_consumed": true,
+    "confirmation_contract": {
+      "path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/fresh_confirmation_contract.json",
+      "file_sha256": "b8b1d67d9862c5071550b9f6cb80296f3f02bd86ec44d3d58815e92090a7e1a0",
+      "contract_hash": "15f7d65b7e4b8c58907a86eeed3c96ca1e49c3594937c1b98a3e3dadd99151c6",
+      "request_hash": "370bc62c9c6420224f880520c7e0ae8ed263cb3f634233dc955b5569e5c53219",
+      "dataset": "GLBX.MDP3",
+      "schema": "ohlcv-1m",
+      "symbols": [
+        "YM.c.0",
+        "MYM.c.0",
+        "ES.c.0"
+      ],
+      "start_inclusive": "2025-01-02",
+      "end_exclusive": "2025-07-01",
+      "data_role": "CONFIRMATION"
+    },
+    "confirmation_result": {
+      "path": "reports/economic_evolution/autonomous_economic_discovery_director_0035_revision_02/branch_results/post_source_exhaustion/post_composite/fresh_confirmation_result.json",
+      "file_sha256": "e5dc6ac4555e3c109c4fc885ad68119af6a3de579f608236af15d1a23939d103",
+      "result_hash": "f4ebea3fbbdf582066bdad12db737e155db1d8abd3847c0df17dbd0f9b4906bc",
+      "completed_at_utc": "2026-07-19T10:04:48.764654Z",
+      "decision": "CONFIRMATION_CONSUMED_ONCE",
+      "evidence_tier": "G_CONFIRMATION_FAILED",
+      "tier_c_promoted": false,
+      "tier_c_failure": "CONTROLLED_STRESSED_MLL_FAILED"
+    },
+    "confirmation_acquisition": {
+      "actual_cost_usd": 1.847858808935,
+      "cumulative_actual_usd_at_acquisition": 102.56857873201596,
+      "file_count": 5,
+      "file_inventory_hash": "c196fb2e4a7108875808f4ca959689b550ed62e336e7bd473e7dbf1bf24eeb9e"
+    },
+    "candidate_confirmation_economics": {
+      "5": {
+        "full_coverage_starts": 19,
+        "normal_passes": 0,
+        "stressed_passes": 0,
+        "normal_net_usd": -3944.8498107831983,
+        "stressed_net_usd": -4553.219810783201,
+        "normal_mll_breaches": 4,
+        "stressed_mll_breaches": 4
+      },
+      "10": {
+        "full_coverage_starts": 8,
+        "normal_passes": 0,
+        "stressed_passes": 0,
+        "normal_net_usd": -2159.270058123875,
+        "stressed_net_usd": -2643.8900581238777,
+        "normal_mll_breaches": 3,
+        "stressed_mll_breaches": 3
+      },
+      "20": {
+        "full_coverage_starts": 3,
+        "normal_passes": 1,
+        "stressed_passes": 1,
+        "normal_net_usd": 1214.0303240622525,
+        "stressed_net_usd": 938.6603240622499,
+        "normal_mll_breaches": 2,
+        "stressed_mll_breaches": 2
+      }
+    }
+  },
+  "later_integrity_reconciliation": {
+    "path": "reports/economic_evolution/risk_corrected_complementarity_graph_v1/economic_result.json",
+    "file_sha256": "7bf14d91494b87c9958b14967c3d556a0414e32f2bc06031b4b4b0d5f3dc404c",
+    "result_hash": "9f4f1fd7dcf23a8842134fbb948851972ab8b252fec48e08f6e1f91e64c7553f",
+    "quarantine_receipt_hash": "0b1cf670b23c18174b7053a5520a2cf3b1cf6dcd56b6cca46f6b776c4af9be5d",
+    "status": "QUARANTINED_TIER_G_EPSILON_RISK_STATUS",
+    "frozen_nominal_risk_charge_per_mini_usd": 0.000001,
+    "corrected_causal_declared_stop_risk_per_mini_usd": 924.1089481960349,
+    "book_mutation_required_to_repair": true
+  },
+  "budget": {
+    "authoritative_cumulative_cap_usd": 200.720719923081,
+    "cumulative_actual_before_audit_usd": 192.17549553961098,
+    "remaining_hard_cap_usd": 8.54522438347002,
+    "new_estimate_requests": 0,
+    "new_purchases": 0,
+    "actual_spend_delta_usd": 0.0
+  },
+  "safety": {
+    "q4_access_count_delta": 0,
+    "broker_connections": 0,
+    "orders": 0,
+    "candidate_retuned": false,
+    "candidate_resized": false,
+    "candidate_replayed": false
+  },
+  "decision": {
+    "status": "FRESH_CONFIRMATION_RETRY_FORBIDDEN_HARD_BLOCK",
+    "reason": "THE_EXACT_FROZEN_BOOK_ALREADY_CONSUMED_AND_FAILED_ITS_FRESH_CONFIRMATION_AND_WAS_SUBSEQUENTLY_QUARANTINED_FOR_EPSILON_NOMINAL_RISK",
+    "tier_c_claim_allowed": false,
+    "additional_confirmation_purchase_allowed_for_this_exact_book": false,
+    "exact_frozen_candidate_eligible_for_replay": false,
+    "repair_implication": "REPLACING_THE_EPSILON_RISK_CHARGE_WITH_THE_CAUSAL_STOP_RISK_WOULD_CREATE_A_NEW_ACCOUNT_POLICY_REQUIRING_NEW_DEVELOPMENT_AND_FREEZE",
+    "next_action": "CLOSE_THIS_EXPLOITATION_ARM_AND_REALLOCATE_TO_AN_ELIGIBLE_FROZEN_CANDIDATE_OR_MATERIALLY_DISTINCT_BRANCH"
+  }
+}
