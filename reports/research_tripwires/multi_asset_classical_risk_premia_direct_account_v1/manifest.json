@@ -1,0 +1,328 @@
+{
+  "account_horizons": [
+    10,
+    20,
+    40
+  ],
+  "account_sizes": [
+    "50K",
+    "100K",
+    "150K"
+  ],
+  "assets": {
+    "M2K": {
+      "asset_class": "EQUITY",
+      "mini_equivalent": 0.1,
+      "point_value": 5.0,
+      "round_turn_commission": 1.24,
+      "symbol": "M2K",
+      "tick_value": 0.5
+    },
+    "MCL": {
+      "asset_class": "ENERGY",
+      "mini_equivalent": 0.1,
+      "point_value": 100.0,
+      "round_turn_commission": 1.54,
+      "symbol": "MCL",
+      "tick_value": 1.0
+    },
+    "MGC": {
+      "asset_class": "METAL",
+      "mini_equivalent": 0.1,
+      "point_value": 10.0,
+      "round_turn_commission": 1.74,
+      "symbol": "MGC",
+      "tick_value": 1.0
+    },
+    "MYM": {
+      "asset_class": "EQUITY",
+      "mini_equivalent": 0.1,
+      "point_value": 0.5,
+      "round_turn_commission": 1.24,
+      "symbol": "MYM",
+      "tick_value": 0.5
+    },
+    "ZN": {
+      "asset_class": "RATES",
+      "mini_equivalent": 1.0,
+      "point_value": 1000.0,
+      "round_turn_commission": 4.2,
+      "symbol": "ZN",
+      "tick_value": 15.625
+    }
+  },
+  "branch_id": "MULTI_ASSET_CLASSICAL_RISK_PREMIA_DIRECT_ACCOUNT_V1",
+  "broker_allowed": false,
+  "created_at_utc": "2026-07-21T09:16:01.367966+00:00",
+  "data_roles": {
+    "DISCOVERY": [
+      "2023-01-03",
+      "2023-10-02"
+    ],
+    "FINAL_DEVELOPMENT": [
+      "2024-04-01",
+      "2024-10-01"
+    ],
+    "VALIDATION": [
+      "2023-10-02",
+      "2024-04-01"
+    ]
+  },
+  "execution": {
+    "decision": "completed prior session only",
+    "fill": "first tradable open of next session",
+    "flatten_cutoff": "13:15 America/Chicago",
+    "positions_aggregated_to_one_daily_account_event": true
+  },
+  "hypothesis": "Medium-horizon trend and relative-strength states across distinct futures asset classes can produce a low-turnover, session-flat direct account path.",
+  "inputs": {
+    "base": {
+      "path": "data/cache/databento/GLBX-MDP3_ohlcv-1m_RTY_M2K_YM_MYM_GC_MGC_CL_MCL_2023-01-01_2024-10-01.parquet",
+      "sha256": "07b3093ed8ef5888898abc3e531e0b522273a6c2047489b60eb36b33afeaf374"
+    },
+    "zn": {
+      "path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zn_explicit_contract_ohlcv.parquet",
+      "sha256": "8347100a5ad0fbd7b5281278764300028ac94dd60823dbbc39fd4056b4926d45"
+    }
+  },
+  "manifest_hash": "c94c3e28414751e807ba264aafabc146e009055a04fd550e9c77b1fd33ea2f89",
+  "maximum_workers": 1,
+  "orders_allowed": false,
+  "policies": [
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 20,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_990bfcc9fb9e40ed1885"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 20,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_31762d8494bf23902494"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 20,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_399dfe9dabdf80f58ffe"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 20,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_52905dc55996f85e5064"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 60,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_4a084d6c9bd298163378"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 60,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_c8f7cb930532e6afab39"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 60,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_f8fbb6fef97f28716104"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 60,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_af4a3bbcabc5db9ec223"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 120,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_d7b8ebad54165a311688"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 120,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_dc1cd729cc664be94675"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 120,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_424bc06c4a7f7ad34cc4"
+    },
+    {
+      "family": "TIME_SERIES_TREND",
+      "lookback_sessions": 120,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_0b5770133fb889efcf49"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 20,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_225c3b3c13b59e2afd7a"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 20,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_a73f062461c620cb7118"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 20,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_fa5e1b592551ac82f11f"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 20,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_96fe10acac5543fa7e3f"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 60,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_5c440dfaa1dc646df80f"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 60,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_86a51bde255166df4c57"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 60,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_d249d244c6cf0d70d967"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 60,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_7db9b69dfb5d4f4070d2"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 120,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_6ef1069c2f111ee0d142"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 120,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_2a1541949eac28a53f0b"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 120,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_2937987064a1f8926ac3"
+    },
+    {
+      "family": "CROSS_SECTIONAL_STRENGTH",
+      "lookback_sessions": 120,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_c48554e1afa969a18a02"
+    },
+    {
+      "family": "TREND_STRENGTH_BLEND",
+      "lookback_sessions": 20,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_b1e3a5c97dc23e4d6863"
+    },
+    {
+      "family": "TREND_STRENGTH_BLEND",
+      "lookback_sessions": 20,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_8aeb3c8a5f75ddd4d778"
+    },
+    {
+      "family": "TREND_STRENGTH_BLEND",
+      "lookback_sessions": 20,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_348a4cf956434e1b4403"
+    },
+    {
+      "family": "TREND_STRENGTH_BLEND",
+      "lookback_sessions": 20,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_2739a2f328e3eda3a6c7"
+    },
+    {
+      "family": "TREND_STRENGTH_BLEND",
+      "lookback_sessions": 60,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_189aa0de28dfc63b8c39"
+    },
+    {
+      "family": "TREND_STRENGTH_BLEND",
+      "lookback_sessions": 60,
+      "maximum_assets": 2,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_f12d5bda81793e51e32c"
+    },
+    {
+      "family": "TREND_STRENGTH_BLEND",
+      "lookback_sessions": 60,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.1,
+      "policy_id": "classical_rp_5451b5f0c96848bd906b"
+    },
+    {
+      "family": "TREND_STRENGTH_BLEND",
+      "lookback_sessions": 60,
+      "maximum_assets": 3,
+      "mll_risk_fraction": 0.2,
+      "policy_id": "classical_rp_8ebeb802de6bd6122fd1"
+    }
+  ],
+  "purchase_allowed": false,
+  "q4_allowed": false,
+  "schema": "hydra_multi_asset_classical_risk_premia_direct_account_v1",
+  "selection": {
+    "discovery_only": true,
+    "exact_account_only_after_held_gate": true,
+    "held_gate": "normal positive in validation and final, stress advisory, no class domination",
+    "maximum_selected": 4
+  },
+  "strongest_argument_against": "Mandatory daily flattening can consume the classical premium in costs and the common sample contains only three chronological eras.",
+  "xfa_allowed": false
+}

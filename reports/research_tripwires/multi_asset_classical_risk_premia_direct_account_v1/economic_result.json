@@ -1,0 +1,3571 @@
+{
+  "branch_id": "MULTI_ASSET_CLASSICAL_RISK_PREMIA_DIRECT_ACCOUNT_V1",
+  "candidates": [
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 850.7825000000018,
+            "EQUITY": -1390.8349999999987,
+            "METAL": -977.1599999999992,
+            "RATES": -1191.4724999999987
+          },
+          "event_count": 86,
+          "gross_usd": -643.6249999999923,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -2.4799999999997766,
+          "minimum_worst_unrealized_usd": -2057.565,
+          "net_usd": -2708.684999999993
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -236.53499999999545,
+            "EQUITY": -467.0699999999965,
+            "METAL": -1899.862499999996,
+            "RATES": -831.7274999999984
+          },
+          "event_count": 65,
+          "gross_usd": -1834.624999999985,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -43.779999999999944,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -3435.1949999999856
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -321.2900000000027,
+            "EQUITY": -3361.8974999999937,
+            "METAL": -703.2799999999959,
+            "RATES": -1714.8875000000003
+          },
+          "event_count": 66,
+          "gross_usd": -5087.374999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -49.129999999999434,
+          "minimum_worst_unrealized_usd": -1548.5649999999998,
+          "net_usd": -6101.354999999994
+        }
+      },
+      "policy_id": "classical_rp_990bfcc9fb9e40ed1885",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 20,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 692.2675000000019,
+            "EQUITY": -1577.6274999999976,
+            "METAL": -1199.6774999999975,
+            "RATES": -1656.1774999999966
+          },
+          "event_count": 86,
+          "gross_usd": -643.6249999999923,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -5.469999999999658,
+          "minimum_worst_unrealized_usd": -2076.41,
+          "net_usd": -3741.2149999999924
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -417.8649999999949,
+            "EQUITY": -543.8549999999966,
+            "METAL": -2081.8249999999957,
+            "RATES": -1191.9349999999977
+          },
+          "event_count": 65,
+          "gross_usd": -1834.624999999985,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -47.1700000000008,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -4235.479999999986
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -370.8100000000027,
+            "EQUITY": -3603.8774999999955,
+            "METAL": -729.669999999996,
+            "RATES": -1903.9874999999997
+          },
+          "event_count": 66,
+          "gross_usd": -5087.374999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -51.69499999999943,
+          "minimum_worst_unrealized_usd": -1567.4099999999999,
+          "net_usd": -6608.344999999994
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1369.1725000000004,
+            "EQUITY": -1283.0149999999987,
+            "METAL": -876.4299999999994,
+            "RATES": -881.632499999999
+          },
+          "event_count": 86,
+          "gross_usd": 450.37500000000546,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -2.4799999999997766,
+          "minimum_worst_unrealized_usd": -2057.565,
+          "net_usd": -1671.9049999999954
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -572.3449999999955,
+            "EQUITY": -833.3199999999963,
+            "METAL": -1979.982499999996,
+            "RATES": -1090.8874999999987
+          },
+          "event_count": 65,
+          "gross_usd": -2814.624999999985,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -61.23999999999966,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -4476.534999999985
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -362.2700000000026,
+            "EQUITY": -3268.407499999995,
+            "METAL": -936.6199999999949,
+            "RATES": -1586.6175000000005
+          },
+          "event_count": 66,
+          "gross_usd": -5095.874999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -66.13000000000045,
+          "minimum_worst_unrealized_usd": -1548.5649999999998,
+          "net_usd": -6153.9149999999945
+        }
+      },
+      "policy_id": "classical_rp_31762d8494bf23902494",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 20,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1196.3525000000006,
+            "EQUITY": -1476.1474999999984,
+            "METAL": -1099.8324999999977,
+            "RATES": -1353.4174999999973
+          },
+          "event_count": 86,
+          "gross_usd": 450.37500000000546,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -5.469999999999658,
+          "minimum_worst_unrealized_usd": -2076.41,
+          "net_usd": -2733.0449999999946
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -767.3299999999954,
+            "EQUITY": -919.4799999999964,
+            "METAL": -2167.254999999996,
+            "RATES": -1453.4249999999981
+          },
+          "event_count": 65,
+          "gross_usd": -2814.624999999985,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -80.73499999999967,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -5307.489999999986
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -414.0300000000027,
+            "EQUITY": -3523.6424999999954,
+            "METAL": -967.3049999999945,
+            "RATES": -1777.9575
+          },
+          "event_count": 66,
+          "gross_usd": -5095.874999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -68.69500000000045,
+          "minimum_worst_unrealized_usd": -1567.4099999999999,
+          "net_usd": -6682.934999999994
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1842.963333333338,
+            "EQUITY": -795.7858333333297,
+            "METAL": -1577.4883333333303,
+            "RATES": -794.314166666664
+          },
+          "event_count": 86,
+          "gross_usd": 1301.3750000000143,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 8.900000000000784,
+          "minimum_worst_unrealized_usd": -2085.3049999999994,
+          "net_usd": -1324.6249999999868
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 190.13000000000346,
+            "EQUITY": -877.9591666666626,
+            "METAL": -1224.5366666666623,
+            "RATES": -1072.734166666664
+          },
+          "event_count": 65,
+          "gross_usd": -610.7499999999851,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -61.355000000000175,
+          "minimum_worst_unrealized_usd": -1485.230000000001,
+          "net_usd": -2985.0999999999863
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -371.92333333333085,
+            "EQUITY": -4083.5049999999956,
+            "METAL": -686.6399999999957,
+            "RATES": -4261.651666666668
+          },
+          "event_count": 66,
+          "gross_usd": -7715.749999999989,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -68.01999999999896,
+          "minimum_worst_unrealized_usd": -2152.9800000000005,
+          "net_usd": -9403.71999999999
+        }
+      },
+      "policy_id": "classical_rp_399dfe9dabdf80f58ffe",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 20,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1669.4033333333375,
+            "EQUITY": -1241.6891666666622,
+            "METAL": -1851.669999999996,
+            "RATES": -1213.6691666666638
+          },
+          "event_count": 86,
+          "gross_usd": 1301.3750000000143,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -1.029999999999887,
+          "minimum_worst_unrealized_usd": -2105.2699999999995,
+          "net_usd": -2637.6249999999864
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -92.47166666666311,
+            "EQUITY": -1176.657499999996,
+            "METAL": -1429.2216666666618,
+            "RATES": -1473.924166666664
+          },
+          "event_count": 65,
+          "gross_usd": -610.7499999999851,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -76.27999999999905,
+          "minimum_worst_unrealized_usd": -1506.5950000000007,
+          "net_usd": -4172.274999999986
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -484.0099999999974,
+            "EQUITY": -4442.444999999996,
+            "METAL": -750.3349999999955,
+            "RATES": -4570.915000000001
+          },
+          "event_count": 66,
+          "gross_usd": -7715.749999999989,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -78.00000000000112,
+          "minimum_worst_unrealized_usd": -2173.5950000000007,
+          "net_usd": -10247.70499999999
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1842.963333333338,
+            "EQUITY": -795.7858333333297,
+            "METAL": -1577.4883333333303,
+            "RATES": -794.314166666664
+          },
+          "event_count": 86,
+          "gross_usd": 1301.3750000000143,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 8.900000000000784,
+          "minimum_worst_unrealized_usd": -2085.3049999999994,
+          "net_usd": -1324.6249999999868
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 190.13000000000346,
+            "EQUITY": -877.9591666666626,
+            "METAL": -1224.5366666666623,
+            "RATES": -1072.734166666664
+          },
+          "event_count": 65,
+          "gross_usd": -610.7499999999851,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -61.355000000000175,
+          "minimum_worst_unrealized_usd": -1485.230000000001,
+          "net_usd": -2985.0999999999863
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -371.92333333333085,
+            "EQUITY": -4083.5049999999956,
+            "METAL": -686.6399999999957,
+            "RATES": -4261.651666666668
+          },
+          "event_count": 66,
+          "gross_usd": -7715.749999999989,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -68.01999999999896,
+          "minimum_worst_unrealized_usd": -2152.9800000000005,
+          "net_usd": -9403.71999999999
+        }
+      },
+      "policy_id": "classical_rp_52905dc55996f85e5064",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 20,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1669.4033333333375,
+            "EQUITY": -1241.6891666666622,
+            "METAL": -1851.669999999996,
+            "RATES": -1213.6691666666638
+          },
+          "event_count": 86,
+          "gross_usd": 1301.3750000000143,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -1.029999999999887,
+          "minimum_worst_unrealized_usd": -2105.2699999999995,
+          "net_usd": -2637.6249999999864
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -92.47166666666311,
+            "EQUITY": -1176.657499999996,
+            "METAL": -1429.2216666666618,
+            "RATES": -1473.924166666664
+          },
+          "event_count": 65,
+          "gross_usd": -610.7499999999851,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -76.27999999999905,
+          "minimum_worst_unrealized_usd": -1506.5950000000007,
+          "net_usd": -4172.274999999986
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -484.0099999999974,
+            "EQUITY": -4442.444999999996,
+            "METAL": -750.3349999999955,
+            "RATES": -4570.915000000001
+          },
+          "event_count": 66,
+          "gross_usd": -7715.749999999989,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -78.00000000000112,
+          "minimum_worst_unrealized_usd": -2173.5950000000007,
+          "net_usd": -10247.70499999999
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -638.4425000000015,
+            "EQUITY": -331.12999999999903,
+            "METAL": -139.23249999999706,
+            "RATES": -824.625
+          },
+          "event_count": 46,
+          "gross_usd": -836.4999999999968,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 12.427500000000254,
+          "minimum_worst_unrealized_usd": -1219.8650000000005,
+          "net_usd": -1933.4299999999973
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -241.50499999999647,
+            "EQUITY": 847.4150000000045,
+            "METAL": 1105.5025000000064,
+            "RATES": 63.112499999998704
+          },
+          "event_count": 65,
+          "gross_usd": 2665.3750000000146,
+          "largest_positive_class_share": 0.5483561752553291,
+          "median_daily_net_usd": 58.519999999999094,
+          "minimum_worst_unrealized_usd": -878.8149999999964,
+          "net_usd": 1774.525000000014
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1564.645,
+            "EQUITY": -1008.892500000007,
+            "METAL": -452.0100000000052,
+            "RATES": -2017.8275
+          },
+          "event_count": 66,
+          "gross_usd": -3956.3750000000123,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -33.27999999999935,
+          "minimum_worst_unrealized_usd": -1592.44,
+          "net_usd": -5043.375000000013
+        }
+      },
+      "policy_id": "classical_rp_4a084d6c9bd298163378",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 60,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -843.8825000000008,
+            "EQUITY": -380.3199999999992,
+            "METAL": -189.8799999999971,
+            "RATES": -1067.8124999999998
+          },
+          "event_count": 46,
+          "gross_usd": -836.4999999999968,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 1.2350000000002517,
+          "minimum_worst_unrealized_usd": -1239.3600000000004,
+          "net_usd": -2481.894999999997
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -267.6324999999964,
+            "EQUITY": 747.6850000000044,
+            "METAL": 931.3475000000062,
+            "RATES": -82.30000000000152
+          },
+          "event_count": 65,
+          "gross_usd": 2665.3750000000146,
+          "largest_positive_class_share": 0.5546929556158087,
+          "median_daily_net_usd": 50.03000000000091,
+          "minimum_worst_unrealized_usd": -898.4099999999963,
+          "net_usd": 1329.1000000000133
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1650.2175000000007,
+            "EQUITY": -1221.3700000000065,
+            "METAL": -487.89000000000533,
+            "RATES": -2227.3974999999987
+          },
+          "event_count": 66,
+          "gross_usd": -3956.3750000000123,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -36.16999999999935,
+          "minimum_worst_unrealized_usd": -1611.2849999999999,
+          "net_usd": -5586.875000000013
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -353.32250000000244,
+            "EQUITY": -240.10999999999956,
+            "METAL": -69.34249999999685,
+            "RATES": -516.6150000000006
+          },
+          "event_count": 46,
+          "gross_usd": -27.99999999999909,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -5.942499999999747,
+          "minimum_worst_unrealized_usd": -1219.8650000000005,
+          "net_usd": -1179.3899999999996
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -367.0449999999964,
+            "EQUITY": 1059.4250000000052,
+            "METAL": 1317.512500000007,
+            "RATES": -62.42750000000123
+          },
+          "event_count": 65,
+          "gross_usd": 2849.875000000016,
+          "largest_positive_class_share": 0.554289921379927,
+          "median_daily_net_usd": 58.519999999999094,
+          "minimum_worst_unrealized_usd": -994.8199999999983,
+          "net_usd": 1947.4650000000154
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1509.8850000000002,
+            "EQUITY": -648.0025000000085,
+            "METAL": -257.0700000000051,
+            "RATES": -2006.1975
+          },
+          "event_count": 66,
+          "gross_usd": -3284.875000000013,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -33.27999999999935,
+          "minimum_worst_unrealized_usd": -1592.44,
+          "net_usd": -4421.155000000013
+        }
+      },
+      "policy_id": "classical_rp_c8f7cb930532e6afab39",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 60,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -569.2025000000026,
+            "EQUITY": -297.7899999999995,
+            "METAL": -122.04499999999683,
+            "RATES": -766.0475000000006
+          },
+          "event_count": 46,
+          "gross_usd": -27.99999999999909,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -17.694999999999748,
+          "minimum_worst_unrealized_usd": -1239.3600000000004,
+          "net_usd": -1755.0849999999994
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -394.9424999999963,
+            "EQUITY": 958.5750000000047,
+            "METAL": 1142.2375000000068,
+            "RATES": -209.61000000000146
+          },
+          "event_count": 65,
+          "gross_usd": 2849.875000000016,
+          "largest_positive_class_share": 0.5437122541873682,
+          "median_daily_net_usd": 50.03000000000091,
+          "minimum_worst_unrealized_usd": -1017.8549999999982,
+          "net_usd": 1496.260000000015
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1596.5775000000006,
+            "EQUITY": -876.160000000008,
+            "METAL": -300.23000000000513,
+            "RATES": -2216.3274999999985
+          },
+          "event_count": 66,
+          "gross_usd": -3284.875000000013,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -36.16999999999935,
+          "minimum_worst_unrealized_usd": -1611.2849999999999,
+          "net_usd": -4989.295000000014
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -227.811666666667,
+            "EQUITY": -1083.1450000000002,
+            "METAL": -451.9966666666656,
+            "RATES": -673.9266666666663
+          },
+          "event_count": 46,
+          "gross_usd": -856.9999999999977,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -84.70499999999986,
+          "minimum_worst_unrealized_usd": -1234.1050000000005,
+          "net_usd": -2436.8799999999983
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 180.5200000000024,
+            "EQUITY": 1460.5750000000103,
+            "METAL": 1577.9883333333432,
+            "RATES": -29.548333333333908
+          },
+          "event_count": 65,
+          "gross_usd": 4382.125000000025,
+          "largest_positive_class_share": 0.4901980377436638,
+          "median_daily_net_usd": 82.28000000000159,
+          "minimum_worst_unrealized_usd": -982.7199999999996,
+          "net_usd": 3189.5350000000235
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1837.7016666666655,
+            "EQUITY": -1393.385833333331,
+            "METAL": -608.7566666666658,
+            "RATES": -1795.7958333333324
+          },
+          "event_count": 66,
+          "gross_usd": -4174.249999999995,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -14.562500000000362,
+          "minimum_worst_unrealized_usd": -1698.1049999999996,
+          "net_usd": -5635.639999999996
+        }
+      },
+      "policy_id": "classical_rp_f8fbb6fef97f28716104",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 60,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -413.82166666666734,
+            "EQUITY": -1302.7383333333341,
+            "METAL": -586.869999999999,
+            "RATES": -923.3899999999999
+          },
+          "event_count": 46,
+          "gross_usd": -856.9999999999977,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -105.36999999999986,
+          "minimum_worst_unrealized_usd": -1254.7200000000003,
+          "net_usd": -3226.8199999999983
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 80.78000000000236,
+            "EQUITY": 1321.9250000000113,
+            "METAL": 1353.8783333333442,
+            "RATES": -163.3433333333339
+          },
+          "event_count": 65,
+          "gross_usd": 4382.125000000025,
+          "largest_positive_class_share": 0.4911436258653522,
+          "median_daily_net_usd": 72.35499999999905,
+          "minimum_worst_unrealized_usd": -986.8299999999996,
+          "net_usd": 2593.240000000023
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -2005.7816666666656,
+            "EQUITY": -1639.7349999999972,
+            "METAL": -735.6766666666656,
+            "RATES": -1985.141666666666
+          },
+          "event_count": 66,
+          "gross_usd": -4174.249999999995,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -27.250000000000377,
+          "minimum_worst_unrealized_usd": -1719.4699999999993,
+          "net_usd": -6366.334999999996
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -227.811666666667,
+            "EQUITY": -1083.1450000000002,
+            "METAL": -451.9966666666656,
+            "RATES": -673.9266666666663
+          },
+          "event_count": 46,
+          "gross_usd": -856.9999999999977,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -84.70499999999986,
+          "minimum_worst_unrealized_usd": -1234.1050000000005,
+          "net_usd": -2436.8799999999983
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 138.67333333333576,
+            "EQUITY": 1460.5750000000103,
+            "METAL": 1536.1416666666769,
+            "RATES": -71.3950000000005
+          },
+          "event_count": 65,
+          "gross_usd": 4260.125000000025,
+          "largest_positive_class_share": 0.48993639281450335,
+          "median_daily_net_usd": 82.28000000000159,
+          "minimum_worst_unrealized_usd": -1006.0199999999979,
+          "net_usd": 3063.9950000000235
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1837.7016666666655,
+            "EQUITY": -1393.385833333331,
+            "METAL": -608.7566666666658,
+            "RATES": -1795.7958333333324
+          },
+          "event_count": 66,
+          "gross_usd": -4174.249999999995,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -14.562500000000362,
+          "minimum_worst_unrealized_usd": -1698.1049999999996,
+          "net_usd": -5635.639999999996
+        }
+      },
+      "policy_id": "classical_rp_af4a3bbcabc5db9ec223",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 60,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -413.82166666666734,
+            "EQUITY": -1302.7383333333341,
+            "METAL": -586.869999999999,
+            "RATES": -923.3899999999999
+          },
+          "event_count": 46,
+          "gross_usd": -856.9999999999977,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -105.36999999999986,
+          "minimum_worst_unrealized_usd": -1254.7200000000003,
+          "net_usd": -3226.8199999999983
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 38.34333333333573,
+            "EQUITY": 1321.9250000000113,
+            "METAL": 1311.4416666666777,
+            "RATES": -205.7800000000005
+          },
+          "event_count": 65,
+          "gross_usd": 4260.125000000025,
+          "largest_positive_class_share": 0.4947861107680097,
+          "median_daily_net_usd": 72.35499999999905,
+          "minimum_worst_unrealized_usd": -1029.154999999998,
+          "net_usd": 2465.930000000023
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -2005.7816666666656,
+            "EQUITY": -1639.7349999999972,
+            "METAL": -735.6766666666656,
+            "RATES": -1985.141666666666
+          },
+          "event_count": 66,
+          "gross_usd": -4174.249999999995,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -27.250000000000377,
+          "minimum_worst_unrealized_usd": -1719.4699999999993,
+          "net_usd": -6366.334999999996
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 34.86000000000003,
+            "EQUITY": 689.9025000000067,
+            "METAL": 640.8400000000067,
+            "RATES": -72.3175
+          },
+          "event_count": 65,
+          "gross_usd": 1807.1250000000146,
+          "largest_positive_class_share": 0.5052000856764687,
+          "median_daily_net_usd": 13.520000000001817,
+          "minimum_worst_unrealized_usd": -845.065,
+          "net_usd": 1293.285000000014
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -39.67000000000033,
+            "EQUITY": -22.53999999999938,
+            "METAL": -558.7500000000001,
+            "RATES": -95.29999999999984
+          },
+          "event_count": 52,
+          "gross_usd": 47.25000000000091,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 2.352499999999883,
+          "minimum_worst_unrealized_usd": -877.315,
+          "net_usd": -716.2599999999993
+        }
+      },
+      "policy_id": "classical_rp_d7b8ebad54165a311688",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 120,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 33.41500000000003,
+            "EQUITY": 560.3225000000065,
+            "METAL": 552.6350000000066,
+            "RATES": -110.00750000000005
+          },
+          "event_count": 65,
+          "gross_usd": 1807.1250000000146,
+          "largest_positive_class_share": 0.4887787346608542,
+          "median_daily_net_usd": 10.53000000000182,
+          "minimum_worst_unrealized_usd": -863.9100000000001,
+          "net_usd": 1036.3650000000134
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -44.00500000000036,
+            "EQUITY": -204.1849999999997,
+            "METAL": -612.0625000000002,
+            "RATES": -237.76249999999982
+          },
+          "event_count": 52,
+          "gross_usd": 47.25000000000091,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -8.190000000000115,
+          "minimum_worst_unrealized_usd": -896.16,
+          "net_usd": -1098.0149999999996
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 65.09000000000006,
+            "EQUITY": 716.5125000000068,
+            "METAL": 637.2200000000068,
+            "RATES": -72.3175
+          },
+          "event_count": 65,
+          "gross_usd": 1866.1250000000146,
+          "largest_positive_class_share": 0.5050050305799351,
+          "median_daily_net_usd": 13.520000000001817,
+          "minimum_worst_unrealized_usd": -845.065,
+          "net_usd": 1346.5050000000142
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -39.67000000000033,
+            "EQUITY": 218.590000000003,
+            "METAL": -558.7500000000001,
+            "RATES": 27.850000000000136
+          },
+          "event_count": 52,
+          "gross_usd": 474.2500000000032,
+          "largest_positive_class_share": 0.8869907482551542,
+          "median_daily_net_usd": 2.352499999999883,
+          "minimum_worst_unrealized_usd": -891.0550000000001,
+          "net_usd": -351.979999999997
+        }
+      },
+      "policy_id": "classical_rp_dc1cd729cc664be94675",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 120,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 62.760000000000055,
+            "EQUITY": 585.4875000000065,
+            "METAL": 548.4550000000065,
+            "RATES": -110.00750000000005
+          },
+          "event_count": 65,
+          "gross_usd": 1866.1250000000146,
+          "largest_positive_class_share": 0.4892506700704646,
+          "median_daily_net_usd": 10.53000000000182,
+          "minimum_worst_unrealized_usd": -863.9100000000001,
+          "net_usd": 1086.6950000000136
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -44.00500000000036,
+            "EQUITY": 8.385000000002861,
+            "METAL": -612.0625000000002,
+            "RATES": -117.41249999999981
+          },
+          "event_count": 52,
+          "gross_usd": 474.2500000000032,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -8.190000000000115,
+          "minimum_worst_unrealized_usd": -911.02,
+          "net_usd": -765.0949999999973
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -275.2333333333305,
+            "EQUITY": 417.830833333342,
+            "METAL": 330.28833333334114,
+            "RATES": -367.2558333333291
+          },
+          "event_count": 65,
+          "gross_usd": 1213.000000000025,
+          "largest_positive_class_share": 0.5585083927137269,
+          "median_daily_net_usd": 10.279999999997727,
+          "minimum_worst_unrealized_usd": -1052.5549999999992,
+          "net_usd": 105.63000000002395
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -348.17999999999984,
+            "EQUITY": -1385.4199999999946,
+            "METAL": -585.2799999999962,
+            "RATES": -1199.089999999999
+          },
+          "event_count": 52,
+          "gross_usd": -2320.4999999999895,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -44.46999999999876,
+          "minimum_worst_unrealized_usd": -1021.5550000000005,
+          "net_usd": -3517.96999999999
+        }
+      },
+      "policy_id": "classical_rp_424bc06c4a7f7ad34cc4",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 120,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -291.0999999999971,
+            "EQUITY": 197.25666666667547,
+            "METAL": 139.6616666666746,
+            "RATES": -493.8733333333291
+          },
+          "event_count": 65,
+          "gross_usd": 1213.000000000025,
+          "largest_positive_class_share": 0.5854732353537673,
+          "median_daily_net_usd": 6.169999999997728,
+          "minimum_worst_unrealized_usd": -1072.519999999999,
+          "net_usd": -448.05499999997653
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -370.8116666666664,
+            "EQUITY": -1619.2341666666612,
+            "METAL": -747.2116666666623,
+            "RATES": -1379.447499999999
+          },
+          "event_count": 52,
+          "gross_usd": -2320.4999999999895,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -48.57999999999876,
+          "minimum_worst_unrealized_usd": -1042.2700000000004,
+          "net_usd": -4116.70499999999
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -275.2333333333305,
+            "EQUITY": 417.830833333342,
+            "METAL": 330.28833333334114,
+            "RATES": -367.2558333333291
+          },
+          "event_count": 65,
+          "gross_usd": 1213.000000000025,
+          "largest_positive_class_share": 0.5585083927137269,
+          "median_daily_net_usd": 10.279999999997727,
+          "minimum_worst_unrealized_usd": -1052.5549999999992,
+          "net_usd": 105.63000000002395
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -348.17999999999984,
+            "EQUITY": -1385.4199999999946,
+            "METAL": -585.2799999999962,
+            "RATES": -1199.089999999999
+          },
+          "event_count": 52,
+          "gross_usd": -2320.4999999999895,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -44.46999999999876,
+          "minimum_worst_unrealized_usd": -1021.5550000000005,
+          "net_usd": -3517.96999999999
+        }
+      },
+      "policy_id": "classical_rp_0b5770133fb889efcf49",
+      "spec": {
+        "family": "TIME_SERIES_TREND",
+        "lookback_sessions": 120,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -291.0999999999971,
+            "EQUITY": 197.25666666667547,
+            "METAL": 139.6616666666746,
+            "RATES": -493.8733333333291
+          },
+          "event_count": 65,
+          "gross_usd": 1213.000000000025,
+          "largest_positive_class_share": 0.5854732353537673,
+          "median_daily_net_usd": 6.169999999997728,
+          "minimum_worst_unrealized_usd": -1072.519999999999,
+          "net_usd": -448.05499999997653
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -370.8116666666664,
+            "EQUITY": -1619.2341666666612,
+            "METAL": -747.2116666666623,
+            "RATES": -1379.447499999999
+          },
+          "event_count": 52,
+          "gross_usd": -2320.4999999999895,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -48.57999999999876,
+          "minimum_worst_unrealized_usd": -1042.2700000000004,
+          "net_usd": -4116.70499999999
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1175.6399999999971,
+            "EQUITY": 292.4075000000029,
+            "METAL": 480.38500000000056,
+            "RATES": 791.7125000000005
+          },
+          "event_count": 86,
+          "gross_usd": 5189.125000000004,
+          "largest_positive_class_share": 0.42904298860096696,
+          "median_daily_net_usd": -2.9224999999999746,
+          "minimum_worst_unrealized_usd": -1836.6899999999998,
+          "net_usd": 2740.1450000000023
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -112.42749999999512,
+            "EQUITY": -151.34500000000412,
+            "METAL": -1583.6374999999975,
+            "RATES": -1137.3299999999986
+          },
+          "event_count": 65,
+          "gross_usd": -1469.499999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -42.279999999997735,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -2984.7399999999943
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -441.44000000000193,
+            "EQUITY": -737.4250000000025,
+            "METAL": -579.8425000000007,
+            "RATES": -1268.9074999999991
+          },
+          "event_count": 66,
+          "gross_usd": -1939.6250000000034,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -33.27999999999935,
+          "minimum_worst_unrealized_usd": -960.489999999999,
+          "net_usd": -3027.615000000004
+        }
+      },
+      "policy_id": "classical_rp_225c3b3c13b59e2afd7a",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 20,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 960.3974999999973,
+            "EQUITY": -98.4824999999966,
+            "METAL": 434.5775000000006,
+            "RATES": 219.16250000000142
+          },
+          "event_count": 86,
+          "gross_usd": 5189.125000000004,
+          "largest_positive_class_share": 0.5949911330354432,
+          "median_daily_net_usd": -13.789999999999974,
+          "minimum_worst_unrealized_usd": -1855.5349999999999,
+          "net_usd": 1515.6550000000027
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -293.4224999999951,
+            "EQUITY": -214.39250000000413,
+            "METAL": -1765.9249999999963,
+            "RATES": -1468.6199999999978
+          },
+          "event_count": 65,
+          "gross_usd": -1469.499999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -45.91999999999773,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -3742.3599999999947
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -539.4100000000022,
+            "EQUITY": -830.3250000000025,
+            "METAL": -728.9200000000006,
+            "RATES": -1472.954999999998
+          },
+          "event_count": 66,
+          "gross_usd": -1939.6250000000034,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -40.91499999999998,
+          "minimum_worst_unrealized_usd": -979.9849999999989,
+          "net_usd": -3571.6100000000038
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1660.8999999999962,
+            "EQUITY": 275.5575000000036,
+            "METAL": 396.5150000000008,
+            "RATES": 1270.2324999999994
+          },
+          "event_count": 86,
+          "gross_usd": 6103.625000000002,
+          "largest_positive_class_share": 0.4609507369133858,
+          "median_daily_net_usd": 49.170000000000236,
+          "minimum_worst_unrealized_usd": -1836.6899999999998,
+          "net_usd": 3603.2050000000013
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -252.75749999999408,
+            "EQUITY": -251.2450000000045,
+            "METAL": -1662.3774999999973,
+            "RATES": -1333.4799999999987
+          },
+          "event_count": 65,
+          "gross_usd": -1904.999999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -61.23999999999966,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -3499.859999999994
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -236.78000000000162,
+            "EQUITY": -617.6250000000024,
+            "METAL": -555.7125000000003,
+            "RATES": -1329.6374999999991
+          },
+          "event_count": 66,
+          "gross_usd": -1625.625000000003,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -30.379999999999605,
+          "minimum_worst_unrealized_usd": -1119.055,
+          "net_usd": -2739.7550000000033
+        }
+      },
+      "policy_id": "classical_rp_a73f062461c620cb7118",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 20,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1435.0374999999965,
+            "EQUITY": -118.13249999999647,
+            "METAL": 350.14750000000083,
+            "RATES": 685.9425000000003
+          },
+          "event_count": 86,
+          "gross_usd": 6103.625000000002,
+          "largest_positive_class_share": 0.5807217555549027,
+          "median_daily_net_usd": 38.067500000000216,
+          "minimum_worst_unrealized_usd": -1855.5349999999999,
+          "net_usd": 2352.9950000000017
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -451.41749999999394,
+            "EQUITY": -327.11750000000455,
+            "METAL": -1850.534999999997,
+            "RATES": -1668.2199999999982
+          },
+          "event_count": 65,
+          "gross_usd": -1904.999999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -80.73499999999967,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -4297.2899999999945
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -339.045000000002,
+            "EQUITY": -716.1250000000025,
+            "METAL": -705.7250000000005,
+            "RATES": -1535.924999999998
+          },
+          "event_count": 66,
+          "gross_usd": -1625.625000000003,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -36.97749999999816,
+          "minimum_worst_unrealized_usd": -1139.02,
+          "net_usd": -3296.8200000000033
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1175.6399999999971,
+            "EQUITY": 292.4075000000029,
+            "METAL": 480.38500000000056,
+            "RATES": 791.7125000000005
+          },
+          "event_count": 86,
+          "gross_usd": 5189.125000000004,
+          "largest_positive_class_share": 0.42904298860096696,
+          "median_daily_net_usd": -2.9224999999999746,
+          "minimum_worst_unrealized_usd": -1836.6899999999998,
+          "net_usd": 2740.1450000000023
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -112.42749999999512,
+            "EQUITY": -151.34500000000412,
+            "METAL": -1583.6374999999975,
+            "RATES": -1137.3299999999986
+          },
+          "event_count": 65,
+          "gross_usd": -1469.499999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -42.279999999997735,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -2984.7399999999943
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -441.44000000000193,
+            "EQUITY": -737.4250000000025,
+            "METAL": -579.8425000000007,
+            "RATES": -1268.9074999999991
+          },
+          "event_count": 66,
+          "gross_usd": -1939.6250000000034,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -33.27999999999935,
+          "minimum_worst_unrealized_usd": -960.489999999999,
+          "net_usd": -3027.615000000004
+        }
+      },
+      "policy_id": "classical_rp_fa5e1b592551ac82f11f",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 20,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 960.3974999999973,
+            "EQUITY": -98.4824999999966,
+            "METAL": 434.5775000000006,
+            "RATES": 219.16250000000142
+          },
+          "event_count": 86,
+          "gross_usd": 5189.125000000004,
+          "largest_positive_class_share": 0.5949911330354432,
+          "median_daily_net_usd": -13.789999999999974,
+          "minimum_worst_unrealized_usd": -1855.5349999999999,
+          "net_usd": 1515.6550000000027
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -293.4224999999951,
+            "EQUITY": -214.39250000000413,
+            "METAL": -1765.9249999999963,
+            "RATES": -1468.6199999999978
+          },
+          "event_count": 65,
+          "gross_usd": -1469.499999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -45.91999999999773,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -3742.3599999999947
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -539.4100000000022,
+            "EQUITY": -830.3250000000025,
+            "METAL": -728.9200000000006,
+            "RATES": -1472.954999999998
+          },
+          "event_count": 66,
+          "gross_usd": -1939.6250000000034,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -40.91499999999998,
+          "minimum_worst_unrealized_usd": -979.9849999999989,
+          "net_usd": -3571.6100000000038
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1660.8999999999962,
+            "EQUITY": 275.5575000000036,
+            "METAL": 396.5150000000008,
+            "RATES": 1270.2324999999994
+          },
+          "event_count": 86,
+          "gross_usd": 6103.625000000002,
+          "largest_positive_class_share": 0.4609507369133858,
+          "median_daily_net_usd": 49.170000000000236,
+          "minimum_worst_unrealized_usd": -1836.6899999999998,
+          "net_usd": 3603.2050000000013
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -252.75749999999408,
+            "EQUITY": -251.2450000000045,
+            "METAL": -1662.3774999999973,
+            "RATES": -1333.4799999999987
+          },
+          "event_count": 65,
+          "gross_usd": -1904.999999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -61.23999999999966,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -3499.859999999994
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -236.78000000000162,
+            "EQUITY": -617.6250000000024,
+            "METAL": -555.7125000000003,
+            "RATES": -1329.6374999999991
+          },
+          "event_count": 66,
+          "gross_usd": -1625.625000000003,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -30.379999999999605,
+          "minimum_worst_unrealized_usd": -1119.055,
+          "net_usd": -2739.7550000000033
+        }
+      },
+      "policy_id": "classical_rp_96fe10acac5543fa7e3f",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 20,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1435.0374999999965,
+            "EQUITY": -118.13249999999647,
+            "METAL": 350.14750000000083,
+            "RATES": 685.9425000000003
+          },
+          "event_count": 86,
+          "gross_usd": 6103.625000000002,
+          "largest_positive_class_share": 0.5807217555549027,
+          "median_daily_net_usd": 38.067500000000216,
+          "minimum_worst_unrealized_usd": -1855.5349999999999,
+          "net_usd": 2352.9950000000017
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -451.41749999999394,
+            "EQUITY": -327.11750000000455,
+            "METAL": -1850.534999999997,
+            "RATES": -1668.2199999999982
+          },
+          "event_count": 65,
+          "gross_usd": -1904.999999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -80.73499999999967,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -4297.2899999999945
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -339.045000000002,
+            "EQUITY": -716.1250000000025,
+            "METAL": -705.7250000000005,
+            "RATES": -1535.924999999998
+          },
+          "event_count": 66,
+          "gross_usd": -1625.625000000003,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -36.97749999999816,
+          "minimum_worst_unrealized_usd": -1139.02,
+          "net_usd": -3296.8200000000033
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 992.6700000000002,
+            "EQUITY": -1066.1750000000004,
+            "METAL": -1024.1674999999987,
+            "RATES": -449.4524999999999
+          },
+          "event_count": 46,
+          "gross_usd": -229.12499999999767,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -95.42250000000023,
+          "minimum_worst_unrealized_usd": -1096.565,
+          "net_usd": -1547.1249999999982
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 354.99000000000046,
+            "EQUITY": 77.07499999999976,
+            "METAL": -591.4424999999935,
+            "RATES": -1262.0574999999951
+          },
+          "event_count": 65,
+          "gross_usd": 512.6250000000138,
+          "largest_positive_class_share": 0.8216124888616303,
+          "median_daily_net_usd": 22.184999999998183,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -1421.4349999999868
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1702.1750000000006,
+            "EQUITY": -465.9975000000007,
+            "METAL": -290.7375000000003,
+            "RATES": -1875.99
+          },
+          "event_count": 66,
+          "gross_usd": -3076.750000000002,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -45.61000000000046,
+          "minimum_worst_unrealized_usd": -1592.44,
+          "net_usd": -4334.900000000002
+        }
+      },
+      "policy_id": "classical_rp_5c440dfaa1dc646df80f",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 60,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 840.6300000000001,
+            "EQUITY": -1204.7625,
+            "METAL": -1084.5949999999987,
+            "RATES": -757.3974999999981
+          },
+          "event_count": 46,
+          "gross_usd": -229.12499999999767,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -98.82000000000023,
+          "minimum_worst_unrealized_usd": -1115.4099999999999,
+          "net_usd": -2206.124999999998
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 272.04750000000035,
+            "EQUITY": 47.362499999999706,
+            "METAL": -996.5074999999935,
+            "RATES": -1711.3674999999937
+          },
+          "event_count": 65,
+          "gross_usd": 512.6250000000138,
+          "largest_positive_class_share": 0.8517187940264872,
+          "median_daily_net_usd": 2.58999999999817,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -2388.4649999999874
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1827.1375000000012,
+            "EQUITY": -681.0900000000007,
+            "METAL": -321.9500000000003,
+            "RATES": -2133.7974999999988
+          },
+          "event_count": 66,
+          "gross_usd": -3076.750000000002,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -52.92000000000043,
+          "minimum_worst_unrealized_usd": -1611.2849999999999,
+          "net_usd": -4963.975000000002
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1281.2399999999996,
+            "EQUITY": -1149.0450000000005,
+            "METAL": -1065.537499999999,
+            "RATES": -124.84250000000037
+          },
+          "event_count": 46,
+          "gross_usd": 302.87500000000057,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -90.66750000000023,
+          "minimum_worst_unrealized_usd": -1096.565,
+          "net_usd": -1058.185
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 266.370000000001,
+            "EQUITY": 77.07499999999976,
+            "METAL": -554.5224999999928,
+            "RATES": -1387.597499999995
+          },
+          "event_count": 65,
+          "gross_usd": 356.62500000001495,
+          "largest_positive_class_share": 0.775582698830964,
+          "median_daily_net_usd": 22.184999999998183,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -1598.6749999999856
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1649.9850000000008,
+            "EQUITY": -405.4175000000007,
+            "METAL": -290.7375000000003,
+            "RATES": -1867.6000000000001
+          },
+          "event_count": 66,
+          "gross_usd": -2919.750000000002,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -40.61000000000003,
+          "minimum_worst_unrealized_usd": -1592.44,
+          "net_usd": -4213.7400000000025
+        }
+      },
+      "policy_id": "classical_rp_86a51bde255166df4c57",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 60,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1121.2349999999994,
+            "EQUITY": -1291.3175000000003,
+            "METAL": -1126.524999999999,
+            "RATES": -442.10749999999985
+          },
+          "event_count": 46,
+          "gross_usd": 302.87500000000057,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -98.82000000000023,
+          "minimum_worst_unrealized_usd": -1115.4099999999999,
+          "net_usd": -1738.7149999999997
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 178.11750000000094,
+            "EQUITY": 47.362499999999706,
+            "METAL": -963.1274999999929,
+            "RATES": -1838.6774999999936
+          },
+          "event_count": 65,
+          "gross_usd": 356.62500000001495,
+          "largest_positive_class_share": 0.7899481106971813,
+          "median_daily_net_usd": 2.58999999999817,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -2576.324999999986
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1782.2275000000009,
+            "EQUITY": -629.4700000000008,
+            "METAL": -321.9500000000003,
+            "RATES": -2127.0874999999987
+          },
+          "event_count": 66,
+          "gross_usd": -2919.750000000002,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -44.545000000000485,
+          "minimum_worst_unrealized_usd": -1611.2849999999999,
+          "net_usd": -4860.7350000000015
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 992.6700000000002,
+            "EQUITY": -1066.1750000000004,
+            "METAL": -1024.1674999999987,
+            "RATES": -449.4524999999999
+          },
+          "event_count": 46,
+          "gross_usd": -229.12499999999767,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -95.42250000000023,
+          "minimum_worst_unrealized_usd": -1096.565,
+          "net_usd": -1547.1249999999982
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 354.99000000000046,
+            "EQUITY": 77.07499999999976,
+            "METAL": -591.4424999999935,
+            "RATES": -1262.0574999999951
+          },
+          "event_count": 65,
+          "gross_usd": 512.6250000000138,
+          "largest_positive_class_share": 0.8216124888616303,
+          "median_daily_net_usd": 22.184999999998183,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -1421.4349999999868
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1702.1750000000006,
+            "EQUITY": -465.9975000000007,
+            "METAL": -290.7375000000003,
+            "RATES": -1875.99
+          },
+          "event_count": 66,
+          "gross_usd": -3076.750000000002,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -45.61000000000046,
+          "minimum_worst_unrealized_usd": -1592.44,
+          "net_usd": -4334.900000000002
+        }
+      },
+      "policy_id": "classical_rp_d249d244c6cf0d70d967",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 60,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 840.6300000000001,
+            "EQUITY": -1204.7625,
+            "METAL": -1084.5949999999987,
+            "RATES": -757.3974999999981
+          },
+          "event_count": 46,
+          "gross_usd": -229.12499999999767,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -98.82000000000023,
+          "minimum_worst_unrealized_usd": -1115.4099999999999,
+          "net_usd": -2206.124999999998
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 272.04750000000035,
+            "EQUITY": 47.362499999999706,
+            "METAL": -996.5074999999935,
+            "RATES": -1711.3674999999937
+          },
+          "event_count": 65,
+          "gross_usd": 512.6250000000138,
+          "largest_positive_class_share": 0.8517187940264872,
+          "median_daily_net_usd": 2.58999999999817,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -2388.4649999999874
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1827.1375000000012,
+            "EQUITY": -681.0900000000007,
+            "METAL": -321.9500000000003,
+            "RATES": -2133.7974999999988
+          },
+          "event_count": 66,
+          "gross_usd": -3076.750000000002,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -52.92000000000043,
+          "minimum_worst_unrealized_usd": -1611.2849999999999,
+          "net_usd": -4963.975000000002
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1281.2399999999996,
+            "EQUITY": -1149.0450000000005,
+            "METAL": -1065.537499999999,
+            "RATES": -124.84250000000037
+          },
+          "event_count": 46,
+          "gross_usd": 302.87500000000057,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -90.66750000000023,
+          "minimum_worst_unrealized_usd": -1096.565,
+          "net_usd": -1058.185
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 266.370000000001,
+            "EQUITY": 77.07499999999976,
+            "METAL": -554.5224999999928,
+            "RATES": -1387.597499999995
+          },
+          "event_count": 65,
+          "gross_usd": 356.62500000001495,
+          "largest_positive_class_share": 0.775582698830964,
+          "median_daily_net_usd": 22.184999999998183,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -1598.6749999999856
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1649.9850000000008,
+            "EQUITY": -405.4175000000007,
+            "METAL": -290.7375000000003,
+            "RATES": -1867.6000000000001
+          },
+          "event_count": 66,
+          "gross_usd": -2919.750000000002,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -40.61000000000003,
+          "minimum_worst_unrealized_usd": -1592.44,
+          "net_usd": -4213.7400000000025
+        }
+      },
+      "policy_id": "classical_rp_7db9b69dfb5d4f4070d2",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 60,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1121.2349999999994,
+            "EQUITY": -1291.3175000000003,
+            "METAL": -1126.524999999999,
+            "RATES": -442.10749999999985
+          },
+          "event_count": 46,
+          "gross_usd": 302.87500000000057,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -98.82000000000023,
+          "minimum_worst_unrealized_usd": -1115.4099999999999,
+          "net_usd": -1738.7149999999997
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 178.11750000000094,
+            "EQUITY": 47.362499999999706,
+            "METAL": -963.1274999999929,
+            "RATES": -1838.6774999999936
+          },
+          "event_count": 65,
+          "gross_usd": 356.62500000001495,
+          "largest_positive_class_share": 0.7899481106971813,
+          "median_daily_net_usd": 2.58999999999817,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -2576.324999999986
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1782.2275000000009,
+            "EQUITY": -629.4700000000008,
+            "METAL": -321.9500000000003,
+            "RATES": -2127.0874999999987
+          },
+          "event_count": 66,
+          "gross_usd": -2919.750000000002,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -44.545000000000485,
+          "minimum_worst_unrealized_usd": -1611.2849999999999,
+          "net_usd": -4860.7350000000015
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -43.1399999999978,
+            "EQUITY": -210.5774999999989,
+            "METAL": -1995.7674999999942,
+            "RATES": -2163.2049999999945
+          },
+          "event_count": 65,
+          "gross_usd": -2753.4999999999845,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -41.28000000000347,
+          "minimum_worst_unrealized_usd": -1129.19,
+          "net_usd": -4412.689999999985
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -356.45999999999935,
+            "EQUITY": -1192.7225,
+            "METAL": -157.15999999999977,
+            "RATES": -993.4225000000004
+          },
+          "event_count": 52,
+          "gross_usd": -1182.1249999999982,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -39.609999999999516,
+          "minimum_worst_unrealized_usd": -928.815,
+          "net_usd": -2699.764999999998
+        }
+      },
+      "policy_id": "classical_rp_6ef1069c2f111ee0d142",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 120,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -83.7099999999979,
+            "EQUITY": -434.4599999999987,
+            "METAL": -2186.6824999999935,
+            "RATES": -2537.432499999993
+          },
+          "event_count": 65,
+          "gross_usd": -2753.4999999999845,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -44.92000000000347,
+          "minimum_worst_unrealized_usd": -1148.0349999999999,
+          "net_usd": -5242.284999999985
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -376.6899999999994,
+            "EQUITY": -1542.7399999999984,
+            "METAL": -186.5524999999998,
+            "RATES": -1352.602499999999
+          },
+          "event_count": 52,
+          "gross_usd": -1182.1249999999982,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -50.47749999999952,
+          "minimum_worst_unrealized_usd": -947.66,
+          "net_usd": -3458.584999999999
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -6.219999999997384,
+            "EQUITY": -177.27749999999833,
+            "METAL": -1995.7674999999942,
+            "RATES": -2166.8249999999944
+          },
+          "event_count": 65,
+          "gross_usd": -2670.4999999999836,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -41.77999999999972,
+          "minimum_worst_unrealized_usd": -1129.19,
+          "net_usd": -4346.089999999984
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -356.45999999999935,
+            "EQUITY": -1072.1424999999995,
+            "METAL": -157.15999999999977,
+            "RATES": -872.8425
+          },
+          "event_count": 52,
+          "gross_usd": -905.1249999999982,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -39.609999999999516,
+          "minimum_worst_unrealized_usd": -1119.055,
+          "net_usd": -2458.604999999998
+        }
+      },
+      "policy_id": "classical_rp_2a1541949eac28a53f0b",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 120,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -50.329999999997455,
+            "EQUITY": -405.2599999999982,
+            "METAL": -2186.6824999999935,
+            "RATES": -2541.6124999999934
+          },
+          "event_count": 65,
+          "gross_usd": -2670.4999999999836,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -46.285000000000004,
+          "minimum_worst_unrealized_usd": -1148.0349999999999,
+          "net_usd": -5183.884999999985
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -376.6899999999994,
+            "EQUITY": -1431.119999999999,
+            "METAL": -186.5524999999998,
+            "RATES": -1240.9824999999996
+          },
+          "event_count": 52,
+          "gross_usd": -905.1249999999982,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -50.47749999999952,
+          "minimum_worst_unrealized_usd": -1139.02,
+          "net_usd": -3235.344999999999
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -43.1399999999978,
+            "EQUITY": -210.5774999999989,
+            "METAL": -1995.7674999999942,
+            "RATES": -2163.2049999999945
+          },
+          "event_count": 65,
+          "gross_usd": -2753.4999999999845,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -41.28000000000347,
+          "minimum_worst_unrealized_usd": -1129.19,
+          "net_usd": -4412.689999999985
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -356.45999999999935,
+            "EQUITY": -1192.7225,
+            "METAL": -157.15999999999977,
+            "RATES": -993.4225000000004
+          },
+          "event_count": 52,
+          "gross_usd": -1182.1249999999982,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -39.609999999999516,
+          "minimum_worst_unrealized_usd": -928.815,
+          "net_usd": -2699.764999999998
+        }
+      },
+      "policy_id": "classical_rp_2937987064a1f8926ac3",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 120,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -83.7099999999979,
+            "EQUITY": -434.4599999999987,
+            "METAL": -2186.6824999999935,
+            "RATES": -2537.432499999993
+          },
+          "event_count": 65,
+          "gross_usd": -2753.4999999999845,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -44.92000000000347,
+          "minimum_worst_unrealized_usd": -1148.0349999999999,
+          "net_usd": -5242.284999999985
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -376.6899999999994,
+            "EQUITY": -1542.7399999999984,
+            "METAL": -186.5524999999998,
+            "RATES": -1352.602499999999
+          },
+          "event_count": 52,
+          "gross_usd": -1182.1249999999982,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -50.47749999999952,
+          "minimum_worst_unrealized_usd": -947.66,
+          "net_usd": -3458.584999999999
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -6.219999999997384,
+            "EQUITY": -177.27749999999833,
+            "METAL": -1995.7674999999942,
+            "RATES": -2166.8249999999944
+          },
+          "event_count": 65,
+          "gross_usd": -2670.4999999999836,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -41.77999999999972,
+          "minimum_worst_unrealized_usd": -1129.19,
+          "net_usd": -4346.089999999984
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -356.45999999999935,
+            "EQUITY": -1072.1424999999995,
+            "METAL": -157.15999999999977,
+            "RATES": -872.8425
+          },
+          "event_count": 52,
+          "gross_usd": -905.1249999999982,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -39.609999999999516,
+          "minimum_worst_unrealized_usd": -1119.055,
+          "net_usd": -2458.604999999998
+        }
+      },
+      "policy_id": "classical_rp_c48554e1afa969a18a02",
+      "spec": {
+        "family": "CROSS_SECTIONAL_STRENGTH",
+        "lookback_sessions": 120,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {},
+          "event_count": 0,
+          "gross_usd": 0.0,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 0.0,
+          "minimum_worst_unrealized_usd": 0.0,
+          "net_usd": 0.0
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -50.329999999997455,
+            "EQUITY": -405.2599999999982,
+            "METAL": -2186.6824999999935,
+            "RATES": -2541.6124999999934
+          },
+          "event_count": 65,
+          "gross_usd": -2670.4999999999836,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -46.285000000000004,
+          "minimum_worst_unrealized_usd": -1148.0349999999999,
+          "net_usd": -5183.884999999985
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -376.6899999999994,
+            "EQUITY": -1431.119999999999,
+            "METAL": -186.5524999999998,
+            "RATES": -1240.9824999999996
+          },
+          "event_count": 52,
+          "gross_usd": -905.1249999999982,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -50.47749999999952,
+          "minimum_worst_unrealized_usd": -1139.02,
+          "net_usd": -3235.344999999999
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 850.7825000000018,
+            "EQUITY": -1390.8349999999987,
+            "METAL": -977.1599999999992,
+            "RATES": -1191.4724999999987
+          },
+          "event_count": 86,
+          "gross_usd": -643.6249999999923,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -2.4799999999997766,
+          "minimum_worst_unrealized_usd": -2057.565,
+          "net_usd": -2708.684999999993
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -236.53499999999545,
+            "EQUITY": -467.0699999999965,
+            "METAL": -1899.862499999996,
+            "RATES": -831.7274999999984
+          },
+          "event_count": 65,
+          "gross_usd": -1834.624999999985,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -43.779999999999944,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -3435.1949999999856
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -321.2900000000027,
+            "EQUITY": -3361.8974999999937,
+            "METAL": -703.2799999999959,
+            "RATES": -1714.8875000000003
+          },
+          "event_count": 66,
+          "gross_usd": -5087.374999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -49.129999999999434,
+          "minimum_worst_unrealized_usd": -1548.5649999999998,
+          "net_usd": -6101.354999999994
+        }
+      },
+      "policy_id": "classical_rp_b1e3a5c97dc23e4d6863",
+      "spec": {
+        "family": "TREND_STRENGTH_BLEND",
+        "lookback_sessions": 20,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 692.2675000000019,
+            "EQUITY": -1577.6274999999976,
+            "METAL": -1199.6774999999975,
+            "RATES": -1656.1774999999966
+          },
+          "event_count": 86,
+          "gross_usd": -643.6249999999923,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -5.469999999999658,
+          "minimum_worst_unrealized_usd": -2076.41,
+          "net_usd": -3741.2149999999924
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -417.8649999999949,
+            "EQUITY": -543.8549999999966,
+            "METAL": -2081.8249999999957,
+            "RATES": -1191.9349999999977
+          },
+          "event_count": 65,
+          "gross_usd": -1834.624999999985,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -47.1700000000008,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -4235.479999999986
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -370.8100000000027,
+            "EQUITY": -3603.8774999999955,
+            "METAL": -729.669999999996,
+            "RATES": -1903.9874999999997
+          },
+          "event_count": 66,
+          "gross_usd": -5087.374999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -51.69499999999943,
+          "minimum_worst_unrealized_usd": -1567.4099999999999,
+          "net_usd": -6608.344999999994
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1369.1725000000004,
+            "EQUITY": -1283.0149999999987,
+            "METAL": -876.4299999999994,
+            "RATES": -881.632499999999
+          },
+          "event_count": 86,
+          "gross_usd": 450.37500000000546,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -2.4799999999997766,
+          "minimum_worst_unrealized_usd": -2057.565,
+          "net_usd": -1671.9049999999954
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -572.3449999999955,
+            "EQUITY": -833.3199999999963,
+            "METAL": -1979.982499999996,
+            "RATES": -1090.8874999999987
+          },
+          "event_count": 65,
+          "gross_usd": -2814.624999999985,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -61.23999999999966,
+          "minimum_worst_unrealized_usd": -1394.6900000000019,
+          "net_usd": -4476.534999999985
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -362.2700000000026,
+            "EQUITY": -3268.407499999995,
+            "METAL": -936.6199999999949,
+            "RATES": -1586.6175000000005
+          },
+          "event_count": 66,
+          "gross_usd": -5095.874999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -66.13000000000045,
+          "minimum_worst_unrealized_usd": -1548.5649999999998,
+          "net_usd": -6153.9149999999945
+        }
+      },
+      "policy_id": "classical_rp_8aeb3c8a5f75ddd4d778",
+      "spec": {
+        "family": "TREND_STRENGTH_BLEND",
+        "lookback_sessions": 20,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1196.3525000000006,
+            "EQUITY": -1476.1474999999984,
+            "METAL": -1099.8324999999977,
+            "RATES": -1353.4174999999973
+          },
+          "event_count": 86,
+          "gross_usd": 450.37500000000546,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -5.469999999999658,
+          "minimum_worst_unrealized_usd": -2076.41,
+          "net_usd": -2733.0449999999946
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -767.3299999999954,
+            "EQUITY": -919.4799999999964,
+            "METAL": -2167.254999999996,
+            "RATES": -1453.4249999999981
+          },
+          "event_count": 65,
+          "gross_usd": -2814.624999999985,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -80.73499999999967,
+          "minimum_worst_unrealized_usd": -1414.2850000000017,
+          "net_usd": -5307.489999999986
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -414.0300000000027,
+            "EQUITY": -3523.6424999999954,
+            "METAL": -967.3049999999945,
+            "RATES": -1777.9575
+          },
+          "event_count": 66,
+          "gross_usd": -5095.874999999994,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -68.69500000000045,
+          "minimum_worst_unrealized_usd": -1567.4099999999999,
+          "net_usd": -6682.934999999994
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1842.963333333338,
+            "EQUITY": -795.7858333333297,
+            "METAL": -1577.4883333333303,
+            "RATES": -794.314166666664
+          },
+          "event_count": 86,
+          "gross_usd": 1301.3750000000143,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 8.900000000000784,
+          "minimum_worst_unrealized_usd": -2085.3049999999994,
+          "net_usd": -1324.6249999999868
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 190.13000000000346,
+            "EQUITY": -877.9591666666626,
+            "METAL": -1224.5366666666623,
+            "RATES": -1072.734166666664
+          },
+          "event_count": 65,
+          "gross_usd": -610.7499999999851,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -61.355000000000175,
+          "minimum_worst_unrealized_usd": -1485.230000000001,
+          "net_usd": -2985.0999999999863
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -371.92333333333085,
+            "EQUITY": -4083.5049999999956,
+            "METAL": -686.6399999999957,
+            "RATES": -4261.651666666668
+          },
+          "event_count": 66,
+          "gross_usd": -7715.749999999989,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -68.01999999999896,
+          "minimum_worst_unrealized_usd": -2152.9800000000005,
+          "net_usd": -9403.71999999999
+        }
+      },
+      "policy_id": "classical_rp_348a4cf956434e1b4403",
+      "spec": {
+        "family": "TREND_STRENGTH_BLEND",
+        "lookback_sessions": 20,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1669.4033333333375,
+            "EQUITY": -1241.6891666666622,
+            "METAL": -1851.669999999996,
+            "RATES": -1213.6691666666638
+          },
+          "event_count": 86,
+          "gross_usd": 1301.3750000000143,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -1.029999999999887,
+          "minimum_worst_unrealized_usd": -2105.2699999999995,
+          "net_usd": -2637.6249999999864
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -92.47166666666311,
+            "EQUITY": -1176.657499999996,
+            "METAL": -1429.2216666666618,
+            "RATES": -1473.924166666664
+          },
+          "event_count": 65,
+          "gross_usd": -610.7499999999851,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -76.27999999999905,
+          "minimum_worst_unrealized_usd": -1506.5950000000007,
+          "net_usd": -4172.274999999986
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -484.0099999999974,
+            "EQUITY": -4442.444999999996,
+            "METAL": -750.3349999999955,
+            "RATES": -4570.915000000001
+          },
+          "event_count": 66,
+          "gross_usd": -7715.749999999989,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -78.00000000000112,
+          "minimum_worst_unrealized_usd": -2173.5950000000007,
+          "net_usd": -10247.70499999999
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1842.963333333338,
+            "EQUITY": -795.7858333333297,
+            "METAL": -1577.4883333333303,
+            "RATES": -794.314166666664
+          },
+          "event_count": 86,
+          "gross_usd": 1301.3750000000143,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 8.900000000000784,
+          "minimum_worst_unrealized_usd": -2085.3049999999994,
+          "net_usd": -1324.6249999999868
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 190.13000000000346,
+            "EQUITY": -877.9591666666626,
+            "METAL": -1224.5366666666623,
+            "RATES": -1072.734166666664
+          },
+          "event_count": 65,
+          "gross_usd": -610.7499999999851,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -61.355000000000175,
+          "minimum_worst_unrealized_usd": -1485.230000000001,
+          "net_usd": -2985.0999999999863
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -371.92333333333085,
+            "EQUITY": -4083.5049999999956,
+            "METAL": -686.6399999999957,
+            "RATES": -4261.651666666668
+          },
+          "event_count": 66,
+          "gross_usd": -7715.749999999989,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -68.01999999999896,
+          "minimum_worst_unrealized_usd": -2152.9800000000005,
+          "net_usd": -9403.71999999999
+        }
+      },
+      "policy_id": "classical_rp_2739a2f328e3eda3a6c7",
+      "spec": {
+        "family": "TREND_STRENGTH_BLEND",
+        "lookback_sessions": 20,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 1669.4033333333375,
+            "EQUITY": -1241.6891666666622,
+            "METAL": -1851.669999999996,
+            "RATES": -1213.6691666666638
+          },
+          "event_count": 86,
+          "gross_usd": 1301.3750000000143,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -1.029999999999887,
+          "minimum_worst_unrealized_usd": -2105.2699999999995,
+          "net_usd": -2637.6249999999864
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -92.47166666666311,
+            "EQUITY": -1176.657499999996,
+            "METAL": -1429.2216666666618,
+            "RATES": -1473.924166666664
+          },
+          "event_count": 65,
+          "gross_usd": -610.7499999999851,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -76.27999999999905,
+          "minimum_worst_unrealized_usd": -1506.5950000000007,
+          "net_usd": -4172.274999999986
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -484.0099999999974,
+            "EQUITY": -4442.444999999996,
+            "METAL": -750.3349999999955,
+            "RATES": -4570.915000000001
+          },
+          "event_count": 66,
+          "gross_usd": -7715.749999999989,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -78.00000000000112,
+          "minimum_worst_unrealized_usd": -2173.5950000000007,
+          "net_usd": -10247.70499999999
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -638.4425000000015,
+            "EQUITY": -331.12999999999903,
+            "METAL": -139.23249999999706,
+            "RATES": -824.625
+          },
+          "event_count": 46,
+          "gross_usd": -836.4999999999968,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 12.427500000000254,
+          "minimum_worst_unrealized_usd": -1219.8650000000005,
+          "net_usd": -1933.4299999999973
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -241.50499999999647,
+            "EQUITY": 847.4150000000045,
+            "METAL": 1105.5025000000064,
+            "RATES": 63.112499999998704
+          },
+          "event_count": 65,
+          "gross_usd": 2665.3750000000146,
+          "largest_positive_class_share": 0.5483561752553291,
+          "median_daily_net_usd": 58.519999999999094,
+          "minimum_worst_unrealized_usd": -878.8149999999964,
+          "net_usd": 1774.525000000014
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1564.645,
+            "EQUITY": -1008.892500000007,
+            "METAL": -452.0100000000052,
+            "RATES": -2017.8275
+          },
+          "event_count": 66,
+          "gross_usd": -3956.3750000000123,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -33.27999999999935,
+          "minimum_worst_unrealized_usd": -1592.44,
+          "net_usd": -5043.375000000013
+        }
+      },
+      "policy_id": "classical_rp_189aa0de28dfc63b8c39",
+      "spec": {
+        "family": "TREND_STRENGTH_BLEND",
+        "lookback_sessions": 60,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -843.8825000000008,
+            "EQUITY": -380.3199999999992,
+            "METAL": -189.8799999999971,
+            "RATES": -1067.8124999999998
+          },
+          "event_count": 46,
+          "gross_usd": -836.4999999999968,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": 1.2350000000002517,
+          "minimum_worst_unrealized_usd": -1239.3600000000004,
+          "net_usd": -2481.894999999997
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -267.6324999999964,
+            "EQUITY": 747.6850000000044,
+            "METAL": 931.3475000000062,
+            "RATES": -82.30000000000152
+          },
+          "event_count": 65,
+          "gross_usd": 2665.3750000000146,
+          "largest_positive_class_share": 0.5546929556158087,
+          "median_daily_net_usd": 50.03000000000091,
+          "minimum_worst_unrealized_usd": -898.4099999999963,
+          "net_usd": 1329.1000000000133
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1650.2175000000007,
+            "EQUITY": -1221.3700000000065,
+            "METAL": -487.89000000000533,
+            "RATES": -2227.3974999999987
+          },
+          "event_count": 66,
+          "gross_usd": -3956.3750000000123,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -36.16999999999935,
+          "minimum_worst_unrealized_usd": -1611.2849999999999,
+          "net_usd": -5586.875000000013
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -353.32250000000244,
+            "EQUITY": -240.10999999999956,
+            "METAL": -69.34249999999685,
+            "RATES": -516.6150000000006
+          },
+          "event_count": 46,
+          "gross_usd": -27.99999999999909,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -5.942499999999747,
+          "minimum_worst_unrealized_usd": -1219.8650000000005,
+          "net_usd": -1179.3899999999996
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -367.0449999999964,
+            "EQUITY": 1059.4250000000052,
+            "METAL": 1317.512500000007,
+            "RATES": -62.42750000000123
+          },
+          "event_count": 65,
+          "gross_usd": 2849.875000000016,
+          "largest_positive_class_share": 0.554289921379927,
+          "median_daily_net_usd": 58.519999999999094,
+          "minimum_worst_unrealized_usd": -994.8199999999983,
+          "net_usd": 1947.4650000000154
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1509.8850000000002,
+            "EQUITY": -648.0025000000085,
+            "METAL": -257.0700000000051,
+            "RATES": -2006.1975
+          },
+          "event_count": 66,
+          "gross_usd": -3284.875000000013,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -33.27999999999935,
+          "minimum_worst_unrealized_usd": -1592.44,
+          "net_usd": -4421.155000000013
+        }
+      },
+      "policy_id": "classical_rp_f12d5bda81793e51e32c",
+      "spec": {
+        "family": "TREND_STRENGTH_BLEND",
+        "lookback_sessions": 60,
+        "maximum_assets": 2,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -569.2025000000026,
+            "EQUITY": -297.7899999999995,
+            "METAL": -122.04499999999683,
+            "RATES": -766.0475000000006
+          },
+          "event_count": 46,
+          "gross_usd": -27.99999999999909,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -17.694999999999748,
+          "minimum_worst_unrealized_usd": -1239.3600000000004,
+          "net_usd": -1755.0849999999994
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -394.9424999999963,
+            "EQUITY": 958.5750000000047,
+            "METAL": 1142.2375000000068,
+            "RATES": -209.61000000000146
+          },
+          "event_count": 65,
+          "gross_usd": 2849.875000000016,
+          "largest_positive_class_share": 0.5437122541873682,
+          "median_daily_net_usd": 50.03000000000091,
+          "minimum_worst_unrealized_usd": -1017.8549999999982,
+          "net_usd": 1496.260000000015
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1596.5775000000006,
+            "EQUITY": -876.160000000008,
+            "METAL": -300.23000000000513,
+            "RATES": -2216.3274999999985
+          },
+          "event_count": 66,
+          "gross_usd": -3284.875000000013,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -36.16999999999935,
+          "minimum_worst_unrealized_usd": -1611.2849999999999,
+          "net_usd": -4989.295000000014
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -227.811666666667,
+            "EQUITY": -1083.1450000000002,
+            "METAL": -451.9966666666656,
+            "RATES": -673.9266666666663
+          },
+          "event_count": 46,
+          "gross_usd": -856.9999999999977,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -84.70499999999986,
+          "minimum_worst_unrealized_usd": -1234.1050000000005,
+          "net_usd": -2436.8799999999983
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 180.5200000000024,
+            "EQUITY": 1460.5750000000103,
+            "METAL": 1577.9883333333432,
+            "RATES": -29.548333333333908
+          },
+          "event_count": 65,
+          "gross_usd": 4382.125000000025,
+          "largest_positive_class_share": 0.4901980377436638,
+          "median_daily_net_usd": 82.28000000000159,
+          "minimum_worst_unrealized_usd": -982.7199999999996,
+          "net_usd": 3189.5350000000235
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1837.7016666666655,
+            "EQUITY": -1393.385833333331,
+            "METAL": -608.7566666666658,
+            "RATES": -1795.7958333333324
+          },
+          "event_count": 66,
+          "gross_usd": -4174.249999999995,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -14.562500000000362,
+          "minimum_worst_unrealized_usd": -1698.1049999999996,
+          "net_usd": -5635.639999999996
+        }
+      },
+      "policy_id": "classical_rp_5451b5f0c96848bd906b",
+      "spec": {
+        "family": "TREND_STRENGTH_BLEND",
+        "lookback_sessions": 60,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.1
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -413.82166666666734,
+            "EQUITY": -1302.7383333333341,
+            "METAL": -586.869999999999,
+            "RATES": -923.3899999999999
+          },
+          "event_count": 46,
+          "gross_usd": -856.9999999999977,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -105.36999999999986,
+          "minimum_worst_unrealized_usd": -1254.7200000000003,
+          "net_usd": -3226.8199999999983
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 80.78000000000236,
+            "EQUITY": 1321.9250000000113,
+            "METAL": 1353.8783333333442,
+            "RATES": -163.3433333333339
+          },
+          "event_count": 65,
+          "gross_usd": 4382.125000000025,
+          "largest_positive_class_share": 0.4911436258653522,
+          "median_daily_net_usd": 72.35499999999905,
+          "minimum_worst_unrealized_usd": -986.8299999999996,
+          "net_usd": 2593.240000000023
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -2005.7816666666656,
+            "EQUITY": -1639.7349999999972,
+            "METAL": -735.6766666666656,
+            "RATES": -1985.141666666666
+          },
+          "event_count": 66,
+          "gross_usd": -4174.249999999995,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -27.250000000000377,
+          "minimum_worst_unrealized_usd": -1719.4699999999993,
+          "net_usd": -6366.334999999996
+        }
+      }
+    },
+    {
+      "normal": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -227.811666666667,
+            "EQUITY": -1083.1450000000002,
+            "METAL": -451.9966666666656,
+            "RATES": -673.9266666666663
+          },
+          "event_count": 46,
+          "gross_usd": -856.9999999999977,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -84.70499999999986,
+          "minimum_worst_unrealized_usd": -1234.1050000000005,
+          "net_usd": -2436.8799999999983
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 138.67333333333576,
+            "EQUITY": 1460.5750000000103,
+            "METAL": 1536.1416666666769,
+            "RATES": -71.3950000000005
+          },
+          "event_count": 65,
+          "gross_usd": 4260.125000000025,
+          "largest_positive_class_share": 0.48993639281450335,
+          "median_daily_net_usd": 82.28000000000159,
+          "minimum_worst_unrealized_usd": -1006.0199999999979,
+          "net_usd": 3063.9950000000235
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -1837.7016666666655,
+            "EQUITY": -1393.385833333331,
+            "METAL": -608.7566666666658,
+            "RATES": -1795.7958333333324
+          },
+          "event_count": 66,
+          "gross_usd": -4174.249999999995,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -14.562500000000362,
+          "minimum_worst_unrealized_usd": -1698.1049999999996,
+          "net_usd": -5635.639999999996
+        }
+      },
+      "policy_id": "classical_rp_8ebeb802de6bd6122fd1",
+      "spec": {
+        "family": "TREND_STRENGTH_BLEND",
+        "lookback_sessions": 60,
+        "maximum_assets": 3,
+        "mll_risk_fraction": 0.2
+      },
+      "stressed": {
+        "DISCOVERY": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -413.82166666666734,
+            "EQUITY": -1302.7383333333341,
+            "METAL": -586.869999999999,
+            "RATES": -923.3899999999999
+          },
+          "event_count": 46,
+          "gross_usd": -856.9999999999977,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -105.36999999999986,
+          "minimum_worst_unrealized_usd": -1254.7200000000003,
+          "net_usd": -3226.8199999999983
+        },
+        "FINAL_DEVELOPMENT": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": 38.34333333333573,
+            "EQUITY": 1321.9250000000113,
+            "METAL": 1311.4416666666777,
+            "RATES": -205.7800000000005
+          },
+          "event_count": 65,
+          "gross_usd": 4260.125000000025,
+          "largest_positive_class_share": 0.4947861107680097,
+          "median_daily_net_usd": 72.35499999999905,
+          "minimum_worst_unrealized_usd": -1029.154999999998,
+          "net_usd": 2465.930000000023
+        },
+        "VALIDATION": {
+          "asset_class_contribution_proxy": {
+            "ENERGY": -2005.7816666666656,
+            "EQUITY": -1639.7349999999972,
+            "METAL": -735.6766666666656,
+            "RATES": -1985.141666666666
+          },
+          "event_count": 66,
+          "gross_usd": -4174.249999999995,
+          "largest_positive_class_share": 1.0,
+          "median_daily_net_usd": -27.250000000000377,
+          "minimum_worst_unrealized_usd": -1719.4699999999993,
+          "net_usd": -6366.334999999996
+        }
+      }
+    }
+  ],
+  "combine_pass_observed": false,
+  "data_inventory": {
+    "common_session_count": 239,
+    "first_session": 20230103,
+    "last_session": 20240926,
+    "rows_by_symbol": {
+      "M2K": 238,
+      "MCL": 238,
+      "MGC": 238,
+      "MYM": 238,
+      "ZN": 238
+    },
+    "usable_common_session_count": 238
+  },
+  "exact_account_policy_count": 0,
+  "governance": {
+    "broker_connections": 0,
+    "data_purchase_usd": 0.0,
+    "numeric_threads_per_worker": 1,
+    "orders": 0,
+    "q4_access_count_delta": 0,
+    "worker_count": 1,
+    "xfa_runs": 0
+  },
+  "leave_one_asset_class_out_performed": true,
+  "manifest_hash": "c94c3e28414751e807ba264aafabc146e009055a04fd550e9c77b1fd33ea2f89",
+  "mll_and_consistency": "HARD",
+  "next_action": "TOMBSTONE_CLASSICAL_RISK_PREMIA_DIRECT_ACCOUNT_NO_NEIGHBOR_TUNING",
+  "non_deployable_upper_bound": {
+    "asset_session_count": 1190,
+    "gross_usd": 179399.75,
+    "label": "NON_DEPLOYABLE_FULL_OUTCOME_UPPER_BOUND",
+    "normal_net_usd": 168163.7700000001,
+    "positive_after_stress": true,
+    "stressed_net_usd": 162545.78000000148
+  },
+  "policy_count": 32,
+  "result_hash": "c00cd646476d4c180b4b3e242566de1f4ac42a618cf3aa91bdfe02df907a84b3",
+  "runtime_seconds": 69.97227556502912,
+  "schema": "hydra_multi_asset_classical_risk_premia_direct_account_v1",
+  "selected_exact_audits": [
+    {
+      "account_results": {},
+      "concentration_ok": false,
+      "exact_account_gate": false,
+      "leave_one_asset_class_out": {
+        "ENERGY": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "EQUITY": -967.9150000000052,
+              "METAL": -1992.9574999999925,
+              "RATES": -1474.7475000000013
+            },
+            "event_count": 65,
+            "gross_usd": -3038.9999999999973,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -66.7,
+            "minimum_worst_unrealized_usd": -1394.6900000000019,
+            "net_usd": -4435.619999999997
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "EQUITY": -527.5450000000009,
+              "METAL": -125.78250000000045,
+              "RATES": -1300.2074999999993
+            },
+            "event_count": 66,
+            "gross_usd": -991.6249999999998,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -16.96499999999864,
+            "minimum_worst_unrealized_usd": -1119.055,
+            "net_usd": -1953.535
+          }
+        },
+        "EQUITY": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": 463.9125000000059,
+              "METAL": -1908.2575000000002,
+              "RATES": -1149.4349999999972
+            },
+            "event_count": 65,
+            "gross_usd": -1092.9999999999905,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -39.53999999999994,
+            "minimum_worst_unrealized_usd": -1394.6900000000019,
+            "net_usd": -2593.7799999999907
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -326.8600000000036,
+              "METAL": -393.96250000000146,
+              "RATES": -1950.9524999999978
+            },
+            "event_count": 66,
+            "gross_usd": -1674.1250000000036,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": 2.860000000000199,
+            "minimum_worst_unrealized_usd": -960.489999999999,
+            "net_usd": -2671.7750000000037
+          }
+        },
+        "METAL": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": 77.8225000000009,
+              "EQUITY": -5.365000000001544,
+              "RATES": -2998.0775000000003
+            },
+            "event_count": 65,
+            "gross_usd": -1428.0000000000005,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -19.825000000000003,
+            "minimum_worst_unrealized_usd": -1097.95,
+            "net_usd": -2925.6200000000003
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -666.7100000000014,
+              "EQUITY": -779.375000000001,
+              "RATES": -1105.6900000000003
+            },
+            "event_count": 66,
+            "gross_usd": -1538.6250000000025,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -40.995000000000346,
+            "minimum_worst_unrealized_usd": -1119.055,
+            "net_usd": -2551.7750000000024
+          }
+        },
+        "RATES": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -111.48999999999249,
+              "EQUITY": -435.2900000000063,
+              "METAL": 2.2200000000042337
+            },
+            "event_count": 65,
+            "gross_usd": -154.9999999999941,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": 5.460000000000341,
+            "minimum_worst_unrealized_usd": -784.48,
+            "net_usd": -544.5599999999944
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -266.2100000000014,
+              "EQUITY": 3.689999999997667,
+              "METAL": -779.6599999999992
+            },
+            "event_count": 66,
+            "gross_usd": -672.500000000003,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -30.379999999999605,
+            "minimum_worst_unrealized_usd": -494.27999999999963,
+            "net_usd": -1042.180000000003
+          }
+        }
+      },
+      "leave_one_out_positive_count_at_least_two": false,
+      "normal_held_positive": false,
+      "policy_id": "classical_rp_96fe10acac5543fa7e3f",
+      "stressed_advisory_held_positive": false
+    },
+    {
+      "account_results": {},
+      "concentration_ok": false,
+      "exact_account_gate": false,
+      "leave_one_asset_class_out": {
+        "ENERGY": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "EQUITY": -967.9150000000052,
+              "METAL": -1992.9574999999925,
+              "RATES": -1474.7475000000013
+            },
+            "event_count": 65,
+            "gross_usd": -3038.9999999999973,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -66.7,
+            "minimum_worst_unrealized_usd": -1394.6900000000019,
+            "net_usd": -4435.619999999997
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "EQUITY": -527.5450000000009,
+              "METAL": -125.78250000000045,
+              "RATES": -1300.2074999999993
+            },
+            "event_count": 66,
+            "gross_usd": -991.6249999999998,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -16.96499999999864,
+            "minimum_worst_unrealized_usd": -1119.055,
+            "net_usd": -1953.535
+          }
+        },
+        "EQUITY": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": 463.9125000000059,
+              "METAL": -1908.2575000000002,
+              "RATES": -1149.4349999999972
+            },
+            "event_count": 65,
+            "gross_usd": -1092.9999999999905,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -39.53999999999994,
+            "minimum_worst_unrealized_usd": -1394.6900000000019,
+            "net_usd": -2593.7799999999907
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -326.8600000000036,
+              "METAL": -393.96250000000146,
+              "RATES": -1950.9524999999978
+            },
+            "event_count": 66,
+            "gross_usd": -1674.1250000000036,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": 2.860000000000199,
+            "minimum_worst_unrealized_usd": -960.489999999999,
+            "net_usd": -2671.7750000000037
+          }
+        },
+        "METAL": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": 77.8225000000009,
+              "EQUITY": -5.365000000001544,
+              "RATES": -2998.0775000000003
+            },
+            "event_count": 65,
+            "gross_usd": -1428.0000000000005,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -19.825000000000003,
+            "minimum_worst_unrealized_usd": -1097.95,
+            "net_usd": -2925.6200000000003
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -666.7100000000014,
+              "EQUITY": -779.375000000001,
+              "RATES": -1105.6900000000003
+            },
+            "event_count": 66,
+            "gross_usd": -1538.6250000000025,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -40.995000000000346,
+            "minimum_worst_unrealized_usd": -1119.055,
+            "net_usd": -2551.7750000000024
+          }
+        },
+        "RATES": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -111.48999999999249,
+              "EQUITY": -435.2900000000063,
+              "METAL": 2.2200000000042337
+            },
+            "event_count": 65,
+            "gross_usd": -154.9999999999941,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": 5.460000000000341,
+            "minimum_worst_unrealized_usd": -784.48,
+            "net_usd": -544.5599999999944
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -266.2100000000014,
+              "EQUITY": 3.689999999997667,
+              "METAL": -779.6599999999992
+            },
+            "event_count": 66,
+            "gross_usd": -672.500000000003,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -30.379999999999605,
+            "minimum_worst_unrealized_usd": -494.27999999999963,
+            "net_usd": -1042.180000000003
+          }
+        }
+      },
+      "leave_one_out_positive_count_at_least_two": false,
+      "normal_held_positive": false,
+      "policy_id": "classical_rp_a73f062461c620cb7118",
+      "stressed_advisory_held_positive": false
+    },
+    {
+      "account_results": {},
+      "concentration_ok": false,
+      "exact_account_gate": false,
+      "leave_one_asset_class_out": {
+        "ENERGY": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "EQUITY": -608.0450000000046,
+              "METAL": -1994.3374999999924,
+              "RATES": -1356.1375000000005
+            },
+            "event_count": 65,
+            "gross_usd": -2595.499999999996,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -28.74000000000091,
+            "minimum_worst_unrealized_usd": -1394.6900000000019,
+            "net_usd": -3958.5199999999963
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "EQUITY": -827.8750000000008,
+              "METAL": -174.0425000000009,
+              "RATES": -1239.4774999999995
+            },
+            "event_count": 66,
+            "gross_usd": -1305.6250000000002,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -16.96499999999864,
+            "minimum_worst_unrealized_usd": -928.815,
+            "net_usd": -2241.3950000000004
+          }
+        },
+        "EQUITY": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": 344.2725000000052,
+              "METAL": -1828.1375000000005,
+              "RATES": -1071.8949999999977
+            },
+            "event_count": 65,
+            "gross_usd": -1100.9999999999918,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -39.53999999999994,
+            "minimum_worst_unrealized_usd": -1394.6900000000019,
+            "net_usd": -2555.759999999992
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -350.9900000000038,
+              "METAL": -418.09250000000156,
+              "RATES": -1950.9524999999978
+            },
+            "event_count": 66,
+            "gross_usd": -1726.125000000004,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": 2.860000000000199,
+            "minimum_worst_unrealized_usd": -960.489999999999,
+            "net_usd": -2720.0350000000044
+          }
+        },
+        "METAL": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": 298.27250000000026,
+              "EQUITY": 93.15499999999892,
+              "RATES": -2801.927499999999
+            },
+            "event_count": 65,
+            "gross_usd": -992.5000000000003,
+            "largest_positive_class_share": 0.7620121222959574,
+            "median_daily_net_usd": -19.825000000000003,
+            "minimum_worst_unrealized_usd": -1097.95,
+            "net_usd": -2410.5000000000005
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -847.2400000000014,
+              "EQUITY": -899.1750000000011,
+              "RATES": -1044.9600000000003
+            },
+            "event_count": 66,
+            "gross_usd": -1800.6250000000025,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -47.91000000000045,
+            "minimum_worst_unrealized_usd": -960.489999999999,
+            "net_usd": -2791.3750000000027
+          }
+        },
+        "RATES": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": 106.38000000000635,
+              "EQUITY": -216.78000000000492,
+              "METAL": 80.96000000000424
+            },
+            "event_count": 65,
+            "gross_usd": 280.500000000006,
+            "largest_positive_class_share": 0.5678445606917921,
+            "median_daily_net_usd": -2.280000000001479,
+            "minimum_worst_unrealized_usd": -645.2799999999999,
+            "net_usd": -29.439999999994317
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -470.8700000000017,
+              "EQUITY": -55.380000000002354,
+              "METAL": -803.7899999999995
+            },
+            "event_count": 66,
+            "gross_usd": -986.5000000000034,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -33.27999999999935,
+            "minimum_worst_unrealized_usd": -494.27999999999963,
+            "net_usd": -1330.0400000000036
+          }
+        }
+      },
+      "leave_one_out_positive_count_at_least_two": false,
+      "normal_held_positive": false,
+      "policy_id": "classical_rp_225c3b3c13b59e2afd7a",
+      "stressed_advisory_held_positive": false
+    },
+    {
+      "account_results": {},
+      "concentration_ok": false,
+      "exact_account_gate": false,
+      "leave_one_asset_class_out": {
+        "ENERGY": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "EQUITY": -608.0450000000046,
+              "METAL": -1994.3374999999924,
+              "RATES": -1356.1375000000005
+            },
+            "event_count": 65,
+            "gross_usd": -2595.499999999996,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -28.74000000000091,
+            "minimum_worst_unrealized_usd": -1394.6900000000019,
+            "net_usd": -3958.5199999999963
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "EQUITY": -827.8750000000008,
+              "METAL": -174.0425000000009,
+              "RATES": -1239.4774999999995
+            },
+            "event_count": 66,
+            "gross_usd": -1305.6250000000002,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -16.96499999999864,
+            "minimum_worst_unrealized_usd": -928.815,
+            "net_usd": -2241.3950000000004
+          }
+        },
+        "EQUITY": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": 344.2725000000052,
+              "METAL": -1828.1375000000005,
+              "RATES": -1071.8949999999977
+            },
+            "event_count": 65,
+            "gross_usd": -1100.9999999999918,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -39.53999999999994,
+            "minimum_worst_unrealized_usd": -1394.6900000000019,
+            "net_usd": -2555.759999999992
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -350.9900000000038,
+              "METAL": -418.09250000000156,
+              "RATES": -1950.9524999999978
+            },
+            "event_count": 66,
+            "gross_usd": -1726.125000000004,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": 2.860000000000199,
+            "minimum_worst_unrealized_usd": -960.489999999999,
+            "net_usd": -2720.0350000000044
+          }
+        },
+        "METAL": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": 298.27250000000026,
+              "EQUITY": 93.15499999999892,
+              "RATES": -2801.927499999999
+            },
+            "event_count": 65,
+            "gross_usd": -992.5000000000003,
+            "largest_positive_class_share": 0.7620121222959574,
+            "median_daily_net_usd": -19.825000000000003,
+            "minimum_worst_unrealized_usd": -1097.95,
+            "net_usd": -2410.5000000000005
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -847.2400000000014,
+              "EQUITY": -899.1750000000011,
+              "RATES": -1044.9600000000003
+            },
+            "event_count": 66,
+            "gross_usd": -1800.6250000000025,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -47.91000000000045,
+            "minimum_worst_unrealized_usd": -960.489999999999,
+            "net_usd": -2791.3750000000027
+          }
+        },
+        "RATES": {
+          "FINAL_DEVELOPMENT": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": 106.38000000000635,
+              "EQUITY": -216.78000000000492,
+              "METAL": 80.96000000000424
+            },
+            "event_count": 65,
+            "gross_usd": 280.500000000006,
+            "largest_positive_class_share": 0.5678445606917921,
+            "median_daily_net_usd": -2.280000000001479,
+            "minimum_worst_unrealized_usd": -645.2799999999999,
+            "net_usd": -29.439999999994317
+          },
+          "VALIDATION": {
+            "asset_class_contribution_proxy": {
+              "ENERGY": -470.8700000000017,
+              "EQUITY": -55.380000000002354,
+              "METAL": -803.7899999999995
+            },
+            "event_count": 66,
+            "gross_usd": -986.5000000000034,
+            "largest_positive_class_share": 1.0,
+            "median_daily_net_usd": -33.27999999999935,
+            "minimum_worst_unrealized_usd": -494.27999999999963,
+            "net_usd": -1330.0400000000036
+          }
+        }
+      },
+      "leave_one_out_positive_count_at_least_two": false,
+      "normal_held_positive": false,
+      "policy_id": "classical_rp_fa5e1b592551ac82f11f",
+      "stressed_advisory_held_positive": false
+    }
+  ],
+  "selected_policy_ids": [
+    "classical_rp_225c3b3c13b59e2afd7a",
+    "classical_rp_96fe10acac5543fa7e3f",
+    "classical_rp_a73f062461c620cb7118",
+    "classical_rp_fa5e1b592551ac82f11f"
+  ],
+  "status": "MULTI_ASSET_CLASSICAL_RISK_PREMIA_DIRECT_ACCOUNT_FALSIFIED_HELD_OUT",
+  "stress_interpretation": "ADVISORY_NOT_PRIMARY"
+}

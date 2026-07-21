@@ -1,0 +1,8 @@
+{
+  "exact_account_policy_count": 0,
+  "manifest_hash": "c94c3e28414751e807ba264aafabc146e009055a04fd550e9c77b1fd33ea2f89",
+  "policy_count": 32,
+  "result_hash": "c00cd646476d4c180b4b3e242566de1f4ac42a618cf3aa91bdfe02df907a84b3",
+  "status": "COMPLETE",
+  "verdict": "MULTI_ASSET_CLASSICAL_RISK_PREMIA_DIRECT_ACCOUNT_FALSIFIED_HELD_OUT"
+}
