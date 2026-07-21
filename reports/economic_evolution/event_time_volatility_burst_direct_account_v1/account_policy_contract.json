@@ -1,0 +1,1164 @@
+{
+  "account_rules": {
+    "100K": {
+      "account_label": "100K",
+      "account_size_usd": 100000,
+      "consistency_target_fraction": 0.5,
+      "maximum_loss_limit_usd": 3000,
+      "maximum_micro_contracts": 100,
+      "maximum_mini_contracts": 10,
+      "minimum_trading_days": 2,
+      "no_activation_fee_usd": 0,
+      "no_activation_monthly_price_usd": 149,
+      "optional_daily_loss_limit_usd": 2000,
+      "profit_target_usd": 6000,
+      "special_contract_caps": {
+        "CL_QM_RB_HO": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "GC": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "MCL": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "MGC": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "SIL_MHG": {
+          "100K": 4,
+          "150K": 6,
+          "50K": 2
+        },
+        "SI_HG_PL": {
+          "100K": 0,
+          "150K": 0,
+          "50K": 0
+        }
+      },
+      "standard_activation_fee_usd": 149,
+      "standard_monthly_price_usd": 99
+    },
+    "150K": {
+      "account_label": "150K",
+      "account_size_usd": 150000,
+      "consistency_target_fraction": 0.5,
+      "maximum_loss_limit_usd": 4500,
+      "maximum_micro_contracts": 150,
+      "maximum_mini_contracts": 15,
+      "minimum_trading_days": 2,
+      "no_activation_fee_usd": 0,
+      "no_activation_monthly_price_usd": 229,
+      "optional_daily_loss_limit_usd": 3000,
+      "profit_target_usd": 9000,
+      "special_contract_caps": {
+        "CL_QM_RB_HO": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "GC": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "MCL": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "MGC": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "SIL_MHG": {
+          "100K": 4,
+          "150K": 6,
+          "50K": 2
+        },
+        "SI_HG_PL": {
+          "100K": 0,
+          "150K": 0,
+          "50K": 0
+        }
+      },
+      "standard_activation_fee_usd": 149,
+      "standard_monthly_price_usd": 199
+    },
+    "50K": {
+      "account_label": "50K",
+      "account_size_usd": 50000,
+      "consistency_target_fraction": 0.5,
+      "maximum_loss_limit_usd": 2000,
+      "maximum_micro_contracts": 50,
+      "maximum_mini_contracts": 5,
+      "minimum_trading_days": 2,
+      "no_activation_fee_usd": 0,
+      "no_activation_monthly_price_usd": 95,
+      "optional_daily_loss_limit_usd": 1000,
+      "profit_target_usd": 3000,
+      "special_contract_caps": {
+        "CL_QM_RB_HO": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "GC": {
+          "100K": 6,
+          "150K": 9,
+          "50K": 3
+        },
+        "MCL": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "MGC": {
+          "100K": 60,
+          "150K": 90,
+          "50K": 30
+        },
+        "SIL_MHG": {
+          "100K": 4,
+          "150K": 6,
+          "50K": 2
+        },
+        "SI_HG_PL": {
+          "100K": 0,
+          "150K": 0,
+          "50K": 0
+        }
+      },
+      "standard_activation_fee_usd": 149,
+      "standard_monthly_price_usd": 49
+    }
+  },
+  "candidate_contract_hash": "553140baed6ff2366d1cb9913eae71fdc0d2f3b05034de84b792911d89b24325",
+  "cell_count": 30,
+  "cells": [
+    {
+      "account_label": "50K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 5.0,
+      "policy_id": "evtburst_2507f62e819218923ca2ce02",
+      "policy_spec_hash": "2507f62e819218923ca2ce0296719d68e296a74ee9fdb8518a176eead1e3602e"
+    },
+    {
+      "account_label": "100K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 10.0,
+      "policy_id": "evtburst_3f211ae8f212a6efa692cf7e",
+      "policy_spec_hash": "3f211ae8f212a6efa692cf7e852b27fc22cce97225d4a35125d20f3502d4b0a9"
+    },
+    {
+      "account_label": "150K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 15.0,
+      "policy_id": "evtburst_827c30df8a3791f832119296",
+      "policy_spec_hash": "827c30df8a3791f832119296df81a2af61177a823af7f66418a11081b40e8727"
+    },
+    {
+      "account_label": "50K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 5.0,
+      "policy_id": "evtburst_03b5eccd2b98b6c3a58d473d",
+      "policy_spec_hash": "03b5eccd2b98b6c3a58d473d4185e14cedff504535bbb09238257871990b1028"
+    },
+    {
+      "account_label": "100K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 10.0,
+      "policy_id": "evtburst_e0349e84cb4449830f590177",
+      "policy_spec_hash": "e0349e84cb4449830f5901777be0c5482ad919cf0830b700d265ada3dd2f8c23"
+    },
+    {
+      "account_label": "150K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 15.0,
+      "policy_id": "evtburst_a405641cb6f4aa86d41dca2b",
+      "policy_spec_hash": "a405641cb6f4aa86d41dca2bd844d7c561455efdbacefabcbd54ba2529dd5719"
+    },
+    {
+      "account_label": "50K",
+      "component_ids": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_5d77643b6bff503185b9cf7a": 43.65676255978467,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 102.41508760763702,
+        "hazard_6c0796ff2ad649749b580c31": 210.87570915866263
+      },
+      "component_priority": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_quantity_tiers": {
+        "hazard_5d77643b6bff503185b9cf7a": 1,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 1,
+        "hazard_6c0796ff2ad649749b580c31": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 5.0,
+      "policy_id": "evtburst_5c221558f37eb706f86a7ad4",
+      "policy_spec_hash": "5c221558f37eb706f86a7ad465ce88fc5130d32a97e822f55470ac387955a63a"
+    },
+    {
+      "account_label": "100K",
+      "component_ids": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_5d77643b6bff503185b9cf7a": 43.65676255978467,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 102.41508760763702,
+        "hazard_6c0796ff2ad649749b580c31": 210.87570915866263
+      },
+      "component_priority": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_quantity_tiers": {
+        "hazard_5d77643b6bff503185b9cf7a": 1,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 1,
+        "hazard_6c0796ff2ad649749b580c31": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 10.0,
+      "policy_id": "evtburst_ac902fb8b4dafe666a1317f5",
+      "policy_spec_hash": "ac902fb8b4dafe666a1317f5d18705bed7ed168df2940b5f6b6ee2f077be11bd"
+    },
+    {
+      "account_label": "150K",
+      "component_ids": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_5d77643b6bff503185b9cf7a": 43.65676255978467,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 102.41508760763702,
+        "hazard_6c0796ff2ad649749b580c31": 210.87570915866263
+      },
+      "component_priority": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_quantity_tiers": {
+        "hazard_5d77643b6bff503185b9cf7a": 1,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 1,
+        "hazard_6c0796ff2ad649749b580c31": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 15.0,
+      "policy_id": "evtburst_d2917742e4d22c7b1044926a",
+      "policy_spec_hash": "d2917742e4d22c7b1044926a701d69fe9e305e5ceaf4a93cc44361e7c2a81d40"
+    },
+    {
+      "account_label": "50K",
+      "component_ids": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_5d77643b6bff503185b9cf7a": 43.65676255978467,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 102.41508760763702,
+        "hazard_6c0796ff2ad649749b580c31": 210.87570915866263
+      },
+      "component_priority": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_quantity_tiers": {
+        "hazard_5d77643b6bff503185b9cf7a": 1,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 1,
+        "hazard_6c0796ff2ad649749b580c31": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 5.0,
+      "policy_id": "evtburst_7c350ce2a09adc1e5be65865",
+      "policy_spec_hash": "7c350ce2a09adc1e5be65865ae46fca14b8183cbcadcacdd755748d825371795"
+    },
+    {
+      "account_label": "100K",
+      "component_ids": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_5d77643b6bff503185b9cf7a": 43.65676255978467,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 102.41508760763702,
+        "hazard_6c0796ff2ad649749b580c31": 210.87570915866263
+      },
+      "component_priority": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_quantity_tiers": {
+        "hazard_5d77643b6bff503185b9cf7a": 1,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 1,
+        "hazard_6c0796ff2ad649749b580c31": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 10.0,
+      "policy_id": "evtburst_a5afce13548df020c497b9ab",
+      "policy_spec_hash": "a5afce13548df020c497b9abb3897b51ce6ccb2a4a52e2e8df91f3aed611b196"
+    },
+    {
+      "account_label": "150K",
+      "component_ids": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_5d77643b6bff503185b9cf7a": 43.65676255978467,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 102.41508760763702,
+        "hazard_6c0796ff2ad649749b580c31": 210.87570915866263
+      },
+      "component_priority": [
+        "hazard_5d77643b6bff503185b9cf7a",
+        "hazard_635d3bd3f8d2f37d661d2cd9",
+        "hazard_6c0796ff2ad649749b580c31"
+      ],
+      "component_quantity_tiers": {
+        "hazard_5d77643b6bff503185b9cf7a": 1,
+        "hazard_635d3bd3f8d2f37d661d2cd9": 1,
+        "hazard_6c0796ff2ad649749b580c31": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 15.0,
+      "policy_id": "evtburst_6d96b127df9811029a65d16f",
+      "policy_spec_hash": "6d96b127df9811029a65d16f240b6d4c568f0a2202f963ff5c81bd5bf7709c95"
+    },
+    {
+      "account_label": "50K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_quantity_tiers": {
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 5.0,
+      "policy_id": "evtburst_77bb9c922613691da88e4bef",
+      "policy_spec_hash": "77bb9c922613691da88e4bef55a684d97996a5a2bf37cb04fdbdb99edc7268af"
+    },
+    {
+      "account_label": "100K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_quantity_tiers": {
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 10.0,
+      "policy_id": "evtburst_7e15aa4a984b874e6008da21",
+      "policy_spec_hash": "7e15aa4a984b874e6008da2190e4cb17f48227724efe3dbc1dddae1c5ca01929"
+    },
+    {
+      "account_label": "150K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_quantity_tiers": {
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 15.0,
+      "policy_id": "evtburst_2877f79442d615c79c6ceb6b",
+      "policy_spec_hash": "2877f79442d615c79c6ceb6b67b4c1378f3fc0a47cae1774b516a4af0163c568"
+    },
+    {
+      "account_label": "50K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_quantity_tiers": {
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 5.0,
+      "policy_id": "evtburst_59add12d83f17260ac36197a",
+      "policy_spec_hash": "59add12d83f17260ac36197ac7efc1cfc8e73e982c16661c0606101e0e177cae"
+    },
+    {
+      "account_label": "100K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_quantity_tiers": {
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 10.0,
+      "policy_id": "evtburst_37857a3771a91d8cb20f3945",
+      "policy_spec_hash": "37857a3771a91d8cb20f39453bad5a9b7219be615c8920377f358d31cf96fdd3"
+    },
+    {
+      "account_label": "150K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_d29d7302b1781cb607328296"
+      ],
+      "component_quantity_tiers": {
+        "hazard_c9e1508f41fd371f279c4327": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 15.0,
+      "policy_id": "evtburst_bf76028ca2ca9884cb69c46c",
+      "policy_spec_hash": "bf76028ca2ca9884cb69c46cd09d3b7325c982d3a622d07ebb931758e734c589"
+    },
+    {
+      "account_label": "50K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 5.0,
+      "policy_id": "evtburst_043b42cb612f01c1dc17d316",
+      "policy_spec_hash": "043b42cb612f01c1dc17d316e0d9f59d8d5e65bf2c4e94542e6b564c22849447"
+    },
+    {
+      "account_label": "100K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 10.0,
+      "policy_id": "evtburst_90b4f3063b1b879adf68a05a",
+      "policy_spec_hash": "90b4f3063b1b879adf68a05a361b49c1709d3d09ca8971a806e6bcbbc8458354"
+    },
+    {
+      "account_label": "150K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 15.0,
+      "policy_id": "evtburst_9a5678f872f50610aed39541",
+      "policy_spec_hash": "9a5678f872f50610aed39541cb2364aa3dc71b02d2a12da373adf87d7384e3bb"
+    },
+    {
+      "account_label": "50K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 5.0,
+      "policy_id": "evtburst_1a160752cec30f610468d2db",
+      "policy_spec_hash": "1a160752cec30f610468d2db951b5a4327a9eb86284d538b9374c8dcdff8cfdb"
+    },
+    {
+      "account_label": "100K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 10.0,
+      "policy_id": "evtburst_503fb82c64b0be9be48c27bb",
+      "policy_spec_hash": "503fb82c64b0be9be48c27bb1a25c6f52efe976e07d498541f59fcc90ca127a3"
+    },
+    {
+      "account_label": "150K",
+      "component_ids": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_c9e1508f41fd371f279c4327": 58.91426655028359
+      },
+      "component_priority": [
+        "hazard_c9e1508f41fd371f279c4327",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_c9e1508f41fd371f279c4327": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 15.0,
+      "policy_id": "evtburst_8f2eecff54eecdb17870bd26",
+      "policy_spec_hash": "8f2eecff54eecdb17870bd262bd26820206ce819231569acada7e68fc5757fb6"
+    },
+    {
+      "account_label": "50K",
+      "component_ids": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 5.0,
+      "policy_id": "evtburst_8b9e909c8db18794f428ce66",
+      "policy_spec_hash": "8b9e909c8db18794f428ce66824b80e772985e0ef40c1169ab1f4afac91c7d9d"
+    },
+    {
+      "account_label": "100K",
+      "component_ids": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 10.0,
+      "policy_id": "evtburst_d442f4f9e4868a1f525ddc28",
+      "policy_spec_hash": "d442f4f9e4868a1f525ddc288264e0231b29addfc6966ae353c9240fc7f1abb1"
+    },
+    {
+      "account_label": "150K",
+      "component_ids": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.35,
+        "daily_profit_lock_fraction": 0.9,
+        "maximum_concurrent_sleeves": 1,
+        "open_risk_ceiling_fraction": 0.3,
+        "profile_id": "SURVIVAL",
+        "target_protection_fraction": 0.85
+      },
+      "maximum_mini_equivalent": 15.0,
+      "policy_id": "evtburst_8975d7ab0e424e3322cacd0a",
+      "policy_spec_hash": "8975d7ab0e424e3322cacd0a2b8a819f0b306f8c6d93b5c7096de2ec49e5cd74"
+    },
+    {
+      "account_label": "50K",
+      "component_ids": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 5.0,
+      "policy_id": "evtburst_5a092ab95a52514a2222d59c",
+      "policy_spec_hash": "5a092ab95a52514a2222d59c7b55ccbe936d32068a4df22b7a52badcdec33339"
+    },
+    {
+      "account_label": "100K",
+      "component_ids": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 10.0,
+      "policy_id": "evtburst_20c4beef908146e1b98f6436",
+      "policy_spec_hash": "20c4beef908146e1b98f64364e8629c2527c359bb5e407a07155d4a3afa80587"
+    },
+    {
+      "account_label": "150K",
+      "component_ids": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_nominal_risk_charges": {
+        "hazard_62985db104c6c4defadb2ab0": 117.22340368784167,
+        "hazard_d29d7302b1781cb607328296": 54.40012186911557
+      },
+      "component_priority": [
+        "hazard_d29d7302b1781cb607328296",
+        "hazard_62985db104c6c4defadb2ab0"
+      ],
+      "component_quantity_tiers": {
+        "hazard_62985db104c6c4defadb2ab0": 1,
+        "hazard_d29d7302b1781cb607328296": 1
+      },
+      "construction": "CHEAP_EVENT_ECONOMICS_TOP_TWO_PER_MARKET_THEN_FROZEN_DIRECT_ACCOUNT",
+      "governor_profile": {
+        "daily_loss_budget_fraction": 0.5,
+        "daily_profit_lock_fraction": 0.95,
+        "maximum_concurrent_sleeves": 2,
+        "open_risk_ceiling_fraction": 0.5,
+        "profile_id": "VELOCITY",
+        "target_protection_fraction": 0.9
+      },
+      "maximum_mini_equivalent": 15.0,
+      "policy_id": "evtburst_70f696a7a335b44ead39fc9d",
+      "policy_spec_hash": "70f696a7a335b44ead39fc9dcdf366f95cfe91c0ee996cf92d4b4118db7a097f"
+    }
+  ],
+  "contract_hash": "2cb8501a90b618fadbc6b88e42833d78c0c4f20f76f69e68768ca92bf5c4ad06",
+  "maximum_exact_policy_cells": 64,
+  "profiles": [
+    {
+      "daily_loss_budget_fraction": 0.35,
+      "daily_profit_lock_fraction": 0.9,
+      "maximum_concurrent_sleeves": 1,
+      "open_risk_ceiling_fraction": 0.3,
+      "profile_id": "SURVIVAL",
+      "target_protection_fraction": 0.85
+    },
+    {
+      "daily_loss_budget_fraction": 0.5,
+      "daily_profit_lock_fraction": 0.95,
+      "maximum_concurrent_sleeves": 2,
+      "open_risk_ceiling_fraction": 0.5,
+      "profile_id": "VELOCITY",
+      "target_protection_fraction": 0.9
+    }
+  ],
+  "schema": "hydra_event_time_volatility_burst_direct_account_v1_account_contract",
+  "selected_components_by_market": {
+    "CL": [
+      "hazard_c9e1508f41fd371f279c4327",
+      "hazard_5d77643b6bff503185b9cf7a"
+    ],
+    "ES": [
+      "hazard_d29d7302b1781cb607328296",
+      "hazard_635d3bd3f8d2f37d661d2cd9"
+    ],
+    "NQ": [
+      "hazard_62985db104c6c4defadb2ab0",
+      "hazard_6c0796ff2ad649749b580c31"
+    ]
+  },
+  "selection_rule": "TOP_TWO_PER_MARKET_BY_WORST_ERA_STRESS_THEN_NORMAL_THEN_DENSITY",
+  "status": "FROZEN_AFTER_CHEAP_SCREEN_BEFORE_ACCOUNT_OUTCOMES"
+}

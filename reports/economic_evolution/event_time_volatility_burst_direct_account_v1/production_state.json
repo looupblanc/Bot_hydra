@@ -1,0 +1,11 @@
+{
+  "direct_policy_cell_count": 30,
+  "exact_account_episode_count": 8352,
+  "exact_sleeve_replay_count": 144,
+  "next_action": "KILL_VARIANCE_CLOCK_BRANCH_AND_START_ROLE_CONDITIONED_SESSION_PATH_ANALOG",
+  "result_hash": "e0dcf5f38289e0ef8620dc02a3c2027bdcb5b87d70634572731db60955379bfd",
+  "runtime_seconds": 643.5212727969047,
+  "status": "COMPLETE",
+  "tier_g_count": 0,
+  "verdict": "EVENT_TIME_VOLATILITY_BURST_FALSIFIED"
+}
