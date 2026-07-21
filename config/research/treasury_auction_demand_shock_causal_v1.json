@@ -1,0 +1,89 @@
+{
+  "schema": "hydra_treasury_auction_demand_shock_causal_manifest_v1",
+  "branch_id": "TREASURY_AUCTION_DEMAND_SHOCK_CAUSAL_V1",
+  "created_at_utc": "2026-07-21T03:08:00Z",
+  "predecessor": {
+    "manifest_path": "config/research/treasury_auction_demand_shock_tripwire_v1.json",
+    "manifest_hash": "d3deec2e4a0e86cc9cdb4cfe0f76fa45535c9e48fb89d18efaaeb9e7a3f65799",
+    "upper_bound_path": "reports/research_tripwires/treasury_auction_demand_shock_v1/upper_bound_result.json",
+    "upper_bound_file_sha256": "60943b916fbc0354572a33ba974a67d9a58a4779445fb67c80f1358ea2b1043f",
+    "upper_bound_result_hash": "be0fac592db450d1ff6b9f20054758ec5c4093190fcf01b65b8b313df4054d69",
+    "status": "TREASURY_AUCTION_UPPER_BOUND_SUPPORTS_CAUSAL_TEST",
+    "non_deployable_evidence_inheritance": false
+  },
+  "frozen_official_inputs": {
+    "note_path": "data/cache/official/treasury_auction_demand_shock_v1/note.json",
+    "note_sha256": "93bc58847f74b2099565ace088fe597274dae1d371af15312e88e3ca92be18be",
+    "bond_path": "data/cache/official/treasury_auction_demand_shock_v1/bond.json",
+    "bond_sha256": "86f7015385d55f8632d3d698da4d6727a8ea1424101a9f0a4b98608835591bd4",
+    "availability": "UPDATED_TIMESTAMP_INTERPRETED_AMERICA_NEW_YORK",
+    "feature_fields": ["bidToCoverRatio", "indirectBidderAccepted", "primaryDealerAccepted", "totalAccepted"]
+  },
+  "chronological_roles": {
+    "DISCOVERY": ["2023-01-01", "2024-01-01"],
+    "VALIDATION": ["2024-01-01", "2024-05-01"],
+    "FINAL_DEVELOPMENT": ["2024-05-01", "2024-10-01"]
+  },
+  "feature_contract": {
+    "history": "EXACTLY_PREVIOUS_SIX_SAME_SECURITY_TERM_AUCTIONS",
+    "minimum_history": 6,
+    "robust_center": "MEDIAN",
+    "robust_scale": "MAX_OF_1_4826_TIMES_MAD_AND_POPULATION_STANDARD_DEVIATION_AND_1E_9",
+    "individual_z_clip": 3.0,
+    "bid_to_cover_z": "CURRENT_BID_TO_COVER_VERSUS_TRAILING_SIX",
+    "indirect_share_z": "CURRENT_INDIRECT_ACCEPTED_DIVIDED_BY_TOTAL_ACCEPTED_VERSUS_TRAILING_SIX",
+    "primary_dealer_share_z": "CURRENT_PRIMARY_DEALER_ACCEPTED_DIVIDED_BY_TOTAL_ACCEPTED_VERSUS_TRAILING_SIX",
+    "demand_score": "BID_TO_COVER_Z_PLUS_INDIRECT_SHARE_Z_MINUS_PRIMARY_DEALER_SHARE_Z",
+    "future_outcomes_in_features": false
+  },
+  "policy": {
+    "actions": ["ABSTAIN", "DEMAND_CONTINUATION"],
+    "trade_threshold_absolute_score_inclusive": 1.5,
+    "direction": "SIGN_OF_DEMAND_SCORE_BUYS_FUTURE_WHEN_POSITIVE",
+    "quantity_tiers": [{"minimum_absolute_score": 1.5, "contracts": 3}, {"minimum_absolute_score": 3.0, "contracts": 5}],
+    "entry": "FIRST_1M_OPEN_STRICTLY_AFTER_UPDATED_TIMESTAMP",
+    "stop_ticks": 8,
+    "target_ticks": 12,
+    "maximum_holding_minutes": 60,
+    "same_bar_stop_target": "STOP_FIRST",
+    "stressed_extra_ticks_per_side": 1,
+    "controls": ["DIRECTION_FLIP", "DETERMINISTIC_RANDOM_DIRECTION_EXPOSURE_MATCHED"]
+  },
+  "account_evaluation": {
+    "account_size_usd": 50000,
+    "profit_target_usd": 3000,
+    "maximum_loss_limit_usd": 2000,
+    "maximum_mini_contracts": 5,
+    "consistency_fraction": 0.5,
+    "complete_non_overlapping_windows_sessions": [5, 10, 20],
+    "normal_and_stressed": true
+  },
+  "gate": {
+    "minimum_validation_completed_events": 8,
+    "minimum_final_completed_events": 8,
+    "minimum_trade_coverage_fraction": 0.20,
+    "maximum_trade_coverage_fraction": 0.80,
+    "positive_stressed_net_validation": true,
+    "positive_stressed_net_final": true,
+    "positive_delta_vs_both_controls_validation": true,
+    "positive_delta_vs_both_controls_final": true,
+    "maximum_event_mll_breach_rate": 0.10,
+    "minimum_stressed_p20_pass_count": 1,
+    "success_status": "TREASURY_AUCTION_CAUSAL_GREEN_TIER_E",
+    "weak_status": "TREASURY_AUCTION_CAUSAL_WEAK",
+    "failure_status": "TREASURY_AUCTION_CAUSAL_FALSIFIED",
+    "tier_q_allowed": false,
+    "neighbor_threshold_retry": false
+  },
+  "frozen_price_inputs_and_specs_from": "config/research/treasury_auction_demand_shock_tripwire_v1.json",
+  "governance": {
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "incremental_data_spend_usd": 0.0,
+    "q4_access": false,
+    "broker_connections": 0,
+    "orders": 0,
+    "xfa_allowed": false
+  },
+  "manifest_hash": "e1efbf9f5139b7348c31970a4f7ccf1441da646e898433e6c587a2b041977acc"
+}

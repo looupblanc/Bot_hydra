@@ -1,0 +1,81 @@
+{
+  "schema": "hydra_treasury_auction_demand_shock_manifest_v1",
+  "branch_id": "TREASURY_AUCTION_DEMAND_SHOCK_TRIPWIRE_V1",
+  "created_at_utc": "2026-07-21T03:00:00Z",
+  "decision_card": {
+    "hypothesis": "Official Treasury auction demand composition, released after the competitive close, creates a causal low-turnover repricing impulse in maturity-matched Treasury futures large enough to improve 50K twenty-session account paths.",
+    "strongest_argument_against": "Auction results may already be incorporated before publication, the events may be too sparse, and commissions plus adverse ticks may consume the post-release move.",
+    "smallest_decisive_experiment": "A fixed-horizon non-deployable direction ceiling over all 2/3/5/7/10/20/30-year auctions from 2023-01-01 through 2024-09-30, using exact cached futures bars, next-open fills, five-contract legal cap, stressed costs, and non-overlapping 20-session account windows.",
+    "expected_runtime_minutes": 8,
+    "expected_data_cost_usd": 0.0,
+    "expected_information_gain": 0.83,
+    "expected_economic_upside": 0.66,
+    "implementation_cost": 0.12,
+    "overfitting_risk": 0.25,
+    "deployment_risk": 0.18,
+    "next_materially_distinct_alternative": "Cross-market calendar-defined month-end stock-bond rebalancing only if the auction upper bound is insufficient; no neighbouring auction thresholds."
+  },
+  "official_event_sources": {
+    "note": "https://www.treasurydirect.gov/TA_WS/securities/search?startDate=2023-01-01&endDate=2024-09-30&dateField=auctionDate&type=Note&format=json",
+    "bond": "https://www.treasurydirect.gov/TA_WS/securities/search?startDate=2023-01-01&endDate=2024-09-30&dateField=auctionDate&type=Bond&format=json",
+    "availability": "UPDATED_TIMESTAMP_INTERPRETED_AMERICA_NEW_YORK",
+    "allowed_terms": ["2-Year", "3-Year", "5-Year", "7-Year", "10-Year", "20-Year", "30-Year"]
+  },
+  "chronological_roles": {
+    "DISCOVERY": ["2023-01-01", "2024-01-01"],
+    "VALIDATION": ["2024-01-01", "2024-05-01"],
+    "FINAL_DEVELOPMENT": ["2024-05-01", "2024-10-01"]
+  },
+  "frozen_price_inputs": {
+    "ZT": {"path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zt_explicit_contract_ohlcv.parquet", "sha256": "28b99c104fdfe745fae3312e35a11fc7cd2e45cdd166393331ac94c7b5d8c761"},
+    "ZF": {"path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zf_explicit_contract_ohlcv.parquet", "sha256": "0c22d67bca3d5ac8d354a82e1007c84c9e9fd331192c60464738bd056caec050"},
+    "ZN": {"path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zn_explicit_contract_ohlcv.parquet", "sha256": "8347100a5ad0fbd7b5281278764300028ac94dd60823dbbc39fd4056b4926d45"},
+    "ZB": {"path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/zb_explicit_contract_ohlcv.parquet", "sha256": "92e4763c678d6b45607824983f6a5cd7cca3d05c8afba40db324d6eb87d77d6e"},
+    "UB": {"path": "data/cache/databento/treasury_curve_tripwire/110de6f631a3ebf415af/bound_input/ub_explicit_contract_ohlcv.parquet", "sha256": "03e09d13f560ff398f1c6936fd2ff8b7dd900ce8877b588a8dad2aab8907defb"}
+  },
+  "term_to_market": {"2-Year": "ZT", "3-Year": "ZF", "5-Year": "ZF", "7-Year": "ZN", "10-Year": "ZN", "20-Year": "ZB", "30-Year": "UB"},
+  "market_specs": {
+    "ZT": {"tick": 0.00390625, "point_value": 2000.0, "round_turn_fee_usd": 2.34},
+    "ZF": {"tick": 0.0078125, "point_value": 1000.0, "round_turn_fee_usd": 2.34},
+    "ZN": {"tick": 0.015625, "point_value": 1000.0, "round_turn_fee_usd": 2.60},
+    "ZB": {"tick": 0.03125, "point_value": 1000.0, "round_turn_fee_usd": 2.78},
+    "UB": {"tick": 0.03125, "point_value": 1000.0, "round_turn_fee_usd": 2.94}
+  },
+  "preflight": {
+    "status": "NON_DEPLOYABLE_UPPER_BOUND",
+    "entry": "FIRST_1M_OPEN_STRICTLY_AFTER_UPDATED_TIMESTAMP",
+    "horizons_minutes": [15, 30, 60],
+    "direction": "HINDSIGHT_SIGN_OF_FIXED_HORIZON_CLOSE_MINUS_ENTRY",
+    "contracts": 5,
+    "stressed_extra_ticks_per_side": 1,
+    "account_size_usd": 50000,
+    "profit_target_usd": 3000,
+    "maximum_loss_limit_usd": 2000,
+    "non_overlapping_account_window_sessions": 20,
+    "minimum_total_events": 40,
+    "minimum_validation_events": 8,
+    "minimum_final_events": 8,
+    "minimum_oracle_20_session_passes": 1,
+    "maximum_oracle_mll_breach_rate": 0.10
+  },
+  "causal_followup_if_upper_bound_passes": {
+    "features": ["TRAILING_6_BID_TO_COVER_ROBUST_Z", "TRAILING_6_INDIRECT_SHARE_ROBUST_Z", "TRAILING_6_PRIMARY_DEALER_SHARE_ROBUST_Z"],
+    "score": "BTC_Z_PLUS_INDIRECT_Z_MINUS_PRIMARY_DEALER_Z",
+    "actions": ["ABSTAIN", "DEMAND_CONTINUATION_1X"],
+    "training": "DISCOVERY_ONLY",
+    "no_threshold_neighbor_search": true
+  },
+  "governance": {
+    "maximum_cpu_workers": 1,
+    "numeric_threads_per_worker": 1,
+    "incremental_data_cost_usd": 0.0,
+    "tier_q_before_causal_gate": false,
+    "combine_before_causal_gate": false,
+    "xfa_allowed": false,
+    "q4_access": false,
+    "broker_connections": 0,
+    "orders": 0
+  },
+  "official_rule_snapshot": {"path": "config/rulesets/topstep_official_2026-07-19.json", "sha256": "7858759cdbfd3cbd1c3743532d93600d6d48feb8a5edb7fe0dc8f96183e07e5b", "parsed_rule_hash": "31c322ae58ea51ea0cc87c4714e09d989038aad0f44b60fd53799fbe10873e6f"},
+  "manifest_hash": "d3deec2e4a0e86cc9cdb4cfe0f76fa45535c9e48fb89d18efaaeb9e7a3f65799"
+}
